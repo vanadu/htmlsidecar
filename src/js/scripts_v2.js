@@ -190,7 +190,7 @@ var Dimwhit = (function () {
       // !VA    a) because it's in dev mode and the hardcoded image is being displayed
       // !VA    b) because the user has already dropped in image in
       // !VA  SO...first we see if there is a currentimage in Appobj.
-      // !VA  There might be another case... there's already an image in user mode and we want to replace it... but I'll worry about that later.
+      // !VA  There might be another case... there's already an image in user mode and we want to replace
       Appobj.currentimg = document.querySelector(appRegions.curImg);
       console.log('Appobj.currentimg is now: ' + Appobj.currentimg);
       if (!Appobj.currentimg) { 
@@ -207,27 +207,8 @@ var Dimwhit = (function () {
             console.log('arr[i] is: ' + arr[i] );
             document.querySelector(arr[i]).innerHTML = `<span class='pop-font'>&nbsp;&nbsp;No Image</span>`;
           } 
-        } else {
-          if ( )
-        }
-      }
-
-
-
-
-
-      // !VA V2 Hide the dropArea in Dev mode
-
-
-
-
-
-
-      // !VA V2 Put the current image object in appObj so we don't have to refer to the UI element string in appRegions any more.
-
-      // !VA V2 If there's a Dev image, continue to populate appObj
-      if (Appobj.currentimg) {
-
+        } 
+      } else {
         document.querySelector(appRegions.dropArea).style.display = 'none';
         // !VA  03.18.18 then set appRegions.curImg to it
         appRegions.curImg = document.querySelector(appRegions.curImg);
@@ -240,16 +221,21 @@ var Dimwhit = (function () {
         Appobj.appcontainer = document.querySelector(appRegions.appContainer);
         Appobj.viewport = document.querySelector(appRegions.imgViewport);
         Appobj.viewer = document.querySelector(appRegions.imgViewer);
-        Appobj.viewer = document.querySelector(appRegions.imgViewer);
-        console.dir(Appobj);
+        document.querySelector(appRegions.toolsContainer).style.display = 'block';
 
-      } else {
-        // NO devIMG set in HTML -- get curImg from Filereader
-        console.log('Need to get curImg from thesd Filereader');
+        // !VA  THIS WILL NEED TO BE FIXED! THE VIEWER COMES FROM THE INPUT FIELD!
+        document.querySelector(appRegions.imgViewer).style.width = '625px';
+        document.querySelector(appRegions.imgViewer).style.height = '525px';
 
-        
+        console.log(Appobj.currentimg);
+        console.log('Appobj.currentimg.width is: ' + Appobj.currentimg.width);
+        console.log('Appobj.currentimg.height is: ' + Appobj.currentimg.height);
+        console.log('Appobj.currentimg.naturalWidth is: ' + Appobj.currentimg.naturalWidth);
+        console.log('Appobj.currentimg.naturalheight is: ' + Appobj.currentimg.naturalHeight);
+
+        // !VA  STOPPED HERE. Have to revisit Appobj and decide what it's supposed to store...
+
       }
-
     };
 
 
