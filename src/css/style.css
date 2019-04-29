@@ -1360,6 +1360,8 @@ input:focus:-ms-input-placeholder {
       vertical-align: middle; }
 
 #main-image-viewer {
+  width: 650px;
+  height: 450px;
   position: absolute;
   top: 50%;
   left: 50%;
