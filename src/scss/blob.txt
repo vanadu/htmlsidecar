@@ -1,0 +1,11 @@
+ab328da fixed the sass tree in gulp -- see notes 
+ad9b850 fixed gulp crash on new sass variable declaration issue	
+100817e Updated img-toolbar-buttons for sass. Turned off no-id in sass-lint
+[master ae6dab8] Last commit before branching to recode app-container
+2854283 Last change before checking back in to main branch
+ab2f4dd committing before merge of new-app-container
+800a593 trying to resolve conflict
+ca3cfed Continuing after merge
+cb486ac SCSS cleanup up to the CCP
+9d18058 SCSS rebuild up to ccp td options
+f8576ad SCSS recoding done, just some minor vendor prefix and minor issues left

@@ -1,0 +1,44 @@
+// 04.01.18A
+
+// BUG: Load 400X1000, resize to 200X500 -- viewer size is too tall
+// BUG: The CSS buttons don't disappear if you delete the entry in the class field -- fixed this once already. FIXED in review_viewerW_input_behavior
+// TODO:  Animate opacity on button display
+// TODO: Resize the Dimwhit logo (644 X 108) for retina
+// TODO: Resize header images for half-screen display
+// TODO: Move the User's Guide to somewhere else
+// TODO: Add terms of service
+// TODO: Change CSS so ccp-options left, right and center are children of the parent instead of spread out across three different elements
+// TODO: Make table width options persist if CCP is closed and reopened
+// TODO: Add option to include width from viewerW in table CCP output -- branch add_viewerW_to_tableCCP
+// TODO: Try to figure out why only the TD clipboard works in scripts_ugly.js on IE11
+// TODO: Update quickstart and users guide
+
+// DONE: fix valign issue in td output. fixed
+// DONE: No action required. Decide where the CSS img CCP output is going to come from. Currently it comes from the Dim Viewers but what if you want the size to be smaller than that? For instance if you want the small phones image to be only 200px and centered, like in the SD tutorial? Well, then you set the image size you want and get it from the img CSS button, of course -- no action necessary here.
+// TODO: Add anchor wrapper in img CCP output
+// TODO: Add <tr></tr> wrapper in TD output branching to add_anchor_row_wrappers -- There's no reason to do this -- would add too much complexity. It's in the table CCP output, and any idiot can use emmet to insert a tr in the code.
+
+
+
+
+
+
+//===================================================
+/* FEATURE ADDITIONS 
+Must add features by tomorrow!
+--Width and height css attributes in table and td for Outlook 120dpi as per:
+https://litmus.com/community/discussions/151-mystery-solved-dpi-scaling-in-outlook-2007-2013
+
+-- add "max-width:100%; to img tag as per this:
+https://github.com/InterNations/antwort/tree/master/three-cols-images
+
+
+--Make the css width and height optional as per this:
+http://www.emailology.org/#1
+
+--max-width:160px; as per this MailChimp blueprints, but it is ancient
+https://github.com/mailchimp/email-blueprints/blob/master/responsive-templates/base_boxed_3column_query.html
+
+
+*/
+
