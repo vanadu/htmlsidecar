@@ -107,14 +107,16 @@ var Dimwhit = (function () {
     };
 
     
-    // !VA THIS needs to be Constructor - most of the data is here 
+ 
     // !VA  This object only contains HTML elements whose properties change based on the properties of the image that is contained in them. It does NOT need to have a Constructor because it's not serving as the blueprint for any other objects.
+    // !VA  We are initializing this here, and it will be updated
     var Appobj = {
       currentimg: document.querySelector(dynamicRegions.curImg),
       viewer: document.querySelector(dynamicRegions.imgViewer),
       viewport: document.querySelector(dynamicRegions.imgViewport),
       appcontainer: document.querySelector(dynamicRegions.appContainer)
     };
+
 
     function getCurIasdasfdmg(curImg, fileName) {
       var a, b;
@@ -138,9 +140,12 @@ var Dimwhit = (function () {
 
     }
 
-    // function handleFileSelect () {
-    //   console.log('HandleFIleSelect running..');
-    // }
+    var Appobj = {
+      currentimg: document.querySelector(dynamicRegions.curImg),
+      viewer: document.querySelector(dynamicRegions.imgViewer),
+      viewport: document.querySelector(dynamicRegions.imgViewport),
+      appcontainer: document.querySelector(dynamicRegions.appContainer)
+    };
     
     // !VA Functions that get returned from the UIContoller object go here
     return {
@@ -259,50 +264,81 @@ var Dimwhit = (function () {
         reader.readAsDataURL(f);
         // }
       },
-
-
       //FILEREADER OBJECT PROCESSING END
+
+
+
+      updateAppobj: function (curImg, imgViewer, imgViewport, appContainer ) {
+        Appobj.currentimg = curImg;
+        Appobj.viewer = imgViewer;
+        Appobj.viewport = imgViewport;
+        Appobj.appcontainer = appContainer;
+        return Appobj;
+      },
+
 
 
       // !VA Populate Appdata using the properties of the dynamic regions in the 
       // !VA  STOPPED HERE: Appdata can only be populated if there's an image. If the DEV image isn't loaded or the USER hasn't dropped in an image yet, then Appdata.filename is undefined and script won't run.
-      getAppData: function() {
+      getAppData: function(Appobj) {
+        console.log('Running getAppData...');
+        // console.log('getAppData: Appobj.currentimg is...');
+        // console.log(Appobj.currentimg.src);
+        console.log('Appobj is: ' + Appobj);
+
         // !VA If there's no current image, then return false. This is the flag to the initializeDOM function that there is no DEV image in the HTML. The init then shows the drop area and 'No Image' in the dimViewers.
-        if (Appobj.currentimg == null) {
+        if (Appobj.currentimg == null || Appobj.currentimg === 'undefined') {
           return false;
         } else {
           // !VA  There is a current image, so populate Appdata based on the object properties in Appobj
-          var Appdata = { 
+          var Appdata = {
             // filename: 'blob',
-            filename: function() {
-              var f =  calcController.getFilenameFromSource(Appobj.currentimg.src);
-              return f;
-            },
-            path: '',
+            // STOP HERE -- I don't understand how to get a funcion return value and set it a property.
+            filename: (function() {
+              
+              var typ = Appobj.currentimg.nodeName;
+              if ( typ === 'DIV') {
+                return 'No Image';
+              } else { 
+                var f =  calcController.getFilenameFromSource(Appobj.currentimg.src);
+                return f;
+              }
+            }),
             imgH: Appobj.currentimg.height,
-            imgW: Appobj.currentimg.width,
-            imgNH: Appobj.currentimg.naturalHeight,
-            imgNW: Appobj.currentimg.naturalWidth,
-            aspect: function() {
-              var a = calcController.getAspectRatio(this.imgNW, this.imgNH);
-              return a;
-            },
-            // aspect: getAspectRatio(Appobj.currentimg.naturalHeight, Appobj.currentimg.naturalWidth),
-            viewerH: Appobj.viewer.height,
-            viewerW: Appobj.viewer.width,
-            viewportH: Appobj.viewport.height,
-            viewportW: Appobj.viewport.width,
-            appH: Appobj.appcontainer.height,
-            appW: Appobj.appcontainer.width,
+            // imgW: Appobj.currentimg.width,
+            // imgNH: Appobj.currentimg.naturalHeight,
+            // imgNW: Appobj.currentimg.naturalWidth,
+            // aspect: function() {
+            //   var a = calcController.getAspectRatio(this.imgNW, this.imgNH);
+            //   return a;
+            // },
+            // // aspect: getAspectRatio(Appobj.currentimg.naturalHeight, Appobj.currentimg.naturalWidth),
+            // viewerH: Appobj.viewer.height,
+            // viewerW: Appobj.viewer.width,
+            // viewportH: Appobj.viewport.height,
+            // viewportW: Appobj.viewport.width,
+            // appH: Appobj.appcontainer.height,
+            // appW: Appobj.appcontainer.width,
       
           };
-          console.table(Appdata);
-          console.log(Appdata.aspect()[0]);
-          console.log(Appdata.aspect()[1]);
+          // console.table(Appdata);
+          // console.log('Appdata.filename is: ' + Appdata.filename());
+          // console.log('getAppData: Appdata.filename is: ' + Appdata.filename());
+          // console.log('getAppData: aspect ratio is: ' + Appdata.aspect()[1]);
           return Appdata;
+
 
         }
       }
+
+      // updateDimViewers: function(Appdata) {
+
+      //   dimViewers.filename = this.filename;
+      //   dimViewers.display = this.imgW + ' X '+ this.imgH;
+
+
+
+      // }
 
 
 
@@ -319,27 +355,14 @@ var Dimwhit = (function () {
 
   // !VA Calculations Controller Contructor
   var calcController = (function() {
-    // !VA Get Appobj from the UI controller module. I'm wondering if it's best just to create Appobj here using the UI strings in UIController.dynamicRegions, assuming this is the only module that Appobj is used.
-    // var Appobj = UIController.getAppobj();
-   
-   
-    //   function(filename, path, imgH, imgW, imgNH, imgNW, aspect, viewerW, viewerH, viewportH, viewportW, appH, appW) { 
-    //   this.filename = filename;
-    //   this.path = path;
-    //   this.imgH = imgH;
-    //   this.imgW = imgW;
-    //   this.imgNH = imgNH;
-    //   this.imgNW = imgNW;
-    //   this.aspect = aspect;
-    //   this.viewerW = viewerW;
-    //   this.viewerH = viewerH;
-    //   this.viewportH = viewportH;
-    //   this.viewportW = viewportW;
-    //   this.appH = appH;
-    //   this.appW = appW;
-    // };
+
+    // var data = UIController.getAppData();
+    // console.log('data is: ' + data);
+
+
     return {
       getAspectRatio: function (var1, var2) {
+        // console.log('getAspectRatio running...');
         var aspectReal = (var1 / var2);
         var aspectInt = function() {
           //get the aspect ratio by getting the gcd (greatest common denominator) and dividing W and H by it
@@ -366,14 +389,14 @@ var Dimwhit = (function () {
       },
 
       getFilenameFromSource: function (source) {
-        // var source = Appobj.currentimg.src;
+        // console.log('getFilenameFromSource running...');
         if (source) {
-          console.log('there is a source');
+          // console.log('there is a source');
           var path = source.split('/');
-          // return  path[path.length - 1];
+          return  path[path.length - 1];
         } else {
           
-          console.log('there is no source');
+          console.log('getFilenameFromSource: there is no source');
           // return `<span class='pop-font'>&nbsp;&nbsp;No Image</span>`;
         }
       }
@@ -381,22 +404,6 @@ var Dimwhit = (function () {
 
 
     };
-
-
-    // !VA  This doesn't work, returns empty array
-    /*
-    var Appobj = function() {
-      var n = Object.entries(UIController.getAppobj());
-      return n;
-    };
-    console.log('appobj is...');
-    console.dir(Appobj);
-    */
-    // !VA  This works, but it might not be the best way. Good enough for now, I think.
-
-    // console.table(Appobj);
-    // !VA  Now, we can build Appdata
-
 
   })();
 
@@ -455,10 +462,22 @@ var Dimwhit = (function () {
       // !VA    b) because the user has already dropped in image in
       // !VA  SO...first we see if there is a currentimage in Appobj.
       // !VA  There might be another case... there's already an image in user mode and we want to replace
-      var Appdata = UIController.getAppData();
-      if (Appdata) { 
-        console.log('DEV MODE: current image set in HTML file');
-        var Appdata = UIController.getAppData();
+      // !VA Here we're working with the DEV image, so we're going to create an Appobj here to pass to getAppData
+      var curImg;
+      var imgViewer;
+      var imgViewport;
+      var appContainer;
+      var Appobj;
+
+
+      // !VA  Test if there is currently #main-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
+      var curImgExists = document.querySelector(dynamicRegions.curImg);
+      console.log('curImgExists is: ' + curImgExists);
+      
+
+      if (curImgExists != null ) { 
+        console.log('Running initializeDOM DEV');
+
 
         // !VA This is DEV MODE, there's a hardcoded image in the HTML
         document.querySelector(staticRegions.dropArea).style.display = 'none';
@@ -473,13 +492,41 @@ var Dimwhit = (function () {
 
       } else {
 
-        // !VA This is USER MODE -- there's no hardcoded image in the HTML file. 
+        // !VA This is USER MODE -- there's no hardcoded image in the HTML file.
+        // !VA  Initialize Appobj to provide values for the Appdata function. Use the  
         console.log('USER MODE: no current image');
         // !VA V2 Show the dropArea
         document.querySelector(staticRegions.dropArea).style.display = 'block';
         // !VA Give some w and h to the imgViewer to show the white icon background.
         document.querySelector(dynamicRegions.imgViewer).style.width = '650px';
         document.querySelector(dynamicRegions.imgViewer).style.height = '450px';
+        // !VA  Now we create an Appobj using the dropArea instead of a curImg, since we don't have a curImg yet. The dropArea will be replaced with a curImg as soon as the user drops one in.
+        curImg = document.querySelector('#drop-area');
+        imgViewer = document.querySelector(dynamicRegions.imgViewer);
+        imgViewport = document.querySelector(dynamicRegions.imgViewport);
+        appContainer = document.querySelector(dynamicRegions.appContainer);
+        // !VA Update the and return the Appobj with the current values
+       var Appobj = UIController.updateAppobj(curImg, imgViewer, imgViewport, appContainer);
+        console.dir(Appobj);
+        // !VA Now get the Appdata using the current Appobj
+        var Appdata = UIController.getAppData(Appobj);
+        // console.dir(Appdata);
+        console.log('Appobj.currentimg is: ' + Appobj.currentimg);
+        console.log(Appdata.filename());
+
+
+
+
+        
+
+
+
+
+
+
+
+
+
         // !VA  !IMPORTANT! To loop through an object listing, use Object.key, .value and .entries to convert a list object into an array!!!!!!!
         // !VA  Loop throug the array and assign No Image tot he dimViewers
         const dimarray = Object.values(dimViewers);
