@@ -305,26 +305,26 @@ var Dimwhit = (function () {
               }
             }),
             imgH: Appobj.currentimg.height,
-            // imgW: Appobj.currentimg.width,
-            // imgNH: Appobj.currentimg.naturalHeight,
-            // imgNW: Appobj.currentimg.naturalWidth,
-            // aspect: function() {
-            //   var a = calcController.getAspectRatio(this.imgNW, this.imgNH);
-            //   return a;
-            // },
-            // // aspect: getAspectRatio(Appobj.currentimg.naturalHeight, Appobj.currentimg.naturalWidth),
-            // viewerH: Appobj.viewer.height,
-            // viewerW: Appobj.viewer.width,
-            // viewportH: Appobj.viewport.height,
-            // viewportW: Appobj.viewport.width,
-            // appH: Appobj.appcontainer.height,
-            // appW: Appobj.appcontainer.width,
+            imgW: Appobj.currentimg.width,
+            imgNH: Appobj.currentimg.naturalHeight,
+            imgNW: Appobj.currentimg.naturalWidth,
+            aspect: function() {
+              var a = calcController.getAspectRatio(this.imgNW, this.imgNH);
+              return a;
+            },
+            // aspect: getAspectRatio(Appobj.currentimg.naturalHeight, Appobj.currentimg.naturalWidth),
+            viewerH: Appobj.viewer.height,
+            viewerW: Appobj.viewer.width,
+            viewportH: Appobj.viewport.height,
+            viewportW: Appobj.viewport.width,
+            appH: Appobj.appcontainer.height,
+            appW: Appobj.appcontainer.width,
       
           };
-          // console.table(Appdata);
-          // console.log('Appdata.filename is: ' + Appdata.filename());
-          // console.log('getAppData: Appdata.filename is: ' + Appdata.filename());
-          // console.log('getAppData: aspect ratio is: ' + Appdata.aspect()[1]);
+          console.table(Appdata);
+          console.log('Appdata.filename is: ' + Appdata.filename());
+          console.log('getAppData: Appdata.filename is: ' + Appdata.filename());
+          console.log('getAppData: aspect ratio is: ' + Appdata.aspect()[1]);
           return Appdata;
 
 
@@ -451,47 +451,93 @@ var Dimwhit = (function () {
 
     };
 
-
-
-
-    var initializeDOM = function() {
-      // !VA V2 There are two conditions here:
-      // !VA  1) The app has no content -- it's been opened in user mode but no image has been dropped in yet. This is the only case where we show the dropArea and show NO IMAGE in the dimViewers
-      // !VA  2) There is content in the app, either:
-      // !VA    a) because it's in dev mode and the hardcoded image is being displayed
-      // !VA    b) because the user has already dropped in image in
-      // !VA  SO...first we see if there is a currentimage in Appobj.
-      // !VA  There might be another case... there's already an image in user mode and we want to replace
-      // !VA Here we're working with the DEV image, so we're going to create an Appobj here to pass to getAppData
-      var curImg;
-      var imgViewer;
-      var imgViewport;
-      var appContainer;
-      var Appobj;
-
+    var initializeDevMode = function() {
+      console.log('initializeDevMode running...');
 
       // !VA  Test if there is currently #main-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
       var curImgExists = document.querySelector(dynamicRegions.curImg);
       console.log('curImgExists is: ' + curImgExists);
-      
-
-      if (curImgExists != null ) { 
-        console.log('Running initializeDOM DEV');
+      // !VA  Now we have to populate Appdata with data. We can do it manually here and just pass the object on to refresh the screen elements.
 
 
-        // !VA This is DEV MODE, there's a hardcoded image in the HTML
-        document.querySelector(staticRegions.dropArea).style.display = 'none';
-        document.querySelector(staticRegions.toolsContainer).style.display = 'block';
+      // !VA If there's no current image, then return false. This is the flag to the initializeDOM function that there is no DEV image in the HTML. The init then shows the drop area and 'No Image' in the dimViewers.
 
-        // !VA  THIS WILL NEED TO BE FIXED! THE VIEWER COMES FROM THE INPUT FIELD!
-        document.querySelector(dynamicRegions.imgViewer).style.width = '625px';
-        document.querySelector(dynamicRegions.imgViewer).style.height = '525px';
+      // !VA  There is a current image, so first populate Appobj manually and then populate getAppData based on the object properties in Appobj
+      var Appdata = {
+        // filename: 'blob',
 
-        // !VA  STOPPED HERE. Have to revisit Appobj and decide what it's supposed to store...
+        filename: (function() {
+          
+          var typ = Appobj.currentimg.nodeName;
+          if ( typ === 'DIV') {
+            return 'No Image';
+          } else { 
+            var f =  calcController.getFilenameFromSource(Appobj.currentimg.src);
+            return f;
+          }
+        }),
+        // imgH: Appobj.currentimg.height,
+        // imgW: Appobj.currentimg.width,
+        // imgNH: Appobj.currentimg.naturalHeight,
+        // imgNW: Appobj.currentimg.naturalWidth,
+        // aspect: function() {
+        //   var a = calcController.getAspectRatio(this.imgNW, this.imgNH);
+        //   return a;
+        // },
+        // aspect: getAspectRatio(Appobj.currentimg.naturalHeight, Appobj.currentimg.naturalWidth),
+        // viewerH: Appobj.viewer.height,
+        // viewerW: Appobj.viewer.width,
+        // viewportH: Appobj.viewport.height,
+        // viewportW: Appobj.viewport.width,
+        // appH: Appobj.appcontainer.height,
+        // appW: Appobj.appcontainer.width,
+      };
+
+      // console.table(Appdata);
+      // console.log('Appdata.filename is: ' + Appdata.filename());
+      // console.log('getAppData: Appdata.filename is: ' + Appdata.filename());
+      // console.log('getAppData: aspect ratio is: ' + Appdata.aspect()[1]);
 
 
-      } else {
 
+
+
+
+      // !VA This is DEV MODE, there's a hardcoded image in the HTML
+      // document.querySelector(staticRegions.dropArea).style.display = 'none';
+      // document.querySelector(staticRegions.toolsContainer).style.display = 'block';
+
+      // !VA  THIS WILL NEED TO BE FIXED! THE VIEWER COMES FROM THE INPUT FIELD!
+      // document.querySelector(dynamicRegions.imgViewer).style.width = '625px';
+      // document.querySelector(dynamicRegions.imgViewer).style.height = '525px';
+
+      // !VA  STOPPED HERE. Have to revisit Appobj and decide what it's supposed to store...
+
+
+    };
+
+
+    var initializeDOM = function() {
+
+
+
+    };
+
+    return {
+      init: function(){
+        console.log('App initialized.');
+        setupEventListeners();
+        // !VA  Test if there is currently #main-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
+        var curImgExists = document.querySelector(dynamicRegions.curImg);
+        if (curImgExists) {
+          initializeDevMode();
+        } else {
+          /* !VA  
+          1) Set the initial interface:
+
+          */
+          // initializeUserMode();
+          /*
         // !VA This is USER MODE -- there's no hardcoded image in the HTML file.
         // !VA  Initialize Appobj to provide values for the Appdata function. Use the  
         console.log('USER MODE: no current image');
@@ -514,19 +560,6 @@ var Dimwhit = (function () {
         console.log('Appobj.currentimg is: ' + Appobj.currentimg);
         console.log(Appdata.filename());
 
-
-
-
-        
-
-
-
-
-
-
-
-
-
         // !VA  !IMPORTANT! To loop through an object listing, use Object.key, .value and .entries to convert a list object into an array!!!!!!!
         // !VA  Loop throug the array and assign No Image tot he dimViewers
         const dimarray = Object.values(dimViewers);
@@ -535,14 +568,8 @@ var Dimwhit = (function () {
             document.querySelector(dimarray[i]).innerHTML = `<span class='pop-font'>&nbsp;&nbsp;No Image</span>`;
           } 
         } 
-      }
-    };
-
-    return {
-      init: function(){
-        console.log('App initialized.');
-        setupEventListeners();
-        initializeDOM();
+              */
+        }
       }
     };
 
