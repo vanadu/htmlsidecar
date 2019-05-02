@@ -1,9 +1,7 @@
 
 /* !VA  
-ISSUE 1 - The main issue here is whether I need to actually put all these DOM objects in variables or just access them when I need them. Currently, the Constructors 
-
-
-
+CURRRENT - Where to initialize Appdata and whether it needs to be populated in initializeDevMode. It should be initialized only once at the top of UIController and then just populated fully in getAppData and then updated as necessary whenever a UI update is required.
+1) Since we're still working in DEV mode, see if we can evaluate the dev image by calling UIController.getAppData.
 
 
 */
@@ -14,6 +12,9 @@ ISSUE 1 - The main issue here is whether I need to actually put all these DOM ob
 var Dimwhit = (function () {
 
   var UIController = (function() {
+
+    // !VA This is where Appdata should be initialized
+    var Appdata = {};
 
     // !VA DimViewer ID strings
     var dimViewers = {
@@ -110,7 +111,7 @@ var Dimwhit = (function () {
  
     // !VA  This object only contains HTML elements whose properties change based on the properties of the image that is contained in them. It does NOT need to have a Constructor because it's not serving as the blueprint for any other objects.
     // !VA  We are initializing this here, and it will be updated
-    var Appdata = {
+    Appobj = {
       currentimg: document.querySelector(dynamicRegions.curImg),
       viewer: document.querySelector(dynamicRegions.imgViewer),
       viewport: document.querySelector(dynamicRegions.imgViewport),
@@ -122,10 +123,6 @@ var Dimwhit = (function () {
       var a, b;
       a = curImg;
       b = fileName;
-      console.log('a is: ' + a);
-      console.log('b is: ' + b);
-      console.log('Appdata.currentimg is...');
-      console.log(Appdata.currentimg);
       document.querySelector(staticRegions.dropArea).style.display = 'none';
       const curImgDiv = document.createElement('div');
     
@@ -273,51 +270,51 @@ var Dimwhit = (function () {
       // !VA Populate Appdata using the properties of the dynamic regions in the 
       // !VA  Appdata can only be populated if there's an image. If the DEV image isn't loaded or the USER hasn't dropped in an image yet, then Appdata.filename is undefined and script won't run.
       // !VA  I think I fixed the above problem by creating a different function for Dev initialization. It can be messy and not DRY since it's not for production anyway.
-      getAppData: function(Appdata) {
-        console.log('Running getAppData...');
+      getAppData: function(Appobj) {
         // console.log('getAppData: Appdata.currentimg is...');
         // console.log(Appdata.currentimg.src);
-        console.log('Appdata is: ' + Appdata);
+        
 
         // !VA If there's no current image, then return false. This is the flag to the initializeDOM function that there is no DEV image in the HTML. The init then shows the drop area and 'No Image' in the dimViewers.
-        if (Appdata.currentimg == null || Appdata.currentimg === 'undefined') {
+        if (Appobj.currentimg == null || Appobj.currentimg === 'undefined') {
           return false;
         } else {
           // !VA  There is a current image, so populate Appdata based on the object properties in Appdata
-          var Appdata = {
+          Appdata = {
             // filename: 'blob',
             // STOP HERE -- I don't understand how to get a funcion return value and set it a property.
-            filename: (function() {
+            filename: calcController.getFilenameFromSource(Appobj.currentimg.src),
+            //  (function() {
               
-              var typ = Appdata.currentimg.nodeName;
-              if ( typ === 'DIV') {
-                return 'No Image';
-              } else { 
-                var f =  calcController.getFilenameFromSource(Appdata.currentimg.src);
-                return f;
-              }
-            }),
-            imgH: Appdata.currentimg.height,
-            imgW: Appdata.currentimg.width,
-            imgNH: Appdata.currentimg.naturalHeight,
-            imgNW: Appdata.currentimg.naturalWidth,
+            //   var typ = Appobj.currentimg.nodeName;
+            //   if ( typ === 'DIV') {
+            //     return 'No Image';
+            //   } else { 
+            //     var f =  calcController.getFilenameFromSource(Appobj.currentimg.src);
+            //     return f;
+            //   }
+            // }),
+            imgH: Appobj.currentimg.height,
+            imgW: Appobj.currentimg.width,
+            imgNH: Appobj.currentimg.naturalHeight,
+            imgNW: Appobj.currentimg.naturalWidth,
             aspect: function() {
               var a = calcController.getAspectRatio(this.imgNW, this.imgNH);
               return a;
             },
-            // aspect: getAspectRatio(Appdata.currentimg.naturalHeight, Appdata.currentimg.naturalWidth),
-            viewerH: Appdata.viewer.height,
-            viewerW: Appdata.viewer.width,
-            viewportH: Appdata.viewport.height,
-            viewportW: Appdata.viewport.width,
-            appH: Appdata.appcontainer.height,
-            appW: Appdata.appcontainer.width,
+            // !VA These values are now initialized in CSS based on the size of dropArea -- probably need to revisit this, not sure why the style needs to be queried.
+            viewerH: parseInt(Appobj.viewer.style.height),
+            viewerW: parseInt(Appobj.viewer.style.width),
+            viewportH: parseInt(Appobj.viewport.style.height),
+            viewportW: parseInt(Appobj.viewport.style.width),
+            appH: parseInt(Appobj.appcontainer.style.height),
+            appW: parseInt(Appobj.appcontainer.style.width),
       
           };
-          console.table(Appdata);
-          console.log('Appdata.filename is: ' + Appdata.filename());
-          console.log('getAppData: Appdata.filename is: ' + Appdata.filename());
-          console.log('getAppData: aspect ratio is: ' + Appdata.aspect()[1]);
+          // console.table(Appdata);
+          // console.log('Appdata.filename is: ' + Appdata.filename);
+          // console.log('getAppData: Appdata.filename is: ' + Appdata.filename());
+          // console.log('getAppData: aspect ratio is: ' + Appdata.aspect()[1]);
           return Appdata;
         }
       },
@@ -329,10 +326,11 @@ var Dimwhit = (function () {
       // This is where we pass in the recalculated Appdata data and update the onscreen display of the Appdataect data in the dimViewers 
       refreshAppUI: function (Appdata) {
         // The page has been initialized but no image has been selected yet, so set all the dimViewers to No Image.
+        console.log('refreshAppUI running...');
+        // !VA Appdata is still empty, so show 'No Image' in the dimViewers and hide the clipboard button.
         if (!Appdata.filename) {
+          document.querySelector(dimViewers.clipboardBut).style.display = 'none';
           const dimarray = Object.values(dimViewers);
-          console.log('dimViewers is now');
-          console.dir(dimViewers);
           for ( let i = 0; i < dimarray.length; i++ ) {
             if ( dimarray[i] !== '#clipboard-but' &&  dimarray[i] !== '#filename-viewer' ) {
               document.querySelector(dimarray[i]).innerHTML = `<span class='pop-font'>&nbsp;&nbsp;No Image</span>`;
@@ -340,7 +338,8 @@ var Dimwhit = (function () {
           } 
           // return;
         } else {
-          // !VA Write the dimViewers to the UI based on Appdata values
+          // !VA Write the dimViewers to the UI based on Appdata values and show the clipboard button
+          document.querySelector(dimViewers.clipboardBut).style.display = 'block';
           // Filename
           document.querySelector(dimViewers.filename).innerHTML = Appdata.filename;
           // Current image display dimensions
@@ -369,6 +368,8 @@ var Dimwhit = (function () {
           console.dir(Appdata);
           console.log(document.querySelector(dynamicRegions.imgViewer).style.width);
           console.log(document.querySelector(dynamicRegions.imgViewer).style.height);
+          document.querySelector(dynamicRegions.curImg).style.width = calcController.intToPx(Appdata.imgW);
+          document.querySelector(dynamicRegions.curImg).style.height = calcController.intToPx(Appdata.imgH);
           document.querySelector(dynamicRegions.imgViewer).style.width = calcController.intToPx(Appdata.viewerW);
           document.querySelector(dynamicRegions.imgViewer).style.height = calcController.intToPx(Appdata.viewerH);
           document.querySelector(dynamicRegions.imgViewport).style.width = calcController.intToPx(Appdata.viewportW);
@@ -402,6 +403,7 @@ var Dimwhit = (function () {
 
     // var data = UIController.getAppData();
     // console.log('data is: ' + data);
+
 
 
     return {
@@ -511,6 +513,7 @@ var Dimwhit = (function () {
         case (Appdata.imgNW > Appdata.viewerW) && (Appdata.imgNH > Appdata.viewerH) :
           // console.log('CASE 4');
           // Set the image Width to the current  viewer width 
+          console.log('Case 4: Appdata.viewerW is: ' + Appdata.viewerW );
           Appdata.imgW = Appdata.viewerW;
           // Set the image height proportional to the new image width using the aspect ratio function
           Appdata.imgH = Math.round((1/this.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[0]) * Appdata.imgW);
@@ -577,6 +580,8 @@ var Dimwhit = (function () {
   // !VA GLOBAL APP CONTROLLER
   var controller = (function(calcCtrl, UICtrl) {
 
+    var Appobj = {};
+
     // !VA V2 getting ID strings from UIController
     var dimViewers = UIController.getDimViewerIDs();
     var dynamicRegions = UIController.getDynamicRegionIDs();
@@ -612,11 +617,80 @@ var Dimwhit = (function () {
       var dropZone = document.querySelector(dynamicRegions.appContainer);
       dropZone.addEventListener('dragover', handleDragOver, false);
     
+      // !VA Initiates the FileReader function to get the dropped image data
       dropZone.addEventListener('drop', UIController.handleFileSelect, false);
       // dropZone.addEventListener('drop', startNewDrop, false);
       // Drag and Drop Listener 
-
       //DRAG AND DROP PROCESSING END
+
+      //EVENT HANDLING START 
+      function addEventHandler(oNode, evt, oFunc, bCaptures) {
+        //Removing this -- apparently IE 9 and 10 support addEventListener
+        // if (typeof(window.event) != "undefined")
+        // 	oNode.attachEvent("on"+evt, oFunc);
+        // else
+        oNode.addEventListener(evt, oFunc, bCaptures);
+      }
+
+      function initializeHandlers() {
+        //Dim Viewer Clipboard Controls
+        // addEventHandler(dimViewers.clipboardBut,'click',toggleCCP,false);
+        // addEventHandler(dimViewers.clipboardBut,'keypress',toggleCCP,false);
+        // CCP button show and hide
+        // !VA NOW -- these should be addEventHandler calls -- but it works for now.
+        // ccpUserInput.imgClass.addEventListener('keypress', showMobileImageButtons);
+        // ccpUserInput.imgClass.addEventListener('blur', showMobileImageButtons);
+        // !VA NOW -- changed the above two to addEventHandler calls -- seems fine.
+        // addEventHandler(ccpUserInput.imgClass,'keypress',showMobileImageButtons,false);
+        // addEventHandler(ccpUserInput.imgClass,'blur',showMobileImageButtons,false);
+        // !VA alt and path fields should not show the CSS buttons
+        // ccpUserInput.imgAlt.addEventListener('keypress', showMobileImageButtons);
+        // ccpUserInput.imgAlt.addEventListener('blur', showMobileImageButtons);
+        // ccpUserInput.imgRelPath.addEventListener('keypress', showMobileImageButtons);
+        // ccpUserInput.imgRelPath.addEventListener('blur', showMobileImageButtons);
+
+        //Image Dimensioning Controls
+        // addEventHandler(toolButtons.grow01,'click',refreshAppObj,false);
+        // addEventHandler(toolButtons.shrink01,'click',refreshAppObj,false);
+        // addEventHandler(toolButtons.grow10,'click',refreshAppObj,false);
+        // addEventHandler(toolButtons.shrink10,'click',refreshAppObj,false);
+        // addEventHandler(toolButtons.grow50,'click',refreshAppObj,false);
+        // addEventHandler(toolButtons.shrink50,'click',refreshAppObj,false);
+        // addEventHandler(toolButtons.customWidth,'dragover',killDrop,false);
+        // addEventHandler(toolButtons.customWidth,'drop',killDrop,false);
+        // addEventHandler(toolButtons.customHeight,'dragover',killDrop,false);
+        // addEventHandler(toolButtons.customHeight,'drop',killDrop,false);
+        // addEventHandler(toolButtons.viewerWidth,'dragover',killDrop,false);
+        // addEventHandler(toolButtons.viewerWidth,'drop',killDrop,false);
+        // addEventHandler(toolButtons.viewerWidth,'keypress',refreshAppObj,false);
+        // addEventHandler(toolButtons.viewerWidth,'click',focusOnClick,false);
+        // !VA 
+        // addEventHandler(toolButtons.customWidth,'click',focusOnClick,false);
+        // addEventHandler(toolButtons.customWidth,'keypress',refreshAppObj,false);
+        // addEventHandler(toolButtons.customHeight,'click',focusOnClick,false);
+        // addEventHandler(toolButtons.customHeight,'keypress',refreshAppObj,false);
+        // addEventHandler(toolButtons.viewerWidth,'blur',handleInputBlur,false);
+        // addEventHandler(toolButtons.customWidth,'blur',handleInputBlur,false);
+        // addEventHandler(toolButtons.customHeight,'blur',handleInputBlur,false);
+        // !VA 
+        // addEventHandler(toolButtons.sPhoneWidth,'dragover',killDrop,false);
+        // addEventHandler(toolButtons.sPhoneWidth,'drop',killDrop,false);
+        // addEventHandler(toolButtons.sPhoneWidth,'keypress',refreshAppObj,false);
+        // addEventHandler(toolButtons.sPhoneWidth,'blur',handleInputBlur,false);
+        // addEventHandler(toolButtons.sPhoneWidth,'click',focusOnClick,false);
+        // addEventHandler(toolButtons.lPhoneWidth,'dragover',killDrop,false);
+        // addEventHandler(toolButtons.lPhoneWidth,'drop',killDrop,false);
+        // addEventHandler(toolButtons.lPhoneWidth,'keypress',refreshAppObj,false);
+        // addEventHandler(toolButtons.lPhoneWidth,'blur',handleInputBlur,false);
+        // addEventHandler(toolButtons.lPhoneWidth,'click',focusOnClick,false);
+
+        // addEventHandler(ccpUserInput.tableWidth,'change',handleOnChange,false);
+        // addEventHandler(ccpUserInput.imgWidth,'change',handleOnChange,false);
+
+
+
+      }
+      addEventHandler(window, 'load', function(evt) {initializeHandlers(); } );
 
 
     };
@@ -631,7 +705,7 @@ var Dimwhit = (function () {
       // console.log('toolButtons.viewerWidth is: ' + toolButtons.viewerWidth);
       // !VA  Test if there is currently #main-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
       var curImgExists = document.querySelector(dynamicRegions.curImg);
-      // console.log('curImgExists is: ' + curImgExists);
+      console.log('curImgExists is: ' + curImgExists);
       // !VA  Now we have to populate Appdata with data. We can do it manually here and just pass the object on to refresh the screen elements.
 
 
@@ -645,50 +719,19 @@ var Dimwhit = (function () {
         viewport: document.querySelector(dynamicRegions.imgViewport),
         appcontainer: document.querySelector(dynamicRegions.appContainer)
       }; 
+      console.log('AppobjDev is...');
+      console.dir(AppobjDev);
+      console.log('AppobjDev.viewport.style.width is: ' + AppobjDev.viewport.style.width);
 
       // !VA Hide the drop area.
       document.querySelector(staticRegions.dropArea).style.display = 'none';
       // !VA  Show the toolbar
       document.querySelector(staticRegions.toolsContainer).style.display = 'block';
 
-      //This is declared here and will be declared also in the USER Mode code. I hope this function is private...
-      var Appdata = {
-        filename: calcController.getFilenameFromSource(AppobjDev.currentimg.src),
-        imgH: AppobjDev.currentimg.height,
-        imgW: AppobjDev.currentimg.width,
-        imgNH: AppobjDev.currentimg.naturalHeight,
-        imgNW: AppobjDev.currentimg.naturalWidth,
-        // !VA This only works if you use this in a method, not just when you pass the arguments using this in a regular function, like was done for 'filename' above. I don't understand why, but it causes the browser to hang, probably a circular referrence. At any rate, you have to call this method with parenths, otherwise it will just return the function expression literal.
-        aspect: function() {
-          var a = calcController.getAspectRatio(this.imgNW, this.imgNH);
-          return a;
-        },
-        viewerH: initViewerH,
-        viewerW: initViewerW,
-        // viewportH: AppobjDev.viewport.height,
-        // viewportW: AppobjDev.viewport.width,
-        // appH: AppobjDev.appcontainer.height,
-        // appW: Appdata.appcontainer.width,
-      };
-      // console.log('Appdata is...');
-      // console.dir(Appdata);
-      // console.log('Appdata.filename is: ' + Appdata.filename);
-      // console.log('getAppData: Appdata.filename is: ' + Appdata.filename);
-      
-      // console.log('getAppData: aspect ratio is: ' + Appdata.aspect()[1]);
-
-
+      // !VA AppobjDev returns NaN for the viewer containers because they don't have values yet... not sure I understand why since height and width are initially declared in CSS.
+      var Appdata = UIController.getAppData(AppobjDev);
+      // !VA evaluate the viewer containers and adjust their size based on the returned Appdata
       var evalViewerSize = calcController.evalViewerSize(Appdata);
-
-
-
-      // !VA This is DEV MODE, there's a hardcoded image in the HTML
-      // document.querySelector(staticRegions.dropArea).style.display = 'none';
-      // document.querySelector(staticRegions.toolsContainer).style.display = 'block';
-
-      // !VA  THIS WILL NEED TO BE FIXED! THE VIEWER COMES FROM THE INPUT FIELD!
-      // document.querySelector(dynamicRegions.imgViewer).style.width = '625px';
-      // document.querySelector(dynamicRegions.imgViewer).style.height = '525px';
 
 
 
@@ -709,9 +752,11 @@ var Dimwhit = (function () {
         if (curImgExists) {
           initializeDevMode();
         } else {
+
+          UIController.refreshAppUI(Appobj);
           /* !VA  
           1) Set the initial interface:
-
+          
           */
           // initializeUserMode();
           /*

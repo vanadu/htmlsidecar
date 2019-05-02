@@ -1234,7 +1234,8 @@ input:focus:-ms-input-placeholder {
   display: block;
   position: absolute;
   top: 40px;
-  width: 100%;
+  width: 850px;
+  height: 679px;
   min-height: 679px !important;
   margin: 0 auto;
   border-top: 110px solid #000;
@@ -1368,7 +1369,6 @@ input:focus:-ms-input-placeholder {
 #main-image-viewer {
   width: 650px;
   height: 450px;
-  border: 1px solid red !important;
   position: absolute;
   top: 50%;
   left: 50%;
