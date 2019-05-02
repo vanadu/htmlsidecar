@@ -75,11 +75,11 @@ var Dimwhit = (function () {
       tableMaxWidth: '#table-max-width-input',
     };
 
-    // !VA ccPropStrings ID Strings
+    // !VA ccpPropStrings ID Strings
     // !VA V2 - This doesn't go here, probably belongs in the App Controller module, but we'll build it here for now and move it later.
     // Stores the strings representing the HTML properties corresponding to the user CCP selections. These property snippets will be used to populate the clipboard.
     // !VA Have to include separate propStrings for opening and closing tags 
-    var ccPropStrings = {
+    var ccpPropStrings = {
       imgClass: '',
       imgAnchorOpen: '',
       imgAnchorClose: '',
@@ -141,7 +141,7 @@ var Dimwhit = (function () {
     }
     */
 
-    
+
     // !VA Functions that get returned from the UIContoller object go here
     return {
       // !VA V2 Return all the strings for the UI element's IDs
@@ -158,7 +158,7 @@ var Dimwhit = (function () {
         return staticRegions;
       },
       getCcpPropStringsIDs: function() {
-        return ccPropStrings;
+        return ccpPropStrings;
       },
       getCcpUserInputIDs: function() {
         return ccpUserInput;
@@ -250,9 +250,6 @@ var Dimwhit = (function () {
             document.getElementById('main-img-container').insertBefore(dynamicRegions.curImg, null);
             // Create the image object and read in the binary image from the FileReader object.
             // This allows access of image properties. You can't get image properties from a FileReader object -- it's just a blob' 
-
-            
-
           };
         })(f);
         // Read in the image file as a data URL.
@@ -262,14 +259,14 @@ var Dimwhit = (function () {
       //FILEREADER OBJECT PROCESSING END
 
 
-
-      updateAppdata: function (curImg, imgViewer, imgViewport, appContainer ) {
-        Appdata.currentimg = curImg;
-        Appdata.viewer = imgViewer;
-        Appdata.viewport = imgViewport;
-        Appdata.appcontainer = appContainer;
-        return Appdata;
-      },
+      // !VA This is wrong...
+      // updateAppdata: function (curImg, imgViewer, imgViewport, appContainer ) {
+      //   Appdata.currentimg = curImg;
+      //   Appdata.viewer = imgViewer;
+      //   Appdata.viewport = imgViewport;
+      //   Appdata.appcontainer = appContainer;
+      //   return Appdata;
+      // },
 
 
 
@@ -322,12 +319,76 @@ var Dimwhit = (function () {
           console.log('getAppData: Appdata.filename is: ' + Appdata.filename());
           console.log('getAppData: aspect ratio is: ' + Appdata.aspect()[1]);
           return Appdata;
+        }
+      },
 
+
+
+
+      // OBJECT AND DISPLAY REFRESH FUNCTIONS
+      // This is where we pass in the recalculated Appdata data and update the onscreen display of the Appdataect data in the dimViewers 
+      refreshAppUI: function (Appdata) {
+        // The page has been initialized but no image has been selected yet, so set all the dimViewers to No Image.
+        if (!Appdata.filename) {
+          const dimarray = Object.values(dimViewers);
+          console.log('dimViewers is now');
+          console.dir(dimViewers);
+          for ( let i = 0; i < dimarray.length; i++ ) {
+            if ( dimarray[i] !== '#clipboard-but' &&  dimarray[i] !== '#filename-viewer' ) {
+              document.querySelector(dimarray[i]).innerHTML = `<span class='pop-font'>&nbsp;&nbsp;No Image</span>`;
+            } 
+          } 
+          // return;
+        } else {
+          // !VA Write the dimViewers to the UI based on Appdata values
+          // Filename
+          document.querySelector(dimViewers.filename).innerHTML = Appdata.filename;
+          // Current image display dimensions
+          document.querySelector(dimViewers.display).innerHTML = `<span class='pop-font'><span id="display-size-width">${Appdata.imgW}</span> X <span id="display-size-height">${Appdata.imgH}</span></span>`;
+          // !VA Dimensions on disk, i.e. natural dimensions
+          document.querySelector(dimViewers.diskimg).innerHTML = `<span class='pop-font'>${Appdata.imgNW} X ${Appdata.imgNH}</span>` ;
+          // Aspect ratio
+          document.querySelector(dimViewers.aspect).innerHTML = `<span class='pop-font'>${calcController.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[1]}</span>` ;
+          // Small phone dimensions
+          // VA! Calculate the height of the image if the width is whatever the small device width is, here 320 pixels
+          // !VA  ALL these values need to be put in a global object
+          // 
+          // // !VA use object instead const smallphonewidth = 320;
+          Appdata.sPhoneH = Math.round(Appdata.sPhoneW * (1 / calcController.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[0]));
+          document.querySelector(dimViewers.smallphones).innerHTML = `<span class='pop-font'><span id='small-phones-width'>${Appdata.sPhoneW}</span> X <span id='small-phones-height'>${Appdata.sPhoneH}</span></span>` ;
+          // Large phone dimensions
+          // Calculate the height of the image if the width is whatever the large device width is, here 480 pixels
+          // !VA use object instead const largephonewidth = 480;
+          Appdata.lPhoneH = Math.round(Appdata.lPhoneW * (1 / calcController.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[0]));
+          document.querySelector(dimViewers.largephones).innerHTML = `<span class='pop-font'><span id='large-phones-width'>${Appdata.lPhoneW}</span> X <span id='large-phones-height'>${Appdata.lPhoneH}</span></span>` ;
+          // Retina dimensions are twice the display dimensions
+          document.querySelector(dimViewers.retina).innerHTML = `<span class='pop-font'>${2 * Appdata.imgW}</span> X <span class='pop-font'>${2 * Appdata.imgH}`;
+
+          // !VA Adjust the image container heights based on the Appdata values calculated in adjustContainerHeights
+          console.log('refreshAppUI: Appdata is...');
+          console.dir(Appdata);
+          console.log(document.querySelector(dynamicRegions.imgViewer).style.width);
+          console.log(document.querySelector(dynamicRegions.imgViewer).style.height);
+          document.querySelector(dynamicRegions.imgViewer).style.width = calcController.intToPx(Appdata.viewerW);
+          document.querySelector(dynamicRegions.imgViewer).style.height = calcController.intToPx(Appdata.viewerH);
+          document.querySelector(dynamicRegions.imgViewport).style.width = calcController.intToPx(Appdata.viewportW);
+          document.querySelector(dynamicRegions.imgViewport).style.height = calcController.intToPx(Appdata.viewportH);
+          // document.querySelector(dynamicRegions.appContainer).style.width = calcController.intToPx(Appdata.appW);
+          document.querySelector(dynamicRegions.appContainer).style.height = calcController.intToPx(Appdata.appH);
+
+
+          // !VA Show the dimension alerts if an image too large or small...
+          // showDimensionAlerts();
+
+
+          return Appdata, dimViewers;
 
         }
-      }
+      },
 
     };
+
+
 
 
   })();
@@ -344,6 +405,16 @@ var Dimwhit = (function () {
 
 
     return {
+      //STRING FUNCTIONS
+      // !VA Convert integer to pixel
+      intToPx: function(int) {
+        let pxval;
+        let str = String(int);
+        pxval = str + 'px';
+        return pxval;
+      },
+      //STRING FUNCTIONS
+
       getAspectRatio: function (var1, var2) {
         // console.log('getAspectRatio running...');
         var aspectReal = (var1 / var2);
@@ -376,7 +447,6 @@ var Dimwhit = (function () {
         if (source) {
           // console.log('there is a source');
           var path = source.split('/');
-          console.log('now');
           return  path[path.length - 1];
         } else {
           
@@ -401,7 +471,7 @@ var Dimwhit = (function () {
           // !VA viewerH is set in initApp, so no change to it here
           // !VA viewerH is set in initapp, so no change to that here either.
           // !VA We don't need to adjust height...but maybe we do for consistency's sake
-          [Appdata.viewerH, Appdata.viewportH, Appdata.appContainerH] = this.adjustHeights(Appdata);
+          this.adjustContainerHeights(Appdata);
           console.log('CASE 1');
           // !VA This looks good...
           break;
@@ -415,7 +485,7 @@ var Dimwhit = (function () {
           Appdata.imgH = Math.round((1/this.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[0]) * Appdata.imgW);
           // Set the viewerH to the imgH
           Appdata.viewerH = Appdata.imgH;
-          [Appdata.viewerH, Appdata.viewportH, Appdata.appContainerH] = this.adjustHeights(Appdata);
+          this.adjustContainerHeights(Appdata);
           console.log('CASE 2');
           // !VA Looks good...
           break;
@@ -428,10 +498,11 @@ var Dimwhit = (function () {
           Appdata.viewerH = Appdata.imgH = Appdata.imgNH;
           // Set the image width to the natural image width
           Appdata.imgW = Appdata.imgNW;
+          console.log('Appdata.viewerH is: ' + Appdata.viewerH);
 
-          // !VA  Use adjustHeights to get the Appdata height
-          // !VA  Note the dependency with initAppdata, see 'Dependency with adjustHeights'
-          [Appdata.viewerH, Appdata.viewportH, Appdata.appContainerH] = this.adjustHeights(Appdata);
+          // !VA  Use adjustContainerHeights to get the Appdata height
+          // !VA  Note the dependency with initAppdata, see 'Dependency with adjustContainerHeights'
+          this.adjustContainerHeights(Appdata);
           console.log('CASE 3');
           // !VA 
           break;
@@ -446,8 +517,8 @@ var Dimwhit = (function () {
           // Set the viewer height to the image height
           Appdata.viewerH = Appdata.imgH;
 
-          // Get the viewport and Appdata height from adjustHeights
-          [Appdata.viewerH, Appdata.viewportH, Appdata.appContainerH] = this.adjustHeights(Appdata);
+          // Get the viewport and Appdata height from adjustContainerHeights
+          this.adjustContainerHeights(Appdata);
           console.log('CASE 4');
           // !VA  BUG Problem with the 800X550, 800X600 -- no top/bottom gutter on viewport
           break;
@@ -456,18 +527,18 @@ var Dimwhit = (function () {
       },
 
       
-      adjustHeights: function (Appdata)  {
+      adjustContainerHeights: function (Appdata)  {
         // !VA This calculates the imgViewer, imgViewport and appContainer height based on the 
-        console.dir(Appdata);
+        // console.dir(Appdata);
         var heightVal = Appdata.imgH;
-        console.log('heightVal is: ' + heightVal);
-        // console.log('adjustHeights Appdata is: ');
+        // console.log('heightVal is: ' + heightVal);
+        // console.log('adjustContainerHeights Appdata is: ');
         // console.dir(Appdata);
         let viewerH;
         let viewportH;
         let appContainerH; 
     
-        // !VA These values still seem arbitrary, need to review. There's a dependency in initAppObj, see 'Dependency with adjustHeights'
+        // !VA These values still seem arbitrary, need to review. There's a dependency in initAppObj, see 'Dependency with adjustContainerHeights'
         // !VA I'm not even sure this is necessary since we're getting the viewerW from maxViewerHeight now -- but we'll leave it in here for the time being.
         if (heightVal <= Appdata.initViewerH) {
           // !VA  This is the min-height set in CSS
@@ -484,17 +555,17 @@ var Dimwhit = (function () {
     
         // viewportH = heightVal + 125;
         appContainerH = viewportH;
-        console.log('Appdata is...');
-        console.dir(Appdata);
+        // console.log('Appdata is...');
+        // console.dir(Appdata);
         // This should write the heights to Appdata and then pass it to the function that writes Appdata to the dimViewers, probably called refreshDimViewers. In fact, there's no reason not to consolidate that function with the function that updates the image container heights and refresh the entire UI at the same time, so refreshUI.
         // console.log('AppcontainerH is: ' + appContainerH);
         Appdata.viewerH = viewerH;
+        console.log('Appdata.viewerH is now: ' + Appdata.viewerH);
         Appdata.viewportH = viewportH;
         Appdata.appH = appContainerH;
-        console.log('adjustHeights: Appdata is...');
-        console.dir(Appdata);
-        //VA STOPPED HERE 5/1. This now returns these three values to evalViewerSize. Not sure why it does that. 
-        return [viewerH, viewportH, appContainerH];
+        // console.log('adjustContainerHeights: Appdata is...');
+        // console.dir(Appdata);
+        UIController.refreshAppUI(Appdata);
       }
 
     };
@@ -511,7 +582,7 @@ var Dimwhit = (function () {
     var dynamicRegions = UIController.getDynamicRegionIDs();
     var staticRegions = UIController.getStaticRegionIDs();
     var toolButtons = UIController.getToolButtonIDs();
-    var ccPropStrings = UIController.getCcpPropStringsIDs();
+    var ccpPropStrings = UIController.getCcpPropStringsIDs();
     var ccpUserInput = UIController.getDynamicRegionIDs();
     var ccpBuildTag = UIController.getCcpBuildTagIDs();
     var dynamicRegions = UIController.getDynamicRegionIDs();
@@ -560,7 +631,7 @@ var Dimwhit = (function () {
       // console.log('toolButtons.viewerWidth is: ' + toolButtons.viewerWidth);
       // !VA  Test if there is currently #main-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
       var curImgExists = document.querySelector(dynamicRegions.curImg);
-      console.log('curImgExists is: ' + curImgExists);
+      // console.log('curImgExists is: ' + curImgExists);
       // !VA  Now we have to populate Appdata with data. We can do it manually here and just pass the object on to refresh the screen elements.
 
 
@@ -599,8 +670,8 @@ var Dimwhit = (function () {
         // appH: AppobjDev.appcontainer.height,
         // appW: Appdata.appcontainer.width,
       };
-      console.log('Appdata is...');
-      console.dir(Appdata);
+      // console.log('Appdata is...');
+      // console.dir(Appdata);
       // console.log('Appdata.filename is: ' + Appdata.filename);
       // console.log('getAppData: Appdata.filename is: ' + Appdata.filename);
       
