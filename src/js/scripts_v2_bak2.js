@@ -270,7 +270,7 @@ var Dimwhit = (function () {
       // !VA Populate Appdata using the properties of the dynamic regions in the 
       // !VA  Appdata can only be populated if there's an image. If the DEV image isn't loaded or the USER hasn't dropped in an image yet, then Appdata.filename is undefined and script won't run.
       // !VA  I think I fixed the above problem by creating a different function for Dev initialization. It can be messy and not DRY since it's not for production anyway.
-      getAppData: function(Appobj, filename) {
+      getAppData: function(Appobj) {
         // console.log('getAppData: Appdata.currentimg is...');
         // console.log(Appdata.currentimg.src);
         
@@ -283,7 +283,7 @@ var Dimwhit = (function () {
           Appdata = {
             // filename: 'blob',
             // STOP HERE -- I don't understand how to get a funcion return value and set it a property.
-            filename: filename,
+            filename: calcController.getFilenameFromSource(Appobj.currentimg.src),
             //  (function() {
               
             //   var typ = Appobj.currentimg.nodeName;
@@ -311,8 +311,7 @@ var Dimwhit = (function () {
             appW: parseInt(Appobj.appcontainer.style.width),
       
           };
-          console.log('getAppData: Appdata is...');
-          console.table(Appdata);
+          // console.table(Appdata);
           // console.log('Appdata.filename is: ' + Appdata.filename);
           // console.log('getAppData: Appdata.filename is: ' + Appdata.filename());
           // console.log('getAppData: aspect ratio is: ' + Appdata.aspect()[1]);
@@ -724,15 +723,13 @@ var Dimwhit = (function () {
       console.dir(AppobjDev);
       console.log('AppobjDev.viewport.style.width is: ' + AppobjDev.viewport.style.width);
 
-      var filename = calcController.getFilenameFromSource(AppobjDev.currentimg.src);
-
       // !VA Hide the drop area.
       document.querySelector(staticRegions.dropArea).style.display = 'none';
       // !VA  Show the toolbar
       document.querySelector(staticRegions.toolsContainer).style.display = 'block';
 
       // !VA AppobjDev returns NaN for the viewer containers because they don't have values yet... not sure I understand why since height and width are initially declared in CSS.
-      var Appdata = UIController.getAppData(AppobjDev, filename);
+      var Appdata = UIController.getAppData(AppobjDev);
       // !VA evaluate the viewer containers and adjust their size based on the returned Appdata
       var evalViewerSize = calcController.evalViewerSize(Appdata);
 
