@@ -473,8 +473,9 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 
 // MAIN IMAGE VIEWER
 #main-image-viewer {
-  // width: 650px;
-  // height: 450px;
+  width: 650px;
+  height: 450px;
+  border: 1px solid red !important;
   position: absolute;
   top: 50%;
   left: 50%;
