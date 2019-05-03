@@ -2,7 +2,7 @@
 /* !VA  
 ===========================================================
 TODO: Fix the main-img-container issue for the dev image. Don't forget that the removeCurImg function references main-img-container, so adding that to the HTML file won't be without repercussions.
-
+DONE: Fix the main-img-container issue for the dev image. Just added main-img-container to HTML and removed the conditional in removeCurImg. Now the curImg is removed with the same line of code in both USER and DEV and there is a main-img-container now in both cases.
 DONE: Now Dev Mode doesn't work any more - can't drop an image on an existing image. This appears to be fixed...we'll see
 DONE: Fix small phones and large phones dimViewers
 DONE: Implement notification fonts on dimViewers
@@ -374,23 +374,12 @@ var Dimwhit = (function () {
       },
       // !VA Test for whether there is already a #main-img element in the DOM, and if there is remove it so handleFileSelect can overwrite it without having to refresh the page to reboot the app.
       removeCurImg: function () {
-        if ( document.querySelector('#main-img-container')) {
-          console.log(document.querySelector('#main-img-container').parentNode);
-          document.querySelector('#main-img-container').parentNode.removeChild(document.querySelector('#main-img-container'));
-        } 
+        // if ( document.querySelector('#main-img-container')) {
+        // console.log(document.querySelector('#main-img-container').parentNode);
+        document.querySelector('#main-img-container').parentNode.removeChild(document.querySelector('#main-img-container'));
+        // } 
       },
 
-      // setDimAlerts: function(dimViewer, boolean) {
-      //   var curDim = dimViewer;
-      //   var att;
-      //   if (boolean) {
-      //     att = 'red';
-      //   } else {
-      //     att = 'auto';
-      //   }
-      //   // !VA Set the style.color property of the to 'red' if true; reset to 'auto' if false
-      //   document.querySelector(curDim).style.color = att;
-      // }
       setDimAlerts: function(curDimViewers, bool) {
         
         console.log('setDimAlerts running');
