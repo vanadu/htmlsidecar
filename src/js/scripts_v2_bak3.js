@@ -1,8 +1,7 @@
 
 /* !VA  
-CURRENT - Comment new code. Stopped here.
-TODO: Fix Dev mode.
-TODO: Fix it so you can drop new images on existing images 
+CURRRENT - Where to initialize Appdata and whether it needs to be populated in initializeDevMode. It should be initialized only once at the top of UIController and then just populated fully in getAppData and then updated as necessary whenever a UI update is required.
+1) Since we're still working in DEV mode, see if we can evaluate the dev image by calling UIController.getAppData.
 
 
 */
@@ -108,6 +107,38 @@ var Dimwhit = (function () {
       largePhonesBuildCSSBut: ''
     };
 
+
+ 
+    // !VA  This object only contains HTML elements whose properties change based on the properties of the image that is contained in them. It does NOT need to have a Constructor because it's not serving as the blueprint for any other objects.
+    // !VA  We are initializing this here, and it will be updated
+    // Appobj = {
+    //   currentimg: document.querySelector(dynamicRegions.curImg),
+    //   viewer: document.querySelector(dynamicRegions.imgViewer),
+    //   viewport: document.querySelector(dynamicRegions.imgViewport),
+    //   appcontainer: document.querySelector(dynamicRegions.appContainer)
+    // };
+
+    /* !VA  I don't remember what this was for. 
+    function getCurIasdasfdmg(curImg, fileName) {
+      var a, b;
+      a = curImg;
+      b = fileName;
+      document.querySelector(staticRegions.dropArea).style.display = 'none';
+      const curImgDiv = document.createElement('div');
+    
+      // Assign an id to the new div -- we're not adding this to an object because it's created here and is only used here. NOTE: These containers divs don't appear in devMode when the curImg is accessed from the index.html 
+      curImgDiv.id = 'main-img-container';
+      // Insert main-img-container into the existing main-image
+      document.getElementById('main-image').insertBefore(curImgDiv, null);
+      // !VA insert main-img-container into the newly-created main-img-container
+      document.getElementById('main-img-container').insertBefore(dynamicRegions.curImg, null);
+      // Create the image object and read in the binary image from the FileReader object.
+      // This allows access of image properties. You can't get image properties from a FileReader object -- it's just a blob' 
+
+    }
+    */
+
+
     // !VA Functions that get returned from the UIContoller object go here
     return {
       // !VA V2 Return all the strings for the UI element's IDs
@@ -138,7 +169,7 @@ var Dimwhit = (function () {
       handleFileSelect: function(evt) {
         console.log('RUnning HandleFileSelect');
         // If a file is already being displayed, i.e. Appdata.filename is true, then remove that image to make room for the next image being dropped
-        // !VA TODO: This doesn't work anymore
+        // !VA TODO:
         if (Appdata.currentimg) {
           // !VA 03.18.18 Don't need the var declaration anymore - it's in the appRegions object
           // var curImg = document.getElementById('main-img');
@@ -193,12 +224,16 @@ var Dimwhit = (function () {
             // curImg.src = e.target.result;
             curImg.src = e.target.result;
             let fileName;
-            // Read the filename of the FileReader object into a variable to pass to the getAppData function, otherwise the blob has no name
+            // Read the filename of the FileReader object into a variable to pass to the getCurImage function, otherwise the blob has no name
             fileName = theFile.name;
+            // Pass the FileObject i.e. new Image object to the function that gets the image data
+            // !VA  03.18.18 Put the curImg created with FileReader in the appRegions object
 
-            // !VA Hide the dropArea - not sure if this is the right place for this.
+            console.log('Showing curImg...');
+
+            // !VA Hide the dropArea
             document.querySelector(staticRegions.dropArea).style.display = 'none';
-            // !VA Populate the Appobj with the new image. Not sure if this is the right place to declare it.
+
             var Appobj = {
               currentimg: curImg,
               viewer: document.querySelector(dynamicRegions.imgViewer),
@@ -206,25 +241,40 @@ var Dimwhit = (function () {
               appcontainer: document.querySelector(dynamicRegions.appContainer)
             };
 
+            // var curImg = 'img/TEST/BikeMedium.jpg';
+            console.dir(curImg);
+            // var div3 = document.createElement('div');
+            // div3.id = 'div3';
+            // document.getElementById('id2').insertBefore(div3, null);
+            var mess;
             // !VA Get element properties here
-            function getElementProperties() { 
-              // !VA Set a short timeout while the blob loads.
-              setTimeout(() => {
-                // !VA Show the curImg, hopefully the blob has loaded by now.
-                document.querySelector(dynamicRegions.curImg).style.display = 'block';
-                // !VA Pass the blob to the Appobj for passing to getImgData
-                Appobj.currentimg = document.querySelector(dynamicRegions.curImg);
-                // !VA Call getAppData to get the image properties
-                Appdata = UIController.getAppData(Appobj, fileName);
-                // !VA Pass Appdata on to evalViewerSizes in order to resize the image containers dynamically based on the dimensions of the image.
-                calcController.evalViewerSize(Appdata);
-                // !VA Timeout of 250 ms while the blob loads.
-              }, 250);
-            }
+            function getElementProperties(mess) { 
 
-            // !VA First, write the new curImg object to the DOM
+              setTimeout(() => {
+                
+                console.log('mess is: ' + mess);
+                // !VA 
+
+                document.querySelector(dynamicRegions.curImg).style.display = 'block';
+                var foo = document.querySelector(dynamicRegions.curImg).width;
+                console.log('foo is: ' + foo);
+                Appobj.currentimg = document.querySelector(dynamicRegions.curImg);
+  
+  
+                console.log('Appobj.currentimg is...');
+                console.dir(Appobj.currentimg);
+                // !VA Call 
+                Appdata = UIController.getAppData(Appobj, fileName);
+                calcController.evalViewerSize(Appdata);
+
+              }, 250);
+        
+              // document.querySelector(dynamicRegions.curImg).style.display = 'block';
+      
+            }
+            // !VA Write elements to DOM here
             function writeImgToDOM(curImg, callback) {
-              // VA! The callback function allows access of image properties. You can't get image properties from a FileReader object -- it's a binary blob that takes time to load, and by the time it's loaded all the functions that get its properties have run and returned undefined. Temporary solution: hide the image object for 250 ms, then show it and get the properties -- by then it should have loaded. There is a better way to do this with promises but that will have to be for later.
+              // VA! This callback function allows access of image properties. You can't get image properties from a FileReader object -- it's a binary blob that takes time to load, and by the time it's loaded all the functions that get its properties have run and returned undefined. Temporary solution: hide the image object for 250 ms, then show it and get the properties -- by then it should have loaded. There is a better way to do this with promises but that will have to be for later.
               // !VA Create a div in the DOM
               var curImgDiv = document.createElement('div');
               // !VA Assign the new div an id that reflects its purpose
@@ -237,9 +287,10 @@ var Dimwhit = (function () {
               // This allows access of image properties. You can't get image properties from a FileReader object -- it's just a blob' 
               // !VA Hide the DOM element while the blob loads.
               document.querySelector(dynamicRegions.curImg).style.display = 'none';
+
               callback(curImg);		
             }
-            // !VA Call the callback function that writes the new image to the DOM.
+        
             writeImgToDOM(curImg, getElementProperties);
 
           };
@@ -252,18 +303,55 @@ var Dimwhit = (function () {
       //FILEREADER OBJECT PROCESSING END
 
 
+      /* DOn't need this anymore, since it didn't work and the callback function does work
+      getCurImg: function () {
+        console.log('getCurImg running');
+
+        // var curImg = document.getElementById('main-img');
+        var curImgDiv = document.createElement('div');
+
+        curImgDiv.id = 'main-img-container';
+        // curImgDiv = 'main-img-container';
+        // Insert main-img-container into the existing main-image
+        document.getElementById('main-image').insertBefore(curImgDiv, null);
+        // !VA insert main-img-container into the newly-created main-img-container
+        document.getElementById('main-img-container').insertBefore(curImg, null);
+        // Create the image object and read in the binary image from the FileReader object.
+        // This allows access of image properties. You can't get image properties from a FileReader object -- it's just a blob' 
+        var curImg = document.getElementById('main-img');
+
+        
+        return foo;
+
+      },
+      */
+
+      // !VA Populate Appdata using the properties of the dynamic regions in the 
       // !VA  Appdata can only be populated if there's an image. If the DEV image isn't loaded or the USER hasn't dropped in an image yet, then Appdata.filename is undefined and script won't run.
       // !VA  I think I fixed the above problem by creating a different function for Dev initialization. It can be messy and not DRY since it's not for production anyway.
       getAppData: function(Appobj, filename) {
+        // console.log('getAppData: Appdata.currentimg is...');
+        // console.log(Appdata.currentimg.src);
+        // console.log('Appobj,currentimg is...');
+        // console.dir(Appobj.currentimg);
+        // var curimgwidth = Appobj.currentimg.width;
+        // console.log('curimgwidth: ' + curimgwidth);
 
+        // var Appobj = {
+        //   currentimg: dynamicRegions.curImg,
+        //   viewer: document.querySelector(dynamicRegions.imgViewer),
+        //   viewport: document.querySelector(dynamicRegions.imgViewport),
+        //   appcontainer: document.querySelector(dynamicRegions.appContainer)
+        // };
+        
         // !VA If there's no current image, then return false. This is the flag to the initializeDOM function that there is no DEV image in the HTML. The init then shows the drop area and 'No Image' in the dimViewers.
-        // !VA TODO: Need to revisit where the 'No Image' flags are written to the dimViewers. I think there are two places where that is done...
         if (Appobj.currentimg == null || Appobj.currentimg === 'undefined') {
           return false;
         } else {
           // !VA  There is a current image, so populate Appdata based on the object properties in Appdata
           Appdata = {
-            // !VA The filename comes from the FileReader or the src property of the HTML img element if we're in Dev mode. Since the FileReader returns a blob with the binary data in the src property, there is not filename attached to the blob itself, so we need to pass in as a separate parameter along with the Appobj in all the function calls.
+            // filename: 'blob',
+            // STOP HERE -- I don't understand how to get a funcion return value and set it a property.
             filename: filename,
             imgH: Appobj.currentimg.height,
             imgW: Appobj.currentimg.width,
@@ -273,7 +361,7 @@ var Dimwhit = (function () {
               var a = calcController.getAspectRatio(this.imgNW, this.imgNH);
               return a;
             },
-            // !VA These values are now initialized in CSS based on the size of dropArea, but they are updated with each new image in the adjustContainerHeight function.
+            // !VA These values are now initialized in CSS based on the size of dropArea -- probably need to revisit this, not sure why the style needs to be queried.
             viewerH: parseInt(Appobj.viewer.style.height),
             viewerW: parseInt(Appobj.viewer.style.width),
             viewportH: parseInt(Appobj.viewport.style.height),
@@ -282,10 +370,11 @@ var Dimwhit = (function () {
             appW: parseInt(Appobj.appcontainer.style.width),
       
           };
-          // console.log('getAppData: Appdata is...');
-          // console.table(Appdata);
-          // console.log('getAppData: Appdata.filename is: ' + Appdata.filename);
-          // console.log('getAppData: aspect ratio is: ' + Appdata.aspect()[1]);
+          console.log('getAppData: Appdata is...');
+          console.table(Appdata);
+          console.log('Appdata.filename is: ' + Appdata.filename);
+          console.log('getAppData: Appdata.filename is: ' + Appdata.filename);
+          console.log('getAppData: aspect ratio is: ' + Appdata.aspect()[1]);
           return Appdata;
           
         }
@@ -295,10 +384,9 @@ var Dimwhit = (function () {
 
 
       // OBJECT AND DISPLAY REFRESH FUNCTIONS
-      // This is where we pass in the recalculated Appdata data and update the onscreen display of the Appdata data in the dimViewers as well as the image object and image containers. 
+      // This is where we pass in the recalculated Appdata data and update the onscreen display of the Appdataect data in the dimViewers 
       refreshAppUI: function (Appdata) {
-        // VA! Need to revisit this...this is also done in the init function, I think and it only needs to be done once.
-        // !VA The page has been initialized but no image has been selected yet, so set all the dimViewers to No Image.
+        // The page has been initialized but no image has been selected yet, so set all the dimViewers to No Image.
         console.log('refreshAppUI running...');
         // !VA Appdata is still empty, so show 'No Image' in the dimViewers and hide the clipboard button.
         if (!Appdata.filename) {
@@ -337,23 +425,34 @@ var Dimwhit = (function () {
           document.querySelector(dimViewers.retina).innerHTML = `<span class='pop-font'>${2 * Appdata.imgW}</span> X <span class='pop-font'>${2 * Appdata.imgH}`;
 
           // !VA Adjust the image container heights based on the Appdata values calculated in adjustContainerHeights
+          console.log('refreshAppUI: Appdata is...');
+          console.dir(Appdata);
+          console.log(document.querySelector(dynamicRegions.imgViewer).style.width);
+          console.log(document.querySelector(dynamicRegions.imgViewer).style.height);
           document.querySelector(dynamicRegions.curImg).style.width = calcController.intToPx(Appdata.imgW);
           document.querySelector(dynamicRegions.curImg).style.height = calcController.intToPx(Appdata.imgH);
           document.querySelector(dynamicRegions.imgViewer).style.width = calcController.intToPx(Appdata.viewerW);
           document.querySelector(dynamicRegions.imgViewer).style.height = calcController.intToPx(Appdata.viewerH);
-          // !VA This is NaN-- not sure we even need this since the app width is static.
           document.querySelector(dynamicRegions.imgViewport).style.width = calcController.intToPx(Appdata.viewportW);
           document.querySelector(dynamicRegions.imgViewport).style.height = calcController.intToPx(Appdata.viewportH);
-          // !VA This is also NaN - same as above.
+          // document.querySelector(dynamicRegions.appContainer).style.width = calcController.intToPx(Appdata.appW);
           document.querySelector(dynamicRegions.appContainer).style.height = calcController.intToPx(Appdata.appH);
 
-          // !VA TODO: Show the dimension alerts if an image too large or small...
+
+          // !VA Show the dimension alerts if an image too large or small...
           // showDimensionAlerts();
 
+
           return Appdata, dimViewers;
+
         }
       },
+
     };
+
+
+
+
   })();
   // var r = UIController.getAppdata();
   // console.dir(r);
@@ -370,7 +469,7 @@ var Dimwhit = (function () {
 
     return {
       //STRING FUNCTIONS
-      // !VA Convert integer to pixel for style properties
+      // !VA Convert integer to pixel
       intToPx: function(int) {
         let pxval;
         let str = String(int);
@@ -379,7 +478,6 @@ var Dimwhit = (function () {
       },
       //STRING FUNCTIONS
 
-      //ASPECT RATIO
       getAspectRatio: function (var1, var2) {
         // console.log('getAspectRatio running...');
         var aspectReal = (var1 / var2);
@@ -407,7 +505,6 @@ var Dimwhit = (function () {
         return [aspectReal, aspectInt];  
       },
 
-      // Get the filename from the src attribute of an img file
       getFilenameFromSource: function (source) {
         // console.log('getFilenameFromSource running...');
         if (source) {
@@ -415,19 +512,18 @@ var Dimwhit = (function () {
           var path = source.split('/');
           return  path[path.length - 1];
         } else {
+          
           console.log('getFilenameFromSource: there is no source');
+          // return `<span class='pop-font'>&nbsp;&nbsp;No Image</span>`;
         }
       },
 
-      // !VA There are four conditions for an image to fit into the appContainer. This evaluates them, sets the Appdata properties accordingly and calls adjustContainerHeights. 
-      // !VA TODO: Actually the function needs to be called only once at the end of the routine...
       evalViewerSize: function (Appdata) {
         // !VA This isn't necessary here, but will probably be used somewhere else...
-        // !VA TODO: Try to figure out whether this is useful at all.
         // const maxViewerWidth = (parseInt(window.getComputedStyle(appRegions.appContainer,null).getPropertyValue('width'), 10)) - 48;
 
         // Using the current image dimensions, set the size of the viewer based on the following criteria:
-        // !VA TODO: This can probably be recoded for efficiency but it works for now. Take another look at it.
+        // !VA This can probably be recoded for efficiency but it works for now 
         switch(true) {
         // The image falls within the default viewer dimensions set in initApp, so do nothing.
         // !VA This case is irrelevant since we're now comparing everything to maxViewerWidth not the  init values. Change accordingly...
@@ -439,7 +535,8 @@ var Dimwhit = (function () {
           // !VA viewerH is set in initapp, so no change to that here either.
           // !VA We don't need to adjust height...but maybe we do for consistency's sake
           this.adjustContainerHeights(Appdata);
-          // console.log('CASE 1');
+          console.log('CASE 1');
+          // !VA This looks good...
           break;
 
         // The image is wider than the current viewer width but shorter than current viewer height, so resize the image based on the viewer width
@@ -452,7 +549,8 @@ var Dimwhit = (function () {
           // Set the viewerH to the imgH
           Appdata.viewerH = Appdata.imgH;
           this.adjustContainerHeights(Appdata);
-          // console.log('CASE 2');
+          console.log('CASE 2');
+          // !VA Looks good...
           break;
 
         // The image is not as wide as the current viewer width, but is taller than the viewer height. Keep the image width but resize the viewer in order to display the full image height
@@ -468,7 +566,8 @@ var Dimwhit = (function () {
           // !VA  Use adjustContainerHeights to get the Appdata height
           // !VA  Note the dependency with initAppdata, see 'Dependency with adjustContainerHeights'
           this.adjustContainerHeights(Appdata);
-          // console.log('CASE 3');
+          console.log('CASE 3');
+          // !VA 
           break;
 
         // The image is wider and taller than the current viewer height and width so we have to resize the image and the viewport based on the current viewport width
@@ -481,16 +580,20 @@ var Dimwhit = (function () {
           Appdata.imgH = Math.round((1/this.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[0]) * Appdata.imgW);
           // Set the viewer height to the image height
           Appdata.viewerH = Appdata.imgH;
+
           // Get the viewport and Appdata height from adjustContainerHeights
           this.adjustContainerHeights(Appdata);
-          // console.log('CASE 4');
-          // !VA TODO: Check this out, doesn't seem to be a problem anymore: BUG Problem with the 800X550, 800X600 -- no top/bottom gutter on viewport
+          console.log('CASE 4');
+          // !VA  BUG Problem with the 800X550, 800X600 -- no top/bottom gutter on viewport
           break;
         }
+
       },
+
       
       adjustContainerHeights: function (Appdata)  {
-        // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values.
+        // !VA This calculates the imgViewer, imgViewport and appContainer height based on the 
+        // console.dir(Appdata);
         var heightVal = Appdata.imgH;
         // console.log('heightVal is: ' + heightVal);
         // console.log('adjustContainerHeights Appdata is: ');
@@ -498,9 +601,9 @@ var Dimwhit = (function () {
         let viewerH;
         let viewportH;
         let appContainerH; 
-
-        // !VA I'm not even sure this is necessary since we're getting the viewerW from maxViewerHeight now -- but we'll leave it in here for the time being. 
-        // !VA TODO: Review this whole maxViewerHeight thing.
+    
+        // !VA These values still seem arbitrary, need to review. There's a dependency in initAppObj, see 'Dependency with adjustContainerHeights'
+        // !VA I'm not even sure this is necessary since we're getting the viewerW from maxViewerHeight now -- but we'll leave it in here for the time being.
         if (heightVal <= Appdata.initViewerH) {
           // !VA  This is the min-height set in CSS
           // appObj.appContainerH = 804;
@@ -513,22 +616,29 @@ var Dimwhit = (function () {
           viewportH = heightVal + 145;
         }
     
+    
         // viewportH = heightVal + 125;
         appContainerH = viewportH;
+        // console.log('Appdata is...');
+        // console.dir(Appdata);
         // This should write the heights to Appdata and then pass it to the function that writes Appdata to the dimViewers, probably called refreshDimViewers. In fact, there's no reason not to consolidate that function with the function that updates the image container heights and refresh the entire UI at the same time, so refreshUI.
+        // console.log('AppcontainerH is: ' + appContainerH);
         Appdata.viewerH = viewerH;
-        // console.log('Appdata.viewerH is now: ' + Appdata.viewerH);
+        console.log('Appdata.viewerH is now: ' + Appdata.viewerH);
         Appdata.viewportH = viewportH;
         Appdata.appH = appContainerH;
         // console.log('adjustContainerHeights: Appdata is...');
         // console.dir(Appdata);
         UIController.refreshAppUI(Appdata);
       }
+
     };
+
   })();
 
+
+
   // !VA GLOBAL APP CONTROLLER
-  // !VA Not sure why UICtrl is used here...
   var controller = (function(calcCtrl, UICtrl) {
 
     var Appobj = {};
@@ -541,6 +651,11 @@ var Dimwhit = (function () {
     var ccpPropStrings = UIController.getCcpPropStringsIDs();
     var ccpUserInput = UIController.getDynamicRegionIDs();
     var ccpBuildTag = UIController.getCcpBuildTagIDs();
+    var dynamicRegions = UIController.getDynamicRegionIDs();
+    // var Appdata = UIController.getAppdata();
+
+
+
 
     var setupEventListeners = function() {
 
@@ -632,25 +747,30 @@ var Dimwhit = (function () {
 
         // addEventHandler(ccpUserInput.tableWidth,'change',handleOnChange,false);
         // addEventHandler(ccpUserInput.imgWidth,'change',handleOnChange,false);
+
+
+
       }
       addEventHandler(window, 'load', function(evt) {initializeHandlers(); } );
+
+
     };
 
-    // !VA This is where we initialize Dev mode, which is where we can start the app with a hard-coded img element in the HTML file. THis is very useful, otherwise we'd have to drop files to initialize or dink with the FileReader object to hard-code a test file.
     var initializeDevMode = function() {
-      // !VA TODO: Dev mode doesn't work any more...
       console.log('initializeDevMode running...');
       // !VA Get the imgViewer dimensions as set in CSS:
       var initViewerW = parseInt(document.querySelector(dynamicRegions.imgViewer).style.width);
-      // !VA Not sure why this isn't used.
       var initViewerH = parseInt(document.querySelector(dynamicRegions.imgViewer).style.height);
       // !VA Initalize the imgViewer width input field value to the default of 650
       document.querySelector(toolButtons.viewerWidth).placeholder = initViewerW;
-      console.log('toolButtons.viewerWidth is: ' + toolButtons.viewerWidth);
+      // console.log('toolButtons.viewerWidth is: ' + toolButtons.viewerWidth);
       // !VA  Test if there is currently #main-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
-      // var curImgExists = document.querySelector(dynamicRegions.curImg);
-      // console.log('curImgExists is: ' + curImgExists);
+      var curImgExists = document.querySelector(dynamicRegions.curImg);
+      console.log('curImgExists is: ' + curImgExists);
       // !VA  Now we have to populate Appdata with data. We can do it manually here and just pass the object on to refresh the screen elements.
+
+
+
       // !VA If there's no current image, then return false. This is the flag to the initializeDOM function that there is no DEV image in the HTML. The init then shows the drop area and 'No Image' in the dimViewers.
 
       // !VA  There is a current image, so first populate Appdata manually and then populate getAppData based on the object properties in Appdata
