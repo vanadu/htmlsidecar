@@ -1,8 +1,11 @@
 
 /* !VA  
 ===========================================================
-TODO: Fix it so you can drop new images on existing images 
+TODO: Fix small phones and large phones dimViewers
+TODO: Implement notification fonts on dimViewers
 
+DONE: Fix small phones and large phones dimViewers
+DONE: Fix it so you can drop new images on existing images 
 DONE: Added onload to getElementProperties to prevent accessing properties before blob is loaded.
 DONE: Devmode wasn't broken, was just using index.html instead of index_v2.html
 
@@ -208,6 +211,10 @@ var Dimwhit = (function () {
               setTimeout(() => {
                 // Once the blob is loaded, show it and get its data
                 curImg.onload = (function() {
+                // !VA Hide the drop area.
+                  document.querySelector(staticRegions.dropArea).style.display = 'none';
+                  // !VA  Show the toolbar
+                  document.querySelector(staticRegions.toolsContainer).style.display = 'block';
                   document.querySelector(dynamicRegions.curImg).style.display = 'block';
                   // !VA Pass the blob to the Appobj for passing to getImgData
                   Appobj.currentimg = document.querySelector(dynamicRegions.curImg);
@@ -251,10 +258,9 @@ var Dimwhit = (function () {
       //FILEREADER OBJECT PROCESSING END
 
 
-      // !VA  Appdata can only be populated if there's an image. If the DEV image isn't loaded or the USER hasn't dropped in an image yet, then Appdata.filename is undefined and script won't run.
-      // !VA  I think I fixed the above problem by creating a different function for Dev initialization. It can be messy and not DRY since it's not for production anyway.
       getAppData: function(Appobj, filename) {
-
+        // !VA  Appdata can only be populated if there's an image. If the DEV image isn't loaded or the USER hasn't dropped in an image yet, then Appdata.filename is undefined and script won't run.
+        // !VA  I think I fixed the above problem by creating a different function for Dev initialization. It can be messy and not DRY since it's not for production anyway.
         // !VA If there's no current image, then return false. This is the flag to the initializeDOM function that there is no DEV image in the HTML. The init then shows the drop area and 'No Image' in the dimViewers.
         // !VA TODO: Need to revisit where the 'No Image' flags are written to the dimViewers. I think there are two places where that is done...
         if (Appobj.currentimg == null || Appobj.currentimg === 'undefined') {
@@ -279,26 +285,30 @@ var Dimwhit = (function () {
             viewportW: parseInt(Appobj.viewport.style.width),
             appH: parseInt(Appobj.appcontainer.style.height),
             appW: parseInt(Appobj.appcontainer.style.width),
+            // !VA Using default values here, but they should be provided elsewhere, like in a template
+            sPhoneW: 320,
+            lPhoneW: 480
+
       
           };
-          // console.log('getAppData: Appdata is...');
+          // console.log('getAppData - Appdata is...');
           // console.table(Appdata);
-          // console.log('getAppData: Appdata.filename is: ' + Appdata.filename);
-          // console.log('getAppData: aspect ratio is: ' + Appdata.aspect()[1]);
+          // console.log('getAppData - Appdata.filename is: ' + Appdata.filename);
+          // console.log('getAppData - aspect ratio is: ' + Appdata.aspect()[1]);
+          console.log('Appdata dimViewers is...');
+          console.dir(dimViewers);
+          calcController.evalDimAlerts(Appdata, dimViewers);
           return Appdata;
           
         }
       },
-
-
-
 
       // OBJECT AND DISPLAY REFRESH FUNCTIONS
       // This is where we pass in the recalculated Appdata data and update the onscreen display of the Appdata data in the dimViewers as well as the image object and image containers. 
       refreshAppUI: function (Appdata) {
         // VA! Need to revisit this...this is also done in the init function, I think and it only needs to be done once.
         // !VA The page has been initialized but no image has been selected yet, so set all the dimViewers to No Image.
-        console.log('refreshAppUI running...');
+        // console.log('refreshAppUI running...');
         // !VA Appdata is still empty, so show 'No Image' in the dimViewers and hide the clipboard button.
         if (!Appdata.filename) {
           document.querySelector(dimViewers.clipboardBut).style.display = 'none';
@@ -310,6 +320,9 @@ var Dimwhit = (function () {
           } 
           // return;
         } else {
+
+          console.log('Appdata is...');
+          console.dir(Appdata);
           // !VA Write the dimViewers to the UI based on Appdata values and show the clipboard button
           document.querySelector(dimViewers.clipboardBut).style.display = 'block';
           // Filename
@@ -358,7 +371,36 @@ var Dimwhit = (function () {
           console.log(document.querySelector('#main-img-container').parentNode);
           document.querySelector('#main-img-container').parentNode.removeChild(document.querySelector('#main-img-container'));
         } 
+      },
+
+      // setDimAlerts: function(dimViewer, boolean) {
+      //   var curDim = dimViewer;
+      //   var att;
+      //   if (boolean) {
+      //     att = 'red';
+      //   } else {
+      //     att = 'auto';
+      //   }
+      //   // !VA Set the style.color property of the to 'red' if true; reset to 'auto' if false
+      //   document.querySelector(curDim).style.color = att;
+      // }
+      setDimAlerts: function(curDimViewers, bool, dimViewers) {
+        console.log('setDimAlerts running');
+        // !VA if evalDimAlerts returns true, then the dimViewer should be displayed in red. To reset the dim alert, set to style color to 'auto'.
+        var att = bool;
+        bool ? att = 'red': att = 'auto';
+
+        
+        // !VA For each dimViewer passed from evalDimAlerts, set the font color style to red.
+        for (let i = 0; i < curDimViewers.length; i++) {
+          document.querySelector(curDimViewers[i]).style.color = att;
+          console.log(curDimViewers[i]);
+          console.log('setDimAlerts - dimViewers is...');
+          console.dir(dimViewers);
+        }
+
       }
+
     };
   })();
   // var r = UIController.getAppdata();
@@ -424,6 +466,7 @@ var Dimwhit = (function () {
           console.log('getFilenameFromSource: there is no source');
         }
       },
+      
 
       // !VA There are four conditions for an image to fit into the appContainer. This evaluates them, sets the Appdata properties accordingly and calls adjustContainerHeights. 
       // !VA TODO: Actually the function needs to be called only once at the end of the routine...
@@ -469,7 +512,6 @@ var Dimwhit = (function () {
           Appdata.viewerH = Appdata.imgH = Appdata.imgNH;
           // Set the image width to the natural image width
           Appdata.imgW = Appdata.imgNW;
-          console.log('Appdata.viewerH is: ' + Appdata.viewerH);
 
           // !VA  Use adjustContainerHeights to get the Appdata height
           // !VA  Note the dependency with initAppdata, see 'Dependency with adjustContainerHeights'
@@ -530,6 +572,23 @@ var Dimwhit = (function () {
         // console.dir(Appdata);
         UIController.refreshAppUI(Appdata);
       },
+
+      evalDimAlerts: function(Appdata, dimViewers) {
+        // !VA Size On Disk is NOT 2X the Display Size: flag Size on Disk and Retina
+        var curDimViewer = [];
+        if (Appdata.imgNW < (Appdata.imgW * 2) ) {
+          curDimViewer.push(dimViewers.diskimg);
+        } 
+        // !VA Small phones isn't at least 2X size on Disk and Retina
+        if (Appdata.imgNW < (Appdata.sPhoneW * 2) ) {
+          curDimViewer.push(dimViewers.smallphones);
+        } 
+        // !VA Large phones isn't at least 2X Size on Disk and Retina
+        if (Appdata.imgNW < (Appdata.lPhoneW * 2) ) {
+          curDimViewer.push(dimViewers.largephones);
+        } 
+        UIController.setDimAlerts(curDimViewer, true, dimViewers);
+      }
     };
   })();
 
@@ -655,10 +714,9 @@ var Dimwhit = (function () {
       var initViewerH = parseInt(document.querySelector(dynamicRegions.imgViewer).style.height);
       // !VA Initalize the imgViewer width input field value to the default of 650
       document.querySelector(toolButtons.viewerWidth).placeholder = initViewerW;
-      console.log('toolButtons.viewerWidth is: ' + toolButtons.viewerWidth);
       // !VA  Test if there is currently #main-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
       var curImgExists = document.querySelector(dynamicRegions.curImg);
-      console.log('curImgExists is: ' + curImgExists);
+      // console.log('curImgExists is: ' + curImgExists);
       // !VA  Now we have to populate Appdata with data. We can do it manually here and just pass the object on to refresh the screen elements.
       // !VA If there's no current image, then return false. This is the flag to the initializeDOM function that there is no DEV image in the HTML. The init then shows the drop area and 'No Image' in the dimViewers.
 
@@ -669,9 +727,7 @@ var Dimwhit = (function () {
         viewport: document.querySelector(dynamicRegions.imgViewport),
         appcontainer: document.querySelector(dynamicRegions.appContainer)
       }; 
-      console.log('AppobjDev is...');
-      console.dir(AppobjDev);
-      console.log('AppobjDev.viewport.style.width is: ' + AppobjDev.viewport.style.width);
+
 
       var filename = calcController.getFilenameFromSource(AppobjDev.currentimg.src);
 
@@ -680,13 +736,12 @@ var Dimwhit = (function () {
       // !VA  Show the toolbar
       document.querySelector(staticRegions.toolsContainer).style.display = 'block';
 
+      // !VA Create
+
       // !VA AppobjDev returns NaN for the viewer containers because they don't have values yet... not sure I understand why since height and width are initially declared in CSS.
       var Appdata = UIController.getAppData(AppobjDev, filename);
       // !VA evaluate the viewer containers and adjust their size based on the returned Appdata
       var evalViewerSize = calcController.evalViewerSize(Appdata);
-
-
-      
 
     };
 
@@ -698,6 +753,9 @@ var Dimwhit = (function () {
         // !VA  Initialize the ImgViewer to accomodate the dragArea. This should be the same as the CSS definition.
         document.querySelector(dynamicRegions.imgViewer).style.width = '650px';
         document.querySelector(dynamicRegions.imgViewer).style.height = '450px';
+        // !VA Make sure the toolsContainer is off and the dropArea is on.
+        document.querySelector(staticRegions.dropArea).style.display = 'block';
+        document.querySelector(staticRegions.toolsContainer).style.display = 'none';
 
         setupEventListeners();
         // !VA  Test if there is currently #main-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
