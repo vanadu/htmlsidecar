@@ -189,7 +189,7 @@ var Dimwhit = (function () {
             var curImg = new Image();
             // !VA create the id
             curImg.id = 'main-img';
-            // !VA assign the blob in e.target.result to the source of the image
+            // !VA assign the blob in e.target.result to the source of the image. the onload function ensures that the blob is loaded before the
             // curImg.src = e.target.result;
             curImg.src = e.target.result;
             let fileName;
@@ -208,16 +208,23 @@ var Dimwhit = (function () {
 
             // !VA Get element properties here
             function getElementProperties() { 
-              // !VA Set a short timeout while the blob loads.
+              // !VA Set a short timeout while the blob loads, then run the onload function before displaying the image and getting its properties. This is probably overkill, but noone will notice the 250ms anyway and better safe then no-workie
               setTimeout(() => {
-                // !VA Show the curImg, hopefully the blob has loaded by now.
-                document.querySelector(dynamicRegions.curImg).style.display = 'block';
-                // !VA Pass the blob to the Appobj for passing to getImgData
-                Appobj.currentimg = document.querySelector(dynamicRegions.curImg);
-                // !VA Call getAppData to get the image properties
-                Appdata = UIController.getAppData(Appobj, fileName);
-                // !VA Pass Appdata on to evalViewerSizes in order to resize the image containers dynamically based on the dimensions of the image.
-                calcController.evalViewerSize(Appdata);
+                // Once the blob is loaded, show it and get its data
+                curImg.onload = (function() {
+                  document.querySelector(dynamicRegions.curImg).style.display = 'block';
+                  // !VA Pass the blob to the Appobj for passing to getImgData
+                  Appobj.currentimg = document.querySelector(dynamicRegions.curImg);
+                  // !VA Call getAppData to get the image properties
+                  Appdata = UIController.getAppData(Appobj, fileName);
+                  // !VA Pass Appdata on to evalViewerSizes in order to resize the image containers dynamically based on the dimensions of the image.
+                  console.log('Appobj is...');
+                  console.dir(Appobj);
+                  calcController.evalViewerSize(Appdata);
+                  console.log('Appdata is...');
+                  console.dir(Appdata);
+                })();
+                
                 // !VA Timeout of 250 ms while the blob loads.
               }, 250);
             }
