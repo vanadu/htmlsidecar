@@ -1,10 +1,9 @@
 
 /* !VA  
 ===========================================================
-TODO: Now Dev Mode doesn't work any more - can't drop an image on an existing image. 
-1) Fix the main-img-container issue for the dev image.
+TODO: Fix the main-img-container issue for the dev image. Don't forget that the removeCurImg function references main-img-container, so adding that to the HTML file won't be without repercussions.
 
-
+DONE: Now Dev Mode doesn't work any more - can't drop an image on an existing image. This appears to be fixed...we'll see
 DONE: Fix small phones and large phones dimViewers
 DONE: Implement notification fonts on dimViewers
 DONE: Fix small phones and large phones dimViewers
