@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" itemscope itemtype="http://schema.org/Article">
+<head>
+  <meta charset="utf-8">
+  <title>DimWHIT.IO</title>
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5-els.js"></script>
+  <![endif]-->
+
+</head>
+  <body>
+    <div id="id1">
+
+      <H1> id2 h1</H1>
+
+    </div>
+
+  <div id="id2">
+
+    
+  </div>
+
+
+
+  </body>
+  <script>
+
+
+  
+
+
+
+// !VA ===========================
+
+
+
+    var curImg = 'img/TEST/BikeMedium.jpg';
+    console.dir(curImg);
+    var div3 = document.createElement('div');
+    div3.id = 'div3';
+    document.getElementById('id2').insertBefore(div3, null);
+    var x;
+    function functionOne(x) { 
+
+        console.log('x is: ' + x);
+        var foo = document.querySelector('#cur-img').width;
+        console.log('foo is: ' + foo);
+        
+
+    }
+
+    function functionTwo(curImg, callback) {
+        console.log('I write the HTML Elements to the DOM');
+        curImg = document.createElement('img');
+        curImg.id = 'cur-img';
+        console.log('curImg.id is: ' + curImg.id);
+        curImg.setAttribute('src', 'img/TEST/BikeMedium.jpg');
+        curImg.setAttribute('width', '304');
+        curImg.setAttribute('height', 'auto');
+        document.getElementById('div3').insertBefore(curImg, null);
+        callback(curImg);		
+    }
+
+    functionTwo(curImg, functionOne);
+
+  </script>
+</html>

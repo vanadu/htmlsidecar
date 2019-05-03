@@ -1165,7 +1165,7 @@ var Dimwhit = (function () {
   //Get aspect ratio End
   //MATH FUNCTIONS END
 
-  //STRING FUNCTIONS
+  //STRING FUNCTIONSmain-image-viewer-wdth
   // !VA Convert integer to pixel
   function intToPx(int) {
     let pxval
@@ -1344,7 +1344,7 @@ var Dimwhit = (function () {
     addEventHandler(toolButtons.sPhoneWidth,'keypress',refreshAppObj,false);
     addEventHandler(toolButtons.sPhoneWidth,'blur',handleInputBlur,false);
     addEventHandler(toolButtons.sPhoneWidth,'click',focusOnClick,false);
-    addEventHandler(toolButtons.lPhoneWidth,'dragover',killDrop,false);
+    addEventHandler(toolButtons.lPhoneWidth,'dragover',killDrop,false);s
     addEventHandler(toolButtons.lPhoneWidth,'drop',killDrop,false);
     addEventHandler(toolButtons.lPhoneWidth,'keypress',refreshAppObj,false);
     addEventHandler(toolButtons.lPhoneWidth,'blur',handleInputBlur,false);

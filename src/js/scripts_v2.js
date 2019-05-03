@@ -107,16 +107,16 @@ var Dimwhit = (function () {
       largePhonesBuildCSSBut: ''
     };
 
-    
+
  
     // !VA  This object only contains HTML elements whose properties change based on the properties of the image that is contained in them. It does NOT need to have a Constructor because it's not serving as the blueprint for any other objects.
     // !VA  We are initializing this here, and it will be updated
-    Appobj = {
-      currentimg: document.querySelector(dynamicRegions.curImg),
-      viewer: document.querySelector(dynamicRegions.imgViewer),
-      viewport: document.querySelector(dynamicRegions.imgViewport),
-      appcontainer: document.querySelector(dynamicRegions.appContainer)
-    };
+    // Appobj = {
+    //   currentimg: document.querySelector(dynamicRegions.curImg),
+    //   viewer: document.querySelector(dynamicRegions.imgViewer),
+    //   viewport: document.querySelector(dynamicRegions.imgViewport),
+    //   appcontainer: document.querySelector(dynamicRegions.appContainer)
+    // };
 
     /* !VA  I don't remember what this was for. 
     function getCurIasdasfdmg(curImg, fileName) {
@@ -169,6 +169,7 @@ var Dimwhit = (function () {
       handleFileSelect: function(evt) {
         console.log('RUnning HandleFileSelect');
         // If a file is already being displayed, i.e. Appdata.filename is true, then remove that image to make room for the next image being dropped
+        // !VA TODO:
         if (Appdata.currentimg) {
           // !VA 03.18.18 Don't need the var declaration anymore - it's in the appRegions object
           // var curImg = document.getElementById('main-img');
@@ -227,45 +228,103 @@ var Dimwhit = (function () {
             fileName = theFile.name;
             // Pass the FileObject i.e. new Image object to the function that gets the image data
             // !VA  03.18.18 Put the curImg created with FileReader in the appRegions object
-            dynamicRegions.curImg = curImg;
-            console.log('Showing curImg...');
-            console.dir(curImg);
-            Appdata.currentimg = curImg;
-            Appdata.filename =fileName;
-            console.dir(Appdata);
 
-            // !VA Trying to understand how Dimwhit 1 handles the image display
-            console.log(Appdata.currentimg);
+            console.log('Showing curImg...');
+
+            // !VA Hide the dropArea
             document.querySelector(staticRegions.dropArea).style.display = 'none';
-            const curImgDiv = document.createElement('div');
-          
-            // Assign an id to the new div -- we're not adding this to an object because it's created here and is only used here. NOTE: These containers divs don't appear in devMode when the curImg is accessed from the index.html 
-            curImgDiv.id = 'main-img-container';
-            // Insert main-img-container into the existing main-image
-            document.getElementById('main-image').insertBefore(curImgDiv, null);
-            // !VA insert main-img-container into the newly-created main-img-container
-            document.getElementById('main-img-container').insertBefore(dynamicRegions.curImg, null);
-            // Create the image object and read in the binary image from the FileReader object.
-            // This allows access of image properties. You can't get image properties from a FileReader object -- it's just a blob' 
+
+            var Appobj = {
+              currentimg: curImg,
+              viewer: document.querySelector(dynamicRegions.imgViewer),
+              viewport: document.querySelector(dynamicRegions.imgViewport),
+              appcontainer: document.querySelector(dynamicRegions.appContainer)
+            };
+
+            // var curImg = 'img/TEST/BikeMedium.jpg';
+            console.dir(curImg);
+            // var div3 = document.createElement('div');
+            // div3.id = 'div3';
+            // document.getElementById('id2').insertBefore(div3, null);
+            var mess;
+            // !VA Get element properties here
+            function getElementProperties(mess) { 
+
+              setTimeout(() => {
+                
+                console.log('mess is: ' + mess);
+                // !VA 
+
+                document.querySelector(dynamicRegions.curImg).style.display = 'block';
+                var foo = document.querySelector(dynamicRegions.curImg).width;
+                console.log('foo is: ' + foo);
+                Appobj.currentimg = document.querySelector(dynamicRegions.curImg);
+  
+  
+                console.log('Appobj.currentimg is...');
+                console.dir(Appobj.currentimg);
+                // !VA Call 
+                Appdata = UIController.getAppData(Appobj, fileName);
+                calcController.evalViewerSize(Appdata);
+
+              }, 250);
+        
+              // document.querySelector(dynamicRegions.curImg).style.display = 'block';
+      
+            }
+            // !VA Write elements to DOM here
+            function writeImgToDOM(curImg, callback) {
+              // VA! This callback function allows access of image properties. You can't get image properties from a FileReader object -- it's a binary blob that takes time to load, and by the time it's loaded all the functions that get its properties have run and returned undefined. Temporary solution: hide the image object for 250 ms, then show it and get the properties -- by then it should have loaded. There is a better way to do this with promises but that will have to be for later.
+              // !VA Create a div in the DOM
+              var curImgDiv = document.createElement('div');
+              // !VA Assign the new div an id that reflects its purpose
+              curImgDiv.id = 'main-img-container';
+              // Insert main-img-container into the existing main-image inside the main-image div.
+              document.getElementById('main-image').insertBefore(curImgDiv, null);
+              // !VA insert the new curImg into the new main-img container
+              document.getElementById('main-img-container').insertBefore(curImg, null);
+              // Create the image object and read in the binary image from the FileReader object.
+              // This allows access of image properties. You can't get image properties from a FileReader object -- it's just a blob' 
+              // !VA Hide the DOM element while the blob loads.
+              document.querySelector(dynamicRegions.curImg).style.display = 'none';
+
+              callback(curImg);		
+            }
+        
+            writeImgToDOM(curImg, getElementProperties);
+
           };
         })(f);
         // Read in the image file as a data URL.
         reader.readAsDataURL(f);
         // }
+        
       },
       //FILEREADER OBJECT PROCESSING END
 
 
-      // !VA This is wrong...
-      // updateAppdata: function (curImg, imgViewer, imgViewport, appContainer ) {
-      //   Appdata.currentimg = curImg;
-      //   Appdata.viewer = imgViewer;
-      //   Appdata.viewport = imgViewport;
-      //   Appdata.appcontainer = appContainer;
-      //   return Appdata;
-      // },
+      /* DOn't need this anymore, since it didn't work and the callback function does work
+      getCurImg: function () {
+        console.log('getCurImg running');
 
+        // var curImg = document.getElementById('main-img');
+        var curImgDiv = document.createElement('div');
 
+        curImgDiv.id = 'main-img-container';
+        // curImgDiv = 'main-img-container';
+        // Insert main-img-container into the existing main-image
+        document.getElementById('main-image').insertBefore(curImgDiv, null);
+        // !VA insert main-img-container into the newly-created main-img-container
+        document.getElementById('main-img-container').insertBefore(curImg, null);
+        // Create the image object and read in the binary image from the FileReader object.
+        // This allows access of image properties. You can't get image properties from a FileReader object -- it's just a blob' 
+        var curImg = document.getElementById('main-img');
+
+        
+        return foo;
+
+      },
+      */
 
       // !VA Populate Appdata using the properties of the dynamic regions in the 
       // !VA  Appdata can only be populated if there's an image. If the DEV image isn't loaded or the USER hasn't dropped in an image yet, then Appdata.filename is undefined and script won't run.
@@ -273,8 +332,18 @@ var Dimwhit = (function () {
       getAppData: function(Appobj, filename) {
         // console.log('getAppData: Appdata.currentimg is...');
         // console.log(Appdata.currentimg.src);
-        
+        // console.log('Appobj,currentimg is...');
+        // console.dir(Appobj.currentimg);
+        // var curimgwidth = Appobj.currentimg.width;
+        // console.log('curimgwidth: ' + curimgwidth);
 
+        // var Appobj = {
+        //   currentimg: dynamicRegions.curImg,
+        //   viewer: document.querySelector(dynamicRegions.imgViewer),
+        //   viewport: document.querySelector(dynamicRegions.imgViewport),
+        //   appcontainer: document.querySelector(dynamicRegions.appContainer)
+        // };
+        
         // !VA If there's no current image, then return false. This is the flag to the initializeDOM function that there is no DEV image in the HTML. The init then shows the drop area and 'No Image' in the dimViewers.
         if (Appobj.currentimg == null || Appobj.currentimg === 'undefined') {
           return false;
@@ -284,16 +353,6 @@ var Dimwhit = (function () {
             // filename: 'blob',
             // STOP HERE -- I don't understand how to get a funcion return value and set it a property.
             filename: filename,
-            //  (function() {
-              
-            //   var typ = Appobj.currentimg.nodeName;
-            //   if ( typ === 'DIV') {
-            //     return 'No Image';
-            //   } else { 
-            //     var f =  calcController.getFilenameFromSource(Appobj.currentimg.src);
-            //     return f;
-            //   }
-            // }),
             imgH: Appobj.currentimg.height,
             imgW: Appobj.currentimg.width,
             imgNH: Appobj.currentimg.naturalHeight,
@@ -313,10 +372,11 @@ var Dimwhit = (function () {
           };
           console.log('getAppData: Appdata is...');
           console.table(Appdata);
-          // console.log('Appdata.filename is: ' + Appdata.filename);
-          // console.log('getAppData: Appdata.filename is: ' + Appdata.filename());
-          // console.log('getAppData: aspect ratio is: ' + Appdata.aspect()[1]);
+          console.log('Appdata.filename is: ' + Appdata.filename);
+          console.log('getAppData: Appdata.filename is: ' + Appdata.filename);
+          console.log('getAppData: aspect ratio is: ' + Appdata.aspect()[1]);
           return Appdata;
+          
         }
       },
 
@@ -737,6 +797,7 @@ var Dimwhit = (function () {
       var evalViewerSize = calcController.evalViewerSize(Appdata);
 
 
+      
 
     };
 
