@@ -1,6 +1,10 @@
 
 /* !VA  
 ===========================================================
+TODO: Now Dev Mode doesn't work any more - can't drop an image on an existing image. 
+1) Fix the main-img-container issue for the dev image.
+
+
 DONE: Fix small phones and large phones dimViewers
 DONE: Implement notification fonts on dimViewers
 DONE: Fix small phones and large phones dimViewers
@@ -206,7 +210,7 @@ var Dimwhit = (function () {
 
             // !VA Get element properties here
             function getElementProperties() { 
-              // !VA Set a short timeout while the blob loads, then run the onload function before displaying the image and getting its properties. This is probably overkill, but noone will notice the 250ms anyway and better safe then no-workie
+              // !VA Set a short timeout while the blob loads, then run the onload function before displaying the image and getting its properties. This is probably overkill, but noone will notice the 250ms anyway and better safe then no-workie.
               setTimeout(() => {
                 // Once the blob is loaded, show it and get its data
                 curImg.onload = (function() {
@@ -230,6 +234,10 @@ var Dimwhit = (function () {
             // !VA First, write the new curImg object to the DOM
             function writeImgToDOM(curImg, callback) {
               // VA! The callback function allows access of image properties. You can't get image properties from a FileReader object -- it's a binary blob that takes time to load, and by the time it's loaded all the functions that get its properties have run and returned undefined. Temporary solution: hide the image object for 250 ms, then show it and get the properties -- by then it should have loaded. There is a better way to do this with promises but that will have to be for later.
+
+              console.log('writeImgToDOM --');
+              console.log('dynamicRegions.curImg is: '+ dynamicRegions.curImg);
+              
               // !VA Create a div in the DOM
               var curImgDiv = document.createElement('div');
               // !VA Assign the new div an id that reflects its purpose
@@ -612,18 +620,11 @@ var Dimwhit = (function () {
         if (Appdata.imgNW < (Appdata.lPhoneW * 2) ) {
           curDimViewer.push(dimViewers.largephones);
         } 
-        
+        // !VA Reset all the dim viewer alerts by passing in the entire dimViewer array
         UIController.setDimAlerts(dimViewers, false);
-
+        // !VA Now set the individual dim viewer alerts for the current image.
         UIController.setDimAlerts(curDimViewer, true);
-
-
       },
-
-      // tst: function() {
-      //   console.log('running tst...');
-      //   console.dir(UIController.dimViewers);
-      // }
     };
   })();
 
@@ -633,8 +634,8 @@ var Dimwhit = (function () {
   var controller = (function(calcCtrl, UICtrl) {
 
     var Appobj = {};
-
-    // !VA V2 getting ID strings from UIController
+    
+    // !VA V2 getting DOM ID strings from UIController
     var dimViewers = UIController.getDimViewerIDs();
     var dynamicRegions = UIController.getDynamicRegionIDs();
     var staticRegions = UIController.getStaticRegionIDs();
@@ -669,9 +670,6 @@ var Dimwhit = (function () {
       // dropZone.addEventListener('drop', startNewDrop, false);
       // Drag and Drop Listener 
       //DRAG AND DROP PROCESSING END
-
-
-
 
       //EVENT HANDLING START 
       function addEventHandler(oNode, evt, oFunc, bCaptures) {
@@ -772,7 +770,13 @@ var Dimwhit = (function () {
       // !VA  Show the toolbar
       document.querySelector(staticRegions.toolsContainer).style.display = 'block';
 
-      // !VA Create
+      // !VA This is where we run writeImgToDOM to:
+      /* 1) Insert the main-img-container insider the main-img element
+         2) Include logic to exclude inserting the image unless it doesn't exist already, i.e. is the FileReader blob and not the hard-coded image from the HTML file.
+      */
+
+
+
 
       // !VA AppobjDev returns NaN for the viewer containers because they don't have values yet... not sure I understand why since height and width are initially declared in CSS.
       var Appdata = UIController.getAppData(AppobjDev, filename);
