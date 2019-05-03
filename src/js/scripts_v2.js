@@ -1,9 +1,10 @@
 
 /* !VA  
-CURRENT - Comment new code. Stopped here.
-TODO: Fix Dev mode.
+===========================================================
 TODO: Fix it so you can drop new images on existing images 
 
+DONE: Added onload to getElementProperties to prevent accessing properties before blob is loaded.
+DONE: Devmode wasn't broken, was just using index.html instead of index_v2.html
 
 */
 //SCRIPT START
@@ -138,13 +139,8 @@ var Dimwhit = (function () {
       handleFileSelect: function(evt) {
         console.log('RUnning HandleFileSelect');
         // If a file is already being displayed, i.e. Appdata.filename is true, then remove that image to make room for the next image being dropped
-        // !VA TODO: This doesn't work anymore
-        if (Appdata.currentimg) {
-          // !VA 03.18.18 Don't need the var declaration anymore - it's in the appRegions object
-          // var curImg = document.getElementById('main-img');
-          dynamicRegions.curImg.parentNode.removeChild(dynamicRegions.curImg);
-        }
-        // console.log('HANDLEFILESELECT');
+        // !VA Remove the current #main-img from the DOM. This has to be done in a separate function call, I'm not sure why handleFileSelect doesn't see #main-img even though it is in the DOM at this point
+        UIController.removeCurImg();
         //The drop event has been executed and handleFileSelect is running.
         // !VA Can't remember what this does...    
         evt.stopPropagation();
@@ -218,11 +214,7 @@ var Dimwhit = (function () {
                   // !VA Call getAppData to get the image properties
                   Appdata = UIController.getAppData(Appobj, fileName);
                   // !VA Pass Appdata on to evalViewerSizes in order to resize the image containers dynamically based on the dimensions of the image.
-                  console.log('Appobj is...');
-                  console.dir(Appobj);
                   calcController.evalViewerSize(Appdata);
-                  console.log('Appdata is...');
-                  console.dir(Appdata);
                 })();
                 
                 // !VA Timeout of 250 ms while the blob loads.
@@ -360,6 +352,13 @@ var Dimwhit = (function () {
           return Appdata, dimViewers;
         }
       },
+      // !VA Test for whether there is already a #main-img element in the DOM, and if there is remove it so handleFileSelect can overwrite it without having to refresh the page to reboot the app.
+      removeCurImg: function () {
+        if ( document.querySelector('#main-img-container')) {
+          console.log(document.querySelector('#main-img-container').parentNode);
+          document.querySelector('#main-img-container').parentNode.removeChild(document.querySelector('#main-img-container'));
+        } 
+      }
     };
   })();
   // var r = UIController.getAppdata();
@@ -530,7 +529,7 @@ var Dimwhit = (function () {
         // console.log('adjustContainerHeights: Appdata is...');
         // console.dir(Appdata);
         UIController.refreshAppUI(Appdata);
-      }
+      },
     };
   })();
 
@@ -575,6 +574,9 @@ var Dimwhit = (function () {
       // dropZone.addEventListener('drop', startNewDrop, false);
       // Drag and Drop Listener 
       //DRAG AND DROP PROCESSING END
+
+
+
 
       //EVENT HANDLING START 
       function addEventHandler(oNode, evt, oFunc, bCaptures) {
@@ -655,8 +657,8 @@ var Dimwhit = (function () {
       document.querySelector(toolButtons.viewerWidth).placeholder = initViewerW;
       console.log('toolButtons.viewerWidth is: ' + toolButtons.viewerWidth);
       // !VA  Test if there is currently #main-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
-      // var curImgExists = document.querySelector(dynamicRegions.curImg);
-      // console.log('curImgExists is: ' + curImgExists);
+      var curImgExists = document.querySelector(dynamicRegions.curImg);
+      console.log('curImgExists is: ' + curImgExists);
       // !VA  Now we have to populate Appdata with data. We can do it manually here and just pass the object on to refresh the screen elements.
       // !VA If there's no current image, then return false. This is the flag to the initializeDOM function that there is no DEV image in the HTML. The init then shows the drop area and 'No Image' in the dimViewers.
 
@@ -700,48 +702,12 @@ var Dimwhit = (function () {
         setupEventListeners();
         // !VA  Test if there is currently #main-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
         var curImgExists = document.querySelector(dynamicRegions.curImg);
+        // console.log('curImgExists is: ' + curImgExists);
         if (curImgExists) {
           initializeDevMode();
         } else {
-
+          // !VA Run refreshAppUI which tests for an existing image and writes 'No Image' to the dimViewers if none is found. Once that is done, the app waits for a drop event.
           UIController.refreshAppUI(Appobj);
-          /* !VA  
-          1) Set the initial interface:
-          
-          */
-          // initializeUserMode();
-          /*
-        // !VA This is USER MODE -- there's no hardcoded image in the HTML file.
-        // !VA  Initialize Appdata to provide values for the Appdata function. Use the  
-        console.log('USER MODE: no current image');
-        // !VA V2 Show the dropArea
-        document.querySelector(staticRegions.dropArea).style.display = 'block';
-        // !VA Give some w and h to the imgViewer to show the white icon background.
-        document.querySelector(dynamicRegions.imgViewer).style.width = '650px';
-        document.querySelector(dynamicRegions.imgViewer).style.height = '450px';
-        // !VA  Now we create an Appdata using the dropArea instead of a curImg, since we don't have a curImg yet. The dropArea will be replaced with a curImg as soon as the user drops one in.
-        curImg = document.querySelector('#drop-area');
-        imgViewer = document.querySelector(dynamicRegions.imgViewer);
-        imgViewport = document.querySelector(dynamicRegions.imgViewport);
-        appContainer = document.querySelector(dynamicRegions.appContainer);
-        // !VA Update the and return the Appdata with the current values
-       var Appdata = UIController.updateAppdata(curImg, imgViewer, imgViewport, appContainer);
-        console.dir(Appdata);
-        // !VA Now get the Appdata using the current Appdata
-        var Appdata = UIController.getAppData(Appdata);
-        // console.dir(Appdata);
-        console.log('Appdata.currentimg is: ' + Appdata.currentimg);
-        console.log(Appdata.filename());
-
-        // !VA  !IMPORTANT! To loop through an object listing, use Object.key, .value and .entries to convert a list object into an array!!!!!!!
-        // !VA  Loop throug the array and assign No Image tot he dimViewers
-        const dimarray = Object.values(dimViewers);
-        for ( let i = 0; i < dimarray.length; i++ ) {
-          if ( dimarray[i] !== '#clipboard-but' &&  dimarray[i] !== '#filename-viewer' ) {
-            document.querySelector(dimarray[i]).innerHTML = `<span class='pop-font'>&nbsp;&nbsp;No Image</span>`;
-          } 
-        } 
-              */
         }
       }
     };
