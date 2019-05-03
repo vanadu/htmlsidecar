@@ -1,9 +1,8 @@
 
 /* !VA  
 ===========================================================
-TODO: Fix small phones and large phones dimViewers
-TODO: Implement notification fonts on dimViewers
-
+DONE: Fix small phones and large phones dimViewers
+DONE: Implement notification fonts on dimViewers
 DONE: Fix small phones and large phones dimViewers
 DONE: Fix it so you can drop new images on existing images 
 DONE: Added onload to getElementProperties to prevent accessing properties before blob is loaded.
@@ -295,12 +294,16 @@ var Dimwhit = (function () {
           // console.table(Appdata);
           // console.log('getAppData - Appdata.filename is: ' + Appdata.filename);
           // console.log('getAppData - aspect ratio is: ' + Appdata.aspect()[1]);
-          console.log('Appdata dimViewers is...');
-          console.dir(dimViewers);
+          // console.log('Appdata dimViewers is...');
+          // console.dir(dimViewers);
+
+          // !VA STOP HERE -- serious problem -- at this point, the curImg hasn't been resized down to the width of the viewer, so the height and width values are also the same as NW and NH. 
+          // !VA TODO: Fix this, it's not getting the right imgH and imgW
           calcController.evalDimAlerts(Appdata, dimViewers);
-          return Appdata;
+
           
         }
+        return Appdata;
       },
 
       // OBJECT AND DISPLAY REFRESH FUNCTIONS
@@ -320,9 +323,6 @@ var Dimwhit = (function () {
           } 
           // return;
         } else {
-
-          console.log('Appdata is...');
-          console.dir(Appdata);
           // !VA Write the dimViewers to the UI based on Appdata values and show the clipboard button
           document.querySelector(dimViewers.clipboardBut).style.display = 'block';
           // Filename
@@ -384,19 +384,33 @@ var Dimwhit = (function () {
       //   // !VA Set the style.color property of the to 'red' if true; reset to 'auto' if false
       //   document.querySelector(curDim).style.color = att;
       // }
-      setDimAlerts: function(curDimViewers, bool, dimViewers) {
+      setDimAlerts: function(curDimViewers, bool) {
+        
         console.log('setDimAlerts running');
+        console.dir(Appdata);
         // !VA if evalDimAlerts returns true, then the dimViewer should be displayed in red. To reset the dim alert, set to style color to 'auto'.
         var att = bool;
-        bool ? att = 'red': att = 'auto';
+        bool ? att = 'red': att = 'inherit';
+        // console.log('setDimAlerts - curDimViewers is...');
+        // console.dir(curDimViewers);
+        // !VA We want to use this same function to reset the dim alerts when a new image is loaded. For that, we need to pass in an array of all the dimViewer IDs, not just an array of the ones that are already red. So, first test if the argument is an object, and if it is convert it into a list of values so the loop will accept it.
+
+        if (Array.isArray(curDimViewers) === false) {
+          // console.log('bool is: ' + bool);
+          curDimViewers = Object.values(curDimViewers);
+          // console.log('curDimViewers is: ' + curDimViewers);
+        }
+        // debugger;
 
 
-        // !VA For each dimViewer passed from evalDimAlerts, set the font color style to red.
+
+        // !VA For each dimViewer passed from evalDimAlerts, set the font color style based on the bool argument passed in.
         for (let i = 0; i < curDimViewers.length; i++) {
           document.querySelector(curDimViewers[i]).style.color = att;
-          console.log(curDimViewers[i]);
-          console.log('setDimAlerts - dimViewers is...');
-          console.dir(dimViewers);
+          // console.log('bool is: ' + bool);
+          // console.log(curDimViewers[i]);
+          // console.log('setDimAlerts - dimViewers is...');
+          // console.dir(dimViewers);
         }
 
       }
@@ -411,9 +425,14 @@ var Dimwhit = (function () {
   // !VA Calculations Controller Contructor
   var calcController = (function() {
 
-    // var data = UIController.getAppData();
-    // console.log('data is: ' + data);
-
+    // !VA If we want to access any of the DOM IDs we have to call them from UIController where they're defined.
+    var dimViewers = UIController.getDimViewerIDs();
+    var dynamicRegions = UIController.getDynamicRegionIDs();
+    var staticRegions = UIController.getStaticRegionIDs();
+    var toolButtons = UIController.getToolButtonIDs();
+    var ccpPropStrings = UIController.getCcpPropStringsIDs();
+    var ccpUserInput = UIController.getDynamicRegionIDs();
+    var ccpBuildTag = UIController.getCcpBuildTagIDs();
 
 
     return {
@@ -521,9 +540,8 @@ var Dimwhit = (function () {
 
         // The image is wider and taller than the current viewer height and width so we have to resize the image and the viewport based on the current viewport width
         case (Appdata.imgNW > Appdata.viewerW) && (Appdata.imgNH > Appdata.viewerH) :
-          // console.log('CASE 4');
           // Set the image Width to the current  viewer width 
-          console.log('Case 4: Appdata.viewerW is: ' + Appdata.viewerW );
+          // console.log('Case 4: Appdata.viewerW is: ' + Appdata.viewerW );
           Appdata.imgW = Appdata.viewerW;
           // Set the image height proportional to the new image width using the aspect ratio function
           Appdata.imgH = Math.round((1/this.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[0]) * Appdata.imgW);
@@ -535,6 +553,10 @@ var Dimwhit = (function () {
           // !VA TODO: Check this out, doesn't seem to be a problem anymore: BUG Problem with the 800X550, 800X600 -- no top/bottom gutter on viewport
           break;
         }
+        // !VA Run evalDimAlerts now, after all the containers have been resized.
+        // !VA !IMPORTANT! THIS IS WHERE TO GET THE UPDATED APPDATA
+        calcController.evalDimAlerts(Appdata, dimViewers);
+        
       },
       
       adjustContainerHeights: function (Appdata)  {
@@ -576,8 +598,11 @@ var Dimwhit = (function () {
       evalDimAlerts: function(Appdata, dimViewers) {
         // !VA Size On Disk is NOT 2X the Display Size: flag Size on Disk and Retina
         var curDimViewer = [];
-        if (Appdata.imgNW < (Appdata.imgW * 2) ) {
+        if (Appdata.imgNW <= (Appdata.imgW * 2) ) {
+          console.log('Appdata.imgW is: ' + Appdata.imgW);
           curDimViewer.push(dimViewers.diskimg);
+          console.log('Case 1');
+          console.dir(Appdata);
         } 
         // !VA Small phones isn't at least 2X size on Disk and Retina
         if (Appdata.imgNW < (Appdata.sPhoneW * 2) ) {
@@ -587,13 +612,18 @@ var Dimwhit = (function () {
         if (Appdata.imgNW < (Appdata.lPhoneW * 2) ) {
           curDimViewer.push(dimViewers.largephones);
         } 
-        UIController.setDimAlerts(curDimViewer, true, dimViewers);
+        
+        UIController.setDimAlerts(dimViewers, false);
+
+        UIController.setDimAlerts(curDimViewer, true);
+
+
       },
 
-      tst: function() {
-        console.log('running tst...');
-        console.dir(UIController.dimViewers);
-      }
+      // tst: function() {
+      //   console.log('running tst...');
+      //   console.dir(UIController.dimViewers);
+      // }
     };
   })();
 
@@ -755,8 +785,7 @@ var Dimwhit = (function () {
 
     return {
       init: function(){
-        calcController.tst();
-
+        // calcController.tst();
         console.log('App initialized.');
         // !VA  Initialize the ImgViewer to accomodate the dragArea. This should be the same as the CSS definition.
         document.querySelector(dynamicRegions.imgViewer).style.width = '650px';

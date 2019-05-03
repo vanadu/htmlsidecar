@@ -344,6 +344,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   width: 98%;
   height:  95px;
   margin: 0 auto;
+  color: #FFFFFF;
   &.show-err {
     transform: translate(0, -85px);
     transition: transform 250ms;
