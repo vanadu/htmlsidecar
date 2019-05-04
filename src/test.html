@@ -7,65 +7,103 @@
   <!--[if lt IE 9]>
   <script src="http://html5shim.googlecode.com/svn/trunk/html5-els.js"></script>
   <![endif]-->
+<style>
+  #cont {
+    position: absolute;
+    top: 50px;
+    right: 20px;
+    border: 1px solid red;
+    width: 200px;
+    height: 500px;
+
+  }
+  .but {
+    width: 200px;
+    height: 50px;
+    position: relative; 
+    display: block;
+    margin-top: 50px;
+  }
+
+  .but:hover {
+    background: yellow;
+  }
+
+
+</style>
 
 </head>
   <body>
-    <div id="id1">
+    <div id="cont">
 
-      <H1> id2 h1</H1>
+      <button id="ID1" class="but">
+          1
+      </button>
+      <button id="ID2" class="but">
+          2
+      </button>
+      <button id="ID3" class="but">
+          3
+      </button>
 
     </div>
 
-  <div id="id2">
-
-    
-  </div>
 
 
 
   </body>
   <script>
 
-
-  
-
-
-
 // !VA ===========================
 
+  // !VA Create event handler function
+  function addEventHandler(oNode, evt, oFunc, bCaptures) {
+  //Removing this -- apparently IE 9 and 10 support addEventListener
+  // if (typeof(window.event) != "undefined")
+  // 	oNode.attachEvent("on"+evt, oFunc);
+  // else
+  oNode.addEventListener(evt, oFunc, bCaptures);
+  }
 
+  // !VA Constructor for objects that store the addEventHandler parameters. Note that placeholders can be added using the constructor's prototype I think.
+  function Eobj(id, evt, func, bool) {
+    this.id = id;
+    this.evt = evt;
+    this.func = func;
+    this.bool = bool;
+  }
 
-    var curImg = 'img/TEST/BikeMedium.jpg';
-    console.dir(curImg);
-    var div3 = document.createElement('div');
-    div3.id = 'div3';
-    document.getElementById('id2').insertBefore(div3, null);
-    var x;
-    function functionOne(x) { 
+  // !VA Array for storing the DOM elements that take event handlers. !IMPORTANT! The DOM elements aren't named successively, so the array will need to be created manually.
+  var buts = [];
+  buts[0] =  new Eobj('ID1', 'click', getAppData, false);
+  buts[1] =  new Eobj('ID2', 'click', getAppData, false);
+  buts[2] =  new Eobj('ID2', 'click', getAppData, false);
 
-        console.log('x is: ' + x);
-        var foo = document.querySelector('#cur-img').width;
-        console.log('foo is: ' + foo);
-        
-
+  console.log('buts.length is: ' + buts.length);
+  function doit(butsarr) {
+    console.log('Doing it...');
+    for (let i = 0; i < butsarr.length; i++) {
+    console.log(butsarr[i]);
+    addEventHandler(document.getElementById(butsarr[i].id), butsarr[i].evt, butsarr[i].func, butsarr[i].bool);
     }
+  }
 
-    function functionTwo(curImg, callback) {
-        console.log('I write the HTML Elements to the DOM');
-        curImg = document.createElement('img');
-        curImg.id = 'cur-img';
-        console.log('curImg.id is: ' + curImg.id);
-        curImg.setAttribute('src', 'img/TEST/KittiesHuge.jpg');
-        curImg.setAttribute('width', '304');
-        curImg.setAttribute('height', 'auto');
-        document.getElementById('div3').insertBefore(curImg, null);
-        callback(curImg);		
-    }
+  function getAppData() {
+    console.log('CLICKED');
 
-    functionTwo(curImg, functionOne);
+  };
+    
+    doit(buts);
 
+    
 
+  // function doit(but1) { 
+  //   console.log('Doing it...');
+  //   console.log(but1);
+  //   console.log('but1.id is: ' + but1.id);
+  //   addEventHandler(document.getElementById(but1.id), but1.evt, but1.func, but1.bool);
 
+  // };
 
   </script>
 </html>
