@@ -153,7 +153,6 @@ var Dimwhit = (function () {
       largePhonesBuildCSSBut: ''
     };
 
-
     // !VA Functions that get returned from the UIContoller object go here
     return {
       // !VA V2 Return all the strings for the UI element's IDs
@@ -303,9 +302,6 @@ var Dimwhit = (function () {
       },
       //FILEREADER OBJECT PROCESSING END
 
-      accessAppdata: function(){
-        return Appdata;
-      },
 
       getAppData: function(Appobj, filename) {
         // !VA  Appdata can only be populated if there's an image. If the DEV image isn't loaded or the USER hasn't dropped in an image yet, then Appdata.filename is undefined and script won't run.
@@ -355,7 +351,7 @@ var Dimwhit = (function () {
         }
         return Appdata;
       },
-      
+
       // OBJECT AND DISPLAY REFRESH FUNCTIONS
       // This is where we pass in the recalculated Appdata data and update the onscreen display of the Appdata data in the dimViewers as well as the image object and image containers. 
       refreshAppUI: function (Appdata) {
@@ -424,6 +420,9 @@ var Dimwhit = (function () {
       },
 
       setDimAlerts: function(curDimViewers, bool) {
+        
+        console.log('setDimAlerts running');
+        console.dir(Appdata);
         // !VA if evalDimAlerts returns true, then the dimViewer should be displayed in red. To reset the dim alert, set to style color to 'auto'.
         var att = bool;
         bool ? att = 'red': att = 'inherit';
@@ -600,6 +599,7 @@ var Dimwhit = (function () {
         var heightVal = Appdata.imgH;
         // console.log('heightVal is: ' + heightVal);
         // console.log('adjustContainerHeights Appdata is: ');
+        // console.dir(Appdata);
         let viewerH;
         let viewportH;
         let appContainerH; 
@@ -626,6 +626,7 @@ var Dimwhit = (function () {
         Appdata.viewportH = viewportH;
         Appdata.appH = appContainerH;
         // console.log('adjustContainerHeights: Appdata is...');
+        // console.dir(Appdata);
         UIController.refreshAppUI(Appdata);
       },
 
@@ -633,7 +634,10 @@ var Dimwhit = (function () {
         // !VA Size On Disk is NOT 2X the Display Size: flag Size on Disk and Retina
         var curDimViewer = [];
         if (Appdata.imgNW <= (Appdata.imgW * 2) ) {
+          console.log('Appdata.imgW is: ' + Appdata.imgW);
           curDimViewer.push(dimViewers.diskimg);
+          console.log('Case 1');
+          console.dir(Appdata);
         } 
         // !VA Small phones isn't at least 2X size on Disk and Retina
         if (Appdata.imgNW < (Appdata.sPhoneW * 2) ) {
@@ -648,27 +652,6 @@ var Dimwhit = (function () {
         // !VA Now set the individual dim viewer alerts for the current image.
         UIController.setDimAlerts(curDimViewer, true);
       },
-
-      validateInteger: function(inputVal) {
-        // !VA Since integer validation is used for all height/width input fields, including those not yet implemented, we're going to use a separate error handler for it, call showMessages from it and return 
-        let isErr;
-        let mess;
-        if (!parseInt(inputVal, 10) || inputVal % 1 !== 0 || inputVal < 0) {
-          // errorMessages(target, "Width and height must be entered as positive whole number.");
-          console.log('validateInteger -- not an integer');
-          isErr = true;
-          // !VA Deal with actual error handling later
-          // mess = errorMessages('notinteger');
-          
-          // showMessage(mess, isErr);
-          
-        } else { 
-          // !VA Input fields return strings, so convert to integer
-          inputVal = parseInt(inputVal);
-          isErr = false;
-        }
-        return isErr;
-      }
     };
   })();
 
@@ -715,149 +698,115 @@ var Dimwhit = (function () {
       // Drag and Drop Listener 
       //DRAG AND DROP PROCESSING END
       
+
       
-      // !VA This was in the old version but it doesn't look necessary
-      // function initializeHandlers() {
+      function initializeHandlers() {
 
-      //EVENT HANDLING START 
-      function addEventHandler(oNode, evt, oFunc, bCaptures) {
-        //Removing this -- apparently IE 9 and 10 support addEventListener
-        // if (typeof(window.event) != "undefined")
-        // 	oNode.attachEvent("on"+evt, oFunc);
-        // else
-        oNode.addEventListener(evt, oFunc, bCaptures);
-      }
-      addEventHandler(document.getElementById(toolButtons.grow01),'click',doit,false);
+        //EVENT HANDLING START 
+        // function addEventHandler(oNode, evt, oFunc, bCaptures) {
+        //   //Removing this -- apparently IE 9 and 10 support addEventListener
+        //   // if (typeof(window.event) != "undefined")
+        //   // 	oNode.attachEvent("on"+evt, oFunc);
+        //   // else
+        //   oNode.addEventListener(evt, oFunc, bCaptures);
 
-      // !VA Add click and blur event handlers for clickable toolButtons: 
-      var tbClickables = [ 'main-image-grow-01', 'main-image-grow-10', 'main-image-grow-50', 'main-image-shrink-01', 'main-image-shrink-10', 'main-image-shrink-50' ];
-      for (let i = 0; i < tbClickables.length; i++) {
-        // !VA convert the ID string to the object inside the loop
-        tbClickables[i] = document.getElementById(tbClickables[i]);
-        // console.log(tbClickables[i]);
-        addEventHandler(tbClickables[i],'click',handleUserAction,false);
-
-      }
-      // !VA Add event handlers for input toolButtons
-      
-      var tbKeypresses = [ 'main-image-viewer-wdth', 'main-img-custom-wdth', 'main-img-custom-hght', 'small-phones-wdth', 'large-phones-wdth' ];
-      for (let i = 0; i < tbKeypresses.length; i++) {
-        // !VA convert the ID string to the object inside the loop
-        tbKeypresses[i] = document.getElementById(tbKeypresses[i]);
-        // console.log(tbKeypresses[i]);
-        addEventHandler((tbKeypresses[i]),'keypress',handleUserAction,false);
-        // addEventHandler((tbKeypresses[i]),'focus',handleUserAction,false);
-        addEventHandler(tbKeypresses[i],'blur',handleUserAction,false);
-        addEventHandler(tbKeypresses[i],'dragover',handleUserAction,false);
-        addEventHandler(tbKeypresses[i],'drop',handleUserAction,false);
-      }
-
-      // addEventHandler(document.getElementById('main-image-viewer-wdth'),'focus',doit,false);
-
-
-      // !VA Need to decide whether to handle all events here or route actions directly from the event handler. For now...
-      function handleUserAction(e) {
-        var keypressed;
-        var isErr;
-        // e.stopPropagation;
-        var el;
-        // !VA Put the event trigger in an object first, so we don't have to keep calling document.getElementById
-        el = document.getElementById(this.id);
-        console.log('handle user action here...');
-        if (event.type === 'click') {
-          console.log(event.type + ': ' + this.id);
-        } else if (event.type === 'keypress') {
-          keypressed = e.which || e.keyCode || e.key;
-          if (keypressed == 13) {
-            // console.log(event.type + ' ' + keypressed + ': ' + this.id);
-            // !VA Get the input and evaluate it
-            var isErr = calcController.validateInteger(this.value);
-            console.log('Not an integer? ' + isErr);
-            if (isErr) {
-              // !VA Get the previous value from Appdata and put it back if the entry is not a valid integer
-              el.value = (function () {
-                var locdata = UIController.accessAppdata();
-                return locdata.viewerW;
-              })();
-            } else {
-              console.log('Pass this value...');
-            }
-          } 
-        } else if ( event.type === 'blur') {
-          console.log(event.type + ': ' + this.id);
-        } else if ( event.type === 'drop') {
-          // console.log(event.type + ': ' + this.id);
-          e.preventDefault;
-          console.log(event.type + ': ' + this.id);
-        } else if ( event.type === 'dragover') {
-          // console.log(event.type + ': ' + this.id);
-          e.preventDefault;
-        } 
-        else {
-          console.log('other event');
-        }
-      }
-
-      function doit() {
-        console.log('Doing it...');
-      }
-
-      // doit();
+        //   function EventHandler(id, evt, func, bool) {
+        //     this.id = id;
+        //     this.evt = evt;
+        //     this.func = func;
+        //     this.bool = bool;
+        //   }
         
+        //   var tbViewerWidth = new EventHandler( toolButtons.viewerWidth, 'keypress', updateAppData, false);
 
-      // Click handlers - focusOnClick
-      // =============================
-      // addEventHandler(toolButtons.customHeight,'click',focusOnClick,false);
-      // addEventHandler(toolButtons.customWidth,'click',focusOnClick,false);
-      // addEventHandler(toolButtons.lPhoneWidth,'click',focusOnClick,false);
-      // addEventHandler(toolButtons.sPhoneWidth,'click',focusOnClick,false);
-      // addEventHandler(toolButtons.viewerWidth,'click',focusOnClick,false);
+        //   function updateAppData() {
+        //     console.log('updateAppData --- ');
+        //   } 
 
-      // Click handlers - Misc
-      // =============================
-      // addEventHandler(dimViewers.clipboardBut,'click',toggleCCP,false);
 
-      // Keypress handlers - showMobileImageButtons
-      // ==================================
-      // addEventHandler(ccpUserInput.imgClass,'keypress',showMobileImageButtons,false);
-      // ccpUserInput.imgAlt.addEventListener('keypress', showMobileImageButtons);
-      // ccpUserInput.imgClass.addEventListener('keypress', showMobileImageButtons);
-      // ccpUserInput.imgRelPath.addEventListener('keypress', showMobileImageButtons);
+        // }
 
-      // Keypress handlers - Misc
-      // ==================================
-      // addEventHandler(dimViewers.clipboardBut,'keypress',toggleCCP,false);
 
-      // Blur handlers - handleInputBlur
-      // =================================
-      // addEventHandler(ccpUserInput.imgClass,'blur',showMobileImageButtons,false);
-      // ccpUserInput.imgAlt.addEventListener('blur', showMobileImageButtons);
-      // ccpUserInput.imgClass.addEventListener('blur', showMobileImageButtons);
-      // ccpUserInput.imgRelPath.addEventListener('blur', showMobileImageButtons);
-      
-      // Dragover handlers - killDrop
-      // ================================
-      // addEventHandler(toolButtons.customHeight,'dragover',killDrop,false);
-      // addEventHandler(toolButtons.customWidth,'dragover',killDrop,false);
-      // addEventHandler(toolButtons.lPhoneWidth,'dragover',killDrop,false);
-      // addEventHandler(toolButtons.sPhoneWidth,'dragover',killDrop,false);
-      // addEventHandler(toolButtons.viewerWidth,'dragover',killDrop,false);
-      
-      // Drop handlers - killDrop
-      // =============================
-      // addEventHandler(toolButtons.customHeight,'drop',killDrop,false);
-      // addEventHandler(toolButtons.customWidth,'drop',killDrop,false);
-      // addEventHandler(toolButtons.lPhoneWidth,'drop',killDrop,false);
-      // addEventHandler(toolButtons.sPhoneWidth,'drop',killDrop,false);
-      // addEventHandler(toolButtons.viewerWidth,'drop',killDrop,false);
 
-      // Change handlers - handleOnChange
-      // =================================
-      // addEventHandler(ccpUserInput.imgWidth,'change',handleOnChange,false);
-      // addEventHandler(ccpUserInput.tableWidth,'change',handleOnChange,false);
 
-      // !VA The closing bracket below belongs to initializeHandlers(), see the top of this function
-      // }
+        //  Dim Viewer Clipboard Controls
+        // Click handlers - refreshAppObject
+        // ==================================
+        // addEventHandler(toolButtons.grow01,'click',refreshAppObj,false);
+        // addEventHandler(toolButtons.grow10,'click',refreshAppObj,false);
+        // addEventHandler(toolButtons.grow50,'click',refreshAppObj,false);
+        // addEventHandler(toolButtons.shrink01,'click',refreshAppObj,false);
+        // addEventHandler(toolButtons.shrink10,'click',refreshAppObj,false);
+        // addEventHandler(toolButtons.shrink50,'click',refreshAppObj,false);
+
+        // Click handlers - focusOnClick
+        // =============================
+        // addEventHandler(toolButtons.customHeight,'click',focusOnClick,false);
+        // addEventHandler(toolButtons.customWidth,'click',focusOnClick,false);
+        // addEventHandler(toolButtons.lPhoneWidth,'click',focusOnClick,false);
+        // addEventHandler(toolButtons.sPhoneWidth,'click',focusOnClick,false);
+        // addEventHandler(toolButtons.viewerWidth,'click',focusOnClick,false);
+
+        // Click handlers - Misc
+        // =============================
+        // addEventHandler(dimViewers.clipboardBut,'click',toggleCCP,false);
+        
+        // Keypress handlers - refreshAppObj
+        // =================================
+        // addEventHandler(toolButtons.customHeight,'keypress',refreshAppObj,false);
+        // addEventHandler(toolButtons.customWidth,'keypress',refreshAppObj,false);
+        // addEventHandler(toolButtons.lPhoneWidth,'keypress',refreshAppObj,false);
+        // addEventHandler(toolButtons.sPhoneWidth,'keypress',refreshAppObj,false);
+        // addEventHandler(toolButtons.viewerWidth,'keypress',refreshAppObj,false);
+
+        // Keypress handlers - showMobileImageButtons
+        // ==================================
+        // addEventHandler(ccpUserInput.imgClass,'keypress',showMobileImageButtons,false);
+        // ccpUserInput.imgAlt.addEventListener('keypress', showMobileImageButtons);
+        // ccpUserInput.imgClass.addEventListener('keypress', showMobileImageButtons);
+        // ccpUserInput.imgRelPath.addEventListener('keypress', showMobileImageButtons);
+
+        // Keypress handlers - Misc
+        // ==================================
+        // addEventHandler(dimViewers.clipboardBut,'keypress',toggleCCP,false);
+        
+        // Blur handlers - handleInputBlur
+        // =================================
+        // addEventHandler(toolButtons.customHeight,'blur',handleInputBlur,false);
+        // addEventHandler(toolButtons.customWidth,'blur',handleInputBlur,false);
+        // addEventHandler(toolButtons.lPhoneWidth,'blur',handleInputBlur,false);
+        // addEventHandler(toolButtons.sPhoneWidth,'blur',handleInputBlur,false);
+        // addEventHandler(toolButtons.viewerWidth,'blur',handleInputBlur,false);
+
+        // Blur handlers - handleInputBlur
+        // =================================
+        // addEventHandler(ccpUserInput.imgClass,'blur',showMobileImageButtons,false);
+        // ccpUserInput.imgAlt.addEventListener('blur', showMobileImageButtons);
+        // ccpUserInput.imgClass.addEventListener('blur', showMobileImageButtons);
+        // ccpUserInput.imgRelPath.addEventListener('blur', showMobileImageButtons);
+        
+        // Dragover handlers - killDrop
+        // ================================
+        // addEventHandler(toolButtons.customHeight,'dragover',killDrop,false);
+        // addEventHandler(toolButtons.customWidth,'dragover',killDrop,false);
+        // addEventHandler(toolButtons.lPhoneWidth,'dragover',killDrop,false);
+        // addEventHandler(toolButtons.sPhoneWidth,'dragover',killDrop,false);
+        // addEventHandler(toolButtons.viewerWidth,'dragover',killDrop,false);
+        
+        // Drop handlers - killDrop
+        // =============================
+        // addEventHandler(toolButtons.customHeight,'drop',killDrop,false);
+        // addEventHandler(toolButtons.customWidth,'drop',killDrop,false);
+        // addEventHandler(toolButtons.lPhoneWidth,'drop',killDrop,false);
+        // addEventHandler(toolButtons.sPhoneWidth,'drop',killDrop,false);
+        // addEventHandler(toolButtons.viewerWidth,'drop',killDrop,false);
+
+        // Change handlers - handleOnChange
+        // =================================
+        // addEventHandler(ccpUserInput.imgWidth,'change',handleOnChange,false);
+        // addEventHandler(ccpUserInput.tableWidth,'change',handleOnChange,false);
+
+      }
       // addEventHandler(window, 'load', function(evt) {initializeHandlers(); } );
     };
 
