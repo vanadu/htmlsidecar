@@ -1317,6 +1317,7 @@ var Dimwhit = (function () {
 
     //Image Dimensioning Controls
     addEventHandler(toolButtons.grow01,'click',refreshAppObj,false);
+    addEventHandler(toolButtons.grow01,'click',refreshAppObj,false);
     addEventHandler(toolButtons.shrink01,'click',refreshAppObj,false);
     addEventHandler(toolButtons.grow10,'click',refreshAppObj,false);
     addEventHandler(toolButtons.shrink10,'click',refreshAppObj,false);

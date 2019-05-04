@@ -5,6 +5,7 @@ TODO: Implement the toolbuttons.
 Separation of tasks:
 NOTE: Keypress is supposed to be deprecated but there is no replacement, so stick with keypress
 https://stackoverflow.com/questions/52882144/replacement-for-deprecated-keypress-dom-event
+TODO: Set input field value to the current value and remove the focus from the input field after the enter key is pressed
 
 1) Get input from event. All the click/keypress functions do respectively basically same thing. They should be handled and passed to functions directly via their eventHandlers, not aggregated into some huge eval function that does everything.
 1) Keypress: 
@@ -320,7 +321,7 @@ var Dimwhit = (function () {
             return them here and update the Appdata
             run adjustContainerHeights here to recalc viewer heights based on above.
         */
-       
+
         UIController.refreshAppUI(Appdata);
         return Appdata;
       },
@@ -481,7 +482,7 @@ var Dimwhit = (function () {
 
 
 
-  // !VA Calculations Controller Contructor
+  // CALCULATIONS AND INPUT EVALUATION CONTROLLER
   var calcController = (function() {
 
     // !VA If we want to access any of the DOM IDs we have to call them from UIController where they're defined.
@@ -497,6 +498,7 @@ var Dimwhit = (function () {
     return {
       //STRING FUNCTIONS
       // !VA Convert integer to pixel for style properties
+      // CONVERT INTEGER TO PIXEL VALUE
       intToPx: function(int) {
         let pxval;
         let str = String(int);
@@ -533,7 +535,7 @@ var Dimwhit = (function () {
         return [aspectReal, aspectInt];  
       },
 
-      // Get the filename from the src attribute of an img file
+      // GET FILENAME FROM SRC ATTRIBUTE OF IMG FILE
       getFilenameFromSource: function (source) {
         // console.log('getFilenameFromSource running...');
         if (source) {
@@ -545,9 +547,29 @@ var Dimwhit = (function () {
         }
       },
       
+      // !VA Update the viewer height based on the user input in Controller.handleUserAction
+      // UPDATE VIEWER HEIGHT
+      updateViewerH: function (val) {
+        var data = UIController.accessAppdata();
+        console.log('updateViewerH -- ');
+        console.log('viewerH is: ' + val);
+        console.log('data.imgW is: ' + data.imgW);
+        if (val < data.imgW ) {
+          console.log('TODO: errorHandler: viewerH cannot be smaller than imgH');
+        } else {
+          // !VA The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image. 
+          console.log('continue...');
+          var data2 = UIController.updateAppData('viewerW', val);
+          console.log('data2 is...');
+          console.dir(data2);
+          calcController.evalViewerSize(data2);
+          // !VA Works...
+        }
+      },
 
       // !VA There are four conditions for an image to fit into the appContainer. This evaluates them, sets the Appdata properties accordingly and calls adjustContainerHeights. 
       // !VA TODO: Actually the function needs to be called only once at the end of the routine...
+      // EVALUATE VIEWER SIZE
       evalViewerSize: function (Appdata) {
         // !VA This isn't necessary here, but will probably be used somewhere else...
         // !VA TODO: Try to figure out whether this is useful at all.
@@ -618,6 +640,7 @@ var Dimwhit = (function () {
         
       },
       
+      // ADJUST IMAGE CONTAINER HEIGHTS
       adjustContainerHeights: function (Appdata)  {
         // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values.
         var heightVal = Appdata.imgH;
@@ -652,6 +675,7 @@ var Dimwhit = (function () {
         UIController.refreshAppUI(Appdata);
       },
 
+      // EVALUATE DIM VIEWER ALERTS
       evalDimAlerts: function(Appdata, dimViewers) {
         // !VA Size On Disk is NOT 2X the Display Size: flag Size on Disk and Retina
         var curDimViewer = [];
@@ -672,19 +696,18 @@ var Dimwhit = (function () {
         UIController.setDimAlerts(curDimViewer, true);
       },
 
+      // !VA Might be good to fold this into error handling
+      // VALIDATE INPUT FOR INTEGER
       validateInteger: function(inputVal) {
         // !VA Since integer validation is used for all height/width input fields, including those not yet implemented, we're going to use a separate error handler for it, call showMessages from it and return 
         let isErr;
-        let mess;
+        // let mess;
         if (!parseInt(inputVal, 10) || inputVal % 1 !== 0 || inputVal < 0) {
           // errorMessages(target, "Width and height must be entered as positive whole number.");
           console.log('validateInteger -- not an integer');
           isErr = true;
           // !VA Deal with actual error handling later
-          // mess = errorMessages('notinteger');
-          
           // showMessage(mess, isErr);
-          
         } else { 
           // !VA Input fields return strings, so convert to integer
           inputVal = parseInt(inputVal);
@@ -696,8 +719,8 @@ var Dimwhit = (function () {
   })();
 
 
-  // !VA GLOBAL APP CONTROLLER
   // !VA Not sure why UICtrl is used here...
+  // GLOBAL APP CONTROLLER
   var controller = (function(calcCtrl, UICtrl) {
 
     var Appobj = {};
@@ -779,6 +802,7 @@ var Dimwhit = (function () {
 
 
       // !VA Need to decide whether to handle all events here or route actions directly from the event handler. For now...
+      // HANDLE USER ACTION 
       function handleUserAction(e) {
         var keypressed;
         var isErr;
@@ -800,9 +824,16 @@ var Dimwhit = (function () {
               el.value = '';
             } else {
               console.log('Pass this value...');
+              console.log('el.id is: ' + el.id);
+              console.log('el.val is: ' + el.value);
               el.id;
+              switch(true) {
+              case (el.id === 'main-image-viewer-wdth') :
+                calcController.updateViewerH(el.value);
+
+              }
               // !VA !IMPORTANT! You can't reference an object property with a variable the normal way. You have to do it using bracket notation, see updateAppData...
-              UIController.updateAppData('viewerW', el.value);
+              // UIController.updateAppData('viewerW', el.value);
             }
           } 
         } else if (  event.type === 'focus') {
@@ -826,6 +857,7 @@ var Dimwhit = (function () {
         }
       }
 
+      // SCRAP DO IT FUNCTION
       function doit() {
         console.log('Doing it...');
       }
@@ -863,22 +895,6 @@ var Dimwhit = (function () {
       // ccpUserInput.imgClass.addEventListener('blur', showMobileImageButtons);
       // ccpUserInput.imgRelPath.addEventListener('blur', showMobileImageButtons);
       
-      // Dragover handlers - killDrop
-      // ================================
-      // addEventHandler(toolButtons.customHeight,'dragover',killDrop,false);
-      // addEventHandler(toolButtons.customWidth,'dragover',killDrop,false);
-      // addEventHandler(toolButtons.lPhoneWidth,'dragover',killDrop,false);
-      // addEventHandler(toolButtons.sPhoneWidth,'dragover',killDrop,false);
-      // addEventHandler(toolButtons.viewerWidth,'dragover',killDrop,false);
-      
-      // Drop handlers - killDrop
-      // =============================
-      // addEventHandler(toolButtons.customHeight,'drop',killDrop,false);
-      // addEventHandler(toolButtons.customWidth,'drop',killDrop,false);
-      // addEventHandler(toolButtons.lPhoneWidth,'drop',killDrop,false);
-      // addEventHandler(toolButtons.sPhoneWidth,'drop',killDrop,false);
-      // addEventHandler(toolButtons.viewerWidth,'drop',killDrop,false);
-
       // Change handlers - handleOnChange
       // =================================
       // addEventHandler(ccpUserInput.imgWidth,'change',handleOnChange,false);
@@ -890,6 +906,7 @@ var Dimwhit = (function () {
     };
 
     // !VA This is where we initialize Dev mode, which is where we can start the app with a hard-coded img element in the HTML file. THis is very useful, otherwise we'd have to drop files to initialize or dink with the FileReader object to hard-code a test file.
+    // INITIALIZE DEV MODE 
     var initializeDevMode = function() {
       // !VA TODO: Dev mode doesn't work any more...
       console.log('initializeDevMode running...');
@@ -913,22 +930,15 @@ var Dimwhit = (function () {
         appcontainer: document.querySelector(dynamicRegions.appContainer)
       }; 
 
-
       var filename = calcController.getFilenameFromSource(AppobjDev.currentimg.src);
-
       // !VA Hide the drop area.
       document.querySelector(staticRegions.dropArea).style.display = 'none';
       // !VA  Show the toolbar
       document.querySelector(staticRegions.toolsContainer).style.display = 'block';
-
       // !VA This is where we run writeImgToDOM to:
       /* 1) Insert the main-img-container insider the main-img element
          2) Include logic to exclude inserting the image unless it doesn't exist already, i.e. is the FileReader blob and not the hard-coded image from the HTML file.
       */
-
-
-
-
       // !VA AppobjDev returns NaN for the viewer containers because they don't have values yet... not sure I understand why since height and width are initially declared in CSS.
       var Appdata = UIController.getAppData(AppobjDev, filename);
       // !VA evaluate the viewer containers and adjust their size based on the returned Appdata
