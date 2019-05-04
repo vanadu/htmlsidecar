@@ -497,7 +497,7 @@ var Dimwhit = (function () {
           }
         
           break;
-        case  (this.id === 'main-img-custom-hght'): 
+        case (this.id === 'main-img-custom-hght'):
           // console.log('CASE 3');
           // console.log('inputVal is: ' + inputVal);
           
@@ -1165,7 +1165,7 @@ var Dimwhit = (function () {
   //Get aspect ratio End
   //MATH FUNCTIONS END
 
-  //STRING FUNCTIONSmain-image-viewer-wdth
+  //STRING FUNCTIONS
   // !VA Convert integer to pixel
   function intToPx(int) {
     let pxval

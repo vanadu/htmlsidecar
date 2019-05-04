@@ -1,15 +1,51 @@
 
 /* !VA  
 ===========================================================
-TODO: Fix the main-img-container issue for the dev image. Don't forget that the removeCurImg function references main-img-container, so adding that to the HTML file won't be without repercussions.
-DONE: Fix the main-img-container issue for the dev image. Just added main-img-container to HTML and removed the conditional in removeCurImg. Now the curImg is removed with the same line of code in both USER and DEV and there is a main-img-container now in both cases.
-DONE: Now Dev Mode doesn't work any more - can't drop an image on an existing image. This appears to be fixed...we'll see
-DONE: Fix small phones and large phones dimViewers
-DONE: Implement notification fonts on dimViewers
-DONE: Fix small phones and large phones dimViewers
-DONE: Fix it so you can drop new images on existing images 
-DONE: Added onload to getElementProperties to prevent accessing properties before blob is loaded.
-DONE: Devmode wasn't broken, was just using index.html instead of index_v2.html
+TODO: Implement the toolbuttons.
+Separation of tasks:
+1) Get input from event. All the click/keypress functions do respectively basically same thing. They should be handled and passed to functions directly via their eventHandlers, not aggregated into some huge eval function that does everything.
+1) Keypress: 
+    TOOLBUTTONS & CCP
+    main-image-viewer-wdth, main-img-custom-width, main-img-custom-height, small-phones-wdth, large-phones-wdth. 
+    Determine which element is this
+      create array of input elements
+      compare with this
+      if this matches element, run function -- need to determine what the function does and how much can be recycled across all the input elements.
+    resetPlaceholders
+    validateInteger
+    errorHandler
+    math or other specific function:
+      viewer width: set viewer width and set  image dimensions to match because the image can't be larger than the viewer;
+     update property
+     update UI
+2) Click: 
+  TOOLBUTTONS & CCP
+  main-image-grow-50, main-image-grow-10, main-image-grow-01, main-image-shrink-50 , main-image-shrink-10, main-image-shrink-01. 
+  a) get the increment 
+  b) update property
+  c) update UI
+
+  STRATEGY
+  ==============
+  It's possible to create one huge object that contains all the DOM elements that have events attached. But that would make them hard to manage. It's best to create one Constructor for all the event triggers and then access them as necessary. Using tyhe addEventHandler function that processes addEventlistener calls, the Constructor would have to have:
+    * Element ID
+    * event type
+    * function to run
+    * false
+    
+
+    This Contstructor and object definitions should be in the controller module.
+    
+    function EventHandler(id, evt, func, bool) {
+    this.id = id;
+    this.evt = evt;
+    this.func = func;
+    this.bool = bool;
+    }
+
+    var new EventHandler = new EventHandler( toolButtons.viewerWidth, 'keypress', refreshAppObj, false);
+
+
 
 */
 //SCRIPT START
@@ -658,72 +694,117 @@ var Dimwhit = (function () {
       // dropZone.addEventListener('drop', startNewDrop, false);
       // Drag and Drop Listener 
       //DRAG AND DROP PROCESSING END
+      
 
-      //EVENT HANDLING START 
-      function addEventHandler(oNode, evt, oFunc, bCaptures) {
-        //Removing this -- apparently IE 9 and 10 support addEventListener
-        // if (typeof(window.event) != "undefined")
-        // 	oNode.attachEvent("on"+evt, oFunc);
-        // else
-        oNode.addEventListener(evt, oFunc, bCaptures);
-      }
-
+      
       function initializeHandlers() {
-        //Dim Viewer Clipboard Controls
-        // addEventHandler(dimViewers.clipboardBut,'click',toggleCCP,false);
-        // addEventHandler(dimViewers.clipboardBut,'keypress',toggleCCP,false);
-        // CCP button show and hide
-        // !VA NOW -- these should be addEventHandler calls -- but it works for now.
-        // ccpUserInput.imgClass.addEventListener('keypress', showMobileImageButtons);
-        // ccpUserInput.imgClass.addEventListener('blur', showMobileImageButtons);
-        // !VA NOW -- changed the above two to addEventHandler calls -- seems fine.
-        // addEventHandler(ccpUserInput.imgClass,'keypress',showMobileImageButtons,false);
-        // addEventHandler(ccpUserInput.imgClass,'blur',showMobileImageButtons,false);
-        // !VA alt and path fields should not show the CSS buttons
-        // ccpUserInput.imgAlt.addEventListener('keypress', showMobileImageButtons);
-        // ccpUserInput.imgAlt.addEventListener('blur', showMobileImageButtons);
-        // ccpUserInput.imgRelPath.addEventListener('keypress', showMobileImageButtons);
-        // ccpUserInput.imgRelPath.addEventListener('blur', showMobileImageButtons);
 
-        //Image Dimensioning Controls
+        //EVENT HANDLING START 
+        // function addEventHandler(oNode, evt, oFunc, bCaptures) {
+        //   //Removing this -- apparently IE 9 and 10 support addEventListener
+        //   // if (typeof(window.event) != "undefined")
+        //   // 	oNode.attachEvent("on"+evt, oFunc);
+        //   // else
+        //   oNode.addEventListener(evt, oFunc, bCaptures);
+
+        //   function EventHandler(id, evt, func, bool) {
+        //     this.id = id;
+        //     this.evt = evt;
+        //     this.func = func;
+        //     this.bool = bool;
+        //   }
+        
+        //   var tbViewerWidth = new EventHandler( toolButtons.viewerWidth, 'keypress', updateAppData, false);
+
+        //   function updateAppData() {
+        //     console.log('updateAppData --- ');
+        //   } 
+
+
+        // }
+
+
+
+
+        //  Dim Viewer Clipboard Controls
+        // Click handlers - refreshAppObject
+        // ==================================
         // addEventHandler(toolButtons.grow01,'click',refreshAppObj,false);
-        // addEventHandler(toolButtons.shrink01,'click',refreshAppObj,false);
         // addEventHandler(toolButtons.grow10,'click',refreshAppObj,false);
-        // addEventHandler(toolButtons.shrink10,'click',refreshAppObj,false);
         // addEventHandler(toolButtons.grow50,'click',refreshAppObj,false);
+        // addEventHandler(toolButtons.shrink01,'click',refreshAppObj,false);
+        // addEventHandler(toolButtons.shrink10,'click',refreshAppObj,false);
         // addEventHandler(toolButtons.shrink50,'click',refreshAppObj,false);
-        // addEventHandler(toolButtons.customWidth,'dragover',killDrop,false);
-        // addEventHandler(toolButtons.customWidth,'drop',killDrop,false);
-        // addEventHandler(toolButtons.customHeight,'dragover',killDrop,false);
-        // addEventHandler(toolButtons.customHeight,'drop',killDrop,false);
-        // addEventHandler(toolButtons.viewerWidth,'dragover',killDrop,false);
-        // addEventHandler(toolButtons.viewerWidth,'drop',killDrop,false);
-        // addEventHandler(toolButtons.viewerWidth,'keypress',refreshAppObj,false);
-        // addEventHandler(toolButtons.viewerWidth,'click',focusOnClick,false);
-        // !VA 
-        // addEventHandler(toolButtons.customWidth,'click',focusOnClick,false);
-        // addEventHandler(toolButtons.customWidth,'keypress',refreshAppObj,false);
-        // addEventHandler(toolButtons.customHeight,'click',focusOnClick,false);
-        // addEventHandler(toolButtons.customHeight,'keypress',refreshAppObj,false);
-        // addEventHandler(toolButtons.viewerWidth,'blur',handleInputBlur,false);
-        // addEventHandler(toolButtons.customWidth,'blur',handleInputBlur,false);
-        // addEventHandler(toolButtons.customHeight,'blur',handleInputBlur,false);
-        // !VA 
-        // addEventHandler(toolButtons.sPhoneWidth,'dragover',killDrop,false);
-        // addEventHandler(toolButtons.sPhoneWidth,'drop',killDrop,false);
-        // addEventHandler(toolButtons.sPhoneWidth,'keypress',refreshAppObj,false);
-        // addEventHandler(toolButtons.sPhoneWidth,'blur',handleInputBlur,false);
-        // addEventHandler(toolButtons.sPhoneWidth,'click',focusOnClick,false);
-        // addEventHandler(toolButtons.lPhoneWidth,'dragover',killDrop,false);
-        // addEventHandler(toolButtons.lPhoneWidth,'drop',killDrop,false);
-        // addEventHandler(toolButtons.lPhoneWidth,'keypress',refreshAppObj,false);
-        // addEventHandler(toolButtons.lPhoneWidth,'blur',handleInputBlur,false);
-        // addEventHandler(toolButtons.lPhoneWidth,'click',focusOnClick,false);
 
-        // addEventHandler(ccpUserInput.tableWidth,'change',handleOnChange,false);
+        // Click handlers - focusOnClick
+        // =============================
+        // addEventHandler(toolButtons.customHeight,'click',focusOnClick,false);
+        // addEventHandler(toolButtons.customWidth,'click',focusOnClick,false);
+        // addEventHandler(toolButtons.lPhoneWidth,'click',focusOnClick,false);
+        // addEventHandler(toolButtons.sPhoneWidth,'click',focusOnClick,false);
+        // addEventHandler(toolButtons.viewerWidth,'click',focusOnClick,false);
+
+        // Click handlers - Misc
+        // =============================
+        // addEventHandler(dimViewers.clipboardBut,'click',toggleCCP,false);
+        
+        // Keypress handlers - refreshAppObj
+        // =================================
+        // addEventHandler(toolButtons.customHeight,'keypress',refreshAppObj,false);
+        // addEventHandler(toolButtons.customWidth,'keypress',refreshAppObj,false);
+        // addEventHandler(toolButtons.lPhoneWidth,'keypress',refreshAppObj,false);
+        // addEventHandler(toolButtons.sPhoneWidth,'keypress',refreshAppObj,false);
+        // addEventHandler(toolButtons.viewerWidth,'keypress',refreshAppObj,false);
+
+        // Keypress handlers - showMobileImageButtons
+        // ==================================
+        // addEventHandler(ccpUserInput.imgClass,'keypress',showMobileImageButtons,false);
+        // ccpUserInput.imgAlt.addEventListener('keypress', showMobileImageButtons);
+        // ccpUserInput.imgClass.addEventListener('keypress', showMobileImageButtons);
+        // ccpUserInput.imgRelPath.addEventListener('keypress', showMobileImageButtons);
+
+        // Keypress handlers - Misc
+        // ==================================
+        // addEventHandler(dimViewers.clipboardBut,'keypress',toggleCCP,false);
+        
+        // Blur handlers - handleInputBlur
+        // =================================
+        // addEventHandler(toolButtons.customHeight,'blur',handleInputBlur,false);
+        // addEventHandler(toolButtons.customWidth,'blur',handleInputBlur,false);
+        // addEventHandler(toolButtons.lPhoneWidth,'blur',handleInputBlur,false);
+        // addEventHandler(toolButtons.sPhoneWidth,'blur',handleInputBlur,false);
+        // addEventHandler(toolButtons.viewerWidth,'blur',handleInputBlur,false);
+
+        // Blur handlers - handleInputBlur
+        // =================================
+        // addEventHandler(ccpUserInput.imgClass,'blur',showMobileImageButtons,false);
+        // ccpUserInput.imgAlt.addEventListener('blur', showMobileImageButtons);
+        // ccpUserInput.imgClass.addEventListener('blur', showMobileImageButtons);
+        // ccpUserInput.imgRelPath.addEventListener('blur', showMobileImageButtons);
+        
+        // Dragover handlers - killDrop
+        // ================================
+        // addEventHandler(toolButtons.customHeight,'dragover',killDrop,false);
+        // addEventHandler(toolButtons.customWidth,'dragover',killDrop,false);
+        // addEventHandler(toolButtons.lPhoneWidth,'dragover',killDrop,false);
+        // addEventHandler(toolButtons.sPhoneWidth,'dragover',killDrop,false);
+        // addEventHandler(toolButtons.viewerWidth,'dragover',killDrop,false);
+        
+        // Drop handlers - killDrop
+        // =============================
+        // addEventHandler(toolButtons.customHeight,'drop',killDrop,false);
+        // addEventHandler(toolButtons.customWidth,'drop',killDrop,false);
+        // addEventHandler(toolButtons.lPhoneWidth,'drop',killDrop,false);
+        // addEventHandler(toolButtons.sPhoneWidth,'drop',killDrop,false);
+        // addEventHandler(toolButtons.viewerWidth,'drop',killDrop,false);
+
+        // Change handlers - handleOnChange
+        // =================================
         // addEventHandler(ccpUserInput.imgWidth,'change',handleOnChange,false);
+        // addEventHandler(ccpUserInput.tableWidth,'change',handleOnChange,false);
+
       }
-      addEventHandler(window, 'load', function(evt) {initializeHandlers(); } );
+      // addEventHandler(window, 'load', function(evt) {initializeHandlers(); } );
     };
 
     // !VA This is where we initialize Dev mode, which is where we can start the app with a hard-coded img element in the HTML file. THis is very useful, otherwise we'd have to drop files to initialize or dink with the FileReader object to hard-code a test file.
