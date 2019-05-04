@@ -303,6 +303,29 @@ var Dimwhit = (function () {
       },
       //FILEREADER OBJECT PROCESSING END
 
+      updateAppData: function (prop, val) {
+        val = parseInt(val); 
+        // !VA !IMPORTANT! THis is HUGE!
+        Appdata[prop] = val;
+        console.log('Appdata.prop is now: ' + Appdata[prop]);
+        // !VA No return value should be required, this is write-only
+        console.log('updateAppData -- Appdata is...');
+        console.dir(Appdata);
+
+        /* !VA STOPPED HERE Now we need to:
+            write a function to:
+                recalc imgW and imgH based on the new viewerW.
+                recalc imgH and imgW based on the new customW/customH values
+
+            return them here and update the Appdata
+            run adjustContainerHeights here to recalc viewer heights based on above.
+        */
+       
+        UIController.refreshAppUI(Appdata);
+        return Appdata;
+      },
+
+
       accessAppdata: function(){
         return Appdata;
       },
@@ -746,7 +769,7 @@ var Dimwhit = (function () {
         tbKeypresses[i] = document.getElementById(tbKeypresses[i]);
         // console.log(tbKeypresses[i]);
         addEventHandler((tbKeypresses[i]),'keypress',handleUserAction,false);
-        // addEventHandler((tbKeypresses[i]),'focus',handleUserAction,false);
+        addEventHandler((tbKeypresses[i]),'focus',handleUserAction,false);
         addEventHandler(tbKeypresses[i],'blur',handleUserAction,false);
         addEventHandler(tbKeypresses[i],'dragover',handleUserAction,false);
         addEventHandler(tbKeypresses[i],'drop',handleUserAction,false);
@@ -772,23 +795,28 @@ var Dimwhit = (function () {
             // console.log(event.type + ' ' + keypressed + ': ' + this.id);
             // !VA Get the input and evaluate it
             var isErr = calcController.validateInteger(this.value);
-            console.log('Not an integer? ' + isErr);
             if (isErr) {
-              // !VA Get the previous value from Appdata and put it back if the entry is not a valid integer
-              el.value = (function () {
-                var locdata = UIController.accessAppdata();
-                return locdata.viewerW;
-              })();
+              // !VA If the value entered isn't an integer, reset it to null and leave the focus there
+              el.value = '';
             } else {
               console.log('Pass this value...');
+              el.id;
+              // !VA !IMPORTANT! You can't reference an object property with a variable the normal way. You have to do it using bracket notation, see updateAppData...
+              UIController.updateAppData('viewerW', el.value);
             }
           } 
+        } else if (  event.type === 'focus') {
+          // !VA Set the value of the element to null when it gets the focus
+          el.value = ''; 
         } else if ( event.type === 'blur') {
-          console.log(event.type + ': ' + this.id);
+          // !VA If the value is not an integer on blur, then reset it to the previous value
+          el.value = (function () {
+            var data = UIController.accessAppdata();
+            return data.viewerW;
+          })();
         } else if ( event.type === 'drop') {
           // console.log(event.type + ': ' + this.id);
           e.preventDefault;
-          console.log(event.type + ': ' + this.id);
         } else if ( event.type === 'dragover') {
           // console.log(event.type + ': ' + this.id);
           e.preventDefault;
