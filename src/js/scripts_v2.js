@@ -243,7 +243,7 @@ var Dimwhit = (function () {
                 })();
                 
                 // !VA Timeout of 250 ms while the blob loads.
-              }, 250);
+              }, 1000);
             }
 
             // !VA First, write the new curImg object to the DOM
@@ -303,6 +303,8 @@ var Dimwhit = (function () {
 
 
       accessAppdata: function(){
+        console.log('accessAppdata -- ');
+        console.dir(Appdata);
         return Appdata;
       },
 
@@ -400,7 +402,7 @@ var Dimwhit = (function () {
           // !VA Adjust the image container heights based on the Appdata values calculated in adjustContainerHeights
           document.querySelector(dynamicRegions.curImg).style.width = calcController.intToPx(Appdata.imgW);
           document.querySelector(dynamicRegions.curImg).style.height = calcController.intToPx(Appdata.imgH);
-          document.querySelector(dynamicRegions.imgViewer).style.width = calcController.intToPx(Appdata.viewerw);
+          document.querySelector(dynamicRegions.imgViewer).style.width = calcController.intToPx(Appdata.viewerW);
           document.querySelector(dynamicRegions.imgViewer).style.height = calcController.intToPx(Appdata.viewerH);
           // !VA This is NaN-- not sure we even need this since the app width is static.
           document.querySelector(dynamicRegions.imgViewport).style.width = calcController.intToPx(Appdata.viewportW);
@@ -533,12 +535,12 @@ var Dimwhit = (function () {
         // console.log('data.imgW is: ' + data.imgW);
         if (val < data.imgW ) {
           // !VA The viewer width can't be smaller than the current image width of XXX, show message
-          console.log('TODO: errorHandler: viewerw cannot be smaller than imgW');
+          console.log('TODO: errorHandler: viewerW cannot be smaller than imgW');
         } else if (val > maxViewerWidth ) {
           console.log('updateViewerW:  val > maxViewerWidth');
         } else {
 
-          // !VA The viewerw is greater than the imgW so we can go ahead and widen the viewerw with no affecton the current image. 
+          // !VA The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image. 
           // console.log('continue...');
           var data2 = UIController.updateAppData('viewerW', val);
           // console.log('data2 is...');
@@ -553,14 +555,11 @@ var Dimwhit = (function () {
 
       updateCustomW: function (val) {
         var data = UIController.accessAppdata();
-        console.log('updateCustomW -- ');
-        console.log('customw is: ' + val);
-        console.log('data.imgW is: ' + data.imgW);
-        console.log('data.imgNW is: ' + data.imgNW);
-        console.log('data.imgNH is: ' + data.imgNH);
+        console.log('updateCustomW -- start');
+        console.dir(data);
         // !VA If the new image width is greater than the viewer width, then show message. 
-        if (val > data.viewerw ) {
-          console.log('TODO: errorHandler: imgH cannot be larger than viewerw of XXX');
+        if (val > data.viewerW ) {
+          console.log('TODO: errorHandler: imgH cannot be larger than viewerW of XXX');
         }
         else {
           // !VA Write the user input for imgW to the data, which is the local copy of Appdata
@@ -573,7 +572,7 @@ var Dimwhit = (function () {
           data2 = UIController.updateAppData('imgH', val);
           console.log('data2 is...');
           console.dir(data2);
-
+          debugger;
           calcController.evalViewerSize(data2);
           calcController.adjustContainerHeights(data2);
 
@@ -595,7 +594,7 @@ var Dimwhit = (function () {
         // The image falls within the default viewer dimensions set in initApp, so do nothing.
         // !VA This case is irrelevant since we're now comparing everything to maxViewerWidth not the  init values. Change accordingly...
         // !VA  NOT SO...now we're trying to restore the previous functionality so...
-        case (Appdata.imgNW <= Appdata.viewerw) && (Appdata.imgNH < Appdata.viewerH) :
+        case (Appdata.imgNW <= Appdata.viewerW) && (Appdata.imgNH < Appdata.viewerH) :
           Appdata.imgW = Appdata.imgNW;
           Appdata.imgH = Appdata.imgNH;
           // !VA viewerH is set in initApp, so no change to it here
@@ -606,10 +605,10 @@ var Dimwhit = (function () {
           break;
 
         // The image is wider than the current viewer width but shorter than current viewer height, so resize the image based on the viewer width
-        case (Appdata.imgNW > Appdata.viewerw) && (Appdata.imgNH < Appdata.viewerH) :
+        case (Appdata.imgNW > Appdata.viewerW) && (Appdata.imgNH < Appdata.viewerH) :
           // console.log('CASE 2');
           // Set the image width to the current viewer
-          Appdata.imgW = Appdata.viewerw;
+          Appdata.imgW = Appdata.viewerW;
           // Get the image height from the aspect ration function
           Appdata.imgH = Math.round((1/this.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[0]) * Appdata.imgW);
           // Set the viewerH to the imgH
@@ -620,7 +619,7 @@ var Dimwhit = (function () {
 
         // The image is not as wide as the current viewer width, but is taller than the viewer height. Keep the image width but resize the viewer in order to display the full image height
         // !VA This might be a problem with consecutive images without page refresh
-        case (Appdata.imgNW <= Appdata.viewerw) && (Appdata.imgNH > Appdata.viewerH) :
+        case (Appdata.imgNW <= Appdata.viewerW) && (Appdata.imgNH > Appdata.viewerH) :
           // console.log('CASE 3');
           // Set the viewer height and the image height to the image natural height
           Appdata.viewerH = Appdata.imgH = Appdata.imgNH;
@@ -634,10 +633,10 @@ var Dimwhit = (function () {
           break;
 
         // The image is wider and taller than the current viewer height and width so we have to resize the image and the viewport based on the current viewport width
-        case (Appdata.imgNW > Appdata.viewerw) && (Appdata.imgNH > Appdata.viewerH) :
+        case (Appdata.imgNW > Appdata.viewerW) && (Appdata.imgNH > Appdata.viewerH) :
           // Set the image Width to the current  viewer width 
-          // console.log('Case 4: Appdata.viewerw is: ' + Appdata.viewerw );
-          Appdata.imgW = Appdata.viewerw;
+          // console.log('Case 4: Appdata.viewerW is: ' + Appdata.viewerW );
+          Appdata.imgW = Appdata.viewerW;
           // Set the image height proportional to the new image width using the aspect ratio function
           Appdata.imgH = Math.round((1/this.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[0]) * Appdata.imgW);
           // Set the viewer height to the image height
@@ -657,6 +656,7 @@ var Dimwhit = (function () {
       // ADJUST IMAGE CONTAINER HEIGHTS
       adjustContainerHeights: function (Appdata)  {
         // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values.
+
         var heightVal = Appdata.imgH;
         // console.log('heightVal is: ' + heightVal);
         // console.log('adjustContainerHeights Appdata is: ');
@@ -664,7 +664,7 @@ var Dimwhit = (function () {
         let viewportH;
         let appContainerH; 
 
-        // !VA I'm not even sure this is necessary since we're getting the viewerw from maxViewerHeight now -- but we'll leave it in here for the time being. 
+        // !VA I'm not even sure this is necessary since we're getting the viewerW from maxViewerHeight now -- but we'll leave it in here for the time being. 
         // !VA TODO: Review this whole maxViewerHeight thing.
         if (heightVal <= Appdata.initViewerH) {
           // !VA  This is the min-height set in CSS
@@ -738,7 +738,9 @@ var Dimwhit = (function () {
           imgW: 'tb-input-customw',
           imgH: 'tb-input-customh'
         };
-        return Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
+        var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
+        alert(ret);
+        return ret;
       }
     };
   })();
@@ -858,28 +860,31 @@ var Dimwhit = (function () {
               el.id;
               switch(true) {
               case (el.id === 'tb-input-viewerw') :
+                console.log('CASE 1 - updateViewerW --');
                 
                 calcController.updateViewerW(el.value);
-                console.log('Keypress handler: updateViewerW');
                 var data = UIController.accessAppdata();
-                console.log('updateCustomW --');
                 console.dir(data);
                 break;
+
               case ( el.id === 'tb-input-customw') :
+                console.log('CASE 2 - updateCustomW --');
                 calcController.updateCustomW(el.value);
 
-                console.log('Keypress handler: updateCustomW');
                 break;
               }
             }
-            console.log('Pressed');
+            // console.log('Pressed');
             // !VA If the value is not an integer on blur, then reset it to the previous value
             el.value = (function () {
+              debugger;
               // !VA Get the Appdata property name that corresponds to the ID of the current input element
               var prop = calcController.getAppdataPropertyFromID(el.id);
               // !VA Access Appdata
+              // debugger;
               var data = UIController.accessAppdata();
               // !VA return the current value of the Appdata property for the current event target to that elements value property
+              alert(data[prop]);
               return data[prop];
             })();
             // !VA Blur the input field when enter is pushed whereby the current value stays in the field.
@@ -954,43 +959,49 @@ var Dimwhit = (function () {
     // !VA This is where we initialize Dev mode, which is where we can start the app with a hard-coded img element in the HTML file. THis is very useful, otherwise we'd have to drop files to initialize or dink with the FileReader object to hard-code a test file.
     // INITIALIZE DEV MODE 
     var initializeDevMode = function() {
-      // !VA TODO: Dev mode doesn't work any more...
-      console.log('initializeDevMode running...');
-      
-      // !VA Get the imgViewer dimensions as set in CSS:
-      var initViewerW = parseInt(document.querySelector(dynamicRegions.imgViewer).style.width);
-      // !VA Not sure why this isn't used.
-      var initViewerH = parseInt(document.querySelector(dynamicRegions.imgViewer).style.height);
-      // !VA Initalize the imgViewer width input field value to the default of 650
-      document.querySelector(toolButtons.viewerW).placeholder = initViewerW;
-      // !VA  Test if there is currently #cur-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
-      var curImgExists = document.querySelector(dynamicRegions.curImg);
-      // console.log('curImgExists is: ' + curImgExists);
-      // !VA  Now we have to populate Appdata with data. We can do it manually here and just pass the object on to refresh the screen elements.
-      // !VA If there's no current image, then return false. This is the flag to the initializeDOM function that there is no DEV image in the HTML. The init then shows the drop area and 'No Image' in the dimViewers.
 
-      // !VA  There is a current image, so first populate Appdata manually and then populate getAppData based on the object properties in Appdata
-      var AppobjDev = {
-        currentimg: document.querySelector(dynamicRegions.curImg),
-        viewer: document.querySelector(dynamicRegions.imgViewer),
-        viewport: document.querySelector(dynamicRegions.imgViewport),
-        appcontainer: document.querySelector(dynamicRegions.appContainer)
-      }; 
+      window.addEventListener('load', function() {
+        console.log('All assets are loaded')
 
-      var filename = calcController.getFilenameFromSource(AppobjDev.currentimg.src);
-      // !VA Hide the drop area.
-      document.querySelector(staticRegions.dropArea).style.display = 'none';
-      // !VA  Show the toolbar
-      document.querySelector(staticRegions.toolsContainer).style.display = 'block';
-      // !VA This is where we run writeImgToDOM to:
-      /* 1) Insert the cur-img-container insider the cur-img element
-         2) Include logic to exclude inserting the image unless it doesn't exist already, i.e. is the FileReader blob and not the hard-coded image from the HTML file.
-      */
-      // !VA AppobjDev returns NaN for the viewer containers because they don't have values yet... not sure I understand why since height and width are initially declared in CSS.
-      var Appdata = UIController.getAppData(AppobjDev, filename);
-      // !VA evaluate the viewer containers and adjust their size based on the returned Appdata
-      var evalViewerSize = calcController.evalViewerSize(Appdata);
 
+        // !VA TODO: Dev mode doesn't work any more...
+        console.log('initializeDevMode running...');
+          
+        // !VA Get the imgViewer dimensions as set in CSS:
+        var initViewerW = parseInt(document.querySelector(dynamicRegions.imgViewer).style.width);
+        // !VA Not sure why this isn't used.
+        var initViewerH = parseInt(document.querySelector(dynamicRegions.imgViewer).style.height);
+        // !VA Initalize the imgViewer width input field value to the default of 650
+        document.querySelector(toolButtons.viewerW).placeholder = initViewerW;
+        // !VA  Test if there is currently #cur-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
+        var curImgExists = document.querySelector(dynamicRegions.curImg);
+        // console.log('curImgExists is: ' + curImgExists);
+        // !VA  Now we have to populate Appdata with data. We can do it manually here and just pass the object on to refresh the screen elements.
+        // !VA If there's no current image, then return false. This is the flag to the initializeDOM function that there is no DEV image in the HTML. The init then shows the drop area and 'No Image' in the dimViewers.
+
+        // !VA  There is a current image, so first populate Appdata manually and then populate getAppData based on the object properties in Appdata
+        var AppobjDev = {
+          currentimg: document.querySelector(dynamicRegions.curImg),
+          viewer: document.querySelector(dynamicRegions.imgViewer),
+          viewport: document.querySelector(dynamicRegions.imgViewport),
+          appcontainer: document.querySelector(dynamicRegions.appContainer)
+        }; 
+
+        var filename = calcController.getFilenameFromSource(AppobjDev.currentimg.src);
+        // !VA Hide the drop area.
+        document.querySelector(staticRegions.dropArea).style.display = 'none';
+        // !VA  Show the toolbar
+        document.querySelector(staticRegions.toolsContainer).style.display = 'block';
+        // !VA This is where we run writeImgToDOM to:
+        /* 1) Insert the cur-img-container insider the cur-img element
+          2) Include logic to exclude inserting the image unless it doesn't exist already, i.e. is the FileReader blob and not the hard-coded image from the HTML file.
+        */
+        // !VA AppobjDev returns NaN for the viewer containers because they don't have values yet... not sure I understand why since height and width are initially declared in CSS.
+        var Appdata = UIController.getAppData(AppobjDev, filename);
+        // !VA evaluate the viewer containers and adjust their size based on the returned Appdata
+        var evalViewerSize = calcController.evalViewerSize(Appdata);
+
+      });
     };
 
 
