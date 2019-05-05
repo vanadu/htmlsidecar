@@ -2,10 +2,13 @@
 /* !VA  
 ===========================================================
 TODO: Implement the toolbuttons.
+TODO: Fix the input fields: when enter is pressed, the focus should leave the field and the current value shown.
 Separation of tasks:
 NOTE: Keypress is supposed to be deprecated but there is no replacement, so stick with keypress
 https://stackoverflow.com/questions/52882144/replacement-for-deprecated-keypress-dom-event
 TODO: Set input field value to the current value and remove the focus from the input field after the enter key is pressed
+
+!IMPORTANT! You can't reference an object property with a variable the normal way. You have to do it using bracket notation, see updateAppData...
 
 1) Get input from event. All the click/keypress functions do respectively basically same thing. They should be handled and passed to functions directly via their eventHandlers, not aggregated into some huge eval function that does everything.
 1) Keypress: 
@@ -546,17 +549,23 @@ var Dimwhit = (function () {
           console.log('getFilenameFromSource: there is no source');
         }
       },
-      
+
       // !VA Update the viewer height based on the user input in Controller.handleUserAction
       // UPDATE VIEWER HEIGHT
-      updateViewerH: function (val) {
+      updateViewerW: function (val) {
+        // !VA TODO: Setting maxViewerWidth just for now
+        var maxViewerWidth = 800;
         var data = UIController.accessAppdata();
-        console.log('updateViewerH -- ');
-        console.log('viewerH is: ' + val);
+        console.log('updateViewerW -- ');
+        console.log('viewerW is: ' + val);
         console.log('data.imgW is: ' + data.imgW);
         if (val < data.imgW ) {
-          console.log('TODO: errorHandler: viewerH cannot be smaller than imgH');
+          // !VA The viewer width can't be smaller than the current image width of XXX, show message
+          console.log('TODO: errorHandler: viewerW cannot be smaller than imgW');
+        } else if (val > maxViewerWidth ) {
+          console.log('updateViewerW:  val > maxViewerWidth');
         } else {
+
           // !VA The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image. 
           console.log('continue...');
           var data2 = UIController.updateAppData('viewerW', val);
@@ -566,6 +575,39 @@ var Dimwhit = (function () {
           // !VA Works...
         }
       },
+
+      // !VA Update the image height based on the user input in Controller.handleUserAction
+      // UPDATE IMAGE HEIGHT
+
+      updateCustomW: function (val) {
+        var data = UIController.accessAppdata();
+        console.log('updateCustomW -- ');
+        console.log('customW is: ' + val);
+        console.log('data.imgW is: ' + data.imgW);
+        console.log('data.imgNW is: ' + data.imgNW);
+        console.log('data.imgNH is: ' + data.imgNH);
+        // !VA If the new image width is greater than the viewer width, then show message. 
+        if (val > data.viewerW ) {
+          console.log('TODO: errorHandler: imgH cannot be larger than viewerW of XXX');
+        }
+        else {
+          // !VA Write the user input for imgW to the data, which is the local copy of Appdata
+          var data2 = UIController.updateAppData('imgW', val);
+          console.log('data2 is...');
+          console.dir(data2);
+          // !VA Calculate the imgH based on the aspectRatio funtion and the current values for imgNW and imgNH and put it in val
+          val = Math.round((1/calcController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgW);
+          // !VA Write the updated imgH to Appdata
+          data2 = UIController.updateAppData('imgH', val);
+          console.log('data2 is...');
+          console.dir(data2);
+
+          calcController.evalViewerSize(data2);
+          calcController.adjustContainerHeights(data2);
+
+        }
+      },
+
 
       // !VA There are four conditions for an image to fit into the appContainer. This evaluates them, sets the Appdata properties accordingly and calls adjustContainerHeights. 
       // !VA TODO: Actually the function needs to be called only once at the end of the routine...
@@ -829,11 +871,14 @@ var Dimwhit = (function () {
               el.id;
               switch(true) {
               case (el.id === 'main-image-viewer-wdth') :
-                calcController.updateViewerH(el.value);
-
+                calcController.updateViewerW(el.value);
+                console.log('Keypress handler: updateViewerW');
+                break;
+              case ( el.id === 'main-img-custom-wdth') :
+                calcController.updateCustomW(el.value);
+                console.log('Keypress handler: updateCustomW');
+                break;
               }
-              // !VA !IMPORTANT! You can't reference an object property with a variable the normal way. You have to do it using bracket notation, see updateAppData...
-              // UIController.updateAppData('viewerW', el.value);
             }
           } 
         } else if (  event.type === 'focus') {
@@ -910,6 +955,7 @@ var Dimwhit = (function () {
     var initializeDevMode = function() {
       // !VA TODO: Dev mode doesn't work any more...
       console.log('initializeDevMode running...');
+      
       // !VA Get the imgViewer dimensions as set in CSS:
       var initViewerW = parseInt(document.querySelector(dynamicRegions.imgViewer).style.width);
       // !VA Not sure why this isn't used.
