@@ -2,11 +2,14 @@
 /* !VA  
 ===========================================================
 TODO: Implement the toolbuttons.
-TODO: Fix the input fields: when enter is pressed, the focus should leave the field and the current value shown.
-Separation of tasks:
+TODO: FIX - Set input field value to the current value and remove the focus from the input field after the enter key is pressed. But entering values in the customW field puts the value of the viewerH field in on blur. The best fix for this requires renaming the UI elements in the HTML to be inline with the Javascript object and property names. Branching now...
+
+
+DONE: Fix the input fields: when enter is pressed, the focus should leave the field and the current value shown.
+
+
 NOTE: Keypress is supposed to be deprecated but there is no replacement, so stick with keypress
 https://stackoverflow.com/questions/52882144/replacement-for-deprecated-keypress-dom-event
-TODO: Set input field value to the current value and remove the focus from the input field after the enter key is pressed
 
 !IMPORTANT! You can't reference an object property with a variable the normal way. You have to do it using bracket notation, see updateAppData...
 
@@ -826,8 +829,8 @@ var Dimwhit = (function () {
         addEventHandler(tbClickables[i],'click',handleUserAction,false);
 
       }
+
       // !VA Add event handlers for input toolButtons
-      
       var tbKeypresses = [ 'main-image-viewer-wdth', 'main-img-custom-wdth', 'main-img-custom-hght', 'small-phones-wdth', 'large-phones-wdth' ];
       for (let i = 0; i < tbKeypresses.length; i++) {
         // !VA convert the ID string to the object inside the loop
@@ -871,6 +874,7 @@ var Dimwhit = (function () {
               el.id;
               switch(true) {
               case (el.id === 'main-image-viewer-wdth') :
+                
                 calcController.updateViewerW(el.value);
                 console.log('Keypress handler: updateViewerW');
                 break;
@@ -880,16 +884,20 @@ var Dimwhit = (function () {
                 break;
               }
             }
+            console.log('Pressed');
+            // !VA If the value is not an integer on blur, then reset it to the previous value
+            el.value = (function () {
+              var data = UIController.accessAppdata();
+              return data.viewerW;
+            })();
+            el.blur();
+            // !VA BRANCHING NOW TO FIX THIS...
           } 
         } else if (  event.type === 'focus') {
           // !VA Set the value of the element to null when it gets the focus
           el.value = ''; 
         } else if ( event.type === 'blur') {
-          // !VA If the value is not an integer on blur, then reset it to the previous value
-          el.value = (function () {
-            var data = UIController.accessAppdata();
-            return data.viewerW;
-          })();
+          e.preventDefault;
         } else if ( event.type === 'drop') {
           // console.log(event.type + ': ' + this.id);
           e.preventDefault;
