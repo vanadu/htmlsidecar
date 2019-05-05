@@ -2,9 +2,7 @@
 /* !VA  
 ===========================================================
 TODO: Implement the toolbuttons.
-
-
-DONE: FIX - Set input field value to the current value and remove the focus from the input field after the enter key is pressed. But entering values in the customw field puts the value of the viewerH field in on blur. The best fix for this requires renaming the UI elements in the HTML to be inline with the Javascript object and property names. Actually, it wasn't really necessary to rename the UI elements and it will cause some pain later when I recycle code from V1, but it does make a lot more sense now.
+TODO: FIX - Set input field value to the current value and remove the focus from the input field after the enter key is pressed. But entering values in the customw field puts the value of the viewerH field in on blur. The best fix for this requires renaming the UI elements in the HTML to be inline with the Javascript object and property names. Branching now...
 
 Renamed:
 

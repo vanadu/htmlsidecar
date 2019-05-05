@@ -2,27 +2,58 @@
 /* !VA  
 ===========================================================
 TODO: Implement the toolbuttons.
+TODO: FIX - Set input field value to the current value and remove the focus from the input field after the enter key is pressed. But entering values in the customW field puts the value of the viewerH field in on blur. The best fix for this requires renaming the UI elements in the HTML to be inline with the Javascript object and property names. Branching now...
 
 
-DONE: FIX - Set input field value to the current value and remove the focus from the input field after the enter key is pressed. But entering values in the customw field puts the value of the viewerH field in on blur. The best fix for this requires renaming the UI elements in the HTML to be inline with the Javascript object and property names. Actually, it wasn't really necessary to rename the UI elements and it will cause some pain later when I recycle code from V1, but it does make a lot more sense now.
-
-Renamed:
-
-main-img               cur-img
-main-img-container     cur-img-container
-
-tb-input-viewerw       tb-input-viewerw
-tb-but-grow50          tb-but-grow50
-tb-but-grow10          tb-but-grow10
-tb-but-grow01          tb-but-grow01
-tb-but-shrink50        tb-but-shrink50
-tb-but-shrink10        tb-but-shrink10
-tb-but-shrink01        tb-but-shrink01
-tb-input-customw       tb-input-customw
-tb-input-customh       tb-input-customh
+DONE: Fix the input fields: when enter is pressed, the focus should leave the field and the current value shown.
 
 
+NOTE: Keypress is supposed to be deprecated but there is no replacement, so stick with keypress
+https://stackoverflow.com/questions/52882144/replacement-for-deprecated-keypress-dom-event
 
+!IMPORTANT! You can't reference an object property with a variable the normal way. You have to do it using bracket notation, see updateAppData...
+
+1) Get input from event. All the click/keypress functions do respectively basically same thing. They should be handled and passed to functions directly via their eventHandlers, not aggregated into some huge eval function that does everything.
+1) Keypress: 
+    TOOLBUTTONS & CCP
+    main-image-viewer-wdth, main-img-custom-width, main-img-custom-height, small-phones-wdth, large-phones-wdth. 
+    Determine which element is this
+      create array of input elements
+      compare with this
+      if this matches element, run function -- need to determine what the function does and how much can be recycled across all the input elements.
+    resetPlaceholders
+    validateInteger
+    errorHandler
+    math or other specific function:
+      viewer width: set viewer width and set  image dimensions to match because the image can't be larger than the viewer;
+     update property
+     update UI
+2) Click: 
+  TOOLBUTTONS & CCP
+  main-image-grow-50, main-image-grow-10, main-image-grow-01, main-image-shrink-50 , main-image-shrink-10, main-image-shrink-01. 
+  a) get the increment 
+  b) update property
+  c) update UI
+
+  STRATEGY
+  ==============
+  It's possible to create one huge object that contains all the DOM elements that have events attached. But that would make them hard to manage. It's best to create one Constructor for all the event triggers and then access them as necessary. Using tyhe addEventHandler function that processes addEventlistener calls, the Constructor would have to have:
+    * Element ID
+    * event type
+    * function to run
+    * false
+    
+
+    This Contstructor and object definitions should be in the controller module.
+    
+    function EventHandler(id, evt, func, bool) {
+    this.id = id;
+    this.evt = evt;
+    this.func = func;
+    this.bool = bool;
+    }
+
+    var new EventHandler = new EventHandler( toolButtons.viewerWidth, 'keypress', refreshAppObj, false);
 
 
 
@@ -52,23 +83,23 @@ var Dimwhit = (function () {
 
     // !VA toolButton ID Strings
     var toolButtons = {
-      viewerW: '#tb-input-viewerw',
-      grow50: '#tb-but-grow50',
-      grow10: '#tb-but-grow10',
-      grow01: '#tb-but-grow01',
-      customW: '#tb-input-customw',
-      toggleImgSize: '#toggle-image-size',
-      customH: '#tb-input-customh',
-      shrink01:'#tb-but-shrink01',
-      shrink10: '#tb-but-shrink10',
-      shrink50: '#tb-but-shrink50',
-      sPhonesW: '#tb-input-large-phonesw',
-      lPhonesW: '#tb-input-small-phonesw',
+      viewerWidth: '#main-image-viewer-wdth',
+      grow50: '#main-image-grow-50',
+      grow10: 'main-image-grow-10',
+      grow01: 'main-image-grow-01',
+      customWidth: 'main-img-custom-wdth',
+      toggleImgSize: 'toggle-image-size',
+      customHeight: 'main-img-custom-hght',
+      shrink01:'main-image-shrink-01',
+      shrink10: 'main-image-shrink-10',
+      shrink50: 'main-image-shrink-50',
+      sPhoneWidth: 'small-phones-wdth',
+      lPhoneWidth: 'large-phones-wdth',
     };
 
     //!VA If we separate this out into UI objects that correspond to the objects we want to create, then we can just loop through them rather than define each property separately. So, dynamicElements are those that resize based on the current image... but I haven't figured out how to loop through them yet.
     var dynamicRegions = {
-      curImg: '#cur-img',
+      curImg: '#main-img',
       imgViewer: '#main-image-viewer',
       imgViewport: '#image-viewport',
       appContainer: '#app-container',
@@ -160,7 +191,7 @@ var Dimwhit = (function () {
       handleFileSelect: function(evt) {
         console.log('RUnning HandleFileSelect');
         // If a file is already being displayed, i.e. Appdata.filename is true, then remove that image to make room for the next image being dropped
-        // !VA Remove the current #cur-img from the DOM. This has to be done in a separate function call, I'm not sure why handleFileSelect doesn't see #cur-img even though it is in the DOM at this point
+        // !VA Remove the current #main-img from the DOM. This has to be done in a separate function call, I'm not sure why handleFileSelect doesn't see #main-img even though it is in the DOM at this point
         UIController.removeCurImg();
         //The drop event has been executed and handleFileSelect is running.
         // !VA Can't remember what this does...    
@@ -205,7 +236,7 @@ var Dimwhit = (function () {
             // Create the image object        
             var curImg = new Image();
             // !VA create the id
-            curImg.id = 'cur-img';
+            curImg.id = 'main-img';
             // !VA assign the blob in e.target.result to the source of the image. the onload function ensures that the blob is loaded before the
             // curImg.src = e.target.result;
             curImg.src = e.target.result;
@@ -256,11 +287,11 @@ var Dimwhit = (function () {
               // !VA Create a div in the DOM
               var curImgDiv = document.createElement('div');
               // !VA Assign the new div an id that reflects its purpose
-              curImgDiv.id = 'cur-img-container';
-              // Insert cur-img-container into the existing main-image inside the main-image div.
+              curImgDiv.id = 'main-img-container';
+              // Insert main-img-container into the existing main-image inside the main-image div.
               document.getElementById('main-image').insertBefore(curImgDiv, null);
-              // !VA insert the new curImg into the new cur-img container
-              document.getElementById('cur-img-container').insertBefore(curImg, null);
+              // !VA insert the new curImg into the new main-img container
+              document.getElementById('main-img-container').insertBefore(curImg, null);
               // Create the image object and read in the binary image from the FileReader object.
               // This allows access of image properties. You can't get image properties from a FileReader object -- it's just a blob' 
               // !VA Hide the DOM element while the blob loads.
@@ -283,15 +314,15 @@ var Dimwhit = (function () {
         val = parseInt(val); 
         // !VA !IMPORTANT! THis is HUGE!
         Appdata[prop] = val;
-        // console.log('Appdata.prop is now: ' + Appdata[prop]);
+        console.log('Appdata.prop is now: ' + Appdata[prop]);
         // !VA No return value should be required, this is write-only
-        // console.log('updateAppData -- Appdata is...');
-        // console.dir(Appdata);
+        console.log('updateAppData -- Appdata is...');
+        console.dir(Appdata);
 
         /* !VA STOPPED HERE Now we need to:
             write a function to:
-                recalc imgW and imgH based on the new viewerw.
-                recalc imgH and imgW based on the new customw/customh values
+                recalc imgW and imgH based on the new viewerW.
+                recalc imgH and imgW based on the new customW/customH values
 
             return them here and update the Appdata
             run adjustContainerHeights here to recalc viewer heights based on above.
@@ -400,7 +431,7 @@ var Dimwhit = (function () {
           // !VA Adjust the image container heights based on the Appdata values calculated in adjustContainerHeights
           document.querySelector(dynamicRegions.curImg).style.width = calcController.intToPx(Appdata.imgW);
           document.querySelector(dynamicRegions.curImg).style.height = calcController.intToPx(Appdata.imgH);
-          document.querySelector(dynamicRegions.imgViewer).style.width = calcController.intToPx(Appdata.viewerw);
+          document.querySelector(dynamicRegions.imgViewer).style.width = calcController.intToPx(Appdata.viewerW);
           document.querySelector(dynamicRegions.imgViewer).style.height = calcController.intToPx(Appdata.viewerH);
           // !VA This is NaN-- not sure we even need this since the app width is static.
           document.querySelector(dynamicRegions.imgViewport).style.width = calcController.intToPx(Appdata.viewportW);
@@ -414,11 +445,11 @@ var Dimwhit = (function () {
           return Appdata, dimViewers;
         }
       },
-      // !VA Test for whether there is already a #cur-img element in the DOM, and if there is remove it so handleFileSelect can overwrite it without having to refresh the page to reboot the app.
+      // !VA Test for whether there is already a #main-img element in the DOM, and if there is remove it so handleFileSelect can overwrite it without having to refresh the page to reboot the app.
       removeCurImg: function () {
-        // if ( document.querySelector('#cur-img-container')) {
-        // console.log(document.querySelector('#cur-img-container').parentNode);
-        document.querySelector('#cur-img-container').parentNode.removeChild(document.querySelector('#cur-img-container'));
+        // if ( document.querySelector('#main-img-container')) {
+        // console.log(document.querySelector('#main-img-container').parentNode);
+        document.querySelector('#main-img-container').parentNode.removeChild(document.querySelector('#main-img-container'));
         // } 
       },
 
@@ -528,20 +559,20 @@ var Dimwhit = (function () {
         // !VA TODO: Setting maxViewerWidth just for now
         var maxViewerWidth = 800;
         var data = UIController.accessAppdata();
-        // console.log('updateViewerW -- ');
-        // console.log('viewerw is: ' + val);
-        // console.log('data.imgW is: ' + data.imgW);
+        console.log('updateViewerW -- ');
+        console.log('viewerW is: ' + val);
+        console.log('data.imgW is: ' + data.imgW);
         if (val < data.imgW ) {
           // !VA The viewer width can't be smaller than the current image width of XXX, show message
-          console.log('TODO: errorHandler: viewerw cannot be smaller than imgW');
+          console.log('TODO: errorHandler: viewerW cannot be smaller than imgW');
         } else if (val > maxViewerWidth ) {
           console.log('updateViewerW:  val > maxViewerWidth');
         } else {
 
-          // !VA The viewerw is greater than the imgW so we can go ahead and widen the viewerw with no affecton the current image. 
-          // console.log('continue...');
+          // !VA The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image. 
+          console.log('continue...');
           var data2 = UIController.updateAppData('viewerW', val);
-          // console.log('data2 is...');
+          console.log('data2 is...');
           console.dir(data2);
           calcController.evalViewerSize(data2);
           // !VA Works...
@@ -554,13 +585,13 @@ var Dimwhit = (function () {
       updateCustomW: function (val) {
         var data = UIController.accessAppdata();
         console.log('updateCustomW -- ');
-        console.log('customw is: ' + val);
+        console.log('customW is: ' + val);
         console.log('data.imgW is: ' + data.imgW);
         console.log('data.imgNW is: ' + data.imgNW);
         console.log('data.imgNH is: ' + data.imgNH);
         // !VA If the new image width is greater than the viewer width, then show message. 
-        if (val > data.viewerw ) {
-          console.log('TODO: errorHandler: imgH cannot be larger than viewerw of XXX');
+        if (val > data.viewerW ) {
+          console.log('TODO: errorHandler: imgH cannot be larger than viewerW of XXX');
         }
         else {
           // !VA Write the user input for imgW to the data, which is the local copy of Appdata
@@ -595,7 +626,7 @@ var Dimwhit = (function () {
         // The image falls within the default viewer dimensions set in initApp, so do nothing.
         // !VA This case is irrelevant since we're now comparing everything to maxViewerWidth not the  init values. Change accordingly...
         // !VA  NOT SO...now we're trying to restore the previous functionality so...
-        case (Appdata.imgNW <= Appdata.viewerw) && (Appdata.imgNH < Appdata.viewerH) :
+        case (Appdata.imgNW <= Appdata.viewerW) && (Appdata.imgNH < Appdata.viewerH) :
           Appdata.imgW = Appdata.imgNW;
           Appdata.imgH = Appdata.imgNH;
           // !VA viewerH is set in initApp, so no change to it here
@@ -606,10 +637,10 @@ var Dimwhit = (function () {
           break;
 
         // The image is wider than the current viewer width but shorter than current viewer height, so resize the image based on the viewer width
-        case (Appdata.imgNW > Appdata.viewerw) && (Appdata.imgNH < Appdata.viewerH) :
+        case (Appdata.imgNW > Appdata.viewerW) && (Appdata.imgNH < Appdata.viewerH) :
           // console.log('CASE 2');
           // Set the image width to the current viewer
-          Appdata.imgW = Appdata.viewerw;
+          Appdata.imgW = Appdata.viewerW;
           // Get the image height from the aspect ration function
           Appdata.imgH = Math.round((1/this.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[0]) * Appdata.imgW);
           // Set the viewerH to the imgH
@@ -620,7 +651,7 @@ var Dimwhit = (function () {
 
         // The image is not as wide as the current viewer width, but is taller than the viewer height. Keep the image width but resize the viewer in order to display the full image height
         // !VA This might be a problem with consecutive images without page refresh
-        case (Appdata.imgNW <= Appdata.viewerw) && (Appdata.imgNH > Appdata.viewerH) :
+        case (Appdata.imgNW <= Appdata.viewerW) && (Appdata.imgNH > Appdata.viewerH) :
           // console.log('CASE 3');
           // Set the viewer height and the image height to the image natural height
           Appdata.viewerH = Appdata.imgH = Appdata.imgNH;
@@ -634,10 +665,10 @@ var Dimwhit = (function () {
           break;
 
         // The image is wider and taller than the current viewer height and width so we have to resize the image and the viewport based on the current viewport width
-        case (Appdata.imgNW > Appdata.viewerw) && (Appdata.imgNH > Appdata.viewerH) :
+        case (Appdata.imgNW > Appdata.viewerW) && (Appdata.imgNH > Appdata.viewerH) :
           // Set the image Width to the current  viewer width 
-          // console.log('Case 4: Appdata.viewerw is: ' + Appdata.viewerw );
-          Appdata.imgW = Appdata.viewerw;
+          // console.log('Case 4: Appdata.viewerW is: ' + Appdata.viewerW );
+          Appdata.imgW = Appdata.viewerW;
           // Set the image height proportional to the new image width using the aspect ratio function
           Appdata.imgH = Math.round((1/this.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[0]) * Appdata.imgW);
           // Set the viewer height to the image height
@@ -664,7 +695,7 @@ var Dimwhit = (function () {
         let viewportH;
         let appContainerH; 
 
-        // !VA I'm not even sure this is necessary since we're getting the viewerw from maxViewerHeight now -- but we'll leave it in here for the time being. 
+        // !VA I'm not even sure this is necessary since we're getting the viewerW from maxViewerHeight now -- but we'll leave it in here for the time being. 
         // !VA TODO: Review this whole maxViewerHeight thing.
         if (heightVal <= Appdata.initViewerH) {
           // !VA  This is the min-height set in CSS
@@ -728,17 +759,6 @@ var Dimwhit = (function () {
           isErr = false;
         }
         return isErr;
-      },
-
-      // !VA Need to get the Appdata property that corresponds to the ID of the DOM input element that sets it. It's easier to just create a list of these correspondences than to rename the whole UI elements and Appdata properties so they correspond, or to create functions that use string methods to extract them from each other.
-      //  GET APPDATA PROPERTY NAME FROM AN HTML ELEMENT ID
-      getAppdataPropertyFromID: function(str) {
-        var IDtoProp = {
-          viewerW:  'tb-input-viewerw',
-          imgW: 'tb-input-customw',
-          imgH: 'tb-input-customh'
-        };
-        return Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
       }
     };
   })();
@@ -798,36 +818,32 @@ var Dimwhit = (function () {
         // else
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
-      // addEventHandler(document.getElementById(toolButtons.grow01),'click',doit,false);
+      addEventHandler(document.getElementById(toolButtons.grow01),'click',doit,false);
 
-      // !VA HERE! 
-
-      
       // !VA Add click and blur event handlers for clickable toolButtons: 
-      var tbClickables = [ toolButtons.grow50, toolButtons.grow10, toolButtons.grow01, toolButtons.shrink50, toolButtons.shrink10, toolButtons.shrink01 ];
+      var tbClickables = [ 'main-image-grow-01', 'main-image-grow-10', 'main-image-grow-50', 'main-image-shrink-01', 'main-image-shrink-10', 'main-image-shrink-50' ];
       for (let i = 0; i < tbClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
-        tbClickables[i] = document.querySelector(tbClickables[i]);
+        tbClickables[i] = document.getElementById(tbClickables[i]);
         // console.log(tbClickables[i]);
         addEventHandler(tbClickables[i],'click',handleUserAction,false);
-        // debugger;
+
       }
-      
+
       // !VA Add event handlers for input toolButtons
-      var tbKeypresses = [ toolButtons.viewerW, toolButtons.customW, toolButtons.customH, toolButtons.sPhonesW, toolButtons.lPhonesW ];
+      var tbKeypresses = [ 'main-image-viewer-wdth', 'main-img-custom-wdth', 'main-img-custom-hght', 'small-phones-wdth', 'large-phones-wdth' ];
       for (let i = 0; i < tbKeypresses.length; i++) {
         // !VA convert the ID string to the object inside the loop
-        tbKeypresses[i] = document.querySelector(tbKeypresses[i]);
+        tbKeypresses[i] = document.getElementById(tbKeypresses[i]);
         // console.log(tbKeypresses[i]);
         addEventHandler((tbKeypresses[i]),'keypress',handleUserAction,false);
         addEventHandler((tbKeypresses[i]),'focus',handleUserAction,false);
         addEventHandler(tbKeypresses[i],'blur',handleUserAction,false);
         addEventHandler(tbKeypresses[i],'dragover',handleUserAction,false);
         addEventHandler(tbKeypresses[i],'drop',handleUserAction,false);
-
       }
 
-      // addEventHandler(document.getElementById('tb-input-viewerw'),'focus',doit,false);
+      // addEventHandler(document.getElementById('main-image-viewer-wdth'),'focus',doit,false);
 
 
       // !VA Need to decide whether to handle all events here or route actions directly from the event handler. For now...
@@ -852,22 +868,18 @@ var Dimwhit = (function () {
               // !VA If the value entered isn't an integer, reset it to null and leave the focus there
               el.value = '';
             } else {
-              // console.log('Pass this value...');
-              // console.log('el.id is: ' + el.id);
-              // console.log('el.val is: ' + el.value);
+              console.log('Pass this value...');
+              console.log('el.id is: ' + el.id);
+              console.log('el.val is: ' + el.value);
               el.id;
               switch(true) {
-              case (el.id === 'tb-input-viewerw') :
+              case (el.id === 'main-image-viewer-wdth') :
                 
                 calcController.updateViewerW(el.value);
                 console.log('Keypress handler: updateViewerW');
-                var data = UIController.accessAppdata();
-                console.log('updateCustomW --');
-                console.dir(data);
                 break;
-              case ( el.id === 'tb-input-customw') :
+              case ( el.id === 'main-img-custom-wdth') :
                 calcController.updateCustomW(el.value);
-
                 console.log('Keypress handler: updateCustomW');
                 break;
               }
@@ -875,14 +887,9 @@ var Dimwhit = (function () {
             console.log('Pressed');
             // !VA If the value is not an integer on blur, then reset it to the previous value
             el.value = (function () {
-              // !VA Get the Appdata property name that corresponds to the ID of the current input element
-              var prop = calcController.getAppdataPropertyFromID(el.id);
-              // !VA Access Appdata
               var data = UIController.accessAppdata();
-              // !VA return the current value of the Appdata property for the current event target to that elements value property
-              return data[prop];
+              return data.viewerW;
             })();
-            // !VA Blur the input field when enter is pushed whereby the current value stays in the field.
             el.blur();
             // !VA BRANCHING NOW TO FIX THIS...
           } 
@@ -913,11 +920,11 @@ var Dimwhit = (function () {
 
       // Click handlers - focusOnClick
       // =============================
-      // addEventHandler(toolButtons.customheight,'click',focusOnClick,false);
-      // addEventHandler(toolButtons.customwidth,'click',focusOnClick,false);
+      // addEventHandler(toolButtons.customHeight,'click',focusOnClick,false);
+      // addEventHandler(toolButtons.customWidth,'click',focusOnClick,false);
       // addEventHandler(toolButtons.lPhoneWidth,'click',focusOnClick,false);
       // addEventHandler(toolButtons.sPhoneWidth,'click',focusOnClick,false);
-      // addEventHandler(toolButtons.viewerwidth,'click',focusOnClick,false);
+      // addEventHandler(toolButtons.viewerWidth,'click',focusOnClick,false);
 
       // Click handlers - Misc
       // =============================
@@ -962,8 +969,8 @@ var Dimwhit = (function () {
       // !VA Not sure why this isn't used.
       var initViewerH = parseInt(document.querySelector(dynamicRegions.imgViewer).style.height);
       // !VA Initalize the imgViewer width input field value to the default of 650
-      document.querySelector(toolButtons.viewerW).placeholder = initViewerW;
-      // !VA  Test if there is currently #cur-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
+      document.querySelector(toolButtons.viewerWidth).placeholder = initViewerW;
+      // !VA  Test if there is currently #main-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
       var curImgExists = document.querySelector(dynamicRegions.curImg);
       // console.log('curImgExists is: ' + curImgExists);
       // !VA  Now we have to populate Appdata with data. We can do it manually here and just pass the object on to refresh the screen elements.
@@ -983,7 +990,7 @@ var Dimwhit = (function () {
       // !VA  Show the toolbar
       document.querySelector(staticRegions.toolsContainer).style.display = 'block';
       // !VA This is where we run writeImgToDOM to:
-      /* 1) Insert the cur-img-container insider the cur-img element
+      /* 1) Insert the main-img-container insider the main-img element
          2) Include logic to exclude inserting the image unless it doesn't exist already, i.e. is the FileReader blob and not the hard-coded image from the HTML file.
       */
       // !VA AppobjDev returns NaN for the viewer containers because they don't have values yet... not sure I understand why since height and width are initially declared in CSS.
@@ -1007,7 +1014,7 @@ var Dimwhit = (function () {
         document.querySelector(staticRegions.toolsContainer).style.display = 'none';
 
         setupEventListeners();
-        // !VA  Test if there is currently #cur-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
+        // !VA  Test if there is currently #main-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
         var curImgExists = document.querySelector(dynamicRegions.curImg);
         // console.log('curImgExists is: ' + curImgExists);
         if (curImgExists) {
