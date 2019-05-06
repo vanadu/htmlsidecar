@@ -572,8 +572,9 @@ var Dimwhit = (function () {
           data2 = UIController.updateAppData('imgH', val);
           console.log('data2 is...');
           console.dir(data2);
-          debugger;
-          calcController.evalViewerSize(data2);
+          // debugger;
+          // !VA Took forever to figure out that you don't need to eval Viewer size
+          // calcController.evalViewerSize(data2);
           calcController.adjustContainerHeights(data2);
 
         }
@@ -877,7 +878,7 @@ var Dimwhit = (function () {
             // console.log('Pressed');
             // !VA If the value is not an integer on blur, then reset it to the previous value
             el.value = (function () {
-              debugger;
+              // debugger;
               // !VA Get the Appdata property name that corresponds to the ID of the current input element
               var prop = calcController.getAppdataPropertyFromID(el.id);
               // !VA Access Appdata

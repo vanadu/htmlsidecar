@@ -2,7 +2,13 @@
 /* !VA  
 ===========================================================
 TODO: Implement the toolbuttons.
+TODO: FIx; when you enter a viewerW value, the display size value changes. This only happens with images where imgNW is greater than imgW. THere's a big problem with this: evalViewerSize changes the imgW under certain circumstances. See HERE!!! This is only a problem if the large image was resized before the viewer size was changed. It was not a problem in the old version, so I shoul dhave a look at that logic.
+TODO: Fix - there's a top and bottom padding tot he viewer when an image is display in the old version.
 
+
+
+TODO: Fix: enter larger than viewerW in customW, get error, but the focus stays in the field. The value should stay the same, which it does, but the field should unfocus.
+TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
 
 DONE: FIX - Set input field value to the current value and remove the focus from the input field after the enter key is pressed. But entering values in the customw field puts the value of the viewerH field in on blur. The best fix for this requires renaming the UI elements in the HTML to be inline with the Javascript object and property names. Actually, it wasn't really necessary to rename the UI elements and it will cause some pain later when I recycle code from V1, but it does make a lot more sense now.
 
@@ -303,8 +309,8 @@ var Dimwhit = (function () {
 
 
       accessAppdata: function(){
-        console.log('accessAppdata -- ');
-        console.dir(Appdata);
+        // console.log('accessAppdata -- ');
+        // console.dir(Appdata);
         return Appdata;
       },
 
@@ -542,6 +548,7 @@ var Dimwhit = (function () {
 
           // !VA The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image. 
           // console.log('continue...');
+          debugger;
           var data2 = UIController.updateAppData('viewerW', val);
           // console.log('data2 is...');
           console.dir(data2);
@@ -572,8 +579,8 @@ var Dimwhit = (function () {
           data2 = UIController.updateAppData('imgH', val);
           console.log('data2 is...');
           console.dir(data2);
-          debugger;
-          calcController.evalViewerSize(data2);
+          // debugger;
+          // calcController.evalViewerSize(data2);
           calcController.adjustContainerHeights(data2);
 
         }
@@ -595,6 +602,7 @@ var Dimwhit = (function () {
         // !VA This case is irrelevant since we're now comparing everything to maxViewerWidth not the  init values. Change accordingly...
         // !VA  NOT SO...now we're trying to restore the previous functionality so...
         case (Appdata.imgNW <= Appdata.viewerW) && (Appdata.imgNH < Appdata.viewerH) :
+        // debugger;
           Appdata.imgW = Appdata.imgNW;
           Appdata.imgH = Appdata.imgNH;
           // !VA viewerH is set in initApp, so no change to it here
@@ -636,6 +644,7 @@ var Dimwhit = (function () {
         case (Appdata.imgNW > Appdata.viewerW) && (Appdata.imgNH > Appdata.viewerH) :
           // Set the image Width to the current  viewer width 
           // console.log('Case 4: Appdata.viewerW is: ' + Appdata.viewerW );
+          // !VA HERE!!! This is the problem. 
           Appdata.imgW = Appdata.viewerW;
           // Set the image height proportional to the new image width using the aspect ratio function
           Appdata.imgH = Math.round((1/this.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[0]) * Appdata.imgW);
@@ -738,8 +747,9 @@ var Dimwhit = (function () {
           imgW: 'tb-input-customw',
           imgH: 'tb-input-customh'
         };
+        // !VA This should return directly wihout a ret variable as tmp storage.
         var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
-        alert(ret);
+        // alert(ret);
         return ret;
       }
     };
@@ -877,14 +887,14 @@ var Dimwhit = (function () {
             // console.log('Pressed');
             // !VA If the value is not an integer on blur, then reset it to the previous value
             el.value = (function () {
-              debugger;
+              // debugger;
               // !VA Get the Appdata property name that corresponds to the ID of the current input element
               var prop = calcController.getAppdataPropertyFromID(el.id);
               // !VA Access Appdata
               // debugger;
               var data = UIController.accessAppdata();
               // !VA return the current value of the Appdata property for the current event target to that elements value property
-              alert(data[prop]);
+              // alert(data[prop]);
               return data[prop];
             })();
             // !VA Blur the input field when enter is pushed whereby the current value stays in the field.
