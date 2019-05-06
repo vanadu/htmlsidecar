@@ -420,7 +420,7 @@ var Dimwhit = (function () {
       // !VA the keyPressed only handles the return key -- need to handle the target's blur as well.
       // !VA NOW -- Only support entry on keypress, otherwise it gets very complicated. So on blur, the field value reverts to the original value before the new value was entered. This is the way it should behave and it's the way it behaves for viewerW but currently not for imgW or imgH
       keyPressed = e.which || e.keyCode || e.key;
-      console.log('keyPressed is: ' + keyPressed);
+      //console.log('keyPressed is: ' + keyPressed);
       if (keyPressed === 13) { // 13 is enter
         // Read the input value into inputVal
         // console.log('keyPressed is: ' + keyPressed); 
@@ -1493,7 +1493,7 @@ var Dimwhit = (function () {
     // !VA Since integer validation is used for all height/width input fields, including those not yet implemented, we're going to use a separate error handler for it, call showMessages from it and return 
     let isErr;
     let mess;
-    console.log('in errorHandler...validating integer');
+    //console.log('in errorHandler...validating integer');
   
     if (!parseInt(inputVal, 10) || inputVal % 1 !== 0 || inputVal < 0) {
       // errorMessages(target, "Width and height must be entered as positive whole number.");
@@ -1757,7 +1757,7 @@ var Dimwhit = (function () {
     console.log('this is: ' + this);
     // this.focus();
     this.select();
-    console.log('Select Me!');
+    //console.log('Select Me!');
     this.style.textAlign = 'center';
   }
 

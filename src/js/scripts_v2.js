@@ -2,8 +2,10 @@
 /* !VA  
 ===========================================================
 TODO: Implement the toolbuttons.
-TODO: FIx; when you enter a viewerW value, the display size value changes. This only happens with images where imgNW is greater than imgW. THere's a big problem with this: evalViewerSize changes the imgW under certain circumstances. See HERE!!! This is only a problem if the large image was resized before the viewer size was changed. It was not a problem in the old version, so I shoul dhave a look at that logic.
+TODO: FIx; when you enter a viewerW value, the img display size value changes. This appears to be fixed by just running adjustContainerHeights from updateViewerW
+
 TODO: Fix - there's a top and bottom padding tot he viewer when an image is display in the old version.
+TODO: Fix -- old version sets the cursor at the end of the input and implements it on enter but doesn't blur until tab.The good thing about that is that youc an tab to different fields wihtout mousing again.Ilike that... let's do it.
 
 
 
@@ -546,13 +548,14 @@ var Dimwhit = (function () {
           console.log('updateViewerW:  val > maxViewerWidth');
         } else {
 
-          // !VA The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image. 
+          // !VA The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running evalViewerWidth. 
           // console.log('continue...');
-          debugger;
           var data2 = UIController.updateAppData('viewerW', val);
           // console.log('data2 is...');
           console.dir(data2);
-          calcController.evalViewerSize(data2);
+          // !VA DON'T Run this here!
+          // calcController.evalViewerSize(data2);
+          calcController.adjustContainerHeights(data2);
           // !VA Works...
         }
       },
