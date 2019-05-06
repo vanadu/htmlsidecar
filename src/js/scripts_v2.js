@@ -2,10 +2,13 @@
 /* !VA  
 ===========================================================
 TODO: Implement the toolbuttons.
-TODO: FIx; when you enter a viewerW value, the img display size value changes. This appears to be fixed by just running adjustContainerHeights from updateViewerW
 
-TODO: Fix - there's a top and bottom padding tot he viewer when an image is display in the old version.
+
+
+DONE: Fixed - there's a top and bottom padding tot he viewer when an image is display in the old version. Changed the initViewerH in adjustContainerHeights to initViewerH instead of Appdata.initViewerH. I hope this isn't a problem later, but it appears to have fixed this issue.
+DONE: FIx; when you enter a viewerW value, the img display size value changes. This appears to be fixed by just running adjustContainerHeights from updateViewerW
 TODO: Fix -- old version sets the cursor at the end of the input and implements it on enter but doesn't blur until tab.The good thing about that is that youc an tab to different fields wihtout mousing again.Ilike that... let's do it.
+
 
 
 
@@ -251,7 +254,7 @@ var Dimwhit = (function () {
                 })();
                 
                 // !VA Timeout of 250 ms while the blob loads.
-              }, 1000);
+              }, 250);
             }
 
             // !VA First, write the new curImg object to the DOM
@@ -669,6 +672,9 @@ var Dimwhit = (function () {
       adjustContainerHeights: function (Appdata)  {
         // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values.
 
+        // !VA Initial height is 450, which is set in the init function, not in Appdata,or as it was V1, in the Appobj.
+
+        var initViewerH= 450;
         var heightVal = Appdata.imgH;
         // console.log('heightVal is: ' + heightVal);
         // console.log('adjustContainerHeights Appdata is: ');
@@ -676,13 +682,15 @@ var Dimwhit = (function () {
         let viewportH;
         let appContainerH; 
 
+
+
         // !VA I'm not even sure this is necessary since we're getting the viewerW from maxViewerHeight now -- but we'll leave it in here for the time being. 
         // !VA TODO: Review this whole maxViewerHeight thing.
-        if (heightVal <= Appdata.initViewerH) {
+        if (heightVal <= initViewerH) {
           // !VA  This is the min-height set in CSS
           // appObj.appContainerH = 804;
           // !VA Trying to set the viewerH based on the initViewerH...
-          viewerH = Appdata.initViewerH;
+          viewerH = initViewerH;
           viewportH = viewerH + 145;
         } else {
           // Need a little buffer in the viewport
@@ -900,8 +908,8 @@ var Dimwhit = (function () {
               // alert(data[prop]);
               return data[prop];
             })();
-            // !VA Blur the input field when enter is pushed whereby the current value stays in the field.
-            el.blur();
+            // !VA Blur the input field when enter is pushed whereby the current value stays in the field. Removed this because I want the cursor to stay at the end of the input and only blur on elsewhere click or on tab key. That way, you can tab to the other fields on the toolButtons instead of having to mouse in again.
+            // el.blur();
             // !VA BRANCHING NOW TO FIX THIS...
           } 
         } else if (  event.type === 'focus') {
