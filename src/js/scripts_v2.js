@@ -2,6 +2,7 @@
 /* !VA  
 ===========================================================
 TODO: Implement the toolbuttons.
+TODO: Reset the customH and customW fields on blur to their placeholders
 
 
 
@@ -534,6 +535,73 @@ var Dimwhit = (function () {
         }
       },
 
+      // Handle all the ToolButton input field input
+      handleTBInput: function(id, val) {
+        // !VA get a copy of Appdata
+        var data = UIController.accessAppdata();
+        // !VA TODO: Setting maxViewerWidth just for now
+        var maxViewerWidth = 800;
+        console.log('val is: ' + val);
+        switch (true) {
+        case (id.includes('viewerw')) :
+          console.log('CASE 1: handling viewerW');
+          if (val < data.imgW ) {
+            // !VA The viewer width can't be smaller than the current image width of XXX, show message
+            console.log('TODO: errorHandler: viewerW cannot be smaller than imgW');
+          } else if (val > maxViewerWidth ) {
+            // !VA Setting a maxViewerWidth here but I need to review V1 and revisit this.
+            console.log('updateViewerW:  val > maxViewerWidth');
+          } else {
+            // !VA The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running evalViewerWidth. 
+            // console.log('continue...');
+            data = UIController.updateAppData('viewerW', val);
+            // console.log('data is...');
+            // !VA DON'T run evalViewerSize! Just adjust the heights based on viewerH because the potential error of it being greater than the max viewer size or smaller than the imgW has already been trapped.
+            console.dir(data);
+          }
+          break;
+        case (id.includes('customw')) :
+        // !VA TODO: restore the placeholder value on blur
+          console.log('handling customW');
+          // !VA If the new image width is greater than the viewer width, then show message. 
+          if (val > data.viewerW ) {
+            console.log('TODO: errorHandler: imgH cannot be larger than viewerW of XXX');
+          }
+          else {
+            // !VA Write the user input for imgW to the data, which is the local copy of Appdata
+            data = UIController.updateAppData('imgW', val);
+            console.log('data is...');
+            console.dir(data);
+            // !VA Calculate the imgH based on the aspectRatio funtion and the current values for imgNW and imgNH and put it in val
+            val = Math.round((1/calcController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgW);
+            // !VA Write the updated imgH to Appdata
+            data = UIController.updateAppData('imgH', val);
+            console.log('data is...');
+            console.dir(data);
+            // calcController.evalViewerSize(data2);
+            calcController.adjustContainerHeights(data);
+
+          }
+          break;
+        case (id.includes('customh')) :
+          console.log('handling customH');
+          // !VA TODO: restore the placeholder value on blur
+          // !VA Write the user input for imgW to the data, which is the local copy of Appdata
+          data = UIController.updateAppData('imgH', val);
+          console.log('data is...');
+          console.dir(data);
+          // !VA Calculate the imgH based on the aspectRatio funtion and the current values for imgNW and imgNH and put it in val
+          val = Math.round((calcController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgH);
+          // !VA Write the updated imgH to Appdata
+          data = UIController.updateAppData('imgW', val);
+          console.log('data2 is...');
+          console.dir(data);
+          break;
+        }
+        calcController.adjustContainerHeights(data);
+
+      },
+
       // !VA Update the viewer height based on the user input in Controller.handleUserAction
       // UPDATE VIEWER HEIGHT
       updateViewerW: function (val) {
@@ -552,7 +620,7 @@ var Dimwhit = (function () {
 
           // !VA The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running evalViewerWidth. 
           // console.log('continue...');
-          var data2 = UIController.updateAppData('viewerW', val);
+
           // console.log('data2 is...');
           console.dir(data2);
           // !VA DON'T Run this here!
@@ -560,6 +628,7 @@ var Dimwhit = (function () {
           calcController.adjustContainerHeights(data2);
           // !VA Works...
         }
+        var data2 = UIController.updateAppData('viewerW', val);
       },
 
       // !VA Update the image height based on the user input in Controller.handleUserAction
@@ -789,7 +858,7 @@ var Dimwhit = (function () {
   })();
 
 
-  // !VA Not sure why UICtrl is used here...
+  // !VA Not sure why UICtrl is used here.
   // GLOBAL APP CONTROLLER
   var controller = (function(calcCtrl, UICtrl) {
 
@@ -844,9 +913,6 @@ var Dimwhit = (function () {
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
       // addEventHandler(document.getElementById(toolButtons.grow01),'click',doit,false);
-
-      // !VA HERE! 
-
       
       // !VA Add click and blur event handlers for clickable toolButtons: 
       var tbClickables = [ toolButtons.grow50, toolButtons.grow10, toolButtons.grow01, toolButtons.shrink50, toolButtons.shrink10, toolButtons.shrink01 ];
@@ -884,66 +950,41 @@ var Dimwhit = (function () {
         var el;
         // !VA Put the event trigger in an object first, so we don't have to keep calling document.getElementById
         el = document.getElementById(this.id);
-        console.log('handle user action here...');
+        console.log('handle user action here.');
         if (event.type === 'click') {
           console.log(event.type + ': ' + this.id);
         } else if (event.type === 'keypress') {
           keypressed = e.which || e.keyCode || e.key;
           if (keypressed == 13) {
-            // console.log(event.type + ' ' + keypressed + ': ' + this.id);
             // !VA Get the input and evaluate it
             var isErr = calcController.validateInteger(this.value);
             if (isErr) {
               // !VA If the value entered isn't an integer, reset it to null and leave the focus there
               el.value = '';
+            // !VA We want to handle all the toolbutton keyboard input in one place, so send the send the target element's id and value to handleTBInput
+            } else if (el.id.includes('tb-input')) {
+              calcController.handleTBInput(el.id, el.value);
             } else {
-              // console.log('Pass this value...');
-              // console.log('el.id is: ' + el.id);
-              // console.log('el.val is: ' + el.value);
-              el.id;
-              switch(true) {
-              case (el.id === 'tb-input-viewerw') :
-                console.log('CASE 1 - updateViewerW --');
-                
-                calcController.updateViewerW(el.value);
-                var data = UIController.accessAppdata();
-                console.dir(data);
-                break;
-
-              case ( el.id === 'tb-input-customw') :
-                console.log('CASE 2 - updateCustomW --');
-                calcController.updateCustomW(el.value);
-
-                break;
-
-              case ( el.id === 'tb-input-customh') :
-                console.log('CASE 3 - updateCustomH --');
-                calcController.updateCustomH(el.value);
-
-                break;
-              }
-
-              
+              // !VA There will be other input fields to handele, but we're not there yet.
+              console.log('Undefined keypress action');
             }
-            // console.log('Pressed');
-            // !VA If the value is not an integer on blur, then reset it to the previous value
-            el.value = (function () {
-              // !VA Get the Appdata property name that corresponds to the ID of the current input element
-              var prop = calcController.getAppdataPropertyFromID(el.id);
-              // !VA Access Appdata
-              var data = UIController.accessAppdata();
-              // !VA return the current value of the Appdata property for the current event target to that elements value property
-              // alert(data[prop]);
-              return data[prop];
-            })();
-            // !VA Blur the input field when enter is pushed whereby the current value stays in the field. Removed this because I want the cursor to stay at the end of the input and only blur on elsewhere click or on tab key. That way, you can tab to the other fields on the toolButtons instead of having to mouse in again.
-            // el.blur();
-            // !VA BRANCHING NOW TO FIX THIS...
           } 
         } else if (  event.type === 'focus') {
           // !VA Set the value of the element to null when it gets the focus
           el.value = ''; 
         } else if ( event.type === 'blur') {
+          console.log('blur');
+          // !VA If the target is viewerW, we want to restore the previous value to the field on blur in case of error or in case it is exited without entering a value with the return key. If the target is customW or customH, we want to restore the placeholder value.
+          // !VA TODO: create function to restore placeholder value
+          el.value = (function () {
+            // !VA Get the Appdata property name that corresponds to the ID of the current input element
+            var prop = calcController.getAppdataPropertyFromID(el.id);
+            // !VA Access Appdata
+            var data = UIController.accessAppdata();
+            // !VA return the current value of the Appdata property for the current event target to that elements value property. 
+            // alert(data[prop]);
+            return data[prop];
+          })();
           e.preventDefault;
         } else if ( event.type === 'drop') {
           // console.log(event.type + ': ' + this.id);
