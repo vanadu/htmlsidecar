@@ -448,7 +448,6 @@ var Dimwhit = (function () {
           curDimViewers = Object.values(curDimViewers);
           // console.log('curDimViewers is: ' + curDimViewers);
         }
-        // debugger;
 
 
 
@@ -585,7 +584,31 @@ var Dimwhit = (function () {
           data2 = UIController.updateAppData('imgH', val);
           console.log('data2 is...');
           console.dir(data2);
-          // debugger;
+          // calcController.evalViewerSize(data2);
+          calcController.adjustContainerHeights(data2);
+
+        }
+      },
+
+      updateCustomH: function (val) {
+        var data = UIController.accessAppdata();
+        console.log('updateCustomH -- start');
+        console.dir(data);
+        // !VA If the new image width is greater than the viewer width, then show message. 
+        if (val > data.viewerW ) {
+          console.log('TODO: errorHandler: imgH cannot be larger than viewerW of XXX');
+        }
+        else {
+          // !VA Write the user input for imgW to the data, which is the local copy of Appdata
+          var data2 = UIController.updateAppData('imgH', val);
+          console.log('data2 is...');
+          console.dir(data2);
+          // !VA Calculate the imgH based on the aspectRatio funtion and the current values for imgNW and imgNH and put it in val
+          val = Math.round((calcController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgH);
+          // !VA Write the updated imgH to Appdata
+          data2 = UIController.updateAppData('imgW', val);
+          console.log('data2 is...');
+          console.dir(data2);
           // calcController.evalViewerSize(data2);
           calcController.adjustContainerHeights(data2);
 
@@ -608,7 +631,6 @@ var Dimwhit = (function () {
         // !VA This case is irrelevant since we're now comparing everything to maxViewerWidth not the  init values. Change accordingly...
         // !VA  NOT SO...now we're trying to restore the previous functionality so...
         case (Appdata.imgNW <= Appdata.viewerW) && (Appdata.imgNH < Appdata.viewerH) :
-        // debugger;
           Appdata.imgW = Appdata.imgNW;
           Appdata.imgH = Appdata.imgNH;
           // !VA viewerH is set in initApp, so no change to it here
@@ -833,7 +855,7 @@ var Dimwhit = (function () {
         tbClickables[i] = document.querySelector(tbClickables[i]);
         // console.log(tbClickables[i]);
         addEventHandler(tbClickables[i],'click',handleUserAction,false);
-        // debugger;
+
       }
       
       // !VA Add event handlers for input toolButtons
@@ -893,16 +915,22 @@ var Dimwhit = (function () {
                 calcController.updateCustomW(el.value);
 
                 break;
+
+              case ( el.id === 'tb-input-customh') :
+                console.log('CASE 3 - updateCustomH --');
+                calcController.updateCustomH(el.value);
+
+                break;
               }
+
+              
             }
             // console.log('Pressed');
             // !VA If the value is not an integer on blur, then reset it to the previous value
             el.value = (function () {
-              // debugger;
               // !VA Get the Appdata property name that corresponds to the ID of the current input element
               var prop = calcController.getAppdataPropertyFromID(el.id);
               // !VA Access Appdata
-              // debugger;
               var data = UIController.accessAppdata();
               // !VA return the current value of the Appdata property for the current event target to that elements value property
               // alert(data[prop]);
