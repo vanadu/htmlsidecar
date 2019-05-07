@@ -2,40 +2,16 @@
 /* !VA  
 ===========================================================
 TODO: Implement the toolbuttons.
-TODO: Reset the customH and customW fields on blur to their placeholders on blur when blur is on mouseclick
 TODO: Fix the images on viewerW and phone input fields
-
-
-
-DONE: Fixed - there's a top and bottom padding tot he viewer when an image is display in the old version. Changed the initViewerH in adjustContainerHeights to initViewerH instead of Appdata.initViewerH. I hope this isn't a problem later, but it appears to have fixed this issue.
-DONE: FIx; when you enter a viewerW value, the img display size value changes. This appears to be fixed by just running adjustContainerHeights from updateViewerW
-TODO: Fix -- old version sets the cursor at the end of the input and implements it on enter but doesn't blur until tab.The good thing about that is that youc an tab to different fields wihtout mousing again.Ilike that... let's do it.
-
-
-
-
 TODO: Fix: enter larger than viewerW in customW, get error, but the focus stays in the field. The value should stay the same, which it does, but the field should unfocus.
+
+DONE: Reset the customH and customW fields on blur to their placeholders on blur when blur is on mouseclick
+
+
+
+
+
 TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
-
-DONE: FIX - Set input field value to the current value and remove the focus from the input field after the enter key is pressed. But entering values in the customw field puts the value of the viewerH field in on blur. The best fix for this requires renaming the UI elements in the HTML to be inline with the Javascript object and property names. Actually, it wasn't really necessary to rename the UI elements and it will cause some pain later when I recycle code from V1, but it does make a lot more sense now.
-
-Renamed:
-
-main-img               cur-img
-main-img-container     cur-img-container
-
-tb-input-viewerw       tb-input-viewerw
-tb-but-grow50          tb-but-grow50
-tb-but-grow10          tb-but-grow10
-tb-but-grow01          tb-but-grow01
-tb-but-shrink50        tb-but-shrink50
-tb-but-shrink10        tb-but-shrink10
-tb-but-shrink01        tb-but-shrink01
-tb-input-customw       tb-input-customw
-tb-input-customh       tb-input-customh
-
-
-
 
 
 
@@ -450,9 +426,6 @@ var Dimwhit = (function () {
           curDimViewers = Object.values(curDimViewers);
           // console.log('curDimViewers is: ' + curDimViewers);
         }
-
-
-
         // !VA For each dimViewer passed from evalDimAlerts, set the font color style based on the bool argument passed in.
         for (let i = 0; i < curDimViewers.length; i++) {
           document.querySelector(curDimViewers[i]).style.color = att;
@@ -461,8 +434,18 @@ var Dimwhit = (function () {
           // console.log('setDimAlerts - dimViewers is...');
           // console.dir(dimViewers);
         }
+      },
 
+      resetPlaceholders: function (...ids) {
+        // If the cursor is in an image resize field, set the value to no value so that the placeholders take over. Only do this for the image resize fields, because the current value is displayed in the dimViewer and doesn't need to be shown in the field itself. For the viewer width field, we need the value to stay in the field because this is the only way to tell the current width of the viewer. 
+        // !VA  viewer width input field value display should also be handled here...currently is not. Search for main-image-viewer-wdth to find out where it's currently handled.
+
+
+    
+
+    
       }
+
 
     };
   })();
@@ -566,9 +549,11 @@ var Dimwhit = (function () {
         case (prop === 'imgW') :
         // !VA TODO: restore the placeholder value on blur
           // console.log('CASE 2: custom width toolButton input');
-          // !VA If the new image width is greater than the viewer width, then show message. 
+          // !VA If the new image width is greater than the viewer width, then show message. This is a temporary fix, the errorHandler should reset the field value to ''.
           if (val > data.viewerW ) {
             console.log('TODO: errorHandler: imgH cannot be larger than viewerW of XXX');
+            controller.onError(id, 'imgH_GT_viewerW');
+            
           }
           else {
             // !VA Write the user input for imgW to the data, which is the local copy of Appdata
@@ -876,38 +861,41 @@ var Dimwhit = (function () {
         } else if (  event.type === 'focus') {
           // !VA Set the value of the element to null when it gets the focus
           el.value = ''; 
+          // !VA NOW!
         } else if ( event.type === 'blur') {
-          console.log('blur');
+          // console.log('blur');
           // !VA If the target is viewerW, we want to restore the previous value to the field on blur in case of error or in case it is exited without entering a value with the return key. If the target is customW or customH, we want to restore the placeholder value.
           // !VA TODO: create function to restore placeholder value
           el.value = (function () {
-            // !VA Get the Appdata property name that corresponds to the ID of the current input element
-            var prop = calcController.elementIdToAppdataProp(el.id);
-            // !VA Access Appdata
-            var data = UIController.accessAppdata();
-            // !VA return the current value of the Appdata property for the current event target to that elements value property. 
-            // alert(data[prop]);
-            return data[prop];
+            console.log('Handling blur');
+            // !VA If the current element is custom height or custom width, set the value of the field to empty to display the placeholder  
+            if ((el.id.includes('customw') || (el.id.includes('customh')))) {
+              return '';
+            // !VA Reset the viewer width field the last value of Appdata.viewerW 
+            } else {
+              // !VA Get the Appdata property name that corresponds to the ID of the current input element
+              var prop = calcController.elementIdToAppdataProp(el.id);
+              // !VA Access Appdata
+              var data = UIController.accessAppdata();
+              // !VA return the current value of the Appdata property for the current event target to that elements value property. 
+              // alert(data[prop]);
+              return data[prop];
+            }
+
+            // e.preventDefault;
           })();
-          e.preventDefault;
         } else if ( event.type === 'drop') {
           // console.log(event.type + ': ' + this.id);
-          e.preventDefault;
+          // e.preventDefault;
         } else if ( event.type === 'dragover') {
           // console.log(event.type + ': ' + this.id);
-          e.preventDefault;
+          // e.preventDefault;
         } 
         else {
           console.log('other event');
         }
       }
 
-      // SCRAP DO IT FUNCTION
-      function doit() {
-        console.log('Doing it...');
-      }
-
-      // doit();
         
 
       // Click handlers - focusOnClick
@@ -948,6 +936,26 @@ var Dimwhit = (function () {
       // !VA The closing bracket below belongs to initializeHandlers(), see the top of this function
       // }
       // addEventHandler(window, 'load', function(evt) {initializeHandlers(); } );
+    };
+
+    //  ERROR HANDLING
+    // ==============================
+    var errorHandler = function(id, str) {
+      // !VA Error handler
+      console.log('id is: ' + id);
+      console.log('str is: ' + str);
+      switch (true) {
+      case (str === 'imgH_GT_viewerW') :
+        console.log('errorHandler: imgH cannot be larger than viewerW of XXX');
+        document.getElementById(id).value = '';
+      }
+
+    };
+
+
+    var doit = function() {
+      // SCRAP DO IT FUNCTION
+      console.log('Doing it...');
     };
 
     // !VA This is where we initialize Dev mode, which is where we can start the app with a hard-coded img element in the HTML file. THis is very useful, otherwise we'd have to drop files to initialize or dink with the FileReader object to hard-code a test file.
@@ -1001,6 +1009,10 @@ var Dimwhit = (function () {
 
 
     return {
+      onError: function(id, str) {
+        console.log('onError in controller');
+        errorHandler(id, str);
+      },
       init: function(){
         // calcController.tst();
         console.log('App initialized.');
