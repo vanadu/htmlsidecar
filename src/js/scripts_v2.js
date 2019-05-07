@@ -2,7 +2,8 @@
 /* !VA  
 ===========================================================
 TODO: Implement the toolbuttons.
-TODO: Reset the customH and customW fields on blur to their placeholders
+TODO: Reset the customH and customW fields on blur to their placeholders on blur when blur is on mouseclick
+TODO: Fix the images on viewerW and phone input fields
 
 
 
@@ -535,16 +536,21 @@ var Dimwhit = (function () {
         }
       },
 
-      // Handle all the ToolButton input field input
+      // USER ACTION HANDLERS
+      // ==========================
+
+      //  HANDLE THE USER INPUT FIELDS IN THE TOOLBUTTONS
       handleTBInput: function(id, val) {
+        // !VA Get the Appdata property that corresponds to the element ID
+        var prop = calcController.elementIdToAppdataProp(id);
         // !VA get a copy of Appdata
         var data = UIController.accessAppdata();
         // !VA TODO: Setting maxViewerWidth just for now
         var maxViewerWidth = 800;
-        console.log('val is: ' + val);
         switch (true) {
-        case (id.includes('viewerw')) :
-          console.log('CASE 1: handling viewerW');
+        // !VA Handle the viewer width toolButton input
+        case (prop === 'viewerW') :
+          // console.log('CASE 1: viewer width toolButton input');
           if (val < data.imgW ) {
             // !VA The viewer width can't be smaller than the current image width of XXX, show message
             console.log('TODO: errorHandler: viewerW cannot be smaller than imgW');
@@ -553,141 +559,44 @@ var Dimwhit = (function () {
             console.log('updateViewerW:  val > maxViewerWidth');
           } else {
             // !VA The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running evalViewerWidth. 
-            // console.log('continue...');
-            data = UIController.updateAppData('viewerW', val);
-            // console.log('data is...');
-            // !VA DON'T run evalViewerSize! Just adjust the heights based on viewerH because the potential error of it being greater than the max viewer size or smaller than the imgW has already been trapped.
-            console.dir(data);
+            data = UIController.updateAppData(prop, val);
           }
           break;
-        case (id.includes('customw')) :
+        // !VA Handle the custom width toolButton input
+        case (prop === 'imgW') :
         // !VA TODO: restore the placeholder value on blur
-          console.log('handling customW');
+          // console.log('CASE 2: custom width toolButton input');
           // !VA If the new image width is greater than the viewer width, then show message. 
           if (val > data.viewerW ) {
             console.log('TODO: errorHandler: imgH cannot be larger than viewerW of XXX');
           }
           else {
             // !VA Write the user input for imgW to the data, which is the local copy of Appdata
-            data = UIController.updateAppData('imgW', val);
-            console.log('data is...');
-            console.dir(data);
+            data = UIController.updateAppData(prop, val);
             // !VA Calculate the imgH based on the aspectRatio funtion and the current values for imgNW and imgNH and put it in val
             val = Math.round((1/calcController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgW);
             // !VA Write the updated imgH to Appdata
             data = UIController.updateAppData('imgH', val);
-            console.log('data is...');
-            console.dir(data);
-            // calcController.evalViewerSize(data2);
-            calcController.adjustContainerHeights(data);
-
           }
           break;
-        case (id.includes('customh')) :
-          console.log('handling customH');
+        // !VA Handle the custom height toolButton input
+        case (prop ==='imgH') :
+          // console.log('CASE 3: custom height toolButton input');
+          // !VA Write the user input for imgH to the data, which is the local copy of Appdata
+          data = UIController.updateAppData(prop, val);
           // !VA TODO: restore the placeholder value on blur
-          // !VA Write the user input for imgW to the data, which is the local copy of Appdata
-          data = UIController.updateAppData('imgH', val);
-          console.log('data is...');
-          console.dir(data);
-          // !VA Calculate the imgH based on the aspectRatio funtion and the current values for imgNW and imgNH and put it in val
           val = Math.round((calcController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgH);
           // !VA Write the updated imgH to Appdata
           data = UIController.updateAppData('imgW', val);
-          console.log('data2 is...');
-          console.dir(data);
           break;
         }
+        // !VA Adjust the container heights based on the updated Appdata properties
         calcController.adjustContainerHeights(data);
-
       },
-
-      // !VA Update the viewer height based on the user input in Controller.handleUserAction
-      // UPDATE VIEWER HEIGHT
-      updateViewerW: function (val) {
-        // !VA TODO: Setting maxViewerWidth just for now
-        var maxViewerWidth = 800;
-        var data = UIController.accessAppdata();
-        // console.log('updateViewerW -- ');
-        // console.log('viewerw is: ' + val);
-        // console.log('data.imgW is: ' + data.imgW);
-        if (val < data.imgW ) {
-          // !VA The viewer width can't be smaller than the current image width of XXX, show message
-          console.log('TODO: errorHandler: viewerW cannot be smaller than imgW');
-        } else if (val > maxViewerWidth ) {
-          console.log('updateViewerW:  val > maxViewerWidth');
-        } else {
-
-          // !VA The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running evalViewerWidth. 
-          // console.log('continue...');
-
-          // console.log('data2 is...');
-          console.dir(data2);
-          // !VA DON'T Run this here!
-          // calcController.evalViewerSize(data2);
-          calcController.adjustContainerHeights(data2);
-          // !VA Works...
-        }
-        var data2 = UIController.updateAppData('viewerW', val);
-      },
-
-      // !VA Update the image height based on the user input in Controller.handleUserAction
-      // UPDATE IMAGE HEIGHT
-
-      updateCustomW: function (val) {
-        var data = UIController.accessAppdata();
-        console.log('updateCustomW -- start');
-        console.dir(data);
-        // !VA If the new image width is greater than the viewer width, then show message. 
-        if (val > data.viewerW ) {
-          console.log('TODO: errorHandler: imgH cannot be larger than viewerW of XXX');
-        }
-        else {
-          // !VA Write the user input for imgW to the data, which is the local copy of Appdata
-          var data2 = UIController.updateAppData('imgW', val);
-          console.log('data2 is...');
-          console.dir(data2);
-          // !VA Calculate the imgH based on the aspectRatio funtion and the current values for imgNW and imgNH and put it in val
-          val = Math.round((1/calcController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgW);
-          // !VA Write the updated imgH to Appdata
-          data2 = UIController.updateAppData('imgH', val);
-          console.log('data2 is...');
-          console.dir(data2);
-          // calcController.evalViewerSize(data2);
-          calcController.adjustContainerHeights(data2);
-
-        }
-      },
-
-      updateCustomH: function (val) {
-        var data = UIController.accessAppdata();
-        console.log('updateCustomH -- start');
-        console.dir(data);
-        // !VA If the new image width is greater than the viewer width, then show message. 
-        if (val > data.viewerW ) {
-          console.log('TODO: errorHandler: imgH cannot be larger than viewerW of XXX');
-        }
-        else {
-          // !VA Write the user input for imgW to the data, which is the local copy of Appdata
-          var data2 = UIController.updateAppData('imgH', val);
-          console.log('data2 is...');
-          console.dir(data2);
-          // !VA Calculate the imgH based on the aspectRatio funtion and the current values for imgNW and imgNH and put it in val
-          val = Math.round((calcController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgH);
-          // !VA Write the updated imgH to Appdata
-          data2 = UIController.updateAppData('imgW', val);
-          console.log('data2 is...');
-          console.dir(data2);
-          // calcController.evalViewerSize(data2);
-          calcController.adjustContainerHeights(data2);
-
-        }
-      },
-
-
+      
+      // EVALUATE VIEWER SIZE
       // !VA There are four conditions for an image to fit into the appContainer. This evaluates them, sets the Appdata properties accordingly and calls adjustContainerHeights. 
       // !VA TODO: Actually the function needs to be called only once at the end of the routine...
-      // EVALUATE VIEWER SIZE
       evalViewerSize: function (Appdata) {
         // !VA This isn't necessary here, but will probably be used somewhere else...
         // !VA TODO: Try to figure out whether this is useful at all.
@@ -762,9 +671,7 @@ var Dimwhit = (function () {
       // ADJUST IMAGE CONTAINER HEIGHTS
       adjustContainerHeights: function (Appdata)  {
         // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values.
-
         // !VA Initial height is 450, which is set in the init function, not in Appdata,or as it was V1, in the Appobj.
-
         var initViewerH= 450;
         var heightVal = Appdata.imgH;
         // console.log('heightVal is: ' + heightVal);
@@ -773,14 +680,11 @@ var Dimwhit = (function () {
         let viewportH;
         let appContainerH; 
 
-
-
         // !VA I'm not even sure this is necessary since we're getting the viewerW from maxViewerHeight now -- but we'll leave it in here for the time being. 
         // !VA TODO: Review this whole maxViewerHeight thing.
         if (heightVal <= initViewerH) {
           // !VA  This is the min-height set in CSS
           // appObj.appContainerH = 804;
-          // !VA Trying to set the viewerH based on the initViewerH...
           viewerH = initViewerH;
           viewportH = viewerH + 145;
         } else {
@@ -843,7 +747,7 @@ var Dimwhit = (function () {
 
       // !VA Need to get the Appdata property that corresponds to the ID of the DOM input element that sets it. It's easier to just create a list of these correspondences than to rename the whole UI elements and Appdata properties so they correspond, or to create functions that use string methods to extract them from each other.
       //  GET APPDATA PROPERTY NAME FROM AN HTML ELEMENT ID
-      getAppdataPropertyFromID: function(str) {
+      elementIdToAppdataProp: function(str) {
         var IDtoProp = {
           viewerW:  'tb-input-viewerw',
           imgW: 'tb-input-customw',
@@ -965,7 +869,7 @@ var Dimwhit = (function () {
             } else if (el.id.includes('tb-input')) {
               calcController.handleTBInput(el.id, el.value);
             } else {
-              // !VA There will be other input fields to handele, but we're not there yet.
+              // !VA There will be other input fields to handle, but we're not there yet.
               console.log('Undefined keypress action');
             }
           } 
@@ -978,7 +882,7 @@ var Dimwhit = (function () {
           // !VA TODO: create function to restore placeholder value
           el.value = (function () {
             // !VA Get the Appdata property name that corresponds to the ID of the current input element
-            var prop = calcController.getAppdataPropertyFromID(el.id);
+            var prop = calcController.elementIdToAppdataProp(el.id);
             // !VA Access Appdata
             var data = UIController.accessAppdata();
             // !VA return the current value of the Appdata property for the current event target to that elements value property. 
