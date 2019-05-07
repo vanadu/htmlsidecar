@@ -1,14 +1,18 @@
 
 /* !VA  
 ===========================================================
-TODO: Implement the toolbuttons.
+TODO: Fix the retina calculations: it should alert if the disk size isn't 2X the display size.
 TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
 
 DONE: Reset the customH and customW fields on blur to their placeholders on blur when blur is on mouseclick
 DONE: Fix the images on viewerW and phone input fields
+DONE: fix small phones and lartge phones toolbuttons.
 
+Changes to UI:
 
-
+filename-viewer       dv-filename-viewer
+clipboard-but         dv-clipboard-but
+then, globally, dim-viewer to dv
 
 
 
@@ -28,14 +32,14 @@ var Dimwhit = (function () {
 
     // !VA DimViewer ID strings
     var dimViewers = {
-      filename: '#filename-viewer',
-      display: '#dim-viewer-display',
-      diskimg: '#dim-viewer-disk-img',
-      aspect: '#dim-viewer-aspect',
-      smallphones: '#dim-viewer-small-phones',
-      largephones: '#dim-viewer-large-phones',
-      retina: '#dim-viewer-retina',
-      clipboardBut: '#clipboard-but'
+      filename: '#dv-filename-viewer',
+      display: '#dv-display',
+      diskimg: '#dv-disk-img',
+      aspect: '#dv-aspect',
+      smallphones: '#dv-small-phones',
+      largephones: '#dv-large-phones',
+      retina: '#dv-retina',
+      clipboardBut: '#dv-clipboard-but'
     };
 
     // !VA toolButton ID Strings
@@ -330,18 +334,8 @@ var Dimwhit = (function () {
 
       
           };
-          // console.log('getAppData - Appdata is...');
-          // console.table(Appdata);
-          // console.log('getAppData - Appdata.filename is: ' + Appdata.filename);
-          // console.log('getAppData - aspect ratio is: ' + Appdata.aspect()[1]);
-          // console.log('Appdata dimViewers is...');
-          // console.dir(dimViewers);
-
-          // !VA STOP HERE -- serious problem -- at this point, the curImg hasn't been resized down to the width of the viewer, so the height and width values are also the same as NW and NH. 
-          // !VA TODO: Fix this, it's not getting the right imgH and imgW
+          // !VA Evaluate the dim alerts
           calcController.evalDimAlerts(Appdata, dimViewers);
-
-          
         }
         return Appdata;
       },
@@ -436,14 +430,29 @@ var Dimwhit = (function () {
         }
       },
 
+      // !VA Not currently in use
       resetPlaceholders: function (...ids) {
         // If the cursor is in an image resize field, set the value to no value so that the placeholders take over. Only do this for the image resize fields, because the current value is displayed in the dimViewer and doesn't need to be shown in the field itself. For the viewer width field, we need the value to stay in the field because this is the only way to tell the current width of the viewer. 
         // !VA  viewer width input field value display should also be handled here...currently is not. Search for main-image-viewer-wdth to find out where it's currently handled.
+      },
 
+      // CCPF - CLIPBOARD FUNCTIONS
+      // ===============================================
 
-    
+      // TOGGLE CLIPBOARD CONTROL PANEL
+      toggleCCP: function (id) {
+        console.log('toggleCCP -- ');
+        // Toggle class 'active' to ccp
+        document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
 
-    
+        // !VA Displaying all the programmatically-populated options here for now
+        // var tableMaxWidth = `'<option>${Appdata.viewerW}</option><option>100%</option>'`;
+        // document.getElementById('table-width-select').innerHTML = tableMaxWidth;
+        // document.getElementById('table-max-width').style.display = 'none';
+
+        // var imgMaxWidth = `'<option>${appObj.imgW}</option><option>100%</option>'`;
+        // document.getElementById('img-width-select').innerHTML = imgMaxWidth;
+        // document.getElementById('img-max-width').style.display = 'none';
       }
 
 
@@ -522,7 +531,7 @@ var Dimwhit = (function () {
       // USER ACTION HANDLERS
       // ==========================
 
-      //  HANDLE THE USER INPUT FIELDS IN THE TOOLBUTTONS
+      //  CALCCONTROLLER: HANDLE THE USER INPUT FIELDS IN THE TOOLBUTTONS
       handleTBInput: function(id, val) {
         // !VA Get the Appdata property that corresponds to the element ID
         var prop = calcController.elementIdToAppdataProp(id);
@@ -573,6 +582,27 @@ var Dimwhit = (function () {
           val = Math.round((calcController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgH);
           // !VA Write the updated imgH to Appdata
           data = UIController.updateAppData('imgW', val);
+          break;
+        case (prop ==='sPhoneW') :
+          // console.log('CASE 3: custom height toolButton input');
+          // !VA Write the user input for imgH to the data, which is the local copy of Appdata
+          console.log('prop is: ' + prop);
+          debugger;
+          data = UIController.updateAppData(prop, val);
+          // !VA TODO: restore the placeholder value on blur
+          // val = Math.round((calcController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgH);
+          // !VA Write the updated imgH to Appdata
+          // data = UIController.updateAppData('imgW', val);
+          break;
+        case (prop ==='lPhoneW') :
+          // console.log('CASE 3: custom height toolButton input');
+          // !VA Write the user input for imgH to the data, which is the local copy of Appdata
+          console.log('prop is: ' + prop);
+          data = UIController.updateAppData(prop, val);
+          // !VA TODO: restore the placeholder value on blur
+          // val = Math.round((calcController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgH);
+          // !VA Write the updated imgH to Appdata
+          // data = UIController.updateAppData('imgW', val);
           break;
         }
         // !VA Adjust the container heights based on the updated Appdata properties
@@ -772,7 +802,10 @@ var Dimwhit = (function () {
         var IDtoProp = {
           viewerW:  'tb-input-viewerw',
           imgW: 'tb-input-customw',
-          imgH: 'tb-input-customh'
+          imgH: 'tb-input-customh',
+          sPhoneW: 'tb-input-small-phonesw',
+          lPhoneW: 'tb-input-large-phonesw'
+
         };
         // !VA This should return directly wihout a ret variable as tmp storage.
         var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
@@ -840,7 +873,7 @@ var Dimwhit = (function () {
       // addEventHandler(document.getElementById(toolButtons.grow01),'click',doit,false);
       
       // !VA Add click and blur event handlers for clickable toolButtons: 
-      var tbClickables = [ toolButtons.grow50, toolButtons.grow10, toolButtons.grow01, toolButtons.shrink50, toolButtons.shrink10, toolButtons.shrink01 ];
+      var tbClickables = [ toolButtons.grow50, toolButtons.grow10, toolButtons.grow01, toolButtons.shrink50, toolButtons.shrink10, toolButtons.shrink01,  ];
       for (let i = 0; i < tbClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         tbClickables[i] = document.querySelector(tbClickables[i]);
@@ -860,8 +893,17 @@ var Dimwhit = (function () {
         addEventHandler(tbKeypresses[i],'blur',handleUserAction,false);
         addEventHandler(tbKeypresses[i],'dragover',handleUserAction,false);
         addEventHandler(tbKeypresses[i],'drop',handleUserAction,false);
-
       }
+
+      // !VA Add click handlers for dimViewer - there's only the clipboard button now but there could be more. 
+      var dvClickables = [ dimViewers.clipboardBut ];
+      for (let i = 0; i < dvClickables.length; i++) {
+        // !VA convert the ID string to the object inside the loop
+        dvClickables[i] = document.querySelector(dvClickables[i]);
+        // console.log(dvClickables[i]);
+        addEventHandler((dvClickables[i]),'click',handleUserAction,false);
+      }
+
 
       // addEventHandler(document.getElementById('tb-input-viewerw'),'focus',doit,false);
 
@@ -878,7 +920,8 @@ var Dimwhit = (function () {
         console.log('handle user action here.');
         if (event.type === 'click') {
           // !VA If the id contains 'tb' then we're dealing with toolButtons buttons.
-          if ( el.id.includes('tb')) {
+          switch (true) {
+          case ( el.id.includes('tb')) :
             // console.log('handleUserAction - tbclicks');
             // console.log('el.id is: ' + el.id);
             var val;
@@ -887,7 +930,14 @@ var Dimwhit = (function () {
             // !VA If the target ID includes 'grow' then the image dimension will be incremented, if 'shrink' then it will be decremented
             (el.id.includes('grow')) ? val : val = -val;
             calcController.handleTBClicks(el.id, val); 
-          }
+            break;
+          case ( el.id.includes('dv')) :
+            
+            console.log('includes dv');
+            UIController.toggleCCP(el.id);
+            break;
+            
+          } 
 
         } else if (event.type === 'keypress') {
           keypressed = e.which || e.keyCode || e.key;

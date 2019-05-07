@@ -357,7 +357,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
     // -webkit-transform: scaleX(0);
     // -webkit-transition: -webkit-transform 500ms;
   }
-  #filename-viewer {
+  #dv-filename-viewer {
     display: block;
     position: absolute;
     top: 5px;
@@ -396,12 +396,12 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
     font-size: 1.365em;
     text-transform: uppercase;
     list-style-type: none;
-    &#dim-viewer-display::before {content: 'Display size: '}
-    &#dim-viewer-disk-img::before {content: 'Size on Disk: '}
-    &#dim-viewer-aspect::before {content: 'Aspect Ratio: '}
-    &#dim-viewer-small-phones::before {content: 'Small Phones: '}
-    &#dim-viewer-large-phones::before {content: 'Large Phones: '}
-    &#dim-viewer-retina::before {content: 'Retina: '}
+    &#dv-display::before {content: 'Display size: '}
+    &#dv-disk-img::before {content: 'Size on Disk: '}
+    &#dv-aspect::before {content: 'Aspect Ratio: '}
+    &#dv-small-phones::before {content: 'Small Phones: '}
+    &#dv-large-phones::before {content: 'Large Phones: '}
+    &#dv-retina::before {content: 'Retina: '}
     // Make the data font defined in the span in the JS pop out against the label.
     .pop-font {
       color: $dim-viewers-pop-font-color;
@@ -415,7 +415,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   left: 50%;
   width: 100%;
   margin-left: -40px;
-  #clipboard-but {
+  #dv-clipboard-but {
     width: 40px;
     height: 47px;
     margin-right: 20px;

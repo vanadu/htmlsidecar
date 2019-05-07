@@ -1271,7 +1271,7 @@ input:focus:-ms-input-placeholder {
   #dim-viewers.hide-err {
     transform: translate(0, 0);
     transition: transform 250ms; }
-  #dim-viewers #filename-viewer {
+  #dim-viewers #dv-filename-viewer {
     display: block;
     position: absolute;
     top: 5px;
@@ -1304,17 +1304,17 @@ input:focus:-ms-input-placeholder {
     font-size: 1.365em;
     text-transform: uppercase;
     list-style-type: none; }
-    #dim-viewers li#dim-viewer-display::before {
+    #dim-viewers li#dv-display::before {
       content: 'Display size: '; }
-    #dim-viewers li#dim-viewer-disk-img::before {
+    #dim-viewers li#dv-disk-img::before {
       content: 'Size on Disk: '; }
-    #dim-viewers li#dim-viewer-aspect::before {
+    #dim-viewers li#dv-aspect::before {
       content: 'Aspect Ratio: '; }
-    #dim-viewers li#dim-viewer-small-phones::before {
+    #dim-viewers li#dv-small-phones::before {
       content: 'Small Phones: '; }
-    #dim-viewers li#dim-viewer-large-phones::before {
+    #dim-viewers li#dv-large-phones::before {
       content: 'Large Phones: '; }
-    #dim-viewers li#dim-viewer-retina::before {
+    #dim-viewers li#dv-retina::before {
       content: 'Retina: '; }
     #dim-viewers li .pop-font {
       color: rgba(255, 255, 255, 0.9); }
@@ -1325,7 +1325,7 @@ input:focus:-ms-input-placeholder {
   left: 50%;
   width: 100%;
   margin-left: -40px; }
-  #clipboard-but-container #clipboard-but {
+  #clipboard-but-container #dv-clipboard-but {
     width: 40px;
     height: 47px;
     margin-right: 20px;
@@ -1334,7 +1334,7 @@ input:focus:-ms-input-placeholder {
     background-image: url(../img/clipboard.png);
     background-position: center top;
     background-size: 40px 47px; }
-    #clipboard-but-container #clipboard-but.active {
+    #clipboard-but-container #dv-clipboard-but.active {
       background-image: url("../img/clipboard-hover.png"); }
 
 #dim-error-container {
