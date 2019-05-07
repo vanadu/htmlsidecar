@@ -1165,17 +1165,17 @@ button:disabled {
         height: 18px;
         margin: 0 10px;
         opacity: .2; }
-    .img-toolbar-buttons li #main-image-viewer-wdth {
+    .img-toolbar-buttons li #tb-input-viewerw {
       width: 95px;
       padding-left: 30px;
       text-align: center;
       background: url("../img/table-icon.png") no-repeat scroll 7px 7px; }
-    .img-toolbar-buttons li #small-phones-wdth {
+    .img-toolbar-buttons li #tb-input-small-phonesw {
       width: 95px;
       padding-left: 30px;
       background: url("../img/small-phones-toolbar-icon.png") no-repeat scroll 12px 2px;
       background-size: 15px 26px; }
-    .img-toolbar-buttons li #large-phones-wdth {
+    .img-toolbar-buttons li #tb-input-large-phonesw {
       width: 95px;
       padding-left: 30px;
       background: url("../img/large-phones-toolbar-icon.png") no-repeat scroll 7px 2px;

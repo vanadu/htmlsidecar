@@ -2,16 +2,15 @@
 /* !VA  
 ===========================================================
 TODO: Implement the toolbuttons.
-TODO: Fix the images on viewerW and phone input fields
-TODO: Fix: enter larger than viewerW in customW, get error, but the focus stays in the field. The value should stay the same, which it does, but the field should unfocus.
+TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
 
 DONE: Reset the customH and customW fields on blur to their placeholders on blur when blur is on mouseclick
+DONE: Fix the images on viewerW and phone input fields
 
 
 
 
 
-TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
 
 
 
@@ -51,8 +50,8 @@ var Dimwhit = (function () {
       shrink01:'#tb-but-shrink01',
       shrink10: '#tb-but-shrink10',
       shrink50: '#tb-but-shrink50',
-      sPhonesW: '#tb-input-large-phonesw',
-      lPhonesW: '#tb-input-small-phonesw',
+      sPhonesW: '#tb-input-small-phonesw',
+      lPhonesW: '#tb-input-large-phonesw',
     };
 
     //!VA If we separate this out into UI objects that correspond to the objects we want to create, then we can just loop through them rather than define each property separately. So, dynamicElements are those that resize based on the current image... but I haven't figured out how to loop through them yet.
