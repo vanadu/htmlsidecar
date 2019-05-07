@@ -111,6 +111,45 @@ var Dimwhit = (function () {
       tableWidth: ''
     };
 
+    // function ClipboardData(imgClass, imgAlt, imgAlign, imgRelPath, imgWidth, imgMaxWidth, tdClass, tdALign, tdValign, tableClass, tableAlign, tableWidth ) {
+    //   this.imgClass = imgClass;
+    //   this.imgAlt = imgAlt;
+    //   this.imgAlign = imgAlign;
+    //   this.imgRelPath =imgRelPath;
+    //   this.imgWidth = imgWidth;
+    //   this.imgMaxWidth = imgMaxWidth;
+    //   this.tdClass = tdClass;
+    //   this.tdAlign = tdAlign;
+    //   this.tdValign = tdValign;
+    //   this.tableClass = tableClass;
+    //   this.tableAlign = tableAlign;
+    //   this.tableWidth = tableWidth;
+    // }
+
+    function ClipboardOutput(id, openTag, classAtt, altAtt, relPathAtt, closeTag) {
+      this.id = id;
+      this.openTag = openTag;
+      this.classAtt = classAtt;
+      this.altAtt = altAtt;
+      this.relPathAtt = relPathAtt;
+      this.closeTag = closeTag;
+    };
+
+    var classblob = 'classname';
+    var altblob = 'alt text here';
+
+
+    // !VA STOP HERE: this is how to do it.
+    // Constructor
+    var imgTag = new ClipboardOutput(imgTag);
+    imgTag.openTag = '<img ';
+    imgTag.classAtt = `class="${classblob}"`;
+    imgTag.altAtt = `alt="${altblob}"`;
+
+    console.log('imgTag.openTag is: ' + imgTag.openTag);
+    console.log('imgTag.classAtt is: ' + imgTag.classAtt);
+    console.log('imgTag.altAtt is: ' + imgTag.altAtt);
+
     // !VA ccpBuildTag ID Strings
     // Stores the ccpMakeTag object for assembling the clipboard create tag buttons
     // !VA V2 Also doesn't belong here, we will move it later.
@@ -440,26 +479,32 @@ var Dimwhit = (function () {
       // ===============================================
 
       // TOGGLE CLIPBOARD CONTROL PANEL
-      toggleCCP: function (id) {
+      ccpToggle: function () {
         console.log('toggleCCP -- ');
         // Toggle class 'active' to ccp
         document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
 
         // !VA Displaying all the programmatically-populated options here for now
-        // var tableMaxWidth = `'<option>${Appdata.viewerW}</option><option>100%</option>'`;
-        // document.getElementById('table-width-select').innerHTML = tableMaxWidth;
-        // document.getElementById('table-max-width').style.display = 'none';
+        // !VA What this does is populate the CCP fields for imgW and viewerW with data from Appdata. Then, more options are added to the CCP based on the selections in the dropdown fields. That functionality is in handleOnChange in V1, but we're not ready for that yet.
+        var tableMaxWidth = `'<option>${Appdata.viewerW}</option><option>100%</option>'`;
+        document.getElementById('table-width-select').innerHTML = tableMaxWidth;
+        document.getElementById('table-max-width').style.display = 'none';
 
-        // var imgMaxWidth = `'<option>${appObj.imgW}</option><option>100%</option>'`;
-        // document.getElementById('img-width-select').innerHTML = imgMaxWidth;
-        // document.getElementById('img-max-width').style.display = 'none';
+        var imgMaxWidth = `'<option>${Appdata.imgW}</option><option>100%</option>'`;
+        document.getElementById('img-width-select').innerHTML = imgMaxWidth;
+        document.getElementById('img-max-width').style.display = 'none';
       }
+
+
+
+
 
 
     };
   })();
   // var r = UIController.getAppdata();
   // console.dir(r);
+
 
 
 
@@ -811,7 +856,24 @@ var Dimwhit = (function () {
         var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
         // alert(ret);
         return ret;
-      }
+      },
+
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     };
   })();
 
@@ -932,9 +994,8 @@ var Dimwhit = (function () {
             calcController.handleTBClicks(el.id, val); 
             break;
           case ( el.id.includes('dv')) :
-            
             console.log('includes dv');
-            UIController.toggleCCP(el.id);
+            UIController.ccpToggle();
             break;
             
           } 
