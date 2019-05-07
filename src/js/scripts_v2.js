@@ -290,13 +290,14 @@ var Dimwhit = (function () {
         return Appdata;
       },
 
-
+      // UIController: return a copy of Appdata
       accessAppdata: function(){
         // console.log('accessAppdata -- ');
         // console.dir(Appdata);
         return Appdata;
       },
 
+      // UIController: initialize AppData, this should probably be renamed to such
       getAppData: function(Appobj, filename) {
         // !VA  Appdata can only be populated if there's an image. If the DEV image isn't loaded or the USER hasn't dropped in an image yet, then Appdata.filename is undefined and script won't run.
         // !VA  I think I fixed the above problem by creating a different function for Dev initialization. It can be messy and not DRY since it's not for production anyway.
@@ -551,7 +552,7 @@ var Dimwhit = (function () {
           // console.log('CASE 2: custom width toolButton input');
           // !VA If the new image width is greater than the viewer width, then show message. This is a temporary fix, the errorHandler should reset the field value to ''.
           if (val > data.viewerW ) {
-            console.log('TODO: errorHandler: imgH cannot be larger than viewerW of XXX');
+            // !VA errorHandler!
             controller.onError(id, 'imgH_GT_viewerW');
             
           }
@@ -578,7 +579,43 @@ var Dimwhit = (function () {
         // !VA Adjust the container heights based on the updated Appdata properties
         calcController.adjustContainerHeights(data);
       },
-      
+
+      // // HANDLES MOUSECLICKS FROM TOOLBUTTONS
+      handleTBClicks: function(id, val) {
+        console.log('handleTBClicks --');
+        // !VA Put getAspectRatio in a variable
+        var aspect;
+        var imgWNew;
+        var imgHNew;
+        var data = UIController.accessAppdata();
+        aspect = calcController.getAspectRatio(data.imgNH, data.imgNW)[0];  
+        // debugger;
+        // !VA If adding the button increment value to the existing imgW or imgH results in a value less than or equal to 0 then abort and error, because an image has to have a positive dimension.
+        if ( data.imgW + val <= 0 || data.imgH + val <= 0 ) {
+          controller.onError(id, 'tbButton_LT_zero');
+        } else if ( data.imgW + val > data.viewerW  ) {
+          controller.onError(id, 'tbButton_GT_viewerW');
+        }   else {
+          // !VA If we're incrementing...
+          if ( id.includes('grow')) {
+            imgWNew = data.imgW + val;
+            imgHNew = imgWNew * aspect;
+            // !VA The image height is growing past the viewer height, so adjust the viewer height
+            if ( imgHNew > data.viewerH ) {
+              console.log('Enlarging viewerH');
+              console.log('imgHNew is: ' + imgHNew);
+              UIController.updateAppData('viewerH', imgHNew);
+            }
+          } else {
+            imgHNew = data.imgH + val;
+            imgWNew = imgHNew * 1/aspect;
+          }
+          UIController.updateAppData('imgW', imgWNew);
+          UIController.updateAppData('imgH', imgHNew);
+          calcController.adjustContainerHeights(data);
+        }
+      },
+
       // EVALUATE VIEWER SIZE
       // !VA There are four conditions for an image to fit into the appContainer. This evaluates them, sets the Appdata properties accordingly and calls adjustContainerHeights. 
       // !VA TODO: Actually the function needs to be called only once at the end of the routine...
@@ -841,7 +878,18 @@ var Dimwhit = (function () {
         el = document.getElementById(this.id);
         console.log('handle user action here.');
         if (event.type === 'click') {
-          console.log(event.type + ': ' + this.id);
+          // !VA If the id contains 'tb' then we're dealing with toolButtons buttons.
+          if ( el.id.includes('tb')) {
+            // console.log('handleUserAction - tbclicks');
+            // console.log('el.id is: ' + el.id);
+            var val;
+            // !VA The last 2 chars of the id indicate the value by which the img dimension should be incremented,so get the last 2 chars and convert to integer
+            val = parseInt(el.id.slice(-2));
+            // !VA If the target ID includes 'grow' then the image dimension will be incremented, if 'shrink' then it will be decremented
+            (el.id.includes('grow')) ? val : val = -val;
+            calcController.handleTBClicks(el.id, val); 
+          }
+
         } else if (event.type === 'keypress') {
           keypressed = e.which || e.keyCode || e.key;
           if (keypressed == 13) {
@@ -942,14 +990,23 @@ var Dimwhit = (function () {
     // ==============================
     var errorHandler = function(id, str) {
       // !VA Error handler
-      console.log('id is: ' + id);
-      console.log('str is: ' + str);
+      // console.log('id is: ' + id);
+      // console.log('str is: ' + str);
       switch (true) {
       case (str === 'imgH_GT_viewerW') :
         console.log('errorHandler: imgH cannot be larger than viewerW of XXX');
         document.getElementById(id).value = '';
+        break;
+      // tbButton_LT_zero
+      case (str === 'tbButton_LT_zero') :
+        console.log('errorHandler: the image height or width can\'t be less than zero');
+        document.getElementById(id).value = '';
+        break;
+      case (str === 'tbButton_GT_viewerW') :
+        console.log('errorHandler: the image can\'t be wider than the viewer');
+        document.getElementById(id).value = '';
+        break;
       }
-
     };
 
 
