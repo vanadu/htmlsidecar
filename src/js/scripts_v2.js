@@ -70,6 +70,8 @@ var Dimwhit = (function () {
       dropArea: '#drop-area',
       toolsContainer: '#tools-container',
       ccpContainer: '#ccp',
+      ccpImgClipbboardBut: '#img-build-html-but',
+
     };
 
     // !VA  ccpUserInput ID Strings
@@ -111,44 +113,54 @@ var Dimwhit = (function () {
       tableWidth: ''
     };
 
-    // function ClipboardData(imgClass, imgAlt, imgAlign, imgRelPath, imgWidth, imgMaxWidth, tdClass, tdALign, tdValign, tableClass, tableAlign, tableWidth ) {
-    //   this.imgClass = imgClass;
-    //   this.imgAlt = imgAlt;
-    //   this.imgAlign = imgAlign;
-    //   this.imgRelPath =imgRelPath;
-    //   this.imgWidth = imgWidth;
-    //   this.imgMaxWidth = imgMaxWidth;
-    //   this.tdClass = tdClass;
-    //   this.tdAlign = tdAlign;
-    //   this.tdValign = tdValign;
-    //   this.tableClass = tableClass;
-    //   this.tableAlign = tableAlign;
-    //   this.tableWidth = tableWidth;
-    // }
+    // Clipboard output for build html image button
+    // !VA Error handling here is awful -- there's a lot of repetition but I can't deal withval it now, have to move on
+    new Clipboard(staticRegions.ccpImgClipbboardBut, {
+      text: function(trigger) {
 
-    function ClipboardOutput(id, openTag, classAtt, altAtt, relPathAtt, closeTag) {
-      this.id = id;
-      this.openTag = openTag;
-      this.classAtt = classAtt;
-      this.altAtt = altAtt;
-      this.relPathAtt = relPathAtt;
-      this.closeTag = closeTag;
-    };
+        // var imgTag = calcController.ccpGetUserInput();
+        console.log('new Clipboard: get img tag');
+        var imgClipboardOutput = [];
+        var obj = calcController.ccpGetUserInput();
+        // !VA Get Appdata object, we need this to access the filename for the src property
+        // var data = UIController.accessAppdata();
+        // var imgClipboardOutput  = [];
+
+
+        // !VA Build the img tag clipboard output object.
+        // !VA Might as well do this here...
+        // var imgTag = new ClipboardOutput(imgTag);
+        // imgTag.openTag = '<img ';
+        // imgTag.classAtt = `class="${classblob} "`;
+        // imgTag.altAtt = `alt="${altblob} "`;
+        // imgTag.srcAtt = `src="${relpathblob}/${data.filename} "`;
+        // imgTag.closeTag = '/>';
+        
+        // !VA Convert the object to an array of values
+        var imgTagArray = Object.values(obj);
+        console.log('imgTagArray is: ' + imgTagArray);
+        // !VA Build the array from the list of values
+        for (let i = 0; i < imgTagArray.length; i++) {
+          imgClipboardOutput.push(imgTagArray[i]);
+        }
+        // !VA Convert the array to a string, removing the comma-separators
+        imgClipboardOutput = imgClipboardOutput.join('');
+        // console.dir(imgClipboardOutput);
+        // !VA Output to the clipboard
+        return imgClipboardOutput;
+      }
+    });
+
+
 
     var classblob = 'classname';
     var altblob = 'alt text here';
+    var relpathblob = 'img';
 
 
-    // !VA STOP HERE: this is how to do it.
-    // Constructor
-    var imgTag = new ClipboardOutput(imgTag);
-    imgTag.openTag = '<img ';
-    imgTag.classAtt = `class="${classblob}"`;
-    imgTag.altAtt = `alt="${altblob}"`;
 
-    console.log('imgTag.openTag is: ' + imgTag.openTag);
-    console.log('imgTag.classAtt is: ' + imgTag.classAtt);
-    console.log('imgTag.altAtt is: ' + imgTag.altAtt);
+
+
 
     // !VA ccpBuildTag ID Strings
     // Stores the ccpMakeTag object for assembling the clipboard create tag buttons
@@ -271,6 +283,8 @@ var Dimwhit = (function () {
                   Appdata = UIController.getAppData(Appobj, fileName);
                   // !VA Pass Appdata on to evalViewerSizes in order to resize the image containers dynamically based on the dimensions of the image.
                   calcController.evalViewerSize(Appdata);
+
+
                 })();
                 
                 // !VA Timeout of 250 ms while the blob loads.
@@ -484,6 +498,7 @@ var Dimwhit = (function () {
         // Toggle class 'active' to ccp
         document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
 
+
         // !VA Displaying all the programmatically-populated options here for now
         // !VA What this does is populate the CCP fields for imgW and viewerW with data from Appdata. Then, more options are added to the CCP based on the selections in the dropdown fields. That functionality is in handleOnChange in V1, but we're not ready for that yet.
         var tableMaxWidth = `'<option>${Appdata.viewerW}</option><option>100%</option>'`;
@@ -494,7 +509,6 @@ var Dimwhit = (function () {
         document.getElementById('img-width-select').innerHTML = imgMaxWidth;
         document.getElementById('img-max-width').style.display = 'none';
       }
-
 
 
 
@@ -517,9 +531,8 @@ var Dimwhit = (function () {
     var staticRegions = UIController.getStaticRegionIDs();
     var toolButtons = UIController.getToolButtonIDs();
     var ccpPropStrings = UIController.getCcpPropStringsIDs();
-    var ccpUserInput = UIController.getDynamicRegionIDs();
+    var ccpUserInput = UIController.getCcpUserInputIDs();
     var ccpBuildTag = UIController.getCcpBuildTagIDs();
-
 
     return {
       //STRING FUNCTIONS
@@ -746,7 +759,6 @@ var Dimwhit = (function () {
         case (Appdata.imgNW > Appdata.viewerW) && (Appdata.imgNH > Appdata.viewerH) :
           // Set the image Width to the current  viewer width 
           // console.log('Case 4: Appdata.viewerW is: ' + Appdata.viewerW );
-          // !VA HERE!!! This is the problem. 
           Appdata.imgW = Appdata.viewerW;
           // Set the image height proportional to the new image width using the aspect ratio function
           Appdata.imgH = Math.round((1/this.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[0]) * Appdata.imgW);
@@ -857,6 +869,41 @@ var Dimwhit = (function () {
         // alert(ret);
         return ret;
       },
+
+      ccpGetUserInput: function() {
+        var data = UIController.accessAppdata();
+        console.log('ccpGetUserInput data is  -- : ');
+        console.dir(data);
+
+        // !VA Constructor for the clipboard output objects
+        function ClipboardOutput(openTag, classAtt, widthAtt, heightAtt, altAtt, srcAtt,closeTag) {
+          this.openTag = openTag;
+          this.classAtt = classAtt;
+          this.widthAtt = widthAtt;
+          this.heightAtt = heightAtt;
+          this.altAtt = altAtt; 
+          this.srcAtt = srcAtt;
+          this.closeTag = closeTag;
+        }
+
+
+        var imgTag = new ClipboardOutput(imgTag);
+        imgTag.openTag = '<img ';
+        imgTag.classAtt = `class="${document.querySelector(ccpUserInput.imgClass).value}" `;
+        imgTag.altAtt = `alt="${document.querySelector(ccpUserInput.imgAlt).value}" `;
+        imgTag.srcAtt = `src="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" `;
+        imgTag.closeTag = '/>';
+
+        console.log('ccpGetUserInput imgTag is  -- : ');
+        console.dir(imgTag);
+
+
+        // console.log('imgTag.classAtt is: ' + imgTag.classAtt);
+        return imgTag;
+
+
+
+      }
 
 
       
@@ -1169,6 +1216,9 @@ var Dimwhit = (function () {
         var Appdata = UIController.getAppData(AppobjDev, filename);
         // !VA evaluate the viewer containers and adjust their size based on the returned Appdata
         var evalViewerSize = calcController.evalViewerSize(Appdata);
+
+        // !VA Open the CCP by default in dev mode
+        document.querySelector(staticRegions.ccpContainer).classList.add('active');
 
       });
     };
