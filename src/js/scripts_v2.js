@@ -114,31 +114,14 @@ var Dimwhit = (function () {
     };
 
     // Clipboard output for build html image button
-    // !VA Error handling here is awful -- there's a lot of repetition but I can't deal withval it now, have to move on
+
     new Clipboard(staticRegions.ccpImgClipbboardBut, {
       text: function(trigger) {
-
-        // var imgTag = calcController.ccpGetUserInput();
         console.log('new Clipboard: get img tag');
         var imgClipboardOutput = [];
-        var obj = calcController.ccpGetUserInput();
+        var imgTagArray = calcController.ccpGetUserInput();
         // !VA Get Appdata object, we need this to access the filename for the src property
-        // var data = UIController.accessAppdata();
-        // var imgClipboardOutput  = [];
-
-
-        // !VA Build the img tag clipboard output object.
-        // !VA Might as well do this here...
-        // var imgTag = new ClipboardOutput(imgTag);
-        // imgTag.openTag = '<img ';
-        // imgTag.classAtt = `class="${classblob} "`;
-        // imgTag.altAtt = `alt="${altblob} "`;
-        // imgTag.srcAtt = `src="${relpathblob}/${data.filename} "`;
-        // imgTag.closeTag = '/>';
         
-        // !VA Convert the object to an array of values
-        var imgTagArray = Object.values(obj);
-        console.log('imgTagArray is: ' + imgTagArray);
         // !VA Build the array from the list of values
         for (let i = 0; i < imgTagArray.length; i++) {
           imgClipboardOutput.push(imgTagArray[i]);
@@ -150,16 +133,6 @@ var Dimwhit = (function () {
         return imgClipboardOutput;
       }
     });
-
-
-
-    var classblob = 'classname';
-    var altblob = 'alt text here';
-    var relpathblob = 'img';
-
-
-
-
 
 
     // !VA ccpBuildTag ID Strings
@@ -534,10 +507,18 @@ var Dimwhit = (function () {
     var ccpUserInput = UIController.getCcpUserInputIDs();
     var ccpBuildTag = UIController.getCcpBuildTagIDs();
 
+    // !VA Constructor for the clipboard output objects. These are all the properties all the clipboard output objects (img, td and table) will have. We will store these key/value pairs in instances of the ClipboardOutput  because they're easier to manage. Then we'll build the output string into an array.
+    function ClipboardOutput(openTag, classAtt, widthAtt ,closeTag) {
+      this.openTag = openTag;
+      this.classAtt = classAtt;
+      this.widthAtt = widthAtt;
+      this.closeTag = closeTag;
+    }
+
     return {
       //STRING FUNCTIONS
       // !VA Convert integer to pixel for style properties
-      // CONVERT INTEGER TO PIXEL VALUE
+      // calcController: CONVERT INTEGER TO PIXEL VALUE
       intToPx: function(int) {
         let pxval;
         let str = String(int);
@@ -546,7 +527,7 @@ var Dimwhit = (function () {
       },
       //STRING FUNCTIONS
 
-      //ASPECT RATIO
+      // calcController: ASPECT RATIO
       getAspectRatio: function (var1, var2) {
         // console.log('getAspectRatio running...');
         var aspectReal = (var1 / var2);
@@ -574,7 +555,7 @@ var Dimwhit = (function () {
         return [aspectReal, aspectInt];  
       },
 
-      // GET FILENAME FROM SRC ATTRIBUTE OF IMG FILE
+      // calcController: GET FILENAME FROM SRC ATTRIBUTE OF IMG FILE
       getFilenameFromSource: function (source) {
         // console.log('getFilenameFromSource running...');
         if (source) {
@@ -589,7 +570,7 @@ var Dimwhit = (function () {
       // USER ACTION HANDLERS
       // ==========================
 
-      //  CALCCONTROLLER: HANDLE THE USER INPUT FIELDS IN THE TOOLBUTTONS
+      //  calcController: HANDLE THE USER INPUT FIELDS IN THE TOOLBUTTONS
       handleTBInput: function(id, val) {
         // !VA Get the Appdata property that corresponds to the element ID
         var prop = calcController.elementIdToAppdataProp(id);
@@ -667,7 +648,7 @@ var Dimwhit = (function () {
         calcController.adjustContainerHeights(data);
       },
 
-      // // HANDLES MOUSECLICKS FROM TOOLBUTTONS
+      // // calcController: HANDLES MOUSECLICKS FROM TOOLBUTTONS
       handleTBClicks: function(id, val) {
         console.log('handleTBClicks --');
         // !VA Put getAspectRatio in a variable
@@ -703,7 +684,7 @@ var Dimwhit = (function () {
         }
       },
 
-      // EVALUATE VIEWER SIZE
+      // calcController: EVALUATE VIEWER SIZE
       // !VA There are four conditions for an image to fit into the appContainer. This evaluates them, sets the Appdata properties accordingly and calls adjustContainerHeights. 
       // !VA TODO: Actually the function needs to be called only once at the end of the routine...
       evalViewerSize: function (Appdata) {
@@ -776,7 +757,7 @@ var Dimwhit = (function () {
         
       },
       
-      // ADJUST IMAGE CONTAINER HEIGHTS
+      // calcController: ADJUST IMAGE CONTAINER HEIGHTS
       adjustContainerHeights: function (Appdata)  {
         // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values.
         // !VA Initial height is 450, which is set in the init function, not in Appdata,or as it was V1, in the Appobj.
@@ -812,7 +793,7 @@ var Dimwhit = (function () {
         UIController.refreshAppUI(Appdata);
       },
 
-      // EVALUATE DIM VIEWER ALERTS
+      // calcController: EVALUATE DIM VIEWER ALERTS
       evalDimAlerts: function(Appdata, dimViewers) {
         // !VA Size On Disk is NOT 2X the Display Size: flag Size on Disk and Retina
         var curDimViewer = [];
@@ -834,7 +815,7 @@ var Dimwhit = (function () {
       },
 
       // !VA Might be good to fold this into error handling
-      // VALIDATE INPUT FOR INTEGER
+      // calcController: VALIDATE INPUT FOR INTEGER
       validateInteger: function(inputVal) {
         // !VA Since integer validation is used for all height/width input fields, including those not yet implemented, we're going to use a separate error handler for it, call showMessages from it and return 
         let isErr;
@@ -854,7 +835,7 @@ var Dimwhit = (function () {
       },
 
       // !VA Need to get the Appdata property that corresponds to the ID of the DOM input element that sets it. It's easier to just create a list of these correspondences than to rename the whole UI elements and Appdata properties so they correspond, or to create functions that use string methods to extract them from each other.
-      //  GET APPDATA PROPERTY NAME FROM AN HTML ELEMENT ID
+      //  calcController: GET APPDATA PROPERTY NAME FROM AN HTML ELEMENT ID
       elementIdToAppdataProp: function(str) {
         var IDtoProp = {
           viewerW:  'tb-input-viewerw',
@@ -870,39 +851,71 @@ var Dimwhit = (function () {
         return ret;
       },
 
+      // calcController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
+      ccpIfNoUserInput: function(att, val) {
+        // !VA We need get the filename from Appdata in case the user leaves 'path' empty
+        var data = UIController.accessAppdata();
+        var str;
+        // console.log('att is: ' + att);
+        // console.log('val is: ' + val);
+        // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
+        if (val && att) {
+          str = `${att}="${val}" `;
+        } else {
+          // !VA If the path field is empty, we need to return the filename without the path.
+          if (att === 'src' && val === '' ) {
+            str = `${att}="${data.filename}" `;
+          } else {
+            // !VA If there is no input, exclude the attribute entry.
+            str = '';
+          }
+        }
+        return str;
+
+      },
+
       ccpGetUserInput: function() {
         var data = UIController.accessAppdata();
         console.log('ccpGetUserInput data is  -- : ');
         console.dir(data);
 
-        // !VA Constructor for the clipboard output objects
-        function ClipboardOutput(openTag, classAtt, widthAtt, heightAtt, altAtt, srcAtt,closeTag) {
-          this.openTag = openTag;
-          this.classAtt = classAtt;
-          this.widthAtt = widthAtt;
-          this.heightAtt = heightAtt;
-          this.altAtt = altAtt; 
-          this.srcAtt = srcAtt;
-          this.closeTag = closeTag;
-        }
-
-
-        var imgTag = new ClipboardOutput(imgTag);
+        // !VA Create the instance for img tag clipboard object and add img-specific properties.
+        // !VA We're doing this in an object and outputting to an array because the object is easier to manage and the array is easier to reorder.
+        var imgTag = new ClipboardOutput('imgTag');
         imgTag.openTag = '<img ';
         imgTag.classAtt = `class="${document.querySelector(ccpUserInput.imgClass).value}" `;
+        imgTag.closeTag = '/>';
         imgTag.altAtt = `alt="${document.querySelector(ccpUserInput.imgAlt).value}" `;
         imgTag.srcAtt = `src="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" `;
-        imgTag.closeTag = '/>';
+        imgTag.heightAtt = `height="${data.imgH}" `;
+        imgTag.widthAtt = `width="${data.imgW}" `;
+        imgTag.styleAtt= `border:"0" style="width: ${data.imgW}px; height: ${data.imgH}px; border: none; outline: none; text-decoration: none; display:block;" `;
 
-        console.log('ccpGetUserInput imgTag is  -- : ');
-        console.dir(imgTag);
+        var imgTagArray = [];
+        imgTagArray[0] = imgTag.openTag;
+        imgTagArray[1] =    
+          calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.imgClass).value);
+        imgTagArray[2] = 
+        calcController.ccpIfNoUserInput('alt',document.querySelector(ccpUserInput.imgAlt).value);
+        imgTagArray[3] = imgTag.widthAtt;
+        imgTagArray[4] = imgTag.heightAtt;
+        imgTagArray[5] = (function () {
+          var str;
+          // str='bollocks';
+          // str= document.querySelector(ccpUserInput.imgRelPath).value;
+          if (document.querySelector(ccpUserInput.imgRelPath).value) {
+            str = imgTag.srcAtt;
+          } else {
+            str = `src="${data.filename}" `;
 
+          }
+          return str;
+        })();
+        imgTagArray[6] = imgTag.styleAtt;
+        imgTagArray[7] = imgTag.closeTag;
 
-        // console.log('imgTag.classAtt is: ' + imgTag.classAtt);
-        return imgTag;
-
-
-
+        // !VA Return the ordered array of imgTag clipboard strings
+        return imgTagArray;
       }
 
 
