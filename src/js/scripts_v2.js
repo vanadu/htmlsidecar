@@ -128,6 +128,19 @@ var Dimwhit = (function () {
       tableWidth: ''
     };
 
+    
+    // !VA ccpBuildTag ID Strings
+    // Stores the ccpMakeTag object for assembling the clipboard create tag buttons
+    // !VA V2 Also doesn't belong here, we will move it later.
+    // !VA Deprecated in this version, I think...
+    // var ccpBuildTag = {
+    //   imgBuildHTMLBut: '',
+    //   imgBuildCSSBut: '',
+    //   smallPhonesBuildCSSBut: '',
+    //   largePhonesBuildCSSBut: ''
+    // };
+
+
     // !VA This tests whether the CCP is open, allowing us to access CCP elements if it is. It's also where we open the CCP by default for development and testing. 
     (function () {
 
@@ -162,6 +175,10 @@ var Dimwhit = (function () {
     new Clipboard(staticRegions.ccpImgClipbboardBut, {
       text: function(trigger) {
         var clipboardStr = calcController.ccpGetImgClipboardOutput();
+
+
+
+
         return clipboardStr;
       }
     });
@@ -170,8 +187,11 @@ var Dimwhit = (function () {
     // Clipboard output for build html image button
     new Clipboard(staticRegions.ccpTdClipbboardBut, {
       text: function(trigger) {
-        var clipboardStr = calcController.ccpGetTdClipboardOutput();
-        console.log('clibboardStr is: ' + clipboardStr);
+        var clipboardStr, clipboardStr2;
+        clipboardStr = calcController.ccpGetTdClipboardOutput();
+        console.log('HERE');
+        console.log(clipboardStr);
+        
         return clipboardStr;
       }
     });
@@ -183,19 +203,6 @@ var Dimwhit = (function () {
         return clipboardStr;
       }
     });
-
-
-
-
-    // !VA ccpBuildTag ID Strings
-    // Stores the ccpMakeTag object for assembling the clipboard create tag buttons
-    // !VA V2 Also doesn't belong here, we will move it later.
-    var ccpBuildTag = {
-      imgBuildHTMLBut: '',
-      imgBuildCSSBut: '',
-      smallPhonesBuildCSSBut: '',
-      largePhonesBuildCSSBut: ''
-    };
 
 
     // !VA Functions that get returned from the UIContoller object go here
@@ -213,15 +220,15 @@ var Dimwhit = (function () {
       getStaticRegionIDs: function() {
         return staticRegions;
       },
-      getCcpPropStringsIDs: function() {
-        return ccpPropStrings;
-      },
+      // getCcpPropStringsIDs: function() {
+      //   return ccpPropStrings;
+      // },
       getCcpUserInputIDs: function() {
         return ccpUserInput;
       },
-      getCcpBuildTagIDs: function() {
-        return ccpBuildTag;
-      },
+      // getCcpBuildTagIDs: function() {
+      //   return ccpBuildTag;
+      // },
 
       //FILEREADER OBJECT PROCESSING
       //Get the user-selected image file object 
@@ -405,7 +412,7 @@ var Dimwhit = (function () {
           document.querySelector(dimViewers.clipboardBut).style.display = 'none';
           const dimarray = Object.values(dimViewers);
           for ( let i = 0; i < dimarray.length; i++ ) {
-            if ( dimarray[i] !== '#clipboard-but' &&  dimarray[i] !== '#filename-viewer' ) {
+            if ( dimarray[i] !== '#dv-clipboard-but' &&  dimarray[i] !== '#dv-filename-viewer' ) {
               document.querySelector(dimarray[i]).innerHTML = `<span class='pop-font'>&nbsp;&nbsp;No Image</span>`;
             } 
           } 
@@ -484,13 +491,23 @@ var Dimwhit = (function () {
       // CCPF - CLIPBOARD FUNCTIONS
       // ===============================================
 
-      // TOGGLE CLIPBOARD CONTROL PANEL
+      // // TOGGLE CLIPBOARD CONTROL PANEL
       ccpToggle: function () {
-        // Toggle class 'active' to ccp
-        document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
-
+      //   // Toggle class 'active' to ccp
+      //   document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
+        var data = UIController.accessAppdata();
 
         // !VA Displaying all the programmatically-populated options here for now
+        // !VA Set the value of the first dropdown in ccpUserInput.tableWidth
+        var twidth = document.querySelector(ccpUserInput.tableWidth);
+        twidth.options[0].innerHTML = 'none';
+        twidth.options[1].innerHTML = data.imgW;
+        twidth.options[2].innerHTML = data.viewerW;
+        var foo = twidth.selectedIndex;
+        console.log('foo is: ' + foo);
+
+
+
         // !VA What this does is populate the CCP fields for imgW and viewerW with data from Appdata. Then, more options are added to the CCP based on the selections in the dropdown fields. That functionality is in handleOnChange in V1, but we're not ready for that yet.
         // var tableMaxWidth = `'<option>${Appdata.viewerW}</option><option>100%</option>'`;
         // document.getElementById('table-width-select').innerHTML = tableMaxWidth;
@@ -500,9 +517,9 @@ var Dimwhit = (function () {
         // document.getElementById('img-width-select').innerHTML = imgMaxWidth;
         // document.getElementById('img-max-width').style.display = 'none';
 
-        if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
-          UIController.accessCcpElements();
-        }
+        document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
+
+
 
       }
 
@@ -522,9 +539,11 @@ var Dimwhit = (function () {
     var dynamicRegions = UIController.getDynamicRegionIDs();
     var staticRegions = UIController.getStaticRegionIDs();
     var toolButtons = UIController.getToolButtonIDs();
-    var ccpPropStrings = UIController.getCcpPropStringsIDs();
+    // !VA Deprecated in this version
+    // var ccpPropStrings = UIController.getCcpPropStringsIDs();
     var ccpUserInput = UIController.getCcpUserInputIDs();
-    var ccpBuildTag = UIController.getCcpBuildTagIDs();
+    // !VA Deprecated in this version
+    // var ccpBuildTag = UIController.getCcpBuildTagIDs();
 
     // !VA Constructor for the clipboard output objects. These are all the properties all the clipboard output objects (img, td and table) will have. We will store these key/value pairs in instances of the ClipboardOutput  because they're easier to manage. Then we'll build the output string into an array.
     function ClipboardOutput(openTag, classAtt, widthAtt ,closeTag) {
@@ -914,9 +933,9 @@ var Dimwhit = (function () {
           id = id.replace('mrk', 'box');
           // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
           if (document.querySelector(id).checked === true) {
-            str = `border:"0" style="width: ${data.imgW}px; height: ${data.imgH}px; border: none; outline: none; text-decoration: none; display:block;" `;
+            str = `border="0" style="width: ${data.imgW}px; height: ${data.imgH}px; border: none; outline: none; text-decoration: none; display:block;" `;
           } else {
-            str = 'border:"0" style="border: none; outline: none; text-decoration: none; display:block;"';
+            str = 'border="0" style="border: none; outline: none; text-decoration: none; display:block;"';
           }
           return str;
         })(ccpUserInput.imgIncludeStyles);
@@ -1029,19 +1048,19 @@ var Dimwhit = (function () {
 
 
         var tdTagArray = [];
-        tdTagArray[0] = tdTag.openTag;
+        tdTagArray[0] = '\t' + tdTag.openTag;
         tdTagArray[1] = tdTag.classAtt;
         tdTagArray[2] = tdTag.alignAtt;
-        tdTagArray[3] = tdTag.valignAtt;
-        tdTagArray[4] = tdTag.tdContents;
-        tdTagArray[5] = tdTag.closeTag;
+        tdTagArray[3] = tdTag.valignAtt + '\n';
+        tdTagArray[4] = '\t\t' + tdTag.tdContents  + '\n';
+        tdTagArray[5] = '\t' + tdTag.closeTag;
         return calcController.buildTagFromArray(tdTagArray);
       }, 
 
       // calcController: GET STRINGS FOR THE TABLE CLIPBOARD OUTPUT
       ccpGetTableClipboardOutput: function () {
-        // !VA We don't need this yet, but we will if we decide to add a width style property which is useful for Outlook 120dpi 
-        // var data = UIController.accessAppdata();
+        // !VA We need this to get Appdata.viewerW
+        var data = UIController.accessAppdata();
 
         var tableTag = new ClipboardOutput('tableTag');
         tableTag.openTag = '<table ';
@@ -1059,7 +1078,7 @@ var Dimwhit = (function () {
           // !VA Put the available options in an array
           var tableAlignOptions = [ 'none', 'left', 'center', 'right' ];
           // !VA Put the desired output strings in an array
-          var clipboardOutput = [ '', 'align="left"', 'align="center"', 'align="right"'];
+          var clipboardOutput = [ '', 'align="left" ', 'align="center" ', 'align="right" '];
           // !VA If the selected index matches the index of the available options array, then output the string that matches that index
           for (let i = 0; i < tableAlignOptions.length; i++) {
             if ( selInd === i) {
@@ -1070,20 +1089,43 @@ var Dimwhit = (function () {
         })(ccpUserInput.tableAlign);
         // !VA tableAlign END
 
-        tableTag.tableContents =    (function () {
+        tableTag.tableContents = (function () {
           var str = calcController.ccpGetTdClipboardOutput();
-          console.log('str is: ' + str);
           return str;
         })();
+
+
+
+        tableTag.widthAtt = (function (id, data) {
+          // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
+          // !VA Pass in the id of the select dropdown
+          var str;
+          // !VA Get the selection index
+          var selInd = document.querySelector(id).selectedIndex;
+          // !VA Put the available options in an array
+          var tableWidthOptions = [ 'none', data.imgW, data.viewerW, '100%' ];
+          // !VA Put the desired output strings in an array
+          var clipboardOutput = [ '',`width="${data.imgW}" `, `width="${data.viewerW}" `, '100%'];
+          // !VA If the selected index matches the index of the available options array, then output the string that matches that index
+          for (let i = 0; i < tableWidthOptions.length; i++) {
+            if ( selInd === i) {
+              str = `${clipboardOutput[i]}`;
+            }
+          }
+          return str;
+        })(ccpUserInput.tdAlign, data);
+
+
+
         tableTag.closeTag = '</table> ';    
 
 
         // !VA If there's no value in any of the fields, make tableTag.openTag a complete tag by including the > on it. If there is a value in any of the fields, put the closing > on tableTag.alignAtt.
-        if (!tableTag.alignAtt && !tableTag.classAtt) {
-          tableTag.openTag = '<table>';
-        } else {
-          tableTag.alignAtt = tableTag.alignAtt + '>';
-        }
+        // if (!tableTag.alignAtt && !tableTag.classAtt) {
+        //   tableTag.openTag = '<table>';
+        // } else {
+        //   tableTag.alignAtt = tableTag.alignAtt + '>';
+        // }
 
 
 
@@ -1091,15 +1133,15 @@ var Dimwhit = (function () {
         tableTagArray[0] = tableTag.openTag;
         tableTagArray[1] = tableTag.classAtt;
         tableTagArray[2] = tableTag.alignAtt;
-        tableTagArray[3] = tableTag.tableContents;
-        tableTagArray[4] = tableTag.closeTag;
+        tableTagArray[3] = tableTag.widthAtt + '>\n<tr>\n';
+        tableTagArray[4] = tableTag.tableContents  + '\n';
+        tableTagArray[5] = '<tr>\n\t' + tableTag.closeTag;
         return calcController.buildTagFromArray(tableTagArray);
       }, 
 
 
       buildTagFromArray: function(array) {
         // !VA Build the array from the list of values
-        console.dir(array);
         var clipboardOutput = [];
         var clipboardStr;
         // !VA Loop through the list of tag strings and build the array to join. 
@@ -1126,9 +1168,11 @@ var Dimwhit = (function () {
     var dynamicRegions = UIController.getDynamicRegionIDs();
     var staticRegions = UIController.getStaticRegionIDs();
     var toolButtons = UIController.getToolButtonIDs();
-    var ccpPropStrings = UIController.getCcpPropStringsIDs();
-    var ccpUserInput = UIController.getDynamicRegionIDs();
-    var ccpBuildTag = UIController.getCcpBuildTagIDs();
+    // !VA Deprecated in this version
+    // var ccpPropStrings = UIController.getCcpPropStringsIDs();
+    var ccpUserInput = UIController.getCcpUserInputIDs();
+    // !VA Deprecated in this version
+    // var ccpBuildTag = UIController.getCcpBuildTagIDs();
 
     var setupEventListeners = function() {
 
@@ -1221,6 +1265,7 @@ var Dimwhit = (function () {
             break;
           case ( el.id.includes('dv')) :
             UIController.ccpToggle();
+            // document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
             break;
           } 
 
@@ -1385,8 +1430,10 @@ var Dimwhit = (function () {
         var evalViewerSize = calcController.evalViewerSize(Appdata);
 
         // !VA Open the CCP by default in dev mode
-        // document.querySelector(staticRegions.ccpContainer).classList.add('active');
-
+        // !VA First, make sure it's closed
+        document.querySelector(staticRegions.ccpContainer).classList.remove('active');
+        // !VA Then run ccpToggle to initialize the dynamic values and open it
+        UIController.ccpToggle();
       });
     };
 
@@ -1414,6 +1461,7 @@ var Dimwhit = (function () {
           initializeDevMode();
         } else {
           // !VA Run refreshAppUI which tests for an existing image and writes 'No Image' to the dimViewers if none is found. Once that is done, the app waits for a drop event.
+          document.querySelector(staticRegions.ccpContainer).classList.remove('active');
           UIController.refreshAppUI(Appobj);
         }
       }
