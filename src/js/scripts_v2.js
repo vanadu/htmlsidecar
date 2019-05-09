@@ -71,6 +71,8 @@ var Dimwhit = (function () {
       toolsContainer: '#tools-container',
       ccpContainer: '#ccp',
       ccpImgClipbboardBut: '#img-build-html-but',
+      ccpTdClipbboardBut: '#td-build-html-but',
+      ccpTableClipbboardBut: '#table-build-html-but'
 
     };
 
@@ -114,15 +116,14 @@ var Dimwhit = (function () {
     };
 
     // Clipboard output for build html image button
-
     new Clipboard(staticRegions.ccpImgClipbboardBut, {
       text: function(trigger) {
         console.log('new Clipboard: get img tag');
         var imgClipboardOutput = [];
-        var imgTagArray = calcController.ccpGetUserInput();
+        var imgTagArray = calcController.ccpGetImgClipboardOutput();
         // !VA Get Appdata object, we need this to access the filename for the src property
         
-        // !VA Build the array from the list of values
+        // !VA Build the array from the list of valuese
         for (let i = 0; i < imgTagArray.length; i++) {
           imgClipboardOutput.push(imgTagArray[i]);
         }
@@ -133,6 +134,30 @@ var Dimwhit = (function () {
         return imgClipboardOutput;
       }
     });
+
+
+    // Clipboard output for build html image button
+    new Clipboard(staticRegions.ccpTdClipbboardBut, {
+      text: function(trigger) {
+        console.log('new Clipboard: get td tag');
+        var tdClipboardOutput = [];
+        var tdTagArray = calcController.ccpGetTdClipboardOutput();
+        // !VA Get Appdata object, we need this to access the filename for the src property
+        
+        // !VA Build the array from the list of valuese
+        for (let i = 0; i < tdTagArray.length; i++) {
+          tdClipboardOutput.push(tdTagArray[i]);
+        }
+        // !VA Convert the array to a string, removing the comma-separators
+        tdClipboardOutput = tdClipboardOutput.join('');
+        // console.dir(tdClipboardOutput);
+        // !VA Output to the clipboard
+        return tdClipboardOutput;
+      }
+    });
+
+
+
 
 
     // !VA ccpBuildTag ID Strings
@@ -874,13 +899,14 @@ var Dimwhit = (function () {
 
       },
 
-      ccpGetUserInput: function() {
+      // calcController: GET STRINGS FOR THE CLIPBOARD OUTPUT
+      ccpGetImgClipboardOutput: function() {
         var data = UIController.accessAppdata();
         console.log('ccpGetUserInput data is  -- : ');
         console.dir(data);
 
         // !VA Create the instance for img tag clipboard object and add img-specific properties.
-        // !VA We're doing this in an object and outputting to an array because the object is easier to manage and the array is easier to reorder.
+        // !VA We're doing this in an object and outputting to an array because the object is easier to manage and the array is easier to reorder. The Constructor is in this module in the private functions above.
         var imgTag = new ClipboardOutput('imgTag');
         imgTag.openTag = '<img ';
         imgTag.classAtt = `class="${document.querySelector(ccpUserInput.imgClass).value}" `;
@@ -889,50 +915,54 @@ var Dimwhit = (function () {
         imgTag.srcAtt = `src="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" `;
         imgTag.heightAtt = `height="${data.imgH}" `;
         imgTag.widthAtt = `width="${data.imgW}" `;
-        imgTag.styleAtt= `border:"0" style="width: ${data.imgW}px; height: ${data.imgH}px; border: none; outline: none; text-decoration: none; display:block;" `;
+        imgTag.styleAtt = `border:"0" style="width: ${data.imgW}px; height: ${data.imgH}px; border: none; outline: none; text-decoration: none; display:block;" `;
+        imgTag.alignAtt = 'none';
 
+        // !VA Now build the array with the object properties above in the correct order for clipboard output
         var imgTagArray = [];
         imgTagArray[0] = imgTag.openTag;
-        imgTagArray[1] =    
+        imgTagArray[1] =   
+          // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
           calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.imgClass).value);
-        imgTagArray[2] = 
-        calcController.ccpIfNoUserInput('alt',document.querySelector(ccpUserInput.imgAlt).value);
-        imgTagArray[3] = imgTag.widthAtt;
-        imgTagArray[4] = imgTag.heightAtt;
-        imgTagArray[5] = (function () {
+        imgTagArray[2] =    (function () {
           var str;
-          // str='bollocks';
-          // str= document.querySelector(ccpUserInput.imgRelPath).value;
+          var selInd = document.querySelector(ccpUserInput.imgAlign).selectedIndex;
+          var imgAlignOptions = [ 'none', 'left', 'middle', 'right' ];
+          console.log('selInd is: ' + selInd);
+          var clipboardOutput = [ '', 'align="left" ', 'align="middle" ', 'align="right" '];
+          for (let i = 0; i < imgAlignOptions.length; i++) {
+            if ( selInd === i) {
+              str = `${clipboardOutput[i]}`;
+              console.log('str is: ' + str);
+              console.log('The selected option is: ' + selInd);
+            }
+          }
+
+          return str;
+        })();
+
+        imgTagArray[3] = 
+          // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output
+          calcController.ccpIfNoUserInput('alt',document.querySelector(ccpUserInput.imgAlt).value);
+        imgTagArray[4] = imgTag.widthAtt;
+        imgTagArray[5] = imgTag.heightAtt;
+        imgTagArray[6] = (function () {
+          var str;
+          // !VA If the path input element is empty, just include the filename and omit the path.
           if (document.querySelector(ccpUserInput.imgRelPath).value) {
             str = imgTag.srcAtt;
           } else {
             str = `src="${data.filename}" `;
-
           }
           return str;
         })();
-        imgTagArray[6] = imgTag.styleAtt;
-        imgTagArray[7] = imgTag.closeTag;
+        imgTagArray[7] = imgTag.styleAtt;
+        imgTagArray[8] = imgTag.closeTag;
+
 
         // !VA Return the ordered array of imgTag clipboard strings
         return imgTagArray;
       }
-
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     };
   })();
@@ -1025,6 +1055,16 @@ var Dimwhit = (function () {
         // console.log(dvClickables[i]);
         addEventHandler((dvClickables[i]),'click',handleUserAction,false);
       }
+
+
+      // var ccpOnChange = 
+            // Change handlers - handleOnChange
+      // =================================
+      // addEventHandler(ccpUserInput.imgWidth,'change',handleOnChange,false);
+      // addEventHandler(ccpUserInput.tableWidth,'change',handleOnChange,false);
+
+
+
 
 
       // addEventHandler(document.getElementById('tb-input-viewerw'),'focus',doit,false);

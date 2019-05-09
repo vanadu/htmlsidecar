@@ -666,6 +666,62 @@ output {
     color: #FFFFFF;
   }
 
+
+.custom-checkbox {
+  position: relative;
+}
+.img-include-css input{
+    position: absolute;
+    left: 0;
+    top: 0;
+    height:15px;
+    width: 50px;    /* Expand the checkbox so that it covers */
+    z-index : 1;    /* the label and span, increase z-index to bring it over */
+    opacity: 0;     /* the label and set opacity to 0 to hide it. */
+}
+.img-include-css input+label {
+    position: relative;
+    left: 0;
+    top: 0;
+    padding-left: 25px;
+    color: black;
+}
+
+
+
+
+  #img-include-css-checkbox  input[type=checkbox] {
+    width: 80px;
+    margin-bottom: 5px;
+    padding-right: 2px;
+    text-align: right;
+    visibility: hidden;
+
+  }
+  // .checkmark { 
+  //   position: absolute; 
+  //   top: 0; 
+  //   left: 0; 
+  //   height: 25px; 
+  //   width: 25px; 
+  //   background-color: black; 
+  // } 
+  #img-include-css-label {
+    width: 160px;
+    text-align: left;
+  }
+
+
+  .checkmark:after { 
+    content: ""; 
+    position: absolute; 
+    display: none; 
+} 
+
+
+
+
+
   fieldset {
     
     width: 100%;
@@ -701,12 +757,14 @@ output {
       .ccp-options-col-2 {
         left: 120px;
         width: 260px;
-        label {
+        label  {
           width: 80px;
           margin-bottom: 5px;
           padding-right: 2px;
           text-align: right;
         }
+
+
       }
       .ccp-options-col-3 {
         left: 390px;

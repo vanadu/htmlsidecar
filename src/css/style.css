@@ -1501,6 +1501,38 @@ output {
     border: 1px solid #616161;
     background: #000000;
     color: #FFFFFF; }
+  #ccp-content .custom-checkbox {
+    position: relative; }
+  #ccp-content .img-include-css input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 15px;
+    width: 50px;
+    /* Expand the checkbox so that it covers */
+    z-index: 1;
+    /* the label and span, increase z-index to bring it over */
+    opacity: 0;
+    /* the label and set opacity to 0 to hide it. */ }
+  #ccp-content .img-include-css input + label {
+    position: relative;
+    left: 0;
+    top: 0;
+    padding-left: 25px;
+    color: black; }
+  #ccp-content #img-include-css-checkbox input[type=checkbox] {
+    width: 80px;
+    margin-bottom: 5px;
+    padding-right: 2px;
+    text-align: right;
+    visibility: hidden; }
+  #ccp-content #img-include-css-label {
+    width: 160px;
+    text-align: left; }
+  #ccp-content .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none; }
   #ccp-content fieldset {
     width: 100%;
     margin-bottom: 5px;
