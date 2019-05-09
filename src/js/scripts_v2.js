@@ -136,9 +136,6 @@ var Dimwhit = (function () {
 
       // !VA If the CCP is open...
       if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
-        console.log('true');
-        console.log('CCP is open');
-        
         // !VA CCP Event Listeners -- we will handle CCP events separately from other UI events here to keep separation of dynamic vs static element handling
         // !VA Handle the checkbox
         var checkmrk = document.querySelector(ccpUserInput.imgIncludeStyles);
@@ -965,14 +962,8 @@ var Dimwhit = (function () {
 
       // calcController: GET STRINGS FOR THE CLIPBOARD OUTPUT
       ccpGetImgClipboardOutput: function() {
+        // !VA Get Appdata - we need it for the filename
         var data = UIController.accessAppdata();
-        console.log('ccpGetUserInput data is  -- : ');
-        console.dir(data);
-
-
-
-
-
         // !VA Create the instance for img tag clipboard object and add img-specific properties.
         // !VA We're doing this in an object and outputting to an array because the object is easier to manage and the array is easier to reorder. The Constructor is in this module in the private functions above.
         var imgTag = new ClipboardOutput('imgTag');
@@ -983,16 +974,35 @@ var Dimwhit = (function () {
         imgTag.srcAtt = `src="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" `;
         imgTag.heightAtt = `height="${data.imgH}" `;
         imgTag.widthAtt = `width="${data.imgW}" `;
-        imgTag.styleAtt = `border:"0" style="width: ${data.imgW}px; height: ${data.imgH}px; border: none; outline: none; text-decoration: none; display:block;" `;
+        // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
+        imgTag.styleAtt =    (function () {
+          var str;
+          if (document.getElementById('img-include-css-checkbox').checked === true) {
+            str = `border:"0" style="width: ${data.imgW}px; height: ${data.imgH}px; border: none; outline: none; text-decoration: none; display:block;" `;
+          } else {
+            str = 'border:"0" style="border: none; outline: none; text-decoration: none; display:block;"';
+          }
+          console.log('str is: ' + str);
+          return str;
+        })();
+        
+
+        
+        
+        
+        
+
         imgTag.alignAtt = 'none';
 
         // !VA Now build the array with the object properties above in the correct order for clipboard output
         var imgTagArray = [];
         imgTagArray[0] = imgTag.openTag;
+
         imgTagArray[1] =   
           // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
           calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.imgClass).value);
-        imgTagArray[2] =    (function () {
+
+        imgTagArray[2] = (function () {
           var str;
           var selInd = document.querySelector(ccpUserInput.imgAlign).selectedIndex;
           var imgAlignOptions = [ 'none', 'left', 'middle', 'right' ];
@@ -1005,13 +1015,13 @@ var Dimwhit = (function () {
               console.log('The selected option is: ' + selInd);
             }
           }
-
           return str;
         })();
 
         imgTagArray[3] = 
           // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output
           calcController.ccpIfNoUserInput('alt',document.querySelector(ccpUserInput.imgAlt).value);
+
         imgTagArray[4] = imgTag.widthAtt;
         imgTagArray[5] = imgTag.heightAtt;
         imgTagArray[6] = (function () {
@@ -1024,6 +1034,7 @@ var Dimwhit = (function () {
           }
           return str;
         })();
+
         imgTagArray[7] = imgTag.styleAtt;
         imgTagArray[8] = imgTag.closeTag;
 
