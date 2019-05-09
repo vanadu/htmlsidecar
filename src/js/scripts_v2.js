@@ -940,6 +940,8 @@ var Dimwhit = (function () {
       // calcController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
       ccpIfNoUserInput: function(att, val) {
         // !VA We need get the filename from Appdata in case the user leaves 'path' empty
+        console.log('att is: ' + att);
+        console.log('val is: ' + val);
         var data = UIController.accessAppdata();
         var str;
         // console.log('att is: ' + att);
@@ -956,6 +958,7 @@ var Dimwhit = (function () {
             str = '';
           }
         }
+      console.log('str is: ' + str);
         return str;
 
       },
@@ -967,78 +970,78 @@ var Dimwhit = (function () {
         // !VA Create the instance for img tag clipboard object and add img-specific properties.
         // !VA We're doing this in an object and outputting to an array because the object is easier to manage and the array is easier to reorder. The Constructor is in this module in the private functions above.
         var imgTag = new ClipboardOutput('imgTag');
+        // !VA imgTag properties
+        // !VA ---------------------------
         imgTag.openTag = '<img ';
-        imgTag.classAtt = `class="${document.querySelector(ccpUserInput.imgClass).value}" `;
-        imgTag.closeTag = '/>';
-        imgTag.altAtt = `alt="${document.querySelector(ccpUserInput.imgAlt).value}" `;
-        imgTag.srcAtt = `src="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" `;
-        imgTag.heightAtt = `height="${data.imgH}" `;
-        imgTag.widthAtt = `width="${data.imgW}" `;
-        // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
-        imgTag.styleAtt =    (function () {
-          var str;
-          if (document.getElementById('img-include-css-checkbox').checked === true) {
-            str = `border:"0" style="width: ${data.imgW}px; height: ${data.imgH}px; border: none; outline: none; text-decoration: none; display:block;" `;
-          } else {
-            str = 'border:"0" style="border: none; outline: none; text-decoration: none; display:block;"';
-          }
-          console.log('str is: ' + str);
-          return str;
-        })();
-        
-
-        
-        
-        
-        
-
-        imgTag.alignAtt = 'none';
-
-        // !VA Now build the array with the object properties above in the correct order for clipboard output
-        var imgTagArray = [];
-        imgTagArray[0] = imgTag.openTag;
-
-        imgTagArray[1] =   
+        imgTag.classAtt = 
           // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
           calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.imgClass).value);
-
-        imgTagArray[2] = (function () {
-          var str;
-          var selInd = document.querySelector(ccpUserInput.imgAlign).selectedIndex;
-          var imgAlignOptions = [ 'none', 'left', 'middle', 'right' ];
-          console.log('selInd is: ' + selInd);
-          var clipboardOutput = [ '', 'align="left" ', 'align="middle" ', 'align="right" '];
-          for (let i = 0; i < imgAlignOptions.length; i++) {
-            if ( selInd === i) {
-              str = `${clipboardOutput[i]}`;
-              console.log('str is: ' + str);
-              console.log('The selected option is: ' + selInd);
-            }
-          }
-          return str;
-        })();
-
-        imgTagArray[3] = 
+        imgTag.closeTag = '/>';
+        imgTag.altAtt =    
           // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output
           calcController.ccpIfNoUserInput('alt',document.querySelector(ccpUserInput.imgAlt).value);
-
-        imgTagArray[4] = imgTag.widthAtt;
-        imgTagArray[5] = imgTag.heightAtt;
-        imgTagArray[6] = (function () {
+        // !VA imgTag.altAtt END
+        imgTag.srcAtt = (function (id, data) {
+          // !VA Pass in the ID and the copy of Appdata to get the filename
           var str;
           // !VA If the path input element is empty, just include the filename and omit the path.
-          if (document.querySelector(ccpUserInput.imgRelPath).value) {
-            str = imgTag.srcAtt;
+          if (document.querySelector(id).value) {
+            str = `src="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" `;
+            console.log('str here is: ' + str);
           } else {
             str = `src="${data.filename}" `;
           }
           return str;
-        })();
+        })(ccpUserInput.imgRelPath, data);
+        // !VA imgTag.srcAtt END
+        imgTag.heightAtt = `height="${data.imgH}" `;
+        imgTag.widthAtt = `width="${data.imgW}" `;
+        imgTag.styleAtt =  (function (id) {
+          // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
+          var str;
+          id = id.replace('mrk', 'box');
+          // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
+          if (document.querySelector(id).checked === true) {
+            str = `border:"0" style="width: ${data.imgW}px; height: ${data.imgH}px; border: none; outline: none; text-decoration: none; display:block;" `;
+          } else {
+            str = 'border:"0" style="border: none; outline: none; text-decoration: none; display:block;"';
+          }
+          return str;
+        })(ccpUserInput.imgIncludeStyles);
+        // !VA imgTag.styleAtt END
+        imgTag.alignAtt = (function (id) {
+          // !VA Pass in the id of the select dropdown
+          var str;
+          // !VA Get the selection index
+          var selInd = document.querySelector(id).selectedIndex;
+          // !VA Put the available options in an array
+          var imgAlignOptions = [ 'none', 'left', 'middle', 'right' ];
+          // !VA Put the desired output strings in an array
+          var clipboardOutput = [ '', 'align="left" ', 'align="middle" ', 'align="right" '];
+          // !VA If the selected index matches the index of the available options array, then output the string that matches that index
+          for (let i = 0; i < imgAlignOptions.length; i++) {
+            if ( selInd === i) {
+              str = `${clipboardOutput[i]}`;
+            }
+          }
+          return str;
+        })(ccpUserInput.imgAlign);
+        // !VA imgTag Object END ------------------------
 
+        // !VA Now build the array with the object properties above in the correct order for clipboard output
+        // !VA imgTagArray
+        // !VA ----------------------------------
+        var imgTagArray = [];
+        imgTagArray[0] = imgTag.openTag;
+        imgTagArray[1] = imgTag.classAtt;
+        imgTagArray[2] = imgTag.alignAtt;
+        imgTagArray[3] = imgTag.altAtt;
+        imgTagArray[4] = imgTag.widthAtt;
+        imgTagArray[5] = imgTag.heightAtt;
+        imgTagArray[6] = imgTag.srcAtt;
         imgTagArray[7] = imgTag.styleAtt;
         imgTagArray[8] = imgTag.closeTag;
-
-
+        // !VA ------------------------------------
         // !VA Return the ordered array of imgTag clipboard strings
         return imgTagArray;
       }
