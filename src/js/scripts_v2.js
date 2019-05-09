@@ -161,7 +161,6 @@ var Dimwhit = (function () {
     // Clipboard output for build html image button
     new Clipboard(staticRegions.ccpImgClipbboardBut, {
       text: function(trigger) {
-        console.log('new Clipboard: get img tag');
         var imgClipboardOutput = [];
         var imgTagArray = calcController.ccpGetImgClipboardOutput();
         // !VA Get Appdata object, we need this to access the filename for the src property
@@ -172,7 +171,6 @@ var Dimwhit = (function () {
         }
         // !VA Convert the array to a string, removing the comma-separators
         imgClipboardOutput = imgClipboardOutput.join('');
-        // console.dir(imgClipboardOutput);
         // !VA Output to the clipboard
         return imgClipboardOutput;
       }
@@ -193,7 +191,6 @@ var Dimwhit = (function () {
         }
         // !VA Convert the array to a string, removing the comma-separators
         tdClipboardOutput = tdClipboardOutput.join('');
-        // console.dir(tdClipboardOutput);
         // !VA Output to the clipboard
         return tdClipboardOutput;
       }
@@ -255,18 +252,14 @@ var Dimwhit = (function () {
         // files is a FileList of File objects. List some properties.
         //Note that the File objects are blob objects that include the parameter
         // type, which indicates the type of file. 
-        // console.log('files is: ' + files);
         // !VA I don't think the output array is used here, so commenting out.
         // var output = [];
         // !VA get the number of files selected
-        // console.log('files.length is:' + files.length);
         
         var f =  files[0];
-        // console.log('f.name is: ' + f.name);
         // !VA this for loop would be used if we were using the entire filelist instead of just one
         // a single dropped file
         // for (var i = 0, f; f = files[i]; i++) {
-        // console.log('files[i].name is: ' + files[i].name);
         // Only process image files.
         //This is the query for file type -- it includes any MIME type that starts 
         //with 'image' which is a huge list of possible formats -- see the complete
@@ -276,7 +269,6 @@ var Dimwhit = (function () {
         if (!f.type.match('image.*')) {
           console.log('NOT IMAGE');
           var target = "notimage";
-          // console.log('target is: ' + target);
           // !VA Below is the error handler - skipping for now
           // var isErr = errorHandler(target, 0, 0);
           console.log('!VA Not an image file error: Exiting...');
@@ -335,10 +327,6 @@ var Dimwhit = (function () {
             // !VA First, write the new curImg object to the DOM
             function writeImgToDOM(curImg, callback) {
               // VA! The callback function allows access of image properties. You can't get image properties from a FileReader object -- it's a binary blob that takes time to load, and by the time it's loaded all the functions that get its properties have run and returned undefined. Temporary solution: hide the image object for 250 ms, then show it and get the properties -- by then it should have loaded. There is a better way to do this with promises but that will have to be for later.
-
-              console.log('writeImgToDOM --');
-              console.log('dynamicRegions.curImg is: '+ dynamicRegions.curImg);
-              
               // !VA Create a div in the DOM
               var curImgDiv = document.createElement('div');
               // !VA Assign the new div an id that reflects its purpose
@@ -368,39 +356,17 @@ var Dimwhit = (function () {
       // UIController: UPDATE APP DATA
       updateAppData: function (prop, val) {
         val = parseInt(val); 
-        // !VA !IMPORTANT! THis is HUGE!
+        // !VA !IMPORTANT! Referencing a property of an object in bracket notation!
         Appdata[prop] = val;
-        // console.log('Appdata.prop is now: ' + Appdata[prop]);
-        // !VA No return value should be required, this is write-only
-        // console.log('updateAppData -- Appdata is...');
-        // console.dir(Appdata);
-
-        /* !VA STOPPED HERE Now we need to:
-            write a function to:
-                recalc imgW and imgH based on the new viewerw.
-                recalc imgH and imgW based on the new customw/customh values
-
-            return them here and update the Appdata
-            run adjustContainerHeights here to recalc viewer heights based on above.
-        */
-
         UIController.refreshAppUI(Appdata);
         return Appdata;
       },
 
-      // UIController: return a copy of Appdata
+      // UIController: return a copy of Appdata to an outside function
       accessAppdata: function(){
-        // console.log('accessAppdata -- ');
-        // console.dir(Appdata);
         return Appdata;
       },
 
-      // UIController: 
-      accessCcpElements: function(){
-        // !VA This is where we have to add event listeners for 
-
-
-      },
 
       // UIController: initialize AppData, this should probably be renamed to such
       getAppData: function(Appobj, filename) {
@@ -447,7 +413,6 @@ var Dimwhit = (function () {
       refreshAppUI: function (Appdata) {
         // VA! Need to revisit this...this is also done in the init function, I think and it only needs to be done once.
         // !VA The page has been initialized but no image has been selected yet, so set all the dimViewers to No Image.
-        // console.log('refreshAppUI running...');
         // !VA Appdata is still empty, so show 'No Image' in the dimViewers and hide the clipboard button.
         if (!Appdata.filename) {
           document.querySelector(dimViewers.clipboardBut).style.display = 'none';
@@ -504,7 +469,6 @@ var Dimwhit = (function () {
       // !VA Test for whether there is already a #cur-img element in the DOM, and if there is remove it so handleFileSelect can overwrite it without having to refresh the page to reboot the app.
       removeCurImg: function () {
         // if ( document.querySelector('#cur-img-container')) {
-        // console.log(document.querySelector('#cur-img-container').parentNode);
         document.querySelector('#cur-img-container').parentNode.removeChild(document.querySelector('#cur-img-container'));
         // } 
       },
@@ -513,22 +477,14 @@ var Dimwhit = (function () {
         // !VA if evalDimAlerts returns true, then the dimViewer should be displayed in red. To reset the dim alert, set to style color to 'auto'.
         var att = bool;
         bool ? att = 'red': att = 'inherit';
-        // console.log('setDimAlerts - curDimViewers is...');
-        // console.dir(curDimViewers);
         // !VA We want to use this same function to reset the dim alerts when a new image is loaded. For that, we need to pass in an array of all the dimViewer IDs, not just an array of the ones that are already red. So, first test if the argument is an object, and if it is convert it into a list of values so the loop will accept it.
 
         if (Array.isArray(curDimViewers) === false) {
-          // console.log('bool is: ' + bool);
           curDimViewers = Object.values(curDimViewers);
-          // console.log('curDimViewers is: ' + curDimViewers);
         }
         // !VA For each dimViewer passed from evalDimAlerts, set the font color style based on the bool argument passed in.
         for (let i = 0; i < curDimViewers.length; i++) {
           document.querySelector(curDimViewers[i]).style.color = att;
-          // console.log('bool is: ' + bool);
-          // console.log(curDimViewers[i]);
-          // console.log('setDimAlerts - dimViewers is...');
-          // console.dir(dimViewers);
         }
       },
 
@@ -543,7 +499,6 @@ var Dimwhit = (function () {
 
       // TOGGLE CLIPBOARD CONTROL PANEL
       ccpToggle: function () {
-        console.log('toggleCCP -- ');
         // Toggle class 'active' to ccp
         document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
 
@@ -559,7 +514,6 @@ var Dimwhit = (function () {
         // document.getElementById('img-max-width').style.display = 'none';
 
         if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
-          console.log('true');
           UIController.accessCcpElements();
         }
 
@@ -572,7 +526,6 @@ var Dimwhit = (function () {
     };
   })();
   // var r = UIController.getAppdata();
-  // console.dir(r);
 
   // CALCULATIONS AND INPUT EVALUATION CONTROLLER
   var calcController = (function() {
@@ -615,7 +568,6 @@ var Dimwhit = (function () {
 
       // calcController: ASPECT RATIO
       getAspectRatio: function (var1, var2) {
-        // console.log('getAspectRatio running...');
         var aspectReal = (var1 / var2);
         var aspectInt = function() {
           //get the aspect ratio by getting the gcd (greatest common denominator) and dividing W and H by it
@@ -643,9 +595,7 @@ var Dimwhit = (function () {
 
       // calcController: GET FILENAME FROM SRC ATTRIBUTE OF IMG FILE
       getFilenameFromSource: function (source) {
-        // console.log('getFilenameFromSource running...');
         if (source) {
-          // console.log('there is a source');
           var path = source.split('/');
           return  path[path.length - 1];
         } else {
@@ -667,7 +617,6 @@ var Dimwhit = (function () {
         switch (true) {
         // !VA Handle the viewer width toolButton input
         case (prop === 'viewerW') :
-          // console.log('CASE 1: viewer width toolButton input');
           if (val < data.imgW ) {
             // !VA The viewer width can't be smaller than the current image width of XXX, show message
             console.log('TODO: errorHandler: viewerW cannot be smaller than imgW');
@@ -682,7 +631,6 @@ var Dimwhit = (function () {
         // !VA Handle the custom width toolButton input
         case (prop === 'imgW') :
         // !VA TODO: restore the placeholder value on blur
-          // console.log('CASE 2: custom width toolButton input');
           // !VA If the new image width is greater than the viewer width, then show message. This is a temporary fix, the errorHandler should reset the field value to ''.
           if (val > data.viewerW ) {
             // !VA errorHandler!
@@ -700,7 +648,6 @@ var Dimwhit = (function () {
           break;
         // !VA Handle the custom height toolButton input
         case (prop ==='imgH') :
-          // console.log('CASE 3: custom height toolButton input');
           // !VA Write the user input for imgH to the data, which is the local copy of Appdata
           data = UIController.updateAppData(prop, val);
           // !VA TODO: restore the placeholder value on blur
@@ -709,9 +656,7 @@ var Dimwhit = (function () {
           data = UIController.updateAppData('imgW', val);
           break;
         case (prop ==='sPhoneW') :
-          // console.log('CASE 3: custom height toolButton input');
           // !VA Write the user input for imgH to the data, which is the local copy of Appdata
-          console.log('prop is: ' + prop);
           debugger;
           data = UIController.updateAppData(prop, val);
           // !VA TODO: restore the placeholder value on blur
@@ -720,9 +665,7 @@ var Dimwhit = (function () {
           // data = UIController.updateAppData('imgW', val);
           break;
         case (prop ==='lPhoneW') :
-          // console.log('CASE 3: custom height toolButton input');
           // !VA Write the user input for imgH to the data, which is the local copy of Appdata
-          console.log('prop is: ' + prop);
           data = UIController.updateAppData(prop, val);
           // !VA TODO: restore the placeholder value on blur
           // val = Math.round((calcController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgH);
@@ -736,7 +679,6 @@ var Dimwhit = (function () {
 
       // // calcController: HANDLES MOUSECLICKS FROM TOOLBUTTONS
       handleTBClicks: function(id, val) {
-        console.log('handleTBClicks --');
         // !VA Put getAspectRatio in a variable
         var aspect;
         var imgWNew;
@@ -791,12 +733,10 @@ var Dimwhit = (function () {
           // !VA viewerH is set in initapp, so no change to that here either.
           // !VA We don't need to adjust height...but maybe we do for consistency's sake
           this.adjustContainerHeights(Appdata);
-          // console.log('CASE 1');
           break;
 
         // The image is wider than the current viewer width but shorter than current viewer height, so resize the image based on the viewer width
         case (Appdata.imgNW > Appdata.viewerW) && (Appdata.imgNH < Appdata.viewerH) :
-          // console.log('CASE 2');
           // Set the image width to the current viewer
           Appdata.imgW = Appdata.viewerW;
           // Get the image height from the aspect ration function
@@ -804,13 +744,11 @@ var Dimwhit = (function () {
           // Set the viewerH to the imgH
           Appdata.viewerH = Appdata.imgH;
           this.adjustContainerHeights(Appdata);
-          // console.log('CASE 2');
           break;
 
         // The image is not as wide as the current viewer width, but is taller than the viewer height. Keep the image width but resize the viewer in order to display the full image height
         // !VA This might be a problem with consecutive images without page refresh
         case (Appdata.imgNW <= Appdata.viewerW) && (Appdata.imgNH > Appdata.viewerH) :
-          // console.log('CASE 3');
           // Set the viewer height and the image height to the image natural height
           Appdata.viewerH = Appdata.imgH = Appdata.imgNH;
           // Set the image width to the natural image width
@@ -819,13 +757,11 @@ var Dimwhit = (function () {
           // !VA  Use adjustContainerHeights to get the Appdata height
           // !VA  Note the dependency with initAppdata, see 'Dependency with adjustContainerHeights'
           this.adjustContainerHeights(Appdata);
-          // console.log('CASE 3');
           break;
 
         // The image is wider and taller than the current viewer height and width so we have to resize the image and the viewport based on the current viewport width
         case (Appdata.imgNW > Appdata.viewerW) && (Appdata.imgNH > Appdata.viewerH) :
           // Set the image Width to the current  viewer width 
-          // console.log('Case 4: Appdata.viewerW is: ' + Appdata.viewerW );
           Appdata.imgW = Appdata.viewerW;
           // Set the image height proportional to the new image width using the aspect ratio function
           Appdata.imgH = Math.round((1/this.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[0]) * Appdata.imgW);
@@ -833,7 +769,6 @@ var Dimwhit = (function () {
           Appdata.viewerH = Appdata.imgH;
           // Get the viewport and Appdata height from adjustContainerHeights
           this.adjustContainerHeights(Appdata);
-          // console.log('CASE 4');
           // !VA TODO: Check this out, doesn't seem to be a problem anymore: BUG Problem with the 800X550, 800X600 -- no top/bottom gutter on viewport
           break;
         }
@@ -849,8 +784,6 @@ var Dimwhit = (function () {
         // !VA Initial height is 450, which is set in the init function, not in Appdata,or as it was V1, in the Appobj.
         var initViewerH= 450;
         var heightVal = Appdata.imgH;
-        // console.log('heightVal is: ' + heightVal);
-        // console.log('adjustContainerHeights Appdata is: ');
         let viewerH;
         let viewportH;
         let appContainerH; 
@@ -872,10 +805,8 @@ var Dimwhit = (function () {
         appContainerH = viewportH;
         // This should write the heights to Appdata and then pass it to the function that writes Appdata to the dimViewers, probably called refreshDimViewers. In fact, there's no reason not to consolidate that function with the function that updates the image container heights and refresh the entire UI at the same time, so refreshUI.
         Appdata.viewerH = viewerH;
-        // console.log('Appdata.viewerH is now: ' + Appdata.viewerH);
         Appdata.viewportH = viewportH;
         Appdata.appH = appContainerH;
-        // console.log('adjustContainerHeights: Appdata is...');
         UIController.refreshAppUI(Appdata);
       },
 
@@ -940,12 +871,8 @@ var Dimwhit = (function () {
       // calcController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
       ccpIfNoUserInput: function(att, val) {
         // !VA We need get the filename from Appdata in case the user leaves 'path' empty
-        console.log('att is: ' + att);
-        console.log('val is: ' + val);
         var data = UIController.accessAppdata();
         var str;
-        // console.log('att is: ' + att);
-        // console.log('val is: ' + val);
         // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
         if (val && att) {
           str = `${att}="${val}" `;
@@ -958,7 +885,6 @@ var Dimwhit = (function () {
             str = '';
           }
         }
-      console.log('str is: ' + str);
         return str;
 
       },
@@ -987,7 +913,6 @@ var Dimwhit = (function () {
           // !VA If the path input element is empty, just include the filename and omit the path.
           if (document.querySelector(id).value) {
             str = `src="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" `;
-            console.log('str here is: ' + str);
           } else {
             str = `src="${data.filename}" `;
           }
@@ -1076,7 +1001,6 @@ var Dimwhit = (function () {
         //I think since it is a div the default event would be for some browsers to 
         //open the file in the browser when dropped
         evt.preventDefault();
-        //console.log('dragging over');
         evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
         console.log('Calling HandleFileSelect');
       }
@@ -1111,7 +1035,6 @@ var Dimwhit = (function () {
       for (let i = 0; i < tbClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         tbClickables[i] = document.querySelector(tbClickables[i]);
-        // console.log(tbClickables[i]);
         addEventHandler(tbClickables[i],'click',handleUserAction,false);
 
       }
@@ -1121,7 +1044,6 @@ var Dimwhit = (function () {
       for (let i = 0; i < tbKeypresses.length; i++) {
         // !VA convert the ID string to the object inside the loop
         tbKeypresses[i] = document.querySelector(tbKeypresses[i]);
-        // console.log(tbKeypresses[i]);
         addEventHandler((tbKeypresses[i]),'keypress',handleUserAction,false);
         addEventHandler((tbKeypresses[i]),'focus',handleUserAction,false);
         addEventHandler(tbKeypresses[i],'blur',handleUserAction,false);
@@ -1134,37 +1056,8 @@ var Dimwhit = (function () {
       for (let i = 0; i < dvClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         dvClickables[i] = document.querySelector(dvClickables[i]);
-        // console.log(dvClickables[i]);
         addEventHandler((dvClickables[i]),'click',handleUserAction,false);
       }
-
-
-
-
-      // !VA Add click handlers for ccp user input items - there's only the include styles checkbox now but there could be more. 
-      // var ccpClickables = [ '#img-include-css-checkbox' ];
-      // for (let i = 0; i < ccpClickables.length; i++) {
-      //   // !VA convert the ID string to the object inside the loop
-      //   ccpClickables[i] = document.querySelector(ccpClickables[i]);
-      //   console.log(dvClickables[i]);
-      //   addEventHandler((ccpClickables[i]),'click',handleUserAction,false);
-      // }
-
-    
-
-
-      // var ccpOnChange = 
-            // Change handlers - handleOnChange
-      // =================================
-      // addEventHandler(ccpUserInput.imgWidth,'change',handleOnChange,false);
-      // addEventHandler(ccpUserInput.tableWidth,'change',handleOnChange,false);
-
-
-
-
-
-      // addEventHandler(document.getElementById('tb-input-viewerw'),'focus',doit,false);
-
 
       // !VA Need to decide whether to handle all events here or route actions directly from the event handler. For now...
       // HANDLE USER ACTION 
@@ -1175,13 +1068,10 @@ var Dimwhit = (function () {
         var el;
         // !VA Put the event trigger in an object first, so we don't have to keep calling document.getElementById
         el = document.getElementById(this.id);
-        console.log('handle user action here.');
         if (event.type === 'click') {
-          // !VA If the id contains 'tb' then we're dealing with toolButtons buttons.
+          // !VA If the id contains 'tb' then we're dealing with toolButtons buttons - the first two chars of the ID indicate the element category
           switch (true) {
           case ( el.id.includes('tb')) :
-            // console.log('handleUserAction - tbclicks');
-            // console.log('el.id is: ' + el.id);
             var val;
             // !VA The last 2 chars of the id indicate the value by which the img dimension should be incremented,so get the last 2 chars and convert to integer
             val = parseInt(el.id.slice(-2));
@@ -1190,7 +1080,6 @@ var Dimwhit = (function () {
             calcController.handleTBClicks(el.id, val); 
             break;
           case ( el.id.includes('dv')) :
-            console.log('includes dv');
             UIController.ccpToggle();
             break;
           } 
@@ -1216,11 +1105,9 @@ var Dimwhit = (function () {
           el.value = ''; 
           // !VA NOW!
         } else if ( event.type === 'blur') {
-          // console.log('blur');
           // !VA If the target is viewerW, we want to restore the previous value to the field on blur in case of error or in case it is exited without entering a value with the return key. If the target is customW or customH, we want to restore the placeholder value.
           // !VA TODO: create function to restore placeholder value
           el.value = (function () {
-            console.log('Handling blur');
             // !VA If the current element is custom height or custom width, set the value of the field to empty to display the placeholder  
             if ((el.id.includes('customw') || (el.id.includes('customh')))) {
               return '';
@@ -1238,10 +1125,8 @@ var Dimwhit = (function () {
             // e.preventDefault;
           })();
         } else if ( event.type === 'drop') {
-          // console.log(event.type + ': ' + this.id);
           // e.preventDefault;
         } else if ( event.type === 'dragover') {
-          // console.log(event.type + ': ' + this.id);
           // e.preventDefault;
         } 
         else {
@@ -1295,8 +1180,6 @@ var Dimwhit = (function () {
     // ==============================
     var errorHandler = function(id, str) {
       // !VA Error handler
-      // console.log('id is: ' + id);
-      // console.log('str is: ' + str);
       switch (true) {
       case (str === 'imgH_GT_viewerW') :
         console.log('errorHandler: imgH cannot be larger than viewerW of XXX');
@@ -1325,9 +1208,6 @@ var Dimwhit = (function () {
     var initializeDevMode = function() {
 
       window.addEventListener('load', function() {
-        console.log('All assets are loaded')
-
-
         // !VA TODO: Dev mode doesn't work any more...
         console.log('initializeDevMode running...');
           
@@ -1339,7 +1219,6 @@ var Dimwhit = (function () {
         document.querySelector(toolButtons.viewerW).placeholder = initViewerW;
         // !VA  Test if there is currently #cur-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
         var curImgExists = document.querySelector(dynamicRegions.curImg);
-        // console.log('curImgExists is: ' + curImgExists);
         // !VA  Now we have to populate Appdata with data. We can do it manually here and just pass the object on to refresh the screen elements.
         // !VA If there's no current image, then return false. This is the flag to the initializeDOM function that there is no DEV image in the HTML. The init then shows the drop area and 'No Image' in the dimViewers.
 
@@ -1391,7 +1270,6 @@ var Dimwhit = (function () {
         setupEventListeners();
         // !VA  Test if there is currently #cur-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
         var curImgExists = document.querySelector(dynamicRegions.curImg);
-        // console.log('curImgExists is: ' + curImgExists);
         if (curImgExists) {
           initializeDevMode();
         } else {
