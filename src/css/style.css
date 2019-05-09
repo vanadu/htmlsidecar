@@ -1501,38 +1501,6 @@ output {
     border: 1px solid #616161;
     background: #000000;
     color: #FFFFFF; }
-  #ccp-content .custom-checkbox {
-    position: relative; }
-  #ccp-content .img-include-css input {
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 15px;
-    width: 50px;
-    /* Expand the checkbox so that it covers */
-    z-index: 1;
-    /* the label and span, increase z-index to bring it over */
-    opacity: 0;
-    /* the label and set opacity to 0 to hide it. */ }
-  #ccp-content .img-include-css input + label {
-    position: relative;
-    left: 0;
-    top: 0;
-    padding-left: 25px;
-    color: black; }
-  #ccp-content #img-include-css-checkbox input[type=checkbox] {
-    width: 80px;
-    margin-bottom: 5px;
-    padding-right: 2px;
-    text-align: right;
-    visibility: hidden; }
-  #ccp-content #img-include-css-label {
-    width: 160px;
-    text-align: left; }
-  #ccp-content .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none; }
   #ccp-content fieldset {
     width: 100%;
     margin-bottom: 5px;
@@ -1551,12 +1519,74 @@ output {
         width: 120px; }
       #ccp-content fieldset .ccp-options .ccp-options-col-2 {
         left: 120px;
-        width: 260px; }
+        width: 260px;
+        /* Customize the checkbox label (the container) */
+        /* Hide the browser's default checkbox */
+        /* Create a custom checkbox */
+        /* On mouse-over, add a grey background color */
+        /* When the checkbox is checked, add a blue background */
+        /* Create the checkmrk/indicator (hidden when not checked) */
+        /* Show the checkmrk when checked */
+        /* Style the checkmrk/indicator */ }
         #ccp-content fieldset .ccp-options .ccp-options-col-2 label {
           width: 80px;
           margin-bottom: 5px;
           padding-right: 2px;
           text-align: right; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 #img-include-css {
+          z-index: -1; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container {
+          width: 100%;
+          display: block;
+          position: relative;
+          padding-left: 35px;
+          margin-bottom: 3px;
+          cursor: pointer;
+          text-align: left;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+          z-index: 100; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container input {
+          position: absolute;
+          opacity: 0;
+          cursor: pointer;
+          height: 0;
+          width: 0; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 #img-include-css-checkmrk {
+          position: absolute;
+          top: 5px;
+          left: 50px;
+          height: 15px;
+          width: 15px;
+          background-color: #eee;
+          display: block;
+          z-index: 100; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container:hover input ~ #img-include-css-checkmrk {
+          background-color: #ccc; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container input:checked ~ #img-include-css-checkmrk {
+          background-color: #5f5e5e; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 #img-include-css-checkmrk:after {
+          content: "";
+          position: absolute;
+          display: none; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container input:checked ~ #img-include-css-checkmrk:after {
+          display: block; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container #img-include-css-checkmrk:after {
+          left: 5px;
+          top: 2px;
+          width: 5px;
+          height: 10px;
+          border: solid white;
+          border-width: 0 3px 3px 0;
+          -webkit-transform: rotate(45deg);
+          -ms-transform: rotate(45deg);
+          transform: rotate(45deg); }
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 #img-include-css-label {
+          width: 220px;
+          padding-left: 44px;
+          text-align: left; }
       #ccp-content fieldset .ccp-options .ccp-options-col-3 {
         left: 390px;
         width: 220px; }

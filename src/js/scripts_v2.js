@@ -25,6 +25,18 @@ then, globally, dim-viewer to dv
 // Namespace
 var Dimwhit = (function () {
 
+  // !VA DEV Test function to get the clicked element to the console
+  // (function () {
+  //   document.addEventListener('click', function(e) {
+  //     e = e || window.event;
+  //     var target = e.target || e.srcElement,
+  //       text = target.textContent || target.innerText;   
+  //     console.log('Get the clicked element: ' + e);
+  //     console.log(e.target);
+  //   }, false);
+  // })();
+
+
   var UIController = (function() {
 
     // !VA This is where Appdata should be initialized
@@ -83,6 +95,7 @@ var Dimwhit = (function () {
       imgAnchor: '#img-anchor-checkbox',
       imgAlt: '#img-alt-input',
       // !VA This isn't even a thing... probably delete it 04.28.19
+      imgIncludeStyles: '#img-include-css-checkmrk',
       imgAlign: '#img-align-select',
       imgRelPath: '#img-relpath-input',
       tdClass: '#td-class-input',
@@ -114,6 +127,39 @@ var Dimwhit = (function () {
       tableAlign: '',
       tableWidth: ''
     };
+
+    // !VA This tests whether the CCP is open, allowing us to access CCP elements if it is. It's also where we open the CCP by default for development and testing. 
+    (function () {
+
+      // !VA Remove this line to stop opening the CCP by default
+      document.querySelector(staticRegions.ccpContainer).classList.add('active');
+
+      // !VA If the CCP is open...
+      if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
+        console.log('true');
+        console.log('CCP is open');
+        
+        // !VA CCP Event Listeners -- we will handle CCP events separately from other UI events here to keep separation of dynamic vs static element handling
+        // !VA Handle the checkbox
+        var checkmrk = document.querySelector(ccpUserInput.imgIncludeStyles);
+        // !VA Toggle the checkbox
+        checkmrk.addEventListener('click', toggleCheckbox, false);
+        // checkmark.addEventListener('click', function(this.) {checkbox.checked ? checkbox.checked = false : checkbox.checked = true;}, false);
+      }
+    })();
+    
+    function testme() {
+      console.log('TESTED!');
+    }
+
+    function toggleCheckbox(target) {
+      // We want this to run for all custom CSS checkboxes used in this project -- but the CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
+      // !VA The clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it.
+      var str = target.target.id.replace('mrk', 'box');
+      var checkbox = document.getElementById(str);
+      // var checkmark = document.querySelector('#img-include-css-checkmark');
+      checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
+    }
 
     // Clipboard output for build html image button
     new Clipboard(staticRegions.ccpImgClipbboardBut, {
@@ -322,6 +368,7 @@ var Dimwhit = (function () {
       },
       //FILEREADER OBJECT PROCESSING END
 
+      // UIController: UPDATE APP DATA
       updateAppData: function (prop, val) {
         val = parseInt(val); 
         // !VA !IMPORTANT! THis is HUGE!
@@ -349,6 +396,13 @@ var Dimwhit = (function () {
         // console.log('accessAppdata -- ');
         // console.dir(Appdata);
         return Appdata;
+      },
+
+      // UIController: 
+      accessCcpElements: function(){
+        // !VA This is where we have to add event listeners for 
+
+
       },
 
       // UIController: initialize AppData, this should probably be renamed to such
@@ -499,13 +553,19 @@ var Dimwhit = (function () {
 
         // !VA Displaying all the programmatically-populated options here for now
         // !VA What this does is populate the CCP fields for imgW and viewerW with data from Appdata. Then, more options are added to the CCP based on the selections in the dropdown fields. That functionality is in handleOnChange in V1, but we're not ready for that yet.
-        var tableMaxWidth = `'<option>${Appdata.viewerW}</option><option>100%</option>'`;
-        document.getElementById('table-width-select').innerHTML = tableMaxWidth;
-        document.getElementById('table-max-width').style.display = 'none';
+        // var tableMaxWidth = `'<option>${Appdata.viewerW}</option><option>100%</option>'`;
+        // document.getElementById('table-width-select').innerHTML = tableMaxWidth;
+        // document.getElementById('table-max-width').style.display = 'none';
 
-        var imgMaxWidth = `'<option>${Appdata.imgW}</option><option>100%</option>'`;
-        document.getElementById('img-width-select').innerHTML = imgMaxWidth;
-        document.getElementById('img-max-width').style.display = 'none';
+        // var imgMaxWidth = `'<option>${Appdata.imgW}</option><option>100%</option>'`;
+        // document.getElementById('img-width-select').innerHTML = imgMaxWidth;
+        // document.getElementById('img-max-width').style.display = 'none';
+
+        if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
+          console.log('true');
+          UIController.accessCcpElements();
+        }
+
       }
 
 
@@ -516,9 +576,6 @@ var Dimwhit = (function () {
   })();
   // var r = UIController.getAppdata();
   // console.dir(r);
-
-
-
 
   // CALCULATIONS AND INPUT EVALUATION CONTROLLER
   var calcController = (function() {
@@ -541,6 +598,13 @@ var Dimwhit = (function () {
     }
 
     return {
+
+      // TESTING FUNCTION
+      calcControllerTest: function() {
+        console.log('calController test');
+      },
+
+
       //STRING FUNCTIONS
       // !VA Convert integer to pixel for style properties
       // calcController: CONVERT INTEGER TO PIXEL VALUE
@@ -905,6 +969,10 @@ var Dimwhit = (function () {
         console.log('ccpGetUserInput data is  -- : ');
         console.dir(data);
 
+
+
+
+
         // !VA Create the instance for img tag clipboard object and add img-specific properties.
         // !VA We're doing this in an object and outputting to an array because the object is easier to manage and the array is easier to reorder. The Constructor is in this module in the private functions above.
         var imgTag = new ClipboardOutput('imgTag');
@@ -1057,6 +1125,20 @@ var Dimwhit = (function () {
       }
 
 
+
+
+      // !VA Add click handlers for ccp user input items - there's only the include styles checkbox now but there could be more. 
+      // var ccpClickables = [ '#img-include-css-checkbox' ];
+      // for (let i = 0; i < ccpClickables.length; i++) {
+      //   // !VA convert the ID string to the object inside the loop
+      //   ccpClickables[i] = document.querySelector(ccpClickables[i]);
+      //   console.log(dvClickables[i]);
+      //   addEventHandler((ccpClickables[i]),'click',handleUserAction,false);
+      // }
+
+    
+
+
       // var ccpOnChange = 
             // Change handlers - handleOnChange
       // =================================
@@ -1097,7 +1179,6 @@ var Dimwhit = (function () {
             console.log('includes dv');
             UIController.ccpToggle();
             break;
-            
           } 
 
         } else if (event.type === 'keypress') {
@@ -1271,7 +1352,7 @@ var Dimwhit = (function () {
         var evalViewerSize = calcController.evalViewerSize(Appdata);
 
         // !VA Open the CCP by default in dev mode
-        document.querySelector(staticRegions.ccpContainer).classList.add('active');
+        // document.querySelector(staticRegions.ccpContainer).classList.add('active');
 
       });
     };

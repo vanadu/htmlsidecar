@@ -3,31 +3,85 @@
 <head>
   <meta charset="utf-8">
   <title>DimWHIT.IO</title>
-
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,400italic,600,800|Source+Code+Pro" rel="stylesheet">
+  <link rel="stylesheet" media="all" href="css/style.css">
   <!--[if lt IE 9]>
   <script src="http://html5shim.googlecode.com/svn/trunk/html5-els.js"></script>
   <![endif]-->
 <style>
-  #cont {
-    position: absolute;
-    top: 50px;
-    right: 20px;
-    border: 1px solid red;
-    width: 200px;
-    height: 500px;
 
-  }
-  .but {
-    width: 200px;
-    height: 50px;
-    position: relative; 
-    display: block;
-    margin-top: 50px;
-  }
+/* Test */
+.container {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 22px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
 
-  .but:hover {
-    background: yellow;
-  }
+/* Hide the browser's default checkbox */
+.container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+}
+
+
+
+/* On mouse-over, add a grey background color */
+.container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.container input:checked ~ .checkmark {
+  background-color: #2196F3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.container .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+
 
 
 </style>
@@ -36,15 +90,11 @@
   <body>
     <div id="cont">
 
-      <button id="ID1" class="but">
-          1
-      </button>
-      <button id="ID2" class="but">
-          2
-      </button>
-      <button id="ID3" class="but">
-          3
-      </button>
+
+      <label class="container">One
+        <input type="checkbox" checked="checked">
+        <span class="checkmark"></span>
+      </label>
 
     </div>
 
