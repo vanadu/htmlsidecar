@@ -161,18 +161,8 @@ var Dimwhit = (function () {
     // Clipboard output for build html image button
     new Clipboard(staticRegions.ccpImgClipbboardBut, {
       text: function(trigger) {
-        var imgClipboardOutput = [];
-        var imgTagArray = calcController.ccpGetImgClipboardOutput();
-        // !VA Get Appdata object, we need this to access the filename for the src property
-        
-        // !VA Build the array from the list of valuese
-        for (let i = 0; i < imgTagArray.length; i++) {
-          imgClipboardOutput.push(imgTagArray[i]);
-        }
-        // !VA Convert the array to a string, removing the comma-separators
-        imgClipboardOutput = imgClipboardOutput.join('');
-        // !VA Output to the clipboard
-        return imgClipboardOutput;
+        var clipboardStr = calcController.ccpGetImgClipboardOutput();
+        return clipboardStr;
       }
     });
 
@@ -180,22 +170,19 @@ var Dimwhit = (function () {
     // Clipboard output for build html image button
     new Clipboard(staticRegions.ccpTdClipbboardBut, {
       text: function(trigger) {
-        console.log('new Clipboard: get td tag');
-        var tdClipboardOutput = [];
-        var tdTagArray = calcController.ccpGetTdClipboardOutput();
-        // !VA Get Appdata object, we need this to access the filename for the src property
-        
-        // !VA Build the array from the list of valuese
-        for (let i = 0; i < tdTagArray.length; i++) {
-          tdClipboardOutput.push(tdTagArray[i]);
-        }
-        // !VA Convert the array to a string, removing the comma-separators
-        tdClipboardOutput = tdClipboardOutput.join('');
-        // !VA Output to the clipboard
-        return tdClipboardOutput;
+        var clipboardStr = calcController.ccpGetTdClipboardOutput();
+        console.log('clibboardStr is: ' + clipboardStr);
+        return clipboardStr;
       }
     });
 
+    // Clipboard output for build html image button
+    new Clipboard(staticRegions.ccpTableClipbboardBut, {
+      text: function(trigger) {
+        var clipboardStr = calcController.ccpGetTableClipboardOutput();
+        return clipboardStr;
+      }
+    });
 
 
 
@@ -889,7 +876,7 @@ var Dimwhit = (function () {
 
       },
 
-      // calcController: GET STRINGS FOR THE CLIPBOARD OUTPUT
+      // calcController: GET STRINGS FOR THE IMG CLIPBOARD OUTPUT
       ccpGetImgClipboardOutput: function() {
         // !VA Get Appdata - we need it for the filename
         var data = UIController.accessAppdata();
@@ -953,7 +940,7 @@ var Dimwhit = (function () {
         })(ccpUserInput.imgAlign);
         // !VA imgTag Object END ------------------------
 
-        // !VA Now build the array with the object properties above in the correct order for clipboard output
+        // !VA Now build the array with the object properties above in the correct order for clipboard output. This lets us easily reorder the individual items in the clipboard tag output.
         // !VA imgTagArray
         // !VA ----------------------------------
         var imgTagArray = [];
@@ -967,9 +954,162 @@ var Dimwhit = (function () {
         imgTagArray[7] = imgTag.styleAtt;
         imgTagArray[8] = imgTag.closeTag;
         // !VA ------------------------------------
-        // !VA Return the ordered array of imgTag clipboard strings
-        return imgTagArray;
+
+
+        // !VA Pass the imgTagArray and return it as string
+        return calcController.buildTagFromArray(imgTagArray);
+      }, 
+      
+      // calcController: GET STRINGS FOR THE TD CLIPBOARD OUTPUT
+      ccpGetTdClipboardOutput: function () {
+        // !VA We don't need this yet, but we will if we decide to add a width style property which is useful for Outlook 120dpi 
+        // var data = UIController.accessAppdata();
+
+        var tdTag = new ClipboardOutput('tdTag');
+        tdTag.openTag = '<td ';
+        tdTag.classAtt = 
+          // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
+          calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tdClass).value);
+
+        tdTag.alignAtt = (function (id) {
+          // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
+          // !VA Pass in the id of the select dropdown
+          var str;
+          // !VA Get the selection index
+          var selInd = document.querySelector(id).selectedIndex;
+          // !VA Put the available options in an array
+          var tdAlignOptions = [ 'none', 'left', 'center', 'right' ];
+          // !VA Put the desired output strings in an array
+          var clipboardOutput = [ '', 'align="left" ', 'align="center" ', 'align="right" '];
+          // !VA If the selected index matches the index of the available options array, then output the string that matches that index
+          for (let i = 0; i < tdAlignOptions.length; i++) {
+            if ( selInd === i) {
+              str = `${clipboardOutput[i]}`;
+            }
+          }
+          return str;
+        })(ccpUserInput.tdAlign);
+        // !VA tdAlign END
+
+        tdTag.valignAtt = (function (id) {
+          // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
+          // !VA Pass in the id of the select dropdown
+          var str;
+          // !VA Get the selection index
+          var selInd = document.querySelector(id).selectedIndex;
+          // !VA Put the available options in an array
+          var tdValignOptions = [ 'none', 'top', 'middle', 'bottom' ];
+          // !VA Put the desired output strings in an array
+          var clipboardOutput = [ '', 'valign="top"', 'valign="middle" ', 'valign="bottom" '];
+          // !VA If the selected index matches the index of the available options array, then output the string that matches that index
+          for (let i = 0; i < tdValignOptions.length; i++) {
+            if ( selInd === i) {
+              str = `${clipboardOutput[i]}`;
+            }
+          }
+          return str;
+        })(ccpUserInput.tdValign);
+        // !VA tdValign END
+
+        tdTag.tdContents =    (function () {
+          var str = calcController.ccpGetImgClipboardOutput();
+          return str;
+        })();
+
+        tdTag.closeTag = '</td>';    
+        // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
+        calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tdClass).value);
+
+        // !VA If there's no value in any of the fields, make tdTag.openTag a complete tag by including the > on it. If there is a value in any of the fields, put the closing > on tdTag.tdValign.
+        if (!tdTag.alignAtt && !tdTag.valignAtt && !tdTag.classAtt ) {
+          tdTag.openTag = '<td>';
+        } else {
+          tdTag.valignAtt = tdTag.valignAtt + '>';
+        }
+
+
+        var tdTagArray = [];
+        tdTagArray[0] = tdTag.openTag;
+        tdTagArray[1] = tdTag.classAtt;
+        tdTagArray[2] = tdTag.alignAtt;
+        tdTagArray[3] = tdTag.valignAtt;
+        tdTagArray[4] = tdTag.tdContents;
+        tdTagArray[5] = tdTag.closeTag;
+        return calcController.buildTagFromArray(tdTagArray);
+      }, 
+
+      // calcController: GET STRINGS FOR THE TABLE CLIPBOARD OUTPUT
+      ccpGetTableClipboardOutput: function () {
+        // !VA We don't need this yet, but we will if we decide to add a width style property which is useful for Outlook 120dpi 
+        // var data = UIController.accessAppdata();
+
+        var tableTag = new ClipboardOutput('tableTag');
+        tableTag.openTag = '<table ';
+        tableTag.classAtt = 
+          // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
+          calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tableClass).value);
+
+
+        tableTag.alignAtt = (function (id) {
+          // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
+          // !VA Pass in the id of the select dropdown
+          var str;
+          // !VA Get the selection index
+          var selInd = document.querySelector(id).selectedIndex;
+          // !VA Put the available options in an array
+          var tableAlignOptions = [ 'none', 'left', 'center', 'right' ];
+          // !VA Put the desired output strings in an array
+          var clipboardOutput = [ '', 'align="left"', 'align="center"', 'align="right"'];
+          // !VA If the selected index matches the index of the available options array, then output the string that matches that index
+          for (let i = 0; i < tableAlignOptions.length; i++) {
+            if ( selInd === i) {
+              str = `${clipboardOutput[i]}`;
+            }
+          }
+          return str;
+        })(ccpUserInput.tableAlign);
+        // !VA tableAlign END
+
+        tableTag.tableContents =    (function () {
+          var str = calcController.ccpGetTdClipboardOutput();
+          console.log('str is: ' + str);
+          return str;
+        })();
+        tableTag.closeTag = '</table> ';    
+
+
+        // !VA If there's no value in any of the fields, make tableTag.openTag a complete tag by including the > on it. If there is a value in any of the fields, put the closing > on tableTag.alignAtt.
+        if (!tableTag.alignAtt && !tableTag.classAtt) {
+          tableTag.openTag = '<table>';
+        } else {
+          tableTag.alignAtt = tableTag.alignAtt + '>';
+        }
+
+
+
+        var tableTagArray = [];
+        tableTagArray[0] = tableTag.openTag;
+        tableTagArray[1] = tableTag.classAtt;
+        tableTagArray[2] = tableTag.alignAtt;
+        tableTagArray[3] = tableTag.tableContents;
+        tableTagArray[4] = tableTag.closeTag;
+        return calcController.buildTagFromArray(tableTagArray);
+      }, 
+
+
+      buildTagFromArray: function(array) {
+        // !VA Build the array from the list of values
+        console.dir(array);
+        var clipboardOutput = [];
+        var clipboardStr;
+        // !VA Loop through the list of tag strings and build the array to join. 
+        for (let i = 0; i < array.length; i++) {
+          clipboardOutput.push(array[i]);
+        }
+        // !VA Convert the array to a string, removing the comma-separators
+        return  clipboardOutput.join('');
       }
+
 
     };
   })();
