@@ -132,7 +132,17 @@ var Dimwhit = (function () {
       tableWidth: ''
     };
 
-    
+    // !VA ccpBuildTag ID Strings
+    // Stores the ccpMakeTag object for assembling the clipboard create tag buttons
+    // !VA V2 Also doesn't belong here, we will move it later.
+    var ccpBuildTag = {
+      imgBuildHTMLBut: '',
+      imgBuildCSSBut: '#img-build-css-but',
+      smallPhonesBuildCSSBut: '#sphones-build-css-but',
+      largePhonesBuildCSSBut: '#lphones-build-css-but'
+    };
+
+
     // !VA This tests whether the CCP is open, allowing us to access CCP elements if it is. It's also where we open the CCP by default for development and testing. 
     (function () {
 
@@ -149,6 +159,7 @@ var Dimwhit = (function () {
         // checkmark.addEventListener('click', function(this.) {checkbox.checked ? checkbox.checked = false : checkbox.checked = true;}, false);
       }
     })();
+
     
     // !VA UIController: Test function
     function testme() {
@@ -191,6 +202,14 @@ var Dimwhit = (function () {
       }
     });
 
+    // Clipboard output for build html image button
+    new Clipboard(ccpBuildTag.imgBuildCSSBut, {
+      text: function(trigger) {
+        var clipboardStr = calcController.ccpGetImgCSSClipboardOutput();
+        return clipboardStr;
+      }
+    });
+
 
     // !VA UIController: Functions that get returned from the UIContoller object go here
     return {
@@ -213,9 +232,9 @@ var Dimwhit = (function () {
       getCcpUserInputIDs: function() {
         return ccpUserInput;
       },
-      // getCcpBuildTagIDs: function() {
-      //   return ccpBuildTag;
-      // },
+      getCcpBuildTagIDs: function() {
+        return ccpBuildTag;
+      },
 
       // UIController: FILEREADER OBJECT PROCESSING
       //Get the user-selected image file object 
@@ -480,20 +499,10 @@ var Dimwhit = (function () {
 
       // // TOGGLE CLIPBOARD CONTROL PANEL
       ccpToggle: function () {
-      
-
-
-        // !VA What this does is populate the CCP fields for imgW and viewerW with data from Appdata. Then, more options are added to the CCP based on the selections in the dropdown fields. That functionality is in handleOnChange in V1, but we're not ready for that yet.
-
-
         document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
-
         if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
           UIController.initCCP();
         }
-
-
-
       },
 
       // !VA UIController: Init function for CCP
@@ -504,7 +513,7 @@ var Dimwhit = (function () {
 
 
         // !VA Displaying all the programmatically-populated options here for now
-        // !VA Set the value of the first dropdown in ccpUserInput.tableWidth
+        // !VA Set the value of the dropdown in ccpUserInput.tableWidth
         var twidth = document.querySelector(ccpUserInput.tableWidth);
         twidth.options[0].innerHTML = 'none';
         twidth.options[1].innerHTML = data.imgW;
@@ -520,7 +529,38 @@ var Dimwhit = (function () {
         // document.getElementById('img-width-select').innerHTML = imgMaxWidth;
         // document.getElementById('img-max-width').style.display = 'none'; 
 
+      },
+
+
+      // UIController Show element when input in another element is made 
+      showElementOnInput: function(event) {
+        // !VA Here we catch the input handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
+        var elems = [];
+        // elems[0] = ccpBuildTag.imgBuildCSSBut;
+
+        elems[0] = document.querySelector(ccpBuildTag.imgBuildCSSBut);
+        elems[1] = document.querySelector(ccpBuildTag.smallPhonesBuildCSSBut);
+        elems[2] = document.querySelector(ccpBuildTag.largePhonesBuildCSSBut);
+
+        console.log('showElementOnInput -- ');
+        console.log('this is: ' + this);
+        console.log('this.id is: ' + this.id);
+
+        console.log('this.value is: ' + this.value);
+
+        for (let i = 0; i < elems.length; i++) {
+          console.log(elems[i]);
+          this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
+          
+
+        }
+
+
+
       }
+
+
+
     };
   })();
   // var r = UIController.getAppdata();
@@ -1111,20 +1151,28 @@ ${tableTag.tableContents}
 </table>`;
 
         return clipboardStr;
+      },
+
+      ccpGetImgCSSClipboardOutput: function() {
+        // !VA Get Appdata to local variable
+        var data = UIController.accessAppdata();
+        // !VA The string to pass the CSS declaration to the clipboard object
+        var clipboardStr;
+        // !VA Clipboard output object 
+        var imgCSSTag = new ClipboardOutput('imgCSSTag');
+        // !VA Put the user-entered class into this property
+        imgCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
+
+        // !VA Build the css class declaration with width and height properties
+        clipboardStr = `img.${imgCSSTag.classAtt} { width: ${data.imgW}px !important; height: ${data.imgH}px !important }`;
+        // !VA Return the css string to the clipboard object.
+        return clipboardStr;
+
       }, 
 
 
-      buildTagFromArray: function(array) {
-        // !VA Build the array from the list of values
-        var clipboardOutput = [];
-        var clipboardStr;
-        // !VA Loop through the list of tag strings and build the array to join. 
-        for (let i = 0; i < array.length; i++) {
-          clipboardOutput.push(array[i]);
-        }
-        // !VA Convert the array to a string, removing the comma-separators
-        return  clipboardOutput.join('');
-      }
+
+
 
 
     };
@@ -1173,8 +1221,7 @@ ${tableTag.tableContents}
       // dropZone.addEventListener('drop', startNewDrop, false);
       // Drag and Drop Listener 
       //DRAG AND DROP PROCESSING END
-      
-      
+
       // !VA This was in the old version but it doesn't look necessary
       // function initializeHandlers() {
 
@@ -1208,6 +1255,28 @@ ${tableTag.tableContents}
         addEventHandler(tbKeypresses[i],'dragover',handleUserAction,false);
         addEventHandler(tbKeypresses[i],'drop',handleUserAction,false);
       }
+
+      // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. Currently only the img class input does that.
+      var ioKeypresses = [ ccpUserInput.imgClass, ccpUserInput.tdClass, ccpUserInput.tableClass ];
+      for (let i = 0; i < ioKeypresses.length; i++) {
+        // !VA convert the ID string to the object inside the loop
+        ioKeypresses[i] = document.querySelector(ioKeypresses[i]);
+        addEventHandler((ioKeypresses[i]),'input',UIController.showElementOnInput,false);
+        // addEventHandler((ioKeypresses[i]),'focus',handleUserAction,false);
+        // addEventHandler(ioKeypresses[i],'blur',handleUserAction,false);
+        // addEventHandler(ioKeypresses[i],'dragover',handleUserAction,false);
+        // addEventHandler(ioKeypresses[i],'drop',handleUserAction,false);
+      }
+
+      // addEventHandler(ccpUserInput.imgClass,'keypress',showMobileImageButtons,false);
+      // ccpUserInput.imgAlt.addEventListener('keypress', showMobileImageButtons);
+      // ccpUserInput.imgClass.addEventListener('keypress', showMobileImageButtons);
+      // ccpUserInput.imgRelPath.addEventListener('keypress', showMobileImageButtons);
+
+
+
+
+
 
       // !VA Add click handlers for dimViewer - there's only the clipboard button now but there could be more. 
       var dvClickables = [ dimViewers.clipboardBut ];
@@ -1309,10 +1378,7 @@ ${tableTag.tableContents}
 
       // Keypress handlers - showMobileImageButtons
       // ==================================
-      // addEventHandler(ccpUserInput.imgClass,'keypress',showMobileImageButtons,false);
-      // ccpUserInput.imgAlt.addEventListener('keypress', showMobileImageButtons);
-      // ccpUserInput.imgClass.addEventListener('keypress', showMobileImageButtons);
-      // ccpUserInput.imgRelPath.addEventListener('keypress', showMobileImageButtons);
+
 
       // Keypress handlers - Misc
       // ==================================
