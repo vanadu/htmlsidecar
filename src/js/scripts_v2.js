@@ -1,6 +1,7 @@
 
 /* !VA  
 ===========================================================
+TODO: Implement the CSS clipboard buttons
 TODO: Fix the retina calculations: it should alert if the disk size isn't 2X the display size.
 TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
 
@@ -966,6 +967,12 @@ var Dimwhit = (function () {
         // !VA ------------------------------------
 
 
+        var clipboardStr;
+        clipboardStr = 
+`
+  <img ${imgTag.widthAtt} ${imgTag.heightAtt} ${imgTag.srcAtt} border="0' ${imgTag.styleAtt} />
+`;
+
         // !VA Pass the imgTagArray and return it as string
         return calcController.buildTagFromArray(imgTagArray);
       }, 
@@ -1037,6 +1044,11 @@ var Dimwhit = (function () {
           tdTag.valignAtt = tdTag.valignAtt + '>';
         }
 
+        var clipboardStr = 
+
+`    <td ${tdTag.alignAtt} ${tdTag.valignAtt}>
+      ${tdTag.tdContents}
+    </td>`;
 
         var tdTagArray = [];
         tdTagArray[0] = '\t' + tdTag.openTag;
@@ -1045,7 +1057,7 @@ var Dimwhit = (function () {
         tdTagArray[3] = tdTag.valignAtt + '\n';
         tdTagArray[4] = '\t\t' + tdTag.tdContents  + '\n';
         tdTagArray[5] = '\t' + tdTag.closeTag;
-        return calcController.buildTagFromArray(tdTagArray);
+        return clipboardStr;
       }, 
 
       // calcController: GET STRINGS FOR THE TABLE CLIPBOARD OUTPUT
@@ -1111,23 +1123,16 @@ var Dimwhit = (function () {
         tableTag.closeTag = '</table> ';    
 
 
-        // !VA If there's no value in any of the fields, make tableTag.openTag a complete tag by including the > on it. If there is a value in any of the fields, put the closing > on tableTag.alignAtt.
-        // if (!tableTag.alignAtt && !tableTag.classAtt) {
-        //   tableTag.openTag = '<table>';
-        // } else {
-        //   tableTag.alignAtt = tableTag.alignAtt + '>';
-        // }
 
 
+        var clipboardStr = 
+`<table border="0" cellpadding="0" cellspacing="0" ${tableTag.classAtt} ${tableTag.alignAtt} ${tableTag.widthAtt}>
+  <tr>
+${tableTag.tableContents}
+  </tr>
+</table>`;
 
-        var tableTagArray = [];
-        tableTagArray[0] = tableTag.openTag;
-        tableTagArray[1] = tableTag.classAtt;
-        tableTagArray[2] = tableTag.alignAtt;
-        tableTagArray[3] = tableTag.widthAtt + '>\n<tr>\n';
-        tableTagArray[4] = tableTag.tableContents  + '\n';
-        tableTagArray[5] = '<tr>\n\t' + tableTag.closeTag;
-        return calcController.buildTagFromArray(tableTagArray);
+        return clipboardStr;
       }, 
 
 
