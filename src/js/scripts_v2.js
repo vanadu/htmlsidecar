@@ -1,6 +1,7 @@
 
 /* !VA  
 ===========================================================
+TODO: fix select options to clipboard
 TODO: Implement the CSS clipboard buttons
 TODO: Fix the retina calculations: it should alert if the disk size isn't 2X the display size.
 TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
@@ -508,6 +509,7 @@ var Dimwhit = (function () {
         twidth.options[0].innerHTML = 'none';
         twidth.options[1].innerHTML = data.imgW;
         twidth.options[2].innerHTML = data.viewerW;
+        twidth.options[3].innerHTML = '100%';
 
         // !VA Not ready for these yet
         // var tableMaxWidth = `'<option>${Appdata.viewerW}</option><option>100%</option>'`;
@@ -537,12 +539,10 @@ var Dimwhit = (function () {
     // !VA Deprecated in this version
     // var ccpBuildTag = UIController.getCcpBuildTagIDs();
 
-    // !VA Constructor for the clipboard output objects. These are all the properties all the clipboard output objects (img, td and table) will have. We will store these key/value pairs in instances of the ClipboardOutput  because they're easier to manage. Then we'll build the output string into an array.
-    function ClipboardOutput(openTag, classAtt, widthAtt ,closeTag) {
-      this.openTag = openTag;
+    // !VA Constructor for the clipboard output objects. These are all the properties all the clipboard output objects (img, td and table) will have. We will store these key/value pairs in instances of the ClipboardOutput  because they're easier to manage. Then we'll build the output into an HTML string.
+    function ClipboardOutput(classAtt, alignAtt ) {
       this.classAtt = classAtt;
-      this.widthAtt = widthAtt;
-      this.closeTag = closeTag;
+      this.alignAtt = alignAtt;
     }
 
     return {
@@ -891,12 +891,13 @@ var Dimwhit = (function () {
       ccpGetImgClipboardOutput: function() {
         // !VA Get Appdata - we need it for the filename
         var data = UIController.accessAppdata();
+        // !VA The string that passes the HTML img tag
+        var clipboardStr; 
         // !VA Create the instance for img tag clipboard object and add img-specific properties.
         // !VA We're doing this in an object and outputting to an array because the object is easier to manage and the array is easier to reorder. The Constructor is in this module in the private functions above.
         var imgTag = new ClipboardOutput('imgTag');
         // !VA imgTag properties
         // !VA ---------------------------
-        imgTag.openTag = '<img ';
         imgTag.classAtt = 
           // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
           calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.imgClass).value);
@@ -925,7 +926,7 @@ var Dimwhit = (function () {
           id = id.replace('mrk', 'box');
           // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
           if (document.querySelector(id).checked === true) {
-            str = `border="0" style="width: ${data.imgW}px; height: ${data.imgH}px; border: none; outline: none; text-decoration: none; display:block;" `;
+            str = `border="0" style="width: ${data.imgW}px; height: ${data.imgH}px; border: none; outline: none; text-decoration: none; display: block;" `;
           } else {
             str = 'border="0" style="border: none; outline: none; text-decoration: none; display:block;"';
           }
@@ -951,30 +952,12 @@ var Dimwhit = (function () {
         })(ccpUserInput.imgAlign);
         // !VA imgTag Object END ------------------------
 
-        // !VA Now build the array with the object properties above in the correct order for clipboard output. This lets us easily reorder the individual items in the clipboard tag output.
-        // !VA imgTagArray
-        // !VA ----------------------------------
-        var imgTagArray = [];
-        imgTagArray[0] = imgTag.openTag;
-        imgTagArray[1] = imgTag.classAtt;
-        imgTagArray[2] = imgTag.alignAtt;
-        imgTagArray[3] = imgTag.altAtt;
-        imgTagArray[4] = imgTag.widthAtt;
-        imgTagArray[5] = imgTag.heightAtt;
-        imgTagArray[6] = imgTag.srcAtt;
-        imgTagArray[7] = imgTag.styleAtt;
-        imgTagArray[8] = imgTag.closeTag;
-        // !VA ------------------------------------
-
-
-        var clipboardStr;
+        // !VA Build the HTML tag
         clipboardStr = 
-`
-  <img ${imgTag.widthAtt} ${imgTag.heightAtt} ${imgTag.srcAtt} border="0' ${imgTag.styleAtt} />
-`;
+`  <img ${imgTag.widthAtt} ${imgTag.heightAtt} ${imgTag.srcAtt} border="0' ${imgTag.styleAtt} />`;
 
         // !VA Pass the imgTagArray and return it as string
-        return calcController.buildTagFromArray(imgTagArray);
+        return clipboardStr;
       }, 
       
       // calcController: GET STRINGS FOR THE TD CLIPBOARD OUTPUT
@@ -983,7 +966,6 @@ var Dimwhit = (function () {
         // var data = UIController.accessAppdata();
 
         var tdTag = new ClipboardOutput('tdTag');
-        tdTag.openTag = '<td ';
         tdTag.classAtt = 
           // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
           calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tdClass).value);
@@ -1029,20 +1011,12 @@ var Dimwhit = (function () {
         // !VA tdValign END
 
         tdTag.tdContents =    (function () {
+          // !VA Get the img tag output and put in between the td tags
           var str = calcController.ccpGetImgClipboardOutput();
           return str;
         })();
 
-        tdTag.closeTag = '</td>';    
-        // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
-        calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tdClass).value);
 
-        // !VA If there's no value in any of the fields, make tdTag.openTag a complete tag by including the > on it. If there is a value in any of the fields, put the closing > on tdTag.tdValign.
-        if (!tdTag.alignAtt && !tdTag.valignAtt && !tdTag.classAtt ) {
-          tdTag.openTag = '<td>';
-        } else {
-          tdTag.valignAtt = tdTag.valignAtt + '>';
-        }
 
         var clipboardStr = 
 
@@ -1075,9 +1049,11 @@ var Dimwhit = (function () {
         tableTag.alignAtt = (function (id) {
           // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
           // !VA Pass in the id of the select dropdown
+          console.log('id alignAtt is: ' + id);
           var str;
           // !VA Get the selection index
           var selInd = document.querySelector(id).selectedIndex;
+          console.log('selInt alignAtt is: ' + selInd);
           // !VA Put the available options in an array
           var tableAlignOptions = [ 'none', 'left', 'center', 'right' ];
           // !VA Put the desired output strings in an array
@@ -1102,13 +1078,15 @@ var Dimwhit = (function () {
         tableTag.widthAtt = (function (id, data) {
           // !VA TODO: The default 'none' is currently set in the HTML, that should be done programmatically
           // !VA Pass in the id of the select dropdown
+          console.log('id widthAtt is: ' + id);
           var str;
           // !VA Get the selection index
           var selInd = document.querySelector(id).selectedIndex;
+          console.log('selInd is: ' + selInd);
           // !VA Put the available options in an array
           var tableWidthOptions = [ 'none', data.imgW, data.viewerW, '100%' ];
           // !VA Put the desired output strings in an array
-          var clipboardOutput = [ '',`width="${data.imgW}" `, `width="${data.viewerW}" `, '100%'];
+          var clipboardOutput = [ '',`width="${data.imgW}"`, `width="${data.viewerW}" `, '100%'];
           // !VA If the selected index matches the index of the available options array, then output the string that matches that index
           for (let i = 0; i < tableWidthOptions.length; i++) {
             if ( selInd === i) {
@@ -1116,7 +1094,7 @@ var Dimwhit = (function () {
             }
           }
           return str;
-        })(ccpUserInput.tdAlign, data);
+        })(ccpUserInput.tableWidth, data);
 
 
 
