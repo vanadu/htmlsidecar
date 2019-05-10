@@ -42,7 +42,7 @@ var Dimwhit = (function () {
     // !VA This is where Appdata should be initialized
     var Appdata = {};
 
-    // !VA DimViewer ID strings
+    // !VA UIController: DimViewer ID strings
     var dimViewers = {
       filename: '#dv-filename-viewer',
       display: '#dv-display',
@@ -54,7 +54,7 @@ var Dimwhit = (function () {
       clipboardBut: '#dv-clipboard-but'
     };
 
-    // !VA toolButton ID Strings
+    // !VA UIController: toolButton ID Strings
     var toolButtons = {
       viewerW: '#tb-input-viewerw',
       grow50: '#tb-but-grow50',
@@ -71,6 +71,7 @@ var Dimwhit = (function () {
     };
 
     //!VA If we separate this out into UI objects that correspond to the objects we want to create, then we can just loop through them rather than define each property separately. So, dynamicElements are those that resize based on the current image... but I haven't figured out how to loop through them yet.
+    // !VA UIController: dynamicRegions
     var dynamicRegions = {
       curImg: '#cur-img',
       imgViewer: '#main-image-viewer',
@@ -78,6 +79,7 @@ var Dimwhit = (function () {
       appContainer: '#app-container',
     };
 
+    // !VA UIController: staticRegions
     var staticRegions = {
       dropArea: '#drop-area',
       toolsContainer: '#tools-container',
@@ -88,7 +90,7 @@ var Dimwhit = (function () {
 
     };
 
-    // !VA  ccpUserInput ID Strings
+    // !VA  UIController: ccpUserInput ID Strings
     // !VA imgAnchor is just a flag for the status of the checkbox. The actual propStrings have to have an Open and Close property.
     var ccpUserInput = {
       imgClass: '#img-class-input',
@@ -107,7 +109,7 @@ var Dimwhit = (function () {
       tableMaxWidth: '#table-max-width-input',
     };
 
-    // !VA ccpPropStrings ID Strings
+    // !VA UIController: ccpPropStrings ID Strings, probably deprecated in V2
     // !VA V2 - This doesn't go here, probably belongs in the App Controller module, but we'll build it here for now and move it later.
     // Stores the strings representing the HTML properties corresponding to the user CCP selections. These property snippets will be used to populate the clipboard.
     // !VA Have to include separate propStrings for opening and closing tags 
@@ -129,18 +131,6 @@ var Dimwhit = (function () {
     };
 
     
-    // !VA ccpBuildTag ID Strings
-    // Stores the ccpMakeTag object for assembling the clipboard create tag buttons
-    // !VA V2 Also doesn't belong here, we will move it later.
-    // !VA Deprecated in this version, I think...
-    // var ccpBuildTag = {
-    //   imgBuildHTMLBut: '',
-    //   imgBuildCSSBut: '',
-    //   smallPhonesBuildCSSBut: '',
-    //   largePhonesBuildCSSBut: ''
-    // };
-
-
     // !VA This tests whether the CCP is open, allowing us to access CCP elements if it is. It's also where we open the CCP by default for development and testing. 
     (function () {
 
@@ -158,10 +148,12 @@ var Dimwhit = (function () {
       }
     })();
     
+    // !VA UIController: Test function
     function testme() {
       console.log('TESTED!');
     }
 
+    // !VA  UIController: Toggle checkboxes
     function toggleCheckbox(target) {
       // We want this to run for all custom CSS checkboxes used in this project -- but the CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
       // !VA The clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it.
@@ -171,27 +163,20 @@ var Dimwhit = (function () {
       checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
     }
 
-    // Clipboard output for build html image button
+    // UIController: Clipboard output for build html image button
+    // !VA TODO: See if this can be consolidated
     new Clipboard(staticRegions.ccpImgClipbboardBut, {
       text: function(trigger) {
         var clipboardStr = calcController.ccpGetImgClipboardOutput();
-
-
-
-
         return clipboardStr;
       }
     });
 
-
     // Clipboard output for build html image button
     new Clipboard(staticRegions.ccpTdClipbboardBut, {
       text: function(trigger) {
-        var clipboardStr, clipboardStr2;
+        var clipboardStr;
         clipboardStr = calcController.ccpGetTdClipboardOutput();
-        console.log('HERE');
-        console.log(clipboardStr);
-        
         return clipboardStr;
       }
     });
@@ -205,7 +190,7 @@ var Dimwhit = (function () {
     });
 
 
-    // !VA Functions that get returned from the UIContoller object go here
+    // !VA UIController: Functions that get returned from the UIContoller object go here
     return {
       // !VA V2 Return all the strings for the UI element's IDs
       getDimViewerIDs: function() {
@@ -230,7 +215,7 @@ var Dimwhit = (function () {
       //   return ccpBuildTag;
       // },
 
-      //FILEREADER OBJECT PROCESSING
+      // UIController: FILEREADER OBJECT PROCESSING
       //Get the user-selected image file object 
       handleFileSelect: function(evt) {
         console.log('RUnning HandleFileSelect');
@@ -405,7 +390,7 @@ var Dimwhit = (function () {
       // OBJECT AND DISPLAY REFRESH FUNCTIONS
       // This is where we pass in the recalculated Appdata data and update the onscreen display of the Appdata data in the dimViewers as well as the image object and image containers. 
       refreshAppUI: function (Appdata) {
-        // VA! Need to revisit this...this is also done in the init function, I think and it only needs to be done once.
+        // VA! TODO: Need to revisit this...this is also done in the init function, I think and it only needs to be done once.
         // !VA The page has been initialized but no image has been selected yet, so set all the dimViewers to No Image.
         // !VA Appdata is still empty, so show 'No Image' in the dimViewers and hide the clipboard button.
         if (!Appdata.filename) {
@@ -413,7 +398,7 @@ var Dimwhit = (function () {
           const dimarray = Object.values(dimViewers);
           for ( let i = 0; i < dimarray.length; i++ ) {
             if ( dimarray[i] !== '#dv-clipboard-but' &&  dimarray[i] !== '#dv-filename-viewer' ) {
-              document.querySelector(dimarray[i]).innerHTML = `<span class='pop-font'>&nbsp;&nbsp;No Image</span>`;
+              document.querySelector(dimarray[i]).innerHTML = '<span class="pop-font">&nbsp;&nbsp;No Image</span>';
             } 
           } 
           // return;
@@ -482,7 +467,7 @@ var Dimwhit = (function () {
         }
       },
 
-      // !VA Not currently in use
+      // !VA UIController: Not currently in use
       resetPlaceholders: function (...ids) {
         // If the cursor is in an image resize field, set the value to no value so that the placeholders take over. Only do this for the image resize fields, because the current value is displayed in the dimViewer and doesn't need to be shown in the field itself. For the viewer width field, we need the value to stay in the field because this is the only way to tell the current width of the viewer. 
         // !VA  viewer width input field value display should also be handled here...currently is not. Search for main-image-viewer-wdth to find out where it's currently handled.
@@ -493,9 +478,28 @@ var Dimwhit = (function () {
 
       // // TOGGLE CLIPBOARD CONTROL PANEL
       ccpToggle: function () {
-      //   // Toggle class 'active' to ccp
-      //   document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
+      
+
+
+        // !VA What this does is populate the CCP fields for imgW and viewerW with data from Appdata. Then, more options are added to the CCP based on the selections in the dropdown fields. That functionality is in handleOnChange in V1, but we're not ready for that yet.
+
+
+        document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
+
+        if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
+          UIController.initCCP();
+        }
+
+
+
+      },
+
+      // !VA UIController: Init function for CCP
+      initCCP: function() {
+        console.log('initCCP');
+        // !VA Copy Appdata to local object
         var data = UIController.accessAppdata();
+
 
         // !VA Displaying all the programmatically-populated options here for now
         // !VA Set the value of the first dropdown in ccpUserInput.tableWidth
@@ -503,30 +507,17 @@ var Dimwhit = (function () {
         twidth.options[0].innerHTML = 'none';
         twidth.options[1].innerHTML = data.imgW;
         twidth.options[2].innerHTML = data.viewerW;
-        var foo = twidth.selectedIndex;
-        console.log('foo is: ' + foo);
 
-
-
-        // !VA What this does is populate the CCP fields for imgW and viewerW with data from Appdata. Then, more options are added to the CCP based on the selections in the dropdown fields. That functionality is in handleOnChange in V1, but we're not ready for that yet.
+        // !VA Not ready for these yet
         // var tableMaxWidth = `'<option>${Appdata.viewerW}</option><option>100%</option>'`;
         // document.getElementById('table-width-select').innerHTML = tableMaxWidth;
         // document.getElementById('table-max-width').style.display = 'none';
 
         // var imgMaxWidth = `'<option>${Appdata.imgW}</option><option>100%</option>'`;
         // document.getElementById('img-width-select').innerHTML = imgMaxWidth;
-        // document.getElementById('img-max-width').style.display = 'none';
-
-        document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
-
-
+        // document.getElementById('img-max-width').style.display = 'none'; 
 
       }
-
-
-
-
-
     };
   })();
   // var r = UIController.getAppdata();
@@ -1097,7 +1088,7 @@ var Dimwhit = (function () {
 
 
         tableTag.widthAtt = (function (id, data) {
-          // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
+          // !VA TODO: The default 'none' is currently set in the HTML, that should be done programmatically
           // !VA Pass in the id of the select dropdown
           var str;
           // !VA Get the selection index
