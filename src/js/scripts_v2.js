@@ -178,12 +178,28 @@ var Dimwhit = (function () {
 
     // UIController: Clipboard output for build html image button
     // !VA TODO: See if this can be consolidated
-    new Clipboard(staticRegions.ccpImgClipbboardBut, {
+    var foo = new Clipboard(staticRegions.ccpImgClipbboardBut, {
       text: function(trigger) {
+        console.log('foo is...');
+        console.dir(foo);
         var clipboardStr = calcController.ccpGetImgClipboardOutput();
+
+        // !VA STOPPED HERE - write a message to an element on success
+        foo.on('success', function(event) {
+          event.clearSelection();
+          event.trigger.textContent = 'Copied';
+          console.log(clipboardStr);
+          window.setTimeout(function() {
+            console.log('Do another one!');
+          }, 2000);
+        });
+
         return clipboardStr;
       }
     });
+
+
+    
 
     // Clipboard output for build html image button
     new Clipboard(staticRegions.ccpTdClipbboardBut, {
@@ -206,6 +222,7 @@ var Dimwhit = (function () {
     new Clipboard(ccpBuildTag.imgBuildCSSBut, {
       text: function(trigger) {
         var clipboardStr = calcController.ccpGetImgCSSClipboardOutput();
+
         return clipboardStr;
       }
     });
@@ -1078,9 +1095,10 @@ var Dimwhit = (function () {
       ccpGetTableClipboardOutput: function () {
         // !VA We need this to get Appdata.viewerW
         var data = UIController.accessAppdata();
-
+        // !VA Variable returning the HTML to the clipboard object 
+        var clipboardStr;
+        // !VA Create the object for storing the individual tag attributes
         var tableTag = new ClipboardOutput('tableTag');
-        tableTag.openTag = '<table ';
         tableTag.classAtt = 
           // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
           calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tableClass).value);
@@ -1113,8 +1131,6 @@ var Dimwhit = (function () {
           return str;
         })();
 
-
-
         tableTag.widthAtt = (function (id, data) {
           // !VA TODO: The default 'none' is currently set in the HTML, that should be done programmatically
           // !VA Pass in the id of the select dropdown
@@ -1136,14 +1152,7 @@ var Dimwhit = (function () {
           return str;
         })(ccpUserInput.tableWidth, data);
 
-
-
-        tableTag.closeTag = '</table> ';    
-
-
-
-
-        var clipboardStr = 
+        clipboardStr = 
 `<table border="0" cellpadding="0" cellspacing="0" ${tableTag.classAtt} ${tableTag.alignAtt} ${tableTag.widthAtt}>
   <tr>
 ${tableTag.tableContents}
@@ -1153,6 +1162,8 @@ ${tableTag.tableContents}
         return clipboardStr;
       },
 
+      // !VA UIContoller: build CSS clipboard output
+      // !VA TODO: This can be consolidated with other CSS output or all other clipboard object functions
       ccpGetImgCSSClipboardOutput: function() {
         // !VA Get Appdata to local variable
         var data = UIController.accessAppdata();

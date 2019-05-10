@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr" itemscope itemtype="http://schema.org/Article">
 <head>
   <meta charset="utf-8">
-  <title>DimWHIT.IO</title>
+  <title>Test</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,400italic,600,800|Source+Code+Pro" rel="stylesheet">
   <link rel="stylesheet" media="all" href="css/style.css">
@@ -16,69 +16,16 @@
 </style>
 
 </head>
-  <body>
+<body>
+    <input id="post-shortlink" value="https://ac.me/qmE_jpnYXFo">
+    <button class="button" id="copy-button" data-clipboard-target="#post-shortlink">Copy</button>
 
-        <table align="left">
-          <tr>
-            <td align="left" valign="top">
-              <img width="200" height="150" src="img/_200X150.png" border="0" style="border: none; outline: none; text-decoration: none; display:block;"/>
-            </td>
-          <tr>
-        </table>
+</body>
 
-  </body>
-  <script>
 
-// !VA ===========================
 
-  // !VA Create event handler function
-  function addEventHandler(oNode, evt, oFunc, bCaptures) {
-  //Removing this -- apparently IE 9 and 10 support addEventListener
-  // if (typeof(window.event) != "undefined")
-  // 	oNode.attachEvent("on"+evt, oFunc);
-  // else
-  oNode.addEventListener(evt, oFunc, bCaptures);
-  }
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.16/clipboard.min.js"></script>
+<script src="js/test.js"></script>
 
-  // !VA Constructor for objects that store the addEventHandler parameters. Note that placeholders can be added using the constructor's prototype I think.
-  function Eobj(id, evt, func, bool) {
-    this.id = id;
-    this.evt = evt;
-    this.func = func;
-    this.bool = bool;
-  }
 
-  // !VA Array for storing the DOM elements that take event handlers. !IMPORTANT! The DOM elements aren't named successively, so the array will need to be created manually.
-  var buts = [];
-  buts[0] =  new Eobj('ID1', 'click', getAppData, false);
-  buts[1] =  new Eobj('ID2', 'click', getAppData, false);
-  buts[2] =  new Eobj('ID2', 'click', getAppData, false);
-
-  console.log('buts.length is: ' + buts.length);
-  function doit(butsarr) {
-    console.log('Doing it...');
-    for (let i = 0; i < butsarr.length; i++) {
-    console.log(butsarr[i]);
-    addEventHandler(document.getElementById(butsarr[i].id), butsarr[i].evt, butsarr[i].func, butsarr[i].bool);
-    }
-  }
-
-  function getAppData() {
-    console.log('CLICKED');
-
-  };
-    
-    doit(buts);
-
-    
-
-  // function doit(but1) { 
-  //   console.log('Doing it...');
-  //   console.log(but1);
-  //   console.log('but1.id is: ' + but1.id);
-  //   addEventHandler(document.getElementById(but1.id), but1.evt, but1.func, but1.bool);
-
-  // };
-
-  </script>
 </html>

@@ -70,6 +70,7 @@
       <!-- .header-subtext -->
       <div class="header-subtext">
         <h2><a href="#"  tabindex="-1"> <span class="dim-initial-cap initial-cap">Dim</span>ensioning &amp; Codebuilding<br/><span class="whit-initial-cap initial-cap">W</span>ebapp for <span class="whit-initial-cap initial-cap">H</span>TML EMail <span class="whit-initial-cap initial-cap">I</span>mage <span class="whit-initial-cap initial-cap">T</span>ags</a></h2> 
+
       </div>
       <!-- /.header-subtext -->
 
@@ -389,6 +390,13 @@
     <div class="end-matter" style="padding: 30px">
       <p style="font-size: 14px; text-align: center;">&copy;2018 Van Albert&nbsp;&nbsp;&nbsp;&nbsp;All rights reserved.</p>
     </div>
+    
+    <div style="position: relative; height: 300px; border: 1px solid red">
+    
+        <input id="post-shortlink" value="https://ac.me/qmE_jpnYXFo">
+        <button class="button" id="copy-button" data-clipboard-target="#post-shortlink">Copy</button>
+    
+    </div>
   </section>
 
 
@@ -408,7 +416,9 @@
 <script>
 
 
-
+(function(){
+    new Clipboard('#copy-button');
+})();
 
 
 </script>
