@@ -431,23 +431,29 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 }
 
 // DIM ERROR DISPLAY
-#dim-error-container {
-  border: 1px solid red;
+#app-error-container {
+  // border: 1px solid red;
   display: block;
   position: absolute;
-  top: -85px;
+  top: -65px;
   left: 0;
   width: 100%;
-  height: 85px;
+  height: 65px;
+  opacity: 1;
   &.show-err {
-    transform: translate(0, 85px);
-    transition: transform 250ms;
+    opacity: 1;
+    transition: opacity .25s ease-in-out;
+
+    // transform: translate(0, 85px);
+    // transition: transform 250ms;
     // -webkit-transform: scaleX(0);
     // -webkit-transition: -webkit-transform 500ms;
   }
   &.hide-err {
-    transform: translate(0, 0px);
-    transition: transform 250ms;
+    opacity: 0;
+    transition: opacity .25s ease-in-out;
+    // transform: translate(0, 0px);
+    // transition: transform 250ms;
     // -webkit-transform: scaleX(0);
     // -webkit-transition: -webkit-transform 500ms;
   }
@@ -461,9 +467,9 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
     // dim-error-message
     td {
       width: 650px;
-      height: 85px;
+      height: 65px;
       color: #FFF;
-      font-size: 16px;
+      font-size: 24px;
       font-style: italic;
       font-weight: normal;
       text-align: center;

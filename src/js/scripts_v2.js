@@ -1,11 +1,15 @@
 
 /* !VA  
 ===========================================================
-TODO: fix select options to clipboard
-TODO: Implement the CSS clipboard buttons
-TODO: Fix the retina calculations: it should alert if the disk size isn't 2X the display size.
+TODO: Put error container above toolbuttons
+
+
 TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
 
+
+DONE: fix select options to clipboard
+DONE: Implement the CSS clipboard buttons
+DONE: Fix the retina calculations: it should alert if the disk size isn't 2X the display size.
 DONE: Reset the customH and customW fields on blur to their placeholders on blur when blur is on mouseclick
 DONE: Fix the images on viewerW and phone input fields
 DONE: fix small phones and lartge phones toolbuttons.
@@ -89,8 +93,8 @@ var Dimwhit = (function () {
       ccpImgClipbboardBut: '#img-build-html-but',
       ccpTdClipbboardBut: '#td-build-html-but',
       ccpTableClipbboardBut: '#table-build-html-but',
-      errViewerContainer: '#dim-error-container',
-      errMessContainer: '#dim-error-message'
+      errViewerContainer: '#app-error-container',
+      errMessContainer: '#app-error-message'
     };
 
     // !VA  UIController: ccpUserInput ID Strings
@@ -590,25 +594,25 @@ var Dimwhit = (function () {
         let displayTime;
         // Get the elements to manipulate for the error message display
         // // !VA Create objects for all the UI elements used in this function
-        var errViewerContainer = document.querySelector('#dim-error-container');
-        var errMessContainer = document.querySelector('#dim-error-message');
-        var dimViewers = document.querySelector('#dim-viewers');
-        var toolsContainer = document.querySelector('#tools-container');
+        var errViewerContainer = document.querySelector('#app-error-container');
+        var errMessContainer = document.querySelector('#app-error-message');
+        // var dimViewers = document.querySelector('#dim-viewers');
+        // var toolsContainer = document.querySelector('#tools-container');
         // Put the respective error message in the error message container
         errMessContainer.innerHTML = mess;
         // Swap dimViewers with errMessContainer and drop toolsContainer behind viewport;
         console.log('HERE');
 
         errViewerContainer.classList.add('show-err');
-        dimViewers.classList.add('show-err');
-        toolsContainer.classList.add('show-err');
+        // dimViewers.classList.add('show-err');
+        // toolsContainer.classList.add('show-err');
         // !VA If it's an error message, show the error formatting, otherwise, show the message formatting
         if (isErr) {
-          document.querySelector('#dim-error-container table td').style.color = '#ff9a9a'; 
+          document.querySelector('#app-error-container table td').style.color = '#ff0000'; 
           // !VA Show the error message 3 seconds so it can be read
           displayTime = 3000;
         } else {
-          document.querySelector('#dim-error-container table td').style.color = '#FFF'; 
+          document.querySelector('#app-error-container table td').style.color = '#FFF'; 
           // !VA Flash the copy message 
           // displayTime = 1000;
           // !VA DevOnly! Lengthening this display time while dealing with CCP issues
@@ -621,16 +625,16 @@ var Dimwhit = (function () {
         setTimeout(function(){
           // Swap the error positions back to normal after 3 seconds
           errViewerContainer.classList.add('hide-err');
-          dimViewers.classList.add('hide-err');
-          toolsContainer.classList.add('hide-err');
+          // dimViewers.classList.add('hide-err');
+          // toolsContainer.classList.add('hide-err');
           errViewerContainer.classList.remove('show-err');
-          dimViewers.classList.remove('show-err');
-          toolsContainer.classList.remove('show-err');
+          // dimViewers.classList.remove('show-err');
+          // toolsContainer.classList.remove('show-err');
           setTimeout(function(){
             // Remove the hide-err class after the .5 seconds -- which is the animation run time set in the CSS transforms.
             errViewerContainer.classList.remove('hide-err');
-            dimViewers.classList.remove('hide-err');
-            toolsContainer.classList.remove('hide-err');
+            // dimViewers.classList.remove('hide-err');
+            // toolsContainer.classList.remove('hide-err');
           },250);
         },displayTime);
       }
