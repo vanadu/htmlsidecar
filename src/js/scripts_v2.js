@@ -180,27 +180,24 @@ var Dimwhit = (function () {
     // !VA TODO: See if this can be consolidated
     var foo = new Clipboard(staticRegions.ccpImgClipbboardBut, {
       text: function(trigger) {
-        console.log('foo is...');
-        console.dir(foo);
+        // console.log('foo is...');
+        // console.dir(foo);
         var clipboardStr = calcController.ccpGetImgClipboardOutput();
 
         // !VA STOPPED HERE - write a message to an element on success
-        foo.on('success', function(event) {
-          event.clearSelection();
-          event.trigger.textContent = 'Copied';
-          console.log(clipboardStr);
-          window.setTimeout(function() {
-            console.log('Do another one!');
-          }, 2000);
-        });
+        // foo.on('success', function(event) {
+        //   event.clearSelection();
+        //   event.trigger.textContent = 'Copied';
+        //   console.log(clipboardStr);
+        //   window.setTimeout(function() {
+        //     console.log('Do another one!');
+        //   }, 2000);
+        // });
 
         return clipboardStr;
       }
     });
-
-
-    
-
+   
     // Clipboard output for build html image button
     new Clipboard(staticRegions.ccpTdClipbboardBut, {
       text: function(trigger) {
@@ -227,6 +224,23 @@ var Dimwhit = (function () {
       }
     });
 
+    // Clipboard output for build html image button
+    new Clipboard(ccpBuildTag.largePhonesBuildCSSBut, {
+      text: function(trigger) {
+        var clipboardStr = calcController.ccpGetLargePhonesCSSClipboardOutput();
+
+        return clipboardStr;
+      }
+    });
+
+    // Clipboard output for build html image button
+    new Clipboard(ccpBuildTag.smallPhonesBuildCSSBut, {
+      text: function(trigger) {
+        var clipboardStr = calcController.ccpGetSmallPhonesCSSClipboardOutput();
+
+        return clipboardStr;
+      }
+    });
 
     // !VA UIController: Functions that get returned from the UIContoller object go here
     return {
@@ -559,14 +573,14 @@ var Dimwhit = (function () {
         elems[1] = document.querySelector(ccpBuildTag.smallPhonesBuildCSSBut);
         elems[2] = document.querySelector(ccpBuildTag.largePhonesBuildCSSBut);
 
-        console.log('showElementOnInput -- ');
-        console.log('this is: ' + this);
-        console.log('this.id is: ' + this.id);
+        // console.log('showElementOnInput -- ');
+        // console.log('this is: ' + this);
+        // console.log('this.id is: ' + this.id);
 
-        console.log('this.value is: ' + this.value);
+        // console.log('this.value is: ' + this.value);
 
         for (let i = 0; i < elems.length; i++) {
-          console.log(elems[i]);
+          // console.log(elems[i]);
           this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
           
 
@@ -1179,6 +1193,42 @@ ${tableTag.tableContents}
         // !VA Return the css string to the clipboard object.
         return clipboardStr;
 
+      }, 
+
+      // !VA UIContoller: build large phone CSS clipboard output
+      // !VA TODO: This can be consolidated with other CSS output or all other clipboard object functions
+      ccpGetLargePhonesCSSClipboardOutput: function() {
+        // !VA Get Appdata to local variable
+        var data = UIController.accessAppdata();
+        console.dir(data);
+        // !VA The string to pass the CSS declaration to the clipboard object
+        var clipboardStr;
+        // !VA Clipboard output object 
+        var largePhonesCSSTag = new ClipboardOutput('largePhonesCSSTag');
+        // !VA Put the user-entered class into this property
+        largePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
+        // !VA Build the css class declaration with and Appdata large phone width and height properties
+        clipboardStr = `img.${largePhonesCSSTag.classAtt} { width: ${data.lPhoneW}px !important; height: ${data.lPhoneH}px !important }`;
+        // !VA Return the css string to the clipboard object.
+        return clipboardStr;
+      }, 
+
+      // !VA UIContoller: build large phone CSS clipboard output
+      // !VA TODO: This can be consolidated with other CSS output or all other clipboard object functions
+      ccpGetSmallPhonesCSSClipboardOutput: function() {
+        // !VA Get Appdata to local variable
+        var data = UIController.accessAppdata();
+        console.dir(data);
+        // !VA The string to pass the CSS declaration to the clipboard object
+        var clipboardStr;
+        // !VA Clipboard output object 
+        var smallPhonesCSSTag = new ClipboardOutput('smallPhonesTag');
+        // !VA Put the user-entered class into this property
+        smallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
+        // !VA Build the css class declaration with and Appdata large phone width and height properties
+        clipboardStr = `img.${smallPhonesCSSTag.classAtt} { width: ${data.sPhoneW}px !important; height: ${data.sPhoneH}px !important }`;
+        // !VA Return the css string to the clipboard object.
+        return clipboardStr;
       }, 
 
 
