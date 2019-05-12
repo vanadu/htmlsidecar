@@ -432,6 +432,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 
 // DIM ERROR DISPLAY
 #dim-error-container {
+  border: 1px solid red;
   display: block;
   position: absolute;
   top: -85px;
