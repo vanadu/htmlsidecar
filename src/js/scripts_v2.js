@@ -588,56 +588,7 @@ var Dimwhit = (function () {
 
       // UIController: 
       // !VA Function to show error and clipboard notification messages
-      showMessage: function(mess, isErr) {
 
-        //Set the time the message will display
-        let displayTime;
-        // Get the elements to manipulate for the error message display
-        // // !VA Create objects for all the UI elements used in this function
-        var errViewerContainer = document.querySelector('#app-error-container');
-        var errMessContainer = document.querySelector('#app-error-message');
-        // var dimViewers = document.querySelector('#dim-viewers');
-        // var toolsContainer = document.querySelector('#tools-container');
-        // Put the respective error message in the error message container
-        errMessContainer.innerHTML = mess;
-        // Swap dimViewers with errMessContainer and drop toolsContainer behind viewport;
-        console.log('HERE');
-
-        errViewerContainer.classList.add('show-err');
-        // dimViewers.classList.add('show-err');
-        // toolsContainer.classList.add('show-err');
-        // !VA If it's an error message, show the error formatting, otherwise, show the message formatting
-        if (isErr) {
-          document.querySelector('#app-error-container table td').style.color = '#ff0000'; 
-          // !VA Show the error message 3 seconds so it can be read
-          displayTime = 3000;
-        } else {
-          document.querySelector('#app-error-container table td').style.color = '#FFF'; 
-          // !VA Flash the copy message 
-          // displayTime = 1000;
-          // !VA DevOnly! Lengthening this display time while dealing with CCP issues
-          displayTime = 1000;
-
-        }
-        // hide toolbarButtons
-
-
-        setTimeout(function(){
-          // Swap the error positions back to normal after 3 seconds
-          errViewerContainer.classList.add('hide-err');
-          // dimViewers.classList.add('hide-err');
-          // toolsContainer.classList.add('hide-err');
-          errViewerContainer.classList.remove('show-err');
-          // dimViewers.classList.remove('show-err');
-          // toolsContainer.classList.remove('show-err');
-          setTimeout(function(){
-            // Remove the hide-err class after the .5 seconds -- which is the animation run time set in the CSS transforms.
-            errViewerContainer.classList.remove('hide-err');
-            // dimViewers.classList.remove('hide-err');
-            // toolsContainer.classList.remove('hide-err');
-          },250);
-        },displayTime);
-      }
 
 
 
@@ -736,11 +687,13 @@ var Dimwhit = (function () {
         // !VA Handle the viewer width toolButton input
         case (prop === 'viewerW') :
           if (val < data.imgW ) {
+            // !VA TODO: review this...
             // !VA The viewer width can't be smaller than the current image width of XXX, show message
             console.log('TODO: errorHandler: viewerW cannot be smaller than imgW');
           } else if (val > maxViewerWidth ) {
             // !VA Setting a maxViewerWidth here but I need to review V1 and revisit this.
-            console.log('updateViewerW:  val > maxViewerWidth');
+            // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px
+            controller.initError(id, 'viewerW_GT_maxViewerWidth', true);
           } else {
             // !VA The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running evalViewerWidth. 
             data = UIController.updateAppData(prop, val);
@@ -752,7 +705,7 @@ var Dimwhit = (function () {
           // !VA If the new image width is greater than the viewer width, then show message. This is a temporary fix, the errorHandler should reset the field value to ''.
           if (val > data.viewerW ) {
             // !VA errorHandler!
-            controller.onError(id, 'imgH_GT_viewerW');
+            controller.initError(id, 'imgW_GT_viewerW');
             
           }
           else {
@@ -775,7 +728,7 @@ var Dimwhit = (function () {
           break;
         case (prop ==='sPhoneW') :
           // !VA Write the user input for imgH to the data, which is the local copy of Appdata
-          debugger;
+          // !VA TODO: add error handling;
           data = UIController.updateAppData(prop, val);
           // !VA TODO: restore the placeholder value on blur
           // val = Math.round((calcController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgH);
@@ -783,6 +736,7 @@ var Dimwhit = (function () {
           // data = UIController.updateAppData('imgW', val);
           break;
         case (prop ==='lPhoneW') :
+          // !VA TODO: add error handling;
           // !VA Write the user input for imgH to the data, which is the local copy of Appdata
           data = UIController.updateAppData(prop, val);
           // !VA TODO: restore the placeholder value on blur
@@ -806,9 +760,9 @@ var Dimwhit = (function () {
         // debugger;
         // !VA If adding the button increment value to the existing imgW or imgH results in a value less than or equal to 0 then abort and error, because an image has to have a positive dimension.
         if ( data.imgW + val <= 0 || data.imgH + val <= 0 ) {
-          controller.onError(id, 'tbButton_LT_zero');
+          controller.initError(id, 'tbButton_LT_zero');
         } else if ( data.imgW + val > data.viewerW  ) {
-          controller.onError(id, 'tbButton_GT_viewerW');
+          controller.initError(id, 'tbButton_GT_viewerW');
         }   else {
           // !VA If we're incrementing...
           if ( id.includes('grow')) {
@@ -1404,6 +1358,14 @@ ${tableTag.tableContents}
         var isErr;
         // e.stopPropagation;
         var el;
+        // !VA If there is an error message showing, allow the CSS transition to run, then remove it
+        var errViewerContainer = document.querySelector(staticRegions.errViewerContainer);
+        var errMessContainer = document.querySelector(staticRegions.errMessContainer);
+        if (errMessContainer.textContent) {
+          // !VA On any event, if errorViewerContainer is showing, hide it.
+          errViewerContainer.classList.remove('show-err');
+          errViewerContainer.classList.add('hide-err');
+        }
         // !VA Put the event trigger in an object first, so we don't have to keep calling document.getElementById
         el = document.getElementById(this.id);
         if (event.type === 'click') {
@@ -1514,24 +1476,82 @@ ${tableTag.tableContents}
 
     //  ERROR HANDLING
     // ==============================
-    var errorHandler = function(id, str) {
-      // !VA Error handler
-      switch (true) {
-      case (str === 'imgH_GT_viewerW') :
-        console.log('errorHandler: imgH cannot be larger than viewerW of XXX');
-        document.getElementById(id).value = '';
-        break;
-      // tbButton_LT_zero
-      case (str === 'tbButton_LT_zero') :
-        console.log('errorHandler: the image height or width can\'t be less than zero');
-        document.getElementById(id).value = '';
-        break;
-      case (str === 'tbButton_GT_viewerW') :
-        console.log('errorHandler: the image can\'t be wider than the viewer');
-        document.getElementById(id).value = '';
-        break;
+    var errorHandler = function(id, str, bool) {
+      console.log('in errorHandler');
+      console.log('id is: ' + id);
+      console.log('str is: ' + str);
+      console.log('bool is: ' + bool);
+      var errorMessages = {
+        imgW_GT_viewerW: 'errorHandler: imgW cannot be larger than viewerW',
+        tbButton_LT_zero: 'errorHandler: the image height or width can\'t be less than zero',
+        tbButton_GT_viewerW: 'errorHandler: the image can\'t be wider than the viewer',
+        // !VA maxViewerWidth issue here, see message below;
+        viewerW_GT_maxViewerWidth: 'errorHandler: the viewer width can\'t be greater than 800px'
+      };
+      console.log('errorMessages.length is: ' + errorMessages.length);
+
+      // !VA Loop through the error ID/message pairs and find the match
+      for (const [key, value] of Object.entries(errorMessages)) { 
+        if (key === str ) {
+          console.log('match');
+          console.log('value is: ' + value);
+          showMessage(id, value, true);
+        }
       }
+
+      
+
     };
+
+    var showMessage = function(id, mess, isErr) {
+
+      console.log('id is: ' + id);
+      console.log('mess is: ' + mess);
+      console.log('isErr is: ' + isErr);
+      //Set the time the message will display
+      // let displayTime;
+      // Get the elements to manipulate for the error message display
+      // // !VA Create objects for all the UI elements used in this function
+      var errViewerContainer = document.querySelector(staticRegions.errViewerContainer);
+      var errMessContainer = document.querySelector(staticRegions.errMessContainer);
+      // var dimViewers = document.querySelector('#dim-viewers');
+      // var toolsContainer = document.querySelector('#tools-container');
+      // Put the respective error message in the error message container
+      errMessContainer.innerHTML = mess;
+      // Swap dimViewers with errMessContainer and drop toolsContainer behind viewport;
+      console.log('HERE');
+
+      errViewerContainer.classList.add('show-err');
+      console.log(errViewerContainer);
+
+
+      // !VA Reset the value of the element into which the error was entered to empty. 
+      document.getElementById(id).value = '';
+      errViewerContainer.classList.remove('hide-err');
+      errViewerContainer.classList.add('show-err');
+
+
+      // }
+      // hide toolbarButtons
+
+
+      // setTimeout(function(){
+      //   // Swap the error positions back to normal after 3 seconds
+      //   errViewerContainer.classList.add('hide-err');
+      //   // dimViewers.classList.add('hide-err');
+      //   // toolsContainer.classList.add('hide-err');
+      //   errViewerContainer.classList.remove('show-err');
+      //   // dimViewers.classList.remove('show-err');
+      //   // toolsContainer.classList.remove('show-err');
+      //   setTimeout(function(){
+      //     // Remove the hide-err class after the .5 seconds -- which is the animation run time set in the CSS transforms.
+      //     errViewerContainer.classList.remove('hide-err');
+      //     // dimViewers.classList.remove('hide-err');
+      //     // toolsContainer.classList.remove('hide-err');
+      //   },250);
+      // },displayTime);
+    };
+
 
 
     var doit = function() {
@@ -1591,9 +1611,9 @@ ${tableTag.tableContents}
 
 
     return {
-      onError: function(id, str) {
-        console.log('onError in controller');
-        errorHandler(id, str);
+      initError: function(id, str, bool) {
+        console.log('initError in controller');
+        errorHandler(id, str, bool);
       },
       init: function(){
         // calcController.tst();
