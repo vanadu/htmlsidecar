@@ -1209,25 +1209,26 @@ var Dimwhit = (function () {
           id = id.replace('mrk', 'box');
           console.log('id is: ' + id);
           // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
+          // !VA Stopped here. Need to implement pathName attribute to complete the src attribute
           if (document.querySelector(id).checked === true) {
             str = 
             
             
   `
-  <td background="${data.filename}" ${tdTag.bgcolorAtt}" width="${data.imgW}" height="${data.imgH}" ${tdTag.valignAtt}">
-  <!--[if gte mso 9]>
-  <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${data.width}px;height:${data.height}px;">
-    <v:fill type="tile" src="https://i.imgur.com/YJOX1PC.png" color="${tdTag.bgcolorAtt}" />
-    <v:textbox inset="0,0,0,0">
-  <![endif]-->
-    <div>
-    <!-- Put Foreground Content Here -->
-    </div>
+    <td background="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" ${tdTag.bgcolorAtt}" width="${data.imgW}" height="${data.imgH}" ${tdTag.valignAtt}">
     <!--[if gte mso 9]>
-      </v:textbox>
-    </v:rect>
-    <![endif]-->
-  </td>
+      <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${data.imgW}px;height:${data.imgH}px;">
+      <v:fill type="tile" src="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" color="${tdTag.bgcolorAtt}" />
+      <v:textbox inset="0,0,0,0">
+      <![endif]-->
+        <div>
+        <!-- Put Foreground Content Here -->
+        </div>
+      <!--[if gte mso 9]>
+        </v:textbox>
+      </v:rect>
+      <![endif]-->
+    </td>
   `;
 
 
