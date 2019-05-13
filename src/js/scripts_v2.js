@@ -1477,16 +1477,17 @@ ${tableTag.tableContents}
     //  ERROR HANDLING
     // ==============================
     var errorHandler = function(id, str, bool) {
+      var data = UIController.accessAppdata();
       console.log('in errorHandler');
       console.log('id is: ' + id);
       console.log('str is: ' + str);
       console.log('bool is: ' + bool);
       var errorMessages = {
-        imgW_GT_viewerW: 'errorHandler: imgW cannot be larger than viewerW',
-        tbButton_LT_zero: 'errorHandler: the image height or width can\'t be less than zero',
-        tbButton_GT_viewerW: 'errorHandler: the image can\'t be wider than the viewer',
+        imgW_GT_viewerW: `An image can't be wider than its parent table (currently set at ${data.viewerW}px). The image width has to be less than the width of its container.`,
+        tbButton_LT_zero: 'Sorry, that would make one of the image dimensions less than 0.',
+        tbButton_GT_viewerW: `Sorry, that would make the image wider than its container, which is currently set at ${data.viewerW}px`,
         // !VA maxViewerWidth issue here, see message below;
-        viewerW_GT_maxViewerWidth: 'errorHandler: the viewer width can\'t be greater than 800px'
+        viewerW_GT_maxViewerWidth: `The container table width can't be greater than the width of the app itself &mdash; 800px.`
       };
       console.log('errorMessages.length is: ' + errorMessages.length);
 
