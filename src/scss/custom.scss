@@ -444,7 +444,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   &.show-err {
     opacity: 1;
     transition: opacity .25s ease-in-out;
-
+    color: #FF0000;
     // transform: translate(0, 85px);
     // transition: transform 250ms;
     // -webkit-transform: scaleX(0);
@@ -454,6 +454,24 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
     opacity: 0;
     transition: opacity .25s ease-in-out;
     // transform: translate(0, 0px);
+    // transition: transform 250ms;
+    // -webkit-transform: scaleX(0);
+    // -webkit-transition: -webkit-transform 500ms;
+  }
+  &.show-mess {
+    opacity: 1;
+    transition: opacity .25s ease-in-out;
+    color: #959595;
+    // transform: translate(0, 85px);
+    // transition: transform 250ms;
+    // -webkit-transform: scaleX(0);
+    // -webkit-transition: -webkit-transform 500ms;
+  }
+  &.hide-mess {
+    opacity: 0;
+    transition: opacity .25s ease-in-out;
+    color: #959595;
+    // transform: translate(0, 85px);
     // transition: transform 250ms;
     // -webkit-transform: scaleX(0);
     // -webkit-transition: -webkit-transform 500ms;
@@ -469,7 +487,6 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
     td {
       width: 650px;
       height: 65px;
-      color: #FF0000;
       font-size: 17px;
       line-height: 18px;
       font-style: italic;
@@ -630,6 +647,17 @@ output {
     font-size: 14px;
     text-align: center;
   }
+}
+#ccp-blocker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 530px !important;
+  width: 800px;
+  background: transparent;
+  display: none;
+  z-index: 999;
+
 }
 
 

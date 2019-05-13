@@ -94,7 +94,8 @@ var Dimwhit = (function () {
       ccpTdClipbboardBut: '#td-build-html-but',
       ccpTableClipbboardBut: '#table-build-html-but',
       appMessContainer: '#app-message-container',
-      appMessDisplay: '#app-message-display'
+      appMessDisplay: '#app-message-display',
+      ccpBlocker: '#ccp-blocker'
     };
 
     // !VA  UIController: ccpUserInput ID Strings
@@ -182,67 +183,108 @@ var Dimwhit = (function () {
     }
 
     // UIController: Clipboard output for build html image button
-    // !VA TODO: See if this can be consolidated
+    // !VA TODO: Might be able to consolidate this into a single function but doesn't seem worth it
     var imgClipboardBut = new Clipboard(staticRegions.ccpImgClipbboardBut, {
       text: function(trigger) {
         // console.log('foo is...');
         // console.dir(foo);
+        // !VA Get the clipboard string 
         var clipboardStr = calcController.ccpGetImgClipboardOutput();
-
-        // !VA STOPPED HERE - write a message to an element on success
+        // !VA Write success message to app message area on success
         imgClipboardBut.on('success', function(event) {
-          event.clearSelection();
-          event.trigger.textContent = 'Copied';
-          console.log(clipboardStr);
-          window.setTimeout(function() {
-            console.log('Do another one!');
-          }, 2000);
+          // debugger;
+        });
+        console.log('NOW');
+        UIController.flashAppMessage(trigger.id);
+        imgClipboardBut.on('error', function(e) {
+          console.error('Action:', e.action);
+          console.error('Trigger:', e.trigger);
+        });
+        // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
+        return clipboardStr;
+      }
+    });
+   
+    // Clipboard output for build td tag button
+    var tdClipbboardBut = new Clipboard(staticRegions.ccpTdClipbboardBut, {
+      text: function(trigger) {
+        var clipboardStr;
+        clipboardStr = calcController.ccpGetTdClipboardOutput();
+        tdClipbboardBut.on('success', function(event) {
+        });
+        console.log('NOW');
+        UIController.flashAppMessage(trigger.id);
+        tdClipbboardBut.on('error', function(e) {
+          console.error('Action:', e.action);
+          console.error('Trigger:', e.trigger);
+        });
+        return clipboardStr;
+      }
+    });
+
+    // Clipboard output for build table tag button
+    var tableClipbboardBut =  new Clipboard(staticRegions.ccpTableClipbboardBut, {
+      text: function(trigger) {
+        var clipboardStr = calcController.ccpGetTableClipboardOutput();
+
+        tableClipbboardBut.on('success', function(event) {
+        });
+        console.log('NOW');
+        UIController.flashAppMessage(trigger.id);
+        tableClipbboardBut.on('error', function(e) {
+          console.error('Action:', e.action);
+          console.error('Trigger:', e.trigger);
         });
 
         return clipboardStr;
       }
     });
-   
-    // Clipboard output for build html image button
-    new Clipboard(staticRegions.ccpTdClipbboardBut, {
-      text: function(trigger) {
-        var clipboardStr;
-        clipboardStr = calcController.ccpGetTdClipboardOutput();
-        return clipboardStr;
-      }
-    });
 
-    // Clipboard output for build html image button
-    new Clipboard(staticRegions.ccpTableClipbboardBut, {
-      text: function(trigger) {
-        var clipboardStr = calcController.ccpGetTableClipboardOutput();
-        return clipboardStr;
-      }
-    });
-
-    // Clipboard output for build html image button
-    new Clipboard(ccpBuildTag.imgBuildCSSBut, {
+    // Clipboard output for build img CSS button
+    var imgBuildCSSBut = new Clipboard(ccpBuildTag.imgBuildCSSBut, {
       text: function(trigger) {
         var clipboardStr = calcController.ccpGetImgCSSClipboardOutput();
 
+        imgBuildCSSBut.on('success', function(event) {
+        });
+        console.log('NOW');
+        UIController.flashAppMessage(trigger.id);
+        imgBuildCSSBut.on('error', function(e) {
+          console.error('Action:', e.action);
+          console.error('Trigger:', e.trigger);
+        });
         return clipboardStr;
       }
     });
 
-    // Clipboard output for build html image button
-    new Clipboard(ccpBuildTag.largePhonesBuildCSSBut, {
+    // Clipboard output for build large phones CSS button
+    var largePhonesBuildCSSBut = new Clipboard(ccpBuildTag.largePhonesBuildCSSBut, {
       text: function(trigger) {
         var clipboardStr = calcController.ccpGetLargePhonesCSSClipboardOutput();
-
+        largePhonesBuildCSSBut.on('success', function(event) {
+        });
+        console.log('NOW');
+        UIController.flashAppMessage(trigger.id);
+        largePhonesBuildCSSBut.on('error', function(e) {
+          console.error('Action:', e.action);
+          console.error('Trigger:', e.trigger);
+        });
         return clipboardStr;
       }
     });
 
-    // Clipboard output for build html image button
-    new Clipboard(ccpBuildTag.smallPhonesBuildCSSBut, {
+    // Clipboard output for small phones CSS button
+    var smallPhonesBuildCSSBut = new Clipboard(ccpBuildTag.smallPhonesBuildCSSBut, {
       text: function(trigger) {
         var clipboardStr = calcController.ccpGetSmallPhonesCSSClipboardOutput();
-
+        smallPhonesBuildCSSBut.on('success', function(event) {
+        });
+        console.log('NOW');
+        UIController.flashAppMessage(trigger.id);
+        smallPhonesBuildCSSBut.on('error', function(e) {
+          console.error('Action:', e.action);
+          console.error('Trigger:', e.trigger);
+        });
         return clipboardStr;
       }
     });
@@ -586,12 +628,56 @@ var Dimwhit = (function () {
         }
       },
 
-      // UIController: 
-      // !VA Function to show error and clipboard notification messages
+      // UIController: Flash a status message in the app message area
+      // !VA We could probably fold this into the error handler but that's going to be complicated enough as it is and this is just for status messages
+      flashAppMessage: function(id) {
+        // !VA Passes in the id of the element that triggered the action for which a status message is displayed.
+
+        // !VA Get the message container and display text into variables
+        var appMessContainer = document.querySelector(staticRegions.appMessContainer);
+        var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
+        var ccpBlocker = document.querySelector(staticRegions.ccpBlocker);
 
 
+        var statusMessages = {
+          'img-build-html-but': '<img> HTML element copied to Clipboard!',
+          'td-build-html-but': '<td> HTML element copied to Clipboard!',
+          'table-build-html-but': '<table> HTML element copied to Clipboard!',
+          'img-build-css-but': 'CSS class delaration copied to the Clipboard!',
+          'lphones-build-css-but': 'CSS class delaration for tablets copied to the Clipboard!',
+          'sphones-build-css-but': 'CSS class delaration for phones copied to the Clipboard!'
+        };
 
+        // !VA First, overlay the CCP blocker to prevent user input while the CSS transitions run and the status message is displayed. Cheap, but effective solution.
+        ccpBlocker.style.display = 'block';
 
+        // !VA Add the class that displays the message
+        appMessContainer.classList.add('show-mess');
+        // !VA Loop through the status id/message pairs and find the match for the trigger
+        for (const [key, value] of Object.entries(statusMessages)) { 
+          if (key === id ) {
+            var mess = value;
+          }
+        }
+        // !VA Write the success message to the message display area
+        appMessDisplay.textContent = mess;
+        // !VA Show the message
+        appMessContainer.classList.add('show-mess');
+        // !VA Show the message for two seconds
+        window.setTimeout(function() {
+        // !VA After two seconds, hide the message and remove the blocker
+          appMessContainer.classList.add('hide-mess');
+          ccpBlocker.style.display = 'none';
+          setTimeout(function(){
+            // !VA Once the opacity transition for the message has completed, remove the show-mess class from the element and set the textContent back to empty
+            appMessContainer.classList.remove('show-mess');
+            appMessContainer.classList.remove('hide-mess');
+            appMessDisplay.textContent = '';
+
+          },250);
+        }, 
+        2000);
+      }
     };
   })();
   // var r = UIController.getAppdata();
@@ -616,6 +702,7 @@ var Dimwhit = (function () {
       this.alignAtt = alignAtt;
     }
 
+    // !VA calcController module public functions from 
     return {
 
       // TESTING FUNCTION
@@ -906,16 +993,16 @@ var Dimwhit = (function () {
       // !VA Might be good to fold this into error handling
       // calcController: VALIDATE INPUT FOR INTEGER
       validateInteger: function(inputVal) {
-        // !VA Since integer validation is used for all height/width input fields, including those not yet implemented, we're going to use a separate error handler for it, call showMessages from it and return 
+        // !VA Since integer validation is used for all height/width input fields, including those not yet implemented, we're going to use a separate error handler for it, call showAppMessages from it and return 
         let isErr;
         // let mess;
         if (!parseInt(inputVal, 10) || inputVal % 1 !== 0 || inputVal < 0) {
           // errorMessages(target, "Width and height must be entered as positive whole number.");
-          UIController.showMessage('blob', true)
+          UIController.showAppMessage('blob', true)
           console.log('validateInteger -- not an integer');
           isErr = true;
           // !VA Deal with actual error handling later
-          // showMessage(mess, isErr);
+          // showAppMessage(mess, isErr);
         } else { 
           // !VA Input fields return strings, so convert to integer
           inputVal = parseInt(inputVal);
@@ -976,7 +1063,7 @@ var Dimwhit = (function () {
         imgTag.classAtt = 
           // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
           calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.imgClass).value);
-        imgTag.closeTag = '/>';
+
         imgTag.altAtt =    
           // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output
           calcController.ccpIfNoUserInput('alt',document.querySelector(ccpUserInput.imgAlt).value);
@@ -1496,7 +1583,7 @@ ${tableTag.tableContents}
         if (key === str ) {
           console.log('match');
           console.log('value is: ' + value);
-          showMessage(id, value, true);
+          showAppMessage(id, value, true);
         }
       }
 
@@ -1504,7 +1591,7 @@ ${tableTag.tableContents}
 
     };
 
-    var showMessage = function(id, mess, isErr) {
+    var showAppMessage = function(id, mess, isErr) {
 
       console.log('id is: ' + id);
       console.log('mess is: ' + mess);

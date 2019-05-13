@@ -1347,10 +1347,19 @@ input:focus:-ms-input-placeholder {
   opacity: 0; }
   #app-message-container.show-err {
     opacity: 1;
-    transition: opacity .25s ease-in-out; }
+    transition: opacity .25s ease-in-out;
+    color: #FF0000; }
   #app-message-container.hide-err {
     opacity: 0;
     transition: opacity .25s ease-in-out; }
+  #app-message-container.show-mess {
+    opacity: 1;
+    transition: opacity .25s ease-in-out;
+    color: #959595; }
+  #app-message-container.hide-mess {
+    opacity: 0;
+    transition: opacity .25s ease-in-out;
+    color: #959595; }
   #app-message-container table {
     display: block;
     position: relative;
@@ -1360,7 +1369,6 @@ input:focus:-ms-input-placeholder {
     #app-message-container table td {
       width: 650px;
       height: 65px;
-      color: #FF0000;
       font-size: 17px;
       line-height: 18px;
       font-style: italic;
@@ -1476,6 +1484,16 @@ output {
     color: #FFF;
     font-size: 14px;
     text-align: center; }
+
+#ccp-blocker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 530px !important;
+  width: 800px;
+  background: transparent;
+  display: none;
+  z-index: 999; }
 
 #ccp-content {
   display: block;
