@@ -224,14 +224,14 @@
                   <div id="img-include-css" > 
                       <label class="img-include-css-container" id="img-include-css-container" for="img-include-css">
                         
-                          <label class="img-include-css-label" id="img-include-css-label" for="img-include-css">
+                        <label class="img-include-css-label" id="img-include-css-label" for="img-include-css">
                         
-                        Include width and height in style attribute
+                        Include width and height in style attribute</label>
                       <!-- The default checkbox is hidden -->
                       <input type="checkbox" id="img-include-css-checkbox">
                       <span id="img-include-css-checkmrk"></span>
                       <!-- VA! These options are set in handleTableWidth -->
-                  </label> 
+                    </label> 
                   </div> 
                   <div id="img-relpath"> 
                     <label id="img-relpath-label" for="img-relpath-input">path=</label> 
@@ -299,6 +299,26 @@
                   </select> 
                 </div> 
               </div> 
+              <div class="ccp-options-col-3">
+                <div id="td-bgcolor">
+                  <label for="td-bgcolor-input" id="td-bgcolor">bgcolor= #</label>
+                  <input type="text" id="td-bgcolor-input" placeholder="none" value="" />
+                </div>
+
+                <div id="td-bgimage" > 
+                    <label class="td-bgimage-container" id="td-bgimage-container" for="td-bgimage">
+                      
+                    <label class="td-bgimage-label" id="td-bgimage-label" for="td-bgimage">
+                      
+                      Background image by <a href="https://backgrounds.cm/">Stig</a>
+                      </label>
+                    <!-- The default checkbox is hidden -->
+                    <input type="checkbox" id="td-bgimage-checkbox">
+                    <span id="td-bgimage-checkmrk"></span>
+                    <!-- VA! These options are set in handleTableWidth -->
+                  </label> 
+                </div> 
+              </div>
             </div><!-- /#ccp-td-options -->
           </fieldset>
 
@@ -340,6 +360,10 @@
                 </div> 
               </div>
               <div class="ccp-options-col-3"> 
+                <div id="table-bgcolor">
+                  <label for="table-bgcolor-input" id="table-bgcolor">bgcolor= #</label>
+                  <input type="text" id="table-bgcolor-input" placeholder="none" value="" />
+                </div>
                 <div id="table-max-width">
                     <!-- VA! These options are set in handleTableWidth -->
                     <label for="table-max-width-input">max-width:</label>

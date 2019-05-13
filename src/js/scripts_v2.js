@@ -32,15 +32,15 @@ then, globally, dim-viewer to dv
 var Dimwhit = (function () {
 
   // !VA DEV Test function to get the clicked element to the console
-  // (function () {
-  //   document.addEventListener('click', function(e) {
-  //     e = e || window.event;
-  //     var target = e.target || e.srcElement,
-  //       text = target.textContent || target.innerText;   
-  //     console.log('Get the clicked element: ' + e);
-  //     console.log(e.target);
-  //   }, false);
-  // })();
+  (function () {
+    document.addEventListener('click', function(e) {
+      e = e || window.event;
+      var target = e.target || e.srcElement,
+        text = target.textContent || target.innerText;   
+      console.log('Get the clicked element: ' + e);
+      console.log(e.target);
+    }, false);
+  })();
 
 
   var UIController = (function() {
@@ -111,9 +111,12 @@ var Dimwhit = (function () {
       tdClass: '#td-class-input',
       tdAlign: '#td-align-select',
       tdValign: '#td-valign-select',
+      tdBgcolor: '#td-bgcolor-input',
+      tdBgimage: '#td-bgimage-checkmrk',
       tableClass: '#table-class-input',
       tableAlign: '#table-align-select',
       tableWidth: '#table-width-select',
+      tableBgcolor: '#table-bgcolor-input',
       tableMaxWidth: '#table-max-width-input',
     };
 
@@ -159,10 +162,12 @@ var Dimwhit = (function () {
       if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
         // !VA CCP Event Listeners -- we will handle CCP events separately from other UI events here to keep separation of dynamic vs static element handling
         // !VA Handle the checkbox
-        var checkmrk = document.querySelector(ccpUserInput.imgIncludeStyles);
+        var imgIncludeStylesCheckmrk = document.querySelector(ccpUserInput.imgIncludeStyles);
         // !VA Toggle the checkbox
-        checkmrk.addEventListener('click', toggleCheckbox, false);
-        // checkmark.addEventListener('click', function(this.) {checkbox.checked ? checkbox.checked = false : checkbox.checked = true;}, false);
+        imgIncludeStylesCheckmrk.addEventListener('click', toggleCheckbox, false);
+        var tdBgimageCheckmrk = document.querySelector(ccpUserInput.tdBgimage);
+        tdBgimageCheckmrk.addEventListener('click', toggleCheckbox, false);
+
       }
     })();
 
@@ -1034,12 +1039,22 @@ var Dimwhit = (function () {
         var data = UIController.accessAppdata();
         var str;
         // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
+        console.log('val is: ' + val);
+        // debugger;
         if (val && att) {
-          str = `${att}="${val}" `;
+          // !VA I might want to change this to include the # in the string itself.
+          if (val === '#') {
+            str = '';
+          } else {
+            str = `${att}="${val}"`;
+          }
+
         } else {
           // !VA If the path field is empty, we need to return the filename without the path.
           if (att === 'src' && val === '' ) {
             str = `${att}="${data.filename}" `;
+          } else if ( att === '#' || att === '') {
+            str = '';
           } else {
             // !VA If there is no input, exclude the attribute entry.
             str = '';
@@ -1086,6 +1101,7 @@ var Dimwhit = (function () {
           // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
           var str;
           id = id.replace('mrk', 'box');
+          console.log('id HERE is: ' + id);
           // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
           if (document.querySelector(id).checked === true) {
             str = `border="0" style="width: ${data.imgW}px; height: ${data.imgH}px; border: none; outline: none; text-decoration: none; display: block;" `;
@@ -1125,7 +1141,10 @@ var Dimwhit = (function () {
       // calcController: GET STRINGS FOR THE TD CLIPBOARD OUTPUT
       ccpGetTdClipboardOutput: function () {
         // !VA We don't need this yet, but we will if we decide to add a width style property which is useful for Outlook 120dpi 
-        // var data = UIController.accessAppdata();
+        var data = UIController.accessAppdata();
+        // !VA Declare the string that gets the clipboard output
+        var clipboardStr;
+
 
         var tdTag = new ClipboardOutput('tdTag');
         tdTag.classAtt = 
@@ -1172,27 +1191,63 @@ var Dimwhit = (function () {
         })(ccpUserInput.tdValign);
         // !VA tdValign END
 
+        // !VA Pass the input value, prepending it hex # character 
+        tdTag.bgcolorAtt =
+         calcController.ccpIfNoUserInput('bgcolor','#' + document.querySelector(ccpUserInput.tdBgcolor).value);
+        // !VA tdBgcolor  END
+
+
         tdTag.tdContents =    (function () {
           // !VA Get the img tag output and put in between the td tags
           var str = calcController.ccpGetImgClipboardOutput();
           return str;
         })();
 
+        tdTag.BgimageAtt =  (function (id) {
+          // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
+          var str;
+          id = id.replace('mrk', 'box');
+          console.log('id is: ' + id);
+          // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
+          if (document.querySelector(id).checked === true) {
+            str = 
+            
+            
+  `
+  <td background="${data.filename}" ${tdTag.bgcolorAtt}" width="${data.imgW}" height="${data.imgH}" ${tdTag.valignAtt}">
+  <!--[if gte mso 9]>
+  <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${data.width}px;height:${data.height}px;">
+    <v:fill type="tile" src="https://i.imgur.com/YJOX1PC.png" color="${tdTag.bgcolorAtt}" />
+    <v:textbox inset="0,0,0,0">
+  <![endif]-->
+    <div>
+    <!-- Put Foreground Content Here -->
+    </div>
+    <!--[if gte mso 9]>
+      </v:textbox>
+    </v:rect>
+    <![endif]-->
+  </td>
+  `;
 
 
-        var clipboardStr = 
+            
+          } else {
+          // !VA The regular TD element
+            str = 
 
-`    <td ${tdTag.alignAtt} ${tdTag.valignAtt}>
+`    <td ${tdTag.classAtt + ' '}${tdTag.alignAtt + ' '}${tdTag.valignAtt + ' '}${tdTag.bgcolorAtt + ' '}>
       ${tdTag.tdContents}
     </td>`;
 
-        var tdTagArray = [];
-        tdTagArray[0] = '\t' + tdTag.openTag;
-        tdTagArray[1] = tdTag.classAtt;
-        tdTagArray[2] = tdTag.alignAtt;
-        tdTagArray[3] = tdTag.valignAtt + '\n';
-        tdTagArray[4] = '\t\t' + tdTag.tdContents  + '\n';
-        tdTagArray[5] = '\t' + tdTag.closeTag;
+          }
+          clipboardStr = str;
+          // return clipboardStr;
+        })(ccpUserInput.tdBgimage);
+
+
+
+
         return clipboardStr;
       }, 
 
@@ -1220,7 +1275,7 @@ var Dimwhit = (function () {
           // !VA Put the available options in an array
           var tableAlignOptions = [ 'none', 'left', 'center', 'right' ];
           // !VA Put the desired output strings in an array
-          var clipboardOutput = [ '', 'align="left" ', 'align="center" ', 'align="right" '];
+          var clipboardOutput = [ '', 'align="left"', 'align="center"', 'align="right"'];
           // !VA If the selected index matches the index of the available options array, then output the string that matches that index
           for (let i = 0; i < tableAlignOptions.length; i++) {
             if ( selInd === i) {
@@ -1247,7 +1302,7 @@ var Dimwhit = (function () {
           // !VA Put the available options in an array
           var tableWidthOptions = [ 'none', data.imgW, data.viewerW, '100%' ];
           // !VA Put the desired output strings in an array
-          var clipboardOutput = [ '',`width="${data.imgW}"`, `width="${data.viewerW}" `, '100%'];
+          var clipboardOutput = [ '',`width="${data.imgW}"`, `width="${data.viewerW}"`, '100%'];
           // !VA If the selected index matches the index of the available options array, then output the string that matches that index
           for (let i = 0; i < tableWidthOptions.length; i++) {
             if ( selInd === i) {
@@ -1257,8 +1312,14 @@ var Dimwhit = (function () {
           return str;
         })(ccpUserInput.tableWidth, data);
 
+        // !VA Pass the input value, prepending it hex # character 
+        tableTag.bgcolorAtt =
+         calcController.ccpIfNoUserInput('bgcolor','#' + document.querySelector(ccpUserInput.tableBgcolor).value);
+        // !VA tdBgcolor  END
+
+
         clipboardStr = 
-`<table border="0" cellpadding="0" cellspacing="0" ${tableTag.classAtt} ${tableTag.alignAtt} ${tableTag.widthAtt}>
+`<table border="0" cellpadding="0" cellspacing="0" ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}>
   <tr>
 ${tableTag.tableContents}
   </tr>

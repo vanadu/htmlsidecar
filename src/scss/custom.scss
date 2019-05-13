@@ -741,21 +741,24 @@ output {
         // !VA Width is actually irrelevant here since these elements are absolutely positioned
         // top: 15px;
         // left: 15px;
-        width: 120px;
+        width: 95px;
       }
       .ccp-options-col-2 {
         left: 120px;
-        width: 260px;
+        width: 220px;
+        // border: 1px solid green;
         label  {
-          width: 80px;
+          width: 60px;
           margin-bottom: 5px;
           padding-right: 2px;
           text-align: right;
+          
+        }
+        input {
+          width: 150px;
         }
         /* Customize the checkbox label (the container) */
-        #img-include-css {
-          z-index: -1;
-        }
+        
         .img-include-css-container {
           width: 100%;
           display: block;
@@ -783,7 +786,7 @@ output {
         #img-include-css-checkmrk {
           position: absolute;
           top: 5px;
-          left: 50px;
+          left: 30px;
           height: 15px;
           width: 15px;
           background-color: #eee;
@@ -795,24 +798,24 @@ output {
         .img-include-css-container:hover input ~ #img-include-css-checkmrk {
           background-color: #ccc;
         }
-
+        
         /* When the checkbox is checked, add a blue background */
         .img-include-css-container input:checked ~ #img-include-css-checkmrk {
           background-color: #5f5e5e;
         }
-
+        
         /* Create the checkmrk/indicator (hidden when not checked) */
         #img-include-css-checkmrk:after {
           content: "";
           position: absolute;
           display: none;
         }
-
+        
         /* Show the checkmrk when checked */
         .img-include-css-container input:checked ~ #img-include-css-checkmrk:after {
           display: block;
         }
-
+        
         /* Style the checkmrk/indicator */
         .img-include-css-container #img-include-css-checkmrk:after {
           left: 5px;
@@ -824,18 +827,18 @@ output {
           -webkit-transform: rotate(45deg);
           -ms-transform: rotate(45deg);
           transform: rotate(45deg);
-
+          
         }
         #img-include-css-label {
-          width: 220px;
-          padding-left: 44px;
+          width: 180px;
+          padding-left: 24px;
           text-align: left;
         }
-
+        
       }
       .ccp-options-col-3 {
-        left: 390px;
-        width: 220px;
+        left: 350px;
+        width: 260px;
         input {
           width: 120px;
         }
@@ -845,6 +848,87 @@ output {
           padding-right: 2px;
           text-align: right;
         }
+        
+        .td-bgimage-container {
+          width: 100%;
+          display: block;
+          position: relative;
+          padding-left: 35px;
+          margin-bottom: 3px;
+          cursor: pointer;
+          // font-size: 22px;
+          text-align: left;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+          z-index: 100;
+          a {
+            font-weight: bold;
+            text-decoration: underline;
+          }
+        }
+        /* Hide the browser's default checkbox */
+        .td-bgimage-container input {
+          position: absolute;
+          opacity: 0;
+          cursor: pointer;
+          height: 0;
+          width: 0;
+        }
+        
+        /* Create a custom checkbox */
+        #td-bgimage-checkmrk {
+          position: absolute;
+          top: 3px;
+          left: 50px;
+          height: 15px;
+          width: 15px;
+          background-color: #eee;
+          display: block;
+          z-index: 100;
+        }
+        
+        /* On mouse-over, add a grey background color */
+        .td-bgimage-container:hover input ~ #td-bgimage-checkmrk {
+          background-color: #ccc;
+        }
+        /* When the checkbox is checked, add a blue background */
+        .td-bgimage-container input:checked ~ #td-bgimage-checkmrk {
+          background-color: #5f5e5e;
+        }
+        #td-bgimage-checkmrk:after {
+          content: "";
+          position: absolute;
+          display: none;
+        }
+        
+        /* Show the checkmrk when checked */
+        .td-bgimage-container input:checked ~ #td-bgimage-checkmrk:after {
+          display: block;
+        }
+        
+        
+        /* Style the checkmrk/indicator */
+        .td-bgimage-container #td-bgimage-checkmrk:after {
+          left: 5px;
+          top: 2px;
+          width: 5px;
+          height: 10px;
+          border: solid white;
+          border-width: 0 3px 3px 0;
+          -webkit-transform: rotate(45deg);
+          -ms-transform: rotate(45deg);
+          transform: rotate(45deg);
+          
+        }
+        #td-bgimage-label {
+          width: 220px;
+          padding-left: 44px;
+          text-align: left;
+        }
+        
+
       }
       .ccp-options-col-4 {
         left: 620px;
@@ -862,7 +946,6 @@ output {
       color: #FFFFFF;
       font-size: 18px;
       vertical-align: baseline;
-      // border: 1px solid green;
     }
     legend {
       height: 20px;
@@ -884,6 +967,7 @@ output {
       height: 110px;
       legend {
         width: 120px;
+
       }
     }
     &#table-options {
@@ -900,6 +984,8 @@ output {
   .ccp-options-col-1 {
     position: absolute;
     #img-build-html-but {
+      width: 100px;
+      float: left;
       display: block;
       background: #000000 url('../img/img-to-cb-html.png') no-repeat center;
       background-size: 90px 46px;
@@ -987,6 +1073,7 @@ output {
 #td-options {
   .ccp-options-col-1 {
     #td-build-html-but {
+      width: 100px;
       display: block;
       background: #000000 url('../img/td-to-cb-html-icon.png') no-repeat center;
       background-size: 90px 46px;
@@ -1004,6 +1091,7 @@ output {
     // left: 20px;
     // width: 120px;
     #table-build-html-but {
+      width: 100px;
       display: block;
       background: #000000 url('../img/table-to-cb-html-icon.png') no-repeat center;
       background-size: 90px 46px;

@@ -1536,10 +1536,10 @@ output {
         margin: 0;
         padding: 0; }
       #ccp-content fieldset .ccp-options .ccp-options-col-1 {
-        width: 120px; }
+        width: 95px; }
       #ccp-content fieldset .ccp-options .ccp-options-col-2 {
         left: 120px;
-        width: 260px;
+        width: 220px;
         /* Customize the checkbox label (the container) */
         /* Hide the browser's default checkbox */
         /* Create a custom checkbox */
@@ -1549,12 +1549,12 @@ output {
         /* Show the checkmrk when checked */
         /* Style the checkmrk/indicator */ }
         #ccp-content fieldset .ccp-options .ccp-options-col-2 label {
-          width: 80px;
+          width: 60px;
           margin-bottom: 5px;
           padding-right: 2px;
           text-align: right; }
-        #ccp-content fieldset .ccp-options .ccp-options-col-2 #img-include-css {
-          z-index: -1; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 input {
+          width: 150px; }
         #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container {
           width: 100%;
           display: block;
@@ -1577,7 +1577,7 @@ output {
         #ccp-content fieldset .ccp-options .ccp-options-col-2 #img-include-css-checkmrk {
           position: absolute;
           top: 5px;
-          left: 50px;
+          left: 30px;
           height: 15px;
           width: 15px;
           background-color: #eee;
@@ -1604,12 +1604,18 @@ output {
           -ms-transform: rotate(45deg);
           transform: rotate(45deg); }
         #ccp-content fieldset .ccp-options .ccp-options-col-2 #img-include-css-label {
-          width: 220px;
-          padding-left: 44px;
+          width: 180px;
+          padding-left: 24px;
           text-align: left; }
       #ccp-content fieldset .ccp-options .ccp-options-col-3 {
-        left: 390px;
-        width: 220px; }
+        left: 350px;
+        width: 260px;
+        /* Hide the browser's default checkbox */
+        /* Create a custom checkbox */
+        /* On mouse-over, add a grey background color */
+        /* When the checkbox is checked, add a blue background */
+        /* Show the checkmrk when checked */
+        /* Style the checkmrk/indicator */ }
         #ccp-content fieldset .ccp-options .ccp-options-col-3 input {
           width: 120px; }
         #ccp-content fieldset .ccp-options .ccp-options-col-3 label {
@@ -1617,6 +1623,61 @@ output {
           margin-bottom: 5px;
           padding-right: 2px;
           text-align: right; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-3 .td-bgimage-container {
+          width: 100%;
+          display: block;
+          position: relative;
+          padding-left: 35px;
+          margin-bottom: 3px;
+          cursor: pointer;
+          text-align: left;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+          z-index: 100; }
+          #ccp-content fieldset .ccp-options .ccp-options-col-3 .td-bgimage-container a {
+            font-weight: bold;
+            text-decoration: underline; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-3 .td-bgimage-container input {
+          position: absolute;
+          opacity: 0;
+          cursor: pointer;
+          height: 0;
+          width: 0; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-3 #td-bgimage-checkmrk {
+          position: absolute;
+          top: 3px;
+          left: 50px;
+          height: 15px;
+          width: 15px;
+          background-color: #eee;
+          display: block;
+          z-index: 100; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-3 .td-bgimage-container:hover input ~ #td-bgimage-checkmrk {
+          background-color: #ccc; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-3 .td-bgimage-container input:checked ~ #td-bgimage-checkmrk {
+          background-color: #5f5e5e; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-3 #td-bgimage-checkmrk:after {
+          content: "";
+          position: absolute;
+          display: none; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-3 .td-bgimage-container input:checked ~ #td-bgimage-checkmrk:after {
+          display: block; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-3 .td-bgimage-container #td-bgimage-checkmrk:after {
+          left: 5px;
+          top: 2px;
+          width: 5px;
+          height: 10px;
+          border: solid white;
+          border-width: 0 3px 3px 0;
+          -webkit-transform: rotate(45deg);
+          -ms-transform: rotate(45deg);
+          transform: rotate(45deg); }
+        #ccp-content fieldset .ccp-options .ccp-options-col-3 #td-bgimage-label {
+          width: 220px;
+          padding-left: 44px;
+          text-align: left; }
       #ccp-content fieldset .ccp-options .ccp-options-col-4 {
         left: 620px;
         width: 70px;
@@ -1654,6 +1715,8 @@ output {
 #img-options .ccp-options-col-1 {
   position: absolute; }
   #img-options .ccp-options-col-1 #img-build-html-but {
+    width: 100px;
+    float: left;
     display: block;
     background: #000000 url("../img/img-to-cb-html.png") no-repeat center;
     background-size: 90px 46px; }
@@ -1720,6 +1783,7 @@ output {
         background-image: url("../img/ccp-sphone-css-but-hover.png"); }
 
 #td-options .ccp-options-col-1 #td-build-html-but {
+  width: 100px;
   display: block;
   background: #000000 url("../img/td-to-cb-html-icon.png") no-repeat center;
   background-size: 90px 46px; }
@@ -1727,6 +1791,7 @@ output {
     background-image: url("../img/td-to-cb-html-icon-hover.png"); }
 
 #table-options .ccp-options-col-1 #table-build-html-but {
+  width: 100px;
   display: block;
   background: #000000 url("../img/table-to-cb-html-icon.png") no-repeat center;
   background-size: 90px 46px; }
