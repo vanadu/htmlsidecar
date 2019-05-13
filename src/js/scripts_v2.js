@@ -93,8 +93,8 @@ var Dimwhit = (function () {
       ccpImgClipbboardBut: '#img-build-html-but',
       ccpTdClipbboardBut: '#td-build-html-but',
       ccpTableClipbboardBut: '#table-build-html-but',
-      errViewerContainer: '#app-error-container',
-      errMessContainer: '#app-error-message'
+      appMessContainer: '#app-message-container',
+      appMessDisplay: '#app-message-display'
     };
 
     // !VA  UIController: ccpUserInput ID Strings
@@ -183,21 +183,21 @@ var Dimwhit = (function () {
 
     // UIController: Clipboard output for build html image button
     // !VA TODO: See if this can be consolidated
-    var foo = new Clipboard(staticRegions.ccpImgClipbboardBut, {
+    var imgClipboardBut = new Clipboard(staticRegions.ccpImgClipbboardBut, {
       text: function(trigger) {
         // console.log('foo is...');
         // console.dir(foo);
         var clipboardStr = calcController.ccpGetImgClipboardOutput();
 
         // !VA STOPPED HERE - write a message to an element on success
-        // foo.on('success', function(event) {
-        //   event.clearSelection();
-        //   event.trigger.textContent = 'Copied';
-        //   console.log(clipboardStr);
-        //   window.setTimeout(function() {
-        //     console.log('Do another one!');
-        //   }, 2000);
-        // });
+        imgClipboardBut.on('success', function(event) {
+          event.clearSelection();
+          event.trigger.textContent = 'Copied';
+          console.log(clipboardStr);
+          window.setTimeout(function() {
+            console.log('Do another one!');
+          }, 2000);
+        });
 
         return clipboardStr;
       }
@@ -1359,12 +1359,12 @@ ${tableTag.tableContents}
         // e.stopPropagation;
         var el;
         // !VA If there is an error message showing, allow the CSS transition to run, then remove it
-        var errViewerContainer = document.querySelector(staticRegions.errViewerContainer);
-        var errMessContainer = document.querySelector(staticRegions.errMessContainer);
-        if (errMessContainer.textContent) {
+        var appMessContainer = document.querySelector(staticRegions.appMessContainer);
+        var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
+        if (appMessDisplay.textContent) {
           // !VA On any event, if errorViewerContainer is showing, hide it.
-          errViewerContainer.classList.remove('show-err');
-          errViewerContainer.classList.add('hide-err');
+          appMessContainer.classList.remove('show-err');
+          appMessContainer.classList.add('hide-err');
         }
         // !VA Put the event trigger in an object first, so we don't have to keep calling document.getElementById
         el = document.getElementById(this.id);
@@ -1513,23 +1513,23 @@ ${tableTag.tableContents}
       // let displayTime;
       // Get the elements to manipulate for the error message display
       // // !VA Create objects for all the UI elements used in this function
-      var errViewerContainer = document.querySelector(staticRegions.errViewerContainer);
-      var errMessContainer = document.querySelector(staticRegions.errMessContainer);
+      var appMessContainer = document.querySelector(staticRegions.appMessContainer);
+      var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
       // var dimViewers = document.querySelector('#dim-viewers');
       // var toolsContainer = document.querySelector('#tools-container');
       // Put the respective error message in the error message container
-      errMessContainer.innerHTML = mess;
-      // Swap dimViewers with errMessContainer and drop toolsContainer behind viewport;
+      appMessDisplay.innerHTML = mess;
+      // Swap dimViewers with appMessDisplay and drop toolsContainer behind viewport;
       console.log('HERE');
 
-      errViewerContainer.classList.add('show-err');
-      console.log(errViewerContainer);
+      appMessContainer.classList.add('show-err');
+      console.log(appMessContainer);
 
 
       // !VA Reset the value of the element into which the error was entered to empty. 
       document.getElementById(id).value = '';
-      errViewerContainer.classList.remove('hide-err');
-      errViewerContainer.classList.add('show-err');
+      appMessContainer.classList.remove('hide-err');
+      appMessContainer.classList.add('show-err');
 
 
       // }
@@ -1538,15 +1538,15 @@ ${tableTag.tableContents}
 
       // setTimeout(function(){
       //   // Swap the error positions back to normal after 3 seconds
-      //   errViewerContainer.classList.add('hide-err');
+      //   appMessContainer.classList.add('hide-err');
       //   // dimViewers.classList.add('hide-err');
       //   // toolsContainer.classList.add('hide-err');
-      //   errViewerContainer.classList.remove('show-err');
+      //   appMessContainer.classList.remove('show-err');
       //   // dimViewers.classList.remove('show-err');
       //   // toolsContainer.classList.remove('show-err');
       //   setTimeout(function(){
       //     // Remove the hide-err class after the .5 seconds -- which is the animation run time set in the CSS transforms.
-      //     errViewerContainer.classList.remove('hide-err');
+      //     appMessContainer.classList.remove('hide-err');
       //     // dimViewers.classList.remove('hide-err');
       //     // toolsContainer.classList.remove('hide-err');
       //   },250);

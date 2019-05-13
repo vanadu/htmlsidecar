@@ -431,7 +431,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 }
 
 // APP ERROR DISPLAY
-#app-error-container {
+#app-message-container {
   // border: 1px solid red;
   display: block;
   position: absolute;
@@ -465,7 +465,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
     width: 650px;
     height: 100%;
     margin: 0 auto;
-    // dim-error-message
+    // app-message-display
     td {
       width: 650px;
       height: 65px;
