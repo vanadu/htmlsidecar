@@ -1539,7 +1539,7 @@ output {
         width: 95px; }
       #ccp-content fieldset .ccp-options .ccp-options-col-2 {
         left: 120px;
-        width: 220px;
+        width: 230px;
         /* Customize the checkbox label (the container) */
         /* Hide the browser's default checkbox */
         /* Create a custom checkbox */
@@ -1609,7 +1609,7 @@ output {
           text-align: left; }
       #ccp-content fieldset .ccp-options .ccp-options-col-3 {
         left: 350px;
-        width: 260px;
+        width: 255px;
         /* Hide the browser's default checkbox */
         /* Create a custom checkbox */
         /* On mouse-over, add a grey background color */
@@ -1619,7 +1619,7 @@ output {
         #ccp-content fieldset .ccp-options .ccp-options-col-3 input {
           width: 120px; }
         #ccp-content fieldset .ccp-options .ccp-options-col-3 label {
-          width: 80px;
+          width: 75px;
           margin-bottom: 5px;
           padding-right: 2px;
           text-align: right; }
@@ -1648,7 +1648,7 @@ output {
         #ccp-content fieldset .ccp-options .ccp-options-col-3 #td-bgimage-checkmrk {
           position: absolute;
           top: 3px;
-          left: 50px;
+          left: 40px;
           height: 15px;
           width: 15px;
           background-color: #eee;
@@ -1676,7 +1676,7 @@ output {
           transform: rotate(45deg); }
         #ccp-content fieldset .ccp-options .ccp-options-col-3 #td-bgimage-label {
           width: 220px;
-          padding-left: 44px;
+          padding-left: 34px;
           text-align: left; }
       #ccp-content fieldset .ccp-options .ccp-options-col-4 {
         left: 620px;
