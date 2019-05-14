@@ -782,7 +782,7 @@ output {
         }
         
         /* When the checkbox is checked, add a blue background */
-        .img-include-css-container input:checked ~ #img-include-css-checkmrk, .table-include-wrapper-container:hover input ~ #table-include-wrapper-checkmrk {
+        .img-include-css-container input:checked ~ #img-include-css-checkmrk, .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk {
           background-color: #5f5e5e;
         }
         
@@ -816,7 +816,10 @@ output {
           padding-left: 24px;
           text-align: left;
         }
-        
+        #table-wrapper-width {
+          /* Hiding this by default, it will be displayed programmatically */
+          display: none;
+        }
       }
       .ccp-options-col-3 {
         left: 350px;

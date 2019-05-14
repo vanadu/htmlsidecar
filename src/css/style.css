@@ -1585,7 +1585,7 @@ output {
           z-index: 100; }
         #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container:hover input ~ #img-include-css-checkmrk, #ccp-content fieldset .ccp-options .ccp-options-col-2 .table-include-wrapper-container:hover input ~ #table-include-wrapper-checkmrk {
           background-color: #ccc; }
-        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container input:checked ~ #img-include-css-checkmrk, #ccp-content fieldset .ccp-options .ccp-options-col-2 .table-include-wrapper-container:hover input ~ #table-include-wrapper-checkmrk {
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container input:checked ~ #img-include-css-checkmrk, #ccp-content fieldset .ccp-options .ccp-options-col-2 .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk {
           background-color: #5f5e5e; }
         #ccp-content fieldset .ccp-options .ccp-options-col-2 #img-include-css-checkmrk:after, #ccp-content fieldset .ccp-options .ccp-options-col-2 #table-include-wrapper-checkmrk:after {
           content: "";
@@ -1607,6 +1607,9 @@ output {
           width: 180px;
           padding-left: 24px;
           text-align: left; }
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 #table-wrapper-width {
+          /* Hiding this by default, it will be displayed programmatically */
+          display: none; }
       #ccp-content fieldset .ccp-options .ccp-options-col-3 {
         left: 350px;
         width: 255px;

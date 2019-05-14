@@ -1,12 +1,14 @@
 
 /* !VA  
 ===========================================================
-TODO: Put error container above toolbuttons
+TODO: Make all checkboxes under one CSS definition
+TODO: Change TABLE width: add width checkbox that shows input with default width of imgW, and another checkbox for wrapper that shows viewerW. Add checkbox for Stig ba
 
 
 TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
 
 
+DONE: Put error container above toolbuttons
 DONE: fix select options to clipboard
 DONE: Implement the CSS clipboard buttons
 DONE: Fix the retina calculations: it should alert if the disk size isn't 2X the display size.
@@ -32,15 +34,15 @@ then, globally, dim-viewer to dv
 var Dimwhit = (function () {
 
   // !VA DEV Test function to get the clicked element to the console
-  (function () {
-    document.addEventListener('click', function(e) {
-      e = e || window.event;
-      var target = e.target || e.srcElement,
-        text = target.textContent || target.innerText;   
-      console.log('Get the clicked element: ' + e);
-      console.log(e.target);
-    }, false);
-  })();
+  // (function () {
+  //   document.addEventListener('click', function(e) {
+  //     e = e || window.event;
+  //     var target = e.target || e.srcElement,
+  //       text = target.textContent || target.innerText;   
+  //     console.log('Get the clicked element: ' + e);
+  //     console.log(e.target);
+  //   }, false);
+  // })();
 
 
   var UIController = (function() {
@@ -116,6 +118,8 @@ var Dimwhit = (function () {
       tableClass: '#table-class-input',
       tableAlign: '#table-align-select',
       tableWidth: '#table-width-select',
+      tableIncludeWrapper: '#table-include-wrapper-checkmrk',
+      tableWrapperWidth: '#table-wrapper-width-input',
       tableBgcolor: '#table-bgcolor-input',
       tableMaxWidth: '#table-max-width-input',
     };
@@ -161,12 +165,17 @@ var Dimwhit = (function () {
       // !VA If the CCP is open...
       if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
         // !VA CCP Event Listeners -- we will handle CCP events separately from other UI events here to keep separation of dynamic vs static element handling
-        // !VA Handle the checkbox
+        // !VA Checkboxes that need toggling
         var imgIncludeStylesCheckmrk = document.querySelector(ccpUserInput.imgIncludeStyles);
+        var tdBgimageCheckmrk = document.querySelector(ccpUserInput.tdBgimage);
+        var tableIncludeWrapper = document.querySelector(ccpUserInput.tableIncludeWrapper);
         // !VA Toggle the checkbox
         imgIncludeStylesCheckmrk.addEventListener('click', toggleCheckbox, false);
-        var tdBgimageCheckmrk = document.querySelector(ccpUserInput.tdBgimage);
         tdBgimageCheckmrk.addEventListener('click', toggleCheckbox, false);
+        console.log('HERE');
+        var foo = tableIncludeWrapper.addEventListener('click', toggleCheckbox, false);
+        console.log('foo is: ' + foo);
+        console.dir(foo);
 
       }
     })();
@@ -177,23 +186,28 @@ var Dimwhit = (function () {
       console.log('TESTED!');
     }
 
-    // !VA  UIController: Toggle checkboxes
+    // !VA  UIController: Toggle checkboxes and run any associated actions
     function toggleCheckbox(target) {
       // We want this to run for all custom CSS checkboxes used in this project -- but the CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
       // !VA The clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it.
-      var str = target.target.id.replace('mrk', 'box');
-      var checkbox = document.getElementById(str);
+
+      var checkbox = document.getElementById(target.target.id.replace('mrk', 'box'));
       // var checkmark = document.querySelector('#img-include-css-checkmark');
       checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
+      // !VA Now run any actions associated with the checkbox
+      // !VA Only show the wrapper table width option if Include wrapper table is selected 
+      checkbox.checked ? document.querySelector('#table-wrapper-width').style.display = 'block' : document.querySelector('#table-wrapper-width').style.display = 'none';
+
+
+
+
+
     }
 
     // UIController: Clipboard output for build html image button
     // !VA TODO: Might be able to consolidate this into a single function but doesn't seem worth it
     var imgClipboardBut = new Clipboard(staticRegions.ccpImgClipbboardBut, {
       text: function(trigger) {
-        // console.log('foo is...');
-        // console.dir(foo);
-        // !VA Get the clipboard string 
         var clipboardStr = calcController.ccpGetImgClipboardOutput();
         // !VA Write success message to app message area on success
         imgClipboardBut.on('success', function(event) {
@@ -603,8 +617,7 @@ var Dimwhit = (function () {
         var twidth = document.querySelector(ccpUserInput.tableWidth);
         twidth.options[0].innerHTML = 'none';
         twidth.options[1].innerHTML = data.imgW;
-        twidth.options[2].innerHTML = data.viewerW;
-        twidth.options[3].innerHTML = '100%';
+
 
         // !VA Not ready for these yet
         // var tableMaxWidth = `'<option>${Appdata.viewerW}</option><option>100%</option>'`;
@@ -621,6 +634,7 @@ var Dimwhit = (function () {
       // UIController Show element when input in another element is made 
       showElementOnInput: function(event) {
         // !VA Here we catch the input handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
+        
         var elems = [];
         // elems[0] = ccpBuildTag.imgBuildCSSBut;
         elems[0] = document.querySelector(ccpBuildTag.imgBuildCSSBut);
@@ -1039,8 +1053,6 @@ var Dimwhit = (function () {
         var data = UIController.accessAppdata();
         var str;
         // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
-        console.log('val is: ' + val);
-        // debugger;
         if (val && att) {
           // !VA I might want to change this to include the # in the string itself.
           if (val === '#') {
@@ -1101,7 +1113,6 @@ var Dimwhit = (function () {
           // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
           var str;
           id = id.replace('mrk', 'box');
-          console.log('id HERE is: ' + id);
           // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
           if (document.querySelector(id).checked === true) {
             str = `border="0" style="width: ${data.imgW}px; height: ${data.imgH}px; border: none; outline: none; text-decoration: none; display: block;" `;
@@ -1209,7 +1220,7 @@ var Dimwhit = (function () {
           id = id.replace('mrk', 'box');
           console.log('id is: ' + id);
           // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
-          // !VA Stopped here. Need to implement pathName attribute to complete the src attribute
+
           if (document.querySelector(id).checked === true) {
             str = 
             
@@ -1301,9 +1312,9 @@ var Dimwhit = (function () {
           var selInd = document.querySelector(id).selectedIndex;
           console.log('selInd is: ' + selInd);
           // !VA Put the available options in an array
-          var tableWidthOptions = [ 'none', data.imgW, data.viewerW, '100%' ];
+          var tableWidthOptions = [ 'none', data.imgW ];
           // !VA Put the desired output strings in an array
-          var clipboardOutput = [ '',`width="${data.imgW}"`, `width="${data.viewerW}"`, '100%'];
+          var clipboardOutput = [ '',`width="${data.imgW}"`];
           // !VA If the selected index matches the index of the available options array, then output the string that matches that index
           for (let i = 0; i < tableWidthOptions.length; i++) {
             if ( selInd === i) {
@@ -1313,6 +1324,23 @@ var Dimwhit = (function () {
           return str;
         })(ccpUserInput.tableWidth, data);
 
+        tableTag.tableIncludeWrapper =  (function (id) {
+          // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
+          // var str;
+          id = id.replace('mrk', 'box');
+          console.log('id HERE is: ' + id);
+          // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
+          // document.querySelector(id).checked = true;
+          if (document.querySelector(id).checked === true) {
+            console.log('TRUE');
+            document.querySelector('#table-wrapper-width').style.display = 'block';
+          } else {
+            console.log('FALSE');
+            document.querySelector('#table-wrapper-width').style.display = 'none';
+          }
+          // return str;
+        })(ccpUserInput.tableIncludeWrapper);
+
         // !VA Pass the input value, prepending it hex # character 
         tableTag.bgcolorAtt =
          calcController.ccpIfNoUserInput('bgcolor','#' + document.querySelector(ccpUserInput.tableBgcolor).value);
@@ -1320,7 +1348,7 @@ var Dimwhit = (function () {
 
 
         clipboardStr = 
-`<table border="0" cellpadding="0" cellspacing="0" ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}>
+`<table ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
   <tr>
 ${tableTag.tableContents}
   </tr>
