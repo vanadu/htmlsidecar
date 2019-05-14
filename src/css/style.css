@@ -1540,7 +1540,7 @@ output {
       #ccp-content fieldset .ccp-options .ccp-options-col-2 {
         left: 120px;
         width: 230px;
-        /* Customize the checkbox label (the container) */
+        /* COLUMN 2 CHECKBOXES */
         /* Hide the browser's default checkbox */
         /* Create a custom checkbox */
         /* On mouse-over, add a grey background color */
@@ -1555,7 +1555,7 @@ output {
           text-align: right; }
         #ccp-content fieldset .ccp-options .ccp-options-col-2 input {
           width: 150px; }
-        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container {
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container, #ccp-content fieldset .ccp-options .ccp-options-col-2 .table-include-wrapper-container {
           width: 100%;
           display: block;
           position: relative;
@@ -1568,13 +1568,13 @@ output {
           -ms-user-select: none;
           user-select: none;
           z-index: 100; }
-        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container input {
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container input, #ccp-content fieldset .ccp-options .ccp-options-col-2 .table-include-wrapper-container input {
           position: absolute;
           opacity: 0;
           cursor: pointer;
           height: 0;
           width: 0; }
-        #ccp-content fieldset .ccp-options .ccp-options-col-2 #img-include-css-checkmrk {
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 #img-include-css-checkmrk, #ccp-content fieldset .ccp-options .ccp-options-col-2 #table-include-wrapper-checkmrk {
           position: absolute;
           top: 5px;
           left: 30px;
@@ -1583,17 +1583,17 @@ output {
           background-color: #eee;
           display: block;
           z-index: 100; }
-        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container:hover input ~ #img-include-css-checkmrk {
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container:hover input ~ #img-include-css-checkmrk, #ccp-content fieldset .ccp-options .ccp-options-col-2 .table-include-wrapper-container:hover input ~ #table-include-wrapper-checkmrk {
           background-color: #ccc; }
-        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container input:checked ~ #img-include-css-checkmrk {
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container input:checked ~ #img-include-css-checkmrk, #ccp-content fieldset .ccp-options .ccp-options-col-2 .table-include-wrapper-container:hover input ~ #table-include-wrapper-checkmrk {
           background-color: #5f5e5e; }
-        #ccp-content fieldset .ccp-options .ccp-options-col-2 #img-include-css-checkmrk:after {
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 #img-include-css-checkmrk:after, #ccp-content fieldset .ccp-options .ccp-options-col-2 #table-include-wrapper-checkmrk:after {
           content: "";
           position: absolute;
           display: none; }
-        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container input:checked ~ #img-include-css-checkmrk:after {
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container input:checked ~ #img-include-css-checkmrk:after, #ccp-content fieldset .ccp-options .ccp-options-col-2 .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk:after {
           display: block; }
-        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container #img-include-css-checkmrk:after {
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 .img-include-css-container #img-include-css-checkmrk:after, #ccp-content fieldset .ccp-options .ccp-options-col-2 .table-include-wrapper-container #table-include-wrapper-checkmrk:after {
           left: 5px;
           top: 2px;
           width: 5px;
@@ -1603,7 +1603,7 @@ output {
           -webkit-transform: rotate(45deg);
           -ms-transform: rotate(45deg);
           transform: rotate(45deg); }
-        #ccp-content fieldset .ccp-options .ccp-options-col-2 #img-include-css-label {
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 #img-include-css-label, #ccp-content fieldset .ccp-options .ccp-options-col-2 #table-include-wrapper-label {
           width: 180px;
           padding-left: 24px;
           text-align: left; }
@@ -1978,14 +1978,12 @@ figure {
 #test-left {
   float: left;
   width: 390px;
-  height: 100%;
-  border: 1px solid green; }
+  height: 100%; }
 
 #test-right {
   float: right;
   width: 390px;
-  height: 100%;
-  border: 1px solid red; }
+  height: 100%; }
 
 #test-right * {
   border: 1px solid magenta; }

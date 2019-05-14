@@ -62,7 +62,6 @@ button:disabled  {
   padding-bottom: 5px;
   // border-top: 1px solid $primary-bg-color;
   // border-bottom: 1px solid $primary-bg-color;
-  // border: 1px solid blue;
 }
 
 .header-content {
@@ -79,7 +78,6 @@ button:disabled  {
   width: 490px;
   // margin: 0 auto;
   margin-left: 20px;
-  // border: 1px solid green;
   .header-logo {
     position: relative;
     width: 354px;
@@ -273,8 +271,6 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   min-height: 679px;
   // padding: 0 30px;
   margin: 15px auto 100px;
-  // border: 1px solid red;
-  // background: yellow;
 }
 
 // TOOLS
@@ -301,7 +297,6 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 
 // IMAGE-VIEWPORT- contains dim viewer, dim-error-container and ccp
 #image-viewport {
-  // border: 1px solid blue !important;
   display: block;
   position: absolute;
   top: 40px;
@@ -432,7 +427,6 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 
 // APP ERROR DISPLAY
 #app-message-container {
-  // border: 1px solid red;
   display: block;
   position: absolute;
   top: -65px;
@@ -660,8 +654,6 @@ output {
 
 }
 
-
-
 #ccp-content {
   display: block;
   position: relative;
@@ -704,13 +696,6 @@ output {
   }
 
 
-
-
-
-
-
-
-
   fieldset {
     
     width: 100%;
@@ -719,7 +704,6 @@ output {
     border-radius: 5px;
 
     #img-ccp-options {
-      // border: 1px solid red;
       // position: relative;
       // top: -15px;
     }
@@ -751,14 +735,13 @@ output {
           margin-bottom: 5px;
           padding-right: 2px;
           text-align: right;
-          
         }
         input {
           width: 150px;
         }
-        /* Customize the checkbox label (the container) */
-        
-        .img-include-css-container {
+
+        /* COLUMN 2 CHECKBOXES */
+        .img-include-css-container, .table-include-wrapper-container  {
           width: 100%;
           display: block;
           position: relative;
@@ -774,7 +757,7 @@ output {
           z-index: 100;
         }
         /* Hide the browser's default checkbox */
-        .img-include-css-container input {
+        .img-include-css-container input, .table-include-wrapper-container input {
           position: absolute;
           opacity: 0;
           cursor: pointer;
@@ -782,7 +765,7 @@ output {
           width: 0;
         }
         /* Create a custom checkbox */
-        #img-include-css-checkmrk {
+        #img-include-css-checkmrk, #table-include-wrapper-checkmrk {
           position: absolute;
           top: 5px;
           left: 30px;
@@ -794,29 +777,29 @@ output {
         }
         
         /* On mouse-over, add a grey background color */
-        .img-include-css-container:hover input ~ #img-include-css-checkmrk {
+        .img-include-css-container:hover input ~ #img-include-css-checkmrk, .table-include-wrapper-container:hover input ~ #table-include-wrapper-checkmrk {
           background-color: #ccc;
         }
         
         /* When the checkbox is checked, add a blue background */
-        .img-include-css-container input:checked ~ #img-include-css-checkmrk {
+        .img-include-css-container input:checked ~ #img-include-css-checkmrk, .table-include-wrapper-container:hover input ~ #table-include-wrapper-checkmrk {
           background-color: #5f5e5e;
         }
         
         /* Create the checkmrk/indicator (hidden when not checked) */
-        #img-include-css-checkmrk:after {
+        #img-include-css-checkmrk:after, #table-include-wrapper-checkmrk:after {
           content: "";
           position: absolute;
           display: none;
         }
         
         /* Show the checkmrk when checked */
-        .img-include-css-container input:checked ~ #img-include-css-checkmrk:after {
+        .img-include-css-container input:checked ~ #img-include-css-checkmrk:after, .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk:after {
           display: block;
         }
         
         /* Style the checkmrk/indicator */
-        .img-include-css-container #img-include-css-checkmrk:after {
+        .img-include-css-container #img-include-css-checkmrk:after, .table-include-wrapper-container #table-include-wrapper-checkmrk:after {
           left: 5px;
           top: 2px;
           width: 5px;
@@ -828,7 +811,7 @@ output {
           transform: rotate(45deg);
           
         }
-        #img-include-css-label {
+        #img-include-css-label, #table-include-wrapper-label {
           width: 180px;
           padding-left: 24px;
           text-align: left;
@@ -1189,7 +1172,6 @@ figure {
   padding: 0 0 10px;
   border-top: 1px solid $dim-color;
   border-bottom: 1px solid $whit-color;
-  // border: 1px solid blue;
   &.qs-clipboard-functions {
     position: relative;
     width: 100%;
@@ -1277,15 +1259,12 @@ figure {
 }
 @media (min-width: 768px) {
   max-width: 992px;
-  // border: 1px solid blue;
  }
 @media (min-width: 992px) {
   max-width: 1200px;
-  // border: 1px solid red;
  }
 @media (min-width: 1200px) { }
 
-  // border: 1px solid blue;
   h1 {
     display: block;
     margin: 0 auto;
@@ -1333,7 +1312,6 @@ figure {
     font-size: 16px;
     line-height: 18px;
     margin-top: 10px;
-    // border: 1px solid blue;
   }
 }
 
@@ -1341,12 +1319,10 @@ figure {
 .video {
   position: relative;
   width: 720px;
-  // border: 1px solid blue;
   iframe {
     display: block;
     position: relative;
     margin: 0 auto;
-    // border: 1px solid red;
   }
 }
 
@@ -1355,7 +1331,6 @@ figure {
   display: block;
   width: 800px;
   height: 600px;
-  // border: 1px solid blue;
   margin: 0 auto;
 }
 
@@ -1363,14 +1338,12 @@ figure {
   float: left;
   width: 390px;
   height: 100%;
-  border: 1px solid green;
 }
 
 #test-right {
   float: right;
   width: 390px;
   height: 100%;
-  border: 1px solid red;
 }
 
 #test-right * {

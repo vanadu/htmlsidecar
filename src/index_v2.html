@@ -352,13 +352,29 @@
                 <div id="table-width">
                     <label id="table-width-label" for="table-width">width=</label> 
                     <select id="table-width-select"> 
+                        <option></option>
                         <option selected="selected"></option>
-                        <option></option>
-                        <option></option>
-                        <option></option>
                     </select>
                 </div> 
+                <div id="table-include-wrapper" > 
+                    <label class="table-include-wrapper-container" id="table-include-wrapper-container" for="img-include-css">
+                      
+                      <label class="table-include-wrapper-label" id="table-include-wrapper-label" for="table-include-wrapper">
+                      
+                      Include wrapper table</label>
+                    <!-- The default checkbox is hidden -->
+                    <input type="checkbox" id="table-include-wrapper-checkbox">
+                    <span id="table-include-wrapper-checkmrk"></span>
+                    <!-- VA! These options are set in handleTableWidth -->
+                  </label> 
+                </div> 
+                <div id="table-wrapper-width"> 
+                    <label for="table-wrapper-width-input">width=</label>
+                    <input id="table-wrapper-width-input" placeholder="none" />  
+                  </div> 
               </div>
+
+
               <div class="ccp-options-col-3"> 
                 <div id="table-bgcolor">
                   <label for="table-bgcolor-input" id="table-bgcolor">bgcolor= #</label>
