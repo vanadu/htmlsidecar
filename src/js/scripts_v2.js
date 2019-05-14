@@ -173,9 +173,7 @@ var Dimwhit = (function () {
         imgIncludeStylesCheckmrk.addEventListener('click', toggleCheckbox, false);
         tdBgimageCheckmrk.addEventListener('click', toggleCheckbox, false);
         console.log('HERE');
-        var foo = tableIncludeWrapper.addEventListener('click', toggleCheckbox, false);
-        console.log('foo is: ' + foo);
-        console.dir(foo);
+        tableIncludeWrapper.addEventListener('click', toggleCheckbox, false);
 
       }
     })();
@@ -195,7 +193,11 @@ var Dimwhit = (function () {
       // var checkmark = document.querySelector('#img-include-css-checkmark');
       checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
       // !VA Now run any actions associated with the checkbox
-      // !VA Only show the wrapper table width option if Include wrapper table is selected 
+      // !VA Only show the CCP wrapper table width option if 'Include wrapper table' is selected 
+      // !VA Get the Appdata for the input default value
+      // !VA TODO: This value needs to be refreshed when the CCP is opened. In fact, entering new values in any of the toolButton inputs has to call a refresh of Appdata and a closing-reopening of the CCP so the values can refresh.
+      var data = UIController.accessAppdata();
+      document.querySelector(ccpUserInput.tableWrapperWidth).value = `${data.viewerW}`;
       checkbox.checked ? document.querySelector('#table-wrapper-width').style.display = 'block' : document.querySelector('#table-wrapper-width').style.display = 'none';
 
 
@@ -1279,11 +1281,9 @@ var Dimwhit = (function () {
         tableTag.alignAtt = (function (id) {
           // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
           // !VA Pass in the id of the select dropdown
-          console.log('id alignAtt is: ' + id);
           var str;
           // !VA Get the selection index
           var selInd = document.querySelector(id).selectedIndex;
-          console.log('selInt alignAtt is: ' + selInd);
           // !VA Put the available options in an array
           var tableAlignOptions = [ 'none', 'left', 'center', 'right' ];
           // !VA Put the desired output strings in an array
@@ -1306,11 +1306,9 @@ var Dimwhit = (function () {
         tableTag.widthAtt = (function (id, data) {
           // !VA TODO: The default 'none' is currently set in the HTML, that should be done programmatically
           // !VA Pass in the id of the select dropdown
-          console.log('id widthAtt is: ' + id);
           var str;
           // !VA Get the selection index
           var selInd = document.querySelector(id).selectedIndex;
-          console.log('selInd is: ' + selInd);
           // !VA Put the available options in an array
           var tableWidthOptions = [ 'none', data.imgW ];
           // !VA Put the desired output strings in an array
@@ -1324,35 +1322,71 @@ var Dimwhit = (function () {
           return str;
         })(ccpUserInput.tableWidth, data);
 
-        tableTag.tableIncludeWrapper =  (function (id) {
-          // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
-          // var str;
-          id = id.replace('mrk', 'box');
-          console.log('id HERE is: ' + id);
-          // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
-          // document.querySelector(id).checked = true;
-          if (document.querySelector(id).checked === true) {
-            console.log('TRUE');
-            document.querySelector('#table-wrapper-width').style.display = 'block';
+        // !VA The 'Include wrapper table' option is shown/hidden in the UIController toggleCheckbox function for the CCP
+
+        tableTag.wrapperwidthAtt = (function (id, data) {
+          // !VA Get Appdata
+          var data = UIController.accessAppdata();
+          // !VA TODO: The default 'none' is currently set in the HTML, that should be done programmatically
+          // !VA Pass in the id of the select dropdown
+          console.log('id widthAtt is: ' + id);
+          var str;
+          str = 'testing...';
+          var tableWrapperInput = document.querySelector(ccpUserInput.tableWrapperWidth)
+          // !VA The user can 1) accept the default of data.viewerW 2) enter a new value or 3) delete the existing value and blur or return. So we need to: 
+          // !VA 1) This is the default set at line 200 when the checkbox is toggled
+          // !VA 2) and 3)
+          if (!tableWrapperInput.value) {
+            tableTag.wrapperwidthAtt = '';
           } else {
-            console.log('FALSE');
-            document.querySelector('#table-wrapper-width').style.display = 'none';
+            tableTag.wrapperwidthAtt = `width="${tableWrapperInput.value}"`;
           }
-          // return str;
-        })(ccpUserInput.tableIncludeWrapper);
+
+          str = tableTag.wrapperwidthAtt;
+          return str;
+        })(ccpUserInput.tableWrapperWidth, data);
 
         // !VA Pass the input value, prepending it hex # character 
         tableTag.bgcolorAtt =
          calcController.ccpIfNoUserInput('bgcolor','#' + document.querySelector(ccpUserInput.tableBgcolor).value);
         // !VA tdBgcolor  END
 
+        var isShown = tableTag.wrapperwidthAtt;
+        console.log('isShown is: ' + isShown);
 
-        clipboardStr = 
-`<table ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
+        // !VA Get the checked status of Include table wrapper
+        if ( document.querySelector('#table-include-wrapper-checkbox').checked) {
+          console.log('CHECKED');
+
+          clipboardStr = 
+
+
+`<table ${tableTag.wrapperwidthAtt} align="center" border="0" cellpadding="0" cellspacing="0">
   <tr>
-${tableTag.tableContents}
+    <td align="center" valign="top"
+      <table ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
+        <tr>
+      ${tableTag.tableContents}
+        </tr>
+    </table>
   </tr>
+</table>`
+
+
+        } else {
+
+          clipboardStr = 
+
+`<table ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
+    <tr>
+       ${tableTag.tableContents}
+    </tr>
 </table>`;
+
+        }
+
+
+
 
         return clipboardStr;
       },
