@@ -1607,7 +1607,7 @@ output {
           width: 180px;
           padding-left: 24px;
           text-align: left; }
-        #ccp-content fieldset .ccp-options .ccp-options-col-2 #table-wrapper-width {
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 #table-wrapper-width, #ccp-content fieldset .ccp-options .ccp-options-col-2 #table-wrapper-class {
           /* Hiding this by default, it will be displayed programmatically */
           display: none; }
       #ccp-content fieldset .ccp-options .ccp-options-col-3 {

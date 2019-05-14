@@ -1,13 +1,13 @@
 
 /* !VA  
 ===========================================================
-TODO: Make all checkboxes under one CSS definition
-TODO: Change TABLE width: add width checkbox that shows input with default width of imgW, and another checkbox for wrapper that shows viewerW. Add checkbox for Stig ba
-
-
+TODO: Tableoptions: move bgcolor to col 2, move include wrapper table to top of col 3 and add bgcolor & align. Change table width to input with default of imgW.  
+TODO: Fix the 'color' option, it just needs the value not the bgcolor label in the Stig thing.
 TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
 
 
+DONE: Change TABLE width: add width checkbox that shows input with default width of imgW, and another checkbox for wrapper that shows viewerW. Add checkbox for Stig ba
+DONE: Make all checkboxes under one CSS definition - Not really possible
 DONE: Put error container above toolbuttons
 DONE: fix select options to clipboard
 DONE: Implement the CSS clipboard buttons
@@ -119,6 +119,7 @@ var Dimwhit = (function () {
       tableAlign: '#table-align-select',
       tableWidth: '#table-width-select',
       tableIncludeWrapper: '#table-include-wrapper-checkmrk',
+      tableWrapperClass: '#table-wrapper-class-input',
       tableWrapperWidth: '#table-wrapper-width-input',
       tableBgcolor: '#table-bgcolor-input',
       tableMaxWidth: '#table-max-width-input',
@@ -198,7 +199,9 @@ var Dimwhit = (function () {
       // !VA TODO: This value needs to be refreshed when the CCP is opened. In fact, entering new values in any of the toolButton inputs has to call a refresh of Appdata and a closing-reopening of the CCP so the values can refresh.
       var data = UIController.accessAppdata();
       document.querySelector(ccpUserInput.tableWrapperWidth).value = `${data.viewerW}`;
+      document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
       checkbox.checked ? document.querySelector('#table-wrapper-width').style.display = 'block' : document.querySelector('#table-wrapper-width').style.display = 'none';
+      checkbox.checked ? document.querySelector('#table-wrapper-class').style.display = 'block' : document.querySelector('#table-wrapper-class').style.display = 'none';
 
 
 
@@ -1145,7 +1148,7 @@ var Dimwhit = (function () {
 
         // !VA Build the HTML tag
         clipboardStr = 
-`  <img ${imgTag.widthAtt} ${imgTag.heightAtt} ${imgTag.srcAtt} border="0' ${imgTag.styleAtt} />`;
+`  <img ${imgTag.widthAtt} ${imgTag.heightAtt} ${imgTag.srcAtt} border="0" ${imgTag.styleAtt} />`;
 
         // !VA Pass the imgTagArray and return it as string
         return clipboardStr;
@@ -1206,7 +1209,7 @@ var Dimwhit = (function () {
 
         // !VA Pass the input value, prepending it hex # character 
         tdTag.bgcolorAtt =
-         calcController.ccpIfNoUserInput('bgcolor','#' + document.querySelector(ccpUserInput.tdBgcolor).value);
+         calcController.ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tdBgcolor).value);
         // !VA tdBgcolor  END
 
 
@@ -1228,7 +1231,7 @@ var Dimwhit = (function () {
             
             
   `
-    <td background="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" ${tdTag.bgcolorAtt}" width="${data.imgW}" height="${data.imgH}" ${tdTag.valignAtt}">
+    <td background="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" ${tdTag.bgcolorAtt} width="${data.imgW}" height="${data.imgH}" ${tdTag.valignAtt}>
     <!--[if gte mso 9]>
       <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${data.imgW}px;height:${data.imgH}px;">
       <v:fill type="tile" src="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" color="${tdTag.bgcolorAtt}" />
@@ -1346,9 +1349,13 @@ var Dimwhit = (function () {
           return str;
         })(ccpUserInput.tableWrapperWidth, data);
 
+        tableTag.wrapperclassAtt = 
+        // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
+        calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tableWrapperClass).value);
+
         // !VA Pass the input value, prepending it hex # character 
         tableTag.bgcolorAtt =
-         calcController.ccpIfNoUserInput('bgcolor','#' + document.querySelector(ccpUserInput.tableBgcolor).value);
+         calcController.ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tableBgcolor).value);
         // !VA tdBgcolor  END
 
         var isShown = tableTag.wrapperwidthAtt;
@@ -1361,9 +1368,9 @@ var Dimwhit = (function () {
           clipboardStr = 
 
 
-`<table ${tableTag.wrapperwidthAtt} align="center" border="0" cellpadding="0" cellspacing="0">
+`<table ${tableTag.wrapperclassAtt + ' '}${tableTag.wrapperwidthAtt + ' '}align="center" border="0" cellpadding="0" cellspacing="0">
   <tr>
-    <td align="center" valign="top"
+    <td align="center" valign="top">
       <table ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
         <tr>
       ${tableTag.tableContents}
