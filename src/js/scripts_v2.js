@@ -4,6 +4,7 @@
 TODO: Tableoptions: move bgcolor to col 2, move include wrapper table to top of col 3 and add bgcolor & align. Change table width to input with default of imgW.  
 TODO: Fix the 'color' option, it just needs the value not the bgcolor label in the Stig thing.
 TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
+TODO: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- I think. Not sure if this is the right behavior...think bout it. Probably not.
 
 
 DONE: Change TABLE width: add width checkbox that shows input with default width of imgW, and another checkbox for wrapper that shows viewerW. Add checkbox for Stig ba
@@ -118,11 +119,14 @@ var Dimwhit = (function () {
       tableClass: '#table-class-input',
       tableAlign: '#table-align-select',
       tableWidth: '#table-width-select',
+      // !VA Not in use yet
+      // tableMaxWidth: '#table-max-width-input',
+      tableBgcolor: '#table-bgcolor-input',
       tableIncludeWrapper: '#table-include-wrapper-checkmrk',
       tableWrapperClass: '#table-wrapper-class-input',
       tableWrapperWidth: '#table-wrapper-width-input',
-      tableBgcolor: '#table-bgcolor-input',
-      tableMaxWidth: '#table-max-width-input',
+      tableWrapperAlign: '#table-wrapper-align-select',
+      tableWrapperBgColor: '#table-wrapper-bgcolor-input',
     };
 
     // !VA UIController: ccpPropStrings ID Strings, probably deprecated in V2
@@ -157,26 +161,13 @@ var Dimwhit = (function () {
     };
 
 
-    // !VA This tests whether the CCP is open, allowing us to access CCP elements if it is. It's also where we open the CCP by default for development and testing. 
+    // !VA CCP IIFE This tests whether the CCP is open, allowing us to access CCP elements if it is. It's also where we open the CCP by default for development and testing. 
     (function () {
 
       // !VA Remove this line to stop opening the CCP by default
       document.querySelector(staticRegions.ccpContainer).classList.add('active');
 
-      // !VA If the CCP is open...
-      if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
-        // !VA CCP Event Listeners -- we will handle CCP events separately from other UI events here to keep separation of dynamic vs static element handling
-        // !VA Checkboxes that need toggling
-        var imgIncludeStylesCheckmrk = document.querySelector(ccpUserInput.imgIncludeStyles);
-        var tdBgimageCheckmrk = document.querySelector(ccpUserInput.tdBgimage);
-        var tableIncludeWrapper = document.querySelector(ccpUserInput.tableIncludeWrapper);
-        // !VA Toggle the checkbox
-        imgIncludeStylesCheckmrk.addEventListener('click', toggleCheckbox, false);
-        tdBgimageCheckmrk.addEventListener('click', toggleCheckbox, false);
-        console.log('HERE');
-        tableIncludeWrapper.addEventListener('click', toggleCheckbox, false);
 
-      }
     })();
 
     
@@ -186,22 +177,46 @@ var Dimwhit = (function () {
     }
 
     // !VA  UIController: Toggle checkboxes and run any associated actions
-    function toggleCheckbox(target) {
-      // We want this to run for all custom CSS checkboxes used in this project -- but the CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
-      // !VA The clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it.
+    function toggleCheckbox(event) {
+      console.log('ToggleCheckbox');
+      // !VA TODO: !IMPORTANT! All the initialization for the CCP is better done elsewhere
+      // !VA But in the meantime, we want this to run for all custom CSS checkboxes used in this project -- but the CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
+      // !VA We will need Appdata to initialize the defaults for the wrapper table below
+      var data = UIController.accessAppdata();
+      // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
+      var wrapperItemsToShow = [];
 
-      var checkbox = document.getElementById(target.target.id.replace('mrk', 'box'));
-      // var checkmark = document.querySelector('#img-include-css-checkmark');
+      // !VA The clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it.
+      var checkbox = document.getElementById(event.target.id.replace('mrk', 'box'));
+      // !VA Toggle the target's checkbox 
       checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
+
       // !VA Now run any actions associated with the checkbox
-      // !VA Only show the CCP wrapper table width option if 'Include wrapper table' is selected 
       // !VA Get the Appdata for the input default value
       // !VA TODO: This value needs to be refreshed when the CCP is opened. In fact, entering new values in any of the toolButton inputs has to call a refresh of Appdata and a closing-reopening of the CCP so the values can refresh.
-      var data = UIController.accessAppdata();
+      
+      // !VA Defaults for wrapper width and class
       document.querySelector(ccpUserInput.tableWrapperWidth).value = `${data.viewerW}`;
       document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
-      checkbox.checked ? document.querySelector('#table-wrapper-width').style.display = 'block' : document.querySelector('#table-wrapper-width').style.display = 'none';
-      checkbox.checked ? document.querySelector('#table-wrapper-class').style.display = 'block' : document.querySelector('#table-wrapper-class').style.display = 'none';
+      // !VA Only show the CCP wrapper width, class, align, and bgcolor options if 'Include wrapper table' is selected 
+
+      wrapperItemsToShow = ['#table-wrapper-class', '#table-wrapper-width', '#table-wrapper-align', '#table-wrapper-bgcolor' ]; 
+      // console.log('wrapperItemsToShow[i] is: ' + wrapperItemsToShow[3]);
+      if (checkbox.checked) {
+        console.log('checked');
+        for (let i = 0; i < wrapperItemsToShow.length; i++) {
+          document.querySelector(wrapperItemsToShow[i]).style.display = 'block'; 
+          // console.log(document.querySelector(wrapperItemsToShow[i])); 
+        }
+      } else {
+        console.log('unchecked');
+        for (let i = 0; i < wrapperItemsToShow.length; i++) {
+          document.querySelector(wrapperItemsToShow[i]).style.display = 'none'; 
+        }
+      }
+
+
+
 
 
 
@@ -624,6 +639,41 @@ var Dimwhit = (function () {
         twidth.options[1].innerHTML = data.imgW;
 
 
+
+    
+        // !VA If the CCP is open...
+        if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
+
+          // !VA Initialize with all the 'include wrapper table' options undisplayed - uncomment this for DEV
+          // var wrapperItemsToHide = ['#table-wrapper-class', '#table-wrapper-width', '#table-wrapper-align', '#table-wrapper-bgcolor' ]; 
+          // for (let i = 0; i < wrapperItemsToHide.length; i++) {
+          //   document.querySelector(wrapperItemsToHide[i]).style.display = 'none'; 
+          // }
+
+          // !VA Initialize with 'include wrapper table' unchecked, or true for DEV
+          var includeWrapperTable = document.querySelector((ccpUserInput.tableIncludeWrapper.replace('mrk', 'box')));
+          includeWrapperTable.checked = true;
+          // !VA Defaults for wrapper width and class
+          document.querySelector(ccpUserInput.tableWrapperWidth).value = `${data.viewerW}`;
+          document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
+
+          // !VA CCP Event Listeners -- we will handle CCP events separately from other UI events here to keep separation of dynamic vs static element handling
+          // !VA Checkboxes that need toggling
+          var imgIncludeStylesCheckmrk = document.querySelector(ccpUserInput.imgIncludeStyles);
+          var tdBgimageCheckmrk = document.querySelector(ccpUserInput.tdBgimage);
+          var tableIncludeWrapper = document.querySelector(ccpUserInput.tableIncludeWrapper);
+          // !VA Toggle the checkbox and initialize the table wrapper defaults
+          // !VA TODO: Revisit all the CCP init
+          imgIncludeStylesCheckmrk.addEventListener('click', toggleCheckbox, false);
+          tdBgimageCheckmrk.addEventListener('click', toggleCheckbox, false);
+          tableIncludeWrapper.addEventListener('click', toggleCheckbox, false);
+
+        }
+
+
+
+
+
         // !VA Not ready for these yet
         // var tableMaxWidth = `'<option>${Appdata.viewerW}</option><option>100%</option>'`;
         // document.getElementById('table-width-select').innerHTML = tableMaxWidth;
@@ -894,6 +944,8 @@ var Dimwhit = (function () {
           calcController.adjustContainerHeights(data);
         }
       },
+
+
 
       // calcController: EVALUATE VIEWER SIZE
       // !VA There are four conditions for an image to fit into the appContainer. This evaluates them, sets the Appdata properties accordingly and calls adjustContainerHeights. 
@@ -1231,7 +1283,7 @@ var Dimwhit = (function () {
             
             
   `
-    <td background="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" ${tdTag.bgcolorAtt} width="${data.imgW}" height="${data.imgH}" ${tdTag.valignAtt}>
+    <td background="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" ${tdTag.bgcolorAtt}" width="${data.imgW}" height="${data.imgH}" ${tdTag.valignAtt}">
     <!--[if gte mso 9]>
       <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${data.imgW}px;height:${data.imgH}px;">
       <v:fill type="tile" src="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" color="${tdTag.bgcolorAtt}" />
@@ -1276,6 +1328,7 @@ var Dimwhit = (function () {
         var clipboardStr;
         // !VA Create the object for storing the individual tag attributes
         var tableTag = new ClipboardOutput('tableTag');
+        // !VA Base Table options----------------------------------------------
         tableTag.classAtt = 
           // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
           calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tableClass).value);
@@ -1324,51 +1377,67 @@ var Dimwhit = (function () {
           }
           return str;
         })(ccpUserInput.tableWidth, data);
+        
+        // !VA Pass the input value 
+        tableTag.bgcolorAtt =
+         calcController.ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tableBgcolor).value);
+        // !VA tdBgcolor
+        // !VA Base Table Tag END------------------------------------------------------
 
-        // !VA The 'Include wrapper table' option is shown/hidden in the UIController toggleCheckbox function for the CCP
-
-        tableTag.wrapperwidthAtt = (function (id, data) {
-          // !VA Get Appdata
-          var data = UIController.accessAppdata();
-          // !VA TODO: The default 'none' is currently set in the HTML, that should be done programmatically
-          // !VA Pass in the id of the select dropdown
-          console.log('id widthAtt is: ' + id);
-          var str;
-          str = 'testing...';
-          var tableWrapperInput = document.querySelector(ccpUserInput.tableWrapperWidth)
-          // !VA The user can 1) accept the default of data.viewerW 2) enter a new value or 3) delete the existing value and blur or return. So we need to: 
-          // !VA 1) This is the default set at line 200 when the checkbox is toggled
-          // !VA 2) and 3)
-          if (!tableWrapperInput.value) {
-            tableTag.wrapperwidthAtt = '';
-          } else {
-            tableTag.wrapperwidthAtt = `width="${tableWrapperInput.value}"`;
-          }
-
-          str = tableTag.wrapperwidthAtt;
-          return str;
-        })(ccpUserInput.tableWrapperWidth, data);
-
+        // !VA Table WRAPPER Start ------------------------------------------------------
+        // !VA !IMPORTANT! The 'Include wrapper table' option is shown/hidden in the UIController toggleCheckbox function for the CCP
+        // !VA Wrapper Class Attribute
         tableTag.wrapperclassAtt = 
         // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
         calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tableWrapperClass).value);
 
-        // !VA Pass the input value, prepending it hex # character 
-        tableTag.bgcolorAtt =
-         calcController.ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tableBgcolor).value);
-        // !VA tdBgcolor  END
+        // !VA Wrapper Width Attribute
+        tableTag.wrapperWidthAtt = (function (id, data) {
+          // !VA Get Appdata
+          // var data = UIController.accessAppdata();
+          var tableWrapperInput = document.querySelector(ccpUserInput.tableWrapperWidth);
+          // !VA If there 
+          if (!tableWrapperInput.value) {
+            tableTag.wrapperWidthAtt = '';
+          } else {
+            tableTag.wrapperWidthAtt = `width="${tableWrapperInput.value}"`;
+          }
 
-        var isShown = tableTag.wrapperwidthAtt;
-        console.log('isShown is: ' + isShown);
+          var str = tableTag.wrapperWidthAtt;
+          return str;
+        })(ccpUserInput.tableWrapperWidth, data);
 
-        // !VA Get the checked status of Include table wrapper
+        // !VA Wrapper align attribute
+        tableTag.wrapperAlignAtt = (function (id) {
+          // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
+          // !VA Pass in the id of the select dropdown
+          var str;
+          // !VA Get the selection index
+          var selInd = document.querySelector(id).selectedIndex;
+          // !VA Put the available options in an array
+          var tableWrapperAlignOptions = [ 'none', 'left', 'center', 'right' ];
+          // !VA Put the desired output strings in an array
+          var clipboardOutput = [ '', 'align="left" ', 'align="center" ', 'align="right" '];
+          // !VA If the selected index matches the index of the available options array, then output the string that matches that index
+          for (let i = 0; i < tableWrapperAlignOptions.length; i++) {
+            if ( selInd === i) {
+              str = `${clipboardOutput[i]}`;
+            }
+          }
+          return str;
+        })(ccpUserInput.tableWrapperAlign);
+
+
+        // !VA Wrapper bgcolor attributePass the input value 
+        tableTag.wrapperBgcolorAtt =
+        calcController.ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tableWrapperBgColor).value);
+        // !VA tdBgcolor
+
+        // !VA Get the checked status of Include table wrapper, and if it's 'checked' output the base table AND the table wrapper
         if ( document.querySelector('#table-include-wrapper-checkbox').checked) {
-          console.log('CHECKED');
-
           clipboardStr = 
 
-
-`<table ${tableTag.wrapperclassAtt + ' '}${tableTag.wrapperwidthAtt + ' '}align="center" border="0" cellpadding="0" cellspacing="0">
+`<table ${tableTag.wrapperclassAtt + ' '}${tableTag.wrapperWidthAtt + ' '}${tableTag.wrapperAlignAtt + ' '}${tableTag.wrapperBgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
   <tr>
     <td align="center" valign="top">
       <table ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
@@ -1377,11 +1446,10 @@ var Dimwhit = (function () {
         </tr>
     </table>
   </tr>
-</table>`
+</table>`;
 
-
+          // !VA If the option is unchecked, output just the base table
         } else {
-
           clipboardStr = 
 
 `<table ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
@@ -1391,10 +1459,6 @@ var Dimwhit = (function () {
 </table>`;
 
         }
-
-
-
-
         return clipboardStr;
       },
 

@@ -314,7 +314,12 @@
                 <div id="table-bgcolor">
                     <label for="table-bgcolor-input" id="table-bgcolor">bgcolor=</label>
                     <input type="text" id="table-bgcolor-input" placeholder="none" value="" />
-                  </div> 
+                </div> 
+                <div id="table-max-width">
+                    <!-- VA! These options are set in handleTableWidth -->
+                    <label for="table-max-width-input">max-width:</label>
+                    <input id="table-max-width-input" value="" placeholder="" />
+                </div>
 
               </div>
 
@@ -336,16 +341,25 @@
                 <div id="table-wrapper-class"> 
                     <label for="table-wrapper-class-input">class=</label>
                     <input id="table-wrapper-class-input" placeholder="none" />  
-                  </div> 
+                </div> 
                 <div id="table-wrapper-width"> 
-                    <label for="table-wrapper-width-input">width=</label>
+                    <label id="table-wrapper-width-input-label" for="table-wrapper-width-input">width=</label>
                     <input id="table-wrapper-width-input" placeholder="none" />  
                 </div> 
-                <div id="table-max-width">
-                    <!-- VA! These options are set in handleTableWidth -->
-                    <label for="table-max-width-input">max-width:</label>
-                    <input id="table-max-width-input" value="" placeholder="" />
-                </div>
+                <div id="table-wrapper-align"> 
+                  <label id="table-wrapper-align-select-label" for="table-wrapper-align-select">align=</label>
+                  <select id="table-wrapper-align-select"> 
+                    <option>none</option>
+                    <option>left</option> 
+                    <option selected="selected">center</option> 
+                    <option>right</option> 
+                  </select>
+                </div> 
+                <div id="table-wrapper-bgcolor"> 
+                    <label id="table-wrapper-bgcolor-input-label" for="table-wrapper-bgcolor-input">bgcolor=</label>
+                    <input id="table-wrapper-bgcolor-input" placeholder="none" />  
+                </div> 
+
               </div>
             </div><!-- /#ccp-table-options -->
 

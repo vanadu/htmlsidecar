@@ -1607,12 +1607,12 @@ output {
           width: 180px;
           padding-left: 24px;
           text-align: left; }
-        #ccp-content fieldset .ccp-options .ccp-options-col-2 #table-wrapper-width, #ccp-content fieldset .ccp-options .ccp-options-col-2 #table-wrapper-class {
+        #ccp-content fieldset .ccp-options .ccp-options-col-2 #table-wrapper-width, #ccp-content fieldset .ccp-options .ccp-options-col-2 #table-wrapper-class, #ccp-content fieldset .ccp-options .ccp-options-col-2 #table-wrapper-align, #ccp-content fieldset .ccp-options .ccp-options-col-2 #table-wrapper-bgcolor {
           /* Hiding this by default, it will be displayed programmatically */
           display: none; }
       #ccp-content fieldset .ccp-options .ccp-options-col-3 {
         left: 350px;
-        width: 255px;
+        width: 280px;
         /* Hide the browser's default checkbox */
         /* Create a custom checkbox */
         /* On mouse-over, add a grey background color */
@@ -1621,9 +1621,9 @@ output {
         /* Show the checkmrk when checked */
         /* Style the checkmrk/indicator */ }
         #ccp-content fieldset .ccp-options .ccp-options-col-3 input {
-          width: 120px; }
+          width: 150px; }
         #ccp-content fieldset .ccp-options .ccp-options-col-3 label {
-          width: 75px;
+          width: 60px;
           margin-bottom: 5px;
           padding-right: 2px;
           text-align: right; }
