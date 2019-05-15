@@ -741,7 +741,7 @@ output {
         }
 
         /* COLUMN 2 CHECKBOXES */
-        .img-include-css-container, .table-include-wrapper-container  {
+        .img-include-css-container {
           width: 100%;
           display: block;
           position: relative;
@@ -765,7 +765,7 @@ output {
           width: 0;
         }
         /* Create a custom checkbox */
-        #img-include-css-checkmrk, #table-include-wrapper-checkmrk {
+        #img-include-css-checkmrk {
           position: absolute;
           top: 5px;
           left: 30px;
@@ -777,29 +777,29 @@ output {
         }
         
         /* On mouse-over, add a grey background color */
-        .img-include-css-container:hover input ~ #img-include-css-checkmrk, .table-include-wrapper-container:hover input ~ #table-include-wrapper-checkmrk {
+        .img-include-css-container:hover input ~ #img-include-css-checkmrk {
           background-color: #ccc;
         }
         
-        /* When the checkbox is checked, add a blue background */
-        .img-include-css-container input:checked ~ #img-include-css-checkmrk, .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk {
+        /* When the checkbox is checked, add a gray background */
+        .img-include-css-container input:checked ~ #img-include-css-checkmrk {
           background-color: #5f5e5e;
         }
         
         /* Create the checkmrk/indicator (hidden when not checked) */
-        #img-include-css-checkmrk:after, #table-include-wrapper-checkmrk:after {
+        #img-include-css-checkmrk:after {
           content: "";
           position: absolute;
           display: none;
         }
         
         /* Show the checkmrk when checked */
-        .img-include-css-container input:checked ~ #img-include-css-checkmrk:after, .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk:after {
+        .img-include-css-container input:checked ~ #img-include-css-checkmrk:after {
           display: block;
         }
         
         /* Style the checkmrk/indicator */
-        .img-include-css-container #img-include-css-checkmrk:after, .table-include-wrapper-container #table-include-wrapper-checkmrk:after {
+        .img-include-css-container #img-include-css-checkmrk:after {
           left: 5px;
           top: 2px;
           width: 5px;
@@ -811,7 +811,9 @@ output {
           transform: rotate(45deg);
           
         }
-        #img-include-css-label, #table-include-wrapper-label {
+
+        // VA! This is the extra label I added because the prodecure I used for the mock checkbox didn't include a label
+        #img-include-css-label {
           width: 180px;
           padding-left: 24px;
           text-align: left;
@@ -834,7 +836,7 @@ output {
           text-align: right;
         }
         
-        .td-bgimage-container {
+        .td-bgimage-container, .table-include-wrapper-container  {
           width: 100%;
           display: block;
           position: relative;
@@ -854,7 +856,7 @@ output {
           }
         }
         /* Hide the browser's default checkbox */
-        .td-bgimage-container input {
+        .td-bgimage-container input, .table-include-wrapper-container input {
           position: absolute;
           opacity: 0;
           cursor: pointer;
@@ -863,7 +865,7 @@ output {
         }
         
         /* Create a custom checkbox */
-        #td-bgimage-checkmrk {
+        #td-bgimage-checkmrk, #table-include-wrapper-checkmrk {
           position: absolute;
           top: 3px;
           left: 40px;
@@ -875,27 +877,29 @@ output {
         }
         
         /* On mouse-over, add a grey background color */
-        .td-bgimage-container:hover input ~ #td-bgimage-checkmrk {
+        .td-bgimage-container:hover input ~ #td-bgimage-checkmrk, .table-include-wrapper-container:hover input ~ #table-include-wrapper-checkmrk {
           background-color: #ccc;
         }
-        /* When the checkbox is checked, add a blue background */
-        .td-bgimage-container input:checked ~ #td-bgimage-checkmrk {
+        /* When the checkbox is checked, add a gray background */
+        .td-bgimage-container input:checked ~ #td-bgimage-checkmrk, .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk {
           background-color: #5f5e5e;
         }
-        #td-bgimage-checkmrk:after {
+
+        /* Create the checkmrk/indicator (hidden when not checked) */
+        #td-bgimage-checkmrk:after, #table-include-wrapper-checkmrk:after  {
           content: "";
           position: absolute;
           display: none;
         }
         
         /* Show the checkmrk when checked */
-        .td-bgimage-container input:checked ~ #td-bgimage-checkmrk:after {
+        .td-bgimage-container input:checked ~ #td-bgimage-checkmrk:after, .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk:after  {
           display: block;
         }
         
         
         /* Style the checkmrk/indicator */
-        .td-bgimage-container #td-bgimage-checkmrk:after {
+        .td-bgimage-container #td-bgimage-checkmrk:after, .table-include-wrapper-container #table-include-wrapper-checkmrk:after {
           left: 5px;
           top: 2px;
           width: 5px;
@@ -907,7 +911,9 @@ output {
           transform: rotate(45deg);
           
         }
-        #td-bgimage-label {
+        
+        // VA! This is the extra label I added because the prodecure I used for the mock checkbox didn't include a label
+        #td-bgimage-label, #table-include-wrapper-label  {
           width: 220px;
           padding-left: 34px;
           text-align: left;
