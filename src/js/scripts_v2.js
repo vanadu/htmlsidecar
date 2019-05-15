@@ -118,7 +118,7 @@ var Dimwhit = (function () {
       tdBgimage: '#td-bgimage-checkmrk',
       tableClass: '#table-class-input',
       tableAlign: '#table-align-select',
-      tableWidth: '#table-width-select',
+      tableWidth: '#table-width-input',
       // !VA Not in use yet
       // tableMaxWidth: '#table-max-width-input',
       tableBgcolor: '#table-bgcolor-input',
@@ -632,11 +632,7 @@ var Dimwhit = (function () {
         var data = UIController.accessAppdata();
 
 
-        // !VA Displaying all the programmatically-populated options here for now
-        // !VA Set the value of the dropdown in ccpUserInput.tableWidth
-        var twidth = document.querySelector(ccpUserInput.tableWidth);
-        twidth.options[0].innerHTML = 'none';
-        twidth.options[1].innerHTML = data.imgW;
+
 
 
 
@@ -653,6 +649,8 @@ var Dimwhit = (function () {
           // !VA Initialize with 'include wrapper table' unchecked, or true for DEV
           var includeWrapperTable = document.querySelector((ccpUserInput.tableIncludeWrapper.replace('mrk', 'box')));
           includeWrapperTable.checked = true;
+          // !VA Default for table width
+          document.querySelector(ccpUserInput.tableWidth).value = `${data.imgW}`;
           // !VA Defaults for wrapper width and class
           document.querySelector(ccpUserInput.tableWrapperWidth).value = `${data.viewerW}`;
           document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
@@ -697,7 +695,6 @@ var Dimwhit = (function () {
         elems[2] = document.querySelector(ccpBuildTag.largePhonesBuildCSSBut);
 
         for (let i = 0; i < elems.length; i++) {
-          // console.log(elems[i]);
           this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
         }
       },
@@ -1138,7 +1135,7 @@ var Dimwhit = (function () {
         // !VA Get Appdata - we need it for the filename
         var data = UIController.accessAppdata();
         // !VA The string that passes the HTML img tag
-        var clipboardStr; 
+        var str; 
         // !VA Create the instance for img tag clipboard object and add img-specific properties.
         // !VA We're doing this in an object and outputting to an array because the object is easier to manage and the array is easier to reorder. The Constructor is in this module in the private functions above.
         var imgTag = new ClipboardOutput('imgTag');
@@ -1152,6 +1149,7 @@ var Dimwhit = (function () {
           // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output
           calcController.ccpIfNoUserInput('alt',document.querySelector(ccpUserInput.imgAlt).value);
         // !VA imgTag.altAtt END
+
         imgTag.srcAtt = (function (id, data) {
           // !VA Pass in the ID and the copy of Appdata to get the filename
           var str;
@@ -1164,8 +1162,8 @@ var Dimwhit = (function () {
           return str;
         })(ccpUserInput.imgRelPath, data);
         // !VA imgTag.srcAtt END
-        imgTag.heightAtt = `height="${data.imgH}" `;
-        imgTag.widthAtt = `width="${data.imgW}" `;
+        imgTag.heightAtt = `height="${data.imgH}"`;
+        imgTag.widthAtt = `width="${data.imgW}"`;
         imgTag.styleAtt =  (function (id) {
           // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
           var str;
@@ -1198,12 +1196,15 @@ var Dimwhit = (function () {
         })(ccpUserInput.imgAlign);
         // !VA imgTag Object END ------------------------
 
+        var imgTagStr; 
+        
+
         // !VA Build the HTML tag
-        clipboardStr = 
-`  <img ${imgTag.widthAtt} ${imgTag.heightAtt} ${imgTag.srcAtt} border="0" ${imgTag.styleAtt} />`;
+
+        imgTagStr = `  <img ${imgTag.classAtt + ' '}${imgTag.altAtt + ''}${imgTag.alignAtt + ' '}${imgTag.widthAtt + ' '}${imgTag.heightAtt + ' '}${imgTag.srcAtt + ' '}${imgTag.styleAtt} />`;
 
         // !VA Pass the imgTagArray and return it as string
-        return clipboardStr;
+        return imgTagStr;
       }, 
       
       // calcController: GET STRINGS FOR THE TD CLIPBOARD OUTPUT
@@ -1359,22 +1360,21 @@ var Dimwhit = (function () {
           return str;
         })();
 
+        // !VA Wrapper Width Attribute
         tableTag.widthAtt = (function (id, data) {
-          // !VA TODO: The default 'none' is currently set in the HTML, that should be done programmatically
-          // !VA Pass in the id of the select dropdown
-          var str;
-          // !VA Get the selection index
-          var selInd = document.querySelector(id).selectedIndex;
-          // !VA Put the available options in an array
-          var tableWidthOptions = [ 'none', data.imgW ];
-          // !VA Put the desired output strings in an array
-          var clipboardOutput = [ '',`width="${data.imgW}"`];
-          // !VA If the selected index matches the index of the available options array, then output the string that matches that index
-          for (let i = 0; i < tableWidthOptions.length; i++) {
-            if ( selInd === i) {
-              str = `${clipboardOutput[i]}`;
-            }
+          // !VA Get Appdata
+          var data = UIController.accessAppdata();
+          var tableWidthInput = document.querySelector(ccpUserInput.tableWidth);
+          console.log('tableWidthInput.value is: ' + tableWidthInput.value);
+          // !VA If there 
+          if (!tableWidthInput.value) {
+            tableTag.tableWidthInput.value = '0';
+          } else {
+            tableTag.tableWidth = `width="${tableWidthInput.value}"`;
           }
+
+          var str = tableTag.tableWidth;
+          console.log('str is: ' + str);
           return str;
         })(ccpUserInput.tableWidth, data);
         
