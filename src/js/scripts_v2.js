@@ -1,5 +1,5 @@
 
-/* !VA  
+/* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
 TODO: Tableoptions: move bgcolor to col 2, move include wrapper table to top of col 3 and add bgcolor & align. Change table width to input with default of imgW.  
 TODO: Fix the 'color' option, it just needs the value not the bgcolor label in the Stig thing.
