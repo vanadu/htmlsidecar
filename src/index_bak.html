@@ -162,15 +162,6 @@
                     <input id="img-relpath-input" value="img" placeholder="none" />
                     <!-- <span class="slash">&nbsp;/</span>  -->
                   </div> 
-                  <div id="img-align"> 
-                    <label id="img-align-label" for="img-align-select">align=</label> 
-                    <select id="img-align-select"> 
-                      <option selected="selected">none</option> 
-                      <option>left</option> 
-                      <option>middle</option> 
-                      <option>right</option> 
-                    </select> 
-                  </div> 
 
                   <!-- VA! V2 Leaving this out for now... -->
                   <!-- <div id="img-width">
@@ -179,23 +170,30 @@
                       <!-- VA! These options are set in handleTableWidth -->
                       <!-- </select>
                   </div>  -->
-
+                  <div id="img-include-css" > 
+                      <label class="img-include-css-container" id="img-include-css-container" for="img-include-css">
+                        
+                        <label class="img-include-css-label" id="img-include-css-label" for="img-include-css">
+                        
+                        Include width and height in style attribute</label>
+                      <!-- The default checkbox is hidden -->
+                      <input type="checkbox" id="img-include-css-checkbox">
+                      <span id="img-include-css-checkmrk"></span>
+                      <!-- VA! These options are set in handleTableWidth -->
+                    </label> 
+                  </div> 
 
                 </div> 
                 <div class="ccp-options-col-3"> 
-                  <div id="img-include-css" > 
-                    <label class="img-include-css-container" id="img-include-css-container" for="img-include-css">
-                      
-                      <label class="img-include-css-label" id="img-include-css-label" for="img-include-css">
-                      
-                      Include width and height in style attribute</label>
-                    <!-- The default checkbox is hidden -->
-                    <input type="checkbox" id="img-include-css-checkbox">
-                    <span id="img-include-css-checkmrk"></span>
-                    <!-- VA! These options are set in handleTableWidth -->
-                  </label> 
-                  </div> 
-
+                    <div id="img-align"> 
+                        <label id="img-align-label" for="img-align-select">align=</label> 
+                        <select id="img-align-select"> 
+                          <option selected="selected">none</option> 
+                          <option>left</option> 
+                          <option>middle</option> 
+                          <option>right</option> 
+                        </select> 
+                      </div> 
                     <!-- VA! V2 Leaving this out for now... -->
                     <!-- <div id="img-max-width"> -->
                         <!-- VA! These options are set in handleTableWidth -->
@@ -219,148 +217,150 @@
           </fieldset>
           <!-- /fieldset #image-options -->
 
+          
           <fieldset id="td-options" class="ccp-fieldset">
-            <!-- /This element is populated dynamically in scripts.js -->
-  
-              <legend>&lt;td&gt; Options</legend> 
+          <!-- /This element is populated dynamically in scripts.js -->
 
-                <div class="ccp-options-col-1"> 
-                  <div id="td-build-html"> 
-                    <button id="td-build-html-but" class="ccp-but"></button> 
-                  </div><!-- /#td-build-html --> 
+            <legend>&lt;td&gt; Options</legend> 
+            <div id="ccp-td-options" class="ccp-options"> 
+              <div class="ccp-options-col-1"> 
+                <div id="ccp-build-html-td"> 
+                  <button id="td-build-html-but" class="ccp-but"></button> 
+                </div><!-- /#ccp-build-html-td --> 
+              </div> 
+    
+              <div class="ccp-options-col-2"> 
+                <div id="td-class"> 
+                  <label for="td-class-input">class=</label> 
+                  <input id="td-class-input" value="" placeholder="none" />  
                 </div> 
-      
-                <div class="ccp-options-col-2"> 
-                  <div id="td-class"> 
-                    <label for="td-class-input">class=</label> 
-                    <input id="td-class-input" value="" placeholder="none" />  
-                  </div> 
-                  <div id="td-align"> 
-                    <label id="td-align-label" for="td-align">align=</label> 
-                    <select id="td-align-select">
-                      <option>none</option> 
-                      <option selected="selected">left</option> 
-                      <option>center</option> 
-                      <option>right</option> 
-                    </select>  
-                  </div> 
-                  <div id="td-valign"> 
-                    <label id="td-valign-label" for="td-valign-select">valign=</label>
-                    <select id="td-valign-select"> 
-                      <option>none</option> 
-                      <option selected="selected">top</option> 
-                      <option>middle</option> 
-                      <option>bottom</option> 
-                    </select> 
-                  </div> 
+                <div id="td-align"> 
+                  <label id="td-align-label" for="td-align">align=</label> 
+                  <select id="td-align-select">
+                    <option>none</option> 
+                    <option selected="selected">left</option> 
+                    <option>center</option> 
+                    <option>right</option> 
+                  </select>  
                 </div> 
-                <div class="ccp-options-col-3">
-                  <div id="td-bgcolor">
-                    <label for="td-bgcolor-input" id="td-bgcolor">bgcolor=</label>
-                    <input type="text" id="td-bgcolor-input" placeholder="none" value="" />
-                  </div>
-  
-                  <div id="td-bgimage" > 
-                      <label class="td-bgimage-container" id="td-bgimage-container" for="td-bgimage">
-                        
-                      <label class="td-bgimage-label" id="td-bgimage-label" for="td-bgimage">
-                        
-                        Background image by <a href="https://backgrounds.cm/">Stig</a>
-                        </label>
-                      <!-- The default checkbox is hidden -->
-                      <input type="checkbox" id="td-bgimage-checkbox">
-                      <span id="td-bgimage-checkmrk"></span>
-                      <!-- VA! These options are set in handleTableWidth -->
-                    </label> 
-                  </div> 
+                <div id="td-valign"> 
+                  <label id="td-valign-label" for="td-valign-select">valign=</label>
+                  <select id="td-valign-select"> 
+                    <option>none</option> 
+                    <option selected="selected">top</option> 
+                    <option>middle</option> 
+                    <option>bottom</option> 
+                  </select> 
+                </div> 
+              </div> 
+              <div class="ccp-options-col-3">
+                <div id="td-bgcolor">
+                  <label for="td-bgcolor-input" id="td-bgcolor">bgcolor=</label>
+                  <input type="text" id="td-bgcolor-input" placeholder="none" value="" />
                 </div>
 
-            </fieldset>
-  
-  
-            <fieldset id="table-options" class="ccp-fieldset">
-            <!-- /This element is populated dynamically in scripts.js -->
-  
-              <legend>&lt;table&gt; Options</legend> 
-              <div id="ccp-table-options" class="ccp-options"> 
-                <div class="ccp-options-col-1"> 
-                  <div id="ccp-build-html-table"> 
-                    <button id="table-build-html-but" class="ccp-but"></button> 
-                  </div><!-- /#ccp-build-html-table --> 
+                <div id="td-bgimage" > 
+                    <label class="td-bgimage-container" id="td-bgimage-container" for="td-bgimage">
+                      
+                    <label class="td-bgimage-label" id="td-bgimage-label" for="td-bgimage">
+                      
+                      Background image by <a href="https://backgrounds.cm/">Stig</a>
+                      </label>
+                    <!-- The default checkbox is hidden -->
+                    <input type="checkbox" id="td-bgimage-checkbox">
+                    <span id="td-bgimage-checkmrk"></span>
+                    <!-- VA! These options are set in handleTableWidth -->
+                  </label> 
                 </div> 
-      
-                <div class="ccp-options-col-2"> 
-                  <div id="table-class"> 
-                    <label for="table-class-input">class=</label>
-                    <input id="table-class-input" placeholder="none" />  
-                  </div> 
-                  <div id="table-align"> 
-                    <label id="table-align-label" for="table-align">align=</label> 
-                    <!-- We can hard code these because there isn't any dynamic data -->
-                    <select id="table-align-select"> 
-                      <option>none</option>
-                      <option>left</option> 
-                      <option selected="selected">center</option> 
-                      <option>right</option> 
-                    </select>
-                  </div>
-                  <div id="table-width">
-                      <label id="table-width-input-label" for="table-width-input">width=</label> 
-                      <input id="table-width-input" value="" placeholder="" />
-                  </div>
-                  <div id="table-bgcolor">
-                      <label for="table-bgcolor-input" id="table-bgcolor">bgcolor=</label>
-                      <input type="text" id="table-bgcolor-input" placeholder="none" value="" />
-                  </div> 
-                  <div id="table-max-width">
-                      <!-- VA! These options are set in handleTableWidth -->
-                      <label for="table-max-width-input">max-width:</label>
-                      <input id="table-max-width-input" value="" placeholder="" />
-                  </div>
-  
+              </div>
+            </div><!-- /#ccp-td-options -->
+          </fieldset>
+
+
+          <fieldset id="table-options" class="ccp-fieldset">
+          <!-- /This element is populated dynamically in scripts.js -->
+
+            <legend>&lt;table&gt; Options</legend> 
+            <div id="ccp-table-options" class="ccp-options"> 
+              <div class="ccp-options-col-1"> 
+                <div id="ccp-build-html-table"> 
+                  <button id="table-build-html-but" class="ccp-but"></button> 
+                </div><!-- /#ccp-build-html-table --> 
+              </div> 
+    
+              <div class="ccp-options-col-2"> 
+                <div id="table-class"> 
+                  <label for="table-class-input">class=</label>
+                  <input id="table-class-input" placeholder="none" />  
+                </div> 
+                <div id="table-align"> 
+                  <label id="table-align-label" for="table-align">align=</label> 
+                  <!-- We can hard code these because there isn't any dynamic data -->
+                  <select id="table-align-select"> 
+                    <option>none</option>
+                    <option>left</option> 
+                    <option selected="selected">center</option> 
+                    <option>right</option> 
+                  </select>
                 </div>
-  
-  
-                <div class="ccp-options-col-3"> 
-  
-                  <div id="table-include-wrapper" > 
-                      <label class="table-include-wrapper-container" id="table-include-wrapper-container" for="img-include-css">
-                        
-                        <label class="table-include-wrapper-label" id="table-include-wrapper-label" for="table-include-wrapper">
-                        
-                        Include wrapper table</label>
-                      <!-- The default checkbox is hidden -->
-                      <input type="checkbox" id="table-include-wrapper-checkbox">
-                      <span id="table-include-wrapper-checkmrk"></span>
-                      <!-- VA! These options are set in handleTableWidth -->
-                    </label> 
-                  </div> 
-                  <div id="table-wrapper-class"> 
-                      <label for="table-wrapper-class-input">class=</label>
-                      <input id="table-wrapper-class-input" placeholder="none" />  
-                  </div> 
-                  <div id="table-wrapper-width"> 
-                      <label id="table-wrapper-width-input-label" for="table-wrapper-width-input">width=</label>
-                      <input id="table-wrapper-width-input" placeholder="none" />  
-                  </div> 
-                  <div id="table-wrapper-align"> 
-                    <label id="table-wrapper-align-select-label" for="table-wrapper-align-select">align=</label>
-                    <select id="table-wrapper-align-select"> 
-                      <option>none</option>
-                      <option>left</option> 
-                      <option selected="selected">center</option> 
-                      <option>right</option> 
-                    </select>
-                  </div> 
-                  <div id="table-wrapper-bgcolor"> 
-                      <label id="table-wrapper-bgcolor-input-label" for="table-wrapper-bgcolor-input">bgcolor=</label>
-                      <input id="table-wrapper-bgcolor-input" placeholder="none" />  
-                  </div> 
-  
+                <div id="table-width">
+                    <label id="table-width-input-label" for="table-width-input">width=</label> 
+                    <input id="table-width-input" value="" placeholder="" />
                 </div>
-              </div><!-- /#ccp-table-options -->
-  
-            </fieldset>
+                <div id="table-bgcolor">
+                    <label for="table-bgcolor-input" id="table-bgcolor">bgcolor=</label>
+                    <input type="text" id="table-bgcolor-input" placeholder="none" value="" />
+                </div> 
+                <div id="table-max-width">
+                    <!-- VA! These options are set in handleTableWidth -->
+                    <label for="table-max-width-input">max-width:</label>
+                    <input id="table-max-width-input" value="" placeholder="" />
+                </div>
+
+              </div>
+
+
+              <div class="ccp-options-col-3"> 
+
+                <div id="table-include-wrapper" > 
+                    <label class="table-include-wrapper-container" id="table-include-wrapper-container" for="img-include-css">
+                      
+                      <label class="table-include-wrapper-label" id="table-include-wrapper-label" for="table-include-wrapper">
+                      
+                      Include wrapper table</label>
+                    <!-- The default checkbox is hidden -->
+                    <input type="checkbox" id="table-include-wrapper-checkbox">
+                    <span id="table-include-wrapper-checkmrk"></span>
+                    <!-- VA! These options are set in handleTableWidth -->
+                  </label> 
+                </div> 
+                <div id="table-wrapper-class"> 
+                    <label for="table-wrapper-class-input">class=</label>
+                    <input id="table-wrapper-class-input" placeholder="none" />  
+                </div> 
+                <div id="table-wrapper-width"> 
+                    <label id="table-wrapper-width-input-label" for="table-wrapper-width-input">width=</label>
+                    <input id="table-wrapper-width-input" placeholder="none" />  
+                </div> 
+                <div id="table-wrapper-align"> 
+                  <label id="table-wrapper-align-select-label" for="table-wrapper-align-select">align=</label>
+                  <select id="table-wrapper-align-select"> 
+                    <option>none</option>
+                    <option>left</option> 
+                    <option selected="selected">center</option> 
+                    <option>right</option> 
+                  </select>
+                </div> 
+                <div id="table-wrapper-bgcolor"> 
+                    <label id="table-wrapper-bgcolor-input-label" for="table-wrapper-bgcolor-input">bgcolor=</label>
+                    <input id="table-wrapper-bgcolor-input" placeholder="none" />  
+                </div> 
+
+              </div>
+            </div><!-- /#ccp-table-options -->
+
+          </fieldset>
+          <!-- /fieldset #image-options -->
         </div><!-- /#ccp-content -->
       </div>
       <!-- /#ccp clipboard control panel -->

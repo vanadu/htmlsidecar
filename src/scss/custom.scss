@@ -668,23 +668,6 @@ output {
   padding: 0;
   // Global CCP character styles
 
-  // !VA Styling the wrapper checkbox and labels 
-  span.blob {
-    color: #FFFFFF;
-    font-size: 18px;
-    font-weight: 300;
-  }
-  #img-wrap-anchor {
-    margin-left: 15px;
-    input[type=checkbox] {
-      transform: scale(1.5);
-    }
-  }
-  // input[type=checkbox] {
-  //   transform: scale(3);
-  // }
-
-
   input, label {
     color: #FFFFFF;
     font-size: 14px;
@@ -699,252 +682,22 @@ output {
     background: #000000;
     color: #FFFFFF;
   }
+  // VA! Set the height of each option fieldset
+  fieldset#img-options, fieldset#td-options, fieldset#table-options {
+    height: 160px;
+  }
 
 
+  // VA! Set the width of the 4 options columns in each fieldset
   fieldset {
-    
+    position: relative;
     width: 100%;
     margin-bottom: 5px;
     border: 1px solid $fieldset-border-color;
     border-radius: 5px;
-
-    #img-ccp-options {
-      // position: relative;
-      // top: -15px;
-    }
-
-    .ccp-options {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      // margin: 0;
-      // padding: 0;
-      // :VA Fix this -- too convoluted
-      .ccp-options-col-1, .ccp-options-col-2, .ccp-options-col-3, .ccp-options-col-4 {
-        position: absolute;
-        top: 2px;
-        margin: 0;
-        padding: 0;
-      }
-      .ccp-options-col-1 {
-        // !VA Width is actually irrelevant here since these elements are absolutely positioned
-        // top: 15px;
-        // left: 15px;
-        width: 95px;
-      }
-      .ccp-options-col-2 {
-        left: 120px;
-        width: 230px;
-        label  {
-          width: 60px;
-          margin-bottom: 5px;
-          padding-right: 2px;
-          text-align: right;
-        }
-        input {
-          width: 150px;
-        }
-
-        /* COLUMN 2 CHECKBOXES */
-        .img-include-css-container {
-          width: 100%;
-          display: block;
-          position: relative;
-          padding-left: 35px;
-          margin-bottom: 3px;
-          cursor: pointer;
-          // font-size: 22px;
-          text-align: left;
-          -webkit-user-select: none;
-          -moz-user-select: none;
-          -ms-user-select: none;
-          user-select: none;
-          z-index: 100;
-        }
-        /* Hide the browser's default checkbox */
-        .img-include-css-container input, .table-include-wrapper-container input {
-          position: absolute;
-          opacity: 0;
-          cursor: pointer;
-          height: 0;
-          width: 0;
-        }
-        /* Create a custom checkbox */
-        #img-include-css-checkmrk {
-          position: absolute;
-          top: 5px;
-          left: 30px;
-          height: 15px;
-          width: 15px;
-          background-color: #eee;
-          display: block;
-          z-index: 100;
-        }
-        
-        /* On mouse-over, add a grey background color */
-        .img-include-css-container:hover input ~ #img-include-css-checkmrk {
-          background-color: #ccc;
-        }
-        
-        /* When the checkbox is checked, add a gray background */
-        .img-include-css-container input:checked ~ #img-include-css-checkmrk {
-          background-color: #5f5e5e;
-        }
-        
-        /* Create the checkmrk/indicator (hidden when not checked) */
-        #img-include-css-checkmrk:after {
-          content: "";
-          position: absolute;
-          display: none;
-        }
-        
-        /* Show the checkmrk when checked */
-        .img-include-css-container input:checked ~ #img-include-css-checkmrk:after {
-          display: block;
-        }
-        
-        /* Style the checkmrk/indicator */
-        .img-include-css-container #img-include-css-checkmrk:after {
-          left: 5px;
-          top: 2px;
-          width: 5px;
-          height: 10px;
-          border: solid white;
-          border-width: 0 3px 3px 0;
-          -webkit-transform: rotate(45deg);
-          -ms-transform: rotate(45deg);
-          transform: rotate(45deg);
-          
-        }
-
-        // VA! This is the extra label I added because the prodecure I used for the mock checkbox didn't include a label
-        #img-include-css-label {
-          width: 180px;
-          padding-left: 24px;
-          text-align: left;
-        }
-        #table-wrapper-width, #table-wrapper-class, #table-wrapper-align, #table-wrapper-bgcolor {
-          /* Hiding this by default, it will be displayed programmatically */
-          display: none;
-        }
-      }
-      .ccp-options-col-3 {
-        left: 350px;
-        width: 280px;
-        input {
-          width: 150px;
-        }
-        label {
-          width: 60px;
-          margin-bottom: 5px;
-          padding-right: 2px;
-          text-align: right;
-        }
-        
-        .td-bgimage-container, .table-include-wrapper-container  {
-          width: 100%;
-          display: block;
-          position: relative;
-          padding-left: 35px;
-          margin-bottom: 3px;
-          cursor: pointer;
-          // font-size: 22px;
-          text-align: left;
-          -webkit-user-select: none;
-          -moz-user-select: none;
-          -ms-user-select: none;
-          user-select: none;
-          z-index: 100;
-          a {
-            font-weight: bold;
-            text-decoration: underline;
-          }
-        }
-        /* Hide the browser's default checkbox */
-        .td-bgimage-container input, .table-include-wrapper-container input {
-          position: absolute;
-          opacity: 0;
-          cursor: pointer;
-          height: 0;
-          width: 0;
-        }
-        
-        /* Create a custom checkbox */
-        #td-bgimage-checkmrk, #table-include-wrapper-checkmrk {
-          position: absolute;
-          top: 3px;
-          left: 40px;
-          height: 15px;
-          width: 15px;
-          background-color: #eee;
-          display: block;
-          z-index: 100;
-        }
-        
-        /* On mouse-over, add a grey background color */
-        .td-bgimage-container:hover input ~ #td-bgimage-checkmrk, .table-include-wrapper-container:hover input ~ #table-include-wrapper-checkmrk {
-          background-color: #ccc;
-        }
-        /* When the checkbox is checked, add a gray background */
-        .td-bgimage-container input:checked ~ #td-bgimage-checkmrk, .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk {
-          background-color: #5f5e5e;
-        }
-
-        /* Create the checkmrk/indicator (hidden when not checked) */
-        #td-bgimage-checkmrk:after, #table-include-wrapper-checkmrk:after  {
-          content: "";
-          position: absolute;
-          display: none;
-        }
-        
-        /* Show the checkmrk when checked */
-        .td-bgimage-container input:checked ~ #td-bgimage-checkmrk:after, .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk:after  {
-          display: block;
-        }
-        
-        
-        /* Style the checkmrk/indicator */
-        .td-bgimage-container #td-bgimage-checkmrk:after, .table-include-wrapper-container #table-include-wrapper-checkmrk:after {
-          left: 5px;
-          top: 2px;
-          width: 5px;
-          height: 10px;
-          border: solid white;
-          border-width: 0 3px 3px 0;
-          -webkit-transform: rotate(45deg);
-          -ms-transform: rotate(45deg);
-          transform: rotate(45deg);
-          
-        }
-        
-        // VA! This is the extra label I added because the prodecure I used for the mock checkbox didn't include a label
-        #td-bgimage-label, #table-include-wrapper-label  {
-          width: 220px;
-          padding-left: 34px;
-          text-align: left;
-        }
-        
-
-      }
-      .ccp-options-col-4 {
-        left: 620px;
-        width: 70px;
-        height: 150px;
-      }
-      .ccp-but {
-        width: 110px;
-        height: 56px;
-        border: none;
-        margin-bottom: 5px;
-      }
-    }
-    span.slash {
-      color: #FFFFFF;
-      font-size: 18px;
-      vertical-align: baseline;
-    }
     legend {
       height: 20px;
+      width: 145px;
       margin: 0 0 0 20px;
       padding: 0 10px;
       border: none;
@@ -952,118 +705,284 @@ output {
       font-size: 16px;
       font-weight: 400;
     }
-    &#img-options {
-      height: 200px;
-      // border: 1px solid green;
-      legend {
-        width: 130px;
-      }
-    }
-    &#td-options {
-      height: 110px;
-      legend {
-        width: 120px;
-
-      }
-    }
-    &#table-options {
-      height: 180px;
-      legend {
-        width: 140px;
-      }
-    }
-  }
-}
-
-// Styles for the left, center and right options columns in each fieldset
-#img-options {
-  .ccp-options-col-1 {
-    position: absolute;
-    #img-build-html-but {
-      width: 100px;
-      float: left;
+    .ccp-options-col-1, .ccp-options-col-2, .ccp-options-col-3, .ccp-options-col-4 {
+      // position: relative;
       display: block;
-      background: #000000 url('../img/img-to-cb-html.png') no-repeat center;
-      background-size: 90px 46px;
-      &:hover {
-        background-image: url('../img/img-to-cb-html-hover.png');
+      float: left;
+      top: 2px;
+      margin: 0;
+      padding: 0;
+    }
+    .ccp-options-col-1 {
+      // !VA Width is actually irrelevant here since these elements are absolutely positioned
+      width: 95px;
+      border: 1px solid transparent; 
+      .ccp-but {
+        width: 90px;
+        height: 90px; 
+        float: left;
+        display: block;
+        border: none;
+        background-size: 90px 46px !important;
+      }
+      #img-build-html-but {
+        background: #000000 url('../img/img-to-cb-html.png') no-repeat center;
+        background-size: 90px 46px;
+        &:hover {
+          background-image: url('../img/img-to-cb-html-hover.png');
+        }
+      }
+      #td-build-html-but {
+        background: #000000 url('../img/td-to-cb-html-icon.png') no-repeat center;
+        &:hover {
+          background-image: url('../img/td-to-cb-html-icon-hover.png');
+        }
+      }
+      #table-build-html-but {
+        background: #000000 url('../img/table-to-cb-html-icon.png') no-repeat center;
+        &:hover {
+          background-image: url('../img/table-to-cb-html-icon-hover.png');
+        }
       }
     }
-    
-  }
+    // VA! Global options for column 2 elements
+    .ccp-options-col-2 {
+      left: 120px;
+      width: 230px;
+      label  {
+        width: 60px;
+        margin-bottom: 5px;
+        padding-right: 2px;
+        text-align: right;
+      }
+      input {
+        width: 150px;
+      }
 
-  .ccp-options-col-4 {
-    #img-build-css {
-      position: relative;
-      width: 60px;
-      height: 35px;
-      margin-bottom: 15px;
-      button {
+      // VA! COLUMN 2 CHECKBOXES
+      .img-include-css-container {
+        width: 100%;
+        display: block;
+        position: relative;
+        padding-left: 35px;
+        margin-bottom: 3px;
+        cursor: pointer;
+        // font-size: 22px;
+        text-align: left;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        z-index: 100;
+      }
+      /* Hide the browser's default checkbox */
+      .img-include-css-container input, .table-include-wrapper-container input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+      }
+      /* Create a custom checkbox */
+      #img-include-css-checkmrk {
+        position: absolute;
+        top: 5px;
+        left: 30px;
+        height: 15px;
+        width: 15px;
+        background-color: #eee;
+        display: block;
+        z-index: 100;
+      }
+      
+      /* On mouse-over, add a grey background color */
+      .img-include-css-container:hover input ~ #img-include-css-checkmrk {
+        background-color: #ccc;
+      }
+      
+      /* When the checkbox is checked, add a gray background */
+      .img-include-css-container input:checked ~ #img-include-css-checkmrk {
+        background-color: #5f5e5e;
+      }
+      
+      /* Create the checkmrk/indicator (hidden when not checked) */
+      #img-include-css-checkmrk:after {
+        content: "";
+        position: absolute;
+        display: none;
+      }
+      
+      /* Show the checkmrk when checked */
+      .img-include-css-container input:checked ~ #img-include-css-checkmrk:after {
+        display: block;
+      }
+      
+      /* Style the checkmrk/indicator */
+      .img-include-css-container #img-include-css-checkmrk:after {
+        left: 5px;
+        top: 2px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 3px 3px 0;
+        -webkit-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+        
+      }
+
+      // VA! This is the extra label I added because the prodecure I used for the mock checkbox didn't include a label
+      #img-include-css-label {
+        width: 180px;
+        padding-left: 24px;
+        text-align: left;
+      }
+      #table-wrapper-width, #table-wrapper-class, #table-wrapper-align, #table-wrapper-bgcolor {
+        /* Hiding this by default, it will be displayed programmatically */
+        display: none;
+      }
+    }
+    .ccp-options-col-3 {
+      left: 350px;
+      width: 280px;
+      // VA! Custom checkbox
+      .td-bgimage-container, .table-include-wrapper-container  {
+        width: 100%;
+        display: block;
+        position: relative;
+        padding-left: 35px;
+        margin-bottom: 3px;
+        cursor: pointer;
+        // font-size: 22px;
+        text-align: left;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        z-index: 100;
+        a {
+          font-weight: bold;
+          text-decoration: underline;
+        }
+      }
+      /* Hide the browser's default checkbox */
+      .td-bgimage-container input, .table-include-wrapper-container input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+      }
+      
+      /* Create a custom checkbox */
+      #td-bgimage-checkmrk, #table-include-wrapper-checkmrk {
+        position: absolute;
+        top: 3px;
+        left: 40px;
+        height: 15px;
+        width: 15px;
+        background-color: #eee;
+        display: block;
+        z-index: 100;
+      }
+      
+      /* On mouse-over, add a grey background color */
+      .td-bgimage-container:hover input ~ #td-bgimage-checkmrk, .table-include-wrapper-container:hover input ~ #table-include-wrapper-checkmrk {
+        background-color: #ccc;
+      }
+      /* When the checkbox is checked, add a gray background */
+      .td-bgimage-container input:checked ~ #td-bgimage-checkmrk, .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk {
+        background-color: #5f5e5e;
+      }
+
+      /* Create the checkmrk/indicator (hidden when not checked) */
+      #td-bgimage-checkmrk:after, #table-include-wrapper-checkmrk:after  {
+        content: "";
+        position: absolute;
+        display: none;
+      }
+      
+      /* Show the checkmrk when checked */
+      .td-bgimage-container input:checked ~ #td-bgimage-checkmrk:after, .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk:after  {
+        display: block;
+      }
+      
+      
+      /* Style the checkmrk/indicator */
+      .td-bgimage-container #td-bgimage-checkmrk:after, .table-include-wrapper-container #table-include-wrapper-checkmrk:after {
+        left: 5px;
+        top: 2px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 3px 3px 0;
+        -webkit-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+        
+      }
+      
+      // VA! This is the extra label I added because the prodecure I used for the mock checkbox didn't include a label
+      #td-bgimage-label, #table-include-wrapper-label  {
+        width: 220px;
+        padding-left: 34px;
+        text-align: left;
+      }
+      
+
+    }
+    .ccp-options-col-4 {
+      left: 620px;
+      width: 70px;
+
+      .ccp-but-container {
+        position: relative;
+        width: 60px;
+        height: 35px;
+        margin-bottom: 10px;
+        // border: 1px solid blue;
+      }
+      .ccp-but {
         display: none;
         width: 60px;
         height: 35px;
-        border: 1px solid transparent;
+        // border: 1px solid transparent;
         background:  none;
         cursor: default;
+        border: none;
+        background-size:  60px 35px !important;
         &.active {
           display: block;
-          background:  #000000 url('../img/ccp-img-css-but.png') no-repeat center;
-          background-size:  60px 35px;
           cursor: pointer;
-          &:hover {
-            background-image:  url('../img/ccp-img-css-but-hover.png');
-          }
+  
         }
       }
-    }
-    #lphones-build-css {
-      position: relative;
-      // left: 20px;
-      width: 70px;
-      height: 41px;
-      margin-bottom: 15px;
-      button {
-        display: none;
-        width: 70px;
-        height: 41px;
-        border: 1px solid transparent;
-        background:  none;
-        cursor: default;
-        &.active {
-          display: block;
-          background: #000000 url('../img/ccp-lphone-css-but.png') no-repeat center;
-          background-size:  70px 41px;
-          cursor: pointer;
-          &:hover {
-            background-image:  url('../img/ccp-lphone-css-but-hover.png');
-          }
+
+      #img-build-css-but.active {
+        background:  #000000 url('../img/ccp-img-css-but.png') no-repeat center;
+        &:hover {
+          background-image:  url('../img/ccp-img-css-but-hover.png');
         }
       }
-    }
-    #sphones-build-css {
-      position:  relative;
-      width: 70px;
-      height: 41px;
-      button {
-        display: none;
-        width: 70px;
-        height: 41px;
-        border: 1px solid transparent;
-        background:  none;
-        cursor: default;
-        &.active {
-          display: block;
-          background: #000000 url('../img/ccp-sphone-css-but.png') no-repeat center;
-          background-size:  70px 41px;
-          cursor: pointer;
-          &:hover {
-            background-image:  url('../img/ccp-sphone-css-but-hover.png');
-          }
+      #lphones-build-css-but.active {
+        background:  #000000 url('../img/ccp-lphone-css-but.png') no-repeat center;
+        &:hover {
+          background-image:  url('../img/ccp-lphone-css-but-hover.png');
+        }
+      }
+      #sphones-build-css-but.active {
+        background:  #000000 url('../img/ccp-sphone-css-but.png') no-repeat center;
+        &:hover {
+          background-image:  url('../img/ccp-sphone-css-but-hover.png');
         }
       }
     }
   }
 }
+
+
+
+
 
 // TD Options
 #td-options {
