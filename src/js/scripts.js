@@ -7,6 +7,7 @@ TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizin
 TODO: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- I think. Not sure if this is the right behavior...think bout it. Probably not.
 
 
+DONE: Moved git repo to github
 DONE: Change TABLE width: add width checkbox that shows input with default width of imgW, and another checkbox for wrapper that shows viewerW. Add checkbox for Stig ba
 DONE: Make all checkboxes under one CSS definition - Not really possible
 DONE: Put error container above toolbuttons
