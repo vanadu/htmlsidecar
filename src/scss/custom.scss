@@ -695,6 +695,13 @@ output {
     margin-bottom: 5px;
     border: 1px solid $fieldset-border-color;
     border-radius: 5px;
+    span.ccp-heading, label.ccp-heading  {
+      font-size: 13px;
+      font-weight: bold;
+      color: #a8a8a8;
+      margin: 0 0 8px 0;
+      padding: 0;
+    }
     legend {
       height: 20px;
       width: 145px;
@@ -715,11 +722,14 @@ output {
     }
     .ccp-options-col-1 {
       // !VA Width is actually irrelevant here since these elements are absolutely positioned
-      width: 95px;
-      border: 1px solid transparent; 
+      width: 105px;
+      height: 120px;
+      margin: 0 7px;
+      border: 1px solid transparent;
       .ccp-but {
         width: 90px;
         height: 90px; 
+        padding-right: 7px;
         float: left;
         display: block;
         border: none;
@@ -759,94 +769,21 @@ output {
         width: 150px;
       }
 
-      // VA! COLUMN 2 CHECKBOXES
-      .img-include-css-container {
-        width: 100%;
-        display: block;
-        position: relative;
-        padding-left: 35px;
-        margin-bottom: 3px;
-        cursor: pointer;
-        // font-size: 22px;
-        text-align: left;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        z-index: 100;
-      }
-      /* Hide the browser's default checkbox */
-      .img-include-css-container input, .table-include-wrapper-container input {
-        position: absolute;
-        opacity: 0;
-        cursor: pointer;
-        height: 0;
-        width: 0;
-      }
-      /* Create a custom checkbox */
-      #img-include-css-checkmrk {
-        position: absolute;
-        top: 5px;
-        left: 30px;
-        height: 15px;
-        width: 15px;
-        background-color: #eee;
-        display: block;
-        z-index: 100;
-      }
-      
-      /* On mouse-over, add a grey background color */
-      .img-include-css-container:hover input ~ #img-include-css-checkmrk {
-        background-color: #ccc;
-      }
-      
-      /* When the checkbox is checked, add a gray background */
-      .img-include-css-container input:checked ~ #img-include-css-checkmrk {
-        background-color: #5f5e5e;
-      }
-      
-      /* Create the checkmrk/indicator (hidden when not checked) */
-      #img-include-css-checkmrk:after {
-        content: "";
-        position: absolute;
-        display: none;
-      }
-      
-      /* Show the checkmrk when checked */
-      .img-include-css-container input:checked ~ #img-include-css-checkmrk:after {
-        display: block;
-      }
-      
-      /* Style the checkmrk/indicator */
-      .img-include-css-container #img-include-css-checkmrk:after {
-        left: 5px;
-        top: 2px;
-        width: 5px;
-        height: 10px;
-        border: solid white;
-        border-width: 0 3px 3px 0;
-        -webkit-transform: rotate(45deg);
-        -ms-transform: rotate(45deg);
-        transform: rotate(45deg);
-        
-      }
-
-      // VA! This is the extra label I added because the prodecure I used for the mock checkbox didn't include a label
-      #img-include-css-label {
-        width: 180px;
-        padding-left: 24px;
-        text-align: left;
-      }
-      #table-wrapper-width, #table-wrapper-class, #table-wrapper-align, #table-wrapper-bgcolor {
-        /* Hiding this by default, it will be displayed programmatically */
-        display: none;
-      }
     }
     .ccp-options-col-3 {
       left: 350px;
       width: 280px;
+      margin-left: 10px; 
+      label {
+        width: 60px;
+        margin-bottom: 5px;
+        padding-right: 2px;
+        text-align: right;
+      }
+      
       // VA! Custom checkbox
-      .td-bgimage-container, .table-include-wrapper-container  {
+
+      .img-include-css-container, .td-bgimage-container, .table-include-wrapper-container  {
         width: 100%;
         display: block;
         position: relative;
@@ -866,7 +803,7 @@ output {
         }
       }
       /* Hide the browser's default checkbox */
-      .td-bgimage-container input, .table-include-wrapper-container input {
+      .img-include-css-container input,.td-bgimage-container input, .table-include-wrapper-container input {
         position: absolute;
         opacity: 0;
         cursor: pointer;
@@ -875,7 +812,7 @@ output {
       }
       
       /* Create a custom checkbox */
-      #td-bgimage-checkmrk, #table-include-wrapper-checkmrk {
+      #img-include-css-checkmrk, #td-bgimage-checkmrk, #table-include-wrapper-checkmrk {
         position: absolute;
         top: 3px;
         left: 40px;
@@ -887,29 +824,29 @@ output {
       }
       
       /* On mouse-over, add a grey background color */
-      .td-bgimage-container:hover input ~ #td-bgimage-checkmrk, .table-include-wrapper-container:hover input ~ #table-include-wrapper-checkmrk {
+      .img-include-css-container:hover input ~ #img-include-css-checkmrk, .td-bgimage-container:hover input ~ #td-bgimage-checkmrk, .table-include-wrapper-container:hover input ~ #table-include-wrapper-checkmrk {
         background-color: #ccc;
       }
       /* When the checkbox is checked, add a gray background */
-      .td-bgimage-container input:checked ~ #td-bgimage-checkmrk, .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk {
+      .img-include-css-container input:checked ~ #img-include-css-checkmrk, .td-bgimage-container input:checked ~ #td-bgimage-checkmrk, .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk {
         background-color: #5f5e5e;
       }
 
       /* Create the checkmrk/indicator (hidden when not checked) */
-      #td-bgimage-checkmrk:after, #table-include-wrapper-checkmrk:after  {
+      #img-include-css-checkmrk:after, #td-bgimage-checkmrk:after, #table-include-wrapper-checkmrk:after  {
         content: "";
         position: absolute;
         display: none;
       }
       
       /* Show the checkmrk when checked */
-      .td-bgimage-container input:checked ~ #td-bgimage-checkmrk:after, .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk:after  {
+      .img-include-css-container input:checked ~ #img-include-css-checkmrk:after, .td-bgimage-container input:checked ~ #td-bgimage-checkmrk:after, .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk:after  {
         display: block;
       }
       
       
       /* Style the checkmrk/indicator */
-      .td-bgimage-container #td-bgimage-checkmrk:after, .table-include-wrapper-container #table-include-wrapper-checkmrk:after {
+      .img-include-css-container #img-include-css-checkmrk:after, .td-bgimage-container #td-bgimage-checkmrk:after, .table-include-wrapper-container #table-include-wrapper-checkmrk:after {
         left: 5px;
         top: 2px;
         width: 5px;
@@ -923,10 +860,14 @@ output {
       }
       
       // VA! This is the extra label I added because the prodecure I used for the mock checkbox didn't include a label
-      #td-bgimage-label, #table-include-wrapper-label  {
+      #img-include-css-label, #td-bgimage-label, #table-include-wrapper-label  {
         width: 220px;
         padding-left: 34px;
         text-align: left;
+      }
+      // VA! The Wrapper table label has to align left because it also serves as the option group heading
+      #table-include-wrapper-checkmrk,  .table-include-wrapper-label{
+        margin-left: -40px;
       }
       
 
@@ -935,17 +876,18 @@ output {
       left: 620px;
       width: 70px;
 
-      .ccp-but-container {
-        position: relative;
-        width: 60px;
-        height: 35px;
-        margin-bottom: 10px;
-        // border: 1px solid blue;
-      }
+      // .ccp-but-container {
+      //   position: relative;
+      //   width: 60px;
+      //   height: 35px;
+      //   margin-bottom: 10px;
+      //   border: 1px solid blue;
+      // }
       .ccp-but {
         display: none;
         width: 60px;
         height: 35px;
+        margin-bottom: 9px;
         // border: 1px solid transparent;
         background:  none;
         cursor: default;
@@ -981,41 +923,6 @@ output {
 }
 
 
-
-
-
-// TD Options
-#td-options {
-  .ccp-options-col-1 {
-    #td-build-html-but {
-      width: 100px;
-      display: block;
-      background: #000000 url('../img/td-to-cb-html-icon.png') no-repeat center;
-      background-size: 90px 46px;
-      &.hover {
-        background-image: url('../img/td-to-cb-html-icon-hover.png');
-      }
-    }
-  }
-}
-
-// TABLE Options
-#table-options {
-  .ccp-options-col-1 {
-    // top: 5px;
-    // left: 20px;
-    // width: 120px;
-    #table-build-html-but {
-      width: 100px;
-      display: block;
-      background: #000000 url('../img/table-to-cb-html-icon.png') no-repeat center;
-      background-size: 90px 46px;
-      &.hover {
-        background-image: url('../img/table-to-cb-html-icon-hover.png');
-      }
-    }
-  }
-}
 
 // VA! 03.26.18
 #table-max-width {

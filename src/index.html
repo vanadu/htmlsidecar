@@ -134,7 +134,7 @@
 
       <!-- #ccp clipboard control panel -->
       <!-- #ccp blocker is only active to block user input while css transitions run and status messages are displayed -->
-      <div id="ccp-blocker" class="devred"></div>
+      <div id="ccp-blocker"></div>
       <div id="ccp">
         <h2>Clipboard Options</h2>
         <!-- #ccp-content -->
@@ -144,9 +144,8 @@
             <legend>&lt;img&gt; Options</legend>
 
                 <div class="ccp-options-col-1"> 
-                  <div id="img-build-html" class="ccp-button"> 
+
                     <button id="img-build-html-but" class="ccp-but"></button> 
-                  </div>  
                 </div> 
                 <div class="ccp-options-col-2"> 
                   <div id="img-class"> 
@@ -225,9 +224,7 @@
               <legend>&lt;td&gt; Options</legend> 
 
                 <div class="ccp-options-col-1"> 
-                  <div id="td-build-html"> 
                     <button id="td-build-html-but" class="ccp-but"></button> 
-                  </div><!-- /#td-build-html --> 
                 </div> 
       
                 <div class="ccp-options-col-2"> 
@@ -284,12 +281,11 @@
               <legend>&lt;table&gt; Options</legend> 
               <div id="ccp-table-options" class="ccp-options"> 
                 <div class="ccp-options-col-1"> 
-                  <div id="ccp-build-html-table"> 
                     <button id="table-build-html-but" class="ccp-but"></button> 
-                  </div><!-- /#ccp-build-html-table --> 
                 </div> 
       
-                <div class="ccp-options-col-2"> 
+                <div class="ccp-options-col-2">
+                    <p><span class="ccp-heading">Parent Table</span></p>
                   <div id="table-class"> 
                     <label for="table-class-input">class=</label>
                     <input id="table-class-input" placeholder="none" />  
@@ -322,13 +318,15 @@
   
   
                 <div class="ccp-options-col-3"> 
-  
-                  <div id="table-include-wrapper" > 
+                  
+
+                  <div id="table-include-wrapper"> 
+
                       <label class="table-include-wrapper-container" id="table-include-wrapper-container" for="img-include-css">
                         
-                        <label class="table-include-wrapper-label" id="table-include-wrapper-label" for="table-include-wrapper">
+                        <label class="table-include-wrapper-label ccp-heading" id="table-include-wrapper-label" for="table-include-wrapper">
                         
-                        Include wrapper table</label>
+                        Wrapper table</label>
                       <!-- The default checkbox is hidden -->
                       <input type="checkbox" id="table-include-wrapper-checkbox">
                       <span id="table-include-wrapper-checkmrk"></span>

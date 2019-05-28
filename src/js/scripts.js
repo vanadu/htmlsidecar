@@ -1,9 +1,10 @@
 
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
-
+TODO: Fix CPP CSS, in progress
 TODO: Move img options up to make more td space
 TODO: Shrink CSS buttons
+TODO: When you select background image by stig in td options, it shows the include table wrapper options in table options. Fix.
 TODO: When you focus on td or table input, the CSS CLipboard buttons appear in the img tag section. They should only  appear if the focus is in the img class input.
 TODO: Tableoptions: move bgcolor to col 2, move include wrapper table to top of col 3 and add bgcolor & align. Change table width to input with default of imgW.  
 TODO: Fix the 'color' option, it just needs the value not the bgcolor label in the Stig thing.
