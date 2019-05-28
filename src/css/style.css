@@ -1,13 +1,13 @@
 @charset "UTF-8";
 .dim-text {
   color: #B7B233;
-  font-family: "Open Sans", Arial, Helvetica, sans-serif;
+  font-family: "Ubuntu", Arial, Helvetica, sans-serif;
   font-size: 110%;
   font-weight: bold; }
 
 .whit-text {
   color: #B77033;
-  font-family: "Open Sans", Arial, Helvetica, sans-serif;
+  font-family: "Ubuntu", Arial, Helvetica, sans-serif;
   font-size: 110%;
   font-weight: normal; }
 
@@ -1258,6 +1258,9 @@ input:focus:-ms-input-placeholder {
   overflow: hidden; }
 
 #dim-viewers {
+  font-family: "Ubuntu", Arial, Helvetica, sans-serif;
+  font-weight: normal;
+  font-size: 1em;
   display: block;
   position: relative;
   top: 0;
@@ -1729,20 +1732,20 @@ output {
 
 #img-options .ccp-options-col-4 #img-build-css {
   position: relative;
-  width: 70px;
-  height: 41px;
+  width: 60px;
+  height: 35px;
   margin-bottom: 15px; }
   #img-options .ccp-options-col-4 #img-build-css button {
     display: none;
-    width: 70px;
-    height: 41px;
+    width: 60px;
+    height: 35px;
     border: 1px solid transparent;
     background: none;
     cursor: default; }
     #img-options .ccp-options-col-4 #img-build-css button.active {
       display: block;
       background: #000000 url("../img/ccp-img-css-but.png") no-repeat center;
-      background-size: 70px 41px;
+      background-size: 60px 35px;
       cursor: pointer; }
       #img-options .ccp-options-col-4 #img-build-css button.active:hover {
         background-image: url("../img/ccp-img-css-but-hover.png"); }

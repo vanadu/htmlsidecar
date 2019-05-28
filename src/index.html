@@ -18,6 +18,7 @@
   <meta charset="utf-8">
   <title>DimWhit V2</title>
   <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,400italic,600,800|Source+Code+Pro" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Ubuntu&display=swap" rel="stylesheet">
   <!-- <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />
   <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16" /> -->
   <link rel="shortcut icon" href="http://dimwhit.io/img/favicon-32x32.ico" />
@@ -160,15 +161,12 @@
                     <label for="img-alt-input">alt=</label> 
                     <input id="img-alt-input" value="" placeholder="none" /> 
                   </div> 
-                  <div id="img-align"> 
-                    <label id="img-align-label" for="img-align-select">align=</label> 
-                    <select id="img-align-select"> 
-                      <option selected="selected">none</option> 
-                      <option>left</option> 
-                      <option>middle</option> 
-                      <option>right</option> 
-                    </select> 
+                  <div id="img-relpath"> 
+                    <label id="img-relpath-label" for="img-relpath-input">path=</label> 
+                    <input id="img-relpath-input" value="img" placeholder="none" />
+                    <!-- <span class="slash">&nbsp;/</span>  -->
                   </div> 
+
                   <!-- VA! V2 Leaving this out for now... -->
                   <!-- <div id="img-width">
                       <label id="img-width-label" for="img-width">width=</label> 
@@ -188,13 +186,18 @@
                       <!-- VA! These options are set in handleTableWidth -->
                     </label> 
                   </div> 
-                  <div id="img-relpath"> 
-                    <label id="img-relpath-label" for="img-relpath-input">path=</label> 
-                    <input id="img-relpath-input" value="img" placeholder="none" />
-                    <!-- <span class="slash">&nbsp;/</span>  -->
-                  </div> 
+
                 </div> 
                 <div class="ccp-options-col-3"> 
+                    <div id="img-align"> 
+                        <label id="img-align-label" for="img-align-select">align=</label> 
+                        <select id="img-align-select"> 
+                          <option selected="selected">none</option> 
+                          <option>left</option> 
+                          <option>middle</option> 
+                          <option>right</option> 
+                        </select> 
+                      </div> 
                     <!-- VA! V2 Leaving this out for now... -->
                     <!-- <div id="img-max-width"> -->
                         <!-- VA! These options are set in handleTableWidth -->
@@ -207,10 +210,10 @@
                     <button id="img-build-css-but" class="ccp-but"></button> 
                   </div>  
                   <div id="lphones-build-css"> 
-                    <button id="lphones-build-css-but"></button> 
+                    <button id="lphones-build-css-but" class="ccp-but"></button> 
                   </div> 
                   <div id="sphones-build-css"> 
-                    <button id="sphones-build-css-but"></button> 
+                    <button id="sphones-build-css-but" class="ccp-but"></button> 
                   </div> 
                 </div> 
               </div>
@@ -381,7 +384,7 @@
           <!-- /#drop-area -->
             <!-- DEVIMG HERE -->
             <div id="cur-img-container">
-              <!-- <img src="img/TEST/KittiesHuge.jpg" data-is-dev1=true id="cur-img" alt=""> -->
+              <img src="img/TEST/KittiesHuge.jpg" data-is-dev1=true id="cur-img" alt="">
             </div>
             <!-- USER-SELECTED IMAGE PROGRAMMATICALLY INSERTED HERE -->
             </div>

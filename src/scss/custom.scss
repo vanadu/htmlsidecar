@@ -335,6 +335,9 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 }
 
 #dim-viewers {
+  font-family: $dim-viewer-font-family;
+  font-weight: normal;
+  font-size: 1em;
   display: block;
   position: relative;
   top: 0; 
@@ -992,20 +995,20 @@ output {
   .ccp-options-col-4 {
     #img-build-css {
       position: relative;
-      width: 70px;
-      height: 41px;
+      width: 60px;
+      height: 35px;
       margin-bottom: 15px;
       button {
         display: none;
-        width: 70px;
-        height: 41px;
+        width: 60px;
+        height: 35px;
         border: 1px solid transparent;
         background:  none;
         cursor: default;
         &.active {
           display: block;
           background:  #000000 url('../img/ccp-img-css-but.png') no-repeat center;
-          background-size:  70px 41px;
+          background-size:  60px 35px;
           cursor: pointer;
           &:hover {
             background-image:  url('../img/ccp-img-css-but-hover.png');
