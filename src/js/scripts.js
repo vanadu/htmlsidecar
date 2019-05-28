@@ -1,6 +1,7 @@
 
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
+
 TODO: Move img options up to make more td space
 TODO: Shrink CSS buttons
 TODO: When you focus on td or table input, the CSS CLipboard buttons appear in the img tag section. They should only  appear if the focus is in the img class input.
