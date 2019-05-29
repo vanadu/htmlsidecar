@@ -1,0 +1,18 @@
+Swap img function
+==================
+Be able to:
+
+We only need desktop and mobile image data to build the swap TD that outputs HTML. 
+
+Select option to save image values as Desktop
+Select option to save Values as Mbile
+Show user which sizes are selected
+
+Output TD. Period -- the classes defined in the HTML img and span are default definitions found in the media query for the desktop size.
+
+Probably the best place is in the toolbuttons upper left, which should then display a new CCP - a SCP or Swap Control Panel
+
+TODO in Windows:
+Create buttons for missing td and table CSS CB output.
+
+

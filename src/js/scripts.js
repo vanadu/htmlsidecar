@@ -2,7 +2,7 @@
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
 
-TODO: When you select background image by stig in td options, it shows the include table wrapper options in table options. Fix.
+TODO: Parent table class att only shows in CB output if Wrapper is selected, not in just the Partent table output.
 TODO: When you focus on td or table input, the CSS CLipboard buttons appear in the img tag section. They should only  appear if the focus is in the img class input.
 TODO: Make bgcolor add the hash if it's not in the value
 TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
@@ -10,6 +10,7 @@ TODO: THe CCP should store all the currently selected options and restore them w
 TODO: Assign keyboard  shortcuts
 TODO: Assign  tab order
 
+DONE: When you select background image by stig in td options, it shows the include table wrapper options in table options. Fix.
 DONE: Fix CPP CSS, in progress
 DONE: Move img options up to make more td space
 DONE: Shrink CSS buttons
@@ -187,6 +188,7 @@ var Dimwhit = (function () {
     // !VA  UIController: Toggle checkboxes and run any associated actions
     function toggleCheckbox(event) {
       console.log('ToggleCheckbox');
+      console.dir(event);
       // !VA TODO: !IMPORTANT! All the initialization for the CCP is better done elsewhere
       // !VA But in the meantime, we want this to run for all custom CSS checkboxes used in this project -- but the CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
       // !VA We will need Appdata to initialize the defaults for the wrapper table below
@@ -196,6 +198,7 @@ var Dimwhit = (function () {
 
       // !VA The clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it.
       var checkbox = document.getElementById(event.target.id.replace('mrk', 'box'));
+      console.log('checkbox.id is: ' + checkbox.id);
       // !VA Toggle the target's checkbox 
       checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
 
@@ -208,28 +211,23 @@ var Dimwhit = (function () {
       document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
       // !VA Only show the CCP wrapper width, class, align, and bgcolor options if 'Include wrapper table' is selected 
 
-      wrapperItemsToShow = ['#table-wrapper-class', '#table-wrapper-width', '#table-wrapper-align', '#table-wrapper-bgcolor' ]; 
-      // console.log('wrapperItemsToShow[i] is: ' + wrapperItemsToShow[3]);
-      if (checkbox.checked) {
-        console.log('checked');
-        for (let i = 0; i < wrapperItemsToShow.length; i++) {
-          document.querySelector(wrapperItemsToShow[i]).style.display = 'block'; 
-          // console.log(document.querySelector(wrapperItemsToShow[i])); 
-        }
-      } else {
-        console.log('unchecked');
-        for (let i = 0; i < wrapperItemsToShow.length; i++) {
-          document.querySelector(wrapperItemsToShow[i]).style.display = 'none'; 
+      // !VA Show wrapper table options if the checked element is 'table-include-wrapper-checkbox'
+      if (checkbox.id === 'table-include-wrapper-checkbox') {
+        wrapperItemsToShow = ['#table-wrapper-class', '#table-wrapper-width', '#table-wrapper-align', '#table-wrapper-bgcolor' ]; 
+        // console.log('wrapperItemsToShow[i] is: ' + wrapperItemsToShow[3]);
+        if (checkbox.checked) {
+          console.log('checked');
+          for (let i = 0; i < wrapperItemsToShow.length; i++) {
+            document.querySelector(wrapperItemsToShow[i]).style.display = 'block'; 
+            // console.log(document.querySelector(wrapperItemsToShow[i])); 
+          }
+        } else {
+          console.log('unchecked');
+          for (let i = 0; i < wrapperItemsToShow.length; i++) {
+            document.querySelector(wrapperItemsToShow[i]).style.display = 'none'; 
+          }
         }
       }
-
-
-
-
-
-
-
-
     }
 
     // UIController: Clipboard output for build html image button
@@ -1452,7 +1450,8 @@ var Dimwhit = (function () {
         <tr>
       ${tableTag.tableContents}
         </tr>
-    </table>
+      </table>
+    </td>
   </tr>
 </table>`;
 
