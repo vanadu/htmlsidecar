@@ -1,20 +1,20 @@
 
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
-TODO: Fix CPP CSS, in progress
-TODO: Move img options up to make more td space
-TODO: Shrink CSS buttons
+
 TODO: When you select background image by stig in td options, it shows the include table wrapper options in table options. Fix.
 TODO: When you focus on td or table input, the CSS CLipboard buttons appear in the img tag section. They should only  appear if the focus is in the img class input.
-TODO: Tableoptions: move bgcolor to col 2, move include wrapper table to top of col 3 and add bgcolor & align. Change table width to input with default of imgW.  
-TODO: Fix the 'color' option, it just needs the value not the bgcolor label in the Stig thing.
+TODO: Make bgcolor add the hash if it's not in the value
 TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
 TODO: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- I think. Not sure if this is the right behavior...think bout it. Probably not.
 TODO: Assign keyboard  shortcuts
 TODO: Assign  tab order
 
-
+DONE: Fix CPP CSS, in progress
+DONE: Move img options up to make more td space
+DONE: Shrink CSS buttons
 DONE: Moved git repo to github
+DONE: Tableoptions: move bgcolor to col 2, move include wrapper table to top of col 3 and add bgcolor & align. Change table width to input with default of imgW.  
 DONE: Change TABLE width: add width checkbox that shows input with default width of imgW, and another checkbox for wrapper that shows viewerW. Add checkbox for Stig ba
 DONE: Make all checkboxes under one CSS definition - Not really possible
 DONE: Put error container above toolbuttons
