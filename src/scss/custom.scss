@@ -900,24 +900,67 @@ output {
         }
       }
 
-      #img-build-css-but.active {
-        background:  #000000 url('../img/ccp-css-img-display-dims.png') no-repeat center;
+      #img-display-css-to-clipboard-but.active {
+        background:  #000000 url('../img/img-display-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
-          background-image:  url('../img/ccp-css-img-display-dims-hover.png');
+          background-image:  url('../img/img-display-css-to-clipboard-icon-hover.png');
         }
       }
-      #lphones-build-css-but.active {
-        background:  #000000 url('../img/ccp-css-img-lphone-dims.png') no-repeat center;
+      #img-lphone-css-to-clipboard-but.active {
+        background:  #000000 url('../img/img-lphone-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
-          background-image:  url('../img/ccp-css-img-lphone-dims-hover.png');
+          background-image:  url('../img/img-lphone-css-to-clipboard-icon-hover.png');
         }
       }
-      #sphones-build-css-but.active {
-        background:  #000000 url('../img/ccp-css-img-sphone-dims.png') no-repeat center;
+      #img-sphone-css-to-clipboard-but.active {
+        background:  #000000 url('../img/img-sphone-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
-          background-image:  url('../img/ccp-css-img-sphone-dims-hover.png');
+          background-image:  url('../img/img-sphone-css-to-clipboard-icon-hover.png');
         }
       }
+
+      #td-display-css-to-clipboard-but.active {
+        background:  #000000 url('../img/td-display-css-to-clipboard-icon.png') no-repeat center;
+        &:hover {
+          background-image:  url('../img/td-display-css-to-clipboard-icon-hover.png');
+        }
+      }
+      #td-lphone-css-to-clipboard-but.active {
+        background:  #000000 url('../img/td-lphone-css-to-clipboard-icon.png') no-repeat center;
+        &:hover {
+          background-image:  url('../img/td-lphone-css-to-clipboard-icon-hover.png');
+        }
+      }
+      #td-sphone-css-to-clipboard-but.active {
+        background:  #000000 url('../img/td-sphone-css-to-clipboard-icon.png') no-repeat center;
+        &:hover {
+          background-image:  url('../img/td-sphone-css-to-clipboard-icon-hover.png');
+        }
+      }
+
+      #table-display-css-to-clipboard-but.active {
+        background:  #000000 url('../img/table-display-css-to-clipboard-icon.png') no-repeat center;
+        &:hover {
+          background-image:  url('../img/table-display-css-to-clipboard-icon-hover.png');
+        }
+      }
+      #table-lphone-css-to-clipboard-but.active {
+        background:  #000000 url('../img/table-lphone-css-to-clipboard-icon.png') no-repeat center;
+        &:hover {
+          background-image:  url('../img/table-lphone-css-to-clipboard-icon-hover.png');
+        }
+      }
+      #table-sphone-css-to-clipboard-but.active {
+        background:  #000000 url('../img/table-sphone-css-to-clipboard-icon.png') no-repeat center;
+        &:hover {
+          background-image:  url('../img/table-sphone-css-to-clipboard-icon-hover.png');
+        }
+      }
+
+
+
+
+
     }
   }
 }

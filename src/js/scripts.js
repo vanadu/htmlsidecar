@@ -2,6 +2,7 @@
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
 
+TODO: FInd and display the notification area
 TODO: Parent table class att only shows in CB output if Wrapper is selected, not in just the Partent table output.
 TODO: When you focus on td or table input, the CSS CLipboard buttons appear in the img tag section. They should only  appear if the focus is in the img class input.
 TODO: Make bgcolor add the hash if it's not in the value
@@ -164,9 +165,15 @@ var Dimwhit = (function () {
     // !VA V2 Also doesn't belong here, we will move it later.
     var ccpBuildTag = {
       imgBuildHTMLBut: '',
-      imgBuildCSSBut: '#img-build-css-but',
-      smallPhonesBuildCSSBut: '#sphones-build-css-but',
-      largePhonesBuildCSSBut: '#lphones-build-css-but'
+      imgDisplayCSSToClipboard: '#img-display-css-to-clipboard-but',
+      imgSPhoneCSSToClipboard: '#img-sphone-css-to-clipboard-but',
+      imgLPhoneCSSToClipboard: '#img-lphone-css-to-clipboard-but',
+      tdDisplayCSSToClipboard: '#td-display-css-to-clipboard-but',
+      tdSPhoneCSSToClipboard: '#td-sphone-css-to-clipboard-but',
+      tdLPhoneCSSToClipboard: '#td-lphone-css-to-clipboard-but',
+      tableDisplayCSSToClipboard: '#table-display-css-to-clipboard-but',
+      tableSPhoneCSSToClipboard: '#table-sphone-css-to-clipboard-but',
+      tableLPhoneCSSToClipboard: '#table-lphone-css-to-clipboard-but',
     };
 
 
@@ -286,15 +293,15 @@ var Dimwhit = (function () {
     });
 
     // Clipboard output for build img CSS button
-    var imgBuildCSSBut = new Clipboard(ccpBuildTag.imgBuildCSSBut, {
+    var imgDisplayCSSToClipboard = new Clipboard(ccpBuildTag.imgDisplayCSSToClipboard, {
       text: function(trigger) {
         var clipboardStr = calcController.ccpGetImgCSSClipboardOutput();
 
-        imgBuildCSSBut.on('success', function(event) {
+        imgDisplayCSSToClipboard.on('success', function(event) {
         });
         console.log('NOW');
         UIController.flashAppMessage(trigger.id);
-        imgBuildCSSBut.on('error', function(e) {
+        imgDisplayCSSToClipboard.on('error', function(e) {
           console.error('Action:', e.action);
           console.error('Trigger:', e.trigger);
         });
@@ -303,14 +310,14 @@ var Dimwhit = (function () {
     });
 
     // Clipboard output for build large phones CSS button
-    var largePhonesBuildCSSBut = new Clipboard(ccpBuildTag.largePhonesBuildCSSBut, {
+    var imgLPhoneCSSToClipboard = new Clipboard(ccpBuildTag.imgLPhoneCSSToClipboard, {
       text: function(trigger) {
         var clipboardStr = calcController.ccpGetLargePhonesCSSClipboardOutput();
-        largePhonesBuildCSSBut.on('success', function(event) {
+        imgLPhoneCSSToClipboard.on('success', function(event) {
         });
         console.log('NOW');
         UIController.flashAppMessage(trigger.id);
-        largePhonesBuildCSSBut.on('error', function(e) {
+        imgLPhoneCSSToClipboard.on('error', function(e) {
           console.error('Action:', e.action);
           console.error('Trigger:', e.trigger);
         });
@@ -319,14 +326,14 @@ var Dimwhit = (function () {
     });
 
     // Clipboard output for small phones CSS button
-    var smallPhonesBuildCSSBut = new Clipboard(ccpBuildTag.smallPhonesBuildCSSBut, {
+    var imgSPhoneCSSToClipboard = new Clipboard(ccpBuildTag.imgSPhoneCSSToClipboard, {
       text: function(trigger) {
         var clipboardStr = calcController.ccpGetSmallPhonesCSSClipboardOutput();
-        smallPhonesBuildCSSBut.on('success', function(event) {
+        imgSPhoneCSSToClipboard.on('success', function(event) {
         });
         console.log('NOW');
         UIController.flashAppMessage(trigger.id);
-        smallPhonesBuildCSSBut.on('error', function(e) {
+        imgSPhoneCSSToClipboard.on('error', function(e) {
           console.error('Action:', e.action);
           console.error('Trigger:', e.trigger);
         });
@@ -693,16 +700,43 @@ var Dimwhit = (function () {
       // UIController Show element when input in another element is made 
       showElementOnInput: function(event) {
         // !VA Here we catch the input handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
-        
-        var elems = [];
-        // elems[0] = ccpBuildTag.imgBuildCSSBut;
-        elems[0] = document.querySelector(ccpBuildTag.imgBuildCSSBut);
-        elems[1] = document.querySelector(ccpBuildTag.smallPhonesBuildCSSBut);
-        elems[2] = document.querySelector(ccpBuildTag.largePhonesBuildCSSBut);
+        console.log('Event...');
+        console.dir(event);
+console.log('event.target.id is: ' + event.target.id);
 
-        for (let i = 0; i < elems.length; i++) {
-          this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
+
+        var elems = [];
+        // elems[0] = ccpBuildTag.imgDisplayCSSToClipboard;
+        elems[0] = document.querySelector(ccpBuildTag.imgDisplayCSSToClipboard);
+        elems[1] = document.querySelector(ccpBuildTag.imgSPhoneCSSToClipboard);
+        elems[2] = document.querySelector(ccpBuildTag.imgLPhoneCSSToClipboard);
+        elems[3] = document.querySelector(ccpBuildTag.tdDisplayCSSToClipboard);
+        elems[4] = document.querySelector(ccpBuildTag.tdSPhoneCSSToClipboard);
+        elems[5] = document.querySelector(ccpBuildTag.tdLPhoneCSSToClipboard);
+        elems[6] = document.querySelector(ccpBuildTag.tableDisplayCSSToClipboard);
+        elems[7] = document.querySelector(ccpBuildTag.tableSPhoneCSSToClipboard);
+        elems[8] = document.querySelector(ccpBuildTag.tableLPhoneCSSToClipboard);
+        // !VA We only want to show the buttons in each respective fieldset
+        // !VA If the input is in the img fieldset, only show the first three buttons in the array
+        if (event.target.id === 'img-class-input') {
+          for (let i = 0; i <= 2; i++) {
+            this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
+          }
+        } else if (event.target.id === 'td-class-input') {
+          console.log('here');
+          // !VA If the input is in the td fieldset, only show the next three buttons in the array
+          for (let i = 3; i <= 5 ; i++) {
+            this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
+          }
+        } else if (event.target.id === 'table-class-input') {
+          console.log('here');
+          // !VA If the input is in the table fieldset, only show the next buttons in the array
+          for (let i = 6; i <= 8 ; i++) {
+            this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
+          }
         }
+
+
       },
 
       // UIController: Flash a status message in the app message area
@@ -720,9 +754,15 @@ var Dimwhit = (function () {
           'img-build-html-but': '<img> HTML element copied to Clipboard!',
           'td-build-html-but': '<td> HTML element copied to Clipboard!',
           'table-build-html-but': '<table> HTML element copied to Clipboard!',
-          'img-build-css-but': 'CSS class delaration copied to the Clipboard!',
-          'lphones-build-css-but': 'CSS class delaration for tablets copied to the Clipboard!',
-          'sphones-build-css-but': 'CSS class delaration for phones copied to the Clipboard!'
+          'img-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard!',
+          'img-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard!',
+          'img-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard!',
+          'td-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard!',
+          'td-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard!',
+          'td-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard!',
+          'table-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard!',
+          'table-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard!',
+          'table-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard!',
         };
 
         // !VA First, overlay the CCP blocker to prevent user input while the CSS transitions run and the status message is displayed. Cheap, but effective solution.

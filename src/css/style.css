@@ -1669,18 +1669,42 @@ output {
         #ccp-content fieldset .ccp-options-col-4 .ccp-but.active {
           display: block;
           cursor: pointer; }
-      #ccp-content fieldset .ccp-options-col-4 #img-build-css-but.active {
-        background: #000000 url("../img/ccp-css-img-display-dims.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #img-build-css-but.active:hover {
-          background-image: url("../img/ccp-css-img-display-dims-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-4 #lphones-build-css-but.active {
-        background: #000000 url("../img/ccp-css-img-lphone-dims.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #lphones-build-css-but.active:hover {
-          background-image: url("../img/ccp-css-img-lphone-dims-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-4 #sphones-build-css-but.active {
-        background: #000000 url("../img/ccp-css-img-sphone-dims.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #sphones-build-css-but.active:hover {
-          background-image: url("../img/ccp-css-img-sphone-dims-hover.png"); }
+      #ccp-content fieldset .ccp-options-col-4 #img-display-css-to-clipboard-but.active {
+        background: #000000 url("../img/img-display-css-to-clipboard-icon.png") no-repeat center; }
+        #ccp-content fieldset .ccp-options-col-4 #img-display-css-to-clipboard-but.active:hover {
+          background-image: url("../img/img-display-css-to-clipboard-icon-hover.png"); }
+      #ccp-content fieldset .ccp-options-col-4 #img-lphone-css-to-clipboard-but.active {
+        background: #000000 url("../img/img-lphone-css-to-clipboard-icon.png") no-repeat center; }
+        #ccp-content fieldset .ccp-options-col-4 #img-lphone-css-to-clipboard-but.active:hover {
+          background-image: url("../img/img-lphone-css-to-clipboard-icon-hover.png"); }
+      #ccp-content fieldset .ccp-options-col-4 #img-sphone-css-to-clipboard-but.active {
+        background: #000000 url("../img/img-sphone-css-to-clipboard-icon.png") no-repeat center; }
+        #ccp-content fieldset .ccp-options-col-4 #img-sphone-css-to-clipboard-but.active:hover {
+          background-image: url("../img/img-sphone-css-to-clipboard-icon-hover.png"); }
+      #ccp-content fieldset .ccp-options-col-4 #td-display-css-to-clipboard-but.active {
+        background: #000000 url("../img/td-display-css-to-clipboard-icon.png") no-repeat center; }
+        #ccp-content fieldset .ccp-options-col-4 #td-display-css-to-clipboard-but.active:hover {
+          background-image: url("../img/td-display-css-to-clipboard-icon-hover.png"); }
+      #ccp-content fieldset .ccp-options-col-4 #td-lphone-css-to-clipboard-but.active {
+        background: #000000 url("../img/td-lphone-css-to-clipboard-icon.png") no-repeat center; }
+        #ccp-content fieldset .ccp-options-col-4 #td-lphone-css-to-clipboard-but.active:hover {
+          background-image: url("../img/td-lphone-css-to-clipboard-icon-hover.png"); }
+      #ccp-content fieldset .ccp-options-col-4 #td-sphone-css-to-clipboard-but.active {
+        background: #000000 url("../img/td-sphone-css-to-clipboard-icon.png") no-repeat center; }
+        #ccp-content fieldset .ccp-options-col-4 #td-sphone-css-to-clipboard-but.active:hover {
+          background-image: url("../img/td-sphone-css-to-clipboard-icon-hover.png"); }
+      #ccp-content fieldset .ccp-options-col-4 #table-display-css-to-clipboard-but.active {
+        background: #000000 url("../img/table-display-css-to-clipboard-icon.png") no-repeat center; }
+        #ccp-content fieldset .ccp-options-col-4 #table-display-css-to-clipboard-but.active:hover {
+          background-image: url("../img/table-display-css-to-clipboard-icon-hover.png"); }
+      #ccp-content fieldset .ccp-options-col-4 #table-lphone-css-to-clipboard-but.active {
+        background: #000000 url("../img/table-lphone-css-to-clipboard-icon.png") no-repeat center; }
+        #ccp-content fieldset .ccp-options-col-4 #table-lphone-css-to-clipboard-but.active:hover {
+          background-image: url("../img/table-lphone-css-to-clipboard-icon-hover.png"); }
+      #ccp-content fieldset .ccp-options-col-4 #table-sphone-css-to-clipboard-but.active {
+        background: #000000 url("../img/table-sphone-css-to-clipboard-icon.png") no-repeat center; }
+        #ccp-content fieldset .ccp-options-col-4 #table-sphone-css-to-clipboard-but.active:hover {
+          background-image: url("../img/table-sphone-css-to-clipboard-icon-hover.png"); }
 
 #table-max-width {
   display: none; }

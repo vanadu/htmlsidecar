@@ -2,7 +2,7 @@
 05.30.2019
 -----------
 TODO: Rename exiting CCP icons, implement TD and Table CCP icons
-TODO: FIX - Parent table class att only shows in CB output if Wrapper is selected, not in just the Partent table output.
+TODO: FIX - FInd and display the notification area
 TODO: FIX- When you focus on td or table input, the CSS CLipboard buttons appear in the img tag section. They should only  appear if the focus is in the img class input.
 TODO: FIX - Delay after clicking a copy-to-clipboard button is too long.
 TODO: FEATURE - Image swap. THIS NEEDS TO BE HASHED OUT!
@@ -12,6 +12,7 @@ TODO: BEHAVIOR - THe CCP should store all the currently selected options and res
 TODO: BEHAVIOR - Assign keyboard  shortcuts
 TODO: Assign  tab order
 
+DONE: FIXED - When you focus on td or table input, the CSS CLipboard buttons appear in the img tag section. They should only  appear if the focus is in the img class input.
 
 As of 05.30.2019
 ----------------
