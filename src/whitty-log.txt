@@ -1,6 +1,12 @@
 
 05.30.2019
 -----------
+TODO: FInd and display the notification area, fix error an notifications display. Somehow, notifications got broken.
+validateInteger accepts inputVal as argument and calls showAppMessages, which takes id, mess, and isErr as parameters. How is it supposed to get all those parameters from validateInteger? Maybe I never finished this...validateInteger should be access those parameters and call errorHandler, not showAppMessage.
+
+
+
+
 TODO: Rename exiting CCP icons, implement TD and Table CCP icons
 TODO: FIX - FInd and display the notification area
 TODO: FIX- When you focus on td or table input, the CSS CLipboard buttons appear in the img tag section. They should only  appear if the focus is in the img class input.

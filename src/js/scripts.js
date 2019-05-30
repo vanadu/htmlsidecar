@@ -2,15 +2,17 @@
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
 
-TODO: FInd and display the notification area
+TODO: FInd and display the notification area, fix error an notifications display.
 TODO: Parent table class att only shows in CB output if Wrapper is selected, not in just the Partent table output.
-TODO: When you focus on td or table input, the CSS CLipboard buttons appear in the img tag section. They should only  appear if the focus is in the img class input.
+
 TODO: Make bgcolor add the hash if it's not in the value
 TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
 TODO: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- I think. Not sure if this is the right behavior...think bout it. Probably not.
 TODO: Assign keyboard  shortcuts
 TODO: Assign  tab order
 
+
+DONE: FIXED - When you focus on td or table input, the CSS CLipboard buttons appear in the img tag section. They should only  appear if the focus is in the img class input.
 DONE: When you select background image by stig in td options, it shows the include table wrapper options in table options. Fix.
 DONE: Fix CPP CSS, in progress
 DONE: Move img options up to make more td space
@@ -627,6 +629,12 @@ var Dimwhit = (function () {
         // !VA  viewer width input field value display should also be handled here...currently is not. Search for main-image-viewer-wdth to find out where it's currently handled.
       },
 
+
+
+
+
+
+
       // CCPF - CLIPBOARD FUNCTIONS
       // ===============================================
 
@@ -723,13 +731,11 @@ console.log('event.target.id is: ' + event.target.id);
             this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
           }
         } else if (event.target.id === 'td-class-input') {
-          console.log('here');
           // !VA If the input is in the td fieldset, only show the next three buttons in the array
           for (let i = 3; i <= 5 ; i++) {
             this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
           }
         } else if (event.target.id === 'table-class-input') {
-          console.log('here');
           // !VA If the input is in the table fieldset, only show the next buttons in the array
           for (let i = 6; i <= 8 ; i++) {
             this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
@@ -1112,21 +1118,17 @@ console.log('event.target.id is: ' + event.target.id);
       // !VA Might be good to fold this into error handling
       // calcController: VALIDATE INPUT FOR INTEGER
       validateInteger: function(inputVal) {
-        // !VA Since integer validation is used for all height/width input fields, including those not yet implemented, we're going to use a separate error handler for it, call showAppMessages from it and return 
+        // !VA Since integer validation is used for all height/width input fields, including those not yet implemented
         let isErr;
         // let mess;
         if (!parseInt(inputVal, 10) || inputVal % 1 !== 0 || inputVal < 0) {
-          // errorMessages(target, "Width and height must be entered as positive whole number.");
-          UIController.showAppMessage('blob', true)
-          console.log('validateInteger -- not an integer');
           isErr = true;
-          // !VA Deal with actual error handling later
-          // showAppMessage(mess, isErr);
         } else { 
           // !VA Input fields return strings, so convert to integer
           inputVal = parseInt(inputVal);
           isErr = false;
         }
+        // !VA Just returning true here, the error code is sent by the calling function in handleUserAction
         return isErr;
       },
 
@@ -1412,6 +1414,7 @@ console.log('event.target.id is: ' + event.target.id);
           var data = UIController.accessAppdata();
           var tableWidthInput = document.querySelector(ccpUserInput.tableWidth);
           console.log('tableWidthInput.value is: ' + tableWidthInput.value);
+          // !VA TODO: Error handling
           // !VA If there 
           if (!tableWidthInput.value) {
             tableTag.tableWidthInput.value = '0';
@@ -1590,6 +1593,7 @@ console.log('event.target.id is: ' + event.target.id);
     // !VA Deprecated in this version
     // var ccpBuildTag = UIController.getCcpBuildTagIDs();
 
+    // !VA controller private: setupEventListeners
     var setupEventListeners = function() {
 
       //DRAG AND DROP PROCESSING START
@@ -1680,8 +1684,8 @@ console.log('event.target.id is: ' + event.target.id);
         addEventHandler((dvClickables[i]),'click',handleUserAction,false);
       }
 
-      // !VA Need to decide whether to handle all events here or route actions directly from the event handler. For now...
-      // HANDLE USER ACTION 
+      // !VA Need to decide whether to handle all events here or route actions directly from the event handler. This should probably be a separate function, not a subroutine of setupEventListeners
+      // controller private setupEventListeners 
       function handleUserAction(e) {
         var keypressed;
         var isErr;
@@ -1720,8 +1724,9 @@ console.log('event.target.id is: ' + event.target.id);
             // !VA Get the input and evaluate it
             var isErr = calcController.validateInteger(this.value);
             if (isErr) {
-              // !VA If the value entered isn't an integer, reset it to null and leave the focus there
+              // !VA If the value entered isn't an integer, reset it to null and leave the focus there, and send the error code to errorHandler
               el.value = '';
+              controller.initError(el.id, 'not_an_integer', true);
             // !VA We want to handle all the toolbutton keyboard input in one place, so send the send the target element's id and value to handleTBInput
             } else if (el.id.includes('tb-input')) {
               calcController.handleTBInput(el.id, el.value);
@@ -1816,71 +1821,53 @@ console.log('event.target.id is: ' + event.target.id);
         tbButton_LT_zero: 'Sorry, that would make one of the image dimensions less than 0.',
         tbButton_GT_viewerW: `Sorry, that would make the image wider than its container, which is currently set at ${data.viewerW}px`,
         // !VA maxViewerWidth issue here, see message below;
-        viewerW_GT_maxViewerWidth: `The container table width can't be greater than the width of the app itself &mdash; 800px.`
+        viewerW_GT_maxViewerWidth: `The container table width can't be greater than the width of the app itself &mdash; 800px.`,
+        not_an_integer: 'Not an integer: please enter a positive whole number for width.'
       };
-      console.log('errorMessages.length is: ' + errorMessages.length);
+
 
       // !VA Loop through the error ID/message pairs and find the match
       for (const [key, value] of Object.entries(errorMessages)) { 
         if (key === str ) {
-          console.log('match');
           console.log('value is: ' + value);
           showAppMessage(id, value, true);
         }
       }
-
-      
-
     };
 
-    var showAppMessage = function(id, mess, isErr) {
 
-      console.log('id is: ' + id);
-      console.log('mess is: ' + mess);
-      console.log('isErr is: ' + isErr);
-      //Set the time the message will display
-      // let displayTime;
-      // Get the elements to manipulate for the error message display
-      // // !VA Create objects for all the UI elements used in this function
-      var appMessContainer = document.querySelector(staticRegions.appMessContainer);
-      var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
-      // var dimViewers = document.querySelector('#dim-viewers');
-      // var toolsContainer = document.querySelector('#tools-container');
-      // Put the respective error message in the error message container
-      appMessDisplay.innerHTML = mess;
-      // Swap dimViewers with appMessDisplay and drop toolsContainer behind viewport;
-      console.log('HERE');
+      // !VA controller private
+      var showAppMessage = function(id, mess, isErr) {
+        console.log('showAppMessage-top');      
+        console.log('id is: ' + id);
+        console.log('mess is: ' + mess);
+        console.log('isErr is: ' + isErr);
+        //Set the time the message will display
+        // let displayTime;
+        // Get the elements to manipulate for the error message display
+        // // !VA Create objects for all the UI elements used in this function
+        var appMessContainer = document.querySelector(staticRegions.appMessContainer);
+        var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
+        // var dimViewers = document.querySelector('#dim-viewers');
+        // var toolsContainer = document.querySelector('#tools-container');
+        // Put the respective error message in the error message container
+        appMessDisplay.innerHTML = mess;
+        // Swap dimViewers with appMessDisplay and drop toolsContainer behind viewport;
+  
+  
+        appMessContainer.classList.add('show-err');
+  
+  
+        // !VA Reset the value of the element into which the error was entered to empty. 
+        document.getElementById(id).value = '';
+        appMessContainer.classList.remove('hide-err');
+        appMessContainer.classList.add('show-err');
 
-      appMessContainer.classList.add('show-err');
-      console.log(appMessContainer);
+      };
 
 
-      // !VA Reset the value of the element into which the error was entered to empty. 
-      document.getElementById(id).value = '';
-      appMessContainer.classList.remove('hide-err');
-      appMessContainer.classList.add('show-err');
 
 
-      // }
-      // hide toolbarButtons
-
-
-      // setTimeout(function(){
-      //   // Swap the error positions back to normal after 3 seconds
-      //   appMessContainer.classList.add('hide-err');
-      //   // dimViewers.classList.add('hide-err');
-      //   // toolsContainer.classList.add('hide-err');
-      //   appMessContainer.classList.remove('show-err');
-      //   // dimViewers.classList.remove('show-err');
-      //   // toolsContainer.classList.remove('show-err');
-      //   setTimeout(function(){
-      //     // Remove the hide-err class after the .5 seconds -- which is the animation run time set in the CSS transforms.
-      //     appMessContainer.classList.remove('hide-err');
-      //     // dimViewers.classList.remove('hide-err');
-      //     // toolsContainer.classList.remove('hide-err');
-      //   },250);
-      // },displayTime);
-    };
 
 
 
