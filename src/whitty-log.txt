@@ -1,14 +1,8 @@
 
 05.30.2019
 -----------
-TODO: FInd and display the notification area, fix error an notifications display. Somehow, notifications got broken.
-validateInteger accepts inputVal as argument and calls showAppMessages, which takes id, mess, and isErr as parameters. How is it supposed to get all those parameters from validateInteger? Maybe I never finished this...validateInteger should be access those parameters and call errorHandler, not showAppMessage.
-
-
-
 
 TODO: Rename exiting CCP icons, implement TD and Table CCP icons
-TODO: FIX - FInd and display the notification area
 TODO: FIX- When you focus on td or table input, the CSS CLipboard buttons appear in the img tag section. They should only  appear if the focus is in the img class input.
 TODO: FIX - Delay after clicking a copy-to-clipboard button is too long.
 TODO: FEATURE - Image swap. THIS NEEDS TO BE HASHED OUT!
@@ -21,7 +15,10 @@ TODO: Assign  tab order
 DONE: FIXED - When you focus on td or table input, the CSS CLipboard buttons appear in the img tag section. They should only  appear if the focus is in the img class input.
 
 As of 05.30.2019
+
+
 ----------------
+DONE: FInd and display the notification area, fix error an notifications display. 
 DONE: When you select background image by stig in td options, it shows the include table wrapper options in table options. Fix.
 DONE: Fix CPP CSS, in progress
 DONE: Move img options up to make more td space

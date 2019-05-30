@@ -2,16 +2,15 @@
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
 
-TODO: FInd and display the notification area, fix error an notifications display.
-TODO: Parent table class att only shows in CB output if Wrapper is selected, not in just the Partent table output.
 
+TODO: Parent table class att only shows in CB output if Wrapper is selected, not in just the Partent table output.
 TODO: Make bgcolor add the hash if it's not in the value
 TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
 TODO: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- I think. Not sure if this is the right behavior...think bout it. Probably not.
 TODO: Assign keyboard  shortcuts
 TODO: Assign  tab order
 
-
+DONE: FInd and display the notification area, fix error an notifications display.
 DONE: FIXED - When you focus on td or table input, the CSS CLipboard buttons appear in the img tag section. They should only  appear if the focus is in the img class input.
 DONE: When you select background image by stig in td options, it shows the include table wrapper options in table options. Fix.
 DONE: Fix CPP CSS, in progress
@@ -238,6 +237,8 @@ var Dimwhit = (function () {
         }
       }
     }
+
+
 
     // UIController: Clipboard output for build html image button
     // !VA TODO: Might be able to consolidate this into a single function but doesn't seem worth it
@@ -1864,12 +1865,6 @@ console.log('event.target.id is: ' + event.target.id);
         appMessContainer.classList.add('show-err');
 
       };
-
-
-
-
-
-
 
     var doit = function() {
       // SCRAP DO IT FUNCTION
