@@ -1,0 +1,32 @@
+
+05.30.2019
+-----------
+TODO: Rename exiting CCP icons, implement TD and Table CCP icons
+TODO: FIX - Parent table class att only shows in CB output if Wrapper is selected, not in just the Partent table output.
+TODO: FIX- When you focus on td or table input, the CSS CLipboard buttons appear in the img tag section. They should only  appear if the focus is in the img class input.
+TODO: FIX - Delay after clicking a copy-to-clipboard button is too long.
+TODO: FEATURE - Image swap. THIS NEEDS TO BE HASHED OUT!
+TODO: FEATURE - Make bgcolor add the hash if it's not in the value
+TODO: FIX, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
+TODO: BEHAVIOR - THe CCP should store all the currently selected options and restore them whenever the ccp is opened. This needs to be revisited. viewerW should persist for the session. imgW and imgH should persist for the current image. I'm not sure how long the CCP options should persist.
+TODO: BEHAVIOR - Assign keyboard  shortcuts
+TODO: Assign  tab order
+
+
+As of 05.30.2019
+----------------
+DONE: When you select background image by stig in td options, it shows the include table wrapper options in table options. Fix.
+DONE: Fix CPP CSS, in progress
+DONE: Move img options up to make more td space
+DONE: Shrink CSS buttons
+DONE: Moved git repo to github
+DONE: Tableoptions: move bgcolor to col 2, move include wrapper table to top of col 3 and add bgcolor & align. Change table width to input with default of imgW.  
+DONE: Change TABLE width: add width checkbox that shows input with default width of imgW, and another checkbox for wrapper that shows viewerW. Add checkbox for Stig ba
+DONE: Make all checkboxes under one CSS definition - Not really possible
+DONE: Put error container above toolbuttons
+DONE: fix select options to clipboard
+DONE: Implement the CSS clipboard buttons
+DONE: Fix the retina calculations: it should alert if the disk size isn't 2X the display size.
+DONE: Reset the customH and customW fields on blur to their placeholders on blur when blur is on mouseclick
+DONE: Fix the images on viewerW and phone input fields
+DONE: fix small phones and lartge phones toolbuttons.
