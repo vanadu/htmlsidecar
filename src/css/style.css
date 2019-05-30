@@ -1670,17 +1670,17 @@ output {
           display: block;
           cursor: pointer; }
       #ccp-content fieldset .ccp-options-col-4 #img-build-css-but.active {
-        background: #000000 url("../img/ccp-img-css-but.png") no-repeat center; }
+        background: #000000 url("../img/ccp-css-img-display-dims.png") no-repeat center; }
         #ccp-content fieldset .ccp-options-col-4 #img-build-css-but.active:hover {
-          background-image: url("../img/ccp-img-css-but-hover.png"); }
+          background-image: url("../img/ccp-css-img-display-dims-hover.png"); }
       #ccp-content fieldset .ccp-options-col-4 #lphones-build-css-but.active {
-        background: #000000 url("../img/ccp-lphone-css-but.png") no-repeat center; }
+        background: #000000 url("../img/ccp-css-img-lphone-dims.png") no-repeat center; }
         #ccp-content fieldset .ccp-options-col-4 #lphones-build-css-but.active:hover {
-          background-image: url("../img/ccp-lphone-css-but-hover.png"); }
+          background-image: url("../img/ccp-css-img-lphone-dims-hover.png"); }
       #ccp-content fieldset .ccp-options-col-4 #sphones-build-css-but.active {
-        background: #000000 url("../img/ccp-sphone-css-but.png") no-repeat center; }
+        background: #000000 url("../img/ccp-css-img-sphone-dims.png") no-repeat center; }
         #ccp-content fieldset .ccp-options-col-4 #sphones-build-css-but.active:hover {
-          background-image: url("../img/ccp-sphone-css-but-hover.png"); }
+          background-image: url("../img/ccp-css-img-sphone-dims-hover.png"); }
 
 #table-max-width {
   display: none; }

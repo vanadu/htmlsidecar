@@ -901,21 +901,21 @@ output {
       }
 
       #img-build-css-but.active {
-        background:  #000000 url('../img/ccp-img-css-but.png') no-repeat center;
+        background:  #000000 url('../img/ccp-css-img-display-dims.png') no-repeat center;
         &:hover {
-          background-image:  url('../img/ccp-img-css-but-hover.png');
+          background-image:  url('../img/ccp-css-img-display-dims-hover.png');
         }
       }
       #lphones-build-css-but.active {
-        background:  #000000 url('../img/ccp-lphone-css-but.png') no-repeat center;
+        background:  #000000 url('../img/ccp-css-img-lphone-dims.png') no-repeat center;
         &:hover {
-          background-image:  url('../img/ccp-lphone-css-but-hover.png');
+          background-image:  url('../img/ccp-css-img-lphone-dims-hover.png');
         }
       }
       #sphones-build-css-but.active {
-        background:  #000000 url('../img/ccp-sphone-css-but.png') no-repeat center;
+        background:  #000000 url('../img/ccp-css-img-sphone-dims.png') no-repeat center;
         &:hover {
-          background-image:  url('../img/ccp-sphone-css-but-hover.png');
+          background-image:  url('../img/ccp-css-img-sphone-dims-hover.png');
         }
       }
     }
