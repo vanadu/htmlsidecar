@@ -1,12 +1,19 @@
 
 05.31.2019
 -----------
+TODO: Clean up structure based on flowchart.
+	-pull handleUserAction out to separate function
+	-abbreviate the clipboard output functions, the names are too long.
+	-determine what constitutes the Model in this app. The model represents the data and does nothing else. So, the data here is just the clipboard output, that is, the HTML tags themselves. 
+	
+
+
 
 TODO: Implement Mobile Swap
 ----------------------------
 When button is not highlighted, show CCP on clipboard icon click.
 When button is highlighted, show Swap Control Panel (SCP) on clipboard click.
-When button is clicked, save current image data, and show mobile drop area. When mobile image is loded, put data in Appdatamob. Arrows are displayed to left and right of dim viewers to allow switching back and forth from desktop to mobile image. Clicking arrows will 
+When button is clicked, save current image data, and show mobile drop area. When mobile image is loded, put data in Appdatamob. Arrows are displayed to left and right of dim viewers to allow switching back and forth from desktop to mobile image. 
 
 
 
