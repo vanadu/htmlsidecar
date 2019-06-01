@@ -1145,7 +1145,7 @@ button:disabled {
 
 .img-toolbar-buttons {
   display: block;
-  width: 800px;
+  width: 840px;
   margin: 0 auto;
   padding: 0; }
   .img-toolbar-buttons li {
@@ -1173,20 +1173,23 @@ button:disabled {
       .img-toolbar-buttons li img.divider {
         width: 5px;
         height: 18px;
-        margin: 0 10px;
+        margin: 0 7px;
         opacity: .2; }
+    .img-toolbar-buttons li #tb-but-mobile-swap {
+      width: 90px;
+      text-align: center; }
     .img-toolbar-buttons li #tb-input-viewerw {
-      width: 95px;
+      width: 80px;
       padding-left: 30px;
       text-align: center;
       background: url("../img/table-icon.png") no-repeat scroll 7px 7px; }
     .img-toolbar-buttons li #tb-input-small-phonesw {
-      width: 95px;
+      width: 70px;
       padding-left: 30px;
       background: url("../img/small-phones-toolbar-icon.png") no-repeat scroll 12px 2px;
       background-size: 15px 26px; }
     .img-toolbar-buttons li #tb-input-large-phonesw {
-      width: 95px;
+      width: 90px;
       padding-left: 30px;
       background: url("../img/large-phones-toolbar-icon.png") no-repeat scroll 7px 2px;
       background-size: 34px 24px; }

@@ -2,7 +2,9 @@
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
 
-
+TODO: 
+TODO: Implement image swap 
+TODO: Implement Td and table copy to clipboard buttons.
 TODO: Parent table class att only shows in CB output if Wrapper is selected, not in just the Partent table output.
 TODO: Make bgcolor add the hash if it's not in the value
 TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
@@ -10,6 +12,8 @@ TODO: THe CCP should store all the currently selected options and restore them w
 TODO: Assign keyboard  shortcuts
 TODO: Assign  tab order
 
+
+DONE: Added FPO image swap button to toolbar.
 DONE: FInd and display the notification area, fix error an notifications display.
 DONE: FIXED - When you focus on td or table input, the CSS CLipboard buttons appear in the img tag section. They should only  appear if the focus is in the img class input.
 DONE: When you select background image by stig in td options, it shows the include table wrapper options in table options. Fix.
@@ -43,7 +47,7 @@ then, globally, dim-viewer to dv
 //PAGE SETUP START
 
 // Namespace
-var Dimwhit = (function () {
+var Whitty = (function () {
 
   // !VA DEV Test function to get the clicked element to the console
   // (function () {
@@ -344,7 +348,7 @@ var Dimwhit = (function () {
       }
     });
 
-    // !VA UIController: Functions that get returned from the UIContoller object go here
+    // !VA Public UIController
     return {
       // !VA V2 Return all the strings for the UI element's IDs
       getDimViewerIDs: function() {
@@ -629,11 +633,6 @@ var Dimwhit = (function () {
         // If the cursor is in an image resize field, set the value to no value so that the placeholders take over. Only do this for the image resize fields, because the current value is displayed in the dimViewer and doesn't need to be shown in the field itself. For the viewer width field, we need the value to stay in the field because this is the only way to tell the current width of the viewer. 
         // !VA  viewer width input field value display should also be handled here...currently is not. Search for main-image-viewer-wdth to find out where it's currently handled.
       },
-
-
-
-
-
 
 
       // CCPF - CLIPBOARD FUNCTIONS
@@ -1567,11 +1566,6 @@ console.log('event.target.id is: ' + event.target.id);
         // !VA Return the css string to the clipboard object.
         return clipboardStr;
       }, 
-
-
-
-
-
 
     };
   })();
