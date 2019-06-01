@@ -248,7 +248,7 @@ var Whitty = (function () {
     // !VA TODO: Might be able to consolidate this into a single function but doesn't seem worth it
     var imgClipboardBut = new Clipboard(staticRegions.ccpImgClipbboardBut, {
       text: function(trigger) {
-        var clipboardStr = calcController.ccpGetImgClipboardOutput();
+        var clipboardStr = calcController.ccpGetCBImgHTML();
         // !VA Write success message to app message area on success
         imgClipboardBut.on('success', function(event) {
           // debugger;
@@ -268,7 +268,7 @@ var Whitty = (function () {
     var tdClipbboardBut = new Clipboard(staticRegions.ccpTdClipbboardBut, {
       text: function(trigger) {
         var clipboardStr;
-        clipboardStr = calcController.ccpGetTdClipboardOutput();
+        clipboardStr = calcController.ccpGetCBTdHTML();
         tdClipbboardBut.on('success', function(event) {
         });
         console.log('NOW');
@@ -284,7 +284,7 @@ var Whitty = (function () {
     // Clipboard output for build table tag button
     var tableClipbboardBut =  new Clipboard(staticRegions.ccpTableClipbboardBut, {
       text: function(trigger) {
-        var clipboardStr = calcController.ccpGetTableClipboardOutput();
+        var clipboardStr = calcController.ccpGetCBTableHTML();
 
         tableClipbboardBut.on('success', function(event) {
         });
@@ -302,7 +302,7 @@ var Whitty = (function () {
     // Clipboard output for build img CSS button
     var imgDisplayCSSToClipboard = new Clipboard(ccpBuildTag.imgDisplayCSSToClipboard, {
       text: function(trigger) {
-        var clipboardStr = calcController.ccpGetImgCSSClipboardOutput();
+        var clipboardStr = calcController.ccpGetCBImgDisplayCSS();
 
         imgDisplayCSSToClipboard.on('success', function(event) {
         });
@@ -319,7 +319,7 @@ var Whitty = (function () {
     // Clipboard output for build large phones CSS button
     var imgLPhoneCSSToClipboard = new Clipboard(ccpBuildTag.imgLPhoneCSSToClipboard, {
       text: function(trigger) {
-        var clipboardStr = calcController.ccpGetLargePhonesCSSClipboardOutput();
+        var clipboardStr = calcController.ccpGetCBImgLPhonesCSS();
         imgLPhoneCSSToClipboard.on('success', function(event) {
         });
         console.log('NOW');
@@ -335,7 +335,7 @@ var Whitty = (function () {
     // Clipboard output for small phones CSS button
     var imgSPhoneCSSToClipboard = new Clipboard(ccpBuildTag.imgSPhoneCSSToClipboard, {
       text: function(trigger) {
-        var clipboardStr = calcController.ccpGetSmallPhonesCSSClipboardOutput();
+        var clipboardStr = calcController.ccpGetCBImgSPhonesCSS();
         imgSPhoneCSSToClipboard.on('success', function(event) {
         });
         console.log('NOW');
@@ -1150,6 +1150,7 @@ console.log('event.target.id is: ' + event.target.id);
       },
 
       // calcController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
+      // !VA TODO: THis should be in handleUserInput
       ccpIfNoUserInput: function(att, val) {
         // !VA We need get the filename from Appdata in case the user leaves 'path' empty
         var data = UIController.accessAppdata();
@@ -1179,7 +1180,7 @@ console.log('event.target.id is: ' + event.target.id);
       },
 
       // calcController: GET STRINGS FOR THE IMG CLIPBOARD OUTPUT
-      ccpGetImgClipboardOutput: function() {
+      ccpGetCBImgHTML: function() {
         // !VA Get Appdata - we need it for the filename
         var data = UIController.accessAppdata();
         // !VA The string that passes the HTML img tag
@@ -1256,7 +1257,7 @@ console.log('event.target.id is: ' + event.target.id);
       }, 
       
       // calcController: GET STRINGS FOR THE TD CLIPBOARD OUTPUT
-      ccpGetTdClipboardOutput: function () {
+      ccpGetCBTdHTML: function () {
         // !VA We don't need this yet, but we will if we decide to add a width style property which is useful for Outlook 120dpi 
         var data = UIController.accessAppdata();
         // !VA Declare the string that gets the clipboard output
@@ -1316,7 +1317,7 @@ console.log('event.target.id is: ' + event.target.id);
 
         tdTag.tdContents =    (function () {
           // !VA Get the img tag output and put in between the td tags
-          var str = calcController.ccpGetImgClipboardOutput();
+          var str = calcController.ccpGetCBImgHTML();
           return str;
         })();
 
@@ -1370,7 +1371,7 @@ console.log('event.target.id is: ' + event.target.id);
       }, 
 
       // calcController: GET STRINGS FOR THE TABLE CLIPBOARD OUTPUT
-      ccpGetTableClipboardOutput: function () {
+      ccpGetCBTableHTML: function () {
         // !VA We need this to get Appdata.viewerW
         var data = UIController.accessAppdata();
         // !VA Variable returning the HTML to the clipboard object 
@@ -1404,7 +1405,7 @@ console.log('event.target.id is: ' + event.target.id);
         // !VA tableAlign END
 
         tableTag.tableContents = (function () {
-          var str = calcController.ccpGetTdClipboardOutput();
+          var str = calcController.ccpGetCBTdHTML();
           return str;
         })();
 
@@ -1514,7 +1515,7 @@ console.log('event.target.id is: ' + event.target.id);
 
       // !VA UIContoller: build CSS clipboard output
       // !VA TODO: This can be consolidated with other CSS output or all other clipboard object functions
-      ccpGetImgCSSClipboardOutput: function() {
+      ccpGetCBImgDisplayCSS: function() {
         // !VA Get Appdata to local variable
         var data = UIController.accessAppdata();
         // !VA The string to pass the CSS declaration to the clipboard object
@@ -1533,7 +1534,7 @@ console.log('event.target.id is: ' + event.target.id);
 
       // !VA UIContoller: build large phone CSS clipboard output
       // !VA TODO: This can be consolidated with other CSS output or all other clipboard object functions
-      ccpGetLargePhonesCSSClipboardOutput: function() {
+      ccpGetCBImgLPhonesCSS: function() {
         // !VA Get Appdata to local variable
         var data = UIController.accessAppdata();
         console.dir(data);
@@ -1551,7 +1552,7 @@ console.log('event.target.id is: ' + event.target.id);
 
       // !VA UIContoller: build large phone CSS clipboard output
       // !VA TODO: This can be consolidated with other CSS output or all other clipboard object functions
-      ccpGetSmallPhonesCSSClipboardOutput: function() {
+      ccpGetCBImgSPhonesCSS: function() {
         // !VA Get Appdata to local variable
         var data = UIController.accessAppdata();
         console.dir(data);

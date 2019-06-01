@@ -1,10 +1,21 @@
 
 05.31.2019
 -----------
-TODO: Clean up structure based on flowchart.
+IN PROGRESS: Clean up structure based on flowchart.
 	-pull handleUserAction out to separate function
 	-abbreviate the clipboard output functions, the names are too long.
 	-determine what constitutes the Model in this app. The model represents the data and does nothing else. So, the data here is just the clipboard output, that is, the HTML tags themselves. 
+
+TODO: Shorten the clipboard function names and make them more descriptive and extensible:
+
+ccpGetImgClipboardOutput				ccpGetCBHTMLImg
+ccpGetTdClipboardOutput					ccpGetCBHTMLTd
+ccpGetTableClipboardOutput				ccpGetCBHTMLTable
+ccpGetImgCSSClipboardOutput				ccpGetCBImgDisplayCSS
+ccpGetLargePhonesCSSClipboardOutput			ccpGetCBImgLPhonesCSS
+ccpGetSmallPhonesCSSClipboardOutput			ccpGetCBImgSPhonesCSS
+
+
 	
 
 
