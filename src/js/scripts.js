@@ -1832,6 +1832,7 @@ console.log('event.target.id is: ' + event.target.id);
 
 
       // !VA controller private
+      // !VA Here we can show a message bypassing errorHandler - not all messages are errors.
       var showAppMessage = function(id, mess, isErr) {
         console.log('showAppMessage-top');      
         console.log('id is: ' + id);
