@@ -2,15 +2,53 @@
 05.31.2019
 -----------
 IN PROGRESS: Clean up structure based on flowchart.
-	-pull handleUserAction out to separate function
-	-abbreviate the clipboard output functions, the names are too long.
-	-determine what constitutes the Model in this app. The model represents the data and does nothing else. So, the data here is just the clipboard output, that is, the HTML tags themselves. 
 
-TODO: Shorten the clipboard function names and make them more descriptive and extensible:
+WHat I'm seeing in the Jonas project is that appController only has one public function... init. Everything else is called from that, and all the public functions are in UIController and budgetController.
 
-ccpGetImgClipboardOutput				ccpGetCBHTMLImg
-ccpGetTdClipboardOutput					ccpGetCBHTMLTd
-ccpGetTableClipboardOutput				ccpGetCBHTMLTable
+So let's recap:
+
+appController.init:
+	-starts app
+	-sets imgViewer to default H and W
+	-displays dropArea
+	-sets display toolsContainer to none
+	-calls setupEventListeners
+	-determines if app is in dev mode and if so, initializes Appdata for dev mode. We can ignore that for now.
+	-makes sure the CCP is closed, and runs refreshAppUI to populate the dimViewers with 'no image'. 
+	-runs setupEventHandlers to wait for user input. 
+
+UIController.handleFileSelect
+	-initiated by drop event
+	-get the blob
+	-assign the blob's filename to a variable
+	-hide the drop area
+	-initialize and populate Appobj with image data. The only thing that needs to be gotten here, though, is curImg. The rest - imgViewer, imgVieweport and appContainer are constants that are queried from the CSS dimensions. Maybe Appdata should be initialized and passed from appInit. 
+	-set timeout of 250ms while the blob loads.
+	-run onload function to ensure the blob has loaded. THis is probably redundant with the preceding instruction. Once the image has loaded:
+		-hide the dropArea
+		-show toolsContainer
+		-show curImg
+		-set Appobj.currentimg - 
+		-run UIController.getAppData to get Appdata properties
+		-run clipboardController.evalViewerSize to resize the image containers based on Appdata
+	Once the above is complete:
+	-run writeImgToDOM with the callback to create the image to the DOM based on the Appdata.
+	
+	This is totally convoluted!
+
+
+	
+	
+
+
+
+
+
+
+
+ccpGetImgClipboardOutput				ccpGetCBImgHTML
+ccpGetTdClipboardOutput					ccpGetCBTdHTML
+ccpGetTableClipboardOutput				ccpGetCBTableHTML
 ccpGetImgCSSClipboardOutput				ccpGetCBImgDisplayCSS
 ccpGetLargePhonesCSSClipboardOutput			ccpGetCBImgLPhonesCSS
 ccpGetSmallPhonesCSSClipboardOutput			ccpGetCBImgSPhonesCSS
@@ -28,7 +66,7 @@ When button is clicked, save current image data, and show mobile drop area. When
 
 
 
-
+TODO: pull handleUserAction out to separate function
 TODO: Implement Td and table copy to clipboard buttons.
 TODO: FIX- When you focus on td or table input, the CSS CLipboard buttons appear in the img tag section. They should only  appear if the focus is in the img class input.
 TODO: FIX - Delay after clicking a copy-to-clipboard button is too long.
@@ -38,6 +76,13 @@ TODO: FIX, when imgNW is greater than imgW the imgNW size flashes before resizin
 TODO: BEHAVIOR - THe CCP should store all the currently selected options and restore them whenever the ccp is opened. This needs to be revisited. viewerW should persist for the session. imgW and imgH should persist for the current image. I'm not sure how long the CCP options should persist.
 TODO: BEHAVIOR - Assign keyboard  shortcuts
 TODO: Assign  tab order
+
+
+As of 01.01.19
+===============
+
+DONE: Rename 'controller' to appController
+DONE: Shorten the clipboard function names and make them more descriptive and extensible:
 
 
 

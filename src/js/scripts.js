@@ -248,7 +248,7 @@ var Whitty = (function () {
     // !VA TODO: Might be able to consolidate this into a single function but doesn't seem worth it
     var imgClipboardBut = new Clipboard(staticRegions.ccpImgClipbboardBut, {
       text: function(trigger) {
-        var clipboardStr = calcController.ccpGetCBImgHTML();
+        var clipboardStr = clipboardController.ccpGetCBImgHTML();
         // !VA Write success message to app message area on success
         imgClipboardBut.on('success', function(event) {
           // debugger;
@@ -268,7 +268,7 @@ var Whitty = (function () {
     var tdClipbboardBut = new Clipboard(staticRegions.ccpTdClipbboardBut, {
       text: function(trigger) {
         var clipboardStr;
-        clipboardStr = calcController.ccpGetCBTdHTML();
+        clipboardStr = clipboardController.ccpGetCBTdHTML();
         tdClipbboardBut.on('success', function(event) {
         });
         console.log('NOW');
@@ -284,7 +284,7 @@ var Whitty = (function () {
     // Clipboard output for build table tag button
     var tableClipbboardBut =  new Clipboard(staticRegions.ccpTableClipbboardBut, {
       text: function(trigger) {
-        var clipboardStr = calcController.ccpGetCBTableHTML();
+        var clipboardStr = clipboardController.ccpGetCBTableHTML();
 
         tableClipbboardBut.on('success', function(event) {
         });
@@ -302,7 +302,7 @@ var Whitty = (function () {
     // Clipboard output for build img CSS button
     var imgDisplayCSSToClipboard = new Clipboard(ccpBuildTag.imgDisplayCSSToClipboard, {
       text: function(trigger) {
-        var clipboardStr = calcController.ccpGetCBImgDisplayCSS();
+        var clipboardStr = clipboardController.ccpGetCBImgDisplayCSS();
 
         imgDisplayCSSToClipboard.on('success', function(event) {
         });
@@ -319,7 +319,7 @@ var Whitty = (function () {
     // Clipboard output for build large phones CSS button
     var imgLPhoneCSSToClipboard = new Clipboard(ccpBuildTag.imgLPhoneCSSToClipboard, {
       text: function(trigger) {
-        var clipboardStr = calcController.ccpGetCBImgLPhonesCSS();
+        var clipboardStr = clipboardController.ccpGetCBImgLPhonesCSS();
         imgLPhoneCSSToClipboard.on('success', function(event) {
         });
         console.log('NOW');
@@ -335,7 +335,7 @@ var Whitty = (function () {
     // Clipboard output for small phones CSS button
     var imgSPhoneCSSToClipboard = new Clipboard(ccpBuildTag.imgSPhoneCSSToClipboard, {
       text: function(trigger) {
-        var clipboardStr = calcController.ccpGetCBImgSPhonesCSS();
+        var clipboardStr = clipboardController.ccpGetCBImgSPhonesCSS();
         imgSPhoneCSSToClipboard.on('success', function(event) {
         });
         console.log('NOW');
@@ -429,6 +429,7 @@ var Whitty = (function () {
             // !VA Hide the dropArea - not sure if this is the right place for this.
             document.querySelector(staticRegions.dropArea).style.display = 'none';
             // !VA Populate the Appobj with the new image. Not sure if this is the right place to declare it.
+            debugger;
             var Appobj = {
               currentimg: curImg,
               viewer: document.querySelector(dynamicRegions.imgViewer),
@@ -452,7 +453,7 @@ var Whitty = (function () {
                   // !VA Call getAppData to get the image properties
                   Appdata = UIController.getAppData(Appobj, fileName);
                   // !VA Pass Appdata on to evalViewerSizes in order to resize the image containers dynamically based on the dimensions of the image.
-                  calcController.evalViewerSize(Appdata);
+                  clipboardController.evalViewerSize(Appdata);
 
 
                 })();
@@ -523,7 +524,7 @@ var Whitty = (function () {
             imgNH: Appobj.currentimg.naturalHeight,
             imgNW: Appobj.currentimg.naturalWidth,
             aspect: function() {
-              var a = calcController.getAspectRatio(this.imgNW, this.imgNH);
+              var a = clipboardController.getAspectRatio(this.imgNW, this.imgNH);
               return a;
             },
             // !VA These values are now initialized in CSS based on the size of dropArea, but they are updated with each new image in the adjustContainerHeight function.
@@ -540,7 +541,7 @@ var Whitty = (function () {
       
           };
           // !VA Evaluate the dim alerts
-          calcController.evalDimAlerts(Appdata, dimViewers);
+          clipboardController.evalDimAlerts(Appdata, dimViewers);
         }
         return Appdata;
       },
@@ -570,32 +571,32 @@ var Whitty = (function () {
           // !VA Dimensions on disk, i.e. natural dimensions
           document.querySelector(dimViewers.diskimg).innerHTML = `<span class='pop-font'>${Appdata.imgNW} X ${Appdata.imgNH}</span>` ;
           // Aspect ratio
-          document.querySelector(dimViewers.aspect).innerHTML = `<span class='pop-font'>${calcController.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[1]}</span>` ;
+          document.querySelector(dimViewers.aspect).innerHTML = `<span class='pop-font'>${clipboardController.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[1]}</span>` ;
           // Small phone dimensions
           // VA! Calculate the height of the image if the width is whatever the small device width is, here 320 pixels
           // !VA  ALL these values need to be put in a global object
           // 
           // // !VA use object instead const smallphonewidth = 320;
-          Appdata.sPhoneH = Math.round(Appdata.sPhoneW * (1 / calcController.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[0]));
+          Appdata.sPhoneH = Math.round(Appdata.sPhoneW * (1 / clipboardController.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[0]));
           document.querySelector(dimViewers.smallphones).innerHTML = `<span class='pop-font'><span id='small-phones-width'>${Appdata.sPhoneW}</span> X <span id='small-phones-height'>${Appdata.sPhoneH}</span></span>` ;
           // Large phone dimensions
           // Calculate the height of the image if the width is whatever the large device width is, here 480 pixels
           // !VA use object instead const largephonewidth = 480;
-          Appdata.lPhoneH = Math.round(Appdata.lPhoneW * (1 / calcController.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[0]));
+          Appdata.lPhoneH = Math.round(Appdata.lPhoneW * (1 / clipboardController.getAspectRatio(Appdata.imgNW, Appdata.imgNH)[0]));
           document.querySelector(dimViewers.largephones).innerHTML = `<span class='pop-font'><span id='large-phones-width'>${Appdata.lPhoneW}</span> X <span id='large-phones-height'>${Appdata.lPhoneH}</span></span>` ;
           // Retina dimensions are twice the display dimensions
           document.querySelector(dimViewers.retina).innerHTML = `<span class='pop-font'>${2 * Appdata.imgW}</span> X <span class='pop-font'>${2 * Appdata.imgH}`;
 
           // !VA Adjust the image container heights based on the Appdata values calculated in adjustContainerHeights
-          document.querySelector(dynamicRegions.curImg).style.width = calcController.intToPx(Appdata.imgW);
-          document.querySelector(dynamicRegions.curImg).style.height = calcController.intToPx(Appdata.imgH);
-          document.querySelector(dynamicRegions.imgViewer).style.width = calcController.intToPx(Appdata.viewerW);
-          document.querySelector(dynamicRegions.imgViewer).style.height = calcController.intToPx(Appdata.viewerH);
+          document.querySelector(dynamicRegions.curImg).style.width = clipboardController.intToPx(Appdata.imgW);
+          document.querySelector(dynamicRegions.curImg).style.height = clipboardController.intToPx(Appdata.imgH);
+          document.querySelector(dynamicRegions.imgViewer).style.width = clipboardController.intToPx(Appdata.viewerW);
+          document.querySelector(dynamicRegions.imgViewer).style.height = clipboardController.intToPx(Appdata.viewerH);
           // !VA This is NaN-- not sure we even need this since the app width is static.
-          document.querySelector(dynamicRegions.imgViewport).style.width = calcController.intToPx(Appdata.viewportW);
-          document.querySelector(dynamicRegions.imgViewport).style.height = calcController.intToPx(Appdata.viewportH);
+          document.querySelector(dynamicRegions.imgViewport).style.width = clipboardController.intToPx(Appdata.viewportW);
+          document.querySelector(dynamicRegions.imgViewport).style.height = clipboardController.intToPx(Appdata.viewportH);
           // !VA This is also NaN - same as above.
-          document.querySelector(dynamicRegions.appContainer).style.height = calcController.intToPx(Appdata.appH);
+          document.querySelector(dynamicRegions.appContainer).style.height = clipboardController.intToPx(Appdata.appH);
 
           // !VA TODO: Show the dimension alerts if an image too large or small...
           // showDimensionAlerts();
@@ -806,7 +807,7 @@ console.log('event.target.id is: ' + event.target.id);
   // var r = UIController.getAppdata();
 
   // CALCULATIONS AND INPUT EVALUATION CONTROLLER
-  var calcController = (function() {
+  var clipboardController = (function() {
 
     // !VA If we want to access any of the DOM IDs we have to call them from UIController where they're defined.
     var dimViewers = UIController.getDimViewerIDs();
@@ -825,18 +826,18 @@ console.log('event.target.id is: ' + event.target.id);
       this.alignAtt = alignAtt;
     }
 
-    // !VA calcController module public functions from 
+    // !VA clipboardController module public functions from 
     return {
 
       // TESTING FUNCTION
-      calcControllerTest: function() {
+      clipboardControllerTest: function() {
         console.log('calController test');
       },
 
 
       //STRING FUNCTIONS
       // !VA Convert integer to pixel for style properties
-      // calcController: CONVERT INTEGER TO PIXEL VALUE
+      // clipboardController: CONVERT INTEGER TO PIXEL VALUE
       intToPx: function(int) {
         let pxval;
         let str = String(int);
@@ -845,7 +846,7 @@ console.log('event.target.id is: ' + event.target.id);
       },
       //STRING FUNCTIONS
 
-      // calcController: ASPECT RATIO
+      // clipboardController: ASPECT RATIO
       getAspectRatio: function (var1, var2) {
         var aspectReal = (var1 / var2);
         var aspectInt = function() {
@@ -872,7 +873,7 @@ console.log('event.target.id is: ' + event.target.id);
         return [aspectReal, aspectInt];  
       },
 
-      // calcController: GET FILENAME FROM SRC ATTRIBUTE OF IMG FILE
+      // clipboardController: GET FILENAME FROM SRC ATTRIBUTE OF IMG FILE
       getFilenameFromSource: function (source) {
         if (source) {
           var path = source.split('/');
@@ -885,10 +886,10 @@ console.log('event.target.id is: ' + event.target.id);
       // USER ACTION HANDLERS
       // ==========================
 
-      //  calcController: HANDLE THE USER INPUT FIELDS IN THE TOOLBUTTONS
+      //  clipboardController: HANDLE THE USER INPUT FIELDS IN THE TOOLBUTTONS
       handleTBInput: function(id, val) {
         // !VA Get the Appdata property that corresponds to the element ID
-        var prop = calcController.elementIdToAppdataProp(id);
+        var prop = clipboardController.elementIdToAppdataProp(id);
         // !VA get a copy of Appdata
         var data = UIController.accessAppdata();
         // !VA TODO: Setting maxViewerWidth just for now
@@ -903,7 +904,7 @@ console.log('event.target.id is: ' + event.target.id);
           } else if (val > maxViewerWidth ) {
             // !VA Setting a maxViewerWidth here but I need to review V1 and revisit this.
             // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px
-            controller.initError(id, 'viewerW_GT_maxViewerWidth', true);
+            appController.initError(id, 'viewerW_GT_maxViewerWidth', true);
           } else {
             // !VA The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running evalViewerWidth. 
             data = UIController.updateAppData(prop, val);
@@ -915,14 +916,14 @@ console.log('event.target.id is: ' + event.target.id);
           // !VA If the new image width is greater than the viewer width, then show message. This is a temporary fix, the errorHandler should reset the field value to ''.
           if (val > data.viewerW ) {
             // !VA errorHandler!
-            controller.initError(id, 'imgW_GT_viewerW');
+            appController.initError(id, 'imgW_GT_viewerW');
             
           }
           else {
             // !VA Write the user input for imgW to the data, which is the local copy of Appdata
             data = UIController.updateAppData(prop, val);
             // !VA Calculate the imgH based on the aspectRatio funtion and the current values for imgNW and imgNH and put it in val
-            val = Math.round((1/calcController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgW);
+            val = Math.round((1/clipboardController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgW);
             // !VA Write the updated imgH to Appdata
             data = UIController.updateAppData('imgH', val);
           }
@@ -932,7 +933,7 @@ console.log('event.target.id is: ' + event.target.id);
           // !VA Write the user input for imgH to the data, which is the local copy of Appdata
           data = UIController.updateAppData(prop, val);
           // !VA TODO: restore the placeholder value on blur
-          val = Math.round((calcController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgH);
+          val = Math.round((clipboardController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgH);
           // !VA Write the updated imgH to Appdata
           data = UIController.updateAppData('imgW', val);
           break;
@@ -941,7 +942,7 @@ console.log('event.target.id is: ' + event.target.id);
           // !VA TODO: add error handling;
           data = UIController.updateAppData(prop, val);
           // !VA TODO: restore the placeholder value on blur
-          // val = Math.round((calcController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgH);
+          // val = Math.round((clipboardController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgH);
           // !VA Write the updated imgH to Appdata
           // data = UIController.updateAppData('imgW', val);
           break;
@@ -950,29 +951,29 @@ console.log('event.target.id is: ' + event.target.id);
           // !VA Write the user input for imgH to the data, which is the local copy of Appdata
           data = UIController.updateAppData(prop, val);
           // !VA TODO: restore the placeholder value on blur
-          // val = Math.round((calcController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgH);
+          // val = Math.round((clipboardController.getAspectRatio(data.imgNW, data.imgNH)[0]) * data.imgH);
           // !VA Write the updated imgH to Appdata
           // data = UIController.updateAppData('imgW', val);
           break;
         }
         // !VA Adjust the container heights based on the updated Appdata properties
-        calcController.adjustContainerHeights(data);
+        clipboardController.adjustContainerHeights(data);
       },
 
-      // // calcController: HANDLES MOUSECLICKS FROM TOOLBUTTONS
+      // // clipboardController: HANDLES MOUSECLICKS FROM TOOLBUTTONS
       handleTBClicks: function(id, val) {
         // !VA Put getAspectRatio in a variable
         var aspect;
         var imgWNew;
         var imgHNew;
         var data = UIController.accessAppdata();
-        aspect = calcController.getAspectRatio(data.imgNH, data.imgNW)[0];  
+        aspect = clipboardController.getAspectRatio(data.imgNH, data.imgNW)[0];  
         // debugger;
         // !VA If adding the button increment value to the existing imgW or imgH results in a value less than or equal to 0 then abort and error, because an image has to have a positive dimension.
         if ( data.imgW + val <= 0 || data.imgH + val <= 0 ) {
-          controller.initError(id, 'tbButton_LT_zero');
+          appController.initError(id, 'tbButton_LT_zero');
         } else if ( data.imgW + val > data.viewerW  ) {
-          controller.initError(id, 'tbButton_GT_viewerW');
+          appController.initError(id, 'tbButton_GT_viewerW');
         }   else {
           // !VA If we're incrementing...
           if ( id.includes('grow')) {
@@ -990,13 +991,13 @@ console.log('event.target.id is: ' + event.target.id);
           }
           UIController.updateAppData('imgW', imgWNew);
           UIController.updateAppData('imgH', imgHNew);
-          calcController.adjustContainerHeights(data);
+          clipboardController.adjustContainerHeights(data);
         }
       },
 
 
 
-      // calcController: EVALUATE VIEWER SIZE
+      // clipboardController: EVALUATE VIEWER SIZE
       // !VA There are four conditions for an image to fit into the appContainer. This evaluates them, sets the Appdata properties accordingly and calls adjustContainerHeights. 
       // !VA TODO: Actually the function needs to be called only once at the end of the routine...
       evalViewerSize: function (Appdata) {
@@ -1058,11 +1059,11 @@ console.log('event.target.id is: ' + event.target.id);
         }
         // !VA Run evalDimAlerts now, after all the containers have been resized.
         // !VA !IMPORTANT! THIS IS WHERE TO GET THE UPDATED APPDATA
-        calcController.evalDimAlerts(Appdata, dimViewers);
+        clipboardController.evalDimAlerts(Appdata, dimViewers);
         
       },
       
-      // calcController: ADJUST IMAGE CONTAINER HEIGHTS
+      // clipboardController: ADJUST IMAGE CONTAINER HEIGHTS
       adjustContainerHeights: function (Appdata)  {
         // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values.
         // !VA Initial height is 450, which is set in the init function, not in Appdata,or as it was V1, in the Appobj.
@@ -1094,7 +1095,7 @@ console.log('event.target.id is: ' + event.target.id);
         UIController.refreshAppUI(Appdata);
       },
 
-      // calcController: EVALUATE DIM VIEWER ALERTS
+      // clipboardController: EVALUATE DIM VIEWER ALERTS
       evalDimAlerts: function(Appdata, dimViewers) {
         // !VA Size On Disk is NOT 2X the Display Size: flag Size on Disk and Retina
         var curDimViewer = [];
@@ -1116,7 +1117,7 @@ console.log('event.target.id is: ' + event.target.id);
       },
 
       // !VA Might be good to fold this into error handling
-      // calcController: VALIDATE INPUT FOR INTEGER
+      // clipboardController: VALIDATE INPUT FOR INTEGER
       validateInteger: function(inputVal) {
         // !VA Since integer validation is used for all height/width input fields, including those not yet implemented
         let isErr;
@@ -1133,7 +1134,7 @@ console.log('event.target.id is: ' + event.target.id);
       },
 
       // !VA Need to get the Appdata property that corresponds to the ID of the DOM input element that sets it. It's easier to just create a list of these correspondences than to rename the whole UI elements and Appdata properties so they correspond, or to create functions that use string methods to extract them from each other.
-      //  calcController: GET APPDATA PROPERTY NAME FROM AN HTML ELEMENT ID
+      //  clipboardController: GET APPDATA PROPERTY NAME FROM AN HTML ELEMENT ID
       elementIdToAppdataProp: function(str) {
         var IDtoProp = {
           viewerW:  'tb-input-viewerw',
@@ -1149,7 +1150,7 @@ console.log('event.target.id is: ' + event.target.id);
         return ret;
       },
 
-      // calcController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
+      // clipboardController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
       // !VA TODO: THis should be in handleUserInput
       ccpIfNoUserInput: function(att, val) {
         // !VA We need get the filename from Appdata in case the user leaves 'path' empty
@@ -1179,7 +1180,7 @@ console.log('event.target.id is: ' + event.target.id);
 
       },
 
-      // calcController: GET STRINGS FOR THE IMG CLIPBOARD OUTPUT
+      // clipboardController: GET STRINGS FOR THE IMG CLIPBOARD OUTPUT
       ccpGetCBImgHTML: function() {
         // !VA Get Appdata - we need it for the filename
         var data = UIController.accessAppdata();
@@ -1192,11 +1193,11 @@ console.log('event.target.id is: ' + event.target.id);
         // !VA ---------------------------
         imgTag.classAtt = 
           // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
-          calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.imgClass).value);
+          clipboardController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.imgClass).value);
 
         imgTag.altAtt =    
           // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output
-          calcController.ccpIfNoUserInput('alt',document.querySelector(ccpUserInput.imgAlt).value);
+          clipboardController.ccpIfNoUserInput('alt',document.querySelector(ccpUserInput.imgAlt).value);
         // !VA imgTag.altAtt END
 
         imgTag.srcAtt = (function (id, data) {
@@ -1256,7 +1257,7 @@ console.log('event.target.id is: ' + event.target.id);
         return imgTagStr;
       }, 
       
-      // calcController: GET STRINGS FOR THE TD CLIPBOARD OUTPUT
+      // clipboardController: GET STRINGS FOR THE TD CLIPBOARD OUTPUT
       ccpGetCBTdHTML: function () {
         // !VA We don't need this yet, but we will if we decide to add a width style property which is useful for Outlook 120dpi 
         var data = UIController.accessAppdata();
@@ -1267,7 +1268,7 @@ console.log('event.target.id is: ' + event.target.id);
         var tdTag = new ClipboardOutput('tdTag');
         tdTag.classAtt = 
           // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
-          calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tdClass).value);
+          clipboardController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tdClass).value);
 
         tdTag.alignAtt = (function (id) {
           // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
@@ -1311,13 +1312,13 @@ console.log('event.target.id is: ' + event.target.id);
 
         // !VA Pass the input value, prepending it hex # character 
         tdTag.bgcolorAtt =
-         calcController.ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tdBgcolor).value);
+         clipboardController.ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tdBgcolor).value);
         // !VA tdBgcolor  END
 
 
         tdTag.tdContents =    (function () {
           // !VA Get the img tag output and put in between the td tags
-          var str = calcController.ccpGetCBImgHTML();
+          var str = clipboardController.ccpGetCBImgHTML();
           return str;
         })();
 
@@ -1370,7 +1371,7 @@ console.log('event.target.id is: ' + event.target.id);
         return clipboardStr;
       }, 
 
-      // calcController: GET STRINGS FOR THE TABLE CLIPBOARD OUTPUT
+      // clipboardController: GET STRINGS FOR THE TABLE CLIPBOARD OUTPUT
       ccpGetCBTableHTML: function () {
         // !VA We need this to get Appdata.viewerW
         var data = UIController.accessAppdata();
@@ -1381,7 +1382,7 @@ console.log('event.target.id is: ' + event.target.id);
         // !VA Base Table options----------------------------------------------
         tableTag.classAtt = 
           // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
-          calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tableClass).value);
+          clipboardController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tableClass).value);
 
 
         tableTag.alignAtt = (function (id) {
@@ -1405,7 +1406,7 @@ console.log('event.target.id is: ' + event.target.id);
         // !VA tableAlign END
 
         tableTag.tableContents = (function () {
-          var str = calcController.ccpGetCBTdHTML();
+          var str = clipboardController.ccpGetCBTdHTML();
           return str;
         })();
 
@@ -1430,7 +1431,7 @@ console.log('event.target.id is: ' + event.target.id);
         
         // !VA Pass the input value 
         tableTag.bgcolorAtt =
-         calcController.ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tableBgcolor).value);
+         clipboardController.ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tableBgcolor).value);
         // !VA tdBgcolor
         // !VA Base Table Tag END------------------------------------------------------
 
@@ -1439,7 +1440,7 @@ console.log('event.target.id is: ' + event.target.id);
         // !VA Wrapper Class Attribute
         tableTag.wrapperclassAtt = 
         // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
-        calcController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tableWrapperClass).value);
+        clipboardController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tableWrapperClass).value);
 
         // !VA Wrapper Width Attribute
         tableTag.wrapperWidthAtt = (function (id, data) {
@@ -1480,7 +1481,7 @@ console.log('event.target.id is: ' + event.target.id);
 
         // !VA Wrapper bgcolor attributePass the input value 
         tableTag.wrapperBgcolorAtt =
-        calcController.ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tableWrapperBgColor).value);
+        clipboardController.ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tableWrapperBgColor).value);
         // !VA tdBgcolor
 
         // !VA Get the checked status of Include table wrapper, and if it's 'checked' output the base table AND the table wrapper
@@ -1574,7 +1575,7 @@ console.log('event.target.id is: ' + event.target.id);
 
   // !VA Not sure why UICtrl is used here.
   // GLOBAL APP CONTROLLER
-  var controller = (function(calcCtrl, UICtrl) {
+  var appController = (function(calcCtrl, UICtrl) {
 
     var Appobj = {};
     
@@ -1589,7 +1590,8 @@ console.log('event.target.id is: ' + event.target.id);
     // !VA Deprecated in this version
     // var ccpBuildTag = UIController.getCcpBuildTagIDs();
 
-    // !VA controller private: setupEventListeners
+    // !VA appController private: setupEventListeners
+    // !VA EVENT LISTENERS
     var setupEventListeners = function() {
 
       //DRAG AND DROP PROCESSING START
@@ -1681,7 +1683,7 @@ console.log('event.target.id is: ' + event.target.id);
       }
 
       // !VA Need to decide whether to handle all events here or route actions directly from the event handler. This should probably be a separate function, not a subroutine of setupEventListeners
-      // controller private setupEventListeners 
+      // appController private setupEventListeners 
       function handleUserAction(e) {
         var keypressed;
         var isErr;
@@ -1706,7 +1708,7 @@ console.log('event.target.id is: ' + event.target.id);
             val = parseInt(el.id.slice(-2));
             // !VA If the target ID includes 'grow' then the image dimension will be incremented, if 'shrink' then it will be decremented
             (el.id.includes('grow')) ? val : val = -val;
-            calcController.handleTBClicks(el.id, val); 
+            clipboardController.handleTBClicks(el.id, val); 
             break;
           case ( el.id.includes('dv')) :
             UIController.ccpToggle();
@@ -1718,14 +1720,14 @@ console.log('event.target.id is: ' + event.target.id);
           keypressed = e.which || e.keyCode || e.key;
           if (keypressed == 13) {
             // !VA Get the input and evaluate it
-            var isErr = calcController.validateInteger(this.value);
+            var isErr = clipboardController.validateInteger(this.value);
             if (isErr) {
               // !VA If the value entered isn't an integer, reset it to null and leave the focus there, and send the error code to errorHandler
               el.value = '';
-              controller.initError(el.id, 'not_an_integer', true);
+              appController.initError(el.id, 'not_an_integer', true);
             // !VA We want to handle all the toolbutton keyboard input in one place, so send the send the target element's id and value to handleTBInput
             } else if (el.id.includes('tb-input')) {
-              calcController.handleTBInput(el.id, el.value);
+              clipboardController.handleTBInput(el.id, el.value);
             } else {
               // !VA There will be other input fields to handle, but we're not there yet.
               console.log('Undefined keypress action');
@@ -1745,7 +1747,7 @@ console.log('event.target.id is: ' + event.target.id);
             // !VA Reset the viewer width field the last value of Appdata.viewerW 
             } else {
               // !VA Get the Appdata property name that corresponds to the ID of the current input element
-              var prop = calcController.elementIdToAppdataProp(el.id);
+              var prop = clipboardController.elementIdToAppdataProp(el.id);
               // !VA Access Appdata
               var data = UIController.accessAppdata();
               // !VA return the current value of the Appdata property for the current event target to that elements value property. 
@@ -1804,7 +1806,12 @@ console.log('event.target.id is: ' + event.target.id);
       // addEventHandler(window, 'load', function(evt) {initializeHandlers(); } );
     };
 
-    //  ERROR HANDLING
+    // !VA STRING FUNCTIONS AND CALCULATIONS
+
+
+
+
+    //  !VA ERROR HANDLING
     // ==============================
     var errorHandler = function(id, str, bool) {
       var data = UIController.accessAppdata();
@@ -1832,7 +1839,7 @@ console.log('event.target.id is: ' + event.target.id);
     };
 
 
-      // !VA controller private
+      // !VA appController private
       // !VA Here we can show a message bypassing errorHandler - not all messages are errors.
       var showAppMessage = function(id, mess, isErr) {
         console.log('showAppMessage-top');      
@@ -1894,7 +1901,7 @@ console.log('event.target.id is: ' + event.target.id);
           appcontainer: document.querySelector(dynamicRegions.appContainer)
         }; 
 
-        var filename = calcController.getFilenameFromSource(AppobjDev.currentimg.src);
+        var filename = clipboardController.getFilenameFromSource(AppobjDev.currentimg.src);
         // !VA Hide the drop area.
         document.querySelector(staticRegions.dropArea).style.display = 'none';
         // !VA  Show the toolbar
@@ -1906,7 +1913,7 @@ console.log('event.target.id is: ' + event.target.id);
         // !VA AppobjDev returns NaN for the viewer containers because they don't have values yet... not sure I understand why since height and width are initially declared in CSS.
         var Appdata = UIController.getAppData(AppobjDev, filename);
         // !VA evaluate the viewer containers and adjust their size based on the returned Appdata
-        var evalViewerSize = calcController.evalViewerSize(Appdata);
+        var evalViewerSize = clipboardController.evalViewerSize(Appdata);
 
         // !VA Open the CCP by default in dev mode
         // !VA First, make sure it's closed
@@ -1920,11 +1927,11 @@ console.log('event.target.id is: ' + event.target.id);
 
     return {
       initError: function(id, str, bool) {
-        console.log('initError in controller');
+        console.log('initError in appController');
         errorHandler(id, str, bool);
       },
       init: function(){
-        // calcController.tst();
+        // clipboardController.tst();
         console.log('App initialized.');
         // !VA  Initialize the ImgViewer to accomodate the dragArea. This should be the same as the CSS definition.
         document.querySelector(dynamicRegions.imgViewer).style.width = '650px';
@@ -1946,9 +1953,9 @@ console.log('event.target.id is: ' + event.target.id);
       }
     };
 
-  })(calcController, UIController);
+  })(clipboardController, UIController);
 
-  controller.init();
+  appController.init();
 
 //Namespace closure
 })();
