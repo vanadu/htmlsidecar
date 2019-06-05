@@ -351,7 +351,7 @@ var Whitty = (function () {
 
     // !VA Rewrite 06.04.19 
     // =============================
-    // !VA NEW UIController Private
+    // !VA NEW UIController Private END
 
 
 
@@ -384,20 +384,19 @@ var Whitty = (function () {
       },
 
       // !VA NEW Start rewrite 06.04.19
+      // !VA NEW UIController public START 
       // ===============================
 
       initUI: function() {
         console.log('initUI');
         // !VA  Initialize the ImgViewer to accomodate the dragArea. This should be the same as the CSS definition: currently 650x450
-        // !VA NEW Get the computed imgViewer height and width 
+        // !VA NEW Write the computed styles to console to make sure they are as expected: 650x450
         // var cStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
         // viewerW = cStyles.getPropertyValue('width');
         // viewerH = cStyles.getPropertyValue('height');
         // console.log('viewerW is: ' + viewerW); 
         // console.log('viewerH is: ' + viewerH); 
 
-        document.querySelector(dynamicRegions.imgViewer).style.width = '650px';
-        document.querySelector(dynamicRegions.imgViewer).style.height = '450px';
         // !VA Make sure the toolsContainer is off and the dropArea is on.
         document.querySelector(staticRegions.dropArea).style.display = 'block';
         document.querySelector(staticRegions.toolsContainer).style.display = 'none';
@@ -411,24 +410,38 @@ var Whitty = (function () {
       },
 
       // !VA 06.04.19A Stopped here, obj not defined.
-      writeDimViewers: function() {
+      writeDimViewers: function(Appobj) {
+
+        // !VA We need the current value in dimViewers.smallphones and dimViewers.largephones to display all the dimViewers. So, if it's not explicitly user-defined, then use the default placeholder value from the HTML, then get the height from getAspectRatio
+        var sPhonesW, sPhonesH, lPhonesW, lPhonesH;
+        sPhonesW = document.querySelector(toolButtons.sPhonesW).value;
+        lPhonesW = document.querySelector(toolButtons.sPhonesW).value;
+        sPhonesW ? sPhonesW : sPhonesW = document.querySelector(toolButtons.sPhonesW).placeholder;
+        lPhonesW ? lPhonesW : lPhonesW = document.querySelector(toolButtons.lPhonesW).placeholder;
+        sPhonesH = Math.round(sPhonesW * (1 / Appobj.aspect[0]));
+        lPhonesH = Math.round(lPhonesW * (1 / Appobj.aspect[0]));
+
+
 
         // !VA Hide the dropArea - not sure if this is the right place for this.
         document.querySelector(staticRegions.dropArea).style.display = 'none';
 
-        var sPhoneW = document.querySelector(toolButtons.sPhonesW).placeholder; 
-        document.querySelector(dimViewers.display).innerHTML = `<span class='pop-font'><span id="display-size-width">${obj.imgW}</span> X <span id="display-size-height">${obj.imgH}</span></span>`;
-        document.querySelector(dimViewers.diskimg).innerHTML = `<span class='pop-font'>${obj.imgNW} X ${obj.imgNH}</span>`;
-        document.querySelector(dimViewers.aspect).innerHTML = `<span class='pop-font'>${getAspectRatio(obj.imgNW, obj.imgNH)[1]}</span>` ;
+
+        document.querySelector(dimViewers.display).innerHTML = `<span class='pop-font'><span id="display-size-width">${Appobj.imgW}</span> X <span id="display-size-height">${Appobj.imgH}</span></span>`;
+        document.querySelector(dimViewers.diskimg).innerHTML = `<span class='pop-font'>${Appobj.imgNW} X ${Appobj.imgNH}</span>`;
+        document.querySelector(dimViewers.aspect).innerHTML = `<span class='pop-font'>${Appobj.aspect[1]}</span>` ;
         document.querySelector(dimViewers.smallphones).innerHTML = `<span class='pop-font'><span id='small-phones-width'>${sPhonesW}</span> X <span id='small-phones-height'>${sPhonesH}</span></span>` ;
         document.querySelector(dimViewers.largephones).innerHTML = `<span class='pop-font'><span id='large-phones-width'>${lPhonesW}</span> X <span id='large-phones-height'>${lPhonesH}</span></span>` ;
-        document.querySelector(dimViewers.retina).innerHTML = `<span class='pop-font'>${2 * obj.imgW}</span> X <span class='pop-font'>${2 * obj.imgH}`;
+        document.querySelector(dimViewers.retina).innerHTML = `<span class='pop-font'>${2 * Appobj.imgW}</span> X <span class='pop-font'>${2 * Appobj.imgH}`;
 
       },
 
+      // !VA NEW Start rewrite 06.04.19
 
-
-
+      writeFilenameToUI: function (fileName) {
+        document.querySelector(dimViewers.filename).textContent = fileName;
+        document.querySelector(dimViewers.filename).style.display = 'block';
+      },
 
 
 
@@ -1799,29 +1812,45 @@ console.log('event.target.id is: ' + event.target.id);
     //  ==============================
     function getCurImgDimensions(isDev) {
       console.log('getCurImgDimensions running');
-
+      console.log('isDev is: ' + isDev);
+      // !VA NEW Initialize Appobj here and pass it along
+      var Appobj = {};
       // !VA At this point imgW and imgW = imgNW and imgNH if this is called from initDev or handleFileSelect. The only difference is that initDev needs to write the filename to the DOM because that's handled by handleFileSelect. So we get the isDev flag
-      if (isDev = true) {
+      if (isDev) {
         // !VA NEW Get the filename of the devImg in the HTML. This is the only time we'll have an actual source file -- in user mode all the images are blobs -- so we can do this as a one-off.
         var filename = document.querySelector(dynamicRegions.curImg).src;
         filename = filename.split('/');
         filename = filename[filename.length - 1];
         document.querySelector(dimViewers.filename).textContent = filename;
+        UICtrl.writeFilenameToUI(filename);
       } 
       
 
 
-      // !VA NEW Get the current image dimensions.
+      // !VA NEW Read required values into Appobj.
       var curImg = document.querySelector(dynamicRegions.curImg);
-      var curImgDimensions = {};
-      curImgDimensions.imgW = curImg.width;
-      curImgDimensions.imgH = curImg.height;
-      curImgDimensions.imgNW = curImg.naturalWidth;
-      curImgDimensions.imgNH = curImg.naturalHeight;
-      console.dir(curImgDimensions);
-      return curImgDimensions;
+      Appobj.imgW = curImg.width;
+      Appobj.imgH = curImg.height;
+      Appobj.imgNW = curImg.naturalWidth;
+      Appobj.imgNH = curImg.naturalHeight;
+      // !VA NEW We need the aspect ratio to calculate the other dimension when the user only inputs one, i.e. when width or height is entered into one of the toolbars' custom width/height fields.
+      Appobj.aspect = getAspectRatio(curImg.naturalWidth,  curImg.naturalHeight);
+      // !VA NEW We need new imgW and imgH properties to store the user input values. We don't want to overwrite the original imgW/imgH values because it appears it's not possible since Javascript passes values by reference, so any changes to properties are lost outside the current function's scope. Plus, we need to have the original values persist for the duration of the session, at which point the app and Appobj are reinitialized. 
+      Appobj.newImgW = '';
+      Appobj.newImgH = '';
+      
+
+      console.dir(Appobj);
+      return Appobj;
     }
 
+    // appController: remove current image
+    // !VA Test for whether there is already a #cur-img element in the DOM, and if there is remove it so handleFileSelect can overwrite it without having to refresh the page to reboot the app.
+    function removeCurImg() {
+      // if ( document.querySelector('#cur-img-container')) {
+      document.querySelector('#cur-img-container').parentNode.removeChild(document.querySelector('#cur-img-container'));
+      // } 
+    }
 
     // appController: FILEREADER OBJECT PROCESSING
     //Get the user-selected image file object 
@@ -1830,7 +1859,7 @@ console.log('event.target.id is: ' + event.target.id);
       // If a file is already being displayed, i.e. Appdata.filename is true, then remove that image to make room for the next image being dropped
       // !VA Remove the current #cur-img from the DOM. This has to be done in a separate function call, I'm not sure why handleFileSelect doesn't see #cur-img even though it is in the DOM at this point
       // !VA NEW Commented out for now
-      // removeCurImg();
+      removeCurImg();
       //The drop event has been executed and handleFileSelect is running.
       // !VA Can't remember what this does...    
       evt.stopPropagation();
@@ -1875,20 +1904,11 @@ console.log('event.target.id is: ' + event.target.id);
           // Read the filename of the FileReader object into a variable to pass to the getAppData function, otherwise the blob has no name
           fileName = theFile.name;
           // !VA NEW Commented out for now
-          // writeFilenameToUI(fileName);
+          UICtrl.writeFilenameToUI(fileName);
           
           // !VA Hide the dropArea - not sure if this is the right place for this.
           document.querySelector(staticRegions.dropArea).style.display = 'none';
-          // !VA NEW Delete
-          // !VA Populate the Appobj with the new image. Not sure if this is the right place to declare it.
-          var Appobj = {
-            currentimg: curImg,
-            viewer: document.querySelector(dynamicRegions.imgViewer),
-            viewport: document.querySelector(dynamicRegions.imgViewport),
-            appcontainer: document.querySelector(dynamicRegions.appContainer)
-          };
-
-          // !VA NEW Once the current image has loaded, initialize the dinViewers by querying the current image properties from UICtrl and passing them to buildDimViewers.
+          // !VA NEW Once the current image has loaded, initialize the dinViewers by querying the current image properties from UICtrl and passing them to writeDimViewers.
           function initializeDimViewers() { 
             // !VA NEW Initialize the variable that will contain the new image's height, width, naturalHeight and naturalWidth
             var curImgDimensions;
@@ -1908,11 +1928,14 @@ console.log('event.target.id is: ' + event.target.id);
                 // !VA Create and array of the Appdata properties to update
                 // !VA Instead of managing Appdata based on some huge object with four HTML elements and all those unneeded properties thereof, we will just update Appdata by creating a local copy with just the properties we want to add.
                 // !VA Stopped here. The problem is that Appdata is a global object in the public functions, as it is now in master. I don't want to put all that stuff in the appController's public functions, so I have to either leave it in UIController or pass it between private functions, which will get very complicated.   I think it will be much cleaner if I only use updateAppData to loop through the items to update and don't use the klunky getAppData. Also, the refreshAppUI function refreshes all the values when it's called - it should only refresh the changed values.
-                // !VA NEW Now that the blob image has been displayed and has DOM properties that can be queried, query them.
-                curImgDimensions = getCurImgDimensions(false);
+                // !VA NEW Now that the blob image has been displayed and has DOM properties that can be queried, query them and write them to Appobj.
+                var Appobj = {};
+                Appobj = getCurImgDimensions(false);
+                console.log('hFS here: Appobj');
+                console.dir(Appobj);
 
                 // !VA NEW Commented out for now.
-                calcViewerDimensions(curImgDimensions);
+                calcViewerDimensions(Appobj);
 
                 // !VA NEW Delete
                 // clipboardController.evalViewerSize(Appdata);
@@ -1951,7 +1974,7 @@ console.log('event.target.id is: ' + event.target.id);
     //FILEREADR OBJECT PROCESSING END
 
 
-    function calcViewerDimensions(obj) {
+    function calcViewerDimensions(Appobj) {
       // !VA This isn't necessary here, but will probably be used somewhere else...
       // !VA TODO: Try to figure out whether this is useful at all.
       // const maxViewerWidth = (parseInt(window.getComputedStyle(appRegions.appContainer,null).getPropertyValue('width'), 10)) - 48;
@@ -1971,9 +1994,9 @@ console.log('event.target.id is: ' + event.target.id);
       // The image falls within the default viewer dimensions set in initApp, so do nothing.
       // !VA This case is irrelevant since we're now comparing everything to maxViewerWidth not the  init values. Change accordingly...
       // !VA  NOT SO...now we're trying to restore the previous functionality so...
-      case (obj.imgNW <= viewerW) && (obj.imgNH < viewerH) :
-        obj.imgW = obj.imgNW;
-        obj.imgH = obj.imgNH;
+      case (Appobj.imgNW <= viewerW) && (Appobj.imgNH < viewerH) :
+        Appobj.imgW = Appobj.imgNW;
+        Appobj.imgH = Appobj.imgNH;
         // !VA viewerH is set in initApp, so no change to it here
         // !VA viewerH is set in initapp, so no change to that here either.
         // !VA We don't need to adjust height...but maybe we do for consistency's sake
@@ -1982,23 +2005,23 @@ console.log('event.target.id is: ' + event.target.id);
 
       // The image is wider than the current viewer width but shorter than current viewer height, so resize the image based on the viewer width
       
-      case (obj.imgNW > viewerW) && (obj.imgNH < viewerH) :
+      case (Appobj.imgNW > viewerW) && (Appobj.imgNH < viewerH) :
         // Set the image width to the current viewer
-        obj.imgW = viewerW;
+        Appobj.imgW = viewerW;
         // Get the image height from the aspect ration function
-        obj.imgH = Math.round((1/getAspectRatio(obj.imgNW, obj.imgNH)[0]) * obj.imgW);
+        Appobj.imgH = Math.round((1/getAspectRatio(Appobj.imgNW, Appobj.imgNH)[0]) * Appobj.imgW);
         // Set the viewerH to the imgH
-        viewerH = obj.imgH;
+        viewerH = Appobj.imgH;
         // this.adjustContainerHeights(Appdata);
         break;
 
       // The image is not as wide as the current viewer width, but is taller than the viewer height. Keep the image width but resize the viewer in order to display the full image height
       // !VA This might be a problem with consecutive images without page refresh
-      case (obj.imgNW <= viewerW) && (obj.imgNH > viewerH) :
+      case (Appobj.imgNW <= viewerW) && (Appobj.imgNH > viewerH) :
         // Set the viewer height and the image height to the image natural height
-        viewerH = obj.imgH = obj.imgNH;
+        viewerH = Appobj.imgH = Appobj.imgNH;
         // Set the image width to the natural image width
-        obj.imgW = obj.imgNW;
+        Appobj.imgW = Appobj.imgNW;
 
         // !VA  Use adjustContainerHeights to get the Appdata height
         // !VA  Note the dependency with initAppdata, see 'Dependency with adjustContainerHeights'
@@ -2006,20 +2029,21 @@ console.log('event.target.id is: ' + event.target.id);
         break;
 
       // The image is wider and taller than the current viewer height and width so we have to resize the image and the viewport based on the current viewport width
-      case (obj.imgNW > viewerW) && (obj.imgNH > viewerH) :
+      case (Appobj.imgNW > viewerW) && (Appobj.imgNH > viewerH) :
         // Set the image Width to the current  viewer width 
-        obj.imgW = viewerW;
+        Appobj.imgW = viewerW;
         // Set the image height proportional to the new image width using the aspect ratio function
-        obj.imgH = Math.round((1/getAspectRatio(obj.imgNW, obj.imgNH)[0]) * obj.imgW);
+        Appobj.imgH = Math.round((1/getAspectRatio(Appobj.imgNW, Appobj.imgNH)[0]) * Appobj.imgW);
         // Set the viewer height to the image height
-        viewerH = obj.imgH;
+        viewerH = Appobj.imgH;
         // Get the viewport and Appdata height from adjustContainerHeights
 
         // !VA TODO: Check this out, doesn't seem to be a problem anymore: BUG Problem with the 800X550, 800X600 -- no top/bottom gutter on viewport
         break;
       }
-      buildDimViewers(obj)
-      doContainerHeights(obj.imgH, obj.imgW, viewerH);
+      // !VA Transfer control to UIController to print to the UI
+      UIController.writeDimViewers(Appobj);
+      doContainerHeights(Appobj.imgH, Appobj.imgW, viewerH);
 
       // !VA Run evalDimAlerts now, after all the containers have been resized.
       // !VA !IMPORTANT! THIS IS WHERE TO GET THE UPDATED APPDATA
@@ -2053,24 +2077,6 @@ console.log('event.target.id is: ' + event.target.id);
         return aspectInt;
       }();
       return [aspectReal, aspectInt];  
-    };
-
-
-    function buildDimViewers(obj) {
-      // !VA We need the current value in dimViewers.smallphones and dimViewers.largephones to display all the dimViewers. So, if it's not explicitly user-defined, then use the default placeholder value from the HTML, then get the height from getAspectRatio
-      var sPhonesW, sPhonesH, lPhonesW, lPhonesH;
-      sPhonesW = document.querySelector(toolButtons.sPhonesW).value;
-      lPhonesW = document.querySelector(toolButtons.sPhonesW).value;
-      sPhonesW ? sPhonesW : sPhonesW = document.querySelector(toolButtons.sPhonesW).placeholder;
-      lPhonesW ? lPhonesW : lPhonesW = document.querySelector(toolButtons.lPhonesW).placeholder;
-      sPhonesH = Math.round(sPhonesW * (1 / getAspectRatio(obj.imgNW, obj.imgNH)[0]));
-      lPhonesH = Math.round(lPhonesW * (1 / getAspectRatio(obj.imgNW, obj.imgNH)[0]));
-
-      UICtrl.writeDimViewers(obj);
-
-      // !VA NEW Need to calculate the viewer and appContainer sizes first then write the modified obj to buildDimViewers
-      // calcViewerDimensions(obj);
-
     }
 
 
