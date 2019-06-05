@@ -182,7 +182,8 @@ var Witty = (function () {
 
       // !VA UIController public writeDimViewers
       writeDimViewers: function(Appobj) {
-
+        console.log('writeDimViewers running');
+        console.table(Appobj);
         // !VA We need the current value in dimViewers.smallphones and dimViewers.largephones to display all the dimViewers. So, if it's not explicitly user-defined, then use the default placeholder value from the HTML, then get the height from getAspectRatio
         var sPhonesW, sPhonesH, lPhonesW, lPhonesH;
         sPhonesW = document.querySelector(toolButtons.sPhonesW).value;
@@ -191,18 +192,28 @@ var Witty = (function () {
         lPhonesW ? lPhonesW : lPhonesW = document.querySelector(toolButtons.lPhonesW).placeholder;
         sPhonesH = Math.round(sPhonesW * (1 / Appobj.aspect[0]));
         lPhonesH = Math.round(lPhonesW * (1 / Appobj.aspect[0]));
+
+        // !VA Now we need to determine if the width and height values are initial or user-modified.
+        var imgW, imgH;
+        Appobj.newImgW ? imgW = Appobj.newImgW : imgW = Appobj.imgW;
+        Appobj.newImgH ? imgH = Appobj.newImgH : imgH = Appobj.imgH;
+        console.log('imgW is: ' + imgW);
+        console.log('imgH is: ' + imgH);
+
         // !VA Hide the dropArea
         document.querySelector(staticRegions.dropArea).style.display = 'none';
         // Write the dimViewers
-        document.querySelector(dimViewers.display).innerHTML = `<span class='pop-font'><span id="display-size-width">${Appobj.imgW}</span> X <span id="display-size-height">${Appobj.imgH}</span></span>`;
+        document.querySelector(dimViewers.display).innerHTML = `<span class='pop-font'><span id="display-size-width">${imgW}</span> X <span id="display-size-height">${imgH}</span></span>`;
         document.querySelector(dimViewers.diskimg).innerHTML = `<span class='pop-font'>${Appobj.imgNW} X ${Appobj.imgNH}</span>`;
         document.querySelector(dimViewers.aspect).innerHTML = `<span class='pop-font'>${Appobj.aspect[1]}</span>` ;
         document.querySelector(dimViewers.smallphones).innerHTML = `<span class='pop-font'><span id='small-phones-width'>${sPhonesW}</span> X <span id='small-phones-height'>${sPhonesH}</span></span>` ;
         document.querySelector(dimViewers.largephones).innerHTML = `<span class='pop-font'><span id='large-phones-width'>${lPhonesW}</span> X <span id='large-phones-height'>${lPhonesH}</span></span>` ;
-        document.querySelector(dimViewers.retina).innerHTML = `<span class='pop-font'>${2 * Appobj.imgW}</span> X <span class='pop-font'>${2 * Appobj.imgH}`;
+        document.querySelector(dimViewers.retina).innerHTML = `<span class='pop-font'>${2 * imgW}</span> X <span class='pop-font'>${2 * imgH}`;
         // !VA NEW Display the clipboard button
         document.querySelector(dimViewers.clipboardBut).style.display = 'block';
       },
+
+
 
       // !VA UIController public writeFilenameToUI
       writeFilenameToUI: function (fileName) {
@@ -218,7 +229,8 @@ var Witty = (function () {
         document.querySelector('#cur-img-container').parentNode.removeChild(document.querySelector('#cur-img-container'));
         // } de1690c
       }, 
-          // !VA appController private adjustImageContainers
+
+      // !VA UIController public adjustImageContainers
       adjustImageContainers: function (imgH, imgW, viewerH)  {
       // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values.
       // !VA Initial height is 450, as it is defined in the CSS. TOo much hassle to try and get the value as defined in the CSS programmatically.
@@ -245,9 +257,32 @@ var Witty = (function () {
       document.querySelector(dynamicRegions.imgViewer).style.height = viewerH + 'px';
       document.querySelector(dynamicRegions.imgViewport).style.height = viewportH + 'px';
       document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';
-      }
+      },
+
+      // writeImgToDOM: function(Appobj) {
+      //   console.log('writeImgToDom running');
+      //   console.table(Appobj);
+      //   var curImg = document.querySelector(dynamicRegions.curImg);
+      //   curImg.style.width = Appobj.newImgW + 'px';
+      //   curImg.style.height = Appobj.newImgH + 'px';
+      //   var curImgDiv = document.createElement('div');
+      //   // !VA Assign the new div an id that reflects its purpose
+      //   curImgDiv.id = 'cur-img-container';
+      //   // Insert cur-img-container into the existing main-image inside the main-image div.
+      //   document.getElementById('main-image').insertBefore(curImgDiv, null);
+      //   // !VA insert the new curImg into the new cur-img container
+      //   document.getElementById('cur-img-container').insertBefore(curImg, null);
+      //   // Create the image object and read in the binary image from the FileReader object.
+      //   // This allows access of image properties. You can't get image properties from a FileReader object -- it's just a blob' 
+      //   // !VA Hide the DOM element while the blob loads.
+
+      // }
+
+
 
     };
+
+    
   })();
 
   // CALCULATIONS AND INPUT EVALUATION CONTROLLER
@@ -272,7 +307,6 @@ var Witty = (function () {
   // GLOBAL APP MODULE
   var appController = (function(calcCtrl, UICtrl) {
 
-    var Appobj = {};
     
     // !VA Getting DOM ID strings from UIController
     var dimViewers = UIController.getDimViewerIDs();
@@ -367,7 +401,12 @@ var Witty = (function () {
       }
 
       // appController private handleUserAction 
-      function handleUserAction(e) {
+      function handleUserAction(evt) {
+        console.log('handleUserAction running');
+        // !VA NEW Get Appobj so we can pass it, whatever the action
+        var Appobj = {};
+        Appobj = getAppobj(false);
+        console.table(Appobj);
         var keypressed;
         var isErr;
         // e.stopPropagation;
@@ -391,7 +430,9 @@ var Witty = (function () {
             val = parseInt(el.id.slice(-2));
             // !VA If the target ID includes 'grow' then the image dimension will be incremented, if 'shrink' then it will be decremented
             (el.id.includes('grow')) ? val : val = -val;
-            clipboardController.handleTBClicks(el.id, val); 
+            Appobj = handleCustomWidth(el.id, val, Appobj); 
+            calcImgViewerSize(Appobj);
+
             break;
           case ( el.id.includes('dv')) :
             UIController.ccpToggle();
@@ -400,17 +441,17 @@ var Witty = (function () {
           } 
 
         } else if (event.type === 'keypress') {
-          keypressed = e.which || e.keyCode || e.key;
+          keypressed = evt.which || evt.keyCode || evt.key;
           if (keypressed == 13) {
             // !VA Get the input and evaluate it
-            var isErr = clipboardController.validateInteger(this.value);
+            var isErr = validateInteger(this.value);
             if (isErr) {
               // !VA If the value entered isn't an integer, reset it to null and leave the focus there, and send the error code to errorHandler
               el.value = '';
               appController.initError(el.id, 'not_an_integer', true);
             // !VA We want to handle all the toolbutton keyboard input in one place, so send the send the target element's id and value to handleTBInput
             } else if (el.id.includes('tb-input')) {
-              clipboardController.handleTBInput(el.id, el.value);
+              handleCustomWidth(el.id, el.value);
             } else {
               // !VA There will be other input fields to handle, but we're not there yet.
               console.log('Undefined keypress action');
@@ -489,10 +530,9 @@ var Witty = (function () {
 
     // !VA appController private functions
     //  ==============================
-    // !VA appController private getCurImgDimensions
-    function getCurImgDimensions(isDev) {
-      console.log('getCurImgDimensions running');
-      console.log('isDev is: ' + isDev);
+    // !VA appController private getAppobj
+    function getAppobj(isDev) {
+      console.log('getAppobj running');
       // !VA NEW Initialize Appobj here and pass it along
       var Appobj = {};
       // !VA At this point imgW and imgW = imgNW and imgNH if this is called from initDev or handleFileSelect. The only difference is that initDev needs to write the filename to the DOM because that's handled by handleFileSelect. So we get the isDev flag
@@ -513,9 +553,6 @@ var Witty = (function () {
       // !VA NEW We need the aspect ratio to calculate the other dimension when the user only inputs one, i.e. when width or height is entered into one of the toolbars' custom width/height fields.
       Appobj.aspect = getAspectRatio(curImg.naturalWidth,  curImg.naturalHeight);
       // !VA NEW We need new imgW and imgH properties to store the user input values. We don't want to overwrite the original imgW/imgH values because it appears it's not possible since Javascript passes values by reference, so any changes to properties are lost outside the current function's scope. Plus, we need to have the original values persist for the duration of the session, at which point the app and Appobj are reinitialized. 
-      Appobj.newImgW = '';
-      Appobj.newImgH = '';
-      console.dir(Appobj);
       return Appobj;
     }
 
@@ -605,7 +642,7 @@ var Witty = (function () {
                 // !VA Stopped here. The problem is that Appdata is a global object in the public functions, as it is now in master. I don't want to put all that stuff in the appController's public functions, so I have to either leave it in UIController or pass it between private functions, which will get very complicated.   I think it will be much cleaner if I only use updateAppData to loop through the items to update and don't use the klunky getAppData. Also, the refreshAppUI function refreshes all the values when it's called - it should only refresh the changed values.
                 // !VA NEW Now that the blob image has been displayed and has DOM properties that can be queried, query them and write them to Appobj.
                 var Appobj = {};
-                Appobj = getCurImgDimensions(false);
+                Appobj = getAppobj(false);
                 console.log('hFS here: Appobj');
                 console.dir(Appobj);
 
@@ -621,7 +658,7 @@ var Witty = (function () {
           }
 
           // !VA First, write the new curImg object to the DOM
-          function writeImgToDOM(curImg, callback) {
+          function initImgToDOM(curImg, callback) {
             // VA! The callback function allows access of image properties. You can't get image properties from a FileReader object -- it's a binary blob that takes time to load, and by the time it's loaded all the functions that get its properties have run and returned undefined. Temporary solution: hide the image object for 250 ms, then show it and get the properties -- by then it should have loaded. There is a better way to do this with promises but that will have to be for later.
             // !VA Create a div in the DOM
             var curImgDiv = document.createElement('div');
@@ -638,7 +675,7 @@ var Witty = (function () {
             callback(curImg);		
           }
           // !VA Call the callback function that writes the new image to the DOM.
-          writeImgToDOM(curImg, initializeDimViewers);
+          initImgToDOM(curImg, initializeDimViewers);
         };
       })(f);
       // Read in the image file as a data URL.
@@ -648,9 +685,11 @@ var Witty = (function () {
     }
     //FILEREADR OBJECT PROCESSING END
 
+
+
     // !VA NEW appController private calcImgViewerSize
     function calcImgViewerSize(Appobj) {
-      console.log('calcImgViewerSize');
+      console.log('calcImgViewerSize running');
       console.dir(Appobj);
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. This can probably be recoded for efficiency but it works for now. Take another look at it.
       // !VA NEW Get the actual viewerW from getComputedStyle
@@ -712,13 +751,17 @@ var Witty = (function () {
         break;
       }
       // !VA Transfer control to UIController to print dimViewer to the UI
-      UICtrl.writeDimViewers(Appobj);
-      // !VA Now rec
-      UICtrl.adjustImageContainers(Appobj.imgH, Appobj.imgW, viewerH);
+      UICtrl.writeDimViewers(Appobj)
 
       // !VA Run evalDimAlerts now, after all the containers have been resized.
       // !VA !IMPORTANT! THIS IS WHERE TO GET THE UPDATED APPDATA
       // clipboardController.evalDimAlerts(Appdata, dimViewers);
+      // UICtrl.writeImgToDOM(Appobj);
+
+      // !VA Now rec
+      // UICtrl.adjustImageContainers(imgW, imgH, viewerH);
+
+
       
     }
 
@@ -759,6 +802,57 @@ var Witty = (function () {
       return pxval;
     }
 
+    // !VA INPUT HANDLING
+    // !VA ============================================================
+    // !VA Handling user input by operation rather than by event type
+    // !VA appController private handleCustomWidth
+    function handleCustomWidth(id, val, Appobj) {
+      // !VA Handle user input changes to Appobj.imgWidth
+      console.log('handleCustomWidth');
+      console.dir(Appobj);
+      console.log('id is: ' + id);
+      console.log('val is: ' + val);
+      if (id.includes('tb-but')) {
+        Appobj.newImgW = Appobj.imgW + val;
+      } else { 
+        Appobj.newImgW = val;
+      }
+      Appobj.newImgH =  Appobj.newImgW * (1 / Appobj.aspect[0]);
+      return Appobj;
+      console.table(Appobj);
+    }
+
+    function handleCustomHeight(id, val, Appobj) {
+      // !VA Handle user input changes to Appobj.imgWidth
+      console.log('handleCustomWidth');
+      console.dir(Appobj);
+      console.log('id is: ' + id);
+      console.log('val is: ' + val);
+      if (id.includes('tb-but')) {
+        Appobj.newImgW = Appobj.imgW + val;
+      } else { 
+        Appobj.newImgW = val;
+      }
+      Appobj.newImgH =  Appobj.newImgW * (1 / Appobj.aspect[0]);
+      console.table(Appobj);
+
+    }
+
+
+    function validateInteger(inputVal) {
+      // !VA Since integer validation is used for all height/width input fields, including those not yet implemented
+      let isErr;
+      // let mess;
+      if (!parseInt(inputVal, 10) || inputVal % 1 !== 0 || inputVal < 0) {
+        isErr = true;
+      } else { 
+        // !VA Input fields return strings, so convert to integer
+        inputVal = parseInt(inputVal);
+        isErr = false;
+      }
+      // !VA Just returning true here, the error code is sent by the calling function in handleUserAction
+      return isErr;
+    }
 
     //  !VA ERROR HANDLING
     // ==============================
@@ -769,7 +863,9 @@ var Witty = (function () {
       // !VA This is where we initialize Dev mode, which is where we can start the app with a hard-coded img element in the HTML file. THis is very useful, otherwise we'd have to drop files to initialize or dink with the FileReader object to hard-code a test file.
       console.log('initDev running');
       // !VA Get the current (devimg) image dimensions and write the dimViewers
-      var curImgDimensions = getCurImgDimensions(true);
+      // !VA Turn on the toolbars
+      document.querySelector(staticRegions.toolsContainer).style.display = 'block';
+      var curImgDimensions = getAppobj(true);
       calcImgViewerSize(curImgDimensions);
       // !VA Open the CCP by default in dev mode
       // !VA First, make sure it's closed

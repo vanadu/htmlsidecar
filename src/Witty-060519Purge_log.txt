@@ -4,6 +4,8 @@ The objective is to remove everything except the core rebuilt functionality of d
 There was a lot of garbage and fluff in the last working version that has to go away and be improved.
 We're removing everything except the UIController aliases to HTML UI Elements in as far as they're probably in use somewhere, the functions that expose the UI elements, and function calls in the modules to get the HTML UI Elements. Removed code can be retrieved from scripts_06.05.19B.js. Removed code is listed below.
 
+Now I have the same problem as before this exercise...can't get the Appdata values to persist. The answer lies in callbacks but I don't understand them!
+
 
 UIController private
 -------------------
@@ -85,6 +87,8 @@ doit
 
 
 
+
+
 Kept:
 dimViewers
 dynamicRegions
@@ -93,7 +97,8 @@ toolButtons
 ccpUserInput
 setupEventListeners
 handleUserAction
-getCurImgDimensions => getAppObj
+getAppObj => was getCurImgDimensions
+	ISSUES: This has to be reinitialized every time there's a user action, or else the previous values will persist!
 removeCurImg
 handleFileSelect
 calcViewerDimensions =>calcImgViewerSize
@@ -107,6 +112,13 @@ doContainerHeights => adjustImgContainers
 		
 getAspectRatio
 intToPx
+NEW:
+handleCustomWidth
+validateInteger
+
+
+
+
 
 appController public
 --------------------------
