@@ -47,7 +47,7 @@ then, globally, dim-viewer to dv
 //PAGE SETUP START
 
 // Namespace
-var Whitty = (function () {
+var witty = (function () {
 
   // !VA DEV Test function to get the clicked element to the console
   // (function () {
