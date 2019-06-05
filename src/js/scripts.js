@@ -648,7 +648,8 @@ var Witty = (function () {
 
                 // !VA NEW Commented out for now.
                 calcImgViewerSize(Appobj);
-
+                console.log('blob');
+                console.dir(Appobj);
                 // !VA NEW Delete
                 // clipboardController.evalViewerSize(Appdata);
               })();
@@ -690,6 +691,7 @@ var Witty = (function () {
     // !VA NEW appController private calcImgViewerSize
     function calcImgViewerSize(Appobj) {
       console.log('calcImgViewerSize running');
+      console.log('blib');
       console.dir(Appobj);
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. This can probably be recoded for efficiency but it works for now. Take another look at it.
       // !VA NEW Get the actual viewerW from getComputedStyle
@@ -751,19 +753,55 @@ var Witty = (function () {
         break;
       }
       // !VA Transfer control to UIController to print dimViewer to the UI
-      UICtrl.writeDimViewers(Appobj)
+      UICtrl.writeDimViewers(Appobj);
+      adjustImgContainers(Appobj.imgH, Appobj.imgW, viewerH);
 
       // !VA Run evalDimAlerts now, after all the containers have been resized.
       // !VA !IMPORTANT! THIS IS WHERE TO GET THE UPDATED APPDATA
       // clipboardController.evalDimAlerts(Appdata, dimViewers);
-      // UICtrl.writeImgToDOM(Appobj);
+      UICtrl.writeImgToDOM(Appobj);
 
       // !VA Now rec
-      // UICtrl.adjustImageContainers(imgW, imgH, viewerH);
-
-
-      
+      // UICtrl.adjustImgContainers(imgW, imgH, viewerH);
     }
+
+        // !VA appController private doContainerHeights
+        function adjustImgContainers(imgH, imgW, viewerH)  {
+          // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values.
+          // !VA Initial height is 450, as it is defined in the CSS. TOo much hassle to try and get the value as defined in the CSS programmatically.
+          // const initViewerH= parseInt(document.querySelector(dynamicRegions.imgViewer).height, 10);
+          const initViewerH = 450;
+          let viewportH;
+          let appH; 
+    
+          // !VA I'm not even sure this is necessary since we're getting the viewerW from maxViewerHeight now -- but we'll leave it in here for the time being. 
+          // !VA TODO: Review this whole maxViewerHeight thing.
+          if (imgH <= initViewerH) {
+            // !VA  This is the min-height set in CSS
+            // appObj.appContainerH = 804;
+            viewerH = initViewerH;
+            viewportH = viewerH + 145;
+          } else {
+            // Need a little buffer in the viewport
+            viewerH = imgH;
+            viewportH = imgH + 145;
+    
+          }
+          appH = viewportH;
+          // viewportH = heightVal + 125;
+          // appContainerH = viewportH;
+          // This should write the heights to Appdata and then pass it to the function that writes Appdata to the dimViewers, probably called refreshDimViewers. In fact, there's no reason not to consolidate that function with the function that updates the image container heights and refresh the entire UI at the same time, so refreshUI.
+          // dynamicRegions.imgViewer
+          // dynamicRegions.imgViewPort
+          // dynamicRegions.appContainer
+    
+    
+          document.querySelector(dynamicRegions.curImg).style.width = imgW + 'px';
+          document.querySelector(dynamicRegions.curImg).style.height =imgH + 'px';;
+          document.querySelector(dynamicRegions.imgViewer).style.height = viewerH + 'px';
+          document.querySelector(dynamicRegions.imgViewport).style.height = viewportH + 'px';
+          document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';;
+        }
 
     
     //appController private: getAspectRatio
@@ -812,14 +850,25 @@ var Witty = (function () {
       console.dir(Appobj);
       console.log('id is: ' + id);
       console.log('val is: ' + val);
+      // if (id.includes('tb-but')) {
+      //   Appobj.newImgW = Appobj.imgW + val;
+      // } else { 
+      //   Appobj.newImgW = val;
+      // }
+      // Appobj.newImgH =  Appobj.newImgW * (1 / Appobj.aspect[0]);
+      // return Appobj;
+      // console.table(Appobj);
+
       if (id.includes('tb-but')) {
-        Appobj.newImgW = Appobj.imgW + val;
+        Appobj.imgW = Appobj.imgW + val;
       } else { 
-        Appobj.newImgW = val;
+        Appobj.imgW = val;
       }
-      Appobj.newImgH =  Appobj.newImgW * (1 / Appobj.aspect[0]);
+      Appobj.imgH =  Appobj.imgW * (1 / Appobj.aspect[0]);
       return Appobj;
       console.table(Appobj);
+
+
     }
 
     function handleCustomHeight(id, val, Appobj) {
@@ -866,6 +915,7 @@ var Witty = (function () {
       // !VA Turn on the toolbars
       document.querySelector(staticRegions.toolsContainer).style.display = 'block';
       var curImgDimensions = getAppobj(true);
+
       calcImgViewerSize(curImgDimensions);
       // !VA Open the CCP by default in dev mode
       // !VA First, make sure it's closed

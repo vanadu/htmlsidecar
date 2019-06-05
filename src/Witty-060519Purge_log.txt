@@ -127,9 +127,26 @@ init
 
 
 
+Program Flow:
+====================
+
+handleFileSelect
+	-removeCurImg
+	-reader.onload
+	 	-UICtrl.writeFIlenameToUI(fileName)
+		-initializeDimViewers
+			-setTimeout
+				-Appobj = getAppobj(false)
+				-calcImgViewerSize(Appobj)
+
+				-MISSING: adjustImgContainers
+			-initImgToDOM(curImg,callback)
+		initImgToDOM(curImg, initializeDimViewers)
 
 
 
+		
+	
 
 
 
