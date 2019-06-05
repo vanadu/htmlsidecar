@@ -127,7 +127,7 @@ init
 
 
 
-Program Flow:
+Program Flow 060519B:
 ====================
 
 handleFileSelect
@@ -138,10 +138,9 @@ handleFileSelect
 			-setTimeout
 				-Appobj = getAppobj(false)
 				-calcImgViewerSize(Appobj)
-
-				-MISSING: adjustImgContainers
+				-adjustImgContainers(Appobj)
 			-initImgToDOM(curImg,callback)
-		initImgToDOM(curImg, initializeDimViewers)
+		-initImgToDOM(curImg, initializeDimViewers)
 
 
 

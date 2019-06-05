@@ -406,6 +406,7 @@ var Witty = (function () {
         // !VA NEW Get Appobj so we can pass it, whatever the action
         var Appobj = {};
         Appobj = getAppobj(false);
+
         console.table(Appobj);
         var keypressed;
         var isErr;
@@ -430,8 +431,9 @@ var Witty = (function () {
             val = parseInt(el.id.slice(-2));
             // !VA If the target ID includes 'grow' then the image dimension will be incremented, if 'shrink' then it will be decremented
             (el.id.includes('grow')) ? val : val = -val;
-            Appobj = handleCustomWidth(el.id, val, Appobj); 
-            calcImgViewerSize(Appobj);
+            console.log('handleUserAction click');
+            console.table(Appobj);
+            handleCustomWidth(el.id, val, Appobj);
 
             break;
           case ( el.id.includes('dv')) :
@@ -450,8 +452,11 @@ var Witty = (function () {
               el.value = '';
               appController.initError(el.id, 'not_an_integer', true);
             // !VA We want to handle all the toolbutton keyboard input in one place, so send the send the target element's id and value to handleTBInput
-            } else if (el.id.includes('tb-input')) {
-              handleCustomWidth(el.id, el.value);
+
+            // !VA NEW
+            } else if (el.id.includes('customw')) {
+              console.log('val is: ' + el.val);
+              handleCustomWidth(el.id, el.value, Appobj);
             } else {
               // !VA There will be other input fields to handle, but we're not there yet.
               console.log('Undefined keypress action');
@@ -490,6 +495,7 @@ var Witty = (function () {
           console.log('other event');
         }
       }
+      
       // Click handlers - focusOnClick
       // =============================
       // addEventHandler(toolButtons.customheight,'click',focusOnClick,false);
@@ -759,7 +765,7 @@ var Witty = (function () {
       // !VA Run evalDimAlerts now, after all the containers have been resized.
       // !VA !IMPORTANT! THIS IS WHERE TO GET THE UPDATED APPDATA
       // clipboardController.evalDimAlerts(Appdata, dimViewers);
-      UICtrl.writeImgToDOM(Appobj);
+      // UICtrl.writeImgToDOM(Appobj);
 
       // !VA Now rec
       // UICtrl.adjustImgContainers(imgW, imgH, viewerH);
@@ -844,20 +850,13 @@ var Witty = (function () {
     // !VA ============================================================
     // !VA Handling user input by operation rather than by event type
     // !VA appController private handleCustomWidth
-    function handleCustomWidth(id, val, Appobj) {
-      // !VA Handle user input changes to Appobj.imgWidth
-      console.log('handleCustomWidth');
+    // !VA Handle user input changes to Appobj.imgWidth
+    // !VA NEW
+      function handleCustomWidth(id, val, Appobj) {
+      console.log('handleCustomWidth start');
       console.dir(Appobj);
       console.log('id is: ' + id);
       console.log('val is: ' + val);
-      // if (id.includes('tb-but')) {
-      //   Appobj.newImgW = Appobj.imgW + val;
-      // } else { 
-      //   Appobj.newImgW = val;
-      // }
-      // Appobj.newImgH =  Appobj.newImgW * (1 / Appobj.aspect[0]);
-      // return Appobj;
-      // console.table(Appobj);
 
       if (id.includes('tb-but')) {
         Appobj.imgW = Appobj.imgW + val;
@@ -865,15 +864,26 @@ var Witty = (function () {
         Appobj.imgW = val;
       }
       Appobj.imgH =  Appobj.imgW * (1 / Appobj.aspect[0]);
-      return Appobj;
       console.table(Appobj);
-
-
+      updateAppobj(Appobj.imgW, Appobj.imgH);
     }
+
+    // !VA NEW So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. Very simple.
+    function updateAppobj(w, h) {
+      var Appobj = {};
+      console.log('updateAppobj');
+      document.querySelector(dynamicRegions.curImg).style.width = w + 'px';
+      document.querySelector(dynamicRegions.curImg).style.height = h + 'px';
+      Appobj = getAppobj(false);
+      console.table(Appobj);
+    }
+
+
+
 
     function handleCustomHeight(id, val, Appobj) {
       // !VA Handle user input changes to Appobj.imgWidth
-      console.log('handleCustomWidth');
+      console.log('handleCustomWidth start');
       console.dir(Appobj);
       console.log('id is: ' + id);
       console.log('val is: ' + val);
@@ -884,6 +894,7 @@ var Witty = (function () {
       }
       Appobj.newImgH =  Appobj.newImgW * (1 / Appobj.aspect[0]);
       console.table(Appobj);
+      return Appobj;
 
     }
 
