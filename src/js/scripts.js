@@ -217,7 +217,36 @@ var Witty = (function () {
         // if ( document.querySelector('#cur-img-container')) {
         document.querySelector('#cur-img-container').parentNode.removeChild(document.querySelector('#cur-img-container'));
         // } de1690c
+      }, 
+          // !VA appController private adjustImageContainers
+      adjustImageContainers: function (imgH, imgW, viewerH)  {
+      // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values.
+      // !VA Initial height is 450, as it is defined in the CSS. TOo much hassle to try and get the value as defined in the CSS programmatically.
+      // const initViewerH= parseInt(document.querySelector(dynamicRegions.imgViewer).height, 10);
+      const initViewerH = 450;
+      let viewportH;
+      let appH; 
+
+      // !VA I'm not even sure this is necessary since we're getting the viewerW from maxViewerHeight now -- but we'll leave it in here for the time being. 
+      // !VA TODO: Review this whole maxViewerHeight thing.
+      if (imgH <= initViewerH) {
+        // !VA  This is the min-height set in CSS
+        // appObj.appContainerH = 804;
+        viewerH = initViewerH;
+        viewportH = viewerH + 145;
+      } else {
+        // Need a little buffer in the viewport
+        viewerH = imgH;
+        viewportH = imgH + 145;
       }
+      appH = viewportH;
+      document.querySelector(dynamicRegions.curImg).style.width = imgW + 'px';
+      document.querySelector(dynamicRegions.curImg).style.height = imgH + 'px';
+      document.querySelector(dynamicRegions.imgViewer).style.height = viewerH + 'px';
+      document.querySelector(dynamicRegions.imgViewport).style.height = viewportH + 'px';
+      document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';
+      }
+
     };
   })();
 
@@ -581,7 +610,7 @@ var Witty = (function () {
                 console.dir(Appobj);
 
                 // !VA NEW Commented out for now.
-                calcViewerDimensions(Appobj);
+                calcImgViewerSize(Appobj);
 
                 // !VA NEW Delete
                 // clipboardController.evalViewerSize(Appdata);
@@ -619,8 +648,10 @@ var Witty = (function () {
     }
     //FILEREADR OBJECT PROCESSING END
 
-    // !VA NEW appController private calcViewerDimensions
-    function calcViewerDimensions(Appobj) {
+    // !VA NEW appController private calcImgViewerSize
+    function calcImgViewerSize(Appobj) {
+      console.log('calcImgViewerSize');
+      console.dir(Appobj);
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. This can probably be recoded for efficiency but it works for now. Take another look at it.
       // !VA NEW Get the actual viewerW from getComputedStyle
       var viewerW;
@@ -648,7 +679,7 @@ var Witty = (function () {
         // Set the image width to the current viewer
         Appobj.imgW = viewerW;
         // Get the image height from the aspect ration function
-        Appobj.imgH = Math.round((1/getAspectRatio(Appobj.imgNW, Appobj.imgNH)[0]) * Appobj.imgW);
+        Appobj.imgH = Math.round((1/Appobj.aspect[0]) * Appobj.imgW);
         // Set the viewerH to the imgH
         viewerH = Appobj.imgH;
         // this.adjustContainerHeights(Appdata);
@@ -672,7 +703,7 @@ var Witty = (function () {
         // Set the image Width to the current  viewer width 
         Appobj.imgW = viewerW;
         // Set the image height proportional to the new image width using the aspect ratio function
-        Appobj.imgH = Math.round((1/getAspectRatio(Appobj.imgNW, Appobj.imgNH)[0]) * Appobj.imgW);
+        Appobj.imgH = Math.round((1/Appobj.aspect[0]) * Appobj.imgW);
         // Set the viewer height to the image height
         viewerH = Appobj.imgH;
         // Get the viewport and Appdata height from adjustContainerHeights
@@ -681,9 +712,9 @@ var Witty = (function () {
         break;
       }
       // !VA Transfer control to UIController to print dimViewer to the UI
-      UIController.writeDimViewers(Appobj);
+      UICtrl.writeDimViewers(Appobj);
       // !VA Now rec
-      doContainerHeights(Appobj.imgH, Appobj.imgW, viewerH);
+      UICtrl.adjustImageContainers(Appobj.imgH, Appobj.imgW, viewerH);
 
       // !VA Run evalDimAlerts now, after all the containers have been resized.
       // !VA !IMPORTANT! THIS IS WHERE TO GET THE UPDATED APPDATA
@@ -720,51 +751,14 @@ var Witty = (function () {
     }
 
     
-      // appController private: CONVERT INTEGER TO PIXEL VALUE
-      function intToPx(int) {
-        let pxval;
-        let str = String(int);
-        pxval = str + 'px';
-        return pxval;
-      }
-
-    // !VA appController private doContainerHeights
-    function doContainerHeights(imgH, imgW, viewerH)  {
-      // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values.
-      // !VA Initial height is 450, as it is defined in the CSS. TOo much hassle to try and get the value as defined in the CSS programmatically.
-      // const initViewerH= parseInt(document.querySelector(dynamicRegions.imgViewer).height, 10);
-      const initViewerH = 450;
-      let viewportH;
-      let appH; 
-
-      // !VA I'm not even sure this is necessary since we're getting the viewerW from maxViewerHeight now -- but we'll leave it in here for the time being. 
-      // !VA TODO: Review this whole maxViewerHeight thing.
-      if (imgH <= initViewerH) {
-        // !VA  This is the min-height set in CSS
-        // appObj.appContainerH = 804;
-        viewerH = initViewerH;
-        viewportH = viewerH + 145;
-      } else {
-        // Need a little buffer in the viewport
-        viewerH = imgH;
-        viewportH = imgH + 145;
-
-      }
-      appH = viewportH;
-      // viewportH = heightVal + 125;
-      // appContainerH = viewportH;
-      // This should write the heights to Appdata and then pass it to the function that writes Appdata to the dimViewers, probably called refreshDimViewers. In fact, there's no reason not to consolidate that function with the function that updates the image container heights and refresh the entire UI at the same time, so refreshUI.
-      // dynamicRegions.imgViewer
-      // dynamicRegions.imgViewPort
-      // dynamicRegions.appContainer
-
-
-      document.querySelector(dynamicRegions.curImg).style.width = intToPx(imgW);
-      document.querySelector(dynamicRegions.curImg).style.height = intToPx(imgH);
-      document.querySelector(dynamicRegions.imgViewer).style.height = intToPx(viewerH);
-      document.querySelector(dynamicRegions.imgViewport).style.height = intToPx(viewportH);
-      document.querySelector(dynamicRegions.appContainer).style.height = intToPx(appH);
+    // appController private: CONVERT INTEGER TO PIXEL VALUE
+    function intToPx(int) {
+      let pxval;
+      let str = String(int);
+      pxval = str + 'px';
+      return pxval;
     }
+
 
     //  !VA ERROR HANDLING
     // ==============================
@@ -776,7 +770,7 @@ var Witty = (function () {
       console.log('initDev running');
       // !VA Get the current (devimg) image dimensions and write the dimViewers
       var curImgDimensions = getCurImgDimensions(true);
-      calcViewerDimensions(curImgDimensions);
+      calcImgViewerSize(curImgDimensions);
       // !VA Open the CCP by default in dev mode
       // !VA First, make sure it's closed
       // document.querySelector(staticRegions.ccpContainer).classList.remove('active');

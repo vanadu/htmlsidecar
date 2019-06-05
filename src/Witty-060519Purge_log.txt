@@ -39,6 +39,7 @@ getCcpUserInputIDs
 getCcpBuildTagIDs
 initUI
 writeDimViewers
+	ISSUES: Evaluate use of Math.round
 writeFilenameToUI
 removeCurImg
 
@@ -96,10 +97,14 @@ getCurImgDimensions => getAppObj
 removeCurImg
 handleFileSelect
 calcViewerDimensions =>calcImgViewerSize
-doContainerHeights => resizeImgContainers
-	ISSUES: move to UIController since it directly manipulates the DOM
-		evaluate why getAspectRatio is called from here, since Appobj.aspect is provided.
+	ISSUES: evaluate why getAspectRatio is called from here, since Appobj.aspect is provided.
+		DONE: Fixed, uses Appobj.aspect now.
 		evaluate the use of Math.round instead of parseInt, which is used elsewhere.
+		I'm going to keep an eye on this and leave it as is for now.
+doContainerHeights => adjustImgContainers
+	ISSUES: move to UIController since it directly manipulates the DOM
+	CHANGED:Moved to UIController
+		
 getAspectRatio
 intToPx
 
