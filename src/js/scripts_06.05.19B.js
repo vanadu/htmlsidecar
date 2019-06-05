@@ -213,6 +213,112 @@ var Witty = (function () {
       }
     }
 
+    // !VA TODO: Might be able to consolidate these into a single function but doesn't seem worth it
+    
+    // !VA UIController private imgClipboardBut
+    // !VA Clipboard output for build img tag button
+    var imgClipboardBut = new Clipboard(staticRegions.ccpImgClipbboardBut, {
+      text: function(trigger) {
+        var clipboardStr = clipboardController.ccpGetCBImgHTML();
+        // !VA Write success message to app message area on success
+        imgClipboardBut.on('success', function(event) {
+          // debugger;
+        });
+        UIController.flashAppMessage(trigger.id);
+        imgClipboardBut.on('error', function(e) {
+          console.error('Action:', e.action);
+          console.error('Trigger:', e.trigger);
+        });
+        // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
+        return clipboardStr;
+      }
+    });
+   
+    // !VA UIController private tdClipbboardBut
+    // !VA Clipboard output for build td tag button
+    var tdClipbboardBut = new Clipboard(staticRegions.ccpTdClipbboardBut, {
+      text: function(trigger) {
+        var clipboardStr;
+        clipboardStr = clipboardController.ccpGetCBTdHTML();
+        tdClipbboardBut.on('success', function(event) {
+        });
+        UIController.flashAppMessage(trigger.id);
+        tdClipbboardBut.on('error', function(e) {
+          console.error('Action:', e.action);
+          console.error('Trigger:', e.trigger);
+        });
+        return clipboardStr;
+      }
+    });
+
+    // !VA UICOntroller private tableClipbboardBut
+    // Clipboard output for build table tag button
+    var tableClipbboardBut =  new Clipboard(staticRegions.ccpTableClipbboardBut, {
+      text: function(trigger) {
+        var clipboardStr = clipboardController.ccpGetCBTableHTML();
+
+        tableClipbboardBut.on('success', function(event) {
+        });
+        UIController.flashAppMessage(trigger.id);
+        tableClipbboardBut.on('error', function(e) {
+          console.error('Action:', e.action);
+          console.error('Trigger:', e.trigger);
+        });
+
+        return clipboardStr;
+      }
+    });
+
+    // !VA UIcontroller private imgDisplayCSSToClipboard
+    // Clipboard output for build img CSS button
+    var imgDisplayCSSToClipboard = new Clipboard(ccpBuildTag.imgDisplayCSSToClipboard, {
+      text: function(trigger) {
+        var clipboardStr = clipboardController.ccpGetCBImgDisplayCSS();
+
+        imgDisplayCSSToClipboard.on('success', function(event) {
+        });
+        UIController.flashAppMessage(trigger.id);
+        imgDisplayCSSToClipboard.on('error', function(e) {
+          console.error('Action:', e.action);9
+          console.error('Trigger:', e.trigger);
+        });
+        return clipboardStr;
+      }
+    });
+
+    // !VA UIController private imgLPhoneCSSToClipboard
+    // Clipboard output for build large phones CSS button
+    var imgLPhoneCSSToClipboard = new Clipboard(ccpBuildTag.imgLPhoneCSSToClipboard, {
+      text: function(trigger) {
+        var clipboardStr = clipboardController.ccpGetCBImgLPhonesCSS();
+        imgLPhoneCSSToClipboard.on('success', function(event) {
+        });
+        UIController.flashAppMessage(trigger.id);
+        imgLPhoneCSSToClipboard.on('error', function(e) {
+          console.error('Action:', e.action);
+          console.error('Trigger:', e.trigger);
+        });
+        return clipboardStr;
+      }
+    });
+
+    // !VA UIController private imgSPhoneCSSToClipboard
+    // Clipboard output for small phones CSS button
+    var imgSPhoneCSSToClipboard = new Clipboard(ccpBuildTag.imgSPhoneCSSToClipboard, {
+      text: function(trigger) {
+        var clipboardStr = clipboardController.ccpGetCBImgSPhonesCSS();
+        imgSPhoneCSSToClipboard.on('success', function(event) {
+        });
+        UIController.flashAppMessage(trigger.id);
+        imgSPhoneCSSToClipboard.on('error', function(e) {
+          console.error('Action:', e.action);
+          console.error('Trigger:', e.trigger);
+        });
+        return clipboardStr;
+      }
+    });
+
+
     // !VA UIController public functions
     return {
       // !VA V2 Return all the strings for the UI element's IDs
@@ -713,9 +819,6 @@ console.log('event.target.id is: ' + event.target.id);
           clipboardStr = str;
           // return clipboardStr;
         })(ccpUserInput.tdBgimage);
-
-
-
 
         return clipboardStr;
       }, 
