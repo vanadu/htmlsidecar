@@ -115,27 +115,6 @@ var Witty = (function () {
       tableWrapperBgColor: '#table-wrapper-bgcolor-input',
     };
 
-    // !VA UIController: ccpPropStrings ID Strings, probably deprecated in V2
-    // !VA V2 - This doesn't go here, probably belongs in the App Controller module, but we'll build it here for now and move it later.
-    // Stores the strings representing the HTML properties corresponding to the user CCP selections. These property snippets will be used to populate the clipboard.
-    // !VA Have to include separate propStrings for opening and closing tags 
-    var ccpPropStrings = {
-      imgClass: '',
-      imgAnchorOpen: '',
-      imgAnchorClose: '',
-      imgAlt: '',
-      imgAlign: '',
-      imgRelPath: '',
-      imgWidth: '',
-      imgMaxWidth: '',
-      tdClass: '',
-      tdAlign: '',
-      tdValign: '',
-      tableClass: '',
-      tableAlign: '',
-      tableWidth: ''
-    };
-
     // !VA ccpBuildTag ID Strings
     // Stores the ccpMakeTag object for assembling the clipboard create tag buttons
     // !VA V2 Also doesn't belong here, we will move it later.
@@ -152,66 +131,6 @@ var Witty = (function () {
       tableLPhoneCSSToClipboard: '#table-lphone-css-to-clipboard-but',
     };
 
-
-    // !VA CCP IIFE This tests whether the CCP is open, allowing us to access CCP elements if it is. It's also where we open the CCP by default for development and testing. 
-    (function () {
-
-      // !VA Remove this line to stop opening the CCP by default
-      document.querySelector(staticRegions.ccpContainer).classList.add('active');
-
-
-    })();
-
-    
-    // !VA UIController private testme
-    function testme() {
-      console.log('TESTED!');
-    }
-
-    // !VA  UIController private toggleCheckbox: Toggle checkboxes and run any associated actions
-    function toggleCheckbox(event) {
-      console.log('ToggleCheckbox');
-      console.dir(event);
-      // !VA TODO: !IMPORTANT! All the initialization for the CCP is better done elsewhere
-      // !VA But in the meantime, we want this to run for all custom CSS checkboxes used in this project -- but the CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
-      // !VA We will need Appdata to initialize the defaults for the wrapper table below
-      var data = UIController.accessAppdata();
-      // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
-      var wrapperItemsToShow = [];
-
-      // !VA The clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it.
-      var checkbox = document.getElementById(event.target.id.replace('mrk', 'box'));
-      console.log('checkbox.id is: ' + checkbox.id);
-      // !VA Toggle the target's checkbox 
-      checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
-
-      // !VA Now run any actions associated with the checkbox
-      // !VA Get the Appdata for the input default value
-      // !VA TODO: This value needs to be refreshed when the CCP is opened. In fact, entering new values in any of the toolButton inputs has to call a refresh of Appdata and a closing-reopening of the CCP so the values can refresh.
-      
-      // !VA Defaults for wrapper width and class
-      document.querySelector(ccpUserInput.tableWrapperWidth).value = `${data.viewerW}`;
-      document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
-      // !VA Only show the CCP wrapper width, class, align, and bgcolor options if 'Include wrapper table' is selected 
-
-      // !VA Show wrapper table options if the checked element is 'table-include-wrapper-checkbox'
-      if (checkbox.id === 'table-include-wrapper-checkbox') {
-        wrapperItemsToShow = ['#table-wrapper-class', '#table-wrapper-width', '#table-wrapper-align', '#table-wrapper-bgcolor' ]; 
-        // console.log('wrapperItemsToShow[i] is: ' + wrapperItemsToShow[3]);
-        if (checkbox.checked) {
-          console.log('checked');
-          for (let i = 0; i < wrapperItemsToShow.length; i++) {
-            document.querySelector(wrapperItemsToShow[i]).style.display = 'block'; 
-            // console.log(document.querySelector(wrapperItemsToShow[i])); 
-          }
-        } else {
-          console.log('unchecked');
-          for (let i = 0; i < wrapperItemsToShow.length; i++) {
-            document.querySelector(wrapperItemsToShow[i]).style.display = 'none'; 
-          }
-        }
-      }
-    }
 
     // !VA UIController public functions
     return {
@@ -242,7 +161,7 @@ var Witty = (function () {
       initUI: function() {
         console.log('initUI');
         // !VA  Initialize the ImgViewer to accomodate the dragArea. This should be the same as the CSS definition: currently 650x450
-        // !VA NEW Write the computed styles to console to make sure they are as expected: 650x450
+        // !VA DEV Write the computed styles to console to make sure they are as expected: 650x450
         // var cStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
         // viewerW = cStyles.getPropertyValue('width');
         // viewerH = cStyles.getPropertyValue('height');
@@ -272,23 +191,17 @@ var Witty = (function () {
         lPhonesW ? lPhonesW : lPhonesW = document.querySelector(toolButtons.lPhonesW).placeholder;
         sPhonesH = Math.round(sPhonesW * (1 / Appobj.aspect[0]));
         lPhonesH = Math.round(lPhonesW * (1 / Appobj.aspect[0]));
-
-
-
-        // !VA Hide the dropArea - not sure if this is the right place for this.
+        // !VA Hide the dropArea
         document.querySelector(staticRegions.dropArea).style.display = 'none';
-
-
+        // Write the dimViewers
         document.querySelector(dimViewers.display).innerHTML = `<span class='pop-font'><span id="display-size-width">${Appobj.imgW}</span> X <span id="display-size-height">${Appobj.imgH}</span></span>`;
         document.querySelector(dimViewers.diskimg).innerHTML = `<span class='pop-font'>${Appobj.imgNW} X ${Appobj.imgNH}</span>`;
         document.querySelector(dimViewers.aspect).innerHTML = `<span class='pop-font'>${Appobj.aspect[1]}</span>` ;
         document.querySelector(dimViewers.smallphones).innerHTML = `<span class='pop-font'><span id='small-phones-width'>${sPhonesW}</span> X <span id='small-phones-height'>${sPhonesH}</span></span>` ;
         document.querySelector(dimViewers.largephones).innerHTML = `<span class='pop-font'><span id='large-phones-width'>${lPhonesW}</span> X <span id='large-phones-height'>${lPhonesH}</span></span>` ;
         document.querySelector(dimViewers.retina).innerHTML = `<span class='pop-font'>${2 * Appobj.imgW}</span> X <span class='pop-font'>${2 * Appobj.imgH}`;
-
         // !VA NEW Display the clipboard button
         document.querySelector(dimViewers.clipboardBut).style.display = 'block';
-
       },
 
       // !VA UIController public writeFilenameToUI
@@ -304,168 +217,6 @@ var Witty = (function () {
         // if ( document.querySelector('#cur-img-container')) {
         document.querySelector('#cur-img-container').parentNode.removeChild(document.querySelector('#cur-img-container'));
         // } de1690c
-      },
-
-      //UIController public setDimAlerts
-      setDimAlerts: function(curDimViewers, bool) {
-        // !VA if evalDimAlerts returns true, then the dimViewer should be displayed in red. To reset the dim alert, set to style color to 'auto'.
-        var att = bool;
-        bool ? att = 'red': att = 'inherit';
-        // !VA We want to use this same function to reset the dim alerts when a new image is loaded. For that, we need to pass in an array of all the dimViewer IDs, not just an array of the ones that are already red. So, first test if the argument is an object, and if it is convert it into a list of values so the loop will accept it.
-
-        if (Array.isArray(curDimViewers) === false) {
-          curDimViewers = Object.values(curDimViewers);
-        }
-        // !VA For each dimViewer passed from evalDimAlerts, set the font color style based on the bool argument passed in.
-        for (let i = 0; i < curDimViewers.length; i++) {
-          document.querySelector(curDimViewers[i]).style.color = att;
-        }
-      },
-
-      // CCPF - CLIPBOARD FUNCTIONS
-      // ===============================================
-
-      // !VA UIController public ccpToggle
-      ccpToggle: function () {
-        document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
-        if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
-          UIController.initCCP();
-        }
-      },
-
-      // !VA UIController public initCCP
-      initCCP: function() {
-        console.log('initCCP');
-        // !VA Copy Appdata to local object
-        var data = UIController.accessAppdata();
-
-        // !VA If the CCP is open...
-        if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
-
-          // !VA Initialize with all the 'include wrapper table' options undisplayed - uncomment this for DEV
-          // var wrapperItemsToHide = ['#table-wrapper-class', '#table-wrapper-width', '#table-wrapper-align', '#table-wrapper-bgcolor' ]; 
-          // for (let i = 0; i < wrapperItemsToHide.length; i++) {
-          //   document.querySelector(wrapperItemsToHide[i]).style.display = 'none'; 
-          // }
-
-          // !VA Initialize with 'include wrapper table' unchecked, or true for DEV
-          var includeWrapperTable = document.querySelector((ccpUserInput.tableIncludeWrapper.replace('mrk', 'box')));
-          includeWrapperTable.checked = true;
-          // !VA Default for table width
-          document.querySelector(ccpUserInput.tableWidth).value = `${data.imgW}`;
-          // !VA Defaults for wrapper width and class
-          document.querySelector(ccpUserInput.tableWrapperWidth).value = `${data.viewerW}`;
-          document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
-
-          // !VA CCP Event Listeners -- we will handle CCP events separately from other UI events here to keep separation of dynamic vs static element handling
-          // !VA Checkboxes that need toggling
-          var imgIncludeStylesCheckmrk = document.querySelector(ccpUserInput.imgIncludeStyles);
-          var tdBgimageCheckmrk = document.querySelector(ccpUserInput.tdBgimage);
-          var tableIncludeWrapper = document.querySelector(ccpUserInput.tableIncludeWrapper);
-          // !VA Toggle the checkbox and initialize the table wrapper defaults
-          // !VA TODO: Revisit all the CCP init
-          imgIncludeStylesCheckmrk.addEventListener('click', toggleCheckbox, false);
-          tdBgimageCheckmrk.addEventListener('click', toggleCheckbox, false);
-          tableIncludeWrapper.addEventListener('click', toggleCheckbox, false);
-
-        }
-      },
-
-
-      // UIController public showElementOnInput 
-      showElementOnInput: function(event) {
-        // !VA Here we catch the input handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
-        console.log('Event...');
-        console.dir(event);
-console.log('event.target.id is: ' + event.target.id);
-
-
-        var elems = [];
-        // elems[0] = ccpBuildTag.imgDisplayCSSToClipboard;
-        elems[0] = document.querySelector(ccpBuildTag.imgDisplayCSSToClipboard);
-        elems[1] = document.querySelector(ccpBuildTag.imgSPhoneCSSToClipboard);
-        elems[2] = document.querySelector(ccpBuildTag.imgLPhoneCSSToClipboard);
-        elems[3] = document.querySelector(ccpBuildTag.tdDisplayCSSToClipboard);
-        elems[4] = document.querySelector(ccpBuildTag.tdSPhoneCSSToClipboard);
-        elems[5] = document.querySelector(ccpBuildTag.tdLPhoneCSSToClipboard);
-        elems[6] = document.querySelector(ccpBuildTag.tableDisplayCSSToClipboard);
-        elems[7] = document.querySelector(ccpBuildTag.tableSPhoneCSSToClipboard);
-        elems[8] = document.querySelector(ccpBuildTag.tableLPhoneCSSToClipboard);
-        // !VA We only want to show the buttons in each respective fieldset
-        // !VA If the input is in the img fieldset, only show the first three buttons in the array
-        if (event.target.id === 'img-class-input') {
-          for (let i = 0; i <= 2; i++) {
-            this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
-          }
-        } else if (event.target.id === 'td-class-input') {
-          // !VA If the input is in the td fieldset, only show the next three buttons in the array
-          for (let i = 3; i <= 5 ; i++) {
-            this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
-          }
-        } else if (event.target.id === 'table-class-input') {
-          // !VA If the input is in the table fieldset, only show the next buttons in the array
-          for (let i = 6; i <= 8 ; i++) {
-            this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
-          }
-        }
-
-
-      },
-
-      // !VA UICOntroller public flashAppMessage
-      flashAppMessage: function(id) {
-        // !VA Passes in the id of the element that triggered the action for which a status message is displayed.
-
-        // !VA Get the message container and display text into variables
-        var appMessContainer = document.querySelector(staticRegions.appMessContainer);
-        var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
-        var ccpBlocker = document.querySelector(staticRegions.ccpBlocker);
-
-
-        var statusMessages = {
-          'img-build-html-but': '<img> HTML element copied to Clipboard!',
-          'td-build-html-but': '<td> HTML element copied to Clipboard!',
-          'table-build-html-but': '<table> HTML element copied to Clipboard!',
-          'img-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard!',
-          'img-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard!',
-          'img-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard!',
-          'td-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard!',
-          'td-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard!',
-          'td-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard!',
-          'table-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard!',
-          'table-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard!',
-          'table-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard!',
-        };
-
-        // !VA First, overlay the CCP blocker to prevent user input while the CSS transitions run and the status message is displayed. Cheap, but effective solution.
-        ccpBlocker.style.display = 'block';
-
-        // !VA Add the class that displays the message
-        appMessContainer.classList.add('show-mess');
-        // !VA Loop through the status id/message pairs and find the match for the trigger
-        for (const [key, value] of Object.entries(statusMessages)) { 
-          if (key === id ) {
-            var mess = value;
-          }
-        }
-        // !VA Write the success message to the message display area
-        appMessDisplay.textContent = mess;
-        // !VA Show the message
-        appMessContainer.classList.add('show-mess');
-        // !VA Show the message for two seconds
-        window.setTimeout(function() {
-        // !VA After two seconds, hide the message and remove the blocker
-          appMessContainer.classList.add('hide-mess');
-          ccpBlocker.style.display = 'none';
-          setTimeout(function(){
-            // !VA Once the opacity transition for the message has completed, remove the show-mess class from the element and set the textContent back to empty
-            appMessContainer.classList.remove('show-mess');
-            appMessContainer.classList.remove('hide-mess');
-            appMessDisplay.textContent = '';
-
-          },250);
-        }, 
-        2000);
       }
     };
   })();
@@ -476,486 +227,14 @@ console.log('event.target.id is: ' + event.target.id);
 
 
     // !VA If we want to access any of the DOM IDs we have to call them from UIController where they're defined.
-    var dimViewers = UIController.getDimViewerIDs();
     var dynamicRegions = UIController.getDynamicRegionIDs();
     var staticRegions = UIController.getStaticRegionIDs();
     var toolButtons = UIController.getToolButtonIDs();
-    // !VA Deprecated in this version
-    // var ccpPropStrings = UIController.getCcpPropStringsIDs();
     var ccpUserInput = UIController.getCcpUserInputIDs();
-    // !VA Deprecated in this version
-    // var ccpBuildTag = UIController.getCcpBuildTagIDs();
-
-    // !VA Constructor for the clipboard output objects. These are all the properties all the clipboard output objects (img, td and table) will have. We will store these key/value pairs in instances of the ClipboardOutput  because they're easier to manage. Then we'll build the output into an HTML string.
-    function ClipboardOutput(classAtt, alignAtt ) {
-      this.classAtt = classAtt;
-      this.alignAtt = alignAtt;
-    }
 
     // !VA clipboardController public functions 
     return {
 
-      // !VA clipboardController public clipboardControllerTest
-      clipboardControllerTest: function() {
-        console.log('calController test');
-      },
-
-      // clipboardController public ccpIfNoUserInput
-      ccpIfNoUserInput: function(att, val) {
-        // !VA We need get the filename from Appdata in case the user leaves 'path' empty
-        var data = UIController.accessAppdata();
-        var str;
-        // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
-        if (val && att) {
-          // !VA I might want to change this to include the # in the string itself.
-          if (val === '#') {
-            str = '';
-          } else {
-            str = `${att}="${val}"`;
-          }
-
-        } else {
-          // !VA If the path field is empty, we need to return the filename without the path.
-          if (att === 'src' && val === '' ) {
-            str = `${att}="${data.filename}" `;
-          } else if ( att === '#' || att === '') {
-            str = '';
-          } else {
-            // !VA If there is no input, exclude the attribute entry.
-            str = '';
-          }
-        }
-        return str;
-
-      },
-
-      // clipboardController public ccpGetCBImgHTML
-      ccpGetCBImgHTML: function() {
-        // !VA Get Appdata - we need it for the filename
-        var data = UIController.accessAppdata();
-        // !VA The string that passes the HTML img tag
-        var str; 
-        // !VA Create the instance for img tag clipboard object and add img-specific properties.
-        // !VA We're doing this in an object and outputting to an array because the object is easier to manage and the array is easier to reorder. The Constructor is in this module in the private functions above.
-        var imgTag = new ClipboardOutput('imgTag');
-        // !VA imgTag properties
-        // !VA ---------------------------
-        imgTag.classAtt = 
-          // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
-          clipboardController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.imgClass).value);
-
-        imgTag.altAtt =    
-          // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output
-          clipboardController.ccpIfNoUserInput('alt',document.querySelector(ccpUserInput.imgAlt).value);
-        // !VA imgTag.altAtt END
-
-        imgTag.srcAtt = (function (id, data) {
-          // !VA Pass in the ID and the copy of Appdata to get the filename
-          var str;
-          // !VA If the path input element is empty, just include the filename and omit the path.
-          if (document.querySelector(id).value) {
-            str = `src="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" `;
-          } else {
-            str = `src="${data.filename}" `;
-          }
-          return str;
-        })(ccpUserInput.imgRelPath, data);
-        // !VA imgTag.srcAtt END
-        imgTag.heightAtt = `height="${data.imgH}"`;
-        imgTag.widthAtt = `width="${data.imgW}"`;
-        imgTag.styleAtt =  (function (id) {
-          // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
-          var str;
-          id = id.replace('mrk', 'box');
-          // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
-          if (document.querySelector(id).checked === true) {
-            str = `border="0" style="width: ${data.imgW}px; height: ${data.imgH}px; border: none; outline: none; text-decoration: none; display: block;" `;
-          } else {
-            str = 'border="0" style="border: none; outline: none; text-decoration: none; display: block;"';
-          }
-          return str;
-        })(ccpUserInput.imgIncludeStyles);
-        // !VA imgTag.styleAtt END
-        imgTag.alignAtt = (function (id) {
-          // !VA Pass in the id of the select dropdown
-          var str;
-          // !VA Get the selection index
-          var selInd = document.querySelector(id).selectedIndex;
-          // !VA Put the available options in an array
-          var imgAlignOptions = [ 'none', 'left', 'middle', 'right' ];
-          // !VA Put the desired output strings in an array
-          var clipboardOutput = [ '', 'align="left" ', 'align="middle" ', 'align="right" '];
-          // !VA If the selected index matches the index of the available options array, then output the string that matches that index
-          for (let i = 0; i < imgAlignOptions.length; i++) {
-            if ( selInd === i) {
-              str = `${clipboardOutput[i]}`;
-            }
-          }
-          return str;
-        })(ccpUserInput.imgAlign);
-        // !VA imgTag Object END ------------------------
-
-        var imgTagStr; 
-        
-
-        // !VA Build the HTML tag
-
-        imgTagStr = `  <img ${imgTag.classAtt + ' '}${imgTag.altAtt + ''}${imgTag.alignAtt + ' '}${imgTag.widthAtt + ' '}${imgTag.heightAtt + ' '}${imgTag.srcAtt + ' '}${imgTag.styleAtt} />`;
-
-        // !VA Pass the imgTagArray and return it as string
-        return imgTagStr;
-      }, 
-      
-      // clipboardController public ccpGetCBTdHTML
-      ccpGetCBTdHTML: function () { 
-        // !VA We don't need this yet, but we will if we decide to add a width style property which is useful for Outlook 120dpi 
-        var data = UIController.accessAppdata();
-        // !VA Declare the string that gets the clipboard output
-        var clipboardStr;
-
-
-        var tdTag = new ClipboardOutput('tdTag');
-        tdTag.classAtt = 
-          // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
-          clipboardController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tdClass).value);
-
-        tdTag.alignAtt = (function (id) {
-          // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
-          // !VA Pass in the id of the select dropdown
-          var str;
-          // !VA Get the selection index
-          var selInd = document.querySelector(id).selectedIndex;
-          // !VA Put the available options in an array
-          var tdAlignOptions = [ 'none', 'left', 'center', 'right' ];
-          // !VA Put the desired output strings in an array
-          var clipboardOutput = [ '', 'align="left" ', 'align="center" ', 'align="right" '];
-          // !VA If the selected index matches the index of the available options array, then output the string that matches that index
-          for (let i = 0; i < tdAlignOptions.length; i++) {
-            if ( selInd === i) {
-              str = `${clipboardOutput[i]}`;
-            }
-          }
-          return str;
-        })(ccpUserInput.tdAlign);
-        // !VA tdAlign END
-
-        tdTag.valignAtt = (function (id) {
-          // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
-          // !VA Pass in the id of the select dropdown
-          var str;
-          // !VA Get the selection index
-          var selInd = document.querySelector(id).selectedIndex;
-          // !VA Put the available options in an array
-          var tdValignOptions = [ 'none', 'top', 'middle', 'bottom' ];
-          // !VA Put the desired output strings in an array
-          var clipboardOutput = [ '', 'valign="top"', 'valign="middle" ', 'valign="bottom" '];
-          // !VA If the selected index matches the index of the available options array, then output the string that matches that index
-          for (let i = 0; i < tdValignOptions.length; i++) {
-            if ( selInd === i) {
-              str = `${clipboardOutput[i]}`;
-            }
-          }
-          return str;
-        })(ccpUserInput.tdValign);
-        // !VA tdValign END
-
-        // !VA Pass the input value, prepending it hex # character 
-        tdTag.bgcolorAtt =
-         clipboardController.ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tdBgcolor).value);
-        // !VA tdBgcolor  END
-
-
-        tdTag.tdContents =    (function () {
-          // !VA Get the img tag output and put in between the td tags
-          var str = clipboardController.ccpGetCBImgHTML();
-          return str;
-        })();
-
-        tdTag.BgimageAtt =  (function (id) {
-          // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
-          var str;
-          id = id.replace('mrk', 'box');
-          console.log('id is: ' + id);
-          // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
-
-          if (document.querySelector(id).checked === true) {
-            str = 
-            
-            
-  `
-    <td background="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" ${tdTag.bgcolorAtt}" width="${data.imgW}" height="${data.imgH}" ${tdTag.valignAtt}">
-    <!--[if gte mso 9]>
-      <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${data.imgW}px;height:${data.imgH}px;">
-      <v:fill type="tile" src="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" color="${tdTag.bgcolorAtt}" />
-      <v:textbox inset="0,0,0,0">
-      <![endif]-->
-        <div>
-        <!-- Put Foreground Content Here -->
-        </div>
-      <!--[if gte mso 9]>
-        </v:textbox>
-      </v:rect>
-      <![endif]-->
-    </td>
-  `;
-
-
-            
-          } else {
-          // !VA The regular TD element
-            str = 
-
-`    <td ${tdTag.classAtt + ' '}${tdTag.alignAtt + ' '}${tdTag.valignAtt + ' '}${tdTag.bgcolorAtt + ' '}>
-      ${tdTag.tdContents}
-    </td>`;
-
-          }
-          clipboardStr = str;
-          // return clipboardStr;
-        })(ccpUserInput.tdBgimage);
-
-
-
-
-        return clipboardStr;
-      }, 
-
-      // clipboardController public ccpGetCBTableHTML
-      ccpGetCBTableHTML: function () {
-        // !VA We need this to get Appdata.viewerW
-        var data = UIController.accessAppdata();
-        // !VA Variable returning the HTML to the clipboard object 
-        var clipboardStr;
-        // !VA Create the object for storing the individual tag attributes
-        var tableTag = new ClipboardOutput('tableTag');
-        // !VA Base Table options----------------------------------------------
-        tableTag.classAtt = 
-          // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
-          clipboardController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tableClass).value);
-
-
-        tableTag.alignAtt = (function (id) {
-          // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
-          // !VA Pass in the id of the select dropdown
-          var str;
-          // !VA Get the selection index
-          var selInd = document.querySelector(id).selectedIndex;
-          // !VA Put the available options in an array
-          var tableAlignOptions = [ 'none', 'left', 'center', 'right' ];
-          // !VA Put the desired output strings in an array
-          var clipboardOutput = [ '', 'align="left"', 'align="center"', 'align="right"'];
-          // !VA If the selected index matches the index of the available options array, then output the string that matches that index
-          for (let i = 0; i < tableAlignOptions.length; i++) {
-            if ( selInd === i) {
-              str = `${clipboardOutput[i]}`;
-            }
-          }
-          return str;
-        })(ccpUserInput.tableAlign);
-        // !VA tableAlign END
-
-        tableTag.tableContents = (function () {
-          var str = clipboardController.ccpGetCBTdHTML();
-          return str;
-        })();
-
-        // !VA Wrapper Width Attribute
-        tableTag.widthAtt = (function (id, data) {
-          // !VA Get Appdata
-          var data = UIController.accessAppdata();
-          var tableWidthInput = document.querySelector(ccpUserInput.tableWidth);
-          console.log('tableWidthInput.value is: ' + tableWidthInput.value);
-          // !VA TODO: Error handling
-          // !VA If there 
-          if (!tableWidthInput.value) {
-            tableTag.tableWidthInput.value = '0';
-          } else {
-            tableTag.tableWidth = `width="${tableWidthInput.value}"`;
-          }
-
-          var str = tableTag.tableWidth;
-          console.log('str is: ' + str);
-          return str;
-        })(ccpUserInput.tableWidth, data);
-        
-        // !VA Pass the input value 
-        tableTag.bgcolorAtt =
-         clipboardController.ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tableBgcolor).value);
-        // !VA tdBgcolor
-        // !VA Base Table Tag END------------------------------------------------------
-
-        // !VA Table WRAPPER Start ------------------------------------------------------
-        // !VA !IMPORTANT! The 'Include wrapper table' option is shown/hidden in the UIController toggleCheckbox function for the CCP
-        // !VA Wrapper Class Attribute
-        tableTag.wrapperclassAtt = 
-        // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
-        clipboardController.ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tableWrapperClass).value);
-
-        // !VA Wrapper Width Attribute
-        tableTag.wrapperWidthAtt = (function (id, data) {
-          // !VA Get Appdata
-          // var data = UIController.accessAppdata();
-          var tableWrapperInput = document.querySelector(ccpUserInput.tableWrapperWidth);
-          // !VA If there 
-          if (!tableWrapperInput.value) {
-            tableTag.wrapperWidthAtt = '';
-          } else {
-            tableTag.wrapperWidthAtt = `width="${tableWrapperInput.value}"`;
-          }
-
-          var str = tableTag.wrapperWidthAtt;
-          return str;
-        })(ccpUserInput.tableWrapperWidth, data);
-
-        // !VA Wrapper align attribute
-        tableTag.wrapperAlignAtt = (function (id) {
-          // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
-          // !VA Pass in the id of the select dropdown
-          var str;
-          // !VA Get the selection index
-          var selInd = document.querySelector(id).selectedIndex;
-          // !VA Put the available options in an array
-          var tableWrapperAlignOptions = [ 'none', 'left', 'center', 'right' ];
-          // !VA Put the desired output strings in an array
-          var clipboardOutput = [ '', 'align="left" ', 'align="center" ', 'align="right" '];
-          // !VA If the selected index matches the index of the available options array, then output the string that matches that index
-          for (let i = 0; i < tableWrapperAlignOptions.length; i++) {
-            if ( selInd === i) {
-              str = `${clipboardOutput[i]}`;
-            }
-          }
-          return str;
-        })(ccpUserInput.tableWrapperAlign);
-
-
-        // !VA Wrapper bgcolor attributePass the input value 
-        tableTag.wrapperBgcolorAtt =
-        clipboardController.ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tableWrapperBgColor).value);
-        // !VA tdBgcolor
-
-        // !VA Get the checked status of Include table wrapper, and if it's 'checked' output the base table AND the table wrapper
-        if ( document.querySelector('#table-include-wrapper-checkbox').checked) {
-          clipboardStr = 
-
-`<table ${tableTag.wrapperclassAtt + ' '}${tableTag.wrapperWidthAtt + ' '}${tableTag.wrapperAlignAtt + ' '}${tableTag.wrapperBgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
-  <tr>
-    <td align="center" valign="top">
-      <table ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
-        <tr>
-      ${tableTag.tableContents}
-        </tr>
-      </table>
-    </td>
-  </tr>
-</table>`;
-
-          // !VA If the option is unchecked, output just the base table
-        } else {
-          clipboardStr = 
-
-`<table ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
-    <tr>
-       ${tableTag.tableContents}
-    </tr>
-</table>`;
-
-        }
-        return clipboardStr;
-      },
-
-      // !VA UIContoller public ccpGetCBImgDisplayCSS
-      ccpGetCBImgDisplayCSS: function() {
-        // !VA Get Appdata to local variable
-        var data = UIController.accessAppdata();
-        // !VA The string to pass the CSS declaration to the clipboard object
-        var clipboardStr;
-        // !VA Clipboard output object 
-        var imgCSSTag = new ClipboardOutput('imgCSSTag');
-        // !VA Put the user-entered class into this property
-        imgCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
-
-        // !VA Build the css class declaration with width and height properties
-        clipboardStr = `img.${imgCSSTag.classAtt} { width: ${data.imgW}px !important; height: ${data.imgH}px !important }`;
-        // !VA Return the css string to the clipboard object.
-        return clipboardStr;
-
-      }, 
-
-      // !VA UIContoller ccpGetCBImgLPhonesCSS
-      ccpGetCBImgLPhonesCSS: function() {
-        // !VA Get Appdata to local variable
-        var data = UIController.accessAppdata();
-        console.dir(data);
-        // !VA The string to pass the CSS declaration to the clipboard object
-        var clipboardStr;
-        // !VA Clipboard output object 
-        var largePhonesCSSTag = new ClipboardOutput('largePhonesCSSTag');
-        // !VA Put the user-entered class into this property
-        largePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
-        // !VA Build the css class declaration with and Appdata large phone width and height properties
-        clipboardStr = `img.${largePhonesCSSTag.classAtt} { width: ${data.lPhoneW}px !important; height: ${data.lPhoneH}px !important }`;
-        // !VA Return the css string to the clipboard object.
-        return clipboardStr;
-      }, 
-
-      // !VA UIContoller ccpGetCBImgSPhonesCSS
-      ccpGetCBImgSPhonesCSS: function() {
-        // !VA Get Appdata to local variable
-        var data = UIController.accessAppdata();
-        console.dir(data);
-        // !VA The string to pass the CSS declaration to the clipboard object
-        var clipboardStr;
-        window.addEventListener('load', function() {
-          // !VA TODO: Dev mode doesn't work any more...
-          console.log('initializeDevMode running...');
-            
-          // !VA Get the imgViewer dimensions as set in CSS:
-          var initViewerW = parseInt(document.querySelector(dynamicRegions.imgViewer).style.width);
-          // !VA Not sure why this isn't used.
-          var initViewerH = parseInt(document.querySelector(dynamicRegions.imgViewer).style.height);
-          // !VA Initalize the imgViewer width input field value to the default of 650
-          document.querySelector(toolButtons.viewerW).placeholder = initViewerW;
-          // !VA  Test if there is currently #cur-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
-          var curImgExists = document.querySelector(dynamicRegions.curImg);
-          // !VA  Now we have to populate Appdata with data. We can do it manually here and just pass the object on to refresh the screen elements.
-          // !VA If there's no current image, then return false. This is the flag to the initializeDOM function that there is no DEV image in the HTML. The init then shows the drop area and 'No Image' in the dimViewers.
-  
-          // !VA  There is a current image, so first populate Appdata manually and then populate getAppData based on the object properties in Appdata
-          var AppobjDev = {
-            currentimg: document.querySelector(dynamicRegions.curImg),
-            viewer: document.querySelector(dynamicRegions.imgViewer),
-            viewport: document.querySelector(dynamicRegions.imgViewport),
-            appcontainer: document.querySelector(dynamicRegions.appContainer)
-          }; 
-  
-          var filename = clipboardController.getFilenameFromSource(AppobjDev.currentimg.src);
-          // !VA Hide the drop area.
-          document.querySelector(staticRegions.dropArea).style.display = 'none';
-          // !VA  Show the toolbar
-          document.querySelector(staticRegions.toolsContainer).style.display = 'block';
-          // !VA This is where we run writeImgToDOM to:
-          /* 1) Insert the cur-img-container insider the cur-img element
-            2) Include logic to exclude inserting the image unless it doesn't exist already, i.e. is the FileReader blob and not the hard-coded image from the HTML file.
-          */
-          // !VA AppobjDev returns NaN for the viewer containers because they don't have values yet... not sure I understand why since height and width are initially declared in CSS.
-          var Appdata = UIController.getAppData(AppobjDev, filename);
-          // !VA evaluate the viewer containers and adjust their size based on the returned Appdata
-          var evalViewerSize = clipboardController.evalViewerSize(Appdata);
-  
-          // !VA Open the CCP by default in dev mode
-          // !VA First, make sure it's closed
-          document.querySelector(staticRegions.ccpContainer).classList.remove('active');
-          // !VA Then run ccpToggle to initialize the dynamic values and open it
-          UIController.ccpToggle();
-        });   // !VA Clipboard output object 
-        var smallPhonesCSSTag = new ClipboardOutput('smallPhonesTag');
-        // !VA Put the user-entered class into this property
-        smallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
-        // !VA Build the css class declaration with and Appdata large phone width and height properties
-        clipboardStr = `img.${smallPhonesCSSTag.classAtt} { width: ${data.sPhoneW}px !important; height: ${data.sPhoneH}px !important }`;
-        // !VA Return the css string to the clipboard object.
-        return clipboardStr;
-      }, 
 
     };
   })();
@@ -966,17 +245,12 @@ console.log('event.target.id is: ' + event.target.id);
 
     var Appobj = {};
     
-    // !VA V2 getting DOM ID strings from UIController
+    // !VA Getting DOM ID strings from UIController
     var dimViewers = UIController.getDimViewerIDs();
     var dynamicRegions = UIController.getDynamicRegionIDs();
     var staticRegions = UIController.getStaticRegionIDs();
     var toolButtons = UIController.getToolButtonIDs();
-    // !VA Deprecated in this version
-    // var ccpPropStrings = UIController.getCcpPropStringsIDs();
     var ccpUserInput = UIController.getCcpUserInputIDs();
-    // !VA Deprecated in this version
-    // var ccpBuildTag = UIController.getCcpBuildTagIDs();
-
 
     // !VA appController private setupEventListeners
     var setupEventListeners = function() {
@@ -1055,12 +329,6 @@ console.log('event.target.id is: ' + event.target.id);
       // ccpUserInput.imgAlt.addEventListener('keypress', showMobileImageButtons);
       // ccpUserInput.imgClass.addEventListener('keypress', showMobileImageButtons);
       // ccpUserInput.imgRelPath.addEventListener('keypress', showMobileImageButtons);
-
-
-
-
-
-
       // !VA Add click handlers for dimViewer - there's only the clipboard button now but there could be more. 
       var dvClickables = [ dimViewers.clipboardBut ];
       for (let i = 0; i < dvClickables.length; i++) {
@@ -1152,9 +420,6 @@ console.log('event.target.id is: ' + event.target.id);
           console.log('other event');
         }
       }
-
-        
-
       // Click handlers - focusOnClick
       // =============================
       // addEventHandler(toolButtons.customheight,'click',focusOnClick,false);
@@ -1356,14 +621,7 @@ console.log('event.target.id is: ' + event.target.id);
 
     // !VA NEW appController private calcViewerDimensions
     function calcViewerDimensions(Appobj) {
-      // !VA This isn't necessary here, but will probably be used somewhere else...
-      // !VA TODO: Try to figure out whether this is useful at all.
-      // const maxViewerWidth = (parseInt(window.getComputedStyle(appRegions.appContainer,null).getPropertyValue('width'), 10)) - 48;
-
-      // Using the current image dimensions, set the size of the viewer based on the following criteria:
-      // !VA TODO: This can probably be recoded for efficiency but it works for now. Take another look at it.
-      
-
+      // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. This can probably be recoded for efficiency but it works for now. Take another look at it.
       // !VA NEW Get the actual viewerW from getComputedStyle
       var viewerW;
       var viewerH;
@@ -1422,8 +680,9 @@ console.log('event.target.id is: ' + event.target.id);
         // !VA TODO: Check this out, doesn't seem to be a problem anymore: BUG Problem with the 800X550, 800X600 -- no top/bottom gutter on viewport
         break;
       }
-      // !VA Transfer control to UIController to print to the UI
+      // !VA Transfer control to UIController to print dimViewer to the UI
       UIController.writeDimViewers(Appobj);
+      // !VA Now rec
       doContainerHeights(Appobj.imgH, Appobj.imgW, viewerH);
 
       // !VA Run evalDimAlerts now, after all the containers have been resized.
@@ -1500,112 +759,16 @@ console.log('event.target.id is: ' + event.target.id);
       // dynamicRegions.appContainer
 
 
-      document.querySelector(dynamicRegions.curImg).style.width = clipboardController.intToPx(imgW);
-      document.querySelector(dynamicRegions.curImg).style.height = clipboardController.intToPx(imgH);
-      document.querySelector(dynamicRegions.imgViewer).style.height = clipboardController.intToPx(viewerH);
-      document.querySelector(dynamicRegions.imgViewport).style.height = clipboardController.intToPx(viewportH);
-      document.querySelector(dynamicRegions.appContainer).style.height = clipboardController.intToPx(appH);
+      document.querySelector(dynamicRegions.curImg).style.width = intToPx(imgW);
+      document.querySelector(dynamicRegions.curImg).style.height = intToPx(imgH);
+      document.querySelector(dynamicRegions.imgViewer).style.height = intToPx(viewerH);
+      document.querySelector(dynamicRegions.imgViewport).style.height = intToPx(viewportH);
+      document.querySelector(dynamicRegions.appContainer).style.height = intToPx(appH);
     }
 
     //  !VA ERROR HANDLING
     // ==============================
-    // !VA appController private errorHandler
 
-    var errorHandler = function(id, str, bool) {
-      var data = UIController.accessAppdata();
-      console.log('in errorHandler');
-      console.log('id is: ' + id);
-      console.log('str is: ' + str);
-      console.log('bool is: ' + bool);
-      var errorMessages = {
-        imgW_GT_viewerW: `An image can't be wider than its parent table (currently set at ${data.viewerW}px). The image width has to be less than the width of its container.`,
-        tbButton_LT_zero: 'Sorry, that would make one of the image dimensions less than 0.',
-        tbButton_GT_viewerW: `Sorry, that would make the image wider than its container, which is currently set at ${data.viewerW}px`,
-        // !VA maxViewerWidth issue here, see message below;
-        viewerW_GT_maxViewerWidth: `The container table width can't be greater than the width of the app itself &mdash; 800px.`,
-        not_an_integer: 'Not an integer: please enter a positive whole number for width.'
-      };
-
-
-      // !VA Loop through the error ID/message pairs and find the match
-      for (const [key, value] of Object.entries(errorMessages)) { 
-        if (key === str ) {
-          console.log('value is: ' + value);
-          showAppMessage(id, value, true);
-        }
-      }
-    };
-
-
-    // appController private: VALIDATE INPUT FOR INTEGER
-    function validateInteger(inputVal) {
-      // !VA Since integer validation is used for all height/width input fields, including those not yet implemented
-      let isErr;
-      // let mess;
-      if (!parseInt(inputVal, 10) || inputVal % 1 !== 0 || inputVal < 0) {
-        isErr = true;
-      } else { 
-        // !VA Input fields return strings, so convert to integer
-        inputVal = parseInt(inputVal);
-        isErr = false;
-      }
-      // !VA Just returning true here, the error code is sent by the calling function in handleUserAction
-      return isErr;
-    }
-
-
-    // !VA Need to get the Appdata property that corresponds to the ID of the DOM input element that sets it. It's easier to just create a list of these correspondences than to rename the whole UI elements and Appdata properties so they correspond, or to create functions that use string methods to extract them from each other.
-    //  appController private: GET APPDATA PROPERTY NAME FROM AN HTML ELEMENT ID
-    function elementIdToAppdataProp(str) {
-      var IDtoProp = {
-        viewerW:  'tb-input-viewerw',
-        imgW: 'tb-input-customw',
-        imgH: 'tb-input-customh',
-        sPhoneW: 'tb-input-small-phonesw',
-        lPhoneW: 'tb-input-large-phonesw'
-
-      };
-      // !VA This should return directly wihout a ret variable as tmp storage.
-      var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
-      // alert(ret);
-      return ret;
-    }
-
-
-      // !VA appController private
-      // !VA Here we can show a message bypassing errorHandler - not all messages are errors.
-    var showAppMessage = function(id, mess, isErr) {
-      console.log('showAppMessage-top');      
-      console.log('id is: ' + id);
-      console.log('mess is: ' + mess);
-      console.log('isErr is: ' + isErr);
-      //Set the time the message will display
-      // let displayTime;
-      // Get the elements to manipulate for the error message display
-      // // !VA Create objects for all the UI elements used in this function
-      var appMessContainer = document.querySelector(staticRegions.appMessContainer);
-      var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
-      // var dimViewers = document.querySelector('#dim-viewers');
-      // var toolsContainer = document.querySelector('#tools-container');
-      // Put the respective error message in the error message container
-      appMessDisplay.innerHTML = mess;
-      // Swap dimViewers with appMessDisplay and drop toolsContainer behind viewport;
-
-
-      appMessContainer.classList.add('show-err');
-
-
-      // !VA Reset the value of the element into which the error was entered to empty. 
-      document.getElementById(id).value = '';
-      appMessContainer.classList.remove('hide-err');
-      appMessContainer.classList.add('show-err');
-
-    };
-
-    var doit = function() {
-      // SCRAP DO IT FUNCTION
-      console.log('Doing it...');
-    };
 
     // !VA NEW appController private
     var initDev = function() {
