@@ -132,14 +132,11 @@ var Witty = (function () {
 
     // !VA UIController private evalDimAlerts
     function evalDimAlerts(dimViewers) {
-      console.log('evalDimAlerts runnign');
       var dimViewers;
       dimViewers = UIController.getDimViewerIDs();
-      console.table(dimViewers);
       // !VA Query Appdata
       var Appdata = {};
       Appdata = appController.getAppdata(false);
-      console.table(Appdata);
       
       // !VA Size On Disk is NOT 2X the Display Size: flag Size on Disk and Retina
       var curDimViewer = [];
@@ -154,7 +151,6 @@ var Witty = (function () {
       if (Appdata.imgNW < (Appdata.lPhonesW * 2) ) {
         curDimViewer.push(dimViewers.largephones);
       } 
-      console.table(curDimViewer);
       // !VA Reset all the dim viewer alerts by passing in the entire dimViewer array
       UIController.setDimAlerts(dimViewers, false);
       // !VA Now set the individual dim viewer alerts for the current image.
@@ -229,7 +225,6 @@ var Witty = (function () {
       // !VA UIController public writeDimViewers
       writeDimViewers: function(Appdata) {
         // !VA We need the current value in dimViewers.smallphones and dimViewers.largephones to display all the dimViewers. So, if it's not explicitly user-defined, then use the default placeholder value from the HTML, then get the height from getAspectRatio
-        console.log('writeDimViewers  running');
         var Appdata = {};
         Appdata = appController.getAppdata();
 
@@ -239,7 +234,7 @@ var Witty = (function () {
         // !VA Hide the dropArea
         document.querySelector(staticRegions.dropArea).style.display = 'none';
         // Write the dimViewers
-        document.querySelector(dimViewers.display).innerHTML = `<span class='pop-font'><span id="display-size-width">${imgW}</span> X <span id="display-size-height">${imgH}</span></span>`;
+        document.querySelector(dimViewers.display).innerHTML = `<span class='pop-font'><span id="display-size-width">${Appdata.imgW}</span> X <span id="display-size-height">${Appdata.imgH}</span></span>`;
         document.querySelector(dimViewers.diskimg).innerHTML = `<span class='pop-font'>${Appdata.imgNW} X ${Appdata.imgNH}</span>`;
         document.querySelector(dimViewers.aspect).innerHTML = `<span class='pop-font'>${Appdata.aspect[1]}</span>` ;
         document.querySelector(dimViewers.smallphones).innerHTML = `<span class='pop-font'><span id='small-phones-width'>${Appdata.sPhonesW}</span> X <span id='small-phones-height'>${Appdata.sPhonesH}</span></span>` ;
@@ -301,7 +296,6 @@ var Witty = (function () {
 
       //UIController: set dim alerts
       setDimAlerts: function(curDimViewers, bool) {
-        console.log('setDimalerts running');
         // !VA if evalDimAlerts returns true, then the dimViewer should be displayed in red. To reset the dim alert, set to style color to 'auto'.
         var att = bool;
         bool ? att = 'red': att = 'inherit';
@@ -320,7 +314,6 @@ var Witty = (function () {
 
       // writeImgToDOM: function(Appdata) {
       //   console.log('writeImgToDom running');
-      //   console.table(Appdata);
       //   var curImg = document.querySelector(dynamicRegions.curImg);
       //   curImg.style.width = Appdata.newImgW + 'px';
       //   curImg.style.height = Appdata.newImgH + 'px';
@@ -722,7 +715,6 @@ var Witty = (function () {
       // debugger;
       var Appdata = {};
       Appdata = appController.getAppdata(false);
-      console.table(Appdata);
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
       // !VA NEW Get the actual viewerW from getComputedStyle
       var viewerW;
