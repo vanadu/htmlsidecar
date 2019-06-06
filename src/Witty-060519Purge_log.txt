@@ -98,7 +98,6 @@ ccpUserInput
 setupEventListeners
 handleUserAction
 getAppObj => was getCurImgDimensions
-	ISSUES: This has to be reinitialized every time there's a user action, or else the previous values will persist!
 removeCurImg
 handleFileSelect
 calcViewerDimensions =>calcImgViewerSize
@@ -112,8 +111,11 @@ doContainerHeights => adjustImgContainers
 		
 getAspectRatio
 intToPx
+
+
 NEW:
-handleCustomWidth
+handleTBInput
+updateAppobj
 validateInteger
 
 

@@ -130,6 +130,54 @@ var Witty = (function () {
     };
 
 
+    // !VA UIController private evalDimAlerts
+    function evalDimAlerts(dimViewers) {
+      console.log('evalDimAlerts runnign');
+      var dimViewers;
+      dimViewers = UIController.getDimViewerIDs();
+      console.table(dimViewers);
+      // !VA Query Appdata
+      var Appdata = {};
+      Appdata = appController.getAppdata(false);
+      console.table(Appdata);
+      
+      // !VA Size On Disk is NOT 2X the Display Size: flag Size on Disk and Retina
+      var curDimViewer = [];
+      if (Appdata.imgNW <= (Appdata.imgW * 2) ) {
+        curDimViewer.push(dimViewers.diskimg);
+      } 
+      // !VA Small phones isn't at least 2X size on Disk and Retina
+      if (Appdata.imgNW < (Appdata.sPhonesW * 2) ) {
+        curDimViewer.push(dimViewers.smallphones);
+      } 
+      // !VA Large phones isn't at least 2X Size on Disk and Retina
+      if (Appdata.imgNW < (Appdata.lPhonesW * 2) ) {
+        curDimViewer.push(dimViewers.largephones);
+      } 
+      console.table(curDimViewer);
+      // !VA Reset all the dim viewer alerts by passing in the entire dimViewer array
+      UIController.setDimAlerts(dimViewers, false);
+      // !VA Now set the individual dim viewer alerts for the current image.
+      UIController.setDimAlerts(curDimViewer, true);
+    }
+
+
+      //UIController: set dim alerts
+      function setDimAlerts(curDimViewers, bool) {
+        // !VA if evalDimAlerts returns true, then the dimViewer should be displayed in red. To reset the dim alert, set to style color to 'auto'.
+        var att = bool;
+        bool ? att = 'red': att = 'inherit';
+        // !VA We want to use this same function to reset the dim alerts when a new image is loaded. For that, we need to pass in an array of all the dimViewer IDs, not just an array of the ones that are already red. So, first test if the argument is an object, and if it is convert it into a list of values so the loop will accept it.
+
+        if (Array.isArray(curDimViewers) === false) {
+          curDimViewers = Object.values(curDimViewers);
+        }
+        // !VA For each dimViewer passed from evalDimAlerts, set the font color style based on the bool argument passed in.
+        for (let i = 0; i < curDimViewers.length; i++) {
+          document.querySelector(curDimViewers[i]).style.color = att;
+        }
+      }
+
     // !VA UIController public functions
     return {
       // !VA V2 Return all the strings for the UI element's IDs
@@ -179,32 +227,30 @@ var Witty = (function () {
       },
 
       // !VA UIController public writeDimViewers
-      writeDimViewers: function(Appobj) {
+      writeDimViewers: function(Appdata) {
         // !VA We need the current value in dimViewers.smallphones and dimViewers.largephones to display all the dimViewers. So, if it's not explicitly user-defined, then use the default placeholder value from the HTML, then get the height from getAspectRatio
-        var sPhonesW, sPhonesH, lPhonesW, lPhonesH;
-        sPhonesW = document.querySelector(toolButtons.sPhonesW).value;
-        lPhonesW = document.querySelector(toolButtons.sPhonesW).value;
-        sPhonesW ? sPhonesW : sPhonesW = document.querySelector(toolButtons.sPhonesW).placeholder;
-        lPhonesW ? lPhonesW : lPhonesW = document.querySelector(toolButtons.lPhonesW).placeholder;
-        sPhonesH = Math.round(sPhonesW * (1 / Appobj.aspect[0]));
-        lPhonesH = Math.round(lPhonesW * (1 / Appobj.aspect[0]));
+        console.log('writeDimViewers  running');
+        var Appdata = {};
+        Appdata = appController.getAppdata();
 
-        // !VA Now we need to determine if the width and height values are initial or user-modified.
-        var imgW, imgH;
-        Appobj.newImgW ? imgW = Appobj.newImgW : imgW = Appobj.imgW;
-        Appobj.newImgH ? imgH = Appobj.newImgH : imgH = Appobj.imgH;
+
+
 
         // !VA Hide the dropArea
         document.querySelector(staticRegions.dropArea).style.display = 'none';
         // Write the dimViewers
         document.querySelector(dimViewers.display).innerHTML = `<span class='pop-font'><span id="display-size-width">${imgW}</span> X <span id="display-size-height">${imgH}</span></span>`;
-        document.querySelector(dimViewers.diskimg).innerHTML = `<span class='pop-font'>${Appobj.imgNW} X ${Appobj.imgNH}</span>`;
-        document.querySelector(dimViewers.aspect).innerHTML = `<span class='pop-font'>${Appobj.aspect[1]}</span>` ;
-        document.querySelector(dimViewers.smallphones).innerHTML = `<span class='pop-font'><span id='small-phones-width'>${sPhonesW}</span> X <span id='small-phones-height'>${sPhonesH}</span></span>` ;
-        document.querySelector(dimViewers.largephones).innerHTML = `<span class='pop-font'><span id='large-phones-width'>${lPhonesW}</span> X <span id='large-phones-height'>${lPhonesH}</span></span>` ;
-        document.querySelector(dimViewers.retina).innerHTML = `<span class='pop-font'>${2 * imgW}</span> X <span class='pop-font'>${2 * imgH}`;
+        document.querySelector(dimViewers.diskimg).innerHTML = `<span class='pop-font'>${Appdata.imgNW} X ${Appdata.imgNH}</span>`;
+        document.querySelector(dimViewers.aspect).innerHTML = `<span class='pop-font'>${Appdata.aspect[1]}</span>` ;
+        document.querySelector(dimViewers.smallphones).innerHTML = `<span class='pop-font'><span id='small-phones-width'>${Appdata.sPhonesW}</span> X <span id='small-phones-height'>${Appdata.sPhonesH}</span></span>` ;
+        document.querySelector(dimViewers.largephones).innerHTML = `<span class='pop-font'><span id='large-phones-width'>${Appdata.lPhonesW}</span> X <span id='large-phones-height'>${Appdata.lPhonesH}</span></span>` ;
+        document.querySelector(dimViewers.retina).innerHTML = `<span class='pop-font'>${2 * Appdata.imgW}</span> X <span class='pop-font'>${2 * Appdata.imgH}`;
         // !VA NEW Display the clipboard button
         document.querySelector(dimViewers.clipboardBut).style.display = 'block';
+
+        evalDimAlerts();
+
+
       },
 
 
@@ -237,7 +283,7 @@ var Witty = (function () {
       // !VA TODO: Review this whole maxViewerHeight thing.
       if (imgH <= initViewerH) {
         // !VA  This is the min-height set in CSS
-        // appObj.appContainerH = 804;
+        // Appdata.appContainerH = 804;
         viewerH = initViewerH;
         viewportH = viewerH + 145;
       } else {
@@ -253,12 +299,31 @@ var Witty = (function () {
       document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';
       },
 
-      // writeImgToDOM: function(Appobj) {
+      //UIController: set dim alerts
+      setDimAlerts: function(curDimViewers, bool) {
+        console.log('setDimalerts running');
+        // !VA if evalDimAlerts returns true, then the dimViewer should be displayed in red. To reset the dim alert, set to style color to 'auto'.
+        var att = bool;
+        bool ? att = 'red': att = 'inherit';
+        // !VA We want to use this same function to reset the dim alerts when a new image is loaded. For that, we need to pass in an array of all the dimViewer IDs, not just an array of the ones that are already red. So, first test if the argument is an object, and if it is convert it into a list of values so the loop will accept it.
+
+        if (Array.isArray(curDimViewers) === false) {
+          curDimViewers = Object.values(curDimViewers);
+        }
+        // !VA For each dimViewer passed from evalDimAlerts, set the font color style based on the bool argument passed in.
+        for (let i = 0; i < curDimViewers.length; i++) {
+          document.querySelector(curDimViewers[i]).style.color = att;
+        }
+      },
+
+
+
+      // writeImgToDOM: function(Appdata) {
       //   console.log('writeImgToDom running');
-      //   console.table(Appobj);
+      //   console.table(Appdata);
       //   var curImg = document.querySelector(dynamicRegions.curImg);
-      //   curImg.style.width = Appobj.newImgW + 'px';
-      //   curImg.style.height = Appobj.newImgH + 'px';
+      //   curImg.style.width = Appdata.newImgW + 'px';
+      //   curImg.style.height = Appdata.newImgH + 'px';
       //   var curImgDiv = document.createElement('div');
       //   // !VA Assign the new div an id that reflects its purpose
       //   curImgDiv.id = 'cur-img-container';
@@ -520,31 +585,7 @@ var Witty = (function () {
 
     // !VA appController private functions
     //  ==============================
-    // !VA appController private getAppobj
-    function getAppobj(isDev) {
 
-      // !VA NEW Initialize Appobj here and pass it along
-      var Appobj = {};
-      // !VA At this point imgW and imgW = imgNW and imgNH if this is called from initDev or handleFileSelect. The only difference is that initDev needs to write the filename to the DOM because that's handled by handleFileSelect. So we get the isDev flag
-      if (isDev) {
-        // !VA NEW Get the filename of the devImg in the HTML. This is the only time we'll have an actual source file -- in user mode all the images are blobs -- so we can do this as a one-off.
-        var filename = document.querySelector(dynamicRegions.curImg).src;
-        filename = filename.split('/');
-        filename = filename[filename.length - 1];
-        document.querySelector(dimViewers.filename).textContent = filename;
-        UICtrl.writeFilenameToUI(filename);
-      } 
-      // !VA NEW Read required values into Appobj.
-      var curImg = document.querySelector(dynamicRegions.curImg);
-      Appobj.imgW = curImg.width;
-      Appobj.imgH = curImg.height;
-      Appobj.imgNW = curImg.naturalWidth;
-      Appobj.imgNH = curImg.naturalHeight;
-      // !VA NEW We need the aspect ratio to calculate the other dimension when the user only inputs one, i.e. when width or height is entered into one of the toolbars' custom width/height fields.
-      Appobj.aspect = getAspectRatio(curImg.naturalWidth,  curImg.naturalHeight);
-      // !VA NEW We need new imgW and imgH properties to store the user input values. We don't want to overwrite the original imgW/imgH values because it appears it's not possible since Javascript passes values by reference, so any changes to properties are lost outside the current function's scope. Plus, we need to have the original values persist for the duration of the session, at which point the app and Appobj are reinitialized. 
-      return Appobj;
-    }
 
     // appController private: remove current image
     // !VA Test for whether there is already a #cur-img element in the DOM, and if there is remove it so handleFileSelect can overwrite it without having to refresh the page to reboot the app.
@@ -630,13 +671,13 @@ var Witty = (function () {
                 // !VA Create and array of the Appdata properties to update
                 // !VA Instead of managing Appdata based on some huge object with four HTML elements and all those unneeded properties thereof, we will just update Appdata by creating a local copy with just the properties we want to add.
                 // !VA Stopped here. The problem is that Appdata is a global object in the public functions, as it is now in master. I don't want to put all that stuff in the appController's public functions, so I have to either leave it in UIController or pass it between private functions, which will get very complicated.   I think it will be much cleaner if I only use updateAppData to loop through the items to update and don't use the klunky getAppData. Also, the refreshAppUI function refreshes all the values when it's called - it should only refresh the changed values.
-                // !VA NEW Now that the blob image has been displayed and has DOM properties that can be queried, query them and write them to Appobj.
-                var Appobj = {};
-                Appobj = getAppobj(false);
-                console.dir(Appobj);
+                // !VA NEW Now that the blob image has been displayed and has DOM properties that can be queried, query them and write them to Appdata.
+                var Appdata = {};
+                Appdata = appController.getAppdata(false);
+                console.dir(Appdata);
 
                 // !VA NEW Commented out for now.
-                calcImgViewerSize();
+                calcImgViewerSize(false);
                 // !VA NEW Delete
                 // clipboardController.evalViewerSize(Appdata);
               })();
@@ -679,25 +720,25 @@ var Witty = (function () {
     // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH
     function calcImgViewerSize() {
       // debugger;
-      var Appobj = {};
-      Appobj = getAppobj(false);
-      // !VA Using the current image dimensions in Appobj, calculate the current size of imgViewer so it adjusts to the current image size. 
+      var Appdata = {};
+      Appdata = appController.getAppdata(false);
+      console.table(Appdata);
+      // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
       // !VA NEW Get the actual viewerW from getComputedStyle
       var viewerW;
       var viewerH;
       var compStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
       viewerW = parseInt(compStyles.getPropertyValue('width'), 10);
       viewerH = parseInt(compStyles.getPropertyValue('height'), 10);
-
-      // !VA If we're initializing a new image, use the naturalWidth and naturalHeight. If we're updating via user input, we need to use the display image and height, imgW and imgH. If we're initializing, then Appobj.imgW and Appobj.imgH will be 0 or falsy because it hasn't been resized yet. So we need to make the following switch case based on the _actual_ image width and height, which will be different based on whether we're initializing or updating. So:
+      // !VA If we're initializing a new image, use the naturalWidth and naturalHeight. If we're updating via user input, we need to use the display image and height, imgW and imgH. If we're initializing, then Appdata.imgW and Appdata.imgH will be 0 or falsy because it hasn't been resized yet. So we need to make the following switch case based on the _actual_ image width and height, which will be different based on whether we're initializing or updating. So:
 
       var actualW, actualH
-      if (Appobj.imgW === 0) {
-        actualW = Appobj.imgNW;
-        actualH = Appobj.imgNH;
+      if (Appdata.imgW === 0) {
+        actualW = Appdata.imgNW;
+        actualH = Appdata.imgNH;
       } else {
-        actualW = Appobj.imgW;
-        actualH = Appobj.imgH; 
+        actualW = Appdata.imgW;
+        actualH = Appdata.imgH; 
       }
 
 
@@ -705,9 +746,9 @@ var Witty = (function () {
       // The image falls within the default viewer dimensions set in initApp, so do nothing.
       // !VA This case is irrelevant since we're now comparing everything to maxViewerWidth not the  init values. Change accordingly...
       // !VA  NOT SO...now we're trying to restore the previous functionality so...
-      case (actualW <= viewerW) && (Appobj.imgNH < viewerH) :
-        actualW = Appobj.imgNW;
-        Appobj.imgH = Appobj.imgNH;
+      case (actualW <= viewerW) && (Appdata.imgNH < viewerH) :
+        actualW = Appdata.imgNW;
+        actualH = Appdata.imgNH;
         // !VA viewerH is set in initApp, so no change to it here
         // !VA viewerH is set in initapp, so no change to that here either.
         // !VA We don't need to adjust height...but maybe we do for consistency's sake
@@ -718,11 +759,11 @@ var Witty = (function () {
       
       case (actualW > viewerW) && (actualH < viewerH) :
         // Set the image width to the current viewer
-        Appobj.imgW = viewerW;
+        Appdata.imgW = viewerW;
         // Get the image height from the aspect ration function
-        Appobj.imgH = Math.round((1/Appobj.aspect[0]) * Appobj.imgW);
+        Appdata.imgH = Math.round((1/Appdata.aspect[0]) * Appdata.imgW);
         // Set the viewerH to the imgH
-        viewerH = Appobj.imgH;
+        viewerH = Appdata.imgH;
         // this.adjustContainerHeights(Appdata);
         break;
 
@@ -730,9 +771,9 @@ var Witty = (function () {
       // !VA This might be a problem with consecutive images without page refresh
       case (actualW <= viewerW) && (actualH > viewerH) :
         // Set the viewer height and the image height to the image natural height
-        viewerH = Appobj.imgH = Appobj.imgNH;
+        viewerH = Appdata.imgH = Appdata.imgNH;
         // Set the image width to the natural image width
-        Appobj.imgW = Appobj.imgNW;
+        Appdata.imgW = Appdata.imgNW;
 
         // !VA  Use adjustContainerHeights to get the Appdata height
         // !VA  Note the dependency with initAppdata, see 'Dependency with adjustContainerHeights'
@@ -742,24 +783,24 @@ var Witty = (function () {
       // The image is wider and taller than the current viewer height and width so we have to resize the image and the viewport based on the current viewport width
       case (actualW > viewerW) && (actualH > viewerH) :
         // Set the image Width to the current  viewer width 
-        Appobj.imgW = viewerW;
+        Appdata.imgW = viewerW;
         // Set the image height proportional to the new image width using the aspect ratio function
-        Appobj.imgH = Math.round((1/Appobj.aspect[0]) * Appobj.imgW);
+        Appdata.imgH = Math.round((1/Appdata.aspect[0]) * Appdata.imgW);
         // Set the viewer height to the image height
-        viewerH = Appobj.imgH;
+        viewerH = Appdata.imgH;
         // Get the viewport and Appdata height from adjustContainerHeights
 
         // !VA TODO: Check this out, doesn't seem to be a problem anymore: BUG Problem with the 800X550, 800X600 -- no top/bottom gutter on viewport
         break;
       }
       // !VA Transfer control to UIController to print dimViewer to the UI
-      UICtrl.writeDimViewers(Appobj);
-      adjustImgContainers(Appobj.imgH, Appobj.imgW, viewerH);
+      UICtrl.writeDimViewers(Appdata);
+      adjustImgContainers(Appdata.imgH, Appdata.imgW, viewerH);
 
       // !VA Run evalDimAlerts now, after all the containers have been resized.
       // !VA !IMPORTANT! THIS IS WHERE TO GET THE UPDATED APPDATA
       // clipboardController.evalDimAlerts(Appdata, dimViewers);
-      // UICtrl.writeImgToDOM(Appobj);
+      // UICtrl.writeImgToDOM(Appdata);
 
       // !VA Now rec
       // UICtrl.adjustImgContainers(imgW, imgH, viewerH);
@@ -778,7 +819,7 @@ var Witty = (function () {
       // !VA TODO: Review this whole maxViewerHeight thing.
       if (imgH <= initViewerH) {
         // !VA  This is the min-height set in CSS
-        // appObj.appContainerH = 804;
+        // Appdata.appContainerH = 804;
         viewerH = initViewerH;
         viewportH = viewerH + 145;
       } else {
@@ -829,9 +870,9 @@ var Witty = (function () {
       }();
       return [aspectReal, aspectInt];  
     }
-
     
-    // appController private: CONVERT INTEGER TO PIXEL VALUE
+    // appController private intToPx: CONVERT INTEGER TO PIXEL VALUE
+    // !VA NEW Probably unused
     function intToPx(int) {
       let pxval;
       let str = String(int);
@@ -839,38 +880,41 @@ var Witty = (function () {
       return pxval;
     }
 
+
+
+
     // !VA INPUT HANDLING
     // !VA ============================================================
     // !VA Handling user input by operation rather than by event type
     // !VA appController private handleCustomWidth
-    // !VA Handle user input changes to Appobj.imgWidth
+    // !VA Handle user input changes to Appdata.imgWidth
     // !VA NEW
       function handleToolbarInput(id, val) {
-      var Appobj = {};
-      Appobj = getAppobj(false);
+      var Appdata = {};
+      Appdata = appController.getAppdata(false);
       // !VA Handle width input by mouseclick 
       if (id.includes('tb-but')) {
         // !VA by mouseclick
-        Appobj.imgW = Appobj.imgW + val;
-        Appobj.imgH =  Appobj.imgW * (1 / Appobj.aspect[0]);
+        Appdata.imgW = Appdata.imgW + val;
+        Appdata.imgH =  Appdata.imgW * (1 / Appdata.aspect[0]);
         // !VA Handle width input input field
       } else if (id.includes('customw')) { 
-        Appobj.imgW = val;
-        Appobj.imgH =  Appobj.imgW * (1 / Appobj.aspect[0]);
+        Appdata.imgW = val;
+        Appdata.imgH =  Appdata.imgW * (1 / Appdata.aspect[0]);
       } else if (id.includes('customh')) {
-        Appobj.imgH = val;
-        Appobj.imgW =  Appobj.imgH * (Appobj.aspect[0]);
+        Appdata.imgH = val;
+        Appdata.imgW =  Appdata.imgH * (Appdata.aspect[0]);
       }
-      Appobj = updateAppobj(Appobj.imgW, Appobj.imgH);
+      Appdata = updateAppdata(Appdata.imgW, Appdata.imgH);
       calcImgViewerSize();
     }
 
     // !VA NEW So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. Very simple.
-    function updateAppobj(w, h) {
-      var Appobj = {};
+    function updateAppdata(w, h) {
+      var Appdata = {};
       document.querySelector(dynamicRegions.curImg).style.width = w + 'px';
       document.querySelector(dynamicRegions.curImg).style.height = h + 'px';
-      Appobj = getAppobj(false);
+      Appdata = appController.getAppdata(false);
     }
 
     function validateInteger(inputVal) {
@@ -899,9 +943,20 @@ var Witty = (function () {
       // !VA Get the current (devimg) image dimensions and write the dimViewers
       // !VA Turn on the toolbars
       document.querySelector(staticRegions.toolsContainer).style.display = 'block';
-      var curImgDimensions = getAppobj(true);
+      document.querySelector(dynamicRegions.curImg).style.display = 'block';
 
-      calcImgViewerSize(curImgDimensions);
+      // !VA NEW Get the filename of the devImg in the HTML. This is the only time we'll have an actual source file -- in user mode all the images are blobs -- so we can do this as a one-off.
+      var filename = document.querySelector(dynamicRegions.curImg).src;
+      filename = filename.split('/');
+      filename = filename[filename.length - 1];
+      document.querySelector(dimViewers.filename).textContent = filename;
+      UICtrl.writeFilenameToUI(filename);
+
+      // !VA Get the dev image's NW and NH from the DOM, update Appdata and let calcImgViewerSize do its thing. 
+      imgW = document.querySelector(dynamicRegions.curImg).naturalWidth;
+      imgH = document.querySelector(dynamicRegions.curImg).naturalHeight;
+      updateAppdata(imgW, imgH);
+      calcImgViewerSize();
       // !VA Open the CCP by default in dev mode
       // !VA First, make sure it's closed
       // document.querySelector(staticRegions.ccpContainer).classList.remove('active');
@@ -914,6 +969,28 @@ var Witty = (function () {
       initError: function(id, str, bool) {
         console.log('initError in appController');
         errorHandler(id, str, bool);
+      },
+      // !VA appController public getAppdata
+      getAppdata: function() {
+        // !VA NEW Initialize Appdata here and pass it along - we put it here because it's called from both the other modules 
+        var Appdata = {};
+
+        // !VA NEW Read required values into Appdata.
+        var curImg = document.querySelector(dynamicRegions.curImg);
+        Appdata.imgW = curImg.width;
+        Appdata.imgH = curImg.height;
+        Appdata.imgNW = curImg.naturalWidth;
+        Appdata.imgNH = curImg.naturalHeight;
+        // !VA NEW We need the aspect ratio to calculate the other dimension when the user only inputs one, i.e. when width or height is entered into one of the toolbars' custom width/height fields.
+        Appdata.aspect = getAspectRatio(curImg.naturalWidth,  curImg.naturalHeight);
+        // !VA NEW We need new imgW and imgH properties to store the user input values. We don't want to overwrite the original imgW/imgH values because it appears it's not possible since Javascript passes values by reference, so any changes to properties are lost outside the current function's scope. Plus, we need to have the original values persist for the duration of the session, at which point the app and Appdata are reinitialized. 
+        Appdata.sPhonesW = document.querySelector(toolButtons.sPhonesW).value
+        Appdata.lPhonesW = document.querySelector(toolButtons.sPhonesW).value;
+        Appdata.sPhonesW ? Appdata.sPhonesW : Appdata.sPhonesW = parseInt(document.querySelector(toolButtons.sPhonesW).placeholder, 10);
+        Appdata.lPhonesW ? Appdata.lPhonesW : Appdata.lPhonesW = parseInt(document.querySelector(toolButtons.lPhonesW).placeholder, 10);
+        Appdata.sPhonesH = Math.round(Appdata.sPhonesW * (1 / Appdata.aspect[0]));
+        Appdata.lPhonesH = Math.round(Appdata.lPhonesW * (1 / Appdata.aspect[0]));
+        return Appdata;
       },
       init: function(){
         // clipboardController.tst();
