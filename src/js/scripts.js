@@ -26,8 +26,6 @@ var Witty = (function () {
   //     e = e || window.event;
   //     var target = e.target || e.srcElement,
   //       text = target.textContent || target.innerText;   
-  //     console.log('Get the clicked element: ' + e);
-  //     console.log(e.target);
   //   }, false);
   // })();
 
@@ -182,8 +180,6 @@ var Witty = (function () {
 
       // !VA UIController public writeDimViewers
       writeDimViewers: function(Appobj) {
-        console.log('writeDimViewers running');
-        console.table(Appobj);
         // !VA We need the current value in dimViewers.smallphones and dimViewers.largephones to display all the dimViewers. So, if it's not explicitly user-defined, then use the default placeholder value from the HTML, then get the height from getAspectRatio
         var sPhonesW, sPhonesH, lPhonesW, lPhonesH;
         sPhonesW = document.querySelector(toolButtons.sPhonesW).value;
@@ -197,8 +193,6 @@ var Witty = (function () {
         var imgW, imgH;
         Appobj.newImgW ? imgW = Appobj.newImgW : imgW = Appobj.imgW;
         Appobj.newImgH ? imgH = Appobj.newImgH : imgH = Appobj.imgH;
-        console.log('imgW is: ' + imgW);
-        console.log('imgH is: ' + imgH);
 
         // !VA Hide the dropArea
         document.querySelector(staticRegions.dropArea).style.display = 'none';
@@ -328,7 +322,6 @@ var Witty = (function () {
         //open the file in the browser when dropped
         evt.preventDefault();
         evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-        console.log('Calling HandleFileSelect');
       }
 
       // Event Listeners for Drag and Drop
@@ -402,7 +395,6 @@ var Witty = (function () {
 
       // appController private handleUserAction 
       function handleUserAction(evt) {
-        console.log('handleUserAction running');
         var keypressed;
         var isErr;
         // e.stopPropagation;
@@ -448,7 +440,6 @@ var Witty = (function () {
 
             // !VA NEW
             } else if (el.id.includes('custom')) {
-              console.log('val is: ' + el.val);
                 handleToolbarInput(el.id, el.value);
             } else {
               // !VA There will be other input fields to handle, but we're not there yet.
@@ -531,7 +522,6 @@ var Witty = (function () {
     //  ==============================
     // !VA appController private getAppobj
     function getAppobj(isDev) {
-      console.log('getAppobj running');
 
       // !VA NEW Initialize Appobj here and pass it along
       var Appobj = {};
@@ -643,7 +633,6 @@ var Witty = (function () {
                 // !VA NEW Now that the blob image has been displayed and has DOM properties that can be queried, query them and write them to Appobj.
                 var Appobj = {};
                 Appobj = getAppobj(false);
-                console.log('hFS here: Appobj');
                 console.dir(Appobj);
 
                 // !VA NEW Commented out for now.
@@ -689,11 +678,9 @@ var Witty = (function () {
     // !VA NEW appController private calcImgViewerSize
     // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH
     function calcImgViewerSize() {
-      console.log('calcImgViewerSize running');
       // debugger;
       var Appobj = {};
       Appobj = getAppobj(false);
-      console.dir(Appobj);
       // !VA Using the current image dimensions in Appobj, calculate the current size of imgViewer so it adjusts to the current image size. 
       // !VA NEW Get the actual viewerW from getComputedStyle
       var viewerW;
@@ -706,7 +693,6 @@ var Witty = (function () {
 
       var actualW, actualH
       if (Appobj.imgW === 0) {
-        console.log('initializing');
         actualW = Appobj.imgNW;
         actualH = Appobj.imgNH;
       } else {
@@ -860,12 +846,8 @@ var Witty = (function () {
     // !VA Handle user input changes to Appobj.imgWidth
     // !VA NEW
       function handleToolbarInput(id, val) {
-      console.log('handleToolbarInput start');
       var Appobj = {};
       Appobj = getAppobj(false);
-      console.dir(Appobj);
-      console.log('id is: ' + id);
-      console.log('val is: ' + val);
       // !VA Handle width input by mouseclick 
       if (id.includes('tb-but')) {
         // !VA by mouseclick
@@ -885,34 +867,11 @@ var Witty = (function () {
 
     // !VA NEW So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. Very simple.
     function updateAppobj(w, h) {
-      console.log('updateAppobj running');
       var Appobj = {};
       document.querySelector(dynamicRegions.curImg).style.width = w + 'px';
       document.querySelector(dynamicRegions.curImg).style.height = h + 'px';
       Appobj = getAppobj(false);
-      console.table(Appobj);
     }
-
-
-
-
-    function handleCustomHeight(id, val, Appobj) {
-      // !VA Handle user input changes to Appobj.imgWidth
-      console.log('handleCustomWidth start');
-      console.dir(Appobj);
-      console.log('id is: ' + id);
-      console.log('val is: ' + val);
-      if (id.includes('tb-but')) {
-        Appobj.newImgW = Appobj.imgW + val;
-      } else { 
-        Appobj.newImgW = val;
-      }
-      Appobj.newImgH =  Appobj.newImgW * (1 / Appobj.aspect[0]);
-      console.table(Appobj);
-      return Appobj;
-
-    }
-
 
     function validateInteger(inputVal) {
       // !VA Since integer validation is used for all height/width input fields, including those not yet implemented
