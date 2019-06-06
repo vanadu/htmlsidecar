@@ -23,10 +23,12 @@ staticRegions
 ccpUserInput
 ccpBuildTag
 
+Added:
+evalDimAlerts (moved from clipboardController public)
+
 UIController public
 -------------------
 Removed:
-setDimAlerts
 ccpToggle
 initCCP
 showElementOnInput
@@ -45,6 +47,9 @@ writeDimViewers
 writeFilenameToUI
 removeCurImg
 
+Added:
+setDimAlerts
+
 clipboardController private
 --------------------------
 Removed:
@@ -52,6 +57,7 @@ dimViewers (getDimViewerIDs)
 ccpPropStrings (getCcpPropStringsIDs)
 ccpBuildTag (getCcpBuildTagIDs)
 ClipboardOutput
+evalDimAlerts
 
 Kept:
 dynamicRegions (getDynamicRegionIDs)
@@ -97,7 +103,7 @@ toolButtons
 ccpUserInput
 setupEventListeners
 handleUserAction
-getAppObj => was getCurImgDimensions
+getAppdata => was getAppobj, getCurImgDimensions
 removeCurImg
 handleFileSelect
 calcViewerDimensions =>calcImgViewerSize
@@ -135,12 +141,12 @@ Program Flow 060519B:
 handleFileSelect
 	-removeCurImg
 	-reader.onload
-	 	-UICtrl.writeFIlenameToUI(fileName)
+	 	-UICtrl.writeFilenameToUI(fileName)
 		-initializeDimViewers
 			-setTimeout
-				-Appobj = getAppobj(false)
-				-calcImgViewerSize(Appobj)
-				-adjustImgContainers(Appobj)
+				-Appdata = appController.getAppdata(false)
+				-calcImgViewerSize()
+				-adjustImgContainers()
 			-initImgToDOM(curImg,callback)
 		-initImgToDOM(curImg, initializeDimViewers)
 

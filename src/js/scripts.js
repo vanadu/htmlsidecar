@@ -3,7 +3,7 @@
 ===========================================================
 IN PROGRESS: 060519Purge - Purging deprecated or not-yet implemented code in this build. We're rebuilding from ground up based on the flowchart 
 
-TODO: 
+TODO: Make Esc cancel the input on customW, customH and viewerW
 TODO: Implement image swap 
 TODO: Implement Td and table copy to clipboard buttons.
 TODO: Parent table class att only shows in CB output if Wrapper is selected, not in just the Partent table output.
@@ -226,10 +226,8 @@ var Witty = (function () {
       writeDimViewers: function(Appdata) {
         // !VA We need the current value in dimViewers.smallphones and dimViewers.largephones to display all the dimViewers. So, if it's not explicitly user-defined, then use the default placeholder value from the HTML, then get the height from getAspectRatio
         var Appdata = {};
+        // !VA Get the current Appdata
         Appdata = appController.getAppdata();
-
-
-
 
         // !VA Hide the dropArea
         document.querySelector(staticRegions.dropArea).style.display = 'none';
@@ -242,10 +240,8 @@ var Witty = (function () {
         document.querySelector(dimViewers.retina).innerHTML = `<span class='pop-font'>${2 * Appdata.imgW}</span> X <span class='pop-font'>${2 * Appdata.imgH}`;
         // !VA NEW Display the clipboard button
         document.querySelector(dimViewers.clipboardBut).style.display = 'block';
-
+        // !VA Call evalDimAlerts to calculate which dimViewer values don't meet HTML email specs.
         evalDimAlerts();
-
-
       },
 
 
@@ -300,7 +296,6 @@ var Witty = (function () {
         var att = bool;
         bool ? att = 'red': att = 'inherit';
         // !VA We want to use this same function to reset the dim alerts when a new image is loaded. For that, we need to pass in an array of all the dimViewer IDs, not just an array of the ones that are already red. So, first test if the argument is an object, and if it is convert it into a list of values so the loop will accept it.
-
         if (Array.isArray(curDimViewers) === false) {
           curDimViewers = Object.values(curDimViewers);
         }
@@ -309,28 +304,62 @@ var Witty = (function () {
           document.querySelector(curDimViewers[i]).style.color = att;
         }
       },
+      // UIController: Flash a status message in the app message area
+      // !VA We could probably fold this into the error handler but that's going to be complicated enough as it is and this is just for status messages
+      flashAppMessage: function(id) {
+        // !VA Passes in the id of the element that triggered the action for which a status message is displayed.
+
+        // !VA Get the message container and display text into variables
+        var appMessContainer = document.querySelector(staticRegions.appMessContainer);
+        var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
+        var ccpBlocker = document.querySelector(staticRegions.ccpBlocker);
 
 
+        var statusMessages = {
+          'img-build-html-but': '<img> HTML element copied to Clipboard!',
+          'td-build-html-but': '<td> HTML element copied to Clipboard!',
+          'table-build-html-but': '<table> HTML element copied to Clipboard!',
+          'img-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard!',
+          'img-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard!',
+          'img-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard!',
+          'td-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard!',
+          'td-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard!',
+          'td-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard!',
+          'table-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard!',
+          'table-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard!',
+          'table-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard!',
+        };
 
-      // writeImgToDOM: function(Appdata) {
-      //   console.log('writeImgToDom running');
-      //   var curImg = document.querySelector(dynamicRegions.curImg);
-      //   curImg.style.width = Appdata.newImgW + 'px';
-      //   curImg.style.height = Appdata.newImgH + 'px';
-      //   var curImgDiv = document.createElement('div');
-      //   // !VA Assign the new div an id that reflects its purpose
-      //   curImgDiv.id = 'cur-img-container';
-      //   // Insert cur-img-container into the existing main-image inside the main-image div.
-      //   document.getElementById('main-image').insertBefore(curImgDiv, null);
-      //   // !VA insert the new curImg into the new cur-img container
-      //   document.getElementById('cur-img-container').insertBefore(curImg, null);
-      //   // Create the image object and read in the binary image from the FileReader object.
-      //   // This allows access of image properties. You can't get image properties from a FileReader object -- it's just a blob' 
-      //   // !VA Hide the DOM element while the blob loads.
+        // !VA First, overlay the CCP blocker to prevent user input while the CSS transitions run and the status message is displayed. Cheap, but effective solution.
+        ccpBlocker.style.display = 'block';
 
-      // }
+        // !VA Add the class that displays the message
+        appMessContainer.classList.add('show-mess');
+        // !VA Loop through the status id/message pairs and find the match for the trigger
+        for (const [key, value] of Object.entries(statusMessages)) { 
+          if (key === id ) {
+            var mess = value;
+          }
+        }
+        // !VA Write the success message to the message display area
+        appMessDisplay.textContent = mess;
+        // !VA Show the message
+        appMessContainer.classList.add('show-mess');
+        // !VA Show the message for two seconds
+        window.setTimeout(function() {
+        // !VA After two seconds, hide the message and remove the blocker
+          appMessContainer.classList.add('hide-mess');
+          ccpBlocker.style.display = 'none';
+          setTimeout(function(){
+            // !VA Once the opacity transition for the message has completed, remove the show-mess class from the element and set the textContent back to empty
+            appMessContainer.classList.remove('show-mess');
+            appMessContainer.classList.remove('hide-mess');
+            appMessDisplay.textContent = '';
 
-
+          },250);
+        }, 
+        2000);
+      }
 
     };
 
@@ -338,7 +367,7 @@ var Witty = (function () {
   })();
 
   // CALCULATIONS AND INPUT EVALUATION CONTROLLER
-  var clipboardController = (function() {
+  var CBController = (function() {
 
 
 
@@ -348,7 +377,7 @@ var Witty = (function () {
     var toolButtons = UIController.getToolButtonIDs();
     var ccpUserInput = UIController.getCcpUserInputIDs();
 
-    // !VA clipboardController public functions 
+    // !VA CBController public functions 
     return {
 
 
@@ -498,7 +527,10 @@ var Witty = (function () {
 
             // !VA NEW
             } else if (el.id.includes('custom')) {
-                handleToolbarInput(el.id, el.value);
+              // !VA Error handling
+                console.log('errorHandler call');
+                handleBadInput(el.id, el.value);
+                // errorHandler(el.id, el.value);
             } else {
               // !VA There will be other input fields to handle, but we're not there yet.
               console.log('Undefined keypress action');
@@ -518,7 +550,7 @@ var Witty = (function () {
             // !VA Reset the viewer width field the last value of Appdata.viewerW 
             } else {
               // !VA Get the Appdata property name that corresponds to the ID of the current input element
-              var prop = clipboardController.elementIdToAppdataProp(el.id);
+              var prop = CBController.elementIdToAppdataProp(el.id);
               // !VA Access Appdata
               var data = UIController.accessAppdata();
               // !VA return the current value of the Appdata property for the current event target to that elements value property. 
@@ -672,7 +704,7 @@ var Witty = (function () {
                 // !VA NEW Commented out for now.
                 calcImgViewerSize(false);
                 // !VA NEW Delete
-                // clipboardController.evalViewerSize(Appdata);
+                // CBController.evalViewerSize(Appdata);
               })();
               
               // !VA Timeout of 250 ms while the blob loads.
@@ -791,7 +823,7 @@ var Witty = (function () {
 
       // !VA Run evalDimAlerts now, after all the containers have been resized.
       // !VA !IMPORTANT! THIS IS WHERE TO GET THE UPDATED APPDATA
-      // clipboardController.evalDimAlerts(Appdata, dimViewers);
+      // CBController.evalDimAlerts(Appdata, dimViewers);
       // UICtrl.writeImgToDOM(Appdata);
 
       // !VA Now rec
@@ -872,7 +904,47 @@ var Witty = (function () {
       return pxval;
     }
 
+    function handleBadInput(id, val) {
+      console.log('handleBadINput running');
+      var Appdata= {};
+      Appdata = appController.getAppdata();
+      var prop = elementIdToAppdataProp(id);
+      console.log('prop is: ' + prop);
+      // !VA TODO: Setting maxViewerWidth just for now
+      var maxViewerWidth = 800;
+      switch (true) {
+        case (prop === 'viewerW') :
+          if (val < Appdata.imgW ) {
+            // !VA TODO: review this...
+            // !VA The viewer width can't be smaller than the current image width of XXX, show message
+          } else if (val > maxViewerWidth ) {
+            // !VA Setting a maxViewerWidth here but I need to review V1 and revisit this.
+            // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px
+            appController.initError(id, 'viewerW_GT_maxViewerWidth', true);
+          } else {
+            // !VA The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running evalViewerWidth. 
+            data = UIController.updateAppData(prop, val);
+          }
+          break;
 
+        // !VA Handle the custom width toolButton input
+        case (prop === 'imgW') :
+          console.log('bad input!');
+        // !VA TODO: restore the placeholder value on blur
+          // !VA If the new image width is greater than the viewer width, then show message. This is a temporary fix, the errorHandler should reset the field value to ''.
+          console.log('Appdata.viewerW is: ' + Appdata.viewerW);
+          console.table(Appdata);
+          if (val > Appdata.viewerW ) {
+            // !VA errorHandler!
+            appController.initError(id, 'imgW_GT_viewerW');
+            
+          }
+        
+      }
+
+
+
+    }
 
 
     // !VA INPUT HANDLING
@@ -927,6 +999,100 @@ var Witty = (function () {
     //  !VA ERROR HANDLING
     // ==============================
 
+      var errorHandler = function(id, str, bool) {
+        console.log('errorHandler running');
+        var Appdata = appController.getAppdata();
+        console.log('str is: ' + str);
+        
+
+
+
+
+
+        var errorMessages = {
+          imgW_GT_viewerW: `An image can't be wider than its parent table (currently set at ${Appdata.viewerW}px). The image width has to be less than the width of its container.`,
+          tbButton_LT_zero: 'Sorry, that would make one of the image dimensions less than 0.',
+          tbButton_GT_viewerW: `Sorry, that would make the image wider than its container, which is currently set at ${Appdata.viewerW}px`,
+          // !VA maxViewerWidth issue here, see message below;
+          viewerW_GT_maxViewerWidth: `The container table width can't be greater than the width of the app itself &mdash; 800px.`,
+          not_an_integer: 'Not an integer: please enter a positive whole number for width.'
+        };
+
+
+        // !VA Loop through the error ID/message pairs and find the match
+        for (const [key, value] of Object.entries(errorMessages)) { 
+          if (key === str ) {
+            showAppMessage(id, value, true);
+          }
+        }
+      };
+
+
+
+
+      // !VA Might be good to fold this into error handling
+      // clipboardController: VALIDATE INPUT FOR INTEGER
+      function validateInteger(inputVal) {
+        // !VA Since integer validation is used for all height/width input fields, including those not yet implemented
+        let isErr;
+        // let mess;
+        if (!parseInt(inputVal, 10) || inputVal % 1 !== 0 || inputVal < 0) {
+          isErr = true;
+        } else { 
+          // !VA Input fields return strings, so convert to integer
+          inputVal = parseInt(inputVal);
+          isErr = false;
+        }
+        // !VA Just returning true here, the error code is sent by the calling function in handleUserAction
+        return isErr;
+      }
+
+
+    // !VA appController private
+    // !VA Here we can show a message bypassing errorHandler - not all messages are errors.
+    var showAppMessage = function(id, mess, isErr) {
+      //Set the time the message will display
+      // let displayTime;
+      // Get the elements to manipulate for the error message display
+      // // !VA Create objects for all the UI elements used in this function
+      var appMessContainer = document.querySelector(staticRegions.appMessContainer);
+      var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
+      // var dimViewers = document.querySelector('#dim-viewers');
+      // var toolsContainer = document.querySelector('#tools-container');
+      // Put the respective error message in the error message container
+      appMessDisplay.innerHTML = mess;
+      // Swap dimViewers with appMessDisplay and drop toolsContainer behind viewport;
+
+
+      appMessContainer.classList.add('show-err');
+
+
+      // !VA Reset the value of the element into which the error was entered to empty. 
+      document.getElementById(id).value = '';
+      appMessContainer.classList.remove('hide-err');
+      appMessContainer.classList.add('show-err');
+
+    };
+
+    // !VA Need to get the Appdata property that corresponds to the ID of the DOM input element that sets it. It's easier to just create a list of these correspondences than to rename the whole UI elements and Appdata properties so they correspond, or to create functions that use string methods to extract them from each other.
+    //  clipboardController: GET APPDATA PROPERTY NAME FROM AN HTML ELEMENT ID
+    function elementIdToAppdataProp(str) {
+      var IDtoProp = {
+        viewerW:  'tb-input-viewerw',
+        imgW: 'tb-input-customw',
+        imgH: 'tb-input-customh',
+        sPhoneW: 'tb-input-small-phonesw',
+        lPhoneW: 'tb-input-large-phonesw'
+
+      };
+      // !VA This should return directly wihout a ret variable as tmp storage.
+      var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
+      // alert(ret);
+      return ret;
+    }
+
+
+
 
     // !VA NEW appController private
     var initDev = function() {
@@ -966,7 +1132,9 @@ var Witty = (function () {
       getAppdata: function() {
         // !VA NEW Initialize Appdata here and pass it along - we put it here because it's called from both the other modules 
         var Appdata = {};
-
+        // !VA Get dynamicRegions
+        dynamicRegions = UIController.getDynamicRegionIDs();
+        console.table(dynamicRegions);
         // !VA NEW Read required values into Appdata.
         var curImg = document.querySelector(dynamicRegions.curImg);
         Appdata.imgW = curImg.width;
@@ -982,10 +1150,16 @@ var Witty = (function () {
         Appdata.lPhonesW ? Appdata.lPhonesW : Appdata.lPhonesW = parseInt(document.querySelector(toolButtons.lPhonesW).placeholder, 10);
         Appdata.sPhonesH = Math.round(Appdata.sPhonesW * (1 / Appdata.aspect[0]));
         Appdata.lPhonesH = Math.round(Appdata.lPhonesW * (1 / Appdata.aspect[0]));
+        Appdata.viewerH = parseInt(document.querySelector(dynamicRegions.imgViewer).style.height, 10);
+        Appdata.viewerW = parseInt(document.querySelector(dynamicRegions.imgViewer).style.width, 10);
+        // !VA Stopped here: Why is viewerW NaN?
+        // console.log('Appdata.viewerW is: ' + Appdata.viewerW);
+        console.log('Here');
+        console.table(Appdata);
         return Appdata;
       },
       init: function(){
-        // clipboardController.tst();
+        // CBController.tst();
         console.log('App initialized.');
         // !VA NEW Make sure the CCP is off
         document.querySelector(staticRegions.ccpContainer).classList.remove('active');
@@ -1001,7 +1175,7 @@ var Witty = (function () {
       }
     };
 
-  })(clipboardController, UIController);
+  })(CBController, UIController);
 
   appController.init();
 
