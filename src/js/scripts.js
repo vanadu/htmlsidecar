@@ -403,11 +403,6 @@ var Witty = (function () {
       // appController private handleUserAction 
       function handleUserAction(evt) {
         console.log('handleUserAction running');
-        // !VA NEW Get Appobj so we can pass it, whatever the action
-        var Appobj = {};
-        Appobj = getAppobj(false);
-
-        console.table(Appobj);
         var keypressed;
         var isErr;
         // e.stopPropagation;
@@ -431,9 +426,7 @@ var Witty = (function () {
             val = parseInt(el.id.slice(-2));
             // !VA If the target ID includes 'grow' then the image dimension will be incremented, if 'shrink' then it will be decremented
             (el.id.includes('grow')) ? val : val = -val;
-            console.log('handleUserAction click');
-            console.table(Appobj);
-            handleCustomWidth(el.id, val, Appobj);
+            handleToolbarInput(el.id, val);
 
             break;
           case ( el.id.includes('dv')) :
@@ -454,9 +447,9 @@ var Witty = (function () {
             // !VA We want to handle all the toolbutton keyboard input in one place, so send the send the target element's id and value to handleTBInput
 
             // !VA NEW
-            } else if (el.id.includes('customw')) {
+            } else if (el.id.includes('custom')) {
               console.log('val is: ' + el.val);
-              handleCustomWidth(el.id, el.value, Appobj);
+                handleToolbarInput(el.id, el.value);
             } else {
               // !VA There will be other input fields to handle, but we're not there yet.
               console.log('Undefined keypress action');
@@ -539,6 +532,7 @@ var Witty = (function () {
     // !VA appController private getAppobj
     function getAppobj(isDev) {
       console.log('getAppobj running');
+
       // !VA NEW Initialize Appobj here and pass it along
       var Appobj = {};
       // !VA At this point imgW and imgW = imgNW and imgNH if this is called from initDev or handleFileSelect. The only difference is that initDev needs to write the filename to the DOM because that's handled by handleFileSelect. So we get the isDev flag
@@ -653,9 +647,7 @@ var Witty = (function () {
                 console.dir(Appobj);
 
                 // !VA NEW Commented out for now.
-                calcImgViewerSize(Appobj);
-                console.log('blob');
-                console.dir(Appobj);
+                calcImgViewerSize();
                 // !VA NEW Delete
                 // clipboardController.evalViewerSize(Appdata);
               })();
@@ -695,11 +687,14 @@ var Witty = (function () {
 
 
     // !VA NEW appController private calcImgViewerSize
-    function calcImgViewerSize(Appobj) {
+    // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH
+    function calcImgViewerSize() {
       console.log('calcImgViewerSize running');
-      console.log('blib');
+      // debugger;
+      var Appobj = {};
+      Appobj = getAppobj(false);
       console.dir(Appobj);
-      // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. This can probably be recoded for efficiency but it works for now. Take another look at it.
+      // !VA Using the current image dimensions in Appobj, calculate the current size of imgViewer so it adjusts to the current image size. 
       // !VA NEW Get the actual viewerW from getComputedStyle
       var viewerW;
       var viewerH;
@@ -707,12 +702,25 @@ var Witty = (function () {
       viewerW = parseInt(compStyles.getPropertyValue('width'), 10);
       viewerH = parseInt(compStyles.getPropertyValue('height'), 10);
 
+      // !VA If we're initializing a new image, use the naturalWidth and naturalHeight. If we're updating via user input, we need to use the display image and height, imgW and imgH. If we're initializing, then Appobj.imgW and Appobj.imgH will be 0 or falsy because it hasn't been resized yet. So we need to make the following switch case based on the _actual_ image width and height, which will be different based on whether we're initializing or updating. So:
+
+      var actualW, actualH
+      if (Appobj.imgW === 0) {
+        console.log('initializing');
+        actualW = Appobj.imgNW;
+        actualH = Appobj.imgNH;
+      } else {
+        actualW = Appobj.imgW;
+        actualH = Appobj.imgH; 
+      }
+
+
       switch(true) {
       // The image falls within the default viewer dimensions set in initApp, so do nothing.
       // !VA This case is irrelevant since we're now comparing everything to maxViewerWidth not the  init values. Change accordingly...
       // !VA  NOT SO...now we're trying to restore the previous functionality so...
-      case (Appobj.imgNW <= viewerW) && (Appobj.imgNH < viewerH) :
-        Appobj.imgW = Appobj.imgNW;
+      case (actualW <= viewerW) && (Appobj.imgNH < viewerH) :
+        actualW = Appobj.imgNW;
         Appobj.imgH = Appobj.imgNH;
         // !VA viewerH is set in initApp, so no change to it here
         // !VA viewerH is set in initapp, so no change to that here either.
@@ -722,7 +730,7 @@ var Witty = (function () {
 
       // The image is wider than the current viewer width but shorter than current viewer height, so resize the image based on the viewer width
       
-      case (Appobj.imgNW > viewerW) && (Appobj.imgNH < viewerH) :
+      case (actualW > viewerW) && (actualH < viewerH) :
         // Set the image width to the current viewer
         Appobj.imgW = viewerW;
         // Get the image height from the aspect ration function
@@ -734,7 +742,7 @@ var Witty = (function () {
 
       // The image is not as wide as the current viewer width, but is taller than the viewer height. Keep the image width but resize the viewer in order to display the full image height
       // !VA This might be a problem with consecutive images without page refresh
-      case (Appobj.imgNW <= viewerW) && (Appobj.imgNH > viewerH) :
+      case (actualW <= viewerW) && (actualH > viewerH) :
         // Set the viewer height and the image height to the image natural height
         viewerH = Appobj.imgH = Appobj.imgNH;
         // Set the image width to the natural image width
@@ -746,7 +754,7 @@ var Witty = (function () {
         break;
 
       // The image is wider and taller than the current viewer height and width so we have to resize the image and the viewport based on the current viewport width
-      case (Appobj.imgNW > viewerW) && (Appobj.imgNH > viewerH) :
+      case (actualW > viewerW) && (actualH > viewerH) :
         // Set the image Width to the current  viewer width 
         Appobj.imgW = viewerW;
         // Set the image height proportional to the new image width using the aspect ratio function
@@ -771,43 +779,42 @@ var Witty = (function () {
       // UICtrl.adjustImgContainers(imgW, imgH, viewerH);
     }
 
-        // !VA appController private doContainerHeights
-        function adjustImgContainers(imgH, imgW, viewerH)  {
-          // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values.
-          // !VA Initial height is 450, as it is defined in the CSS. TOo much hassle to try and get the value as defined in the CSS programmatically.
-          // const initViewerH= parseInt(document.querySelector(dynamicRegions.imgViewer).height, 10);
-          const initViewerH = 450;
-          let viewportH;
-          let appH; 
-    
-          // !VA I'm not even sure this is necessary since we're getting the viewerW from maxViewerHeight now -- but we'll leave it in here for the time being. 
-          // !VA TODO: Review this whole maxViewerHeight thing.
-          if (imgH <= initViewerH) {
-            // !VA  This is the min-height set in CSS
-            // appObj.appContainerH = 804;
-            viewerH = initViewerH;
-            viewportH = viewerH + 145;
-          } else {
-            // Need a little buffer in the viewport
-            viewerH = imgH;
-            viewportH = imgH + 145;
-    
-          }
-          appH = viewportH;
-          // viewportH = heightVal + 125;
-          // appContainerH = viewportH;
-          // This should write the heights to Appdata and then pass it to the function that writes Appdata to the dimViewers, probably called refreshDimViewers. In fact, there's no reason not to consolidate that function with the function that updates the image container heights and refresh the entire UI at the same time, so refreshUI.
-          // dynamicRegions.imgViewer
-          // dynamicRegions.imgViewPort
-          // dynamicRegions.appContainer
-    
-    
-          document.querySelector(dynamicRegions.curImg).style.width = imgW + 'px';
-          document.querySelector(dynamicRegions.curImg).style.height =imgH + 'px';;
-          document.querySelector(dynamicRegions.imgViewer).style.height = viewerH + 'px';
-          document.querySelector(dynamicRegions.imgViewport).style.height = viewportH + 'px';
-          document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';;
-        }
+    // !VA appController private doContainerHeights
+    function adjustImgContainers(imgH, imgW, viewerH)  {
+      // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values.
+      // !VA Initial height is 450, as it is defined in the CSS. TOo much hassle to try and get the value as defined in the CSS programmatically.
+      // const initViewerH= parseInt(document.querySelector(dynamicRegions.imgViewer).height, 10);
+      const initViewerH = 450;
+      let viewportH;
+      let appH; 
+
+      // !VA I'm not even sure this is necessary since we're getting the viewerW from maxViewerHeight now -- but we'll leave it in here for the time being. 
+      // !VA TODO: Review this whole maxViewerHeight thing.
+      if (imgH <= initViewerH) {
+        // !VA  This is the min-height set in CSS
+        // appObj.appContainerH = 804;
+        viewerH = initViewerH;
+        viewportH = viewerH + 145;
+      } else {
+        // Need a little buffer in the viewport
+        viewerH = imgH;
+        viewportH = imgH + 145;
+
+      }
+      appH = viewportH;
+      // viewportH = heightVal + 125;
+      // appContainerH = viewportH;
+      // This should write the heights to Appdata and then pass it to the function that writes Appdata to the dimViewers, probably called refreshDimViewers. In fact, there's no reason not to consolidate that function with the function that updates the image container heights and refresh the entire UI at the same time, so refreshUI.
+      // dynamicRegions.imgViewer
+      // dynamicRegions.imgViewPort
+      // dynamicRegions.appContainer
+
+      document.querySelector(dynamicRegions.curImg).style.width = imgW + 'px';
+      document.querySelector(dynamicRegions.curImg).style.height =imgH + 'px';;
+      document.querySelector(dynamicRegions.imgViewer).style.height = viewerH + 'px';
+      document.querySelector(dynamicRegions.imgViewport).style.height = viewportH + 'px';
+      document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';;
+    }
 
     
     //appController private: getAspectRatio
@@ -852,26 +859,34 @@ var Witty = (function () {
     // !VA appController private handleCustomWidth
     // !VA Handle user input changes to Appobj.imgWidth
     // !VA NEW
-      function handleCustomWidth(id, val, Appobj) {
-      console.log('handleCustomWidth start');
+      function handleToolbarInput(id, val) {
+      console.log('handleToolbarInput start');
+      var Appobj = {};
+      Appobj = getAppobj(false);
       console.dir(Appobj);
       console.log('id is: ' + id);
       console.log('val is: ' + val);
-
+      // !VA Handle width input by mouseclick 
       if (id.includes('tb-but')) {
+        // !VA by mouseclick
         Appobj.imgW = Appobj.imgW + val;
-      } else { 
+        Appobj.imgH =  Appobj.imgW * (1 / Appobj.aspect[0]);
+        // !VA Handle width input input field
+      } else if (id.includes('customw')) { 
         Appobj.imgW = val;
+        Appobj.imgH =  Appobj.imgW * (1 / Appobj.aspect[0]);
+      } else if (id.includes('customh')) {
+        Appobj.imgH = val;
+        Appobj.imgW =  Appobj.imgH * (Appobj.aspect[0]);
       }
-      Appobj.imgH =  Appobj.imgW * (1 / Appobj.aspect[0]);
-      console.table(Appobj);
-      updateAppobj(Appobj.imgW, Appobj.imgH);
+      Appobj = updateAppobj(Appobj.imgW, Appobj.imgH);
+      calcImgViewerSize();
     }
 
     // !VA NEW So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. Very simple.
     function updateAppobj(w, h) {
+      console.log('updateAppobj running');
       var Appobj = {};
-      console.log('updateAppobj');
       document.querySelector(dynamicRegions.curImg).style.width = w + 'px';
       document.querySelector(dynamicRegions.curImg).style.height = h + 'px';
       Appobj = getAppobj(false);
