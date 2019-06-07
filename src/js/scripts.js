@@ -1,11 +1,11 @@
 
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
-IN PROGRESS: 060519Purge - Purging deprecated or not-yet implemented code in this build. We're rebuilding from ground up based on the flowchart 
-
-TODO: Make Esc cancel the input on customW, customH and viewerW
-TODO: Implement image swap 
+TODO: Show/Hide CCP
 TODO: Implement Td and table copy to clipboard buttons.
+TODO: Make Esc cancel the input in input fields. Now, on error the cursor stays in the field and nothing happens, you have to tab out. On Esc, the focus should elsewhere.
+TODO: Fix bug - load 400X1000, multiple click on +50, Display Size shows 450 but the img doesn't grow...
+TODO: Implement image swap 
 TODO: Parent table class att only shows in CB output if Wrapper is selected, not in just the Partent table output.
 TODO: Make bgcolor add the hash if it's not in the value
 TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
@@ -157,22 +157,116 @@ var Witty = (function () {
       UIController.setDimAlerts(curDimViewer, true);
     }
 
+    // !VA UIController: Init function for CCP
+    function initCCP() {
+      // !VA Copy Appdata to local object
+      var data = appController.getAppdata();
 
-      //UIController: set dim alerts
-      function setDimAlerts(curDimViewers, bool) {
-        // !VA if evalDimAlerts returns true, then the dimViewer should be displayed in red. To reset the dim alert, set to style color to 'auto'.
-        var att = bool;
-        bool ? att = 'red': att = 'inherit';
-        // !VA We want to use this same function to reset the dim alerts when a new image is loaded. For that, we need to pass in an array of all the dimViewer IDs, not just an array of the ones that are already red. So, first test if the argument is an object, and if it is convert it into a list of values so the loop will accept it.
+      // !VA If the CCP is open...
+      if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
 
-        if (Array.isArray(curDimViewers) === false) {
-          curDimViewers = Object.values(curDimViewers);
+        // !VA Initialize with all the 'include wrapper table' options undisplayed - uncomment this for DEV
+        // var wrapperItemsToHide = ['#table-wrapper-class', '#table-wrapper-width', '#table-wrapper-align', '#table-wrapper-bgcolor' ]; 
+        // for (let i = 0; i < wrapperItemsToHide.length; i++) {
+        //   document.querySelector(wrapperItemsToHide[i]).style.display = 'none'; 
+        // }
+
+        // !VA Initialize with 'include wrapper table' unchecked, or true for DEV
+        var includeWrapperTable = document.querySelector((ccpUserInput.tableIncludeWrapper.replace('mrk', 'box')));
+        includeWrapperTable.checked = true;
+        // !VA Default for table width
+        document.querySelector(ccpUserInput.tableWidth).value = `${data.imgW}`;
+        // !VA Defaults for wrapper width and class
+        document.querySelector(ccpUserInput.tableWrapperWidth).value = `${data.viewerW}`;
+        document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
+
+        // !VA CCP Event Listeners -- we will handle CCP events separately from other UI events here to keep separation of dynamic vs static element handling
+        // !VA Checkboxes that need toggling
+        var imgIncludeStylesCheckmrk = document.querySelector(ccpUserInput.imgIncludeStyles);
+        var tdBgimageCheckmrk = document.querySelector(ccpUserInput.tdBgimage);
+        var tableIncludeWrapper = document.querySelector(ccpUserInput.tableIncludeWrapper);
+        // !VA Toggle the checkbox and initialize the table wrapper defaults
+        // !VA TODO: Revisit all the CCP init
+        imgIncludeStylesCheckmrk.addEventListener('click', toggleCheckbox, false);
+        tdBgimageCheckmrk.addEventListener('click', toggleCheckbox, false);
+        tableIncludeWrapper.addEventListener('click', toggleCheckbox, false);
+      }
+    }
+
+
+    // UIController Show element when input in another element is made 
+    function showElementOnInput(event) {
+      // !VA Here we catch the input handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
+
+
+      var elems = [];
+      // elems[0] = ccpBuildTag.imgDisplayCSSToClipboard;
+      elems[0] = document.querySelector(ccpBuildTag.imgDisplayCSSToClipboard);
+      elems[1] = document.querySelector(ccpBuildTag.imgSPhoneCSSToClipboard);
+      elems[2] = document.querySelector(ccpBuildTag.imgLPhoneCSSToClipboard);
+      elems[3] = document.querySelector(ccpBuildTag.tdDisplayCSSToClipboard);
+      elems[4] = document.querySelector(ccpBuildTag.tdSPhoneCSSToClipboard);
+      elems[5] = document.querySelector(ccpBuildTag.tdLPhoneCSSToClipboard);
+      elems[6] = document.querySelector(ccpBuildTag.tableDisplayCSSToClipboard);
+      elems[7] = document.querySelector(ccpBuildTag.tableSPhoneCSSToClipboard);
+      elems[8] = document.querySelector(ccpBuildTag.tableLPhoneCSSToClipboard);
+      // !VA We only want to show the buttons in each respective fieldset
+      // !VA If the input is in the img fieldset, only show the first three buttons in the array
+      if (event.target.id === 'img-class-input') {
+        for (let i = 0; i <= 2; i++) {
+          this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
         }
-        // !VA For each dimViewer passed from evalDimAlerts, set the font color style based on the bool argument passed in.
-        for (let i = 0; i < curDimViewers.length; i++) {
-          document.querySelector(curDimViewers[i]).style.color = att;
+      } else if (event.target.id === 'td-class-input') {
+        // !VA If the input is in the td fieldset, only show the next three buttons in the array
+        for (let i = 3; i <= 5 ; i++) {
+          this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
+        }
+      } else if (event.target.id === 'table-class-input') {
+        // !VA If the input is in the table fieldset, only show the next buttons in the array
+        for (let i = 6; i <= 8 ; i++) {
+          this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
         }
       }
+    }
+
+    // !VA  UIController: Toggle checkboxes and run any associated actions
+    function toggleCheckbox(event) {
+      // !VA TODO: !IMPORTANT! All the initialization for the CCP is better done elsewhere
+      // !VA But in the meantime, we want this to run for all custom CSS checkboxes used in this project -- but the CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
+      // !VA We will need Appdata to initialize the defaults for the wrapper table below
+      var data = appController.getAppdata();
+      // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
+      var wrapperItemsToShow = [];
+
+      // !VA The clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it.
+      var checkbox = document.getElementById(event.target.id.replace('mrk', 'box'));
+      // !VA Toggle the target's checkbox 
+      checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
+
+      // !VA Now run any actions associated with the checkbox
+      // !VA Get the Appdata for the input default value
+      // !VA TODO: This value needs to be refreshed when the CCP is opened. In fact, entering new values in any of the toolButton inputs has to call a refresh of Appdata and a closing-reopening of the CCP so the values can refresh.
+      
+      // !VA Defaults for wrapper width and class
+      document.querySelector(ccpUserInput.tableWrapperWidth).value = `${data.viewerW}`;
+      document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
+      // !VA Only show the CCP wrapper width, class, align, and bgcolor options if 'Include wrapper table' is selected 
+
+      // !VA Show wrapper table options if the checked element is 'table-include-wrapper-checkbox'
+      if (checkbox.id === 'table-include-wrapper-checkbox') {
+        wrapperItemsToShow = ['#table-wrapper-class', '#table-wrapper-width', '#table-wrapper-align', '#table-wrapper-bgcolor' ]; 
+        if (checkbox.checked) {
+          for (let i = 0; i < wrapperItemsToShow.length; i++) {
+            document.querySelector(wrapperItemsToShow[i]).style.display = 'block'; 
+          }
+        } else {
+          for (let i = 0; i < wrapperItemsToShow.length; i++) {
+            document.querySelector(wrapperItemsToShow[i]).style.display = 'none'; 
+          }
+        }
+      }
+    }
+
 
     // !VA UIController public functions
     return {
@@ -243,54 +337,14 @@ var Witty = (function () {
         // !VA Call evalDimAlerts to calculate which dimViewer values don't meet HTML email specs.
         evalDimAlerts();
       },
-
-
-
       // !VA UIController public writeFilenameToUI
       writeFilenameToUI: function (fileName) {
         document.querySelector(dimViewers.filename).textContent = fileName;
         document.querySelector(dimViewers.filename).style.display = 'block';
       },
 
-
-      // UIController public removeCurImg
-      // !VA Test for whether there is already a #cur-img element in the DOM, and if there is remove it so handleFileSelect can overwrite it without having to refresh the page to reboot the app.
-      removeCurImg: function () {
-        // if ( document.querySelector('#cur-img-container')) {
-        document.querySelector('#cur-img-container').parentNode.removeChild(document.querySelector('#cur-img-container'));
-        // } de1690c
-      }, 
-
-      // !VA UIController public adjustImageContainers
-      adjustImageContainers: function (imgH, imgW, viewerH)  {
-      // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values.
-      // !VA Initial height is 450, as it is defined in the CSS. TOo much hassle to try and get the value as defined in the CSS programmatically.
-      // const initViewerH= parseInt(document.querySelector(dynamicRegions.imgViewer).height, 10);
-      const initViewerH = 450;
-      let viewportH;
-      let appH; 
-
-      // !VA I'm not even sure this is necessary since we're getting the viewerW from maxViewerHeight now -- but we'll leave it in here for the time being. 
-      // !VA TODO: Review this whole maxViewerHeight thing.
-      if (imgH <= initViewerH) {
-        // !VA  This is the min-height set in CSS
-        // Appdata.appContainerH = 804;
-        viewerH = initViewerH;
-        viewportH = viewerH + 145;
-      } else {
-        // Need a little buffer in the viewport
-        viewerH = imgH;
-        viewportH = imgH + 145;
-      }
-      appH = viewportH;
-      document.querySelector(dynamicRegions.curImg).style.width = imgW + 'px';
-      document.querySelector(dynamicRegions.curImg).style.height = imgH + 'px';
-      document.querySelector(dynamicRegions.imgViewer).style.height = viewerH + 'px';
-      document.querySelector(dynamicRegions.imgViewport).style.height = viewportH + 'px';
-      document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';
-      },
-
-      //UIController: set dim alerts
+      // !VA NEW I had this as private but moved to public, not sure why.
+      //UIController public setDimAlerts
       setDimAlerts: function(curDimViewers, bool) {
         // !VA if evalDimAlerts returns true, then the dimViewer should be displayed in red. To reset the dim alert, set to style color to 'auto'.
         var att = bool;
@@ -304,8 +358,9 @@ var Witty = (function () {
           document.querySelector(curDimViewers[i]).style.color = att;
         }
       },
+
       // UIController: Flash a status message in the app message area
-      // !VA We could probably fold this into the error handler but that's going to be complicated enough as it is and this is just for status messages
+      // !VA NEW - review this. We could probably fold this into the error handler but that's going to be complicated enough as it is and this is just for status messages
       flashAppMessage: function(id) {
         // !VA Passes in the id of the element that triggered the action for which a status message is displayed.
 
@@ -359,7 +414,20 @@ var Witty = (function () {
           },250);
         }, 
         2000);
-      }
+      },
+
+
+      // // TOGGLE CLIPBOARD CONTROL PANEL
+      ccpToggle: function () {
+        document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
+        if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
+          initCCP();
+        }
+      },
+
+
+
+
 
     };
 
@@ -529,7 +597,7 @@ var Witty = (function () {
             } else if (el.id.includes('custom')) {
               // !VA Error handling
                 console.log('errorHandler call');
-                handleBadInput(el.id, el.value);
+                checkKeyboardInput(el.id, el.value);
                 // errorHandler(el.id, el.value);
             } else {
               // !VA There will be other input fields to handle, but we're not there yet.
@@ -550,9 +618,9 @@ var Witty = (function () {
             // !VA Reset the viewer width field the last value of Appdata.viewerW 
             } else {
               // !VA Get the Appdata property name that corresponds to the ID of the current input element
-              var prop = CBController.elementIdToAppdataProp(el.id);
+              var prop = elementIdToAppdataProp(el.id);
               // !VA Access Appdata
-              var data = UIController.accessAppdata();
+              var data = appController.getAppdata();
               // !VA return the current value of the Appdata property for the current event target to that elements value property. 
               // alert(data[prop]);
               return data[prop];
@@ -704,8 +772,6 @@ var Witty = (function () {
 
                 // !VA NEW Commented out for now.
                 calcImgViewerSize(false);
-                // !VA NEW Delete
-                // CBController.evalViewerSize(Appdata);
               })();
               
               // !VA Timeout of 250 ms while the blob loads.
@@ -823,13 +889,7 @@ var Witty = (function () {
       UICtrl.writeDimViewers(Appdata);
       adjustImgContainers(Appdata.imgH, Appdata.imgW, viewerH);
 
-      // !VA Run evalDimAlerts now, after all the containers have been resized.
-      // !VA !IMPORTANT! THIS IS WHERE TO GET THE UPDATED APPDATA
-      // CBController.evalDimAlerts(Appdata, dimViewers);
-      // UICtrl.writeImgToDOM(Appdata);
 
-      // !VA Now rec
-      // UICtrl.adjustImgContainers(imgW, imgH, viewerH);
     }
 
     // !VA appController private doContainerHeights
@@ -906,8 +966,8 @@ var Witty = (function () {
       return pxval;
     }
 
-    function handleBadInput(id, val) {
-      console.log('handleBadINput running');
+    function checkKeyboardInput(id, val) {
+      console.log('checkKeyboardInput running');
       var Appdata= {};
       Appdata = appController.getAppdata();
       var prop = elementIdToAppdataProp(id);
@@ -1161,12 +1221,9 @@ var Witty = (function () {
         Appdata.viewerW = viewerW;
         // !VA Stopped here: Why is viewerW NaN?
         // console.log('Appdata.viewerW is: ' + Appdata.viewerW);
-        console.log('Here');
-        console.table(Appdata);
         return Appdata;
       },
       init: function(){
-        // CBController.tst();
         console.log('App initialized.');
         // !VA NEW Make sure the CCP is off
         document.querySelector(staticRegions.ccpContainer).classList.remove('active');

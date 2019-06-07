@@ -26,6 +26,7 @@ ccpBuildTag
 Added:
 evalDimAlerts (moved from clipboardController public)
 
+
 UIController public
 -------------------
 Removed:
@@ -48,6 +49,7 @@ writeFilenameToUI
 removeCurImg
 
 Added:
+flashAppMessage 
 setDimAlerts
 
 clipboardController private

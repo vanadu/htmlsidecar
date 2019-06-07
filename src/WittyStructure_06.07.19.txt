@@ -1,0 +1,161 @@
+Witty Program Outline 06.07.19
+------------------------------
+
+
+Witty
+===========================
+	appController
+	-----------------------
+		adjustImgContainers
+		!VA This has a duplicate function name as the public UIController function below. 
+		It's called by calcImgViewerSize after writeDimViewers. It doesn't call Appdata, seems like a temporary hackjob. 
+
+
+
+			appH
+			initViewerH
+			viewportH
+		calcImgViewerSize
+			actualH
+			actualW
+			Appdata
+			compStyles
+			viewerH
+			viewerW
+		checkKeyboardInput
+			Appdata
+			maxViewerWidth
+			prop
+		elementIdToAppdataProp
+			IDtoProp
+			ret
+				find() callback
+		getAppdata
+			Appdata
+			cStyles
+			curImg
+			imgViewer
+			viewerH
+			viewerW
+		getAspectRatio
+			aspectInt
+			aspectReal
+		handleFileSelect
+			<function>
+				<function>
+					initializeDimViewers
+					initImgToDOM
+						curImg
+						fileName
+				f
+				files
+				reader
+				target
+		handleToolbarInput
+			Appdata
+		init 
+			curImgExists
+		initError
+		intToPx
+			pxVal
+			str
+		removeCurImg
+		updateAppdata
+			Appdata
+		validateInteger
+			isErr
+		validateInteger
+			isErr
+		ccpUserInput
+		dimViewers
+		dynamicRegions
+		errorHandler
+		initDev
+		setupEventListeners
+		showAppMessage
+		staticRegions
+		toolButtons
+
+	CBController
+	-----------------------
+	<function>
+
+	UIController
+	-----------------------
+	!VA This is called by nothing, apparently, and seems to be a dupe of the appController private function above. Deleted.
+	adjustImageContainers
+		appH
+		initViewerH
+		viewportH
+	evalDimAlerts
+		Appdata
+		curDimViewer
+		dimViewers
+	flashAppMessage
+		window.setTimeout() callback
+		appMessContainer
+		appMessDisplay
+		ccpBlocker
+		key
+		mess
+		statusMessages
+		value
+	getCcpBuildTagIDs
+	getCcpUserInputIDs
+	getDimViewerIDs
+	getDynamicRegionIDs
+	getStaticRegionIDs
+	getToolButtonIDs
+	initUI
+		dimarray
+		i
+	!VA THis appears to be a dupe of the appController private function above...deleted.
+	removeCurImg
+	setDimAlerts
+		att
+		i
+	writeDimViewers
+		Appdata
+	writeFinanameToUI
+		Appdata
+		CCPBuildTag
+		ccpUserInput
+		dimViewers
+		dynamicRegions
+		staticRegions
+		toolButtons
+
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
