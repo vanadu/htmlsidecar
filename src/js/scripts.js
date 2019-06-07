@@ -695,7 +695,8 @@ var Witty = (function () {
                 // !VA Pass Appdata on to evalViewerSizes in order to resize the image containers dynamically based on the dimensions of the image.
                 // !VA Create and array of the Appdata properties to update
                 // !VA Instead of managing Appdata based on some huge object with four HTML elements and all those unneeded properties thereof, we will just update Appdata by creating a local copy with just the properties we want to add.
-                // !VA Stopped here. The problem is that Appdata is a global object in the public functions, as it is now in master. I don't want to put all that stuff in the appController's public functions, so I have to either leave it in UIController or pass it between private functions, which will get very complicated.   I think it will be much cleaner if I only use updateAppData to loop through the items to update and don't use the klunky getAppData. Also, the refreshAppUI function refreshes all the values when it's called - it should only refresh the changed values.
+                // !VA Review this - it might be an older comment...
+                // !VA The problem is that Appdata is a global object in the public functions, as it is now in master. I don't want to put all that stuff in the appController's public functions, so I have to either leave it in UIController or pass it between private functions, which will get very complicated.   I think it will be much cleaner if I only use updateAppData to loop through the items to update and don't use the klunky getAppData. Also, the refreshAppUI function refreshes all the values when it's called - it should only refresh the changed values.
                 // !VA NEW Now that the blob image has been displayed and has DOM properties that can be queried, query them and write them to Appdata.
                 var Appdata = {};
                 Appdata = appController.getAppdata(false);
@@ -744,7 +745,7 @@ var Witty = (function () {
     // !VA NEW appController private calcImgViewerSize
     // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH
     function calcImgViewerSize() {
-      // debugger;
+
       // !VA Here's the problem...
       var Appdata = {};
       Appdata = appController.getAppdata(false);
@@ -930,11 +931,10 @@ var Witty = (function () {
 
         // !VA Handle the custom width toolButton input
         case (prop === 'imgW') :
-          console.log('bad input!');
+          console.log('customW!');
         // !VA TODO: restore the placeholder value on blur
           // !VA If the new image width is greater than the viewer width, then show message. This is a temporary fix, the errorHandler should reset the field value to ''.
           console.log('Appdata.viewerW is: ' + Appdata.viewerW);
-          console.table(Appdata);
           if (val > Appdata.viewerW ) {
             // !VA errorHandler!
             appController.initError(id, 'imgW_GT_viewerW');
@@ -1011,7 +1011,7 @@ var Witty = (function () {
 
 
         var errorMessages = {
-          imgW_GT_viewerW: `An image can't be wider than its parent table (currently set at ${Appdata.viewerW}px). The image width has to be less than the width of its container.`,
+          imgW_GT_viewerW: `The image width has to be less than the width of its container table, which is now&nbsp;set&nbsp;to&nbsp;${Appdata.viewerW}px.`,
           tbButton_LT_zero: 'Sorry, that would make one of the image dimensions less than 0.',
           tbButton_GT_viewerW: `Sorry, that would make the image wider than its container, which is currently set at ${Appdata.viewerW}px`,
           // !VA maxViewerWidth issue here, see message below;
@@ -1135,9 +1135,15 @@ var Witty = (function () {
         var Appdata = {};
         // !VA Get dynamicRegions
         dynamicRegions = UIController.getDynamicRegionIDs();
-        console.table(dynamicRegions);
         // !VA NEW Read required values into Appdata.
         var curImg = document.querySelector(dynamicRegions.curImg);
+        var imgViewer = document.querySelector(dynamicRegions.imgViewer);
+        // !VA Get the computed styles for viewerW and viewerH
+        var cStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
+        var viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
+        var viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
+
+        // !VA Assign property values
         Appdata.imgW = curImg.width;
         Appdata.imgH = curImg.height;
         Appdata.imgNW = curImg.naturalWidth;
@@ -1151,8 +1157,8 @@ var Witty = (function () {
         Appdata.lPhonesW ? Appdata.lPhonesW : Appdata.lPhonesW = parseInt(document.querySelector(toolButtons.lPhonesW).placeholder, 10);
         Appdata.sPhonesH = Math.round(Appdata.sPhonesW * (1 / Appdata.aspect[0]));
         Appdata.lPhonesH = Math.round(Appdata.lPhonesW * (1 / Appdata.aspect[0]));
-        Appdata.viewerH = parseInt(document.querySelector(dynamicRegions.imgViewer).style.height, 10);
-        Appdata.viewerW = parseInt(document.querySelector(dynamicRegions.imgViewer).style.width, 10);
+        Appdata.viewerH = viewerH;
+        Appdata.viewerW = viewerW;
         // !VA Stopped here: Why is viewerW NaN?
         // console.log('Appdata.viewerW is: ' + Appdata.viewerW);
         console.log('Here');
