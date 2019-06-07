@@ -745,6 +745,7 @@ var Witty = (function () {
     // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH
     function calcImgViewerSize() {
       // debugger;
+      // !VA Here's the problem...
       var Appdata = {};
       Appdata = appController.getAppdata(false);
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
