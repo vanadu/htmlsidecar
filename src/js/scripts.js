@@ -1,7 +1,10 @@
 
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
-TODO: Show/Hide CCP
+BRANCH: ImplementCCPOptions
+
+
+
 TODO: Implement Td and table copy to clipboard buttons.
 TODO: Make Esc cancel the input in input fields. Now, on error the cursor stays in the field and nothing happens, you have to tab out. On Esc, the focus should elsewhere.
 TODO: Fix bug - load 400X1000, multiple click on +50, Display Size shows 450 but the img doesn't grow...
@@ -13,6 +16,10 @@ TODO: THe CCP should store all the currently selected options and restore them w
 TODO: Assign keyboard  shortcuts
 TODO: Assign  tab order
 
+
+
+
+DONE: Show/Hide CCP, make checkboxes functional.
 */
 //SCRIPT START
 //PAGE SETUP START
@@ -77,9 +84,6 @@ var Witty = (function () {
       dropArea: '#drop-area',
       toolsContainer: '#tools-container',
       ccpContainer: '#ccp',
-      ccpImgClipbboardBut: '#img-build-html-but',
-      ccpTdClipbboardBut: '#td-build-html-but',
-      ccpTableClipbboardBut: '#table-build-html-but',
       appMessContainer: '#app-message-container',
       appMessDisplay: '#app-message-display',
       ccpBlocker: '#ccp-blocker'
@@ -113,20 +117,25 @@ var Witty = (function () {
       tableWrapperBgColor: '#table-wrapper-bgcolor-input',
     };
 
-    // !VA ccpBuildTag ID Strings
+    // !VA ccpMakeClip ID Strings
     // Stores the ccpMakeTag object for assembling the clipboard create tag buttons
     // !VA V2 Also doesn't belong here, we will move it later.
-    var ccpBuildTag = {
-      imgBuildHTMLBut: '',
-      imgDisplayCSSToClipboard: '#img-display-css-to-clipboard-but',
-      imgSPhoneCSSToClipboard: '#img-sphone-css-to-clipboard-but',
-      imgLPhoneCSSToClipboard: '#img-lphone-css-to-clipboard-but',
-      tdDisplayCSSToClipboard: '#td-display-css-to-clipboard-but',
-      tdSPhoneCSSToClipboard: '#td-sphone-css-to-clipboard-but',
-      tdLPhoneCSSToClipboard: '#td-lphone-css-to-clipboard-but',
-      tableDisplayCSSToClipboard: '#table-display-css-to-clipboard-but',
-      tableSPhoneCSSToClipboard: '#table-sphone-css-to-clipboard-but',
-      tableLPhoneCSSToClipboard: '#table-lphone-css-to-clipboard-but',
+    var ccpMakeClip = {
+      // !VA Build HTML Clipboard Buttons
+      ccpImgWriteHTMLToCB: '#img-build-html-but',
+      ccpTdWriteHTMLToCB: '#td-build-html-but',
+      ccpTableWriteHTMLToCB: '#table-build-html-but',
+      // !VA Make CSS Clip Buttons
+
+      imgDisplayWriteCSSToCB: '#img-display-css-to-clipboard-but',
+      imgSPhoneWriteCSSToCB: '#img-sphone-css-to-clipboard-but',
+      imgLPhoneWriteCSSToCB: '#img-lphone-css-to-clipboard-but',
+      tdDisplayWriteCSSToCB: '#td-display-css-to-clipboard-but',
+      tdSPhoneWriteCSSToCB: '#td-sphone-css-to-clipboard-but',
+      tdLPhoneWriteCSSToCB: '#td-lphone-css-to-clipboard-but',
+      tableDisplayWriteCSSToCB: '#table-display-css-to-clipboard-but',
+      tableSPhoneWriteCSSToCB: '#table-sphone-css-to-clipboard-but',
+      tableLPhoneWriteCSSToCB: '#table-lphone-css-to-clipboard-but',
     };
 
 
@@ -157,59 +166,24 @@ var Witty = (function () {
       UIController.setDimAlerts(curDimViewer, true);
     }
 
-    // !VA UIController: Init function for CCP
-    function initCCP() {
-      // !VA Copy Appdata to local object
-      var data = appController.getAppdata();
-
-      // !VA If the CCP is open...
-      if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
-
-        // !VA Initialize with all the 'include wrapper table' options undisplayed - uncomment this for DEV
-        // var wrapperItemsToHide = ['#table-wrapper-class', '#table-wrapper-width', '#table-wrapper-align', '#table-wrapper-bgcolor' ]; 
-        // for (let i = 0; i < wrapperItemsToHide.length; i++) {
-        //   document.querySelector(wrapperItemsToHide[i]).style.display = 'none'; 
-        // }
-
-        // !VA Initialize with 'include wrapper table' unchecked, or true for DEV
-        var includeWrapperTable = document.querySelector((ccpUserInput.tableIncludeWrapper.replace('mrk', 'box')));
-        includeWrapperTable.checked = true;
-        // !VA Default for table width
-        document.querySelector(ccpUserInput.tableWidth).value = `${data.imgW}`;
-        // !VA Defaults for wrapper width and class
-        document.querySelector(ccpUserInput.tableWrapperWidth).value = `${data.viewerW}`;
-        document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
-
-        // !VA CCP Event Listeners -- we will handle CCP events separately from other UI events here to keep separation of dynamic vs static element handling
-        // !VA Checkboxes that need toggling
-        var imgIncludeStylesCheckmrk = document.querySelector(ccpUserInput.imgIncludeStyles);
-        var tdBgimageCheckmrk = document.querySelector(ccpUserInput.tdBgimage);
-        var tableIncludeWrapper = document.querySelector(ccpUserInput.tableIncludeWrapper);
-        // !VA Toggle the checkbox and initialize the table wrapper defaults
-        // !VA TODO: Revisit all the CCP init
-        imgIncludeStylesCheckmrk.addEventListener('click', toggleCheckbox, false);
-        tdBgimageCheckmrk.addEventListener('click', toggleCheckbox, false);
-        tableIncludeWrapper.addEventListener('click', toggleCheckbox, false);
-      }
-    }
 
 
     // UIController Show element when input in another element is made 
     function showElementOnInput(event) {
-      // !VA Here we catch the input handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
+      // !VA Here we catch the event handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
 
 
       var elems = [];
-      // elems[0] = ccpBuildTag.imgDisplayCSSToClipboard;
-      elems[0] = document.querySelector(ccpBuildTag.imgDisplayCSSToClipboard);
-      elems[1] = document.querySelector(ccpBuildTag.imgSPhoneCSSToClipboard);
-      elems[2] = document.querySelector(ccpBuildTag.imgLPhoneCSSToClipboard);
-      elems[3] = document.querySelector(ccpBuildTag.tdDisplayCSSToClipboard);
-      elems[4] = document.querySelector(ccpBuildTag.tdSPhoneCSSToClipboard);
-      elems[5] = document.querySelector(ccpBuildTag.tdLPhoneCSSToClipboard);
-      elems[6] = document.querySelector(ccpBuildTag.tableDisplayCSSToClipboard);
-      elems[7] = document.querySelector(ccpBuildTag.tableSPhoneCSSToClipboard);
-      elems[8] = document.querySelector(ccpBuildTag.tableLPhoneCSSToClipboard);
+      // elems[0] = ccpMakeClip.imgDisplayCSSToClipboard;
+      elems[0] = document.querySelector(ccpMakeClip.imgDisplayCSSToClipboard);
+      elems[1] = document.querySelector(ccpMakeClip.imgSPhoneCSSToClipboard);
+      elems[2] = document.querySelector(ccpMakeClip.imgLPhoneCSSToClipboard);
+      elems[3] = document.querySelector(ccpMakeClip.tdDisplayCSSToClipboard);
+      elems[4] = document.querySelector(ccpMakeClip.tdSPhoneCSSToClipboard);
+      elems[5] = document.querySelector(ccpMakeClip.tdLPhoneCSSToClipboard);
+      elems[6] = document.querySelector(ccpMakeClip.tableDisplayCSSToClipboard);
+      elems[7] = document.querySelector(ccpMakeClip.tableSPhoneCSSToClipboard);
+      elems[8] = document.querySelector(ccpMakeClip.tableLPhoneCSSToClipboard);
       // !VA We only want to show the buttons in each respective fieldset
       // !VA If the input is in the img fieldset, only show the first three buttons in the array
       if (event.target.id === 'img-class-input') {
@@ -290,7 +264,7 @@ var Witty = (function () {
         return ccpUserInput;
       },
       getCcpBuildTagIDs: function() {
-        return ccpBuildTag;
+        return ccpMakeClip;
       },
 
       // !VA UIController public initUI
@@ -416,19 +390,6 @@ var Witty = (function () {
         2000);
       },
 
-
-      // // TOGGLE CLIPBOARD CONTROL PANEL
-      ccpToggle: function () {
-        document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
-        if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
-          initCCP();
-        }
-      },
-
-
-
-
-
     };
 
     
@@ -525,16 +486,22 @@ var Witty = (function () {
       }
 
       // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. Currently only the img class input does that.
-      var ioKeypresses = [ ccpUserInput.imgClass, ccpUserInput.tdClass, ccpUserInput.tableClass ];
-      for (let i = 0; i < ioKeypresses.length; i++) {
+      var ccpKeypresses = [ ccpUserInput.imgClass, ccpUserInput.tdClass, ccpUserInput.tableClass ];
+      for (let i = 0; i < ccpKeypresses.length; i++) {
         // !VA convert the ID string to the object inside the loop
-        ioKeypresses[i] = document.querySelector(ioKeypresses[i]);
-        addEventHandler((ioKeypresses[i]),'input',UIController.showElementOnInput,false);
+        ccpKeypresses[i] = document.querySelector(ccpKeypresses[i]);
+        addEventHandler((ccpKeypresses[i]),'input',UIController.showElementOnInput,false);
         // addEventHandler((ioKeypresses[i]),'focus',handleUserAction,false);
         // addEventHandler(ioKeypresses[i],'blur',handleUserAction,false);
         // addEventHandler(ioKeypresses[i],'dragover',handleUserAction,false);
         // addEventHandler(ioKeypresses[i],'drop',handleUserAction,false);
       }
+      
+
+
+
+
+
 
       // addEventHandler(ccpUserInput.imgClass,'keypress',showMobileImageButtons,false);
       // ccpUserInput.imgAlt.addEventListener('keypress', showMobileImageButtons);
@@ -545,7 +512,7 @@ var Witty = (function () {
       for (let i = 0; i < dvClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         dvClickables[i] = document.querySelector(dvClickables[i]);
-        addEventHandler((dvClickables[i]),'click',handleUserAction,false);
+        addEventHandler((dvClickables[i]),'click',initCCP,false);
       }
 
       // appController private handleUserAction 
@@ -804,7 +771,7 @@ var Witty = (function () {
       // }
       
     }
-    //FILEREADR OBJECT PROCESSING END
+    //FILEREADER OBJECT PROCESSING END
 
 
 
@@ -1042,20 +1009,107 @@ var Witty = (function () {
       Appdata = appController.getAppdata(false);
     }
 
-    function validateInteger(inputVal) {
-      // !VA Since integer validation is used for all height/width input fields, including those not yet implemented
-      let isErr;
-      // let mess;
-      if (!parseInt(inputVal, 10) || inputVal % 1 !== 0 || inputVal < 0) {
-        isErr = true;
-      } else { 
-        // !VA Input fields return strings, so convert to integer
-        inputVal = parseInt(inputVal);
-        isErr = false;
+    // !VA CCP Functions
+    // !VA appController private initCCP
+    function initCCP() {
+      // !VA Copy Appdata to local object
+      console.log('initCCP running');
+      var Appdata = appController.getAppdata();
+      console.table(Appdata);
+      // !VA The app initializes with the CCP closed, so toggle it on and off here.
+      document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
+      // !VA If the CCP is open:
+
+
+
+
+
+
+
+  
+      // !VA If the CCP is open...
+      if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
+        // !VA We have to initialize CCP DOM elements here because they don't exist until the CCP is displayed.
+
+        // !VA CCP Checkboxes - these are mock checkboxes with custom styling, so the ID names have to be converted to checkbox names in order to select or deselect them. We attach the event handler to the checkmark, not the checkbox. The checkmark is converted to checkbox for handling in toggleCheckbox.
+        var ccpCheckmarks = [ ccpUserInput.imgIncludeStyles, ccpUserInput.tdBgimage, ccpUserInput.tableIncludeWrapper ]
+        var ccpCheckboxes = [];
+        for (let i = 0; i < ccpCheckmarks.length; i++) {
+          document.querySelector(ccpCheckmarks[i]).addEventListener('click', handleCheckboxes, false);
+        }
+
+        // !VA Initialize with all the 'include wrapper table' options undisplayed - uncomment this for DEV
+        // var wrapperItemsToHide = ['#table-wrapper-class', '#table-wrapper-width', '#table-wrapper-align', '#table-wrapper-bgcolor' ]; 
+        // for (let i = 0; i < wrapperItemsToHide.length; i++) {
+        //   document.querySelector(wrapperItemsToHide[i]).style.display = 'none'; 
+        // }
+
+        // !VA Initialize with 'include wrapper table' unchecked, or true for DEV
+        // var includeWrapperTable = document.querySelector((ccpUserInput.tableIncludeWrapper.replace('mrk', 'box')));
+        // includeWrapperTable.checked = true;
+        // !VA Default for table width
+        document.querySelector(ccpUserInput.tableWidth).value = `${Appdata.imgW}`;
+        // !VA Defaults for wrapper width and class
+        document.querySelector(ccpUserInput.tableWrapperWidth).value = `${Appdata.viewerW}`;
+        document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
+
       }
-      // !VA Just returning true here, the error code is sent by the calling function in handleUserAction
-      return isErr;
+
+
+
+
+
+      // !VA Not ready for these yet
+      // var tableMaxWidth = `'<option>${Appdata.viewerW}</option><option>100%</option>'`;
+      // document.getElementById('table-width-select').innerHTML = tableMaxWidth;
+      // document.getElementById('table-max-width').style.display = 'none';
+
+      // var imgMaxWidth = `'<option>${Appdata.imgW}</option><option>100%</option>'`;
+      // document.getElementById('img-width-select').innerHTML = imgMaxWidth;
+      // document.getElementById('img-max-width').style.display = 'none'; 
+
     }
+    
+        // !VA  UIController: Toggle checkboxes and run any associated actions
+        function handleCheckboxes(event) {
+          console.log('handleCheckboxes running');
+
+          // !VA Toggle CCP checkboxes and run any associated operations.
+          // !VA The CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
+          // !VA We will need Appdata to initialize the defaults for the wrapper table below
+          var data = appController.getAppdata();
+          // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
+          var wrapperItemsToShow = [];
+    
+          // !VA The clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it.
+          var checkbox = document.getElementById(event.target.id.replace('mrk', 'box'));
+          // !VA Toggle the target's checkbox 
+          checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
+    
+          // !VA Now run any actions associated with the checkbox
+          // !VA Get the Appdata for the input default value
+          // !VA TODO: This value needs to be refreshed when the CCP is opened. In fact, entering new values in any of the toolButton inputs has to call a refresh of Appdata and a closing-reopening of the CCP so the values can refresh.
+          
+          // !VA Defaults for wrapper width and class
+          document.querySelector(ccpUserInput.tableWrapperWidth).value = `${data.viewerW}`;
+          document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
+          // !VA Only show the CCP wrapper width, class, align, and bgcolor options if 'Include wrapper table' is selected 
+    
+          // !VA Show wrapper table options if the checked element is 'table-include-wrapper-checkbox'
+          if (checkbox.id === 'table-include-wrapper-checkbox') {
+            wrapperItemsToShow = ['#table-wrapper-class', '#table-wrapper-width', '#table-wrapper-align', '#table-wrapper-bgcolor' ]; 
+            if (checkbox.checked) {
+              for (let i = 0; i < wrapperItemsToShow.length; i++) {
+                document.querySelector(wrapperItemsToShow[i]).style.display = 'block'; 
+              }
+            } else {
+              for (let i = 0; i < wrapperItemsToShow.length; i++) {
+                document.querySelector(wrapperItemsToShow[i]).style.display = 'none'; 
+              }
+            }
+          }
+        }
+
 
     //  !VA ERROR HANDLING
     // ==============================
@@ -1065,10 +1119,6 @@ var Witty = (function () {
         var Appdata = appController.getAppdata();
         console.log('str is: ' + str);
         
-
-
-
-
 
         var errorMessages = {
           imgW_GT_viewerW: `The image width has to be less than the width of its container table, which is now&nbsp;set&nbsp;to&nbsp;${Appdata.viewerW}px.`,
@@ -1087,9 +1137,6 @@ var Witty = (function () {
           }
         }
       };
-
-
-
 
       // !VA Might be good to fold this into error handling
       // clipboardController: VALIDATE INPUT FOR INTEGER
