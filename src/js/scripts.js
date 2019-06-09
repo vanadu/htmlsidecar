@@ -120,7 +120,7 @@ var Witty = (function () {
     // !VA ccpMakeClip ID Strings
     // Stores the ccpMakeTag object for assembling the clipboard create tag buttons
     // !VA V2 Also doesn't belong here, we will move it later.
-    var ccpMakeClip = {
+    var ccpMakeClipBut = {
       // !VA Build HTML Clipboard Buttons
       ccpImgWriteHTMLToCB: '#img-build-html-but',
       ccpTdWriteHTMLToCB: '#td-build-html-but',
@@ -168,78 +168,7 @@ var Witty = (function () {
 
 
 
-    // UIController Show element when input in another element is made 
-    function showElementOnInput(event) {
-      // !VA Here we catch the event handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
 
-
-      var elems = [];
-      // elems[0] = ccpMakeClip.imgDisplayCSSToClipboard;
-      elems[0] = document.querySelector(ccpMakeClip.imgDisplayCSSToClipboard);
-      elems[1] = document.querySelector(ccpMakeClip.imgSPhoneCSSToClipboard);
-      elems[2] = document.querySelector(ccpMakeClip.imgLPhoneCSSToClipboard);
-      elems[3] = document.querySelector(ccpMakeClip.tdDisplayCSSToClipboard);
-      elems[4] = document.querySelector(ccpMakeClip.tdSPhoneCSSToClipboard);
-      elems[5] = document.querySelector(ccpMakeClip.tdLPhoneCSSToClipboard);
-      elems[6] = document.querySelector(ccpMakeClip.tableDisplayCSSToClipboard);
-      elems[7] = document.querySelector(ccpMakeClip.tableSPhoneCSSToClipboard);
-      elems[8] = document.querySelector(ccpMakeClip.tableLPhoneCSSToClipboard);
-      // !VA We only want to show the buttons in each respective fieldset
-      // !VA If the input is in the img fieldset, only show the first three buttons in the array
-      if (event.target.id === 'img-class-input') {
-        for (let i = 0; i <= 2; i++) {
-          this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
-        }
-      } else if (event.target.id === 'td-class-input') {
-        // !VA If the input is in the td fieldset, only show the next three buttons in the array
-        for (let i = 3; i <= 5 ; i++) {
-          this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
-        }
-      } else if (event.target.id === 'table-class-input') {
-        // !VA If the input is in the table fieldset, only show the next buttons in the array
-        for (let i = 6; i <= 8 ; i++) {
-          this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
-        }
-      }
-    }
-
-    // !VA  UIController: Toggle checkboxes and run any associated actions
-    function toggleCheckbox(event) {
-      // !VA TODO: !IMPORTANT! All the initialization for the CCP is better done elsewhere
-      // !VA But in the meantime, we want this to run for all custom CSS checkboxes used in this project -- but the CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
-      // !VA We will need Appdata to initialize the defaults for the wrapper table below
-      var data = appController.getAppdata();
-      // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
-      var wrapperItemsToShow = [];
-
-      // !VA The clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it.
-      var checkbox = document.getElementById(event.target.id.replace('mrk', 'box'));
-      // !VA Toggle the target's checkbox 
-      checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
-
-      // !VA Now run any actions associated with the checkbox
-      // !VA Get the Appdata for the input default value
-      // !VA TODO: This value needs to be refreshed when the CCP is opened. In fact, entering new values in any of the toolButton inputs has to call a refresh of Appdata and a closing-reopening of the CCP so the values can refresh.
-      
-      // !VA Defaults for wrapper width and class
-      document.querySelector(ccpUserInput.tableWrapperWidth).value = `${data.viewerW}`;
-      document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
-      // !VA Only show the CCP wrapper width, class, align, and bgcolor options if 'Include wrapper table' is selected 
-
-      // !VA Show wrapper table options if the checked element is 'table-include-wrapper-checkbox'
-      if (checkbox.id === 'table-include-wrapper-checkbox') {
-        wrapperItemsToShow = ['#table-wrapper-class', '#table-wrapper-width', '#table-wrapper-align', '#table-wrapper-bgcolor' ]; 
-        if (checkbox.checked) {
-          for (let i = 0; i < wrapperItemsToShow.length; i++) {
-            document.querySelector(wrapperItemsToShow[i]).style.display = 'block'; 
-          }
-        } else {
-          for (let i = 0; i < wrapperItemsToShow.length; i++) {
-            document.querySelector(wrapperItemsToShow[i]).style.display = 'none'; 
-          }
-        }
-      }
-    }
 
 
     // !VA UIController public functions
@@ -265,6 +194,9 @@ var Witty = (function () {
       },
       getCcpBuildTagIDs: function() {
         return ccpMakeClip;
+      },
+      getCcpMakeClipButIDs: function() {
+        return ccpMakeClipBut;
       },
 
       // !VA UIController public initUI
@@ -424,6 +356,8 @@ var Witty = (function () {
     var staticRegions = UIController.getStaticRegionIDs();
     var toolButtons = UIController.getToolButtonIDs();
     var ccpUserInput = UIController.getCcpUserInputIDs();
+    var ccpMakeClipBut =  UIController.getCcpMakeClipButIDs();
+    
 
     // !VA appController private setupEventListeners
     var setupEventListeners = function() {
@@ -490,7 +424,7 @@ var Witty = (function () {
       for (let i = 0; i < ccpKeypresses.length; i++) {
         // !VA convert the ID string to the object inside the loop
         ccpKeypresses[i] = document.querySelector(ccpKeypresses[i]);
-        addEventHandler((ccpKeypresses[i]),'input',UIController.showElementOnInput,false);
+        addEventHandler((ccpKeypresses[i]),'input',showElementOnInput,false);
         // addEventHandler((ioKeypresses[i]),'focus',handleUserAction,false);
         // addEventHandler(ioKeypresses[i],'blur',handleUserAction,false);
         // addEventHandler(ioKeypresses[i],'dragover',handleUserAction,false);
@@ -1019,15 +953,6 @@ var Witty = (function () {
       // !VA The app initializes with the CCP closed, so toggle it on and off here.
       document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
       // !VA If the CCP is open:
-
-
-
-
-
-
-
-  
-      // !VA If the CCP is open...
       if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
         // !VA We have to initialize CCP DOM elements here because they don't exist until the CCP is displayed.
 
@@ -1035,7 +960,7 @@ var Witty = (function () {
         var ccpCheckmarks = [ ccpUserInput.imgIncludeStyles, ccpUserInput.tdBgimage, ccpUserInput.tableIncludeWrapper ]
         var ccpCheckboxes = [];
         for (let i = 0; i < ccpCheckmarks.length; i++) {
-          document.querySelector(ccpCheckmarks[i]).addEventListener('click', handleCheckboxes, false);
+          document.querySelector(ccpCheckmarks[i]).addEventListener('click', handleCCPInput, false);
         }
 
         // !VA Initialize with all the 'include wrapper table' options undisplayed - uncomment this for DEV
@@ -1070,45 +995,96 @@ var Witty = (function () {
 
     }
     
-        // !VA  UIController: Toggle checkboxes and run any associated actions
-        function handleCheckboxes(event) {
-          console.log('handleCheckboxes running');
+    // !VA  appController: Toggle checkboxes and run any associated actions
+    function handleCCPInput(event) {
+      console.log('handleCCPInput running');
 
-          // !VA Toggle CCP checkboxes and run any associated operations.
-          // !VA The CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
-          // !VA We will need Appdata to initialize the defaults for the wrapper table below
-          var data = appController.getAppdata();
-          // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
-          var wrapperItemsToShow = [];
-    
-          // !VA The clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it.
-          var checkbox = document.getElementById(event.target.id.replace('mrk', 'box'));
-          // !VA Toggle the target's checkbox 
-          checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
-    
-          // !VA Now run any actions associated with the checkbox
-          // !VA Get the Appdata for the input default value
-          // !VA TODO: This value needs to be refreshed when the CCP is opened. In fact, entering new values in any of the toolButton inputs has to call a refresh of Appdata and a closing-reopening of the CCP so the values can refresh.
-          
-          // !VA Defaults for wrapper width and class
-          document.querySelector(ccpUserInput.tableWrapperWidth).value = `${data.viewerW}`;
-          document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
-          // !VA Only show the CCP wrapper width, class, align, and bgcolor options if 'Include wrapper table' is selected 
-    
-          // !VA Show wrapper table options if the checked element is 'table-include-wrapper-checkbox'
-          if (checkbox.id === 'table-include-wrapper-checkbox') {
-            wrapperItemsToShow = ['#table-wrapper-class', '#table-wrapper-width', '#table-wrapper-align', '#table-wrapper-bgcolor' ]; 
-            if (checkbox.checked) {
-              for (let i = 0; i < wrapperItemsToShow.length; i++) {
-                document.querySelector(wrapperItemsToShow[i]).style.display = 'block'; 
-              }
-            } else {
-              for (let i = 0; i < wrapperItemsToShow.length; i++) {
-                document.querySelector(wrapperItemsToShow[i]).style.display = 'none'; 
-              }
-            }
+      // !VA Toggle CCP checkboxes and run any associated operations.
+      // !VA 
+      // !VA The CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
+      // !VA We will need Appdata to initialize the defaults for the wrapper table below
+      var data = appController.getAppdata();
+
+
+
+
+
+
+      // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
+      var wrapperItemsToShow = [];
+
+      // !VA The clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it.
+      var checkbox = document.getElementById(event.target.id.replace('mrk', 'box'));
+      // !VA Toggle the target's checkbox 
+      checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
+
+      // !VA Now run any actions associated with the checkbox
+      // !VA Get the Appdata for the input default value
+      // !VA TODO: This value needs to be refreshed when the CCP is opened. In fact, entering new values in any of the toolButton inputs has to call a refresh of Appdata and a closing-reopening of the CCP so the values can refresh.
+      
+      // !VA Defaults for wrapper width and class
+      document.querySelector(ccpUserInput.tableWrapperWidth).value = `${data.viewerW}`;
+      document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
+      // !VA Only show the CCP wrapper width, class, align, and bgcolor options if 'Include wrapper table' is selected 
+
+      // !VA Show wrapper table options if the checked element is 'table-include-wrapper-checkbox'
+      if (checkbox.id === 'table-include-wrapper-checkbox') {
+        wrapperItemsToShow = ['#table-wrapper-class', '#table-wrapper-width', '#table-wrapper-align', '#table-wrapper-bgcolor' ]; 
+        if (checkbox.checked) {
+          for (let i = 0; i < wrapperItemsToShow.length; i++) {
+            document.querySelector(wrapperItemsToShow[i]).style.display = 'block'; 
+          }
+        } else {
+          for (let i = 0; i < wrapperItemsToShow.length; i++) {
+            document.querySelector(wrapperItemsToShow[i]).style.display = 'none'; 
           }
         }
+      }
+    }
+
+
+    // UIController Show element when input in another element is made 
+    function showElementOnInput(event) {
+      // !VA Here we catch the event handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
+      console.dir(event);
+      console.log('event.target.id is: ' + event.target.id);
+      console.log('document.querySelector(ccpMakeClipBut.imgDisplayCSSToClipboard is: ' + document.querySelector(ccpMakeClipBut.imgDisplayCSSToClipboard));
+
+      var elems = [];
+      // elems[0] = ccpMakeClip.imgDisplayCSSToCB;
+      elems[0] = document.querySelector(ccpMakeClipBut.imgDisplayWriteCSSToCB);
+      elems[1] = document.querySelector(ccpMakeClipBut.imgSPhoneWriteCSSToCB);
+      elems[2] = document.querySelector(ccpMakeClipBut.imgLPhoneWriteCSSToCB);
+      elems[3] = document.querySelector(ccpMakeClipBut.tdDisplayWriteCSSToCB);
+      elems[4] = document.querySelector(ccpMakeClipBut.tdSPhoneWriteCSSToCB);
+      elems[5] = document.querySelector(ccpMakeClipBut.tdLPhoneWriteCSSToCB);
+      elems[6] = document.querySelector(ccpMakeClipBut.tableDisplayWriteCSSToCB);
+      elems[7] = document.querySelector(ccpMakeClipBut.tableSPhoneWriteCSSToCB);
+      elems[8] = document.querySelector(ccpMakeClipBut.tableLPhoneWriteCSSToCB);
+      console.dir(elems);
+      // !VA We only want to show the buttons in each respective fieldset
+      // !VA If the input is in the img fieldset, only show the first three buttons in the array
+      if (event.target.id === 'img-class-input') {
+        for (let i = 0; i <= 2; i++) {
+          this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
+        }
+      } else if (event.target.id === 'td-class-input') {
+        // !VA If the input is in the td fieldset, only show the next three buttons in the array
+        for (let i = 3; i <= 5 ; i++) {
+          this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
+        }
+      } else if (event.target.id === 'table-class-input') {
+        // !VA If the input is in the table fieldset, only show the next buttons in the array
+        for (let i = 6; i <= 8 ; i++) {
+          this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
+        }
+      }
+    }
+
+
+    // function ccpMakeClip() {
+    //   console.log('ccpMakeClip running');
+    // }
 
 
     //  !VA ERROR HANDLING
@@ -1225,9 +1201,10 @@ var Witty = (function () {
       calcImgViewerSize();
       // !VA Open the CCP by default in dev mode
       // !VA First, make sure it's closed
-      // document.querySelector(staticRegions.ccpContainer).classList.remove('active');
-      // !VA Then run ccpToggle to initialize the dynamic values and open it
-      // UIController.ccpToggle();
+      document.querySelector(staticRegions.ccpContainer).classList.remove('active');
+      // !VA Then run initCCP to initialize the dynamic values and open it
+ 
+      initCCP();
     };
 
     // !VA appController public
