@@ -1529,7 +1529,7 @@ output {
     border: 1px solid #616161;
     background: #000000;
     color: #FFFFFF; }
-  #ccp-content fieldset#img-options, #ccp-content fieldset#td-options, #ccp-content fieldset#table-options {
+  #ccp-content fieldset#ccp-img-options, #ccp-content fieldset#ccp-td-options, #ccp-content fieldset#ccp-table-options {
     height: 160px; }
   #ccp-content fieldset {
     position: relative;
@@ -1571,18 +1571,18 @@ output {
         display: block;
         border: none;
         background-size: 90px 46px !important; }
-      #ccp-content fieldset .ccp-options-col-1 #img-build-html-but {
+      #ccp-content fieldset .ccp-options-col-1 #ccp-img-build-html-but {
         background: #000000 url("../img/img-to-cb-html.png") no-repeat center;
         background-size: 90px 46px; }
-        #ccp-content fieldset .ccp-options-col-1 #img-build-html-but:hover {
+        #ccp-content fieldset .ccp-options-col-1 #ccp-img-build-html-but:hover {
           background-image: url("../img/img-to-cb-html-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-1 #td-build-html-but {
+      #ccp-content fieldset .ccp-options-col-1 #ccp-td-build-html-but {
         background: #000000 url("../img/td-to-cb-html-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-1 #td-build-html-but:hover {
+        #ccp-content fieldset .ccp-options-col-1 #ccp-td-build-html-but:hover {
           background-image: url("../img/td-to-cb-html-icon-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-1 #table-build-html-but {
+      #ccp-content fieldset .ccp-options-col-1 #ccp-table-build-html-but {
         background: #000000 url("../img/table-to-cb-html-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-1 #table-build-html-but:hover {
+        #ccp-content fieldset .ccp-options-col-1 #ccp-table-build-html-but:hover {
           background-image: url("../img/table-to-cb-html-icon-hover.png"); }
     #ccp-content fieldset .ccp-options-col-2 {
       left: 120px;
@@ -1610,7 +1610,7 @@ output {
         margin-bottom: 5px;
         padding-right: 2px;
         text-align: right; }
-      #ccp-content fieldset .ccp-options-col-3 .img-include-css-container, #ccp-content fieldset .ccp-options-col-3 .td-bgimage-container, #ccp-content fieldset .ccp-options-col-3 .table-include-wrapper-container {
+      #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-css-container, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container {
         width: 100%;
         display: block;
         position: relative;
@@ -1623,16 +1623,16 @@ output {
         -ms-user-select: none;
         user-select: none;
         z-index: 100; }
-        #ccp-content fieldset .ccp-options-col-3 .img-include-css-container a, #ccp-content fieldset .ccp-options-col-3 .td-bgimage-container a, #ccp-content fieldset .ccp-options-col-3 .table-include-wrapper-container a {
+        #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-css-container a, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container a, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container a {
           font-weight: bold;
           text-decoration: underline; }
-      #ccp-content fieldset .ccp-options-col-3 .img-include-css-container input, #ccp-content fieldset .ccp-options-col-3 .td-bgimage-container input, #ccp-content fieldset .ccp-options-col-3 .table-include-wrapper-container input {
+      #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-css-container input, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container input, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container input {
         position: absolute;
         opacity: 0;
         cursor: pointer;
         height: 0;
         width: 0; }
-      #ccp-content fieldset .ccp-options-col-3 #img-include-css-checkmrk, #ccp-content fieldset .ccp-options-col-3 #td-bgimage-checkmrk, #ccp-content fieldset .ccp-options-col-3 #table-include-wrapper-checkmrk {
+      #ccp-content fieldset .ccp-options-col-3 #ccp-img-include-css-checkmrk, #ccp-content fieldset .ccp-options-col-3 #ccp-td-bgimage-checkmrk, #ccp-content fieldset .ccp-options-col-3 #ccp-table-include-wrapper-checkmrk {
         position: absolute;
         top: 3px;
         left: 40px;
@@ -1641,17 +1641,17 @@ output {
         background-color: #eee;
         display: block;
         z-index: 100; }
-      #ccp-content fieldset .ccp-options-col-3 .img-include-css-container:hover input ~ #img-include-css-checkmrk, #ccp-content fieldset .ccp-options-col-3 .td-bgimage-container:hover input ~ #td-bgimage-checkmrk, #ccp-content fieldset .ccp-options-col-3 .table-include-wrapper-container:hover input ~ #table-include-wrapper-checkmrk {
+      #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-css-container:hover input ~ #ccp-img-include-css-checkmrk, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container:hover input ~ #ccp-td-bgimage-checkmrk, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container:hover input ~ #ccp-table-include-wrapper-checkmrk {
         background-color: #ccc; }
-      #ccp-content fieldset .ccp-options-col-3 .img-include-css-container input:checked ~ #img-include-css-checkmrk, #ccp-content fieldset .ccp-options-col-3 .td-bgimage-container input:checked ~ #td-bgimage-checkmrk, #ccp-content fieldset .ccp-options-col-3 .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk {
+      #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-css-container input:checked ~ #ccp-img-include-css-checkmrk, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container input:checked ~ #ccp-td-bgimage-checkmrk, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container input:checked ~ #ccp-table-include-wrapper-checkmrk {
         background-color: #5f5e5e; }
-      #ccp-content fieldset .ccp-options-col-3 #img-include-css-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 #td-bgimage-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 #table-include-wrapper-checkmrk:after {
+      #ccp-content fieldset .ccp-options-col-3 #ccp-img-include-css-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 #ccp-td-bgimage-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 #ccp-table-include-wrapper-checkmrk:after {
         content: "";
         position: absolute;
         display: none; }
-      #ccp-content fieldset .ccp-options-col-3 .img-include-css-container input:checked ~ #img-include-css-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 .td-bgimage-container input:checked ~ #td-bgimage-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk:after {
+      #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-css-container input:checked ~ #ccp-img-include-css-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container input:checked ~ #ccp-td-bgimage-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container input:checked ~ #ccp-table-include-wrapper-checkmrk:after {
         display: block; }
-      #ccp-content fieldset .ccp-options-col-3 .img-include-css-container #img-include-css-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 .td-bgimage-container #td-bgimage-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 .table-include-wrapper-container #table-include-wrapper-checkmrk:after {
+      #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-css-container #ccp-img-include-css-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container #ccp-td-bgimage-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container #ccp-table-include-wrapper-checkmrk:after {
         left: 5px;
         top: 2px;
         width: 5px;
@@ -1661,11 +1661,11 @@ output {
         -webkit-transform: rotate(45deg);
         -ms-transform: rotate(45deg);
         transform: rotate(45deg); }
-      #ccp-content fieldset .ccp-options-col-3 #img-include-css-label, #ccp-content fieldset .ccp-options-col-3 #td-bgimage-label, #ccp-content fieldset .ccp-options-col-3 #table-include-wrapper-label {
+      #ccp-content fieldset .ccp-options-col-3 #ccp-img-include-css-label, #ccp-content fieldset .ccp-options-col-3 #ccp-td-bgimage-label, #ccp-content fieldset .ccp-options-col-3 #ccp-table-include-wrapper-label {
         width: 220px;
         padding-left: 34px;
         text-align: left; }
-      #ccp-content fieldset .ccp-options-col-3 #table-include-wrapper-checkmrk, #ccp-content fieldset .ccp-options-col-3 .table-include-wrapper-label {
+      #ccp-content fieldset .ccp-options-col-3 #ccp-table-include-wrapper-checkmrk, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-label {
         margin-left: -40px; }
     #ccp-content fieldset .ccp-options-col-4 {
       left: 620px;
@@ -1682,41 +1682,41 @@ output {
         #ccp-content fieldset .ccp-options-col-4 .ccp-but.active {
           display: block;
           cursor: pointer; }
-      #ccp-content fieldset .ccp-options-col-4 #img-display-css-to-clipboard-but.active {
+      #ccp-content fieldset .ccp-options-col-4 #ccp-img-display-css-to-clipboard-but.active {
         background: #000000 url("../img/img-display-css-to-clipboard-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #img-display-css-to-clipboard-but.active:hover {
+        #ccp-content fieldset .ccp-options-col-4 #ccp-img-display-css-to-clipboard-but.active:hover {
           background-image: url("../img/img-display-css-to-clipboard-icon-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-4 #img-lphone-css-to-clipboard-but.active {
+      #ccp-content fieldset .ccp-options-col-4 #ccp-img-lphone-css-to-clipboard-but.active {
         background: #000000 url("../img/img-lphone-css-to-clipboard-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #img-lphone-css-to-clipboard-but.active:hover {
+        #ccp-content fieldset .ccp-options-col-4 #ccp-img-lphone-css-to-clipboard-but.active:hover {
           background-image: url("../img/img-lphone-css-to-clipboard-icon-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-4 #img-sphone-css-to-clipboard-but.active {
+      #ccp-content fieldset .ccp-options-col-4 #ccp-img-sphone-css-to-clipboard-but.active {
         background: #000000 url("../img/img-sphone-css-to-clipboard-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #img-sphone-css-to-clipboard-but.active:hover {
+        #ccp-content fieldset .ccp-options-col-4 #ccp-img-sphone-css-to-clipboard-but.active:hover {
           background-image: url("../img/img-sphone-css-to-clipboard-icon-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-4 #td-display-css-to-clipboard-but.active {
+      #ccp-content fieldset .ccp-options-col-4 #ccp-td-display-css-to-clipboard-but.active {
         background: #000000 url("../img/td-display-css-to-clipboard-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #td-display-css-to-clipboard-but.active:hover {
+        #ccp-content fieldset .ccp-options-col-4 #ccp-td-display-css-to-clipboard-but.active:hover {
           background-image: url("../img/td-display-css-to-clipboard-icon-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-4 #td-lphone-css-to-clipboard-but.active {
+      #ccp-content fieldset .ccp-options-col-4 #ccp-td-lphone-css-to-clipboard-but.active {
         background: #000000 url("../img/td-lphone-css-to-clipboard-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #td-lphone-css-to-clipboard-but.active:hover {
+        #ccp-content fieldset .ccp-options-col-4 #ccp-td-lphone-css-to-clipboard-but.active:hover {
           background-image: url("../img/td-lphone-css-to-clipboard-icon-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-4 #td-sphone-css-to-clipboard-but.active {
+      #ccp-content fieldset .ccp-options-col-4 #ccp-td-sphone-css-to-clipboard-but.active {
         background: #000000 url("../img/td-sphone-css-to-clipboard-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #td-sphone-css-to-clipboard-but.active:hover {
+        #ccp-content fieldset .ccp-options-col-4 #ccp-td-sphone-css-to-clipboard-but.active:hover {
           background-image: url("../img/td-sphone-css-to-clipboard-icon-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-4 #table-display-css-to-clipboard-but.active {
+      #ccp-content fieldset .ccp-options-col-4 #ccp-table-display-css-to-clipboard-but.active {
         background: #000000 url("../img/table-display-css-to-clipboard-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #table-display-css-to-clipboard-but.active:hover {
+        #ccp-content fieldset .ccp-options-col-4 #ccp-table-display-css-to-clipboard-but.active:hover {
           background-image: url("../img/table-display-css-to-clipboard-icon-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-4 #table-lphone-css-to-clipboard-but.active {
+      #ccp-content fieldset .ccp-options-col-4 #ccp-table-lphone-css-to-clipboard-but.active {
         background: #000000 url("../img/table-lphone-css-to-clipboard-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #table-lphone-css-to-clipboard-but.active:hover {
+        #ccp-content fieldset .ccp-options-col-4 #ccp-table-lphone-css-to-clipboard-but.active:hover {
           background-image: url("../img/table-lphone-css-to-clipboard-icon-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-4 #table-sphone-css-to-clipboard-but.active {
+      #ccp-content fieldset .ccp-options-col-4 #ccp-table-sphone-css-to-clipboard-but.active {
         background: #000000 url("../img/table-sphone-css-to-clipboard-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #table-sphone-css-to-clipboard-but.active:hover {
+        #ccp-content fieldset .ccp-options-col-4 #ccp-table-sphone-css-to-clipboard-but.active:hover {
           background-image: url("../img/table-sphone-css-to-clipboard-icon-hover.png"); }
 
 #table-max-width {

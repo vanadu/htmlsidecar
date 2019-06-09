@@ -1,6 +1,19 @@
 
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
+IN PROGRESS: RenameUIElements
+TODO: rename:
+tb-input-viewerw  => tb-input-viewerwidth
+tb-input-customw  => tb-input-imgwidth
+tb-input-customh  => tb-input-imgheight
+tb-input-small-phonesw  => tb-input-sphones-width
+tb-input-large-phonesw  => tb-input-lphones-width
+table-width-input => ccp-input-table-width
+table-wrapper-width-input => ccp-input-table-wrapper-width
+
+AND: Prefix all the CCP UI elements with ccp and put the element type second, as I should have done originally.
+
+
 TODO: Finish reviewing and implementing write to clipboard buttons.
 
 
@@ -93,29 +106,30 @@ var Witty = (function () {
     // !VA  UIController: ccpUserInput ID Strings
     // !VA imgAnchor is just a flag for the status of the checkbox. The actual propStrings have to have an Open and Close property.
     var ccpUserInput = {
-      imgClass: '#img-class-input',
-      imgAnchor: '#img-anchor-checkbox',
-      imgAlt: '#img-alt-input',
+      imgClass: '#ccp-input-img-class',
+      // imgAnchor: '#ccp-img-anchor-checkbox',
+      imgAlt: '#ccp-input-img-alt',
       // !VA This isn't even a thing... probably delete it 04.28.19
-      imgIncludeStyles: '#img-include-css-checkmrk',
-      imgAlign: '#img-align-select',
-      imgRelPath: '#img-relpath-input',
-      tdClass: '#td-class-input',
-      tdAlign: '#td-align-select',
-      tdValign: '#td-valign-select',
-      tdBgcolor: '#td-bgcolor-input',
-      tdBgimage: '#td-bgimage-checkmrk',
-      tableClass: '#table-class-input',
-      tableAlign: '#table-align-select',
-      tableWidth: '#table-width-input',
+      // !VA Not renaming the checkbox/checkmarks for now because they already have code that queries the last three characters to determine if mrk or box...
+      imgIncludeStyles: '#ccp-img-include-css-checkmrk',
+      imgAlign: '#ccp-select-img-align',
+      imgRelPath: '#ccp-input-img-relpath',
+      tdClass: '#ccp-input-td-class',
+      tdAlign: '#ccp-select-td-align',
+      tdValign: '#ccp-select-td-valign',
+      tdBgcolor: '#ccp-input-td-bgcolor',
+      tdBgimage: '#ccp-td-bgimage-checkmrk',
+      tableClass: '#ccp-input-table-class',
+      tableAlign: '#ccp-select-table-align',
+      tableWidth: '#ccp-input-table-width',
       // !VA Not in use yet
       // tableMaxWidth: '#table-max-width-input',
-      tableBgcolor: '#table-bgcolor-input',
-      tableIncludeWrapper: '#table-include-wrapper-checkmrk',
-      tableWrapperClass: '#table-wrapper-class-input',
-      tableWrapperWidth: '#table-wrapper-width-input',
-      tableWrapperAlign: '#table-wrapper-align-select',
-      tableWrapperBgColor: '#table-wrapper-bgcolor-input',
+      tableBgcolor: '#ccp-input-table-bgcolor',
+      tableIncludeWrapper: '#ccp-table-include-wrapper-checkmrk',
+      tableWrapperClass: '#ccp-input-table-wrapper-class',
+      tableWrapperWidth: '#ccp-input-table-wrapper-width',
+      tableWrapperAlign: '#ccp-select-table-wrapper-align',
+      tableWrapperBgColor: '#ccp-input-table-wrapper-bgcolor',
     };
 
     // !VA ccpMakeClip ID Strings
@@ -123,20 +137,20 @@ var Witty = (function () {
     // !VA V2 Also doesn't belong here, we will move it later.
     var ccpMakeClipBut = {
       // !VA Build HTML Clipboard Buttons
-      ccpImgWriteHTMLToCB: '#img-build-html-but',
-      ccpTdWriteHTMLToCB: '#td-build-html-but',
-      ccpTableWriteHTMLToCB: '#table-build-html-but',
+      ccpImgWriteHTMLToCB: '#ccp-img-build-html-but',
+      ccpTdWriteHTMLToCB: '#ccp-td-build-html-but',
+      ccpTableWriteHTMLToCB: '#ccp-table-build-html-but',
       // !VA Make CSS Clip Buttons
 
-      imgDisplayWriteCSSToCB: '#img-display-css-to-clipboard-but',
-      imgSPhoneWriteCSSToCB: '#img-sphone-css-to-clipboard-but',
-      imgLPhoneWriteCSSToCB: '#img-lphone-css-to-clipboard-but',
-      tdDisplayWriteCSSToCB: '#td-display-css-to-clipboard-but',
-      tdSPhoneWriteCSSToCB: '#td-sphone-css-to-clipboard-but',
-      tdLPhoneWriteCSSToCB: '#td-lphone-css-to-clipboard-but',
-      tableDisplayWriteCSSToCB: '#table-display-css-to-clipboard-but',
-      tableSPhoneWriteCSSToCB: '#table-sphone-css-to-clipboard-but',
-      tableLPhoneWriteCSSToCB: '#table-lphone-css-to-clipboard-but',
+      imgDisplayWriteCSSToCB: '#ccp-img-display-css-to-clipboard-but',
+      imgSPhoneWriteCSSToCB: '#ccp-img-sphone-css-to-clipboard-but',
+      imgLPhoneWriteCSSToCB: '#ccp-img-lphone-css-to-clipboard-but',
+      tdDisplayWriteCSSToCB: '#ccp-td-display-css-to-clipboard-but',
+      tdSPhoneWriteCSSToCB: '#ccp-td-sphone-css-to-clipboard-but',
+      tdLPhoneWriteCSSToCB: '#ccp-td-lphone-css-to-clipboard-but',
+      tableDisplayWriteCSSToCB: '#ccp-table-display-css-to-clipboard-but',
+      tableSPhoneWriteCSSToCB: '#ccp-table-sphone-css-to-clipboard-but',
+      tableLPhoneWriteCSSToCB: '#ccp-table-lphone-css-to-clipboard-but',
     };
 
 
@@ -527,6 +541,7 @@ var Witty = (function () {
         // if (typeof(window.event) != "undefined")
         // 	oNode.attachEvent("on"+evt, oFunc);
         // else
+        console.log('oNode.id is: ' + oNode.id);
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
       // addEventHandler(document.getElementById(toolButtons.grow01),'click',doit,false);
@@ -917,8 +932,6 @@ var Witty = (function () {
         break;
       }
       // !VA Transfer control to UIController to print dimViewer to the UI
-      console.log('herre');
-      console.table(Appdata);
       resizeContainers(Appdata.imgH, Appdata.imgW, viewerH);
 
 
@@ -1073,7 +1086,6 @@ var Witty = (function () {
       // !VA Copy Appdata to local object
       console.log('initCCP running');
       var Appdata = appController.getAppdata();
-      console.table(Appdata);
       // !VA The app initializes with the CCP closed, so toggle it on and off here.
       document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
       // !VA If the CCP is open:

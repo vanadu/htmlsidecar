@@ -700,7 +700,7 @@ output {
     color: #FFFFFF;
   }
   // VA! Set the height of each option fieldset
-  fieldset#img-options, fieldset#td-options, fieldset#table-options {
+  fieldset#ccp-img-options, fieldset#ccp-td-options, fieldset#ccp-table-options {
     height: 160px;
   }
 
@@ -752,20 +752,20 @@ output {
         border: none;
         background-size: 90px 46px !important;
       }
-      #img-build-html-but {
+      #ccp-img-build-html-but {
         background: #000000 url('../img/img-to-cb-html.png') no-repeat center;
         background-size: 90px 46px;
         &:hover {
           background-image: url('../img/img-to-cb-html-hover.png');
         }
       }
-      #td-build-html-but {
+      #ccp-td-build-html-but {
         background: #000000 url('../img/td-to-cb-html-icon.png') no-repeat center;
         &:hover {
           background-image: url('../img/td-to-cb-html-icon-hover.png');
         }
       }
-      #table-build-html-but {
+      #ccp-table-build-html-but {
         background: #000000 url('../img/table-to-cb-html-icon.png') no-repeat center;
         &:hover {
           background-image: url('../img/table-to-cb-html-icon-hover.png');
@@ -800,7 +800,7 @@ output {
       
       // VA! Custom checkbox
 
-      .img-include-css-container, .td-bgimage-container, .table-include-wrapper-container  {
+      .ccp-img-include-css-container, .ccp-td-bgimage-container, .ccp-table-include-wrapper-container  {
         width: 100%;
         display: block;
         position: relative;
@@ -820,7 +820,7 @@ output {
         }
       }
       /* Hide the browser's default checkbox */
-      .img-include-css-container input,.td-bgimage-container input, .table-include-wrapper-container input {
+      .ccp-img-include-css-container input,.ccp-td-bgimage-container input, .ccp-table-include-wrapper-container input {
         position: absolute;
         opacity: 0;
         cursor: pointer;
@@ -829,7 +829,7 @@ output {
       }
       
       /* Create a custom checkbox */
-      #img-include-css-checkmrk, #td-bgimage-checkmrk, #table-include-wrapper-checkmrk {
+      #ccp-img-include-css-checkmrk, #ccp-td-bgimage-checkmrk, #ccp-table-include-wrapper-checkmrk {
         position: absolute;
         top: 3px;
         left: 40px;
@@ -841,29 +841,29 @@ output {
       }
       
       /* On mouse-over, add a grey background color */
-      .img-include-css-container:hover input ~ #img-include-css-checkmrk, .td-bgimage-container:hover input ~ #td-bgimage-checkmrk, .table-include-wrapper-container:hover input ~ #table-include-wrapper-checkmrk {
+      .ccp-img-include-css-container:hover input ~ #ccp-img-include-css-checkmrk, .ccp-td-bgimage-container:hover input ~ #ccp-td-bgimage-checkmrk, .ccp-table-include-wrapper-container:hover input ~ #ccp-table-include-wrapper-checkmrk {
         background-color: #ccc;
       }
       /* When the checkbox is checked, add a gray background */
-      .img-include-css-container input:checked ~ #img-include-css-checkmrk, .td-bgimage-container input:checked ~ #td-bgimage-checkmrk, .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk {
+      .ccp-img-include-css-container input:checked ~ #ccp-img-include-css-checkmrk, .ccp-td-bgimage-container input:checked ~ #ccp-td-bgimage-checkmrk, .ccp-table-include-wrapper-container input:checked ~ #ccp-table-include-wrapper-checkmrk {
         background-color: #5f5e5e;
       }
 
       /* Create the checkmrk/indicator (hidden when not checked) */
-      #img-include-css-checkmrk:after, #td-bgimage-checkmrk:after, #table-include-wrapper-checkmrk:after  {
+      #ccp-img-include-css-checkmrk:after, #ccp-td-bgimage-checkmrk:after, #ccp-table-include-wrapper-checkmrk:after  {
         content: "";
         position: absolute;
         display: none;
       }
       
       /* Show the checkmrk when checked */
-      .img-include-css-container input:checked ~ #img-include-css-checkmrk:after, .td-bgimage-container input:checked ~ #td-bgimage-checkmrk:after, .table-include-wrapper-container input:checked ~ #table-include-wrapper-checkmrk:after  {
+      .ccp-img-include-css-container input:checked ~ #ccp-img-include-css-checkmrk:after, .ccp-td-bgimage-container input:checked ~ #ccp-td-bgimage-checkmrk:after, .ccp-table-include-wrapper-container input:checked ~ #ccp-table-include-wrapper-checkmrk:after  {
         display: block;
       }
       
       
       /* Style the checkmrk/indicator */
-      .img-include-css-container #img-include-css-checkmrk:after, .td-bgimage-container #td-bgimage-checkmrk:after, .table-include-wrapper-container #table-include-wrapper-checkmrk:after {
+      .ccp-img-include-css-container #ccp-img-include-css-checkmrk:after, .ccp-td-bgimage-container #ccp-td-bgimage-checkmrk:after, .ccp-table-include-wrapper-container #ccp-table-include-wrapper-checkmrk:after {
         left: 5px;
         top: 2px;
         width: 5px;
@@ -877,13 +877,13 @@ output {
       }
       
       // VA! This is the extra label I added because the prodecure I used for the mock checkbox didn't include a label
-      #img-include-css-label, #td-bgimage-label, #table-include-wrapper-label  {
+      #ccp-img-include-css-label, #ccp-td-bgimage-label, #ccp-table-include-wrapper-label  {
         width: 220px;
         padding-left: 34px;
         text-align: left;
       }
       // VA! The Wrapper table label has to align left because it also serves as the option group heading
-      #table-include-wrapper-checkmrk,  .table-include-wrapper-label{
+      #ccp-table-include-wrapper-checkmrk,  .ccp-table-include-wrapper-label{
         margin-left: -40px;
       }
       
@@ -917,57 +917,57 @@ output {
         }
       }
 
-      #img-display-css-to-clipboard-but.active {
+      #ccp-img-display-css-to-clipboard-but.active {
         background:  #000000 url('../img/img-display-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
           background-image:  url('../img/img-display-css-to-clipboard-icon-hover.png');
         }
       }
-      #img-lphone-css-to-clipboard-but.active {
+      #ccp-img-lphone-css-to-clipboard-but.active {
         background:  #000000 url('../img/img-lphone-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
           background-image:  url('../img/img-lphone-css-to-clipboard-icon-hover.png');
         }
       }
-      #img-sphone-css-to-clipboard-but.active {
+      #ccp-img-sphone-css-to-clipboard-but.active {
         background:  #000000 url('../img/img-sphone-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
           background-image:  url('../img/img-sphone-css-to-clipboard-icon-hover.png');
         }
       }
 
-      #td-display-css-to-clipboard-but.active {
+      #ccp-td-display-css-to-clipboard-but.active {
         background:  #000000 url('../img/td-display-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
           background-image:  url('../img/td-display-css-to-clipboard-icon-hover.png');
         }
       }
-      #td-lphone-css-to-clipboard-but.active {
+      #ccp-td-lphone-css-to-clipboard-but.active {
         background:  #000000 url('../img/td-lphone-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
           background-image:  url('../img/td-lphone-css-to-clipboard-icon-hover.png');
         }
       }
-      #td-sphone-css-to-clipboard-but.active {
+      #ccp-td-sphone-css-to-clipboard-but.active {
         background:  #000000 url('../img/td-sphone-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
           background-image:  url('../img/td-sphone-css-to-clipboard-icon-hover.png');
         }
       }
 
-      #table-display-css-to-clipboard-but.active {
+      #ccp-table-display-css-to-clipboard-but.active {
         background:  #000000 url('../img/table-display-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
           background-image:  url('../img/table-display-css-to-clipboard-icon-hover.png');
         }
       }
-      #table-lphone-css-to-clipboard-but.active {
+      #ccp-table-lphone-css-to-clipboard-but.active {
         background:  #000000 url('../img/table-lphone-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
           background-image:  url('../img/table-lphone-css-to-clipboard-icon-hover.png');
         }
       }
-      #table-sphone-css-to-clipboard-but.active {
+      #ccp-table-sphone-css-to-clipboard-but.active {
         background:  #000000 url('../img/table-sphone-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
           background-image:  url('../img/table-sphone-css-to-clipboard-icon-hover.png');
