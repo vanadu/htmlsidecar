@@ -162,9 +162,9 @@ var Witty = (function () {
         curDimViewer.push(dimViewers.largephones);
       } 
       // !VA Reset all the dim viewer alerts by passing in the entire dimViewer array
-      UIController.setDimAlerts(dimViewers, false);
+      UIController.writeDimAlerts(dimViewers, false);
       // !VA Now set the individual dim viewer alerts for the current image.
-      UIController.setDimAlerts(curDimViewer, true);
+      UIController.writeDimAlerts(curDimViewer, true);
     }
 
 
@@ -244,15 +244,15 @@ var Witty = (function () {
         // !VA Call evalDimAlerts to calculate which dimViewer values don't meet HTML email specs.
         evalDimAlerts();
       },
-      // !VA UIController public writeFilenameToUI
-      writeFilenameToUI: function (fileName) {
+      // !VA UIController public writeFilename
+      writeFilename: function (fileName) {
         document.querySelector(dimViewers.filename).textContent = fileName;
         document.querySelector(dimViewers.filename).style.display = 'block';
       },
 
       // !VA NEW I had this as private but moved to public, not sure why.
-      //UIController public setDimAlerts
-      setDimAlerts: function(curDimViewers, bool) {
+      //UIController public writeDimAlerts
+      writeDimAlerts: function(curDimViewers, bool) {
         // !VA if evalDimAlerts returns true, then the dimViewer should be displayed in red. To reset the dim alert, set to style color to 'auto'.
         var att = bool;
         bool ? att = 'red': att = 'inherit';
@@ -489,12 +489,12 @@ var Witty = (function () {
 
     
     // !VA Getting DOM ID strings from UIController
-    var dimViewers = UIController.getDimViewerIDs();
-    var dynamicRegions = UIController.getDynamicRegionIDs();
-    var staticRegions = UIController.getStaticRegionIDs();
-    var toolButtons = UIController.getToolButtonIDs();
-    var ccpUserInput = UIController.getCcpUserInputIDs();
-    var ccpMakeClipBut =  UIController.getCcpMakeClipButIDs();
+    var dimViewers = UICtrl.getDimViewerIDs();
+    var dynamicRegions = UICtrl.getDynamicRegionIDs();
+    var staticRegions = UICtrl.getStaticRegionIDs();
+    var toolButtons = UICtrl.getToolButtonIDs();
+    var ccpUserInput = UICtrl.getCcpUserInputIDs();
+    var ccpMakeClipBut =  UICtrl.getCcpMakeClipButIDs();
     
 
     // !VA appController private setupEventListeners
@@ -779,12 +779,12 @@ var Witty = (function () {
           // Read the filename of the FileReader object into a variable to pass to the getAppData function, otherwise the blob has no name
           fileName = theFile.name;
           // !VA NEW Commented out for now
-          UICtrl.writeFilenameToUI(fileName);
+          UICtrl.writeFilename(fileName);
           
           // !VA Hide the dropArea - not sure if this is the right place for this.
           document.querySelector(staticRegions.dropArea).style.display = 'none';
           // !VA NEW Once the current image has loaded, initialize the dinViewers by querying the current image properties from UICtrl and passing them to writeDimViewers.
-          function initializeDimViewers() { 
+          function initDimViewers() { 
             // !VA NEW Initialize the variable that will contain the new image's height, width, naturalHeight and naturalWidth
             var curImgDimensions;
             // !VA Review
@@ -835,7 +835,7 @@ var Witty = (function () {
             callback(curImg);		
           }
           // !VA Call the callback function that writes the new image to the DOM.
-          initImgToDOM(curImg, initializeDimViewers);
+          initImgToDOM(curImg, initDimViewers);
         };
       })(f);
       // Read in the image file as a data URL.
@@ -926,13 +926,13 @@ var Witty = (function () {
       }
       // !VA Transfer control to UIController to print dimViewer to the UI
       UICtrl.writeDimViewers(Appdata);
-      adjustImgContainers(Appdata.imgH, Appdata.imgW, viewerH);
+      resizeContainers(Appdata.imgH, Appdata.imgW, viewerH);
 
 
     }
 
     // !VA appController private doContainerHeights
-    function adjustImgContainers(imgH, imgW, viewerH)  {
+    function resizeContainers(imgH, imgW, viewerH)  {
       // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values.
       // !VA Initial height is 450, as it is defined in the CSS. TOo much hassle to try and get the value as defined in the CSS programmatically.
       // const initViewerH= parseInt(document.querySelector(dynamicRegions.imgViewer).height, 10);
@@ -1073,7 +1073,7 @@ var Witty = (function () {
       calcImgViewerSize();
     }
 
-    // !VA NEW So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. Very simple.
+    // !VA NEW So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. 
     function updateAppdata(w, h) {
       var Appdata = {};
       document.querySelector(dynamicRegions.curImg).style.width = w + 'px';
@@ -1320,7 +1320,7 @@ var Witty = (function () {
       filename = filename.split('/');
       filename = filename[filename.length - 1];
       document.querySelector(dimViewers.filename).textContent = filename;
-      UICtrl.writeFilenameToUI(filename);
+      UICtrl.writeFilename(filename);
 
       // !VA Get the dev image's NW and NH from the DOM, update Appdata and let calcImgViewerSize do its thing. 
       imgW = document.querySelector(dynamicRegions.curImg).naturalWidth;
@@ -1346,7 +1346,7 @@ var Witty = (function () {
         // !VA NEW Initialize Appdata here and pass it along - we put it here because it's called from both the other modules 
         var Appdata = {};
         // !VA Get dynamicRegions
-        dynamicRegions = UIController.getDynamicRegionIDs();
+        dynamicRegions = UICtrl.getDynamicRegionIDs();
         // !VA NEW Read required values into Appdata.
         var curImg = document.querySelector(dynamicRegions.curImg);
         var imgViewer = document.querySelector(dynamicRegions.imgViewer);
