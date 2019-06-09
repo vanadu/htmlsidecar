@@ -1,11 +1,12 @@
 
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
-BRANCH: ImplementCCPOptions
+TODO: Finish reviewing and implementing write to clipboard buttons.
 
 
 
 TODO: Implement Td and table copy to clipboard buttons.
+TODO: Make mrk => box function...not sure where though or whether it's necessary since it's just a one-liner.
 TODO: Make Esc cancel the input in input fields. Now, on error the cursor stays in the field and nothing happens, you have to tab out. On Esc, the focus should elsewhere.
 TODO: Fix bug - load 400X1000, multiple click on +50, Display Size shows 450 but the img doesn't grow...
 TODO: Implement image swap 
@@ -327,16 +328,153 @@ var Witty = (function () {
     
   })();
 
-  // CALCULATIONS AND INPUT EVALUATION CONTROLLER
+
+
   var CBController = (function() {
 
 
-
+    // !VA CBController private functions
     // !VA If we want to access any of the DOM IDs we have to call them from UIController where they're defined.
     var dynamicRegions = UIController.getDynamicRegionIDs();
     var staticRegions = UIController.getStaticRegionIDs();
     var toolButtons = UIController.getToolButtonIDs();
+    var dimViewers = UIController.getDimViewerIDs();
     var ccpUserInput = UIController.getCcpUserInputIDs();
+    var ccpMakeClipBut = UIController.getCcpMakeClipButIDs();
+
+    
+    // !VA Constructor for the clipboard output objects. These are all the properties all the clipboard output objects (img, td and table) will have. We store these key/value pairs in instances of the ClipboardOutput  because they're easier to manage. Then we write the output into an HTML string.
+    function ClipboardOutput(classAtt, alignAtt ) {
+      this.classAtt = classAtt;
+      this.alignAtt = alignAtt;
+    }
+
+    // CBController: GET STRINGS FOR THE IMG CLIPBOARD OUTPUT
+    function ccpGetCBImgHTML() {
+      // !VA Get Appdata - we need it for the filename
+      var data = appController.getAppdata();
+      // !VA The string that passes the HTML img tag
+      var str; 
+      // !VA Create the instance for img tag clipboard object and add img-specific properties.
+      // !VA We're doing this in an object and outputting to an array because the object is easier to manage and the array is easier to reorder. The Constructor is in this module in the private functions above.
+      var imgTag = new ClipboardOutput('imgTag');
+      // !VA imgTag properties
+      // !VA ---------------------------
+      imgTag.classAtt = 
+        // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
+        ccpIfNoUserInput('class',document.querySelector(ccpUserInput.imgClass).value);
+
+      imgTag.altAtt =    
+        // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output
+        ccpIfNoUserInput('alt',document.querySelector(ccpUserInput.imgAlt).value);
+      // !VA imgTag.altAtt END
+
+      imgTag.srcAtt = (function (id, data) {
+        // !VA Get the filename from the dimViewer
+        
+        var str;
+        // !VA If the path input element is empty, just include the filename and omit the path.
+        if (document.querySelector(id).value) {
+          str = `src="${document.querySelector(ccpUserInput.imgRelPath).value}/${document.querySelector(dimViewers.filename).textContent} `;
+        } else {
+          str = document.querySelector(dimViewers.filename).textContent;
+        }
+        console.log('str is: ' + str);
+        return str;
+      })(ccpUserInput.imgRelPath, data);
+      // !VA imgTag.srcAtt END
+      imgTag.heightAtt = `height="${data.imgH}"`;
+      imgTag.widthAtt = `width="${data.imgW}"`;
+      imgTag.styleAtt =  (function (id) {
+        // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
+        var str;
+        id = id.replace('mrk', 'box');
+        // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
+        if (document.querySelector(id).checked === true) {
+          str = `border="0" style="width: ${data.imgW}px; height: ${data.imgH}px; border: none; outline: none; text-decoration: none; display: block;" `;
+        } else {
+          str = 'border="0" style="border: none; outline: none; text-decoration: none; display: block;"';
+        }
+        return str;
+      })(ccpUserInput.imgIncludeStyles);
+      // !VA imgTag.styleAtt END
+      imgTag.alignAtt = (function (id) {
+        // !VA Pass in the id of the select dropdown
+        var str;
+        // !VA Get the selection index
+        var selInd = document.querySelector(id).selectedIndex;
+        // !VA Put the available options in an array
+        var imgAlignOptions = [ 'none', 'left', 'middle', 'right' ];
+        // !VA Put the desired output strings in an array
+        var clipboardOutput = [ '', 'align="left" ', 'align="middle" ', 'align="right" '];
+        // !VA If the selected index matches the index of the available options array, then output the string that matches that index
+        for (let i = 0; i < imgAlignOptions.length; i++) {
+          if ( selInd === i) {
+            str = `${clipboardOutput[i]}`;
+          }
+        }
+        return str;
+      })(ccpUserInput.imgAlign);
+      // !VA imgTag Object END ------------------------
+
+      var imgTagStr; 
+      
+
+      // !VA Build the HTML tag
+
+      imgTagStr = `  <img ${imgTag.classAtt + ' '}${imgTag.altAtt + ''}${imgTag.alignAtt + ' '}${imgTag.widthAtt + ' '}${imgTag.heightAtt + ' '}${imgTag.srcAtt + ' '}${imgTag.styleAtt} />`;
+
+      // !VA Pass the imgTagArray and return it as string
+      return imgTagStr;
+    } 
+
+  // CBController private imgClipboardBut: Clipboard output for build html image button
+  var imgClipboardBut = new Clipboard(ccpMakeClipBut.ccpImgWriteHTMLToCB, {
+    text: function(trigger) {
+      var clipboardStr = ccpGetCBImgHTML();
+      // !VA Write success message to app message area on success
+      imgClipboardBut.on('success', function(event) {
+        // debugger;
+      });
+      UIController.flashAppMessage(trigger.id);
+      imgClipboardBut.on('error', function(e) {
+        console.error('Action:', e.action);
+        console.error('Trigger:', e.trigger);
+      });
+      // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
+      return clipboardStr;
+    }
+  });
+
+      // clipboardController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
+      // !VA TODO: THis should be in handleUserInput
+      function ccpIfNoUserInput(att, value) {
+        // !VA We need get the filename from Appdata in case the user leaves 'path' empty
+        var Appdata = appController.getAppdata();
+        var str;
+        // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
+        if (value && att) {
+          // !VA I might want to change this to include the # in the string itself.
+          if (value === '#') {
+            str = '';
+          } else {
+            str = `${att}="${value}"`;
+          }
+
+        } else {
+          // !VA If the path field is empty, we need to return the filename without the path.
+          if (att === 'src' && value === '' ) {
+            str = `${att}="${Appdata.filename}" `;
+          } else if ( att === '#' || att === '') {
+            str = '';
+          } else {
+            // !VA If there is no input, exclude the attribute entry.
+            str = '';
+          }
+        }
+        return str;
+
+      }
 
     // !VA CBController public functions 
     return {
@@ -998,35 +1136,25 @@ var Witty = (function () {
     // !VA  appController: Toggle checkboxes and run any associated actions
     function handleCCPInput(event) {
       console.log('handleCCPInput running');
-
-      // !VA Toggle CCP checkboxes and run any associated operations.
-      // !VA 
-      // !VA The CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
-      // !VA We will need Appdata to initialize the defaults for the wrapper table below
+      // !VA Get the Appdata for the input default value
       var data = appController.getAppdata();
 
-
-
-
-
+      // !VA Toggle CCP checkboxes and run associated operations. The CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
 
       // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
       var wrapperItemsToShow = [];
 
-      // !VA The clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it.
+      // !VA With this faux checkmark structure, the clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it.
       var checkbox = document.getElementById(event.target.id.replace('mrk', 'box'));
       // !VA Toggle the target's checkbox 
       checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
 
       // !VA Now run any actions associated with the checkbox
-      // !VA Get the Appdata for the input default value
       // !VA TODO: This value needs to be refreshed when the CCP is opened. In fact, entering new values in any of the toolButton inputs has to call a refresh of Appdata and a closing-reopening of the CCP so the values can refresh.
       
       // !VA Defaults for wrapper width and class
       document.querySelector(ccpUserInput.tableWrapperWidth).value = `${data.viewerW}`;
       document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
-      // !VA Only show the CCP wrapper width, class, align, and bgcolor options if 'Include wrapper table' is selected 
-
       // !VA Show wrapper table options if the checked element is 'table-include-wrapper-checkbox'
       if (checkbox.id === 'table-include-wrapper-checkbox') {
         wrapperItemsToShow = ['#table-wrapper-class', '#table-wrapper-width', '#table-wrapper-align', '#table-wrapper-bgcolor' ]; 
@@ -1115,7 +1243,7 @@ var Witty = (function () {
       };
 
       // !VA Might be good to fold this into error handling
-      // clipboardController: VALIDATE INPUT FOR INTEGER
+      // appController private validateInteger
       function validateInteger(inputVal) {
         // !VA Since integer validation is used for all height/width input fields, including those not yet implemented
         let isErr;
@@ -1132,7 +1260,7 @@ var Witty = (function () {
       }
 
 
-    // !VA appController private
+    // !VA appController private showAppMessage
     // !VA Here we can show a message bypassing errorHandler - not all messages are errors.
     var showAppMessage = function(id, mess, isErr) {
       //Set the time the message will display
