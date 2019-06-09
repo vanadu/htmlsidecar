@@ -224,7 +224,7 @@ var Witty = (function () {
       },
 
       // !VA UIController public writeDimViewers
-      writeDimViewers: function(Appdata) {
+      writeDimViewers: function() {
         // !VA We need the current value in dimViewers.smallphones and dimViewers.largephones to display all the dimViewers. So, if it's not explicitly user-defined, then use the default placeholder value from the HTML, then get the height from getAspectRatio
         var Appdata = {};
         // !VA Get the current Appdata
@@ -243,11 +243,6 @@ var Witty = (function () {
         document.querySelector(dimViewers.clipboardBut).style.display = 'block';
         // !VA Call evalDimAlerts to calculate which dimViewer values don't meet HTML email specs.
         evalDimAlerts();
-      },
-      // !VA UIController public writeFilename
-      writeFilename: function (fileName) {
-        document.querySelector(dimViewers.filename).textContent = fileName;
-        document.querySelector(dimViewers.filename).style.display = 'block';
       },
 
       // !VA NEW I had this as private but moved to public, not sure why.
@@ -922,7 +917,8 @@ var Witty = (function () {
         break;
       }
       // !VA Transfer control to UIController to print dimViewer to the UI
-      UICtrl.writeDimViewers(Appdata);
+      console.log('herre');
+      console.table(Appdata);
       resizeContainers(Appdata.imgH, Appdata.imgW, viewerH);
 
 
@@ -930,7 +926,7 @@ var Witty = (function () {
 
     // !VA appController private doContainerHeights
     function resizeContainers(imgH, imgW, viewerH)  {
-      // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values.
+      // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values which are passed in from resizeContainers.
       // !VA Initial height is 450, as it is defined in the CSS. TOo much hassle to try and get the value as defined in the CSS programmatically.
       // const initViewerH= parseInt(document.querySelector(dynamicRegions.imgViewer).height, 10);
       const initViewerH = 450;
@@ -938,31 +934,24 @@ var Witty = (function () {
       let appH; 
 
       // !VA I'm not even sure this is necessary since we're getting the viewerW from maxViewerHeight now -- but we'll leave it in here for the time being. 
-      // !VA TODO: Review this whole maxViewerHeight thing.
+      // !VA The viewport is 145px taller than the imgViewer. 
       if (imgH <= initViewerH) {
-        // !VA  This is the min-height set in CSS
-        // Appdata.appContainerH = 804;
+
         viewerH = initViewerH;
         viewportH = viewerH + 145;
       } else {
         // Need a little buffer in the viewport
         viewerH = imgH;
         viewportH = imgH + 145;
-
       }
       appH = viewportH;
-      // viewportH = heightVal + 125;
-      // appContainerH = viewportH;
-      // This should write the heights to Appdata and then pass it to the function that writes Appdata to the dimViewers, probably called refreshDimViewers. In fact, there's no reason not to consolidate that function with the function that updates the image container heights and refresh the entire UI at the same time, so refreshUI.
-      // dynamicRegions.imgViewer
-      // dynamicRegions.imgViewPort
-      // dynamicRegions.appContainer
-
       document.querySelector(dynamicRegions.curImg).style.width = imgW + 'px';
       document.querySelector(dynamicRegions.curImg).style.height =imgH + 'px';;
       document.querySelector(dynamicRegions.imgViewer).style.height = viewerH + 'px';
       document.querySelector(dynamicRegions.imgViewport).style.height = viewportH + 'px';
       document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';;
+      // !VA Now that the image and its containers are written to the DOM, go ahead and write the dimViewers.
+      UICtrl.writeDimViewers();
     }
 
     
