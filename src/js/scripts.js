@@ -3,11 +3,11 @@
 ===========================================================
 IN PROGRESS: RenameUIElements
 TODO: rename:
-tb-input-viewerw  => tb-input-viewerwidth
-tb-input-customw  => tb-input-imgwidth
-tb-input-customh  => tb-input-imgheight
-tb-input-small-phonesw  => tb-input-sphones-width
-tb-input-large-phonesw  => tb-input-lphones-width
+tb-input-viewerwidth  => tb-input-viewerwidthidth
+tb-input-imgwidth  => tb-input-imgwidth
+tb-input-imgheight  => tb-input-imgheight
+tb-input-sphones-width  => tb-input-sphones-width
+tb-input-lphones-width  => tb-input-lphones-width
 table-width-input => ccp-input-table-width
 table-wrapper-width-input => ccp-input-table-wrapper-width
 
@@ -70,18 +70,18 @@ var Witty = (function () {
 
     // !VA UIController: toolButton ID Strings
     var toolButtons = {
-      viewerW: '#tb-input-viewerw',
+      viewerW: '#tb-input-viewerwidth',
       grow50: '#tb-but-grow50',
       grow10: '#tb-but-grow10',
       grow01: '#tb-but-grow01',
-      customW: '#tb-input-customw',
+      imgWidth: '#tb-input-imgwidth',
       toggleImgSize: '#toggle-image-size',
-      customH: '#tb-input-customh',
+      imgHeight: '#tb-input-imgheight',
       shrink01:'#tb-but-shrink01',
       shrink10: '#tb-but-shrink10',
       shrink50: '#tb-but-shrink50',
-      sPhonesW: '#tb-input-small-phonesw',
-      lPhonesW: '#tb-input-large-phonesw',
+      sPhonesW: '#tb-input-sphones-width',
+      lPhonesW: '#tb-input-lphones-width',
     };
 
     //!VA If we separate this out into UI objects that correspond to the objects we want to create, then we can just loop through them rather than define each property separately. So, dynamicElements are those that resize based on the current image... but I haven't figured out how to loop through them yet.
@@ -285,20 +285,20 @@ var Witty = (function () {
         var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
         var ccpBlocker = document.querySelector(staticRegions.ccpBlocker);
 
-
+        // !VA TODO: These element IDs are hardcoded, but they should be aliased. Not sure how to do that...
         var statusMessages = {
-          'img-build-html-but': '<img> HTML element copied to Clipboard!',
-          'td-build-html-but': '<td> HTML element copied to Clipboard!',
-          'table-build-html-but': '<table> HTML element copied to Clipboard!',
-          'img-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard!',
-          'img-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard!',
-          'img-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard!',
-          'td-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard!',
-          'td-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard!',
-          'td-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard!',
-          'table-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard!',
-          'table-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard!',
-          'table-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard!',
+          'ccp-img-build-html-but': '<img> HTML element copied to Clipboard',
+          'ccp-td-build-html-but': '<td> HTML element copied to Clipboard',
+          'ccp-table-build-html-but': '<table> HTML element copied to Clipboard',
+          'ccp-img-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard',
+          'ccp-img-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard',
+          'ccp-img-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard',
+          'ccp-td-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard!',
+          'ccp-td-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard',
+          'ccp-td-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard',
+          'ccp-table-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard',
+          'ccp-table-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard',
+          'ccp-table-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard',
         };
 
         // !VA First, overlay the CCP blocker to prevent user input while the CSS transitions run and the status message is displayed. Cheap, but effective solution.
@@ -541,7 +541,6 @@ var Witty = (function () {
         // if (typeof(window.event) != "undefined")
         // 	oNode.attachEvent("on"+evt, oFunc);
         // else
-        console.log('oNode.id is: ' + oNode.id);
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
       // addEventHandler(document.getElementById(toolButtons.grow01),'click',doit,false);
@@ -556,7 +555,7 @@ var Witty = (function () {
       }
       
       // !VA Add event handlers for input toolButtons
-      var tbKeypresses = [ toolButtons.viewerW, toolButtons.customW, toolButtons.customH, toolButtons.sPhonesW, toolButtons.lPhonesW ];
+      var tbKeypresses = [ toolButtons.viewerW, toolButtons.imgWidth, toolButtons.imgHeight, toolButtons.sPhonesW, toolButtons.lPhonesW ];
       for (let i = 0; i < tbKeypresses.length; i++) {
         // !VA convert the ID string to the object inside the loop
         tbKeypresses[i] = document.querySelector(tbKeypresses[i]);
@@ -579,6 +578,13 @@ var Witty = (function () {
         // addEventHandler(ioKeypresses[i],'drop',handleUserAction,false);
       }
       
+      var els = document.getElementsByTagName('input');
+      console.log('els.length is: ' + els.length);
+      for (let i = 0; i < els.length; i++) {
+        if (els[i].id.includes('width')) {
+          console.log(els[i].id);
+        }
+      }
 
 
 
@@ -658,11 +664,11 @@ var Witty = (function () {
           el.value = ''; 
           // !VA NOW!
         } else if ( event.type === 'blur') {
-          // !VA If the target is viewerW, we want to restore the previous value to the field on blur in case of error or in case it is exited without entering a value with the return key. If the target is customW or customH, we want to restore the placeholder value.
+          // !VA If the target is viewerW, we want to restore the previous value to the field on blur in case of error or in case it is exited without entering a value with the return key. If the target is imgwidth or imgheight, we want to restore the placeholder value.
           // !VA TODO: create function to restore placeholder value
           el.value = (function () {
             // !VA If the current element is custom height or custom width, set the value of the field to empty to display the placeholder  
-            if ((el.id.includes('customw') || (el.id.includes('customh')))) {
+            if ((el.id.includes('imgwidth') || (el.id.includes('imgheight')))) {
               return '';
             // !VA Reset the viewer width field the last value of Appdata.viewerW 
             } else {
@@ -1029,7 +1035,7 @@ var Witty = (function () {
 
         // !VA Handle the custom width toolButton input
         case (prop === 'imgW') :
-          console.log('customW!');
+          console.log('imgwidth!');
         // !VA TODO: restore the placeholder value on blur
           // !VA If the new image width is greater than the viewer width, then show message. This is a temporary fix, the errorHandler should reset the field value to ''.
           console.log('Appdata.viewerW is: ' + Appdata.viewerW);
@@ -1061,10 +1067,10 @@ var Witty = (function () {
         Appdata.imgW = Appdata.imgW + val;
         Appdata.imgH =  Appdata.imgW * (1 / Appdata.aspect[0]);
         // !VA Handle width input input field
-      } else if (id.includes('customw')) { 
+      } else if (id.includes('imgwidth')) { 
         Appdata.imgW = val;
         Appdata.imgH =  Appdata.imgW * (1 / Appdata.aspect[0]);
-      } else if (id.includes('customh')) {
+      } else if (id.includes('imgheight')) {
         Appdata.imgH = val;
         Appdata.imgW =  Appdata.imgH * (Appdata.aspect[0]);
       }
@@ -1288,11 +1294,11 @@ var Witty = (function () {
     //  clipboardController: GET APPDATA PROPERTY NAME FROM AN HTML ELEMENT ID
     function elementIdToAppdataProp(str) {
       var IDtoProp = {
-        viewerW:  'tb-input-viewerw',
-        imgW: 'tb-input-customw',
-        imgH: 'tb-input-customh',
-        sPhoneW: 'tb-input-small-phonesw',
-        lPhoneW: 'tb-input-large-phonesw'
+        viewerW:  'tb-input-viewerwidth',
+        imgW: 'tb-input-imgwidth',
+        imgH: 'tb-input-imgheight',
+        sPhoneW: 'tb-input-sphones-width',
+        lPhoneW: 'tb-input-lphones-width'
 
       };
       // !VA This should return directly wihout a ret variable as tmp storage.
