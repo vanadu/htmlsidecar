@@ -229,10 +229,10 @@ var Witty = (function () {
         var Appdata = {};
         // !VA Get the current Appdata
         Appdata = appController.getAppdata();
-
         // !VA Hide the dropArea
         document.querySelector(staticRegions.dropArea).style.display = 'none';
         // Write the dimViewers
+        document.querySelector(dimViewers.filename).innerHTML = `<span class='pop-font'>${Appdata.filename}</span>`;
         document.querySelector(dimViewers.display).innerHTML = `<span class='pop-font'><span id="display-size-width">${Appdata.imgW}</span> X <span id="display-size-height">${Appdata.imgH}</span></span>`;
         document.querySelector(dimViewers.diskimg).innerHTML = `<span class='pop-font'>${Appdata.imgNW} X ${Appdata.imgNH}</span>`;
         document.querySelector(dimViewers.aspect).innerHTML = `<span class='pop-font'>${Appdata.aspect[1]}</span>` ;
@@ -721,11 +721,7 @@ var Witty = (function () {
 
     // appController private: remove current image
     // !VA Test for whether there is already a #cur-img element in the DOM, and if there is remove it so handleFileSelect can overwrite it without having to refresh the page to reboot the app.
-    function removeCurImg() {
-      // if ( document.querySelector('#cur-img-container')) {
-      document.querySelector('#cur-img-container').parentNode.removeChild(document.querySelector('#cur-img-container'));
-      // } 
-    }
+
 
     // appController private: hfs - FILEREADER OBJECT PROCESSING
     //Get the user-selected image file object 
@@ -733,8 +729,8 @@ var Witty = (function () {
       console.log('hFS running');
       // If a file is already being displayed, i.e. Appdata.filename is true, then remove that image to make room for the next image being dropped
       // !VA Remove the current #cur-img from the DOM. This has to be done in a separate function call, I'm not sure why handleFileSelect doesn't see #cur-img even though it is in the DOM at this point
-      // !VA NEW Commented out for now
-      removeCurImg();
+      // !VA Remove the current image if one exists so the user can drop another one over it and reboot the process rather than having to refresh the browser and drop another image. This way, all the current settings are maintained. If they want new settings they can refresh the browser.
+      document.querySelector('#cur-img-container').parentNode.removeChild(document.querySelector('#cur-img-container'));
       //The drop event has been executed and handleFileSelect is running.
       // !VA Can't remember what this does...    
       evt.stopPropagation();
@@ -778,8 +774,8 @@ var Witty = (function () {
           let fileName;
           // Read the filename of the FileReader object into a variable to pass to the getAppData function, otherwise the blob has no name
           fileName = theFile.name;
-          // !VA NEW Commented out for now
-          UICtrl.writeFilename(fileName);
+          // !VA Write the filename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
+          document.querySelector(dimViewers.filename).textContent = fileName;
           
           // !VA Hide the dropArea - not sure if this is the right place for this.
           document.querySelector(staticRegions.dropArea).style.display = 'none';
@@ -805,11 +801,7 @@ var Witty = (function () {
                 // !VA Review this - it might be an older comment...
                 // !VA The problem is that Appdata is a global object in the public functions, as it is now in master. I don't want to put all that stuff in the appController's public functions, so I have to either leave it in UIController or pass it between private functions, which will get very complicated.   I think it will be much cleaner if I only use updateAppData to loop through the items to update and don't use the klunky getAppData. Also, the refreshAppUI function refreshes all the values when it's called - it should only refresh the changed values.
                 // !VA NEW Now that the blob image has been displayed and has DOM properties that can be queried, query them and write them to Appdata.
-                var Appdata = {};
-                Appdata = appController.getAppdata(false);
-                console.dir(Appdata);
-
-                // !VA NEW Commented out for now.
+                // !VA Now that we have a current image in the DOM, Get Appdata so we can store the filename in it.
                 calcImgViewerSize(false);
               })();
               
@@ -819,6 +811,7 @@ var Witty = (function () {
 
           // !VA First, write the new curImg object to the DOM
           function initImgToDOM(curImg, callback) {
+
             // VA! The callback function allows access of image properties. You can't get image properties from a FileReader object -- it's a binary blob that takes time to load, and by the time it's loaded all the functions that get its properties have run and returned undefined. Temporary solution: hide the image object for 250 ms, then show it and get the properties -- by then it should have loaded. There is a better way to do this with promises but that will have to be for later.
             // !VA Create a div in the DOM
             var curImgDiv = document.createElement('div');
@@ -837,11 +830,15 @@ var Witty = (function () {
           // !VA Call the callback function that writes the new image to the DOM.
           initImgToDOM(curImg, initDimViewers);
         };
+
+
+
+
       })(f);
       // Read in the image file as a data URL.
       reader.readAsDataURL(f);
-      // }
-      
+
+
     }
     //FILEREADER OBJECT PROCESSING END
 
@@ -1310,22 +1307,25 @@ var Witty = (function () {
     var initDev = function() {
       // !VA This is where we initialize Dev mode, which is where we can start the app with a hard-coded img element in the HTML file. THis is very useful, otherwise we'd have to drop files to initialize or dink with the FileReader object to hard-code a test file.
       console.log('initDev running');
+      // !VA Get Appdata so we can store the filename
+      var Appdata = appController.getAppdata();
       // !VA Get the current (devimg) image dimensions and write the dimViewers
       // !VA Turn on the toolbars
       document.querySelector(staticRegions.toolsContainer).style.display = 'block';
       document.querySelector(dynamicRegions.curImg).style.display = 'block';
 
       // !VA NEW Get the filename of the devImg in the HTML. This is the only time we'll have an actual source file -- in user mode all the images are blobs -- so we can do this as a one-off.
+      
       var filename = document.querySelector(dynamicRegions.curImg).src;
       filename = filename.split('/');
       filename = filename[filename.length - 1];
+      // !VA Write the filename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
       document.querySelector(dimViewers.filename).textContent = filename;
-      UICtrl.writeFilename(filename);
-
       // !VA Get the dev image's NW and NH from the DOM, update Appdata and let calcImgViewerSize do its thing. 
       imgW = document.querySelector(dynamicRegions.curImg).naturalWidth;
       imgH = document.querySelector(dynamicRegions.curImg).naturalHeight;
-      updateAppdata(imgW, imgH);
+      // !VA TODO this doesn't work and serves no purpose: deleted
+      // updateAppdata(imgW, imgH);
       calcImgViewerSize();
       // !VA Open the CCP by default in dev mode
       // !VA First, make sure it's closed
@@ -1347,7 +1347,12 @@ var Witty = (function () {
         var Appdata = {};
         // !VA Get dynamicRegions
         dynamicRegions = UICtrl.getDynamicRegionIDs();
+        dimViewers = UICtrl.getDimViewerIDs();
         // !VA NEW Read required values into Appdata.
+        // !VA NOW!
+        Appdata.filename = document.querySelector(dimViewers.filename).textContent;
+
+
         var curImg = document.querySelector(dynamicRegions.curImg);
         var imgViewer = document.querySelector(dynamicRegions.imgViewer);
         // !VA Get the computed styles for viewerW and viewerH
