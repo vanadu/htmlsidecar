@@ -1,23 +1,10 @@
 
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
-IN PROGRESS: RenameUIElements
-TODO: rename:
-tb-input-viewerwidth  => tb-input-viewerwidthidth
-tb-input-imgwidth  => tb-input-imgwidth
-tb-input-imgheight  => tb-input-imgheight
-tb-input-sphones-width  => tb-input-sphones-width
-tb-input-lphones-width  => tb-input-lphones-width
-table-width-input => ccp-input-table-width
-table-wrapper-width-input => ccp-input-table-wrapper-width
+IN PROGRESS: RenameUIElements Fixes
 
-AND: Prefix all the CCP UI elements with ccp and put the element type second, as I should have done originally.
-
-
+TODO: Fix default value in viewerW field
 TODO: Finish reviewing and implementing write to clipboard buttons.
-
-
-
 TODO: Implement Td and table copy to clipboard buttons.
 TODO: Make mrk => box function...not sure where though or whether it's necessary since it's just a one-liner.
 TODO: Make Esc cancel the input in input fields. Now, on error the cursor stays in the field and nothing happens, you have to tab out. On Esc, the focus should elsewhere.
@@ -28,11 +15,12 @@ TODO: Make bgcolor add the hash if it's not in the value
 TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
 TODO: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- I think. Not sure if this is the right behavior...think bout it. Probably not.
 TODO: Assign keyboard  shortcuts
-TODO: Assign  tab order
+TODO: Assign tab order
 
 
-
-
+DONE: resize viewerW doesn't work Fixed, reconfigured updateAppdata to include viewerW
+DONE: - imgheight and imgwidth don't work Fixed, added handleToolbarInput to follow checkKeyboardInput
+DONE: Rename UI.
 DONE: Show/Hide CCP, make checkboxes functional.
 */
 //SCRIPT START
@@ -388,7 +376,6 @@ var Witty = (function () {
         } else {
           str = document.querySelector(dimViewers.filename).textContent;
         }
-        console.log('str is: ' + str);
         return str;
       })(ccpUserInput.imgRelPath, data);
       // !VA imgTag.srcAtt END
@@ -578,19 +565,6 @@ var Witty = (function () {
         // addEventHandler(ioKeypresses[i],'drop',handleUserAction,false);
       }
       
-      var els = document.getElementsByTagName('input');
-      console.log('els.length is: ' + els.length);
-      for (let i = 0; i < els.length; i++) {
-        if (els[i].id.includes('width')) {
-          console.log(els[i].id);
-        }
-      }
-
-
-
-
-
-
       // addEventHandler(ccpUserInput.imgClass,'keypress',showMobileImageButtons,false);
       // ccpUserInput.imgAlt.addEventListener('keypress', showMobileImageButtons);
       // ccpUserInput.imgClass.addEventListener('keypress', showMobileImageButtons);
@@ -649,10 +623,11 @@ var Witty = (function () {
             // !VA We want to handle all the toolbutton keyboard input in one place, so send the send the target element's id and value to handleTBInput
 
             // !VA NEW
-            } else if (el.id.includes('custom')) {
+            } else if (el.id.includes('width') || el.id.includes('height')) {
               // !VA Error handling
-                console.log('errorHandler call');
+                // !VA NEW I put this in to separate the error handling from the action but now nothing works...
                 checkKeyboardInput(el.id, el.value);
+                handleToolbarInput(el.id, el.value);
                 // errorHandler(el.id, el.value);
             } else {
               // !VA There will be other input fields to handle, but we're not there yet.
@@ -671,7 +646,7 @@ var Witty = (function () {
             if ((el.id.includes('imgwidth') || (el.id.includes('imgheight')))) {
               return '';
             // !VA Reset the viewer width field the last value of Appdata.viewerW 
-            } else {
+            } else if (el.id.includes('viewerwidth')) {
               // !VA Get the Appdata property name that corresponds to the ID of the current input element
               var prop = elementIdToAppdataProp(el.id);
               // !VA Access Appdata
@@ -1015,12 +990,12 @@ var Witty = (function () {
       var Appdata= {};
       Appdata = appController.getAppdata();
       var prop = elementIdToAppdataProp(id);
-      console.log('prop is: ' + prop);
       // !VA TODO: Setting maxViewerWidth just for now
       var maxViewerWidth = 800;
       switch (true) {
         case (prop === 'viewerW') :
           if (val < Appdata.imgW ) {
+            console.log('NOW!');
             // !VA TODO: review this...
             // !VA The viewer width can't be smaller than the current image width of XXX, show message
           } else if (val > maxViewerWidth ) {
@@ -1028,27 +1003,20 @@ var Witty = (function () {
             // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px
             appController.initError(id, 'viewerW_GT_maxViewerWidth', true);
           } else {
-            // !VA The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running evalViewerWidth. 
-            data = UIController.updateAppData(prop, val);
+            // !VA The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running calcImgViewerSize. So, update Appdata.viewerW with val, and pass in unchanged values of imgW and imgH
+            Appdata = updateAppdata(val, Appdata.imgW, Appdata.imgH);
           }
           break;
-
         // !VA Handle the custom width toolButton input
         case (prop === 'imgW') :
-          console.log('imgwidth!');
         // !VA TODO: restore the placeholder value on blur
           // !VA If the new image width is greater than the viewer width, then show message. This is a temporary fix, the errorHandler should reset the field value to ''.
-          console.log('Appdata.viewerW is: ' + Appdata.viewerW);
           if (val > Appdata.viewerW ) {
             // !VA errorHandler!
             appController.initError(id, 'imgW_GT_viewerW');
             
           }
-        
       }
-
-
-
     }
 
 
@@ -1057,11 +1025,12 @@ var Witty = (function () {
     // !VA Handling user input by operation rather than by event type
     // !VA appController private handleCustomWidth
     // !VA Handle user input changes to Appdata.imgWidth
-    // !VA NEW
+    // !VA NEW 
       function handleToolbarInput(id, val) {
+        console.log('handleToolbarInput');
       var Appdata = {};
       Appdata = appController.getAppdata(false);
-      // !VA Handle width input by mouseclick 
+      // !VA Handle clicks on the toolbutton increment buttons. 
       if (id.includes('tb-but')) {
         // !VA by mouseclick
         Appdata.imgW = Appdata.imgW + val;
@@ -1073,18 +1042,40 @@ var Witty = (function () {
       } else if (id.includes('imgheight')) {
         Appdata.imgH = val;
         Appdata.imgW =  Appdata.imgH * (Appdata.aspect[0]);
+      } else if (id.includes('viewerwidth')) {
+        Appdata.viewerW = val;
       }
-      Appdata = updateAppdata(Appdata.imgW, Appdata.imgH);
+      Appdata = updateAppdata(Appdata.viewerW, Appdata.imgW, Appdata.imgH);
       calcImgViewerSize();
     }
 
     // !VA NEW So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. 
-    function updateAppdata(w, h) {
+
+    // OLD
+    function updateAppdata(vw, iw, ih) {
+      console.log('updateAppdata running');
       var Appdata = {};
-      document.querySelector(dynamicRegions.curImg).style.width = w + 'px';
-      document.querySelector(dynamicRegions.curImg).style.height = h + 'px';
+      document.querySelector(dynamicRegions.imgViewer).style.width = vw + 'px';
+      document.querySelector(dynamicRegions.curImg).style.width = iw + 'px';
+      document.querySelector(dynamicRegions.curImg).style.height = ih + 'px';
       Appdata = appController.getAppdata(false);
     }
+
+    //NEW
+    // function updateAppdata(prop, val) {
+    //   var Appdata = {};
+    //   appController.getAppdata();
+      
+    //   val = parseInt(val); 
+    //   // !VA !IMPORTANT! Referencing a property of an object in bracket notation!
+    //   Appdata[prop] = val;
+    //   UIController.refreshAppUI(Appdata);
+    //   return Appdata;
+    // };
+
+
+
+
 
     // !VA CCP Functions
     // !VA appController private initCCP
@@ -1178,10 +1169,6 @@ var Witty = (function () {
     // UIController Show element when input in another element is made 
     function showElementOnInput(event) {
       // !VA Here we catch the event handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
-      console.dir(event);
-      console.log('event.target.id is: ' + event.target.id);
-      console.log('document.querySelector(ccpMakeClipBut.imgDisplayCSSToClipboard is: ' + document.querySelector(ccpMakeClipBut.imgDisplayCSSToClipboard));
-
       var elems = [];
       // elems[0] = ccpMakeClip.imgDisplayCSSToCB;
       elems[0] = document.querySelector(ccpMakeClipBut.imgDisplayWriteCSSToCB);
@@ -1214,10 +1201,6 @@ var Witty = (function () {
     }
 
 
-    // function ccpMakeClip() {
-    //   console.log('ccpMakeClip running');
-    // }
-
 
     //  !VA ERROR HANDLING
     // ==============================
@@ -1225,9 +1208,6 @@ var Witty = (function () {
       var errorHandler = function(id, str, bool) {
         console.log('errorHandler running');
         var Appdata = appController.getAppdata();
-        console.log('str is: ' + str);
-        
-
         var errorMessages = {
           imgW_GT_viewerW: `The image width has to be less than the width of its container table, which is now&nbsp;set&nbsp;to&nbsp;${Appdata.viewerW}px.`,
           tbButton_LT_zero: 'Sorry, that would make one of the image dimensions less than 0.',
@@ -1335,9 +1315,9 @@ var Witty = (function () {
       // updateAppdata(imgW, imgH);
       calcImgViewerSize();
       // !VA Open the CCP by default in dev mode
-      // !VA First, make sure it's closed
-      document.querySelector(staticRegions.ccpContainer).classList.remove('active');
-      // !VA Then run initCCP to initialize the dynamic values and open it
+      // !VA First, set it to the opposite of how you want to start it.
+      document.querySelector(staticRegions.ccpContainer).classList.add('active');
+      // !VA Then run initCCP to initialize
  
       initCCP();
     };
@@ -1383,8 +1363,6 @@ var Witty = (function () {
         Appdata.lPhonesH = Math.round(Appdata.lPhonesW * (1 / Appdata.aspect[0]));
         Appdata.viewerH = viewerH;
         Appdata.viewerW = viewerW;
-        // !VA Stopped here: Why is viewerW NaN?
-        // console.log('Appdata.viewerW is: ' + Appdata.viewerW);
         return Appdata;
       },
       init: function(){
