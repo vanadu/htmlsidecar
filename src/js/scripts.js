@@ -1,9 +1,19 @@
 
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
-IN PROGRESS: RenameUIElements Fixes
+IN PROGRESS: Fix that smallphones and largephones input fields show undefined and show in Appdata as pixel values.
+I have to stop being stubborn and accept the default behavior, which is for the value in the field to be inplemented on Tab, and for the current value to appear in the field rather than some placeholder. The reason is that the Phones input fields have no UI element to get their values from, unlike the other toolbar input fields. So on blur, the current value is the value that appears in the input field when the blur occurs. There's no value in Appdata for phones and I don't want to add one -- the model is that the elements themselves are the global objects that store the values and the only mutable ones are viewerW, imgW and imgH. SO:
 
-TODO: Fix default value in viewerW field
+ENTER: Implements the value without blur so you can see the effect and change it if you want, and updates the input's value with the current value.
+TAB: Implements the value and blurs and updates the input's value with the current value.
+ESC: Blurs to the window without changing the field value.
+
+Besides this everything works, so we will commit and push to master, then branch to fix. See stop here for stopping point.
+
+
+
+TODO: Fix being able to resize viewerW smaller than imgW
+
 TODO: Finish reviewing and implementing write to clipboard buttons.
 TODO: Implement Td and table copy to clipboard buttons.
 TODO: Make mrk => box function...not sure where though or whether it's necessary since it's just a one-liner.
@@ -18,6 +28,7 @@ TODO: Assign keyboard  shortcuts
 TODO: Assign tab order
 
 
+DONE: Fix default value in viewerW field - Fixed, added to calcImgViewerSize
 DONE: resize viewerW doesn't work Fixed, reconfigured updateAppdata to include viewerW
 DONE: - imgheight and imgwidth don't work Fixed, added handleToolbarInput to follow checkKeyboardInput
 DONE: Rename UI.
@@ -217,6 +228,8 @@ var Witty = (function () {
         document.querySelector(staticRegions.dropArea).style.display = 'block';
         document.querySelector(staticRegions.toolsContainer).style.display = 'none';
         document.querySelector(dimViewers.clipboardBut).style.display = 'none';
+
+
         const dimarray = Object.values(dimViewers);
         for ( let i = 0; i < dimarray.length; i++ ) {
           if ( dimarray[i] !== '#dv-clipboard-but' &&  dimarray[i] !== '#dv-filename-viewer' ) {
@@ -583,6 +596,9 @@ var Witty = (function () {
         var isErr;
         // e.stopPropagation;
         var el;
+        var Appdata = appController.getAppdata();
+
+
         // !VA If there is an error message showing, allow the CSS transition to run, then remove it
         var appMessContainer = document.querySelector(staticRegions.appMessContainer);
         var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
@@ -625,7 +641,12 @@ var Witty = (function () {
             // !VA NEW
             } else if (el.id.includes('width') || el.id.includes('height')) {
               // !VA Error handling
-                // !VA NEW I put this in to separate the error handling from the action but now nothing works...
+              // !VA Stopped here...
+                console.log('handleUserAction:');
+                console.log('foo');
+                console.log('el.id is: ' + el.id);
+                console.log('el.value is: ' + el.value);
+             
                 checkKeyboardInput(el.id, el.value);
                 handleToolbarInput(el.id, el.value);
                 // errorHandler(el.id, el.value);
@@ -639,21 +660,32 @@ var Witty = (function () {
           el.value = ''; 
           // !VA NOW!
         } else if ( event.type === 'blur') {
+
           // !VA If the target is viewerW, we want to restore the previous value to the field on blur in case of error or in case it is exited without entering a value with the return key. If the target is imgwidth or imgheight, we want to restore the placeholder value.
           // !VA TODO: create function to restore placeholder value
           el.value = (function () {
+
+            console.log('el.value is: ' + el.value);
+            console.log('el.id is: ' + el.id);
+            console.log('blur');
+            console.dir(Appdata);
             // !VA If the current element is custom height or custom width, set the value of the field to empty to display the placeholder  
+            // !VA Thiis does nothing
             if ((el.id.includes('imgwidth') || (el.id.includes('imgheight')))) {
               return '';
             // !VA Reset the viewer width field the last value of Appdata.viewerW 
-            } else if (el.id.includes('viewerwidth')) {
+            } else if (el.id.includes('viewerwidth') || el.id.includes('phones')) {
               // !VA Get the Appdata property name that corresponds to the ID of the current input element
               var prop = elementIdToAppdataProp(el.id);
               // !VA Access Appdata
-              var data = appController.getAppdata();
+
               // !VA return the current value of the Appdata property for the current event target to that elements value property. 
               // alert(data[prop]);
-              return data[prop];
+              console.log('handleUserAction');
+              console.log('prop is: ' + prop);
+              console.table(Appdata);
+              console.log('Appdata[prop] is: ' + Appdata[prop]);
+              return Appdata[prop];
             }
 
             // e.preventDefault;
@@ -783,6 +815,7 @@ var Witty = (function () {
                 document.querySelector(staticRegions.dropArea).style.display = 'none';
                 // !VA  Show the toolbar
                 document.querySelector(staticRegions.toolsContainer).style.display = 'block';
+
                 // !VA Display the current image
                 curImg.style.display = 'block';
                 // !VA NOW the image is in the DOM and we can call functions to get its properties.
@@ -793,6 +826,16 @@ var Witty = (function () {
                 // !VA The problem is that Appdata is a global object in the public functions, as it is now in master. I don't want to put all that stuff in the appController's public functions, so I have to either leave it in UIController or pass it between private functions, which will get very complicated.   I think it will be much cleaner if I only use updateAppData to loop through the items to update and don't use the klunky getAppData. Also, the refreshAppUI function refreshes all the values when it's called - it should only refresh the changed values.
                 // !VA NEW Now that the blob image has been displayed and has DOM properties that can be queried, query them and write them to Appdata.
                 // !VA Now that we have a current image in the DOM, Get Appdata so we can store the filename in it.
+
+                // !VA Initialize the value in the toolbar viewerW input field to its initial CSS  value.
+                console.log('document.querySelector(dynamicRegions.imgViewer) is: ' + document.querySelector(dynamicRegions.imgViewer));
+                console.dir(document.querySelector(dynamicRegions.imgViewer));
+                
+                document.querySelector(toolButtons.viewerW).value = document.querySelector(dynamicRegions.imgViewer).style.width;
+
+
+
+
                 calcImgViewerSize(false);
               })();
               
@@ -838,8 +881,7 @@ var Witty = (function () {
     // !VA NEW appController private calcImgViewerSize
     // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH
     function calcImgViewerSize() {
-
-      // !VA Here's the problem...
+      console.log('calcViewerSize running');
       var Appdata = {};
       Appdata = appController.getAppdata(false);
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
@@ -849,7 +891,10 @@ var Witty = (function () {
       var compStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
       viewerW = parseInt(compStyles.getPropertyValue('width'), 10);
       viewerH = parseInt(compStyles.getPropertyValue('height'), 10);
-      // !VA If we're initializing a new image, use the naturalWidth and naturalHeight. If we're updating via user input, we need to use the display image and height, imgW and imgH. If we're initializing, then Appdata.imgW and Appdata.imgH will be 0 or falsy because it hasn't been resized yet. So we need to make the following switch case based on the _actual_ image width and height, which will be different based on whether we're initializing or updating. So:
+      // !VA Write the viewerW to the toolbar input field
+      document.querySelector(toolButtons.viewerW).value = viewerW;
+
+      // !VA If we're initializing a new image, use the naturalWidth and naturalHeight. If we're updating via user input, we need to use the display image and height, imgW and imgH. If we're initializing, then Appdata.imgW and Appdata.imgH will be 0 or falsy because it hasn't been resized yet. So we need to make the following decision based on the _actual_ image width and height, which will be different based on whether we're initializing or updating. So:
 
       var actualW, actualH
       if (Appdata.imgW === 0) {
@@ -913,13 +958,13 @@ var Witty = (function () {
         break;
       }
       // !VA Transfer control to UIController to print dimViewer to the UI
-      resizeContainers(Appdata.imgH, Appdata.imgW, viewerH);
+      resizeContainers(viewerH, Appdata.imgW, Appdata.imgH );
 
 
     }
 
     // !VA appController private doContainerHeights
-    function resizeContainers(imgH, imgW, viewerH)  {
+    function resizeContainers(viewerH, imgW, imgH)  {
       // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values which are passed in from resizeContainers.
       // !VA Initial height is 450, as it is defined in the CSS. TOo much hassle to try and get the value as defined in the CSS programmatically.
       // const initViewerH= parseInt(document.querySelector(dynamicRegions.imgViewer).height, 10);
@@ -985,26 +1030,32 @@ var Witty = (function () {
       return pxval;
     }
 
+    // !VA NEW I don't know wny I'm checking Appdata properties here instead of target ids...
     function checkKeyboardInput(id, val) {
       console.log('checkKeyboardInput running');
       var Appdata= {};
       Appdata = appController.getAppdata();
       var prop = elementIdToAppdataProp(id);
+      console.log('prop is: ' + prop);
+      console.table(Appdata);
       // !VA TODO: Setting maxViewerWidth just for now
       var maxViewerWidth = 800;
       switch (true) {
         case (prop === 'viewerW') :
           if (val < Appdata.imgW ) {
             console.log('NOW!');
-            // !VA TODO: review this...
-            // !VA The viewer width can't be smaller than the current image width of XXX, show message
+            // !VA TODO: review this...I'm not sure I want to container to resize the image by default or show an error. 
+            // !VA The viewer width can't be smaller than the current image width of XXX, show message. 
           } else if (val > maxViewerWidth ) {
             // !VA Setting a maxViewerWidth here but I need to review V1 and revisit this.
             // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px
             appController.initError(id, 'viewerW_GT_maxViewerWidth', true);
           } else {
-            // !VA The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running calcImgViewerSize. So, update Appdata.viewerW with val, and pass in unchanged values of imgW and imgH
+            // !VA first write val to the viewerW input's value
+            // document.querySelector(dynamicRegions.imgViewer).value = val;
+            // !VA  The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running calcImgViewerSize. So, update Appdata.viewerW with val, and pass in unchanged values of imgW and imgH
             Appdata = updateAppdata(val, Appdata.imgW, Appdata.imgH);
+            console.table(Appdata);
           }
           break;
         // !VA Handle the custom width toolButton input
@@ -1016,7 +1067,14 @@ var Witty = (function () {
             appController.initError(id, 'imgW_GT_viewerW');
             
           }
-      }
+        // !VA Handle the custom width toolButton input
+        case (prop === 'sPhoneW') :
+            console.log('checkKeyboardInput sPhoneW');
+
+
+
+        }
+        
     }
 
 
@@ -1028,8 +1086,10 @@ var Witty = (function () {
     // !VA NEW 
       function handleToolbarInput(id, val) {
         console.log('handleToolbarInput');
+        console.log('id is: ' + id);
       var Appdata = {};
       Appdata = appController.getAppdata(false);
+      console.table(Appdata); 
       // !VA Handle clicks on the toolbutton increment buttons. 
       if (id.includes('tb-but')) {
         // !VA by mouseclick
@@ -1044,6 +1104,10 @@ var Witty = (function () {
         Appdata.imgW =  Appdata.imgH * (Appdata.aspect[0]);
       } else if (id.includes('viewerwidth')) {
         Appdata.viewerW = val;
+      } else if (id.includes('sphones')) {
+        console.log('handleToolbarInput sphones');
+      } else if (id.includes('lphones')) {
+        console.log('handleToolbarInput lphones');
       }
       Appdata = updateAppdata(Appdata.viewerW, Appdata.imgW, Appdata.imgH);
       calcImgViewerSize();
@@ -1277,8 +1341,8 @@ var Witty = (function () {
         viewerW:  'tb-input-viewerwidth',
         imgW: 'tb-input-imgwidth',
         imgH: 'tb-input-imgheight',
-        sPhoneW: 'tb-input-sphones-width',
-        lPhoneW: 'tb-input-lphones-width'
+        sPhonesW: 'tb-input-sphones-width',
+        lPhonesW: 'tb-input-lphones-width'
 
       };
       // !VA This should return directly wihout a ret variable as tmp storage.
@@ -1355,8 +1419,8 @@ var Witty = (function () {
         // !VA NEW We need the aspect ratio to calculate the other dimension when the user only inputs one, i.e. when width or height is entered into one of the toolbars' custom width/height fields.
         Appdata.aspect = getAspectRatio(curImg.naturalWidth,  curImg.naturalHeight);
         // !VA NEW We need new imgW and imgH properties to store the user input values. We don't want to overwrite the original imgW/imgH values because it appears it's not possible since Javascript passes values by reference, so any changes to properties are lost outside the current function's scope. Plus, we need to have the original values persist for the duration of the session, at which point the app and Appdata are reinitialized. 
-        Appdata.sPhonesW = document.querySelector(toolButtons.sPhonesW).value
-        Appdata.lPhonesW = document.querySelector(toolButtons.sPhonesW).value;
+        Appdata.sPhonesW = parseInt(document.querySelector(toolButtons.sPhonesW).value, 10);
+        Appdata.lPhonesW = parseInt(document.querySelector(toolButtons.lPhonesW).value, 10);
         Appdata.sPhonesW ? Appdata.sPhonesW : Appdata.sPhonesW = parseInt(document.querySelector(toolButtons.sPhonesW).placeholder, 10);
         Appdata.lPhonesW ? Appdata.lPhonesW : Appdata.lPhonesW = parseInt(document.querySelector(toolButtons.lPhonesW).placeholder, 10);
         Appdata.sPhonesH = Math.round(Appdata.sPhonesW * (1 / Appdata.aspect[0]));
