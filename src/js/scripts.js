@@ -3,6 +3,26 @@
 ===========================================================
 
 LAST COMMIT BEFORE BRANCH TO 061119Start
+Branch 061119Start
+-------------------
+Issue 05: Rename calcImg VieweSize to calcViewerSize
+Issue 01: two chars of ID in handleUserAction. 
+
+Branch isNewImgFunction
+------------------------
+Issue 06: Pull isNewImg(actualW, actualH) out of calcViewerSize into new function.
+Issue 08: Rename actualW and actualH to actualImgW and actualImgH - these will be passed in as parameters in Issue 06 anyway.
+
+Branch rewriteHandleUserAction061119
+-------------------------------------
+Issue 02: handleUserAction rewrite. Consider folding error checking from checkKeyboardInput back into the user action handler. Also reviewer use of elementIdToAppdataProp.
+
+
+Branch TBA
+------------
+Issue 03: prop to target rewrite in checkKeyboardInput. 
+Issue 04: separate handleToolbarInput back out into event-centered functions instead of region-centered.
+Issue 07: Rewrite updateAppdata to be parameters... with key/value pairs as parameter.
 
 
 TODO: Fix being able to resize viewerW smaller than imgW
