@@ -1,19 +1,11 @@
 
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
-IN PROGRESS: Fix that smallphones and largephones input fields show undefined and show in Appdata as pixel values.
-I have to stop being stubborn and accept the default behavior, which is for the value in the field to be inplemented on Tab, and for the current value to appear in the field rather than some placeholder. The reason is that the Phones input fields have no UI element to get their values from, unlike the other toolbar input fields. So on blur, the current value is the value that appears in the input field when the blur occurs. There's no value in Appdata for phones and I don't want to add one -- the model is that the elements themselves are the global objects that store the values and the only mutable ones are viewerW, imgW and imgH. SO:
 
-ENTER: Implements the value without blur so you can see the effect and change it if you want, and updates the input's value with the current value.
-TAB: Implements the value and blurs and updates the input's value with the current value.
-ESC: Blurs to the window without changing the field value.
-
-Besides this everything works, so we will commit and push to master, then branch to fix. See stop here for stopping point.
-
+LAST COMMIT BEFORE BRANCH TO 061119Start
 
 
 TODO: Fix being able to resize viewerW smaller than imgW
-
 TODO: Finish reviewing and implementing write to clipboard buttons.
 TODO: Implement Td and table copy to clipboard buttons.
 TODO: Make mrk => box function...not sure where though or whether it's necessary since it's just a one-liner.
@@ -27,7 +19,7 @@ TODO: THe CCP should store all the currently selected options and restore them w
 TODO: Assign keyboard  shortcuts
 TODO: Assign tab order
 
-
+DONE: Fix that smallphones and largephones input fields show undefined and show in Appdata as pixel values.
 DONE: Fix default value in viewerW field - Fixed, added to calcImgViewerSize
 DONE: resize viewerW doesn't work Fixed, reconfigured updateAppdata to include viewerW
 DONE: - imgheight and imgwidth don't work Fixed, added handleToolbarInput to follow checkKeyboardInput
