@@ -5,8 +5,8 @@
 LAST COMMIT BEFORE BRANCH TO 061119Start
 Branch 061119Start
 -------------------
-Issue 05: Rename calcImg VieweSize to calcViewerSize
-Issue 01: two chars of ID in handleUserAction. 
+DONE: Issue 05, Rename calcImg VieweSize to calcViewerSize
+DONE: Issue 01, two chars of ID in handleUserAction. 
 
 Branch isNewImgFunction
 ------------------------
@@ -40,7 +40,7 @@ TODO: Assign keyboard  shortcuts
 TODO: Assign tab order
 
 DONE: Fix that smallphones and largephones input fields show undefined and show in Appdata as pixel values.
-DONE: Fix default value in viewerW field - Fixed, added to calcImgViewerSize
+DONE: Fix default value in viewerW field - Fixed, added to calcViewerSize
 DONE: resize viewerW doesn't work Fixed, reconfigured updateAppdata to include viewerW
 DONE: - imgheight and imgwidth don't work Fixed, added handleToolbarInput to follow checkKeyboardInput
 DONE: Rename UI.
@@ -624,7 +624,7 @@ var Witty = (function () {
         if (event.type === 'click') {
           // !VA If the id contains 'tb' then we're dealing with toolButtons buttons - the first two chars of the ID indicate the element category
           switch (true) {
-          case ( el.id.includes('tb')) :
+          case ( el.id.includes('tb-but')) :
             var val;
             // !VA The last 2 chars of the id indicate the value by which the img dimension should be incremented,so get the last 2 chars and convert to integer
             val = parseInt(el.id.slice(-2));
@@ -848,7 +848,7 @@ var Witty = (function () {
 
 
 
-                calcImgViewerSize(false);
+                calcViewerSize(false);
               })();
               
               // !VA Timeout of 250 ms while the blob loads.
@@ -890,9 +890,9 @@ var Witty = (function () {
 
 
 
-    // !VA NEW appController private calcImgViewerSize
+    // !VA NEW appController private calcViewerSize
     // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH
-    function calcImgViewerSize() {
+    function calcViewerSize() {
       console.log('calcViewerSize running');
       var Appdata = {};
       Appdata = appController.getAppdata(false);
@@ -1065,7 +1065,7 @@ var Witty = (function () {
           } else {
             // !VA first write val to the viewerW input's value
             // document.querySelector(dynamicRegions.imgViewer).value = val;
-            // !VA  The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running calcImgViewerSize. So, update Appdata.viewerW with val, and pass in unchanged values of imgW and imgH
+            // !VA  The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running calcViewerSize. So, update Appdata.viewerW with val, and pass in unchanged values of imgW and imgH
             Appdata = updateAppdata(val, Appdata.imgW, Appdata.imgH);
             console.table(Appdata);
           }
@@ -1122,7 +1122,7 @@ var Witty = (function () {
         console.log('handleToolbarInput lphones');
       }
       Appdata = updateAppdata(Appdata.viewerW, Appdata.imgW, Appdata.imgH);
-      calcImgViewerSize();
+      calcViewerSize();
     }
 
     // !VA NEW So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. 
@@ -1384,12 +1384,12 @@ var Witty = (function () {
       filename = filename[filename.length - 1];
       // !VA Write the filename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
       document.querySelector(dimViewers.filename).textContent = filename;
-      // !VA Get the dev image's NW and NH from the DOM, update Appdata and let calcImgViewerSize do its thing. 
+      // !VA Get the dev image's NW and NH from the DOM, update Appdata and let calcViewerSize do its thing. 
       imgW = document.querySelector(dynamicRegions.curImg).naturalWidth;
       imgH = document.querySelector(dynamicRegions.curImg).naturalHeight;
       // !VA TODO this doesn't work and serves no purpose: deleted
       // updateAppdata(imgW, imgH);
-      calcImgViewerSize();
+      calcViewerSize();
       // !VA Open the CCP by default in dev mode
       // !VA First, set it to the opposite of how you want to start it.
       document.querySelector(staticRegions.ccpContainer).classList.add('active');
