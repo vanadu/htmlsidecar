@@ -5,20 +5,20 @@
 LAST COMMIT BEFORE BRANCH TO 061119Start
 Branch 061119Start
 -------------------
-DONE: Issue 05, Rename calcImg Viegit weSize to calcViewerSize
+DONE: Issue 05, Rename calcImg VieweSize to calcViewerSize
 DONE: Issue 01, two chars of ID in handleUserAction. 
 
 Branch isNewImgFunction
 ------------------------
-DONE: Issue 06, Pull isNewImg(actualW, actualH) out of calcViewerSize into new function.
-Status: I can't find any condition where imgW and imgH are 0 in Appdata.
-Status: Just modified getAppdata and now imagewidth and imageheight dont' work any more. THe problem is at line 948 in calcViewerSize. It's Case 1 - commented as 'Do nothing', but it doesn't do nothing, it sets curImgW and curImgH to curImgNW and curImgNH. Removing  that now and retesting.
-Status: isNewImg doesn't appear to be necessary. Tweaked getAppdata and calcViewerSize, everything appears to work in dev and user mode.
-DONE, Issue 08: Rename actualW and actualH to actualImgW and actualImgH - these will be passed in as parameters in Issue 06 anyway. Folded into Issue 06 solution. Assigned all the Appdata properties to local variables and renamed.
+Issue 06: Pull isNewImg(actualW, actualH) out of calcViewerSize into new function.
+Issue 08: Rename actualW and actualH to actualImgW and actualImgH - these will be passed in as parameters in Issue 06 anyway.
 
 Branch rewriteHandleUserAction061119
 -------------------------------------
 Issue 02: handleUserAction rewrite. Consider folding error checking from checkKeyboardInput back into the user action handler. Also reviewer use of elementIdToAppdataProp.
+Status: Pulled out focus, clicks and keypress from handleUserAction. 
+Status: Changed keypress to keyup
+Status: Added Esc functionality to input fields.
 
 
 Branch TBA
@@ -565,7 +565,7 @@ var Witty = (function () {
       for (let i = 0; i < tbClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         tbClickables[i] = document.querySelector(tbClickables[i]);
-        addEventHandler(tbClickables[i],'click',handleUserAction,false);
+        addEventHandler(tbClickables[i],'click',handleClicks,false);
 
       }
       
@@ -574,8 +574,8 @@ var Witty = (function () {
       for (let i = 0; i < tbKeypresses.length; i++) {
         // !VA convert the ID string to the object inside the loop
         tbKeypresses[i] = document.querySelector(tbKeypresses[i]);
-        addEventHandler((tbKeypresses[i]),'keypress',handleUserAction,false);
-        addEventHandler((tbKeypresses[i]),'focus',handleUserAction,false);
+        addEventHandler((tbKeypresses[i]),'keyup',handleKeyup,false);
+        addEventHandler((tbKeypresses[i]),'focus',handleFocus,false);
         addEventHandler(tbKeypresses[i],'blur',handleUserAction,false);
         addEventHandler(tbKeypresses[i],'dragover',handleUserAction,false);
         addEventHandler(tbKeypresses[i],'drop',handleUserAction,false);
@@ -605,6 +605,90 @@ var Witty = (function () {
         addEventHandler((dvClickables[i]),'click',initCCP,false);
       }
 
+      // !VA Branch rewriteHandleUserAction061119 
+      // !VA appController private handleClicks
+      function handleClicks(evt) {
+        // !VA Carryover from earlier handleUserAction
+        // !VA Get the target element of the click
+        el = document.getElementById(this.id);
+        // !VA Handle the increment toolbuttons
+        switch (true) {
+          case ( el.id.includes('tb-but')) :
+            var val;
+            // !VA The last 2 chars of the id indicate the value by which the img dimension should be incremented,so get the last 2 chars and convert to integer
+            val = parseInt(el.id.slice(-2));
+            // !VA If the target ID includes 'grow' then the image dimension will be incremented, if 'shrink' then it will be decremented
+            (el.id.includes('grow')) ? val : val = -val;
+            handleToolbarInput(el.id, val);
+            break;
+        }
+      }
+
+  //     document.addEventListener('keydown', function(event) {
+  //       const key = event.key; // Or const {key} = event; in ES6+
+  //       if (key === "Escape") {
+  //           console.log('Escape');
+  //       }
+  //   });
+
+  //   document.addEventListener('keyup', function(event){
+  //     console.log(event.keyCode)
+  //     if(event.keyCode == 27) {
+  //         console.log('keyup 27');
+  //     }
+  // })
+
+      function handleKeyup(evt) {
+        // !VA 
+        keyup = evt.which || evt.keyCode || evt.key;
+        el = document.getElementById(this.id);
+        if (keyup == 27) {
+          // !VA If an input has the focus and ESC is pressed, blur that input.
+          var inputs = document.getElementsByTagName('input');
+          for (let i = 0; i < inputs.length; i++) {
+          console.log('inputs[i].id' + inputs[i].id);
+            inputs[i].blur();
+          }
+        }
+        if (keyup == 13) {
+          console.log('ENTER was pressed');
+          // !VA Get the input and evaluate it
+          var isErr = validateInteger(this.value);
+          if (isErr) {
+            // !VA If the value entered isn't an integer, reset it to null and leave the focus there, and send the error code to errorHandler
+            el.value = '';
+            appController.initError(el.id, 'not_an_integer', true);
+          // !VA We want to handle all the toolbutton keyboard input in one place, so send the send the target element's id and value to handleTBInput
+
+          // !VA NEW
+          } else if (el.id.includes('width') || el.id.includes('height')) {
+            // !VA Error handling
+            // !VA Stopped here...
+              console.log('handleUserAction:');
+              console.log('foo');
+              console.log('el.id is: ' + el.id);
+              console.log('el.value is: ' + el.value);
+           
+              checkKeyboardInput(el.id, el.value);
+              handleToolbarInput(el.id, el.value);
+              // errorHandler(el.id, el.value);
+          } else {
+            // !VA There will be other input fields to handle, but we're not there yet.
+            console.log('Undefined keypress action');
+          }
+        } 
+      }
+
+      function handleFocus(evevtent) {
+        // !VA Get the target element of the click
+        el = document.getElementById(this.id);
+        // !VA Set the clicked element's value to empty - I think this is the default anyway.
+        el.value = ''; 
+      }
+
+
+
+
       // appController private handleUserAction 
       function handleUserAction(evt) {
         var keypressed;
@@ -624,25 +708,9 @@ var Witty = (function () {
         }
         // !VA Put the event trigger in an object first, so we don't have to keep calling document.getElementById
         el = document.getElementById(this.id);
-        if (event.type === 'click') {
-          // !VA If the id contains 'tb' then we're dealing with toolButtons buttons - the first two chars of the ID indicate the element category
-          switch (true) {
-          case ( el.id.includes('tb-but')) :
-            var val;
-            // !VA The last 2 chars of the id indicate the value by which the img dimension should be incremented,so get the last 2 chars and convert to integer
-            val = parseInt(el.id.slice(-2));
-            // !VA If the target ID includes 'grow' then the image dimension will be incremented, if 'shrink' then it will be decremented
-            (el.id.includes('grow')) ? val : val = -val;
-            handleToolbarInput(el.id, val);
 
-            break;
-          case ( el.id.includes('dv')) :
-            UIController.ccpToggle();
-            // document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
-            break;
-          } 
 
-        } else if (event.type === 'keypress') {
+         if (event.type === 'keypress') {
           keypressed = evt.which || evt.keyCode || evt.key;
           if (keypressed == 13) {
             // !VA Get the input and evaluate it
@@ -847,7 +915,10 @@ var Witty = (function () {
                 console.dir(document.querySelector(dynamicRegions.imgViewer));
                 
                 document.querySelector(toolButtons.viewerW).value = document.querySelector(dynamicRegions.imgViewer).style.width;
-                console.log('initDimViewers');
+
+
+
+
                 calcViewerSize(false);
               })();
               
@@ -888,66 +959,43 @@ var Witty = (function () {
     }
     //FILEREADER OBJECT PROCESSING END
 
-    // !VA appController private isNewImage
-    // !VA Determine if we're initializing a new image at the default imgViewer size or changing the imgW, imgH or viewerW display properties of an existing image. If we're initializing, then Appdata.imgNW and Appdata.imgNH will be 0 or falsy because it hasn't been resized to fit in the imgViewer yet. 
-    // // !VA branch isNewImageFunction - This doesn't appear to be necessary, so delete in the next branch.
-    function isNewImage() {
-      // !VA Get the current Appdata with image and container dimension data from the DOM
-      var Appdata = {};
-      Appdata = appController.getAppdata(false);
-      let isNewImg;
-      let actualImgW, actualImgH
-      let retval = [];
-      console.log('isNewImage');
-      console.table(Appdata);
 
-
-
-      (!Appdata.imgNW || !Appdata.imgNH) ? retval = [ curImgW, Appdata,imgNH ] : retval = [ Appdata.imgW, Appdata.imgH ]
-      return retval;
-
-      // if (!Appdata.imgW && !Appdata.imgH) { 
-      //   actualImgW = curImgNW; actualImgH = curImgNH;
-
-      // } else {
-      //   actualImgW = Appdata.imgW; actualImgH = Appdata.imgH; 
-      // }
-      // return [ actualImgW, actualImgH ]
-    }
 
     // !VA NEW appController private calcViewerSize
-    // !VA NOTE: There was in issue with different img sizes depending on whether the image was being initialized or modified. It resolved itself, see branch isNewImgFunction.
+    // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH
     function calcViewerSize() {
       console.log('calcViewerSize running');
       var Appdata = {};
       Appdata = appController.getAppdata(false);
-      console.table(Appdata);
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
-      // !VA Write Appdata image properties into local variable names for convenience and readability
-      let viewerW, viewerH, curImgW, curImgH, curImgNW, curImgNH;
-      curImgW = Appdata.imgW; curImgH = Appdata.imgH; curImgNW = Appdata.imgNW, curImgNH = Appdata.imgNH;
-      
       // !VA NEW Get the actual viewerW from getComputedStyle
-      // !VA Branch isNewImageFunction - this appears to be a dupe of the same function in getAppdata.
-      console.log('calcViewerSize: Getting computed styles for imgViewer');
-      var cStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
-      viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
-      viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
+      var viewerW;
+      var viewerH;
+      var compStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
+      viewerW = parseInt(compStyles.getPropertyValue('width'), 10);
+      viewerH = parseInt(compStyles.getPropertyValue('height'), 10);
       // !VA Write the viewerW to the toolbar input field
       document.querySelector(toolButtons.viewerW).value = viewerW;
-      // !VA Log that the toolbutton value was updated here
-      console.log('toolButtons.viewerW updated in calcViewerSize');
+
+      // !VA If we're initializing a new image, use the naturalWidth and naturalHeight. If we're updating via user input, we need to use the display image and height, imgW and imgH. If we're initializing, then Appdata.imgW and Appdata.imgH will be 0 or falsy because it hasn't been resized yet. So we need to make the following decision based on the _actual_ image width and height, which will be different based on whether we're initializing or updating. So:
+
+      var actualW, actualH
+      if (Appdata.imgW === 0) {
+        actualW = Appdata.imgNW;
+        actualH = Appdata.imgNH;
+      } else {
+        actualW = Appdata.imgW;
+        actualH = Appdata.imgH; 
+      }
+
 
       switch(true) {
       // The image falls within the default viewer dimensions set in initApp, so do nothing.
       // !VA This case is irrelevant since we're now comparing everything to maxViewerWidth not the  init values. Change accordingly...
       // !VA  NOT SO...now we're trying to restore the previous functionality so...
-      // !VA Changed curImgNH to curImgH branch isNewImageFunction
-      case (curImgW <= viewerW) && (curImgH < viewerH) :
-        console.log('case 1');
-        // !VA Removed, branch isNewImgFunction
-        // curImgW = curImgNW;
-        // curImgH = curImgNH;
+      case (actualW <= viewerW) && (Appdata.imgNH < viewerH) :
+        actualW = Appdata.imgNW;
+        actualH = Appdata.imgNH;
         // !VA viewerH is set in initApp, so no change to it here
         // !VA viewerH is set in initapp, so no change to that here either.
         // !VA We don't need to adjust height...but maybe we do for consistency's sake
@@ -956,12 +1004,11 @@ var Witty = (function () {
 
       // The image is wider than the current viewer width but shorter than current viewer height, so resize the image based on the viewer width
       
-      case (curImgW > viewerW) && (curImgH < viewerH) :
-        console.log('case 2');
+      case (actualW > viewerW) && (actualH < viewerH) :
         // Set the image width to the current viewer
-        curImgW = viewerW;
+        Appdata.imgW = viewerW;
         // Get the image height from the aspect ration function
-        curImgH = Math.round((1/Appdata.aspect[0]) * curImgW);
+        Appdata.imgH = Math.round((1/Appdata.aspect[0]) * Appdata.imgW);
         // Set the viewerH to the imgH
         viewerH = Appdata.imgH;
         // this.adjustContainerHeights(Appdata);
@@ -969,12 +1016,11 @@ var Witty = (function () {
 
       // The image is not as wide as the current viewer width, but is taller than the viewer height. Keep the image width but resize the viewer in order to display the full image height
       // !VA This might be a problem with consecutive images without page refresh
-      case (curImgW <= viewerW) && (curImgH > viewerH) :
-        console.log('case 3');
+      case (actualW <= viewerW) && (actualH > viewerH) :
         // Set the viewer height and the image height to the image natural height
-        viewerH = curImgH = curImgNH;
+        viewerH = Appdata.imgH = Appdata.imgNH;
         // Set the image width to the natural image width
-        curImgW = curImgNW;
+        Appdata.imgW = Appdata.imgNW;
 
         // !VA  Use adjustContainerHeights to get the Appdata height
         // !VA  Note the dependency with initAppdata, see 'Dependency with adjustContainerHeights'
@@ -982,21 +1028,20 @@ var Witty = (function () {
         break;
 
       // The image is wider and taller than the current viewer height and width so we have to resize the image and the viewport based on the current viewport width
-      case (curImgW > viewerW) && (curImgH > viewerH) :
-        console.log('case 4');
+      case (actualW > viewerW) && (actualH > viewerH) :
         // Set the image Width to the current  viewer width 
-        curImgW = viewerW;
+        Appdata.imgW = viewerW;
         // Set the image height proportional to the new image width using the aspect ratio function
-        curImgH = Math.round((1/Appdata.aspect[0]) * curImgW);
+        Appdata.imgH = Math.round((1/Appdata.aspect[0]) * Appdata.imgW);
         // Set the viewer height to the image height
-        viewerH = curImgH;
+        viewerH = Appdata.imgH;
         // Get the viewport and Appdata height from adjustContainerHeights
 
         // !VA TODO: Check this out, doesn't seem to be a problem anymore: BUG Problem with the 800X550, 800X600 -- no top/bottom gutter on viewport
         break;
       }
       // !VA Transfer control to UIController to print dimViewer to the UI
-      resizeContainers(viewerH, curImgW, curImgH );
+      resizeContainers(viewerH, Appdata.imgW, Appdata.imgH );
 
 
     }
@@ -1445,7 +1490,6 @@ var Witty = (function () {
         var curImg = document.querySelector(dynamicRegions.curImg);
         var imgViewer = document.querySelector(dynamicRegions.imgViewer);
         // !VA Get the computed styles for viewerW and viewerH
-        console.log('getAppdata: Getting computed styles for imgViewer');
         var cStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
         var viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
         var viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
@@ -1453,9 +1497,6 @@ var Witty = (function () {
         // !VA Assign property values
         Appdata.imgW = curImg.width;
         Appdata.imgH = curImg.height;
-        // !VA Changing this in branch isNewImgFunction - it makes no sense to me now.
-        // curImgNW = curImg.naturalWidth;
-        // curImgNH = curImg.naturalHeight;
         Appdata.imgNW = curImg.naturalWidth;
         Appdata.imgNH = curImg.naturalHeight;
         // !VA NEW We need the aspect ratio to calculate the other dimension when the user only inputs one, i.e. when width or height is entered into one of the toolbars' custom width/height fields.
