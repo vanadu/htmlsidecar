@@ -19,6 +19,12 @@ Issue 02: handleUserAction rewrite. Consider folding error checking from checkKe
 Status: Pulled out focus, clicks and keypress from handleUserAction. 
 Status: Changed keypress to keyup
 Status: Added Esc functionality to input fields.
+Commit 1: 4567a28
+Cleaned up console calls.
+
+Handle blur notes:
+
+
 
 
 Branch TBA
@@ -574,11 +580,14 @@ var Witty = (function () {
       for (let i = 0; i < tbKeypresses.length; i++) {
         // !VA convert the ID string to the object inside the loop
         tbKeypresses[i] = document.querySelector(tbKeypresses[i]);
+        // !VA Handles all key events except TAB, which require keyDown to get the value of the current input rather than the input being tabbed to.
+
+        // addEventHandler((tbKeypresses[i]),'keypress',handleKeypress,false);
         addEventHandler((tbKeypresses[i]),'keyup',handleKeyup,false);
         addEventHandler((tbKeypresses[i]),'focus',handleFocus,false);
-        addEventHandler(tbKeypresses[i],'blur',handleUserAction,false);
-        addEventHandler(tbKeypresses[i],'dragover',handleUserAction,false);
-        addEventHandler(tbKeypresses[i],'drop',handleUserAction,false);
+        // addEventHandler(tbKeypresses[i],'blur',handleUserAction,false);
+        // addEventHandler(tbKeypresses[i],'dragover',handleUserAction,false);
+        // addEventHandler(tbKeypresses[i],'drop',handleUserAction,false);
       }
 
       // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. Currently only the img class input does that.
@@ -624,34 +633,64 @@ var Witty = (function () {
         }
       }
 
-  //     document.addEventListener('keydown', function(event) {
-  //       const key = event.key; // Or const {key} = event; in ES6+
-  //       if (key === "Escape") {
-  //           console.log('Escape');
-  //       }
-  //   });
+      // !VA THIS WORKS!!!!!
+      // document.onkeydown = function(evt) {
+      //   evt = evt || window.event;
+      //   if (evt.keyCode == 27) {//27 is the code for escape
+      //       console.log('el.id is: ' + el.id);
+      //       document.querySelector(toolButtons.viewerW).blur(); 
+      //       console.log('blurring');
+      //       // el.value = '';
+      //       console.log('el.value is: ' + el.value);
+      //       console.log('el.placeholder is: ' + el.placeholder);
+      //   }
+      // };
 
-  //   document.addEventListener('keyup', function(event){
-  //     console.log(event.keyCode)
-  //     if(event.keyCode == 27) {
-  //         console.log('keyup 27');
-  //     }
-  // })
+      // !VA Trying...
+      // function handleEscKey(initVal) {
+      //   console.log('handleEscKey running');
+      //   document.onkeydown = function(evt) {
+      //     evt = evt || window.event;
+      //     if (evt.keyCode == 27) {//27 is the code for escape
+      //         console.log('el.id is: ' + el.id);
+      //         document.querySelector(toolButtons.viewerW).blur(); 
+      //         console.log('blurring');
+      //         // el.value = '';
+      //         console.log('el.value is: ' + el.value);
+      //         console.log('el.placeholder is: ' + el.placeholder);
+      //     }
+      //   };
+      // };
+
+
 
       function handleKeyup(evt) {
-        // !VA 
-        keyup = evt.which || evt.keyCode || evt.key;
         el = document.getElementById(this.id);
-        if (keyup == 27) {
-          // !VA If an input has the focus and ESC is pressed, blur that input.
-          var inputs = document.getElementsByTagName('input');
-          for (let i = 0; i < inputs.length; i++) {
-          console.log('inputs[i].id' + inputs[i].id);
-            inputs[i].blur();
-          }
+        console.log('el.defaultValue is: ' + el.defaultValue);
+        keyup = evt.which || evt.keyCode || evt.key;
+        console.log('keyup is: ' + keyup);
+        console.log('INITIAL: this.value is: ' + this.value);
+        var initVal = this.value;
+        console.log('typeof(el.value) is: ' + typeof(el.value));
+        // console.log('typeof(Appdata.viewerW) is: ' + typeof(Appdata.viewerW));
+        
+        
+        // !VA OK, after two days, this appears to work even though I tried it many times before and it stripped out the CSS formatting.
+        if (keyup == 27 ) {
+          console.log('this.value is: ' + this.value);
+          var Appdata = appController.getAppdata();
+          this.value = Appdata.viewerW;
+          this.blur();
         }
-        if (keyup == 13) {
-          console.log('ENTER was pressed');
+        // !VA Focusing on enter key behavior for now
+        // if (keyup == 13 || keyup == 9) {
+        // !VA viewerW field:
+        // !VA Enter key should initiate the action and 
+          // !VA if no error, show the value, and stay in the input field.
+          // !VA if error, reset the value to '' and show the error.
+          // !VA Right now, ESC does nothing and tabbing is the only way to blur.
+        if (keyup == 13 ) {
+          console.log('Value when return pressed: ' + this.value);
           // !VA Get the input and evaluate it
           var isErr = validateInteger(this.value);
           if (isErr) {
@@ -664,11 +703,6 @@ var Witty = (function () {
           } else if (el.id.includes('width') || el.id.includes('height')) {
             // !VA Error handling
             // !VA Stopped here...
-              console.log('handleUserAction:');
-              console.log('foo');
-              console.log('el.id is: ' + el.id);
-              console.log('el.value is: ' + el.value);
-           
               checkKeyboardInput(el.id, el.value);
               handleToolbarInput(el.id, el.value);
               // errorHandler(el.id, el.value);
@@ -677,13 +711,59 @@ var Witty = (function () {
             console.log('Undefined keypress action');
           }
         } 
+        if (evt.keyCode == 27) {//27 is the code for escape
+          document.onkeydown = function(evt) {
+            evt = evt || window.event;
+                console.log('el.id is: ' + el.id);
+                document.querySelector(toolButtons.viewerW).blur(); 
+                console.log('blurring');
+                // el.value = '';
+                console.log('el.value is: ' + el.value);
+                console.log('el.placeholder is: ' + el.placeholder);
+          };
+        }
+
+
+
       }
 
-      function handleFocus(evevtent) {
+      function handleFocus(evt) {
         // !VA Get the target element of the click
         el = document.getElementById(this.id);
         // !VA Set the clicked element's value to empty - I think this is the default anyway.
-        el.value = ''; 
+        this.select();
+        // el.value = ''; 
+      }
+
+      function handleBlur(evt) {
+        el = document.getElementById(this.id);
+        el.value = (function () {
+
+
+
+
+          console.log('el.value is: ' + el.value);
+          console.log('el.id is: ' + el.id);
+          console.log('blur');
+          console.dir(Appdata);
+          // !VA If the current element is custom height or custom width, set the value of the field to empty to display the placeholder  
+          // !VA Thiis does nothing
+          if ((el.id.includes('imgwidth') || (el.id.includes('imgheight')))) {
+            return '';
+          // !VA Reset the viewer width field the last value of Appdata.viewerW 
+          } else if (el.id.includes('viewerwidth') || el.id.includes('phones')) {
+            // !VA Get the Appdata property name that corresponds to the ID of the current input element
+            var prop = elementIdToAppdataProp(el.id);
+            // !VA Access Appdata
+
+            // !VA return the current value of the Appdata property for the current event target to that elements value property. 
+            // alert(data[prop]);
+            console.log('handleUserAction');
+            return Appdata[prop];
+          }
+
+          // e.preventDefault;
+        })();
       }
 
 
@@ -709,70 +789,11 @@ var Witty = (function () {
         // !VA Put the event trigger in an object first, so we don't have to keep calling document.getElementById
         el = document.getElementById(this.id);
 
-
-         if (event.type === 'keypress') {
-          keypressed = evt.which || evt.keyCode || evt.key;
-          if (keypressed == 13) {
-            // !VA Get the input and evaluate it
-            var isErr = validateInteger(this.value);
-            if (isErr) {
-              // !VA If the value entered isn't an integer, reset it to null and leave the focus there, and send the error code to errorHandler
-              el.value = '';
-              appController.initError(el.id, 'not_an_integer', true);
-            // !VA We want to handle all the toolbutton keyboard input in one place, so send the send the target element's id and value to handleTBInput
-
-            // !VA NEW
-            } else if (el.id.includes('width') || el.id.includes('height')) {
-              // !VA Error handling
-              // !VA Stopped here...
-                console.log('handleUserAction:');
-                console.log('foo');
-                console.log('el.id is: ' + el.id);
-                console.log('el.value is: ' + el.value);
-             
-                checkKeyboardInput(el.id, el.value);
-                handleToolbarInput(el.id, el.value);
-                // errorHandler(el.id, el.value);
-            } else {
-              // !VA There will be other input fields to handle, but we're not there yet.
-              console.log('Undefined keypress action');
-            }
-          } 
-        } else if (  event.type === 'focus') {
-          // !VA Set the value of the element to null when it gets the focus
-          el.value = ''; 
-          // !VA NOW!
-        } else if ( event.type === 'blur') {
+        if ( event.type === 'blur') {
 
           // !VA If the target is viewerW, we want to restore the previous value to the field on blur in case of error or in case it is exited without entering a value with the return key. If the target is imgwidth or imgheight, we want to restore the placeholder value.
           // !VA TODO: create function to restore placeholder value
-          el.value = (function () {
 
-            console.log('el.value is: ' + el.value);
-            console.log('el.id is: ' + el.id);
-            console.log('blur');
-            console.dir(Appdata);
-            // !VA If the current element is custom height or custom width, set the value of the field to empty to display the placeholder  
-            // !VA Thiis does nothing
-            if ((el.id.includes('imgwidth') || (el.id.includes('imgheight')))) {
-              return '';
-            // !VA Reset the viewer width field the last value of Appdata.viewerW 
-            } else if (el.id.includes('viewerwidth') || el.id.includes('phones')) {
-              // !VA Get the Appdata property name that corresponds to the ID of the current input element
-              var prop = elementIdToAppdataProp(el.id);
-              // !VA Access Appdata
-
-              // !VA return the current value of the Appdata property for the current event target to that elements value property. 
-              // alert(data[prop]);
-              console.log('handleUserAction');
-              console.log('prop is: ' + prop);
-              console.table(Appdata);
-              console.log('Appdata[prop] is: ' + Appdata[prop]);
-              return Appdata[prop];
-            }
-
-            // e.preventDefault;
-          })();
         } else if ( event.type === 'drop') {
           // e.preventDefault;
         } else if ( event.type === 'dragover') {
@@ -1119,8 +1140,6 @@ var Witty = (function () {
       var Appdata= {};
       Appdata = appController.getAppdata();
       var prop = elementIdToAppdataProp(id);
-      console.log('prop is: ' + prop);
-      console.table(Appdata);
       // !VA TODO: Setting maxViewerWidth just for now
       var maxViewerWidth = 800;
       switch (true) {
@@ -1138,7 +1157,6 @@ var Witty = (function () {
             // document.querySelector(dynamicRegions.imgViewer).value = val;
             // !VA  The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running calcViewerSize. So, update Appdata.viewerW with val, and pass in unchanged values of imgW and imgH
             Appdata = updateAppdata(val, Appdata.imgW, Appdata.imgH);
-            console.table(Appdata);
           }
           break;
         // !VA Handle the custom width toolButton input
@@ -1169,10 +1187,8 @@ var Witty = (function () {
     // !VA NEW 
       function handleToolbarInput(id, val) {
         console.log('handleToolbarInput');
-        console.log('id is: ' + id);
       var Appdata = {};
       Appdata = appController.getAppdata(false);
-      console.table(Appdata); 
       // !VA Handle clicks on the toolbutton increment buttons. 
       if (id.includes('tb-but')) {
         // !VA by mouseclick
