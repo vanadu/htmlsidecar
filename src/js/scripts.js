@@ -666,21 +666,41 @@ var Witty = (function () {
 
       function handleKeyup(evt) {
         el = document.getElementById(this.id);
-        console.log('el.defaultValue is: ' + el.defaultValue);
+        target = el.id;
         keyup = evt.which || evt.keyCode || evt.key;
-        console.log('keyup is: ' + keyup);
-        console.log('INITIAL: this.value is: ' + this.value);
-        var initVal = this.value;
-        console.log('typeof(el.value) is: ' + typeof(el.value));
-        // console.log('typeof(Appdata.viewerW) is: ' + typeof(Appdata.viewerW));
         
-        
-        // !VA OK, after two days, this appears to work even though I tried it many times before and it stripped out the CSS formatting.
+        // !VA OK, after two days, this appears to work even though I tried it many times before and it stripped out the CSS formatting. 
+        // !VA We are using switch/case here because I thought there would be other cases. But it looks like viewerW, sPhonesW and lPhonesW all use the same scheme and they're now all defined by default in the HTML file. So unless there are different schemes in the CCP and SCP that need handling here, make this an if/else with imgWidth and imgHeight as the if.
+        var Appdata = appController.getAppdata();
         if (keyup == 27 ) {
+          switch (true) {
+            // !VA If the target element is viewerW then on blur exit the element with no change to Appdata and show the current Appdata.viewerW in the input field - so no change.  
+            case ( target === document.querySelector(toolButtons.viewerW).id) :
+              this.value = Appdata.viewerW;
+              console.log('HERE ');
+              this.blur();
+              break;
+              // !VA If the target is imgWidth or imgHeight, on blur exit the element with no change and set el.value to '' so the placeholder is displayed. We do not need to show the current selected value here because it's shown in dimViewer.displaysize.  
+            case ( target === document.querySelector(toolButtons.imgWidth).id || target   === document.querySelector(toolButtons.imgHeight)) :
+              el.value = '',
+              this.blur();  
+              break;
+            // !VA If the target is sPhonesW or sPhonesH, restore to the values in Appdata, which are read from the data attributes data-sphonesw and data-lphonesw
+            case  target === document.querySelector(toolButtons.sPhonesW).id :
+                console.table(Appdata);
+                this.value = Appdata.sPhonesW;
+                console.log('HERE ');
+                this.blur();
+                break;
+
+            case  target === document.querySelector(toolButtons.lPhonesW).id :
+                this.value = Appdata.sPhonesW;
+                console.log('HERE ');
+                this.blur();
+                break;
+          }
+          console.log('handleKeyup - 27');
           console.log('this.value is: ' + this.value);
-          var Appdata = appController.getAppdata();
-          this.value = Appdata.viewerW;
-          this.blur();
         }
         // !VA Focusing on enter key behavior for now
         // if (keyup == 13 || keyup == 9) {
@@ -711,17 +731,17 @@ var Witty = (function () {
             console.log('Undefined keypress action');
           }
         } 
-        if (evt.keyCode == 27) {//27 is the code for escape
-          document.onkeydown = function(evt) {
-            evt = evt || window.event;
-                console.log('el.id is: ' + el.id);
-                document.querySelector(toolButtons.viewerW).blur(); 
-                console.log('blurring');
-                // el.value = '';
-                console.log('el.value is: ' + el.value);
-                console.log('el.placeholder is: ' + el.placeholder);
-          };
-        }
+        // if (evt.keyCode == 27) {//27 is the code for escape
+        //   document.onkeydown = function(evt) {
+        //     evt = evt || window.event;
+        //         console.log('el.id is: ' + el.id);
+        //         document.querySelector(toolButtons.viewerW).blur(); 
+        //         console.log('blurring');
+        //         // el.value = '';
+        //         console.log('el.value is: ' + el.value);
+        //         console.log('el.placeholder is: ' + el.placeholder);
+        //   };
+        // }
 
 
 
@@ -735,36 +755,7 @@ var Witty = (function () {
         // el.value = ''; 
       }
 
-      function handleBlur(evt) {
-        el = document.getElementById(this.id);
-        el.value = (function () {
 
-
-
-
-          console.log('el.value is: ' + el.value);
-          console.log('el.id is: ' + el.id);
-          console.log('blur');
-          console.dir(Appdata);
-          // !VA If the current element is custom height or custom width, set the value of the field to empty to display the placeholder  
-          // !VA Thiis does nothing
-          if ((el.id.includes('imgwidth') || (el.id.includes('imgheight')))) {
-            return '';
-          // !VA Reset the viewer width field the last value of Appdata.viewerW 
-          } else if (el.id.includes('viewerwidth') || el.id.includes('phones')) {
-            // !VA Get the Appdata property name that corresponds to the ID of the current input element
-            var prop = elementIdToAppdataProp(el.id);
-            // !VA Access Appdata
-
-            // !VA return the current value of the Appdata property for the current event target to that elements value property. 
-            // alert(data[prop]);
-            console.log('handleUserAction');
-            return Appdata[prop];
-          }
-
-          // e.preventDefault;
-        })();
-      }
 
 
 
@@ -931,12 +922,24 @@ var Witty = (function () {
                 // !VA NEW Now that the blob image has been displayed and has DOM properties that can be queried, query them and write them to Appdata.
                 // !VA Now that we have a current image in the DOM, Get Appdata so we can store the filename in it.
 
-                // !VA Initialize the value in the toolbar viewerW input field to its initial CSS  value.
-                console.log('document.querySelector(dynamicRegions.imgViewer) is: ' + document.querySelector(dynamicRegions.imgViewer));
-                console.dir(document.querySelector(dynamicRegions.imgViewer));
+                // !VA Initialize the value in the toolbar viewerW input field to its initial CSS value.
+                // !VA Commenting this out since I changed it to hard-coded in the HTML file along with sPhonesW and sPhonesH.
+                // console.log('document.querySelector(dynamicRegions.imgViewer) is: ' + document.querySelector(dynamicRegions.imgViewer));
+                // console.dir(document.querySelector(dynamicRegions.imgViewer));
+                // document.querySelector(toolButtons.viewerW).value = document.querySelector(dynamicRegions.imgViewer).style.width;
                 
-                document.querySelector(toolButtons.viewerW).value = document.querySelector(dynamicRegions.imgViewer).style.width;
+                // !VA Set the data attribute for small phone and large phone width. We need this because there is not actual HTML element that corresponds to these properties, and thus no way to persist them globally. So the data attribute sphonew and sphoneh will be written to the toolbar input field as surrogate for an actual DOM element that Appdata can query.
+                var sphonesw, lphonesw;
+                sphonesw = document.querySelector(toolButtons.sPhonesW);
+                lphonesw = document.querySelector(toolButtons.lPhonesW)                
+                sphonesw.setAttribute('data-sphonesw', '320')
+                lphonesw.setAttribute('data-lphonesw', '480')
+                console.log('sphonesw.value is: ' + sphonesw.value);
+                sphonesw.value = sphonesw.getAttribute('data-sphonesw');
+                lphonesw.value = lphonesw.getAttribute('data-lphonesw');
+                
 
+                console.log('FOO');
 
 
 
@@ -988,6 +991,7 @@ var Witty = (function () {
       console.log('calcViewerSize running');
       var Appdata = {};
       Appdata = appController.getAppdata(false);
+      console.table(Appdata);
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
       // !VA NEW Get the actual viewerW from getComputedStyle
       var viewerW;
@@ -1145,7 +1149,6 @@ var Witty = (function () {
       switch (true) {
         case (prop === 'viewerW') :
           if (val < Appdata.imgW ) {
-            console.log('NOW!');
             // !VA TODO: review this...I'm not sure I want to container to resize the image by default or show an error. 
             // !VA The viewer width can't be smaller than the current image width of XXX, show message. 
           } else if (val > maxViewerWidth ) {
@@ -1474,8 +1477,34 @@ var Witty = (function () {
       // !VA Get the dev image's NW and NH from the DOM, update Appdata and let calcViewerSize do its thing. 
       imgW = document.querySelector(dynamicRegions.curImg).naturalWidth;
       imgH = document.querySelector(dynamicRegions.curImg).naturalHeight;
-      // !VA TODO this doesn't work and serves no purpose: deleted
-      // updateAppdata(imgW, imgH);
+
+
+
+      // !VA Initialize the value in the toolbar viewerW input field to its initial CSS value.
+      // !VA Commenting this out since I changed it to hard-coded in the HTML file along with sPhonesW and sPhonesH.
+      // console.log('document.querySelector(dynamicRegions.imgViewer) is: ' + document.querySelector(dynamicRegions.imgViewer));
+      // console.dir(document.querySelector(dynamicRegions.imgViewer));
+      // document.querySelector(toolButtons.viewerW).value = document.querySelector(dynamicRegions.imgViewer).style.width;
+      
+      // !VA THis is duplicated in handleFileSelect, only included here to initialize dev mode.
+      // !VA Set the data attribute for small phone and large phone width. We need this because there is not actual HTML element that corresponds to these properties, and thus no way to persist them globally. So the data attribute sphonew and sphoneh will be written to the toolbar input field as surrogate for an actual DOM element that Appdata can query.
+      var sphonesw, lphonesw;
+      sphonesw = document.querySelector(toolButtons.sPhonesW);
+      lphonesw = document.querySelector(toolButtons.lPhonesW)                
+      sphonesw.setAttribute('data-sphonesw', '320')
+      lphonesw.setAttribute('data-lphonesw', '480')
+      console.log('sphonesw.value is: ' + sphonesw.value);
+      sphonesw.value = sphonesw.getAttribute('data-sphonesw');
+      lphonesw.value = lphonesw.getAttribute('data-lphonesw');
+      
+
+      console.log('initDev');
+
+
+
+
+
+
       calcViewerSize();
       // !VA Open the CCP by default in dev mode
       // !VA First, set it to the opposite of how you want to start it.
@@ -1518,8 +1547,9 @@ var Witty = (function () {
         // !VA NEW We need the aspect ratio to calculate the other dimension when the user only inputs one, i.e. when width or height is entered into one of the toolbars' custom width/height fields.
         Appdata.aspect = getAspectRatio(curImg.naturalWidth,  curImg.naturalHeight);
         // !VA NEW We need new imgW and imgH properties to store the user input values. We don't want to overwrite the original imgW/imgH values because it appears it's not possible since Javascript passes values by reference, so any changes to properties are lost outside the current function's scope. Plus, we need to have the original values persist for the duration of the session, at which point the app and Appdata are reinitialized. 
-        Appdata.sPhonesW = parseInt(document.querySelector(toolButtons.sPhonesW).value, 10);
-        Appdata.lPhonesW = parseInt(document.querySelector(toolButtons.lPhonesW).value, 10);
+        Appdata.sPhonesW = parseInt(document.querySelector(toolButtons.sPhonesW).getAttribute('data-sphonesw'), 10);
+        Appdata.lPhonesW = parseInt(document.querySelector(toolButtons.lPhonesW).getAttribute('data-lphonesw'), 10);
+
         Appdata.sPhonesW ? Appdata.sPhonesW : Appdata.sPhonesW = parseInt(document.querySelector(toolButtons.sPhonesW).placeholder, 10);
         Appdata.lPhonesW ? Appdata.lPhonesW : Appdata.lPhonesW = parseInt(document.querySelector(toolButtons.lPhonesW).placeholder, 10);
         Appdata.sPhonesH = Math.round(Appdata.sPhonesW * (1 / Appdata.aspect[0]));
