@@ -25,6 +25,8 @@ Commit 1: 4567a28
 Commit 2: 
 061219 Start. Esc works. Implement elementIdToAppdataProp in handleKeyup.
 
+Commit 3: Enter works, handleMouseEvents, handleToolbarInput, updateAppdata works.
+
 
 
 
@@ -33,9 +35,10 @@ Branch TBA
 ------------
 Issue 03: prop to target rewrite in checkKeyboardInput - No, this will be expanded. Function arguments will be passed as prop, not target. 
 Issue 04: separate handleToolbarInput back out into event-centered functions instead of region-centered.
-Issue 07: Rewrite updateAppdata to be parameters... with key/value pairs as parameter.
 
 
+TODO: Rewrite updateAppdata to be parameters... with key/value pairs as parameter.
+TOD0: Think about making getAppdata only query a specific property if possible.
 TODO: Fix being able to resize viewerW smaller than imgW - current behavior is imgw resizes with viewerW. If that's the desired behavior, imgW still doesn't write the udpated width to Appdata, that needs to be fixed.
 TODO: Finish reviewing and implementing write to clipboard buttons.
 TODO: Implement Td and table copy to clipboard buttons.
@@ -1121,14 +1124,29 @@ var Witty = (function () {
           
     // !VA INPUT HANDLING
     // !VA ============================================================
-    // !VA Handling user input by operation rather than by event type
-    // !VA appController private handleCustomWidth
-    // !VA Handle user input changes to Appdata.imgWidth
-    // !VA NEW 
+    // !VA appController private handleToolbarClicks
+    // !VA Handle the increment buttons on the toolbar, called by handleMouseClicks
     function handleToolbarClicks(id, val) {
+      // !VA Get the Appdata properties
+      var Appdata = {};
+      Appdata = appController.getAppdata();
+      // !VA Initialize vars for value after-click and Appdata property
       console.log('id is: ' + id);
-      console.log('val is: ' + val);
-
+      var newVal;
+      var prop;
+      // !VA Add the increment to Appdata.imgW. It's already been parsed as a positive or negative integer by handleMouseEvents.
+      newVal = Appdata.imgW + val;
+      // !VA This ONLY affects the imgW, so we can hard-code that property name here... not ideal but it works.
+      prop = 'imgW';
+      // !VA Call errorHandler if the action results in imgW or imgH being less than zero
+      if ( Appdata.imgW + val <= 0 || Appdata.imgH + val <= 0 ) {
+        appController.initError(true, 'tbButton_LT_zero');
+      } else if ( Appdata.imgW + val > Appdata.viewerW  ) {
+        appController.initError(true, 'tbButton_GT_viewerW');
+      }   else {
+        // !VA Now we can pick up handleToolbar input and let it do the rest of the work.
+        handleToolbarInput(prop, newVal)
+      }
     }
 
 
