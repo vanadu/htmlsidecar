@@ -579,7 +579,7 @@ var Witty = (function () {
       for (let i = 0; i < tbClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         tbClickables[i] = document.querySelector(tbClickables[i]);
-        addEventHandler(tbClickables[i],'click',handleClicks,false);
+        addEventHandler(tbClickables[i],'click',handleMouseEvents,false);
 
       }
       
@@ -593,7 +593,9 @@ var Witty = (function () {
         // addEventHandler((tbKeypresses[i]),'keypress',handleKeypress,false);
         addEventHandler((tbKeypresses[i]),'keyup',handleKeyup,false);
         addEventHandler((tbKeypresses[i]),'focus',handleFocus,false);
+        // !VA Deprecated
         // addEventHandler(tbKeypresses[i],'blur',handleUserAction,false);
+        // !VA TODO
         // addEventHandler(tbKeypresses[i],'dragover',handleUserAction,false);
         // addEventHandler(tbKeypresses[i],'drop',handleUserAction,false);
       }
@@ -622,121 +624,47 @@ var Witty = (function () {
         addEventHandler((dvClickables[i]),'click',initCCP,false);
       }
 
+      // !VA appController private handleFocus
+      // !VA Handle behavior when an element gets the focus. Pertains only to keyboard input, actually, I'm not sure whether buttons or CCP elements need special handling.
+      function handleFocus(evt) {
+        // !VA Get the target element of the click
+        el = document.getElementById(this.id);
+        // !VA Select the clicked element's value, or if there's no value, set it to empty with a cursor, which is the default select behavior for empty fields.
+        this.select();
+      }
+
       // !VA Branch rewriteHandleUserAction061119 
-      // !VA appController private handleClicks
-      function handleClicks(evt) {
+      // !VA appController private handleMouseEvents
+      function handleMouseEvents(evt) {
         // !VA Carryover from earlier handleUserAction
         // !VA Get the target element of the click
         el = document.getElementById(this.id);
         // !VA Handle the increment toolbuttons
-        switch (true) {
-          case ( el.id.includes('tb-but')) :
-            var val;
-            // !VA The last 2 chars of the id indicate the value by which the img dimension should be incremented,so get the last 2 chars and convert to integer
-            val = parseInt(el.id.slice(-2));
-            // !VA If the target ID includes 'grow' then the image dimension will be incremented, if 'shrink' then it will be decremented
-            (el.id.includes('grow')) ? val : val = -val;
-            handleToolbarInput(el.id, val);
-            break;
-        }
+
+        if (event.type === 'click') {
+
+          switch (true) {
+            case ( el.id.includes('tb-but')) :
+              var val;
+              // !VA The last 2 chars of the id indicate the value by which the img dimension should be incremented,so get the last 2 chars and convert to integer
+              val = parseInt(el.id.slice(-2));
+              // !VA If the target ID includes 'grow' then the image dimension will be incremented, if 'shrink' then it will be decremented
+              (el.id.includes('grow')) ? val : val = -val;
+              handleToolbarClicks(el.id, val);
+              break;
+          }
+        }  else if ( event.type === 'drop') {
+          e.preventDefault;
+        } else if ( event.type === 'dragover') {
+          e.preventDefault;
+        } 
       }
 
-      // !VA THIS WORKS!!!!!
-      // document.onkeydown = function(evt) {
-      //   evt = evt || window.event;
-      //   if (evt.keyCode == 27) {//27 is the code for escape
-      //       console.log('el.id is: ' + el.id);
-      //       document.querySelector(toolButtons.viewerW).blur(); 
-      //       console.log('blurring');
-      //       // el.value = '';
-      //       console.log('el.value is: ' + el.value);
-      //       console.log('el.placeholder is: ' + el.placeholder);
-      //   }
-      // };
-
-      // !VA Trying...
-      // function handleEscKey(initVal) {
-      //   console.log('handleEscKey running');
-      //   document.onkeydown = function(evt) {
-      //     evt = evt || window.event;
-      //     if (evt.keyCode == 27) {//27 is the code for escape
-      //         console.log('el.id is: ' + el.id);
-      //         document.querySelector(toolButtons.viewerW).blur(); 
-      //         console.log('blurring');
-      //         // el.value = '';
-      //         console.log('el.value is: ' + el.value);
-      //         console.log('el.placeholder is: ' + el.placeholder);
-      //     }
-      //   };
-      // };
-
-
-
+      // !VA appController private handleKeyup
+      // !VA Handle all keyboard input
       function handleKeyup(evt) {
-        el = document.getElementById(this.id);
-        target = el.id;
-        var prop = elementIdToAppdataProp(target);
-        keyup = evt.which || evt.keyCode || evt.key;
-        var isErr;
-        // !VA OK, after two days, this appears to work even though I tried it many times before and it stripped out the CSS formatting. 
-        // !VA We are using switch/case here because I thought there would be other cases. But it looks like viewerW, sPhonesW and lPhonesW all use the same scheme and they're now all defined by default in the HTML file. So unless there are different schemes in the CCP and SCP that need handling here, make this an if/else with imgWidth and imgHeight as the if.
-        var Appdata = appController.getAppdata();
-        // !VA We need a separate conditional for ESC, ENTER and TAB. 
-        // !VA If ESC, we want imgW and imgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the dimViewers and there's no need to recalc the W and H each time the user makes and entry - that would just be confusing. For viewerW, sPhonesW and lPhonesW we want to exit the field and restore the preexisting value from Appdata.
-        if (keyup == 27 ) {
-            if (prop === 'imgW' || prop === 'imgH') {
-              console.log('prop is: ' + prop);
-              this.value = ('');
-              this.blur();
-            } else {
-              console.log('prop is: ' + prop);
-              this.value = Appdata[prop];
-              console.log('Else prop is: ' + prop);
-              this.blur();
-            }
-        }
-        if (keyup == 13 ) {
-          console.log('Value when return pressed: ' + this.value);
-          // !VA Get the input and evaluate it
 
-          isErr = checkKeyboardInput(prop, el.value);
-          console.log('handleKeyup isErr is: ' + isErr);
-          if (isErr) {
-            this.select();
-          } else {
-            console.log('update Appdata');
-          } 
-
-
-
-          // handleToolbarInput(el.id, el.value);
-
-        }
-      }
-
-      function handleFocus(evt) {
-        // !VA Get the target element of the click
-        el = document.getElementById(this.id);
-        // !VA Set the clicked element's value to empty - I think this is the default anyway.
-        this.select();
-        // el.value = ''; 
-      }
-
-
-
-
-
-
-      // appController private handleUserAction 
-      function handleUserAction(evt) {
-        var keypressed;
-        var isErr;
-        // e.stopPropagation;
-        var el;
-        var Appdata = appController.getAppdata();
-
-
-        // !VA If there is an error message showing, allow the CSS transition to run, then remove it
+        // !VA Error messages dont' work -- the below came from handleUserAction before I deleted it.
         var appMessContainer = document.querySelector(staticRegions.appMessContainer);
         var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
         if (appMessDisplay.textContent) {
@@ -744,40 +672,56 @@ var Witty = (function () {
           appMessContainer.classList.remove('show-err');
           appMessContainer.classList.add('hide-err');
         }
-        // !VA Put the event trigger in an object first, so we don't have to keep calling document.getElementById
+
+        // !VA Get the target input element
         el = document.getElementById(this.id);
-
-        if ( event.type === 'blur') {
-
-          // !VA If the target is viewerW, we want to restore the previous value to the field on blur in case of error or in case it is exited without entering a value with the return key. If the target is imgwidth or imgheight, we want to restore the placeholder value.
-          // !VA TODO: create function to restore placeholder value
-
-        } else if ( event.type === 'drop') {
-          // e.preventDefault;
-        } else if ( event.type === 'dragover') {
-          // e.preventDefault;
-        } 
-        else {
-          console.log('other event');
+        // !VA Get the id
+        target = el.id;
+        // !VA Get the Appdata property that corresponds to the target input element.
+        var prop = elementIdToAppdataProp(target);
+        // !VA Initalize boolean that notifies of error status after checkKeyboardInput
+        var isErr;
+        // !VA Find out which key was struck
+        keyup = evt.which || evt.keyCode || evt.key;
+        // !VA Get the current Appdata object
+        var Appdata = appController.getAppdata();
+        // !VA We need a separate conditional for ESC, ENTER and TAB.
+        // !VA  If ESC, we want imgW and imgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the dimViewers and there's no need to recalc the W and H each time the user makes and entry - that would just be confusing. 
+        if (keyup == 27 ) {
+            if (prop === 'imgW' || prop === 'imgH') {
+              this.value = ('');
+              this.blur();
+            // !VA For viewerW, sPhonesW and lPhonesW we want to exit the field and restore the preexisting value from Appdata.
+            } else {
+              this.value = Appdata[prop];
+              this.blur();
+            }
+        }
+        if (keyup == 13 ) {
+          // !VA Get the input and evaluate it. 
+          isErr = checkKeyboardInput(prop, el.value);
+          if (isErr) {
+            // !VA If it returns an error, select the input and show the error message so the user can correct it or ESC out of the field.
+            this.select();
+          } else {
+            // !VA If no error, pass the Appdata property name and the entered value for further processing.
+            Appdata = handleToolbarInput(prop, this.value);
+          } 
         }
       }
-      
-      // Click handlers - focusOnClick
-      // =============================
-      // addEventHandler(toolButtons.customheight,'click',focusOnClick,false);
-      // addEventHandler(toolButtons.customwidth,'click',focusOnClick,false);
-      // addEventHandler(toolButtons.lPhoneWidth,'click',focusOnClick,false);
-      // addEventHandler(toolButtons.sPhoneWidth,'click',focusOnClick,false);
-      // addEventHandler(toolButtons.viewerwidth,'click',focusOnClick,false);
+
+
+
+
 
       // Click handlers - Misc
       // =============================
+      // !VA This was moved to initCCP I think
       // addEventHandler(dimViewers.clipboardBut,'click',toggleCCP,false);
 
       // Keypress handlers - showMobileImageButtons
       // ==================================
-
-
+      
       // Keypress handlers - Misc
       // ==================================
       // addEventHandler(dimViewers.clipboardBut,'keypress',toggleCCP,false);
@@ -802,8 +746,6 @@ var Witty = (function () {
 
     // !VA appController private functions
     //  ==============================
-
-
     // appController private: remove current image
     // !VA Test for whether there is already a #cur-img element in the DOM, and if there is remove it so handleFileSelect can overwrite it without having to refresh the page to reboot the app.
 
@@ -958,7 +900,6 @@ var Witty = (function () {
       console.log('calcViewerSize running');
       var Appdata = {};
       Appdata = appController.getAppdata(false);
-      console.table(Appdata);
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
       // !VA NEW Get the actual viewerW from getComputedStyle
       var viewerW;
@@ -1113,7 +1054,6 @@ var Witty = (function () {
       isErr = false;
       var Appdata= {};
       Appdata = appController.getAppdata();
-      console.table(Appdata);
       // !VA TODO: Setting maxViewerWidth just for now
       var maxViewerWidth = 800;
 
@@ -1179,49 +1119,92 @@ var Witty = (function () {
     }
           
           
-          // !VA INPUT HANDLING
-          // !VA ============================================================
-          // !VA Handling user input by operation rather than by event type
-          // !VA appController private handleCustomWidth
-          // !VA Handle user input changes to Appdata.imgWidth
-          // !VA NEW 
-          function handleToolbarInput(id, val) {
-            console.log('handleToolbarInput');
-            var Appdata = {};
-            Appdata = appController.getAppdata(false);
-            // !VA Handle clicks on the toolbutton increment buttons. 
-            if (id.includes('tb-but')) {
-        // !VA by mouseclick
-        Appdata.imgW = Appdata.imgW + val;
-        Appdata.imgH =  Appdata.imgW * (1 / Appdata.aspect[0]);
-        // !VA Handle width input input field
-      } else if (id.includes('imgwidth')) { 
-        Appdata.imgW = val;
-        Appdata.imgH =  Appdata.imgW * (1 / Appdata.aspect[0]);
-      } else if (id.includes('imgheight')) {
-        Appdata.imgH = val;
-        Appdata.imgW =  Appdata.imgH * (Appdata.aspect[0]);
-      } else if (id.includes('viewerwidth')) {
-        Appdata.viewerW = val;
-      } else if (id.includes('sphones')) {
-        console.log('handleToolbarInput sphones');
-      } else if (id.includes('lphones')) {
-        console.log('handleToolbarInput lphones');
+    // !VA INPUT HANDLING
+    // !VA ============================================================
+    // !VA Handling user input by operation rather than by event type
+    // !VA appController private handleCustomWidth
+    // !VA Handle user input changes to Appdata.imgWidth
+    // !VA NEW 
+    function handleToolbarClicks(id, val) {
+      console.log('id is: ' + id);
+      console.log('val is: ' + val);
+
+    }
+
+
+    // !VA This works, but it's mickey-mouse too. 
+    function handleToolbarInput(prop, val) {
+      console.log('handleToolbarInput');
+      var Appdata = {};
+      Appdata = appController.getAppdata(false);
+      var imgH, imgW;
+      // !VA Handle clicks on the toolbutton increment buttons. 
+      switch(true) {
+        case (prop === 'viewerW') :
+        
+
+          updateAppdata(prop, val); 
+          break;          
+
+        case (prop === 'imgW') :
+
+          imgH =  val * (1 / Appdata.aspect[0]);
+          updateAppdata(prop, val); 
+          updateAppdata('imgH', imgH); 
+          break;
+
+        case (prop === 'imgH') :
+
+          imgW =  val * (Appdata.aspect[0]);
+          updateAppdata(prop, val);
+          updateAppdata('imgW', imgW)
+          break;
+
+        case (prop === 'sPhonesW') :
+          console.log('handleToolbarInput sPhonesw');          
+          break;
+
+        case (prop === 'lPhonesW') :
+            console.log('handleToolbarInput lPhonesw');          
+          break;
+
       }
-      Appdata = updateAppdata(Appdata.viewerW, Appdata.imgW, Appdata.imgH);
+
       calcViewerSize();
     }
 
-    // !VA NEW So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. 
+    // !VA NEW So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. Here, there are 5 mutable elements and 5 properties. Only one of the properties has changed. So we loop through them all, find the match for the prop argument, then update only the element/data property that matches. This is a mickey-mouse solution but it works for now. Ideally we will pass in a key/value pair including the property name and the ID alias so we can use properties... in case there are more than one.
 
-    // OLD
-    function updateAppdata(vw, iw, ih) {
+    
+    function updateAppdata(prop, val ) {
       console.log('updateAppdata running');
       var Appdata = {};
-      document.querySelector(dynamicRegions.imgViewer).style.width = vw + 'px';
-      document.querySelector(dynamicRegions.curImg).style.width = iw + 'px';
-      document.querySelector(dynamicRegions.curImg).style.height = ih + 'px';
+      var props = [];
+      console.log('updateAppdata prop is: ' + prop);
+      props = ['viewerW', 'imgW', 'imgH', 'sPhonesW', 'lPhonesH']
+
+      for (let i = 0; i < props.length; i++) {
+      console.log('props[i] is: ' + props[i]);
+        switch(true) {
+          case prop === 'viewerW' :
+            document.querySelector(dynamicRegions.imgViewer).style.width = val + 'px';  
+            break;
+          case prop === 'imgW' :
+            document.querySelector(dynamicRegions.curImg).style.width = val + 'px';
+          break;
+          case prop === 'imgH' :
+            document.querySelector(dynamicRegions.curImg).style.height = val + 'px';
+          break;
+          case prop === 'sPhoneW' :
+            document.querySelector(toolButtons.sPhonesW).setAttribute('data-sphonesw') = val + 'px';
+          break;
+          case prop === 'lPhoneW ' :
+            document.querySelector(toolButtons.lPhonesW).setAttribute('data-lphonesw') = val + 'px';
+          break;
+        }
+      }
       Appdata = appController.getAppdata(false);
+      console.table(Appdata);
     }
 
     //NEW
