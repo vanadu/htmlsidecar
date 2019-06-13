@@ -2,40 +2,6 @@
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
 
-LAST COMMIT BEFORE BRANCH TO 061119Start
-Branch 061119Start
--------------------
-DONE: Issue 05, Rename calcImg VieweSize to calcViewerSize
-DONE: Issue 01, two chars of ID in handleUserAction. 
-
-Branch isNewImgFunction
-------------------------
-Issue 06: Pull isNewImg(actualW, actualH) out of calcViewerSize into new function.
-Issue 08: Rename actualW and actualH to actualImgW and actualImgH - these will be passed in as parameters in Issue 06 anyway.
-
-Branch rewriteHandleUserAction061119
--------------------------------------
-Issue 02: handleUserAction rewrite. Consider folding error checking from checkKeyboardInput back into the user action handler. Also reviewer use of elementIdToAppdataProp.
-Status: Pulled out focus, clicks and keypress from handleUserAction. 
-Status: Changed keypress to keyup
-Status: Added Esc functionality to input fields.
-Commit 1: 4567a28
-
-
-Commit 2: 
-061219 Start. Esc works. Implement elementIdToAppdataProp in handleKeyup.
-
-Commit 3: Enter works, handleMouseEvents, handleToolbarInput, updateAppdata works.
-
-
-
-
-
-Branch TBA
-------------
-Issue 03: prop to target rewrite in checkKeyboardInput - No, this will be expanded. Function arguments will be passed as prop, not target. 
-Issue 04: separate handleToolbarInput back out into event-centered functions instead of region-centered.
-
 
 TODO: Rewrite updateAppdata to be parameters... with key/value pairs as parameter.
 TOD0: Think about making getAppdata only query a specific property if possible.
@@ -43,12 +9,6 @@ TODO: Fix being able to resize viewerW smaller than imgW - current behavior is i
 TODO: Finish reviewing and implementing write to clipboard buttons.
 TODO: Implement Td and table copy to clipboard buttons.
 TODO: Make mrk => box function...not sure where though or whether it's necessary since it's just a one-liner.
-TODO: Make Esc cancel the input in input fields. Now, on error the cursor stays in the field and nothing happens, you have to tab out. On Esc, the focus should elsewhere.
-
-
-
-
-
 TODO: Fix error messages - they don't fade out. Loop that in with flashAppMessage
 TODO: Fix bug - load 400X1000, multiple click on +50, Display Size shows 450 but the img doesn't grow...
 TODO: Implement image swap 
@@ -59,6 +19,7 @@ TODO: THe CCP should store all the currently selected options and restore them w
 TODO: Assign keyboard  shortcuts
 TODO: Assign tab order
 
+DONE: Branch rewriteHandleUserAction061119
 DONE: Fix that smallphones and largephones input fields show undefined and show in Appdata as pixel values.
 DONE: Fix default value in viewerW field - Fixed, added to calcViewerSize
 DONE: resize viewerW doesn't work Fixed, reconfigured updateAppdata to include viewerW
@@ -846,14 +807,8 @@ var Witty = (function () {
                 lphonesw = document.querySelector(toolButtons.lPhonesW)                
                 sphonesw.setAttribute('data-sphonesw', '320')
                 lphonesw.setAttribute('data-lphonesw', '480')
-                console.log('sphonesw.value is: ' + sphonesw.value);
                 sphonesw.value = sphonesw.getAttribute('data-sphonesw');
                 lphonesw.value = lphonesw.getAttribute('data-lphonesw');
-                
-
-                console.log('FOO');
-
-
 
                 calcViewerSize(false);
               })();
@@ -913,8 +868,8 @@ var Witty = (function () {
       // !VA Write the viewerW to the toolbar input field
       document.querySelector(toolButtons.viewerW).value = viewerW;
 
-      // !VA If we're initializing a new image, use the naturalWidth and naturalHeight. If we're updating via user input, we need to use the display image and height, imgW and imgH. If we're initializing, then Appdata.imgW and Appdata.imgH will be 0 or falsy because it hasn't been resized yet. So we need to make the following decision based on the _actual_ image width and height, which will be different based on whether we're initializing or updating. So:
-
+      // !VA If we're initializing a new image, use the naturalWidth and naturalHeight. If we're updating via user input, we need to use the display image and height, imgW and imgH. If we're initializing, then Appdata.imgW and Appdata.imgH will be 0 or falsy because it hasn't been resized yet. So we need to make the following decision based on the _actual_ image width and height, which will be different based on whether we're initializing or updating.
+      // !VA I thought I fixed this...it appears to only apply to dev mode.
       var actualW, actualH
       if (Appdata.imgW === 0) {
         actualW = Appdata.imgNW;
@@ -923,7 +878,6 @@ var Witty = (function () {
         actualW = Appdata.imgW;
         actualH = Appdata.imgH; 
       }
-
 
       switch(true) {
       // The image falls within the default viewer dimensions set in initApp, so do nothing.
@@ -1041,7 +995,7 @@ var Witty = (function () {
     }
     
     // appController private intToPx: CONVERT INTEGER TO PIXEL VALUE
-    // !VA NEW Probably unused
+    // !VA TODO: Probably unused, delete
     function intToPx(int) {
       let pxval;
       let str = String(int);
@@ -1060,63 +1014,61 @@ var Witty = (function () {
       // !VA TODO: Setting maxViewerWidth just for now
       var maxViewerWidth = 800;
 
-
+      // !VA First, we validate that the user-entered value is an integer and if so, set the error variables.
       if (validateInteger(val)) {
         errCode = 'not_Integer';
         isErr = true;
-        console.log('checkKeyboardINput - not an integer');
       } else {
-
+        // !VA Now, we handle the error cases if user has entered a value in the imgViewer field 
         switch (true) {
           case (prop === 'viewerW') :
+            // !VA The user has selected a viewerW that's smaller than the currently displayed image. Undetermined how to deal with this but for now the current image is shrunk to the selected viewerW. But Appdata is not updated accordingly, needs to be fixed.
             if (val < Appdata.imgW ) {
-              // !VA TODO: review this...I'm not sure I want to container to resize the image by default or show an error. And even if it does, imgW had to be updated in Appdata.
-              // !VA The viewer width can't be smaller than the current image width of XXX, show message. 
+              // !VA Do nothing for now, see above.
             } else if (val > maxViewerWidth ) {
-              // !VA Setting a maxViewerWidth here but I need to review V1 and revisit this.
-              // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px
+              // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px - and the user-entered value exceeds this, so error.
               isErr = true;
               errCode = 'viewerW_GT_maxViewerWidth';
             } else {
               // !VA first write val to the viewerW input's value
               // document.querySelector(dynamicRegions.imgViewer).value = val;
-              // !VA  The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running calcViewerSize. So, update Appdata.viewerW with val, and pass in unchanged values of imgW and imgH
+              // !VA  The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running calcViewerSize. So, return no error and continue in handleKeyup.
               isErr = false;
-              console.log('checkKeyboardInput: Appdata = updateAppdata(val, Appdata.imgW, Appdata.imgH);');
             }
-            
             break;
-            // !VA Handle the custom width toolButton input
+            // !VA Handle the imagewidth toolButton input
           case (prop === 'imgW') :
-              // !VA TODO: restore the placeholder value on blur
-              // !VA If the new image width is greater than the viewer width, then show message. This is a temporary fix, the errorHandler should reset the field value to ''.
+              // !VA If the new image width is greater than the viewer width, then show message. 
               if (val > Appdata.viewerW ) {
                 // !VA errorHandler!
                 isErr = true;
                 errCode = 'imgW_GT_viewerW';
               }
-              
-
               break;
-              // !VA Handle the custom width toolButton input
-          case (prop === 'sPhoneW') :
-            console.log('checkKeyboardInput sPhoneW');
-            isErr = true;
-            errCode = 'unknownErrCode';
-            break;
+          // !VA TODO: Handle the imageheight toolButton input
+          case (prop === 'imgW') :
+              console.log('Error handling for imagewidth input not implemented!');
+              break;
 
+              // !VA TODO: Handle the small phone input
+          case (prop === 'sPhoneW') :
+              console.log('Error handling for sPhonesW input not implemented!');
+            break;
+          
+          // !VA Handle the small phone input
+          case (prop === 'sPhoneW') :
+              console.log('Error handling for imagewidth input not implemented!');
+              break;
         }
       } 
 
       if (isErr) {
+        // !VA IF Error pass the code to errorHandler to get the error message
         appController.initError(isErr, errCode);
       } else {
+        // !VA If no error, pass false back to handleKeyup and continue.
         isErr = false;
       }
-
-      console.log('checkKeyboardInput isErr is: ' + isErr);
-      console.log('checkKeyboardInput errCOde is: ' + errCode);
-
       return isErr;
 
     }
@@ -1150,55 +1102,53 @@ var Witty = (function () {
     }
 
 
-    // !VA This works, but it's mickey-mouse too. 
+    // !VA This works, but it's mickey-mouse too. It also handles the toolbar buttons after the changed values have been extracted by handleToolbarClicks.
     function handleToolbarInput(prop, val) {
       console.log('handleToolbarInput');
+      // !VA Get Appdata properties.
       var Appdata = {};
       Appdata = appController.getAppdata(false);
+      // !VA Initialize vars for imgH and imgW since we need to calculate one based on the value of the other and Appdata.aspect.
       var imgH, imgW;
-      // !VA Handle clicks on the toolbutton increment buttons. 
       switch(true) {
+        // !VA If the value was entered in the imgViewer field, go ahead and updateAppdata as is.
         case (prop === 'viewerW') :
-        
-
           updateAppdata(prop, val); 
           break;          
 
         case (prop === 'imgW') :
-
+          // !VA If the value was entered in imgwidth, calc imgH based on val and write to Appdata.
           imgH =  val * (1 / Appdata.aspect[0]);
           updateAppdata(prop, val); 
           updateAppdata('imgH', imgH); 
           break;
 
         case (prop === 'imgH') :
-
+          // !VA If the value was entered in imgheight, calc imgW based on val and write to Appdata.
           imgW =  val * (Appdata.aspect[0]);
           updateAppdata(prop, val);
           updateAppdata('imgW', imgW)
           break;
 
         case (prop === 'sPhonesW') :
-          console.log('handleToolbarInput sPhonesw');          
+          // !VA TODO: needs handling
+          console.log('handleToolbarInput sPhonesw: not yet handled');          
           break;
 
         case (prop === 'lPhonesW') :
-            console.log('handleToolbarInput lPhonesw');          
+          // !VA TODO: needs handling
+          console.log('handleToolbarInput lPhonesw: not yet handled');  
           break;
-
       }
-
       calcViewerSize();
     }
 
     // !VA NEW So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. Here, there are 5 mutable elements and 5 properties. Only one of the properties has changed. So we loop through them all, find the match for the prop argument, then update only the element/data property that matches. This is a mickey-mouse solution but it works for now. Ideally we will pass in a key/value pair including the property name and the ID alias so we can use properties... in case there are more than one.
-
-    
     function updateAppdata(prop, val ) {
       console.log('updateAppdata running');
       var Appdata = {};
+      // !VA Set an array with the mutable Appdata proerty names. These are the properties that get their values direcly from DOM elements, which are queried as needed by getAppdata. All the other Appdata properties are derived from these five.
       var props = [];
-      console.log('updateAppdata prop is: ' + prop);
       props = ['viewerW', 'imgW', 'imgH', 'sPhonesW', 'lPhonesH']
 
       for (let i = 0; i < props.length; i++) {
@@ -1222,24 +1172,7 @@ var Witty = (function () {
         }
       }
       Appdata = appController.getAppdata(false);
-      console.table(Appdata);
     }
-
-    //NEW
-    // function updateAppdata(prop, val) {
-    //   var Appdata = {};
-    //   appController.getAppdata();
-      
-    //   val = parseInt(val); 
-    //   // !VA !IMPORTANT! Referencing a property of an object in bracket notation!
-    //   Appdata[prop] = val;
-    //   UIController.refreshAppUI(Appdata);
-    //   return Appdata;
-    // };
-
-
-
-
 
     // !VA CCP Functions
     // !VA appController private initCCP
@@ -1276,20 +1209,6 @@ var Witty = (function () {
         document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
 
       }
-
-
-
-
-
-      // !VA Not ready for these yet
-      // var tableMaxWidth = `'<option>${Appdata.viewerW}</option><option>100%</option>'`;
-      // document.getElementById('table-width-select').innerHTML = tableMaxWidth;
-      // document.getElementById('table-max-width').style.display = 'none';
-
-      // var imgMaxWidth = `'<option>${Appdata.imgW}</option><option>100%</option>'`;
-      // document.getElementById('img-width-select').innerHTML = imgMaxWidth;
-      // document.getElementById('img-max-width').style.display = 'none'; 
-
     }
     
     // !VA  appController: Toggle checkboxes and run any associated actions
@@ -1334,7 +1253,6 @@ var Witty = (function () {
     function showElementOnInput(event) {
       // !VA Here we catch the event handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
       var elems = [];
-      // elems[0] = ccpMakeClip.imgDisplayCSSToCB;
       elems[0] = document.querySelector(ccpMakeClipBut.imgDisplayWriteCSSToCB);
       elems[1] = document.querySelector(ccpMakeClipBut.imgSPhoneWriteCSSToCB);
       elems[2] = document.querySelector(ccpMakeClipBut.imgLPhoneWriteCSSToCB);
@@ -1364,11 +1282,8 @@ var Witty = (function () {
       }
     }
 
-
-
     //  !VA ERROR HANDLING
     // ==============================
-
       var errorHandler = function(isErr, errCode) {
         console.log('errorHandler running');
         var Appdata = appController.getAppdata();
@@ -1494,17 +1409,9 @@ var Witty = (function () {
       lphonesw = document.querySelector(toolButtons.lPhonesW)                
       sphonesw.setAttribute('data-sphonesw', '320')
       lphonesw.setAttribute('data-lphonesw', '480')
-      console.log('sphonesw.value is: ' + sphonesw.value);
       sphonesw.value = sphonesw.getAttribute('data-sphonesw');
       lphonesw.value = lphonesw.getAttribute('data-lphonesw');
-      
-
       console.log('initDev');
-
-
-
-
-
 
       calcViewerSize();
       // !VA Open the CCP by default in dev mode
@@ -1517,13 +1424,13 @@ var Witty = (function () {
 
     // !VA appController public
     return {
+      // !VA Were putting this here so it can be accessed from either other module -- all it does it get the code and pass it on to the private appController function that finds the error code from the string and passes that on to UIController for display.
       initError: function(isErr, errCode) {
-        console.log('initError in appController');
-        console.log('initError isErr is: ' + isErr);
-        console.log('initError errCOde is: ' + errCode);
         errorHandler(isErr, errCode);
       },
       // !VA appController public getAppdata
+      // !VA This needs to be just a pass-on function so we can get this junk out of the appController public functions.
+      
       getAppdata: function() {
         // !VA NEW Initialize Appdata here and pass it along - we put it here because it's called from both the other modules 
         var Appdata = {};
