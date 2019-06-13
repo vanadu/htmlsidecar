@@ -20,7 +20,9 @@ Status: Pulled out focus, clicks and keypress from handleUserAction.
 Status: Changed keypress to keyup
 Status: Added Esc functionality to input fields.
 Commit 1: 4567a28
-Cleaned up console calls.
+
+
+Commit 2: 061219 Start. Esc works. Implement elementIdToAppdataProp in handleKeyup.
 
 Handle blur notes:
 
@@ -29,16 +31,22 @@ Handle blur notes:
 
 Branch TBA
 ------------
-Issue 03: prop to target rewrite in checkKeyboardInput. 
+Issue 03: prop to target rewrite in checkKeyboardInput - No, this will be expanded. Function arguments will be passed as prop, not target. 
 Issue 04: separate handleToolbarInput back out into event-centered functions instead of region-centered.
 Issue 07: Rewrite updateAppdata to be parameters... with key/value pairs as parameter.
 
 
-TODO: Fix being able to resize viewerW smaller than imgW
+TODO: Fix being able to resize viewerW smaller than imgW - current behavior is imgw resizes with viewerW. If that's the desired behavior, imgW still doesn't write the udpated width to Appdata, that needs to be fixed.
 TODO: Finish reviewing and implementing write to clipboard buttons.
 TODO: Implement Td and table copy to clipboard buttons.
 TODO: Make mrk => box function...not sure where though or whether it's necessary since it's just a one-liner.
 TODO: Make Esc cancel the input in input fields. Now, on error the cursor stays in the field and nothing happens, you have to tab out. On Esc, the focus should elsewhere.
+
+
+
+
+
+TODO: Fix error messages - they don't fade out. Loop that in with flashAppMessage
 TODO: Fix bug - load 400X1000, multiple click on +50, Display Size shows 450 but the img doesn't grow...
 TODO: Implement image swap 
 TODO: Parent table class att only shows in CB output if Wrapper is selected, not in just the Partent table output.
@@ -667,6 +675,8 @@ var Witty = (function () {
       function handleKeyup(evt) {
         el = document.getElementById(this.id);
         target = el.id;
+        var prop = elementIdToAppdataProp(target);
+        console.log('prop is: ' + prop);
         keyup = evt.which || evt.keyCode || evt.key;
         
         // !VA OK, after two days, this appears to work even though I tried it many times before and it stripped out the CSS formatting. 
@@ -675,32 +685,36 @@ var Witty = (function () {
         if (keyup == 27 ) {
           switch (true) {
             // !VA If the target element is viewerW then on blur exit the element with no change to Appdata and show the current Appdata.viewerW in the input field - so no change.  
-            case ( target === document.querySelector(toolButtons.viewerW).id) :
-              this.value = Appdata.viewerW;
-              console.log('HERE ');
+            case ( prop === 'viewerW') :
+              this.value = Appdata[prop];
+              console.log('27 - viewerW');
               this.blur();
               break;
               // !VA If the target is imgWidth or imgHeight, on blur exit the element with no change and set el.value to '' so the placeholder is displayed. We do not need to show the current selected value here because it's shown in dimViewer.displaysize.  
-            case ( target === document.querySelector(toolButtons.imgWidth).id || target   === document.querySelector(toolButtons.imgHeight)) :
+            case ( prop  === 'imgW' ) :
               el.value = '',
+              console.log('27 - imgW');
               this.blur();  
               break;
+            // !VA If the target is imgWidth or imgHeight, on blur exit the element with no change and set el.value to '' so the placeholder is displayed. We do not need to show the current selected value here because it's shown in dimViewer.displaysize.  
+            case ( prop   === 'imgH') :
+                el.value = '',
+                console.log('27 - imgH');
+                this.blur();  
+                break;
             // !VA If the target is sPhonesW or sPhonesH, restore to the values in Appdata, which are read from the data attributes data-sphonesw and data-lphonesw
-            case  target === document.querySelector(toolButtons.sPhonesW).id :
-                console.table(Appdata);
-                this.value = Appdata.sPhonesW;
-                console.log('HERE ');
+            case  prop === 'sPhonesW' :
+                this.value = Appdata[prop];
+                console.log('27 - sPhonesW');
                 this.blur();
                 break;
 
-            case  target === document.querySelector(toolButtons.lPhonesW).id :
-                this.value = Appdata.sPhonesW;
-                console.log('HERE ');
+            case  prop === 'lPhonesW' :
+                this.value = Appdata[prop];
+                console.log('27 - lPhonesW');
                 this.blur();
                 break;
           }
-          console.log('handleKeyup - 27');
-          console.log('this.value is: ' + this.value);
         }
         // !VA Focusing on enter key behavior for now
         // if (keyup == 13 || keyup == 9) {
@@ -720,16 +734,13 @@ var Witty = (function () {
           // !VA We want to handle all the toolbutton keyboard input in one place, so send the send the target element's id and value to handleTBInput
 
           // !VA NEW
-          } else if (el.id.includes('width') || el.id.includes('height')) {
+          } else {
             // !VA Error handling
             // !VA Stopped here...
               checkKeyboardInput(el.id, el.value);
               handleToolbarInput(el.id, el.value);
               // errorHandler(el.id, el.value);
-          } else {
-            // !VA There will be other input fields to handle, but we're not there yet.
-            console.log('Undefined keypress action');
-          }
+          } 
         } 
         // if (evt.keyCode == 27) {//27 is the code for escape
         //   document.onkeydown = function(evt) {
