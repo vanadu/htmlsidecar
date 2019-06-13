@@ -22,9 +22,9 @@ Status: Added Esc functionality to input fields.
 Commit 1: 4567a28
 
 
-Commit 2: 061219 Start. Esc works. Implement elementIdToAppdataProp in handleKeyup.
+Commit 2: 
+061219 Start. Esc works. Implement elementIdToAppdataProp in handleKeyup.
 
-Handle blur notes:
 
 
 
@@ -676,86 +676,42 @@ var Witty = (function () {
         el = document.getElementById(this.id);
         target = el.id;
         var prop = elementIdToAppdataProp(target);
-        console.log('prop is: ' + prop);
         keyup = evt.which || evt.keyCode || evt.key;
-        
+        var isErr;
         // !VA OK, after two days, this appears to work even though I tried it many times before and it stripped out the CSS formatting. 
         // !VA We are using switch/case here because I thought there would be other cases. But it looks like viewerW, sPhonesW and lPhonesW all use the same scheme and they're now all defined by default in the HTML file. So unless there are different schemes in the CCP and SCP that need handling here, make this an if/else with imgWidth and imgHeight as the if.
         var Appdata = appController.getAppdata();
+        // !VA We need a separate conditional for ESC, ENTER and TAB. 
+        // !VA If ESC, we want imgW and imgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the dimViewers and there's no need to recalc the W and H each time the user makes and entry - that would just be confusing. For viewerW, sPhonesW and lPhonesW we want to exit the field and restore the preexisting value from Appdata.
         if (keyup == 27 ) {
-          switch (true) {
-            // !VA If the target element is viewerW then on blur exit the element with no change to Appdata and show the current Appdata.viewerW in the input field - so no change.  
-            case ( prop === 'viewerW') :
-              this.value = Appdata[prop];
-              console.log('27 - viewerW');
+            if (prop === 'imgW' || prop === 'imgH') {
+              console.log('prop is: ' + prop);
+              this.value = ('');
               this.blur();
-              break;
-              // !VA If the target is imgWidth or imgHeight, on blur exit the element with no change and set el.value to '' so the placeholder is displayed. We do not need to show the current selected value here because it's shown in dimViewer.displaysize.  
-            case ( prop  === 'imgW' ) :
-              el.value = '',
-              console.log('27 - imgW');
-              this.blur();  
-              break;
-            // !VA If the target is imgWidth or imgHeight, on blur exit the element with no change and set el.value to '' so the placeholder is displayed. We do not need to show the current selected value here because it's shown in dimViewer.displaysize.  
-            case ( prop   === 'imgH') :
-                el.value = '',
-                console.log('27 - imgH');
-                this.blur();  
-                break;
-            // !VA If the target is sPhonesW or sPhonesH, restore to the values in Appdata, which are read from the data attributes data-sphonesw and data-lphonesw
-            case  prop === 'sPhonesW' :
-                this.value = Appdata[prop];
-                console.log('27 - sPhonesW');
-                this.blur();
-                break;
-
-            case  prop === 'lPhonesW' :
-                this.value = Appdata[prop];
-                console.log('27 - lPhonesW');
-                this.blur();
-                break;
-          }
+            } else {
+              console.log('prop is: ' + prop);
+              this.value = Appdata[prop];
+              console.log('Else prop is: ' + prop);
+              this.blur();
+            }
         }
-        // !VA Focusing on enter key behavior for now
-        // if (keyup == 13 || keyup == 9) {
-        // !VA viewerW field:
-        // !VA Enter key should initiate the action and 
-          // !VA if no error, show the value, and stay in the input field.
-          // !VA if error, reset the value to '' and show the error.
-          // !VA Right now, ESC does nothing and tabbing is the only way to blur.
         if (keyup == 13 ) {
           console.log('Value when return pressed: ' + this.value);
           // !VA Get the input and evaluate it
-          var isErr = validateInteger(this.value);
+
+          isErr = checkKeyboardInput(prop, el.value);
+          console.log('handleKeyup isErr is: ' + isErr);
           if (isErr) {
-            // !VA If the value entered isn't an integer, reset it to null and leave the focus there, and send the error code to errorHandler
-            el.value = '';
-            appController.initError(el.id, 'not_an_integer', true);
-          // !VA We want to handle all the toolbutton keyboard input in one place, so send the send the target element's id and value to handleTBInput
-
-          // !VA NEW
+            this.select();
           } else {
-            // !VA Error handling
-            // !VA Stopped here...
-              checkKeyboardInput(el.id, el.value);
-              handleToolbarInput(el.id, el.value);
-              // errorHandler(el.id, el.value);
+            console.log('update Appdata');
           } 
-        } 
-        // if (evt.keyCode == 27) {//27 is the code for escape
-        //   document.onkeydown = function(evt) {
-        //     evt = evt || window.event;
-        //         console.log('el.id is: ' + el.id);
-        //         document.querySelector(toolButtons.viewerW).blur(); 
-        //         console.log('blurring');
-        //         // el.value = '';
-        //         console.log('el.value is: ' + el.value);
-        //         console.log('el.placeholder is: ' + el.placeholder);
-        //   };
-        // }
 
 
 
+          // handleToolbarInput(el.id, el.value);
+
+        }
       }
 
       function handleFocus(evt) {
@@ -1149,62 +1105,92 @@ var Witty = (function () {
       return pxval;
     }
 
-    // !VA NEW I don't know wny I'm checking Appdata properties here instead of target ids...
-    function checkKeyboardInput(id, val) {
+    // !VA NEW Parsing keyboard input based on Appdata property passed in from handleKeyup.
+    function checkKeyboardInput(prop, val) {
       console.log('checkKeyboardInput running');
+      var errCode;
+      var isErr;
+      isErr = false;
       var Appdata= {};
       Appdata = appController.getAppdata();
-      var prop = elementIdToAppdataProp(id);
+      console.table(Appdata);
       // !VA TODO: Setting maxViewerWidth just for now
       var maxViewerWidth = 800;
-      switch (true) {
-        case (prop === 'viewerW') :
-          if (val < Appdata.imgW ) {
-            // !VA TODO: review this...I'm not sure I want to container to resize the image by default or show an error. 
-            // !VA The viewer width can't be smaller than the current image width of XXX, show message. 
-          } else if (val > maxViewerWidth ) {
-            // !VA Setting a maxViewerWidth here but I need to review V1 and revisit this.
-            // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px
-            appController.initError(id, 'viewerW_GT_maxViewerWidth', true);
-          } else {
-            // !VA first write val to the viewerW input's value
-            // document.querySelector(dynamicRegions.imgViewer).value = val;
-            // !VA  The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running calcViewerSize. So, update Appdata.viewerW with val, and pass in unchanged values of imgW and imgH
-            Appdata = updateAppdata(val, Appdata.imgW, Appdata.imgH);
-          }
-          break;
-        // !VA Handle the custom width toolButton input
-        case (prop === 'imgW') :
-        // !VA TODO: restore the placeholder value on blur
-          // !VA If the new image width is greater than the viewer width, then show message. This is a temporary fix, the errorHandler should reset the field value to ''.
-          if (val > Appdata.viewerW ) {
-            // !VA errorHandler!
-            appController.initError(id, 'imgW_GT_viewerW');
+
+
+      if (validateInteger(val)) {
+        errCode = 'not_Integer';
+        isErr = true;
+        console.log('checkKeyboardINput - not an integer');
+      } else {
+
+        switch (true) {
+          case (prop === 'viewerW') :
+            if (val < Appdata.imgW ) {
+              // !VA TODO: review this...I'm not sure I want to container to resize the image by default or show an error. And even if it does, imgW had to be updated in Appdata.
+              // !VA The viewer width can't be smaller than the current image width of XXX, show message. 
+            } else if (val > maxViewerWidth ) {
+              // !VA Setting a maxViewerWidth here but I need to review V1 and revisit this.
+              // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px
+              isErr = true;
+              errCode = 'viewerW_GT_maxViewerWidth';
+            } else {
+              // !VA first write val to the viewerW input's value
+              // document.querySelector(dynamicRegions.imgViewer).value = val;
+              // !VA  The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running calcViewerSize. So, update Appdata.viewerW with val, and pass in unchanged values of imgW and imgH
+              isErr = false;
+              console.log('checkKeyboardInput: Appdata = updateAppdata(val, Appdata.imgW, Appdata.imgH);');
+            }
             
-          }
-        // !VA Handle the custom width toolButton input
-        case (prop === 'sPhoneW') :
+            break;
+            // !VA Handle the custom width toolButton input
+          case (prop === 'imgW') :
+              // !VA TODO: restore the placeholder value on blur
+              // !VA If the new image width is greater than the viewer width, then show message. This is a temporary fix, the errorHandler should reset the field value to ''.
+              if (val > Appdata.viewerW ) {
+                // !VA errorHandler!
+                isErr = true;
+                errCode = 'imgW_GT_viewerW';
+              }
+              
+
+              break;
+              // !VA Handle the custom width toolButton input
+          case (prop === 'sPhoneW') :
             console.log('checkKeyboardInput sPhoneW');
-
-
+            isErr = true;
+            errCode = 'unknownErrCode';
+            break;
 
         }
-        
+      } 
+
+      if (isErr) {
+        appController.initError(isErr, errCode);
+      } else {
+        isErr = false;
+      }
+
+      console.log('checkKeyboardInput isErr is: ' + isErr);
+      console.log('checkKeyboardInput errCOde is: ' + errCode);
+
+      return isErr;
+
     }
-
-
-    // !VA INPUT HANDLING
-    // !VA ============================================================
-    // !VA Handling user input by operation rather than by event type
-    // !VA appController private handleCustomWidth
-    // !VA Handle user input changes to Appdata.imgWidth
-    // !VA NEW 
-      function handleToolbarInput(id, val) {
-        console.log('handleToolbarInput');
-      var Appdata = {};
-      Appdata = appController.getAppdata(false);
-      // !VA Handle clicks on the toolbutton increment buttons. 
-      if (id.includes('tb-but')) {
+          
+          
+          // !VA INPUT HANDLING
+          // !VA ============================================================
+          // !VA Handling user input by operation rather than by event type
+          // !VA appController private handleCustomWidth
+          // !VA Handle user input changes to Appdata.imgWidth
+          // !VA NEW 
+          function handleToolbarInput(id, val) {
+            console.log('handleToolbarInput');
+            var Appdata = {};
+            Appdata = appController.getAppdata(false);
+            // !VA Handle clicks on the toolbutton increment buttons. 
+            if (id.includes('tb-but')) {
         // !VA by mouseclick
         Appdata.imgW = Appdata.imgW + val;
         Appdata.imgH =  Appdata.imgW * (1 / Appdata.aspect[0]);
@@ -1382,10 +1368,11 @@ var Witty = (function () {
     //  !VA ERROR HANDLING
     // ==============================
 
-      var errorHandler = function(id, str, bool) {
+      var errorHandler = function(isErr, errCode) {
         console.log('errorHandler running');
         var Appdata = appController.getAppdata();
         var errorMessages = {
+          not_Integer: 'This value has to be a positive whole number - try again.',
           imgW_GT_viewerW: `The image width has to be less than the width of its container table, which is now&nbsp;set&nbsp;to&nbsp;${Appdata.viewerW}px.`,
           tbButton_LT_zero: 'Sorry, that would make one of the image dimensions less than 0.',
           tbButton_GT_viewerW: `Sorry, that would make the image wider than its container, which is currently set at ${Appdata.viewerW}px`,
@@ -1397,10 +1384,11 @@ var Witty = (function () {
 
         // !VA Loop through the error ID/message pairs and find the match
         for (const [key, value] of Object.entries(errorMessages)) { 
-          if (key === str ) {
-            showAppMessage(id, value, true);
+          if (key === errCode ) {
+            showAppMessage(value);
           }
         }
+        return true;
       };
 
       // !VA Might be good to fold this into error handling
@@ -1423,7 +1411,7 @@ var Witty = (function () {
 
     // !VA appController private showAppMessage
     // !VA Here we can show a message bypassing errorHandler - not all messages are errors.
-    var showAppMessage = function(id, mess, isErr) {
+    var showAppMessage = function(errMess) {
       //Set the time the message will display
       // let displayTime;
       // Get the elements to manipulate for the error message display
@@ -1433,7 +1421,7 @@ var Witty = (function () {
       // var dimViewers = document.querySelector('#dim-viewers');
       // var toolsContainer = document.querySelector('#tools-container');
       // Put the respective error message in the error message container
-      appMessDisplay.innerHTML = mess;
+      appMessDisplay.innerHTML = errMess;
       // Swap dimViewers with appMessDisplay and drop toolsContainer behind viewport;
 
 
@@ -1441,9 +1429,10 @@ var Witty = (function () {
 
 
       // !VA Reset the value of the element into which the error was entered to empty. 
-      document.getElementById(id).value = '';
-      appMessContainer.classList.remove('hide-err');
-      appMessContainer.classList.add('show-err');
+      // document.getElementById(id).value = '';
+      // appMessContainer.classList.remove('hide-err');
+      // appMessContainer.classList.add('show-err');
+      console.log('Error: reset the value of the element to its original value and select it.');
 
     };
 
@@ -1527,9 +1516,11 @@ var Witty = (function () {
 
     // !VA appController public
     return {
-      initError: function(id, str, bool) {
+      initError: function(isErr, errCode) {
         console.log('initError in appController');
-        errorHandler(id, str, bool);
+        console.log('initError isErr is: ' + isErr);
+        console.log('initError errCOde is: ' + errCode);
+        errorHandler(isErr, errCode);
       },
       // !VA appController public getAppdata
       getAppdata: function() {
