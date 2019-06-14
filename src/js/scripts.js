@@ -1377,7 +1377,7 @@ var Witty = (function () {
       // !VA This is where we initialize Dev mode, which is where we can start the app with a hard-coded img element in the HTML file. THis is very useful, otherwise we'd have to drop files to initialize or dink with the FileReader object to hard-code a test file.
       console.log('initDev running');
       // !VA Get Appdata so we can store the filename
-      var Appdata = appController.getAppdata();
+      // var Appdata = appController.getAppdata();
       // !VA Get the current (devimg) image dimensions and write the dimViewers
       // !VA Turn on the toolbars
       document.querySelector(staticRegions.toolsContainer).style.display = 'block';
@@ -1390,9 +1390,9 @@ var Witty = (function () {
       filename = filename[filename.length - 1];
       // !VA Write the filename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
       document.querySelector(dimViewers.filename).textContent = filename;
-      // !VA Get the dev image's NW and NH from the DOM, update Appdata and let calcViewerSize do its thing. 
-      imgW = document.querySelector(dynamicRegions.curImg).naturalWidth;
-      imgH = document.querySelector(dynamicRegions.curImg).naturalHeight;
+      // !VA Get the dev image's NW and NH from the DOM. We do NOT write this to Appdata now because 
+      // imgW = document.querySelector(dynamicRegions.curImg).naturalWidth;
+      // imgH = document.querySelector(dynamicRegions.curImg).naturalHeight;
 
 
 
