@@ -3,8 +3,7 @@
 ===========================================================
 06.17.19
 
-
-
+TODO: rewrite getAppdata to only query specific items in the array, or at least use destructuring to only make a const out of which ever Appdata property is needed in the respective function.
 
 
 
@@ -24,6 +23,7 @@ TODO: THe CCP should store all the currently selected options and restore them w
 TODO: Assign keyboard  shortcuts
 TODO: Assign tab order
 
+DONE: Rewrite updateAppdata to be parameters... with key/value pairs as parameter.
 DONE: Fold handleToolbarClicks into checkUserInput and rename to checkUserInput
 Branch checkUserInput
 DONE: Branch rewriteHandleUserAction061119
@@ -779,32 +779,33 @@ var Witty = (function () {
       // !VA Branch rewriteHandleUserAction061119 
       // !VA appController private handleMouseEvents. Preprocess mouse events and route them to respective eval handler.
       function handleMouseEvents(evt) {
+        console.log('handleMouseEvents');
         // !VA Carryover from earlier handleUserAction
         // !VA Get the target element of the click
         el = document.getElementById(this.id);
-
+        var args = { };
+        args.target = el.id;
+        
+        
         // !VA Handle the increment toolbuttons
         if (event.type === 'click') {
           switch (true) {
             case ( el.id.includes('tb-but')) :
               // !VA Variable to hold the name of the Appdata property the event corresponds to
-              var prop;
+              var prop, val;
               // !VA We need to query Appdata properties to get the current value of imgW so we can add the toolbutton increments to id
               var Appdata = {};
               Appdata = appController.getAppdata();
               // !VA This is a click on one of the toolbutton increment buttons, so we're dealing with the Appdata.imgW property.
-              prop = 'imgW';
+              args.prop = 'imgW';
               // !VA The last 2 chars of the id indicate the value by which the img dimension should be incremented,so get the last 2 chars and convert to integer
               val = parseInt(el.id.slice(-2));
               // !VA If the target ID includes 'grow' then the image dimension will be incremented, if 'shrink' then it will be decremented
               (el.id.includes('grow')) ? val : val = -val;
               // !VA Add val to the current imgW to get the value to be passed to checkUserInput for error parsing.
               val = Appdata.imgW + val;
-              console.log('in handleMouseEvents');
-              console.log('val is: ' + val);
-              // !VA HERE!
-              isErr = checkUserInput(prop, val);
-              console.log('isErr is: ' + isErr);
+              args.val = val;
+              isErr = checkUserInput(args);
               if (isErr) {
                 // !VA If it returns an error, select the input and show the error message so the user can correct it or ESC out of the field.
                 console.log('handleMouseEvents: ERROR MESSAGE SHOULD BE SHOWN NOW!');
@@ -812,24 +813,25 @@ var Witty = (function () {
               } else {
                 // !VA If no error, pass the Appdata property name and the entered value for further processing.
                 // !VA NOTE: We might have to include the target ID in the error handling because this button should trigger a different message than the keyboard message. Revisit.
-                evalToolbarInput(prop, val);
+                // !VA Passing arguments as object
+                evalToolbarInput(args);
               } 
               break;
-          }
-          // !VA TODO: Revisit this
-        }  else if ( event.type === 'drop') {
-          e.preventDefault;
-          // !VA TODO: Revisit this
-        } else if ( event.type === 'dragover') {
-          e.preventDefault;
-        } 
-      }
-
-
-      // !VA appController private handleKeyup
-      // !VA Handle all keyboard input after the user has selected an image and handleFileSelect has added it to the DOM
-      function handleKeyup(evt) {
-
+            }
+            // !VA TODO: Revisit this
+          }  else if ( event.type === 'drop') {
+            e.preventDefault;
+            // !VA TODO: Revisit this
+          } else if ( event.type === 'dragover') {
+            e.preventDefault;
+          } 
+        }
+        
+        
+        // !VA appController private handleKeyup
+        // !VA Handle all keyboard input after the user has selected an image and handleFileSelect has added it to the DOM
+        function handleKeyup(evt) {
+          
         // !VA Error messages dont' work -- the below came from handleUserAction before I deleted it.
         var appMessContainer = document.querySelector(staticRegions.appMessContainer);
         var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
@@ -841,10 +843,14 @@ var Witty = (function () {
 
         // !VA Get the target input element
         el = document.getElementById(this.id);
-        // !VA Get the id
-        target = el.id;
+        // !VA Args is target, prop, val
+        var args = { };
+        args.target = el.id;
+
         // !VA Get the Appdata property that corresponds to the target input element.
-        var prop = elementIdToAppdataProp(target);
+        args.prop = elementIdToAppdataProp(this.id);
+        // !VA Write the user input into args.val
+        args.val = this.value;
         // !VA Initalize boolean that notifies of error status after checkUserInput
         var isErr;
         // !VA Find out which key was struck
@@ -854,6 +860,7 @@ var Witty = (function () {
         // !VA We need a separate conditional for ESC, ENTER and TAB.
         // !VA  If ESC, we want imgW and imgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the dimViewers and there's no need to recalc the W and H each time the user makes and entry - that would just be confusing. 
         if (keyup == 27 ) {
+            // !VA If the value was entered into the W or H field, escape out of the field and reset the values to the placeholders
             if (prop === 'imgW' || prop === 'imgH') {
               this.value = ('');
               this.blur();
@@ -865,46 +872,53 @@ var Witty = (function () {
         }
         if (keyup == 13 ) {
           // !VA Get the input and evaluate it. 
-          isErr = checkUserInput(prop, el.value);
+          isErr = checkUserInput(args);
           if (isErr) {
             // !VA If it returns an error, select the input and show the error message so the user can correct it or ESC out of the field.
             console.log('ERROR MESSAGE SHOULD BE SHOWN NOW!');
             this.select();
           } else {
-            // !VA If no error, pass the Appdata property name and the entered value for further processing.
-            Appdata = evalToolbarInput(prop, this.value);
+            // !VA If no error, pass the target, prop and value to evalToolbarInput to evaluate it further.
+            Appdata = evalToolbarInput(args);
           } 
         }
       }
 
 
 
-    // !VA This works, but it's mickey-mouse too. It also handles the toolbar buttons after the changed values have been extracted by handleToolbarClicks.
-    function evalToolbarInput(prop, val) {
+    // !VA appController private evalToolbarInput
+    // !VA args is the target, prop and val passed in from handleKeyUp and handleMouseEvents. 
+    function evalToolbarInput(args) {
       console.log('evalToolbarInput');
+      // !VA ES6 Destructure args into constants.
+      const { target, prop, val } = args;
+      // !VA HERE!
       // !VA Get Appdata properties.
       var Appdata = {};
+      // !VA All we really need here is Appdata.aspect. Everything else is calculated based on the user's input.
       Appdata = appController.getAppdata(false);
-      // !VA Initialize vars for imgH and imgW since we need to calculate one based on the value of the other and Appdata.aspect.
+      // !VA Initialize vars for imgH and imgW since we need to calculate one based on the value of the other and Appdata.aspect. 
       var imgH, imgW;
       switch(true) {
-        // !VA If the value was entered in the imgViewer field, go ahead and updateAppdata as is.
+        // !VA If the value was entered in the imgViewer field, just pass prop and val through to updateAppdata.
         case (prop === 'viewerW') :
-          updateAppdata(prop, val); 
+          arg1 = [ prop, val ]
           break;          
 
         case (prop === 'imgW') :
-          // !VA If the value was entered in imgwidth, calc imgH based on val and write to Appdata.
+          // !VA If the value was entered in imgwidth, calc imgH based on val and aspect. Then put prop and val in arg1, and put the imgH property name and the calculated imgH into arg2. These will be passed on avia the spread operator to updateAppdata. 
           imgH =  val * (1 / Appdata.aspect[0]);
-          updateAppdata(prop, val); 
-          updateAppdata('imgH', imgH); 
+          // updateAppdata(prop, val); 
+          arg1 = [ prop, val ]
+          arg2 = [ 'imgH', imgH ] 
+          // updateAppdata('imgH', imgH); 
           break;
 
         case (prop === 'imgH') :
-          // !VA If the value was entered in imgheight, calc imgW based on val and write to Appdata.
+          // !VA If the value was entered in imgheight, calc imgW based on val and aspect. Then put prop and val in arg1, and put the imgW property name and the calculated imgW into arg2. These will be passed on via the ES6 spread operator to updateAppdata.
           imgW =  val * (Appdata.aspect[0]);
-          updateAppdata(prop, val);
-          updateAppdata('imgW', imgW)
+          arg1 = [ prop, val ]
+          arg2 = [ 'imgW', imgW ] 
           break;
 
         case (prop === 'sPhonesW') :
@@ -917,6 +931,10 @@ var Witty = (function () {
           console.log('evalToolbarInput lPhonesw: not yet handled');  
           break;
       }
+      
+      // !VA Call updateAppdata to resize the DOM elements and data properties that correspond to the Appdata properties above.
+      updateAppdata( arg1, arg2 );
+      // !VA Once those DOM properties and data properties have been updated, recalculate the image's containers.
       calcViewerSize();
     }
 
@@ -1077,10 +1095,11 @@ var Witty = (function () {
 
     // !VA NEW Parsing keyboard input based on Appdata property passed in from handleKeyup.
     // !VA TODO: rename to checkUserInput and include parsing of the toolbutton mouseclicks from handleToolbarClicks.
-    function checkUserInput(prop, val) {
+    function checkUserInput(args) {
       console.log('checkUserInput running');
-      console.log('prop is: ' + prop);
-      console.log('val is: ' + val);
+      console.dir(args);
+      // !VA Destructure args
+      const { target, prop, val } = args;
       var errCode;
       var isErr;
       isErr = false;
@@ -1152,16 +1171,21 @@ var Witty = (function () {
 
 
     // !VA NEW So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. Here, there are 5 mutable elements and 5 properties. Only one of the properties has changed. So we loop through them all, find the match for the prop argument, then update only the element/data property that matches. This is a mickey-mouse solution but it works for now. Ideally we will pass in a key/value pair including the property name and the ID alias so we can use properties... in case there are more than one.
-    function updateAppdata(prop, val ) {
+    function updateAppdata( ...params ) {
       console.log('updateAppdata running');
       var Appdata = {};
-      // !VA Set an array with the mutable Appdata proerty names. These are the properties that get their values direcly from DOM elements, which are queried as needed by getAppdata. All the other Appdata properties are derived from these five.
-      var props = [];
-      props = ['viewerW', 'imgW', 'imgH', 'sPhonesW', 'lPhonesH']
+      console.log('params is: ');
+      console.dir(params);
+      var prop, val;
+      
 
-      for (let i = 0; i < props.length; i++) {
-      console.log('props[i] is: ' + props[i]);
-        switch(true) {
+      for (let i = 0; i < params.length; i++) {
+      console.log('params[i] is: ' + params[i]);
+          prop = params[i][0];
+          val = params[i][1];
+          console.log('prop is: ' + prop);
+          console.log('val is: ' + val);
+          switch(true) {
           case prop === 'viewerW' :
             document.querySelector(dynamicRegions.imgViewer).style.width = val + 'px';  
             break;
@@ -1178,7 +1202,34 @@ var Witty = (function () {
             document.querySelector(toolButtons.lPhonesW).setAttribute('data-lphonesw') = val + 'px';
           break;
         }
+
+
       }
+
+
+      // !VA Set an array with the mutable Appdata proerty names. These are the properties that get their values direcly from DOM elements, which are queried as needed by getAppdata. All the other Appdata properties are derived from these five.
+      // var props = [];
+      // props = ['viewerW', 'imgW', 'imgH', 'sPhonesW', 'lPhonesH']
+
+      // for (let i = 0; i < props.length; i++) {
+      //   switch(true) {
+      //     case prop === 'viewerW' :
+      //       document.querySelector(dynamicRegions.imgViewer).style.width = val + 'px';  
+      //       break;
+      //     case prop === 'imgW' :
+      //       document.querySelector(dynamicRegions.curImg).style.width = val + 'px';
+      //     break;
+      //     case prop === 'imgH' :
+      //       document.querySelector(dynamicRegions.curImg).style.height = val + 'px';
+      //     break;
+      //     case prop === 'sPhoneW' :
+      //       document.querySelector(toolButtons.sPhonesW).setAttribute('data-sphonesw') = val + 'px';
+      //     break;
+      //     case prop === 'lPhoneW ' :
+      //       document.querySelector(toolButtons.lPhonesW).setAttribute('data-lphonesw') = val + 'px';
+      //     break;
+      //   }
+      // }
       Appdata = appController.getAppdata(false);
     }
 
