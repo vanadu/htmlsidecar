@@ -2,8 +2,7 @@
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
 06.17.19
-TODO: Fold handleToolbarClicks into checkUserInput and rename to checkUserInput
-Branch checkUserInput
+
 
 
 
@@ -25,6 +24,8 @@ TODO: THe CCP should store all the currently selected options and restore them w
 TODO: Assign keyboard  shortcuts
 TODO: Assign tab order
 
+DONE: Fold handleToolbarClicks into checkUserInput and rename to checkUserInput
+Branch checkUserInput
 DONE: Branch rewriteHandleUserAction061119
 DONE: Fix that smallphones and largephones input fields show undefined and show in Appdata as pixel values.
 DONE: Fix default value in viewerW field - Fixed, added to calcViewerSize
@@ -876,32 +877,6 @@ var Witty = (function () {
         }
       }
 
-    // !VA appController private handleToolbarClicks
-    // !VA Handle the increment buttons on the toolbar, called by handleMouseEvents
-    // !VA TODO: THis needs to be folded into checkUserInput., 
-    // !VA DONE: Deprecated 06/17
-    function handleToolbarClicks(id, val) {
-      // !VA Get the Appdata properties
-      var Appdata = {};
-      Appdata = appController.getAppdata();
-      // !VA Initialize vars for value after-click and Appdata property
-      console.log('id is: ' + id);
-      var newVal;
-      var prop;
-      // !VA Add the increment to Appdata.imgW. It's already been parsed as a positive or negative integer by handleMouseEvents.
-      newVal = Appdata.imgW + val;
-      // !VA This ONLY affects the imgW, so we can hard-code that property name here... not ideal but it works.
-      prop = 'imgW';
-      // !VA Call errorHandler if the action results in imgW or imgH being less than zero
-      if ( Appdata.imgW + val <= 0 || Appdata.imgH + val <= 0 ) {
-        appController.initError(true, 'tbButton_LT_zero');
-      } else if ( Appdata.imgW + val > Appdata.viewerW  ) {
-        appController.initError(true, 'tbButton_GT_viewerW');
-      }   else {
-        // !VA Now we can pick up handleToolbar input and let it do the rest of the work.
-        evalToolbarInput(prop, newVal)
-      }
-    }
 
 
     // !VA This works, but it's mickey-mouse too. It also handles the toolbar buttons after the changed values have been extracted by handleToolbarClicks.
