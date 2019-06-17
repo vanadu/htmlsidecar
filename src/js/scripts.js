@@ -884,7 +884,80 @@ var Witty = (function () {
         }
       }
 
+    // !VA NEW Parsing keyboard input based on Appdata property passed in from handleKeyup.
+    // !VA TODO: rename to checkUserInput and include parsing of the toolbutton mouseclicks from handleToolbarClicks.
+    function checkUserInput(args) {
+      console.log('checkUserInput running');
+      console.dir(args);
+      // !VA Destructure args
+      const { target, prop, val } = args;
+      var errCode;
+      var isErr;
+      isErr = false;
+      var Appdata= {};
+      Appdata = appController.getAppdata();
+      // !VA TODO: Setting maxViewerWidth just for now
+      var maxViewerWidth = 800;
 
+      // !VA First, we validate that the user-entered value is an integer and if so, set the error variables.
+      if (validateInteger(val)) {
+        // !VA NOTE: This is where we could easily trap the negative button increment if it falls below 0 to send a different message than just the standard 'not_Integer' message. Revisit.
+        errCode = 'not_Integer';
+        isErr = true;
+      } else {
+        // !VA Now, we handle the error cases if user has entered a value in the imgViewer field 
+        switch (true) {
+          case (prop === 'viewerW') :
+            // !VA The user has selected a viewerW that's smaller than the currently displayed image. Undetermined how to deal with this but for now the current image is shrunk to the selected viewerW. But Appdata is not updated accordingly, needs to be fixed.
+            if (val < Appdata.imgW ) {
+              // !VA Do nothing for now, see above.
+            } else if (val > maxViewerWidth ) {
+              // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px - and the user-entered value exceeds this, so error.
+              isErr = true;
+              errCode = 'viewerW_GT_maxViewerWidth';
+            } else {
+              // !VA first write val to the viewerW input's value
+              // document.querySelector(dynamicRegions.imgViewer).value = val;
+              // !VA  The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running calcViewerSize. So, return no error and continue in handleKeyup.
+              isErr = false;
+            }
+            break;
+            // !VA Handle the imagewidth toolButton input
+          case (prop === 'imgW') :
+              // !VA If the new image width is greater than the viewer width, then show message. 
+              if (val > Appdata.viewerW ) {
+                // !VA errorHandler!
+                isErr = true;
+                errCode = 'imgW_GT_viewerW';
+              }
+              break;
+          // !VA TODO: Handle the imageheight toolButton input
+          case (prop === 'imgW') :
+              console.log('Error handling for imagewidth input not implemented!');
+              break;
+
+              // !VA TODO: Handle the small phone input
+          case (prop === 'sPhoneW') :
+              console.log('Error handling for sPhonesW input not implemented!');
+            break;
+          
+          // !VA Handle the small phone input
+          case (prop === 'sPhoneW') :
+              console.log('Error handling for imagewidth input not implemented!');
+              break;
+        }
+      } 
+
+      if (isErr) {
+        // !VA IF Error pass the code to errorHandler to get the error message
+        appController.initError(isErr, errCode);
+      } else {
+        // !VA If no error, pass false back to handleKeyup and continue.
+        isErr = false;
+      }
+      return isErr;
+
+    }
 
     // !VA appController private evalToolbarInput
     // !VA args is the target, prop and val passed in from handleKeyUp and handleMouseEvents. 
@@ -892,7 +965,6 @@ var Witty = (function () {
       console.log('evalToolbarInput');
       // !VA ES6 Destructure args into constants.
       const { target, prop, val } = args;
-      // !VA HERE!
       // !VA Get Appdata properties.
       var Appdata = {};
       // !VA All we really need here is Appdata.aspect. Everything else is calculated based on the user's input.
@@ -938,9 +1010,39 @@ var Witty = (function () {
       calcViewerSize();
     }
 
+    function updateAppdata( ...params ) {
+      console.log('updateAppdata running');
+      var Appdata = {};
+      var prop, val;
+      
+      // !VA Each param pair is a property name prop and a value val. evalToolbarInput passes in one or more such pairs whose corresponding Appdata DOM element/data attribute has to be updated. So, loop through the argument arrays and update the corresponding DOM elements
+      for (let i = 0; i < params.length; i++) {
+      console.log('params[i] is: ' + params[i]);
+          prop = params[i][0];
+          val = params[i][1];
+          console.log('prop is: ' + prop);
+          console.log('val is: ' + val);
+          switch(true) {
+          case prop === 'viewerW' :
+            document.querySelector(dynamicRegions.imgViewer).style.width = val + 'px';  
+            break;
+          case prop === 'imgW' :
+            document.querySelector(dynamicRegions.curImg).style.width = val + 'px';
+          break;
+          case prop === 'imgH' :
+            document.querySelector(dynamicRegions.curImg).style.height = val + 'px';
+          break;
+          case prop === 'sPhoneW' :
+            document.querySelector(toolButtons.sPhonesW).setAttribute('data-sphonesw') = val + 'px';
+          break;
+          case prop === 'lPhoneW ' :
+            document.querySelector(toolButtons.lPhonesW).setAttribute('data-lphonesw') = val + 'px';
+          break;
+        }
+      }
 
-
-
+      Appdata = appController.getAppdata(false);
+    }
 
     // !VA NEW appController private calcViewerSize
     // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH
@@ -1022,8 +1124,6 @@ var Witty = (function () {
       }
       // !VA Transfer control to UIController to print dimViewer to the UI
       resizeContainers(viewerH, Appdata.imgW, Appdata.imgH );
-
-
     }
 
     // !VA appController private doContainerHeights
@@ -1038,7 +1138,6 @@ var Witty = (function () {
       // !VA I'm not even sure this is necessary since we're getting the viewerW from maxViewerHeight now -- but we'll leave it in here for the time being. 
       // !VA The viewport is 145px taller than the imgViewer. 
       if (imgH <= initViewerH) {
-
         viewerH = initViewerH;
         viewportH = viewerH + 145;
       } else {
@@ -1048,7 +1147,7 @@ var Witty = (function () {
       }
       appH = viewportH;
       document.querySelector(dynamicRegions.curImg).style.width = imgW + 'px';
-      document.querySelector(dynamicRegions.curImg).style.height =imgH + 'px';;
+      document.querySelector(dynamicRegions.curImg).style.height =imgH + 'px';
       document.querySelector(dynamicRegions.imgViewer).style.height = viewerH + 'px';
       document.querySelector(dynamicRegions.imgViewport).style.height = viewportH + 'px';
       document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';;
@@ -1083,155 +1182,9 @@ var Witty = (function () {
       }();
       return [aspectReal, aspectInt];  
     }
-    
-    // appController private intToPx: CONVERT INTEGER TO PIXEL VALUE
-    // !VA TODO: Probably unused, delete
-    function intToPx(int) {
-      let pxval;
-      let str = String(int);
-      pxval = str + 'px';
-      return pxval;
-    }
-
-    // !VA NEW Parsing keyboard input based on Appdata property passed in from handleKeyup.
-    // !VA TODO: rename to checkUserInput and include parsing of the toolbutton mouseclicks from handleToolbarClicks.
-    function checkUserInput(args) {
-      console.log('checkUserInput running');
-      console.dir(args);
-      // !VA Destructure args
-      const { target, prop, val } = args;
-      var errCode;
-      var isErr;
-      isErr = false;
-      var Appdata= {};
-      Appdata = appController.getAppdata();
-      // !VA TODO: Setting maxViewerWidth just for now
-      var maxViewerWidth = 800;
-
-      // !VA First, we validate that the user-entered value is an integer and if so, set the error variables.
-      if (validateInteger(val)) {
-        // !VA NOTE: This is where we could easily trap the negative button increment if it falls below 0 to send a different message than just the standard 'not_Integer' message. Revisit.
-        errCode = 'not_Integer';
-        isErr = true;
-      } else {
-        // !VA Now, we handle the error cases if user has entered a value in the imgViewer field 
-        switch (true) {
-          case (prop === 'viewerW') :
-            // !VA The user has selected a viewerW that's smaller than the currently displayed image. Undetermined how to deal with this but for now the current image is shrunk to the selected viewerW. But Appdata is not updated accordingly, needs to be fixed.
-            if (val < Appdata.imgW ) {
-              // !VA Do nothing for now, see above.
-            } else if (val > maxViewerWidth ) {
-              // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px - and the user-entered value exceeds this, so error.
-              isErr = true;
-              errCode = 'viewerW_GT_maxViewerWidth';
-            } else {
-              // !VA first write val to the viewerW input's value
-              // document.querySelector(dynamicRegions.imgViewer).value = val;
-              // !VA  The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running calcViewerSize. So, return no error and continue in handleKeyup.
-              isErr = false;
-            }
-            break;
-            // !VA Handle the imagewidth toolButton input
-          case (prop === 'imgW') :
-              // !VA If the new image width is greater than the viewer width, then show message. 
-              if (val > Appdata.viewerW ) {
-                // !VA errorHandler!
-                isErr = true;
-                errCode = 'imgW_GT_viewerW';
-              }
-              break;
-          // !VA TODO: Handle the imageheight toolButton input
-          case (prop === 'imgW') :
-              console.log('Error handling for imagewidth input not implemented!');
-              break;
-
-              // !VA TODO: Handle the small phone input
-          case (prop === 'sPhoneW') :
-              console.log('Error handling for sPhonesW input not implemented!');
-            break;
-          
-          // !VA Handle the small phone input
-          case (prop === 'sPhoneW') :
-              console.log('Error handling for imagewidth input not implemented!');
-              break;
-        }
-      } 
-
-      if (isErr) {
-        // !VA IF Error pass the code to errorHandler to get the error message
-        appController.initError(isErr, errCode);
-      } else {
-        // !VA If no error, pass false back to handleKeyup and continue.
-        isErr = false;
-      }
-      return isErr;
-
-    }
-          
-
 
     // !VA NEW So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. Here, there are 5 mutable elements and 5 properties. Only one of the properties has changed. So we loop through them all, find the match for the prop argument, then update only the element/data property that matches. This is a mickey-mouse solution but it works for now. Ideally we will pass in a key/value pair including the property name and the ID alias so we can use properties... in case there are more than one.
-    function updateAppdata( ...params ) {
-      console.log('updateAppdata running');
-      var Appdata = {};
-      console.log('params is: ');
-      console.dir(params);
-      var prop, val;
-      
 
-      for (let i = 0; i < params.length; i++) {
-      console.log('params[i] is: ' + params[i]);
-          prop = params[i][0];
-          val = params[i][1];
-          console.log('prop is: ' + prop);
-          console.log('val is: ' + val);
-          switch(true) {
-          case prop === 'viewerW' :
-            document.querySelector(dynamicRegions.imgViewer).style.width = val + 'px';  
-            break;
-          case prop === 'imgW' :
-            document.querySelector(dynamicRegions.curImg).style.width = val + 'px';
-          break;
-          case prop === 'imgH' :
-            document.querySelector(dynamicRegions.curImg).style.height = val + 'px';
-          break;
-          case prop === 'sPhoneW' :
-            document.querySelector(toolButtons.sPhonesW).setAttribute('data-sphonesw') = val + 'px';
-          break;
-          case prop === 'lPhoneW ' :
-            document.querySelector(toolButtons.lPhonesW).setAttribute('data-lphonesw') = val + 'px';
-          break;
-        }
-
-
-      }
-
-
-      // !VA Set an array with the mutable Appdata proerty names. These are the properties that get their values direcly from DOM elements, which are queried as needed by getAppdata. All the other Appdata properties are derived from these five.
-      // var props = [];
-      // props = ['viewerW', 'imgW', 'imgH', 'sPhonesW', 'lPhonesH']
-
-      // for (let i = 0; i < props.length; i++) {
-      //   switch(true) {
-      //     case prop === 'viewerW' :
-      //       document.querySelector(dynamicRegions.imgViewer).style.width = val + 'px';  
-      //       break;
-      //     case prop === 'imgW' :
-      //       document.querySelector(dynamicRegions.curImg).style.width = val + 'px';
-      //     break;
-      //     case prop === 'imgH' :
-      //       document.querySelector(dynamicRegions.curImg).style.height = val + 'px';
-      //     break;
-      //     case prop === 'sPhoneW' :
-      //       document.querySelector(toolButtons.sPhonesW).setAttribute('data-sphonesw') = val + 'px';
-      //     break;
-      //     case prop === 'lPhoneW ' :
-      //       document.querySelector(toolButtons.lPhonesW).setAttribute('data-lphonesw') = val + 'px';
-      //     break;
-      //   }
-      // }
-      Appdata = appController.getAppdata(false);
-    }
 
     // !VA CCP Functions
     // !VA appController private initCCP
@@ -1355,7 +1308,6 @@ var Witty = (function () {
           viewerW_GT_maxViewerWidth: `The container table width can't be greater than the width of the app itself &mdash; 800px.`,
           not_an_integer: 'Not an integer: please enter a positive whole number for width.'
         };
-
 
         // !VA Loop through the error ID/message pairs and find the match
         for (const [key, value] of Object.entries(errorMessages)) { 
