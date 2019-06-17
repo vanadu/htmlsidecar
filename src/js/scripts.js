@@ -1390,6 +1390,8 @@ var Witty = (function () {
       filename = filename[filename.length - 1];
       // !VA Write the filename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
       document.querySelector(dimViewers.filename).textContent = filename;
+
+      
       // !VA Get the dev image's NW and NH from the DOM. We do NOT write this to Appdata now because 
       // imgW = document.querySelector(dynamicRegions.curImg).naturalWidth;
       // imgH = document.querySelector(dynamicRegions.curImg).naturalHeight;
