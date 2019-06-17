@@ -2,7 +2,7 @@
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
 06.17.19
-TODO: Fold handleToolbarClicks into checkKeyboardInput and rename to checkUserInput
+TODO: Fold handleToolbarClicks into checkUserInput and rename to checkUserInput
 Branch checkUserInput
 
 
@@ -29,7 +29,7 @@ DONE: Branch rewriteHandleUserAction061119
 DONE: Fix that smallphones and largephones input fields show undefined and show in Appdata as pixel values.
 DONE: Fix default value in viewerW field - Fixed, added to calcViewerSize
 DONE: resize viewerW doesn't work Fixed, reconfigured updateAppdata to include viewerW
-DONE: - imgheight and imgwidth don't work Fixed, added evalToolbarInput to follow checkKeyboardInput
+DONE: - imgheight and imgwidth don't work Fixed, added evalToolbarInput to follow checkUserInput
 DONE: Rename UI.
 DONE: Show/Hide CCP, make checkboxes functional.
 */
@@ -781,16 +781,38 @@ var Witty = (function () {
         // !VA Carryover from earlier handleUserAction
         // !VA Get the target element of the click
         el = document.getElementById(this.id);
+
         // !VA Handle the increment toolbuttons
         if (event.type === 'click') {
           switch (true) {
             case ( el.id.includes('tb-but')) :
-              var val;
+              // !VA Variable to hold the name of the Appdata property the event corresponds to
+              var prop;
+              // !VA We need to query Appdata properties to get the current value of imgW so we can add the toolbutton increments to id
+              var Appdata = {};
+              Appdata = appController.getAppdata();
+              // !VA This is a click on one of the toolbutton increment buttons, so we're dealing with the Appdata.imgW property.
+              prop = 'imgW';
               // !VA The last 2 chars of the id indicate the value by which the img dimension should be incremented,so get the last 2 chars and convert to integer
               val = parseInt(el.id.slice(-2));
               // !VA If the target ID includes 'grow' then the image dimension will be incremented, if 'shrink' then it will be decremented
               (el.id.includes('grow')) ? val : val = -val;
-              handleToolbarClicks(el.id, val);
+              // !VA Add val to the current imgW to get the value to be passed to checkUserInput for error parsing.
+              val = Appdata.imgW + val;
+              console.log('in handleMouseEvents');
+              console.log('val is: ' + val);
+              // !VA HERE!
+              isErr = checkUserInput(prop, val);
+              console.log('isErr is: ' + isErr);
+              if (isErr) {
+                // !VA If it returns an error, select the input and show the error message so the user can correct it or ESC out of the field.
+                console.log('handleMouseEvents: ERROR MESSAGE SHOULD BE SHOWN NOW!');
+                // !VA Post-error button handling?
+              } else {
+                // !VA If no error, pass the Appdata property name and the entered value for further processing.
+                // !VA NOTE: We might have to include the target ID in the error handling because this button should trigger a different message than the keyboard message. Revisit.
+                evalToolbarInput(prop, val);
+              } 
               break;
           }
           // !VA TODO: Revisit this
@@ -822,7 +844,7 @@ var Witty = (function () {
         target = el.id;
         // !VA Get the Appdata property that corresponds to the target input element.
         var prop = elementIdToAppdataProp(target);
-        // !VA Initalize boolean that notifies of error status after checkKeyboardInput
+        // !VA Initalize boolean that notifies of error status after checkUserInput
         var isErr;
         // !VA Find out which key was struck
         keyup = evt.which || evt.keyCode || evt.key;
@@ -842,9 +864,10 @@ var Witty = (function () {
         }
         if (keyup == 13 ) {
           // !VA Get the input and evaluate it. 
-          isErr = checkKeyboardInput(prop, el.value);
+          isErr = checkUserInput(prop, el.value);
           if (isErr) {
             // !VA If it returns an error, select the input and show the error message so the user can correct it or ESC out of the field.
+            console.log('ERROR MESSAGE SHOULD BE SHOWN NOW!');
             this.select();
           } else {
             // !VA If no error, pass the Appdata property name and the entered value for further processing.
@@ -855,7 +878,8 @@ var Witty = (function () {
 
     // !VA appController private handleToolbarClicks
     // !VA Handle the increment buttons on the toolbar, called by handleMouseEvents
-    // !VA TODO: THis needs to be folded into checkKeyboardInput., 
+    // !VA TODO: THis needs to be folded into checkUserInput., 
+    // !VA DONE: Deprecated 06/17
     function handleToolbarClicks(id, val) {
       // !VA Get the Appdata properties
       var Appdata = {};
@@ -1078,8 +1102,10 @@ var Witty = (function () {
 
     // !VA NEW Parsing keyboard input based on Appdata property passed in from handleKeyup.
     // !VA TODO: rename to checkUserInput and include parsing of the toolbutton mouseclicks from handleToolbarClicks.
-    function checkKeyboardInput(prop, val) {
-      console.log('checkKeyboardInput running');
+    function checkUserInput(prop, val) {
+      console.log('checkUserInput running');
+      console.log('prop is: ' + prop);
+      console.log('val is: ' + val);
       var errCode;
       var isErr;
       isErr = false;
@@ -1090,6 +1116,7 @@ var Witty = (function () {
 
       // !VA First, we validate that the user-entered value is an integer and if so, set the error variables.
       if (validateInteger(val)) {
+        // !VA NOTE: This is where we could easily trap the negative button increment if it falls below 0 to send a different message than just the standard 'not_Integer' message. Revisit.
         errCode = 'not_Integer';
         isErr = true;
       } else {
@@ -1446,7 +1473,6 @@ var Witty = (function () {
         dynamicRegions = UICtrl.getDynamicRegionIDs();
         dimViewers = UICtrl.getDimViewerIDs();
         // !VA NEW Read required values into Appdata.
-        // !VA NOW!
         Appdata.filename = document.querySelector(dimViewers.filename).textContent;
 
 
