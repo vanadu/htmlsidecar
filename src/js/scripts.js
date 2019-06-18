@@ -533,8 +533,8 @@ var Witty = (function () {
       // Drag and Drop Listener 
       //DRAG AND DROP PROCESSING END
 
-      // !VA This was in the old version but it doesn't look necessary
-      // function initializeHandlers() {
+    // !VA This was in the old version but it doesn't look necessary
+    // function initializeHandlers() {
 
       //EVENT HANDLING START 
       function addEventHandler(oNode, evt, oFunc, bCaptures) {
@@ -597,14 +597,7 @@ var Witty = (function () {
         addEventHandler((dvClickables[i]),'click',initCCP,false);
       }
 
-      // !VA appController private handleFocus
-      // !VA Handle behavior when an element gets the focus. Pertains only to keyboard input, actually, I'm not sure whether buttons or CCP elements need special handling.
-      function handleFocus(evt) {
-        // !VA Get the target element of the click
-        el = document.getElementById(this.id);
-        // !VA Select the clicked element's value, or if there's no value, set it to empty with a cursor, which is the default select behavior for empty fields.
-        this.select();
-      }
+
 
       // Click handlers - Misc
       // =============================
@@ -638,8 +631,7 @@ var Witty = (function () {
 
     // !VA appController private functions
     //  ==============================
-    // appController private: remove current image
-    // !VA Test for whether there is already a #cur-img element in the DOM, and if there is remove it so handleFileSelect can overwrite it without having to refresh the page to reboot the app.
+
 
 
     // appController private: hfs - FILEREADER OBJECT PROCESSING
@@ -772,142 +764,168 @@ var Witty = (function () {
       reader.readAsDataURL(f);
     }
     //FILEREADER OBJECT PROCESSING END
-
-          
+            
     // !VA INPUT HANDLING
     // !VA ============================================================
 
+    // !VA appController private handleFocus
+    // !VA Handle behavior when an element gets the focus. Pertains only to keyboard input, actually, I'm not sure whether buttons or CCP elements need special handling.
+    function handleFocus(evt) {
+      // !VA Get the target element of the click
+      el = document.getElementById(this.id);
+      // !VA Select the clicked element's value, or if there's no value, set it to empty with a cursor, which is the default select behavior for empty fields.
+      this.select();
+    }
 
-      // !VA Branch rewriteHandleUserAction061119 
-      // !VA appController private handleMouseEvents. Preprocess mouse events and route them to respective eval handler.
-      function handleMouseEvents(evt) {
-        console.log('handleMouseEvents');
-        // !VA Carryover from earlier handleUserAction
-        // !VA Get the target element of the click
-        el = document.getElementById(this.id);
-        var args = { };
-        args.target = el.id;
-        
-        
-        // !VA Handle the increment toolbuttons
-        if (event.type === 'click') {
-          switch (true) {
-            case ( el.id.includes('tb-but')) :
-              // !VA Variable to hold the name of the Appdata property the event corresponds to
-              var prop, val;
-              // !VA We need to query Appdata properties to get the current value of imgW so we can add the toolbutton increments to id
-              var Appdata = {};
-              Appdata = appController.getAppdata();
-              // !VA This is a click on one of the toolbutton increment buttons, so we're dealing with the Appdata.imgW property.
-              args.prop = 'imgW';
-              // !VA The last 2 chars of the id indicate the value by which the img dimension should be incremented,so get the last 2 chars and convert to integer
-              val = parseInt(el.id.slice(-2));
-              // !VA If the target ID includes 'grow' then the image dimension will be incremented, if 'shrink' then it will be decremented
-              (el.id.includes('grow')) ? val : val = -val;
-              // !VA Add val to the current imgW to get the value to be passed to checkUserInput for error parsing.
-              val = Appdata.imgW + val;
-              args.val = val;
-              isErr = checkUserInput(args);
-              if (isErr) {
-                // !VA If it returns an error, select the input and show the error message so the user can correct it or ESC out of the field.
-                console.log('handleMouseEvents: ERROR MESSAGE SHOULD BE SHOWN NOW!');
-                // !VA Post-error button handling?
-              } else {
-                // !VA If no error, pass the Appdata property name and the entered value for further processing.
-                // !VA NOTE: We might have to include the target ID in the error handling because this button should trigger a different message than the keyboard message. Revisit.
-                // !VA Passing arguments as object
-                evalToolbarInput(args);
-              } 
-              break;
-            }
-            // !VA TODO: Revisit this
-          }  else if ( event.type === 'drop') {
-            e.preventDefault;
-            // !VA TODO: Revisit this
-          } else if ( event.type === 'dragover') {
-            e.preventDefault;
-          } 
-        }
-        
-        // !VA appController private function
-
-        // !VA NOTE: This isn't DRY -- should remove the duplicate sections from handleKeyup and make a separate function.
-        function handleKeydown(evt) {
-          var el;
-          var args = { };
-          var isErr;
-          el = document.getElementById(this.id);
-          // !VA Args is target, prop, val
-          args.target = el.id;
-          args.val = this.value;
-          args.prop = elementIdToAppdataProp(this.id);
-
-          
-          // !VA Error messages dont' work -- the below came from handleUserAction before I deleted it.
-          var appMessContainer = document.querySelector(staticRegions.appMessContainer);
-          var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
-          if (appMessDisplay.textContent) {
-            // !VA On any event, if errorViewerContainer is showing, hide it.
-            appMessContainer.classList.remove('show-err');
-            appMessContainer.classList.add('hide-err');
-          }
-          keydown = evt.which || evt.keyCode || evt.key;
-          var isTab;
-          if (keydown == 9 || keydown == 13 ) {
-            // !VA Set a flag if the the Tab key was pressed
-            (keydown == 9) ? isTab = true : isTab = false;
+    // !VA Branch rewriteHandleUserAction061119 
+    // !VA appController private handleMouseEvents. Preprocess mouse events and route them to respective eval handler.
+    function handleMouseEvents(evt) {
+      console.log('handleMouseEvents');
+      // !VA Carryover from earlier handleUserAction
+      // !VA Get the target element of the click
+      el = document.getElementById(this.id);
+      var args = { };
+      args.target = el.id;
+      
+      
+      // !VA Handle the increment toolbuttons
+      if (event.type === 'click') {
+        switch (true) {
+          case ( el.id.includes('tb-but')) :
+            // !VA Variable to hold the name of the Appdata property the event corresponds to
+            var prop, val;
+            // !VA We need to query Appdata properties to get the current value of imgW so we can add the toolbutton increments to id
+            var Appdata = {};
+            Appdata = appController.getAppdata();
+            // !VA This is a click on one of the toolbutton increment buttons, so we're dealing with the Appdata.imgW property.
+            args.prop = 'imgW';
+            // !VA The last 2 chars of the id indicate the value by which the img dimension should be incremented,so get the last 2 chars and convert to integer
+            val = parseInt(el.id.slice(-2));
+            // !VA If the target ID includes 'grow' then the image dimension will be incremented, if 'shrink' then it will be decremented
+            (el.id.includes('grow')) ? val : val = -val;
+            // !VA Add val to the current imgW to get the value to be passed to checkUserInput for error parsing.
+            val = Appdata.imgW + val;
+            args.val = val;
             isErr = checkUserInput(args);
-            console.log('tab pressed');
-            // isErr = checkUserInput(args);
-            console.log('isErr is: ' + isErr);
             if (isErr) {
               // !VA If it returns an error, select the input and show the error message so the user can correct it or ESC out of the field.
-              console.log('ERROR MESSAGE SHOULD BE SHOWN NOW!');
-              evt.preventDefault();
-              this.select();
+              console.log('handleMouseEvents: ERROR MESSAGE SHOULD BE SHOWN NOW!');
+              // !VA Post-error button handling?
             } else {
-
-              // !VA If the value was entered in the imgW or imgH field... 
-              if (args.prop === 'imgW' || args.prop === 'imgH') {
-                // !VA If the Tab key pressed, then remove the value to display the placeholder. Otherwise, stay in the field and select the value
-                isTab ? this.value = ('') : this.select();
-              // !VA For viewerW, sPhonesW and lPhonesW, on Enter we want to stay in the field and display the value so the user can change it after seeing the resulting image size change.
-              } else {
-                this.select();
-              }
+              // !VA If no error, pass the Appdata property name and the entered value for further processing.
+              // !VA NOTE: We might have to include the target ID in the error handling because this button should trigger a different message than the keyboard message. Revisit.
+              // !VA Passing arguments as object
+              evalToolbarInput(args);
             } 
+            break;
+          }
+          // !VA TODO: Revisit this
+        }  else if ( event.type === 'drop') {
+          e.preventDefault;
+          // !VA TODO: Revisit this
+        } else if ( event.type === 'dragover') {
+          e.preventDefault;
+        } 
+    }
+          
+    // !VA appController private function
+
+    // !VA NOTE: This isn't DRY -- should remove the duplicate sections from handleKeyup and make a separate function.
+    function handleKeydown(evt) {
+      // !VA Get the keypress
+      keydown = evt.which || evt.keyCode || evt.key;
+      // !VA Only set vars and get values if Tab and Enter keys were pressed
+      if (keydown == 9 || keydown == 13 ) {
+        var el, isErr, isEnter, isTab
+        var args = { }, Appdata = { };
+        // !VA We need Appdata to restore fields to previous values on error or tabbing through fields without changing their values.
+        Appdata = appController.getAppdata();
+        // !VA Get the target element
+        el = document.getElementById(this.id);
+        // !VA Args is target, prop, val
+        args.target = el.id;
+        args.val = this.value;
+        args.prop = elementIdToAppdataProp(this.id);
+        // !VA Set a flag if the the Enter key was pressed, for readability
+        (keydown == 13) ? isEnter = true : isEnter = false;
+        // !VA Set a flag if the the Tab key was pressed, for readability
+        (keydown == 9) ? isTab = true : isTab = false;
+        // !VA If Tab was pressed and this.value is either empty or equals the Appdata value, then there's been no change to the field, so let Tab just cycle through the fields as per its default.
+
+
+        if ((isTab) && ((this.value === '' || this.value == Appdata[args.prop]))) {
+          // !VA Only if imgW or imgH, delete the existing value to display the placeholders
+          if (args.prop === 'imgW' || args.prop === 'imgH') {
+            this.onblur = function() {
+              this.value = '';
+            };
+          }
+        } else {
+          // !VA Field value was changed, so first, pass the args to checkUserInput for errors.
+          isErr = checkUserInput(args);
+          if (isErr) {
+            // !VA If it returns an error, select the input and show the error message so the user can correct it or ESC out of the field. If Tab, prevent advancing to the next field until the error is corrected or ESC is pressed.
+            isEnter ? isEnter : evt.preventDefault(); 
+            console.log('Not an integer, enter an integer or ESC to leave the input field.');
+              // !VA We have to leave the bad value in the field so the user can correct it or press Esc to blur without change.  
+              this.select();
+          } else {
+              console.log('not error');
+              // !VA If the value was entered in the imgW or imgH field, show the value selected first so the user can view and change it before implementing. Only on Tab can the value be implemented and advance to the next field.
+              if (args.prop === 'imgW' || args.prop === 'imgH') {
+                if (isEnter) {
+                  this.select();
+                } else {
+                console.log('tab pressed');
+                this.value = '';
+                this.blur();
+          }
+              // !VA For viewerW, sPhonesW and lPhonesW, on Enter we want to stay in the field and display the value so the user can change it after seeing the resulting image size change. On Tab, we want to keep the value and Tab to the next field. In either case:
+              // this.select();
+        }
             // !VA Pass the target, prop and value to evalToolbarInput.
             Appdata = evalToolbarInput(args);
-          }
+          
+          
+          
+          
+          
         }
+            
 
 
-        
-        // !VA appController private handleKeyup
-        // !VA keyPress handler for the ESC key.  This has to be handled on keyup, so we need a separate handler for it.
-        function handleKeyup(evt) {
-        var el, prop;
-        // !VA Get the target input element
-        el = document.getElementById(this.id);
-        // !VA We only need the property here, so no need to create an args object. We could actually just use the target but since we're standardizing on property names, let's stick with that.
-        prop = elementIdToAppdataProp(this.id);
-        // !VA Find out which key was struck
-        keyup = evt.which || evt.keyCode || evt.key;
-        // !VA Get the current Appdata object because we need the previous Appdata value to restore when the ESC key is pressed
-        var Appdata = appController.getAppdata();
-        // !VA  On ESC, we want imgW and imgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the dimViewers and there's no need to recalc the W and H each time the user makes and entry - that would just be confusing. 
-        if (keyup == 27 ) {
-          // !VA If the value was entered into the W or H field, escape out of the field and reset the values to the placeholders
-          if (prop === 'imgW' || prop === 'imgH') {
-            this.value = ('');
-            this.blur();
-          // !VA For viewerW, sPhonesW and lPhonesW we want to exit the field and restore the preexisting value from Appdata.
-          } else {
-            this.value = Appdata[prop];
-            this.blur();
-          }
+
+
+
+        } 
+      }
+    }
+
+    // !VA appController private handleKeyup
+    // !VA keyPress handler for the ESC key.  This has to be handled on keyup, so we need a separate handler for it.
+    function handleKeyup(evt) {
+      var el, prop;
+      // !VA Get the target input element
+      el = document.getElementById(this.id);
+      // !VA We only need the property here, so no need to create an args object. We could actually just use the target but since we're standardizing on property names, let's stick with that.
+      prop = elementIdToAppdataProp(this.id);
+      // !VA Find out which key was struck
+      keyup = evt.which || evt.keyCode || evt.key;
+      // !VA Get the current Appdata object because we need the previous Appdata value to restore when the ESC key is pressed
+      var Appdata = appController.getAppdata();
+      // !VA  On ESC, we want imgW and imgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the dimViewers and there's no need to recalc the W and H each time the user makes and entry - that would just be confusing. 
+      if (keyup == 27 ) {
+        // !VA If the value was entered into the W or H field, escape out of the field and reset the values to the placeholders
+        if (prop === 'imgW' || prop === 'imgH') {
+          this.value = ('');
+          this.blur();
+        // !VA For viewerW, sPhonesW and lPhonesW we want to exit the field and restore the preexisting value from Appdata.
+        } else {
+          this.value = Appdata[prop];
+          this.blur();
         }
       }
+    }
 
     // !VA NEW Parsing keyboard input based on Appdata property passed in from handleKeyup.
     // !VA TODO: rename to checkUserInput and include parsing of the toolbutton mouseclicks from handleToolbarClicks.
@@ -1176,8 +1194,7 @@ var Witty = (function () {
       // !VA Now that the image and its containers are written to the DOM, go ahead and write the dimViewers.
       UICtrl.writeDimViewers();
     }
-
-    
+      
     //appController private: getAspectRatio
     function getAspectRatio (var1, var2) {
       var aspectReal = (var1 / var2);
@@ -1244,7 +1261,7 @@ var Witty = (function () {
 
       }
     }
-    
+      
     // !VA  appController: Toggle checkboxes and run any associated actions
     function handleCCPInput(event) {
       console.log('handleCCPInput running');
@@ -1318,44 +1335,44 @@ var Witty = (function () {
 
     //  !VA ERROR HANDLING
     // ==============================
-      var errorHandler = function(isErr, errCode) {
-        console.log('errorHandler running');
-        var Appdata = appController.getAppdata();
-        var errorMessages = {
-          not_Integer: 'This value has to be a positive whole number - try again.',
-          imgW_GT_viewerW: `The image width has to be less than the width of its container table, which is now&nbsp;set&nbsp;to&nbsp;${Appdata.viewerW}px.`,
-          tbButton_LT_zero: 'Sorry, that would make one of the image dimensions less than 0.',
-          tbButton_GT_viewerW: `Sorry, that would make the image wider than its container, which is currently set at ${Appdata.viewerW}px`,
-          // !VA maxViewerWidth issue here, see message below;
-          viewerW_GT_maxViewerWidth: `The container table width can't be greater than the width of the app itself &mdash; 800px.`,
-          not_an_integer: 'Not an integer: please enter a positive whole number for width.'
-        };
-
-        // !VA Loop through the error ID/message pairs and find the match
-        for (const [key, value] of Object.entries(errorMessages)) { 
-          if (key === errCode ) {
-            showAppMessage(value);
-          }
-        }
-        return true;
+    var errorHandler = function(isErr, errCode) {
+      console.log('errorHandler running');
+      var Appdata = appController.getAppdata();
+      var errorMessages = {
+        not_Integer: 'This value has to be a positive whole number - try again or press ESC.',
+        imgW_GT_viewerW: `The image width has to be less than the width of its container table, which is now&nbsp;set&nbsp;to&nbsp;${Appdata.viewerW}px.`,
+        tbButton_LT_zero: 'Sorry, that would make one of the image dimensions less than 0.',
+        tbButton_GT_viewerW: `Sorry, that would make the image wider than its container, which is currently set at ${Appdata.viewerW}px`,
+        // !VA maxViewerWidth issue here, see message below;
+        viewerW_GT_maxViewerWidth: `The container table width can't be greater than the width of the app itself &mdash; 800px.`,
+        not_an_integer: 'Not an integer: please enter a positive whole number for width.'
       };
 
-      // !VA Might be good to fold this into error handling
-      // appController private validateInteger
-      function validateInteger(inputVal) {
-        // !VA Since integer validation is used for all height/width input fields, including those not yet implemented
-        let isErr;
-        // let mess;
-        if (!parseInt(inputVal, 10) || inputVal % 1 !== 0 || inputVal < 0) {
-          isErr = true;
-        } else { 
-          // !VA Input fields return strings, so convert to integer
-          inputVal = parseInt(inputVal);
-          isErr = false;
+      // !VA Loop through the error ID/message pairs and find the match
+      for (const [key, value] of Object.entries(errorMessages)) { 
+        if (key === errCode ) {
+          showAppMessage(value);
         }
-        // !VA Just returning true here, the error code is sent by the calling function in handleUserAction
-        return isErr;
       }
+      return true;
+    };
+
+    // !VA Might be good to fold this into error handling
+    // appController private validateInteger
+    function validateInteger(inputVal) {
+      // !VA Since integer validation is used for all height/width input fields, including those not yet implemented
+      let isErr;
+      // let mess;
+      if (!parseInt(inputVal, 10) || inputVal % 1 !== 0 || inputVal < 0) {
+        isErr = true;
+      } else { 
+        // !VA Input fields return strings, so convert to integer
+        inputVal = parseInt(inputVal);
+        isErr = false;
+      }
+      // !VA Just returning true here, the error code is sent by the calling function in handleUserAction
+      return isErr;
+    }
 
 
     // !VA appController private showAppMessage
@@ -1454,7 +1471,7 @@ var Witty = (function () {
       // !VA First, set it to the opposite of how you want to start it.
       document.querySelector(staticRegions.ccpContainer).classList.add('active');
       // !VA Then run initCCP to initialize
- 
+
       initCCP();
     };
 
