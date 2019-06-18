@@ -5,9 +5,6 @@
 
 TODO: rewrite getAppdata to only query specific items in the array, or at least use destructuring to only make a const out of which ever Appdata property is needed in the respective function.
 
-
-
-TODO: Rewrite updateAppdata to be parameters... with key/value pairs as parameter.
 TOD0: Think about making getAppdata only query a specific property if possible.
 TODO: Fix being able to resize viewerW smaller than imgW - current behavior is imgw resizes with viewerW. If that's the desired behavior, imgW still doesn't write the udpated width to Appdata, that needs to be fixed.
 TODO: Finish reviewing and implementing write to clipboard buttons.
@@ -1144,7 +1141,7 @@ var Witty = (function () {
         // Need a little buffer in the viewport
         viewerH = imgH;
         viewportH = imgH + 145;
-      }
+      } 
       appH = viewportH;
       document.querySelector(dynamicRegions.curImg).style.width = imgW + 'px';
       document.querySelector(dynamicRegions.curImg).style.height =imgH + 'px';
