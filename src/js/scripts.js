@@ -1,7 +1,11 @@
 
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
-06.17.19
+06.18.19
+Branch fixAppMessages
+
+TODO: imgW field on tab doesn't reset to placeholders. 
+
 
 TODO: rewrite getAppdata to only query specific items in the array, or at least use destructuring to only make a const out of which ever Appdata property is needed in the respective function.
 
@@ -559,6 +563,7 @@ var Witty = (function () {
         // !VA Handles all key events except TAB, which require keyDown to get the value of the current input rather than the input being tabbed to.
 
         // addEventHandler((tbKeypresses[i]),'keypress',handleKeypress,false);
+        addEventHandler((tbKeypresses[i]),'keydown',handleKeydown,false);
         addEventHandler((tbKeypresses[i]),'keyup',handleKeyup,false);
         addEventHandler((tbKeypresses[i]),'focus',handleFocus,false);
         // !VA Deprecated
@@ -824,60 +829,83 @@ var Witty = (function () {
           } 
         }
         
+        // !VA appController private function
+
+        // !VA NOTE: This isn't DRY -- should remove the duplicate sections from handleKeyup and make a separate function.
+        function handleKeydown(evt) {
+          var el;
+          var args = { };
+          var isErr;
+          el = document.getElementById(this.id);
+          // !VA Args is target, prop, val
+          args.target = el.id;
+          args.val = this.value;
+          args.prop = elementIdToAppdataProp(this.id);
+
+          
+          // !VA Error messages dont' work -- the below came from handleUserAction before I deleted it.
+          var appMessContainer = document.querySelector(staticRegions.appMessContainer);
+          var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
+          if (appMessDisplay.textContent) {
+            // !VA On any event, if errorViewerContainer is showing, hide it.
+            appMessContainer.classList.remove('show-err');
+            appMessContainer.classList.add('hide-err');
+          }
+          keydown = evt.which || evt.keyCode || evt.key;
+          var isTab;
+          if (keydown == 9 || keydown == 13 ) {
+            // !VA Set a flag if the the Tab key was pressed
+            (keydown == 9) ? isTab = true : isTab = false;
+            isErr = checkUserInput(args);
+            console.log('tab pressed');
+            // isErr = checkUserInput(args);
+            console.log('isErr is: ' + isErr);
+            if (isErr) {
+              // !VA If it returns an error, select the input and show the error message so the user can correct it or ESC out of the field.
+              console.log('ERROR MESSAGE SHOULD BE SHOWN NOW!');
+              evt.preventDefault();
+              this.select();
+            } else {
+
+              // !VA If the value was entered in the imgW or imgH field... 
+              if (args.prop === 'imgW' || args.prop === 'imgH') {
+                // !VA If the Tab key pressed, then remove the value to display the placeholder. Otherwise, stay in the field and select the value
+                isTab ? this.value = ('') : this.select();
+              // !VA For viewerW, sPhonesW and lPhonesW, on Enter we want to stay in the field and display the value so the user can change it after seeing the resulting image size change.
+              } else {
+                this.select();
+              }
+            } 
+            // !VA Pass the target, prop and value to evalToolbarInput.
+            Appdata = evalToolbarInput(args);
+          }
+        }
+
+
         
         // !VA appController private handleKeyup
-        // !VA Handle all keyboard input after the user has selected an image and handleFileSelect has added it to the DOM
+        // !VA keyPress handler for the ESC key.  This has to be handled on keyup, so we need a separate handler for it.
         function handleKeyup(evt) {
-          
-        // !VA Error messages dont' work -- the below came from handleUserAction before I deleted it.
-        var appMessContainer = document.querySelector(staticRegions.appMessContainer);
-        var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
-        if (appMessDisplay.textContent) {
-          // !VA On any event, if errorViewerContainer is showing, hide it.
-          appMessContainer.classList.remove('show-err');
-          appMessContainer.classList.add('hide-err');
-        }
-
+        var el, prop;
         // !VA Get the target input element
         el = document.getElementById(this.id);
-        // !VA Args is target, prop, val
-        var args = { };
-        args.target = el.id;
-
-        // !VA Get the Appdata property that corresponds to the target input element.
-        args.prop = elementIdToAppdataProp(this.id);
-        // !VA Write the user input into args.val
-        args.val = this.value;
-        // !VA Initalize boolean that notifies of error status after checkUserInput
-        var isErr;
+        // !VA We only need the property here, so no need to create an args object. We could actually just use the target but since we're standardizing on property names, let's stick with that.
+        prop = elementIdToAppdataProp(this.id);
         // !VA Find out which key was struck
         keyup = evt.which || evt.keyCode || evt.key;
-        // !VA Get the current Appdata object
+        // !VA Get the current Appdata object because we need the previous Appdata value to restore when the ESC key is pressed
         var Appdata = appController.getAppdata();
-        // !VA We need a separate conditional for ESC, ENTER and TAB.
-        // !VA  If ESC, we want imgW and imgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the dimViewers and there's no need to recalc the W and H each time the user makes and entry - that would just be confusing. 
+        // !VA  On ESC, we want imgW and imgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the dimViewers and there's no need to recalc the W and H each time the user makes and entry - that would just be confusing. 
         if (keyup == 27 ) {
-            // !VA If the value was entered into the W or H field, escape out of the field and reset the values to the placeholders
-            if (prop === 'imgW' || prop === 'imgH') {
-              this.value = ('');
-              this.blur();
-            // !VA For viewerW, sPhonesW and lPhonesW we want to exit the field and restore the preexisting value from Appdata.
-            } else {
-              this.value = Appdata[prop];
-              this.blur();
-            }
-        }
-        if (keyup == 13 ) {
-          // !VA Get the input and evaluate it. 
-          isErr = checkUserInput(args);
-          if (isErr) {
-            // !VA If it returns an error, select the input and show the error message so the user can correct it or ESC out of the field.
-            console.log('ERROR MESSAGE SHOULD BE SHOWN NOW!');
-            this.select();
+          // !VA If the value was entered into the W or H field, escape out of the field and reset the values to the placeholders
+          if (prop === 'imgW' || prop === 'imgH') {
+            this.value = ('');
+            this.blur();
+          // !VA For viewerW, sPhonesW and lPhonesW we want to exit the field and restore the preexisting value from Appdata.
           } else {
-            // !VA If no error, pass the target, prop and value to evalToolbarInput to evaluate it further.
-            Appdata = evalToolbarInput(args);
-          } 
+            this.value = Appdata[prop];
+            this.blur();
+          }
         }
       }
 
@@ -885,7 +913,6 @@ var Witty = (function () {
     // !VA TODO: rename to checkUserInput and include parsing of the toolbutton mouseclicks from handleToolbarClicks.
     function checkUserInput(args) {
       console.log('checkUserInput running');
-      console.dir(args);
       // !VA Destructure args
       const { target, prop, val } = args;
       var errCode;
@@ -959,7 +986,7 @@ var Witty = (function () {
     // !VA appController private evalToolbarInput
     // !VA args is the target, prop and val passed in from handleKeyUp and handleMouseEvents. 
     function evalToolbarInput(args) {
-      console.log('evalToolbarInput');
+      console.log('evalToolbarInput running');
       // !VA ES6 Destructure args into constants.
       const { target, prop, val } = args;
       // !VA Get Appdata properties.
@@ -972,6 +999,7 @@ var Witty = (function () {
         // !VA If the value was entered in the imgViewer field, just pass prop and val through to updateAppdata.
         case (prop === 'viewerW') :
           arg1 = [ prop, val ]
+          arg2 = '';
           break;          
 
         case (prop === 'imgW') :
@@ -1014,11 +1042,8 @@ var Witty = (function () {
       
       // !VA Each param pair is a property name prop and a value val. evalToolbarInput passes in one or more such pairs whose corresponding Appdata DOM element/data attribute has to be updated. So, loop through the argument arrays and update the corresponding DOM elements
       for (let i = 0; i < params.length; i++) {
-      console.log('params[i] is: ' + params[i]);
           prop = params[i][0];
           val = params[i][1];
-          console.log('prop is: ' + prop);
-          console.log('val is: ' + val);
           switch(true) {
           case prop === 'viewerW' :
             document.querySelector(dynamicRegions.imgViewer).style.width = val + 'px';  
@@ -1336,6 +1361,7 @@ var Witty = (function () {
     // !VA appController private showAppMessage
     // !VA Here we can show a message bypassing errorHandler - not all messages are errors.
     var showAppMessage = function(errMess) {
+      console.log('showAppMessage running');
       //Set the time the message will display
       // let displayTime;
       // Get the elements to manipulate for the error message display
@@ -1356,7 +1382,7 @@ var Witty = (function () {
       // document.getElementById(id).value = '';
       // appMessContainer.classList.remove('hide-err');
       // appMessContainer.classList.add('show-err');
-      console.log('Error: reset the value of the element to its original value and select it.');
+      // console.log('Error: reset the value of the element to its original value and select it.');
 
     };
 
