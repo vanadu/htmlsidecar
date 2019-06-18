@@ -279,45 +279,35 @@ var Witty = (function () {
 
       // UIController: Flash a status message in the app message area
       // !VA NEW - review this. We could probably fold this into the error handler but that's going to be complicated enough as it is and this is just for status messages
-      flashAppMessage: function(id) {
+      flashAppMessage: function(isErr, mess) {
+
+        console.log('flashAppMessage running');
+        console.log('isErr is: ' + isErr);
+        console.log('mess is: ' + mess);
         // !VA Passes in the id of the element that triggered the action for which a status message is displayed.
 
         // !VA Get the message container and display text into variables
         var appMessContainer = document.querySelector(staticRegions.appMessContainer);
         var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
         var ccpBlocker = document.querySelector(staticRegions.ccpBlocker);
-
-        // !VA TODO: These element IDs are hardcoded, but they should be aliased. Not sure how to do that...
-        var statusMessages = {
-          'ccp-img-build-html-but': '<img> HTML element copied to Clipboard',
-          'ccp-td-build-html-but': '<td> HTML element copied to Clipboard',
-          'ccp-table-build-html-but': '<table> HTML element copied to Clipboard',
-          'ccp-img-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard',
-          'ccp-img-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard',
-          'ccp-img-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard',
-          'ccp-td-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard!',
-          'ccp-td-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard',
-          'ccp-td-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard',
-          'ccp-table-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard',
-          'ccp-table-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard',
-          'ccp-table-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard',
-        };
+        var messType;
+        isErr ? messType = 'show-err' : messType = 'show-mess';
 
         // !VA First, overlay the CCP blocker to prevent user input while the CSS transitions run and the status message is displayed. Cheap, but effective solution.
         ccpBlocker.style.display = 'block';
 
         // !VA Add the class that displays the message
-        appMessContainer.classList.add('show-mess');
-        // !VA Loop through the status id/message pairs and find the match for the trigger
-        for (const [key, value] of Object.entries(statusMessages)) { 
-          if (key === id ) {
-            var mess = value;
-          }
-        }
+        appMessContainer.classList.add(messType);
+        // // !VA Loop through the status id/message pairs and find the match for the trigger
+        // for (const [key, value] of Object.entries(appMessages)) { 
+        //   if (key === id ) {
+        //     var mess = value;
+        //   }
+        // }
         // !VA Write the success message to the message display area
-        appMessDisplay.textContent = mess;
+        appMessDisplay.innerHTML = mess;
         // !VA Show the message
-        appMessContainer.classList.add('show-mess');
+        appMessContainer.classList.add(messType);
         // !VA Show the message for two seconds
         window.setTimeout(function() {
         // !VA After two seconds, hide the message and remove the blocker
@@ -325,7 +315,7 @@ var Witty = (function () {
           ccpBlocker.style.display = 'none';
           setTimeout(function(){
             // !VA Once the opacity transition for the message has completed, remove the show-mess class from the element and set the textContent back to empty
-            appMessContainer.classList.remove('show-mess');
+            appMessContainer.classList.remove(messType);
             appMessContainer.classList.remove('hide-mess');
             appMessDisplay.textContent = '';
 
@@ -566,6 +556,7 @@ var Witty = (function () {
         addEventHandler((tbKeypresses[i]),'keydown',handleKeydown,false);
         addEventHandler((tbKeypresses[i]),'keyup',handleKeyup,false);
         addEventHandler((tbKeypresses[i]),'focus',handleFocus,false);
+        addEventHandler((tbKeypresses[i]),'blur',handleBlur,false);
         // !VA Deprecated
         // addEventHandler(tbKeypresses[i],'blur',handleUserAction,false);
         // !VA TODO
@@ -777,6 +768,23 @@ var Witty = (function () {
       this.select();
     }
 
+    function handleBlur(evt) {
+      // !VA Handle blur
+      console.log('handleBlur running');
+      var Appdata = {};
+      Appdata = appController.getAppdata();
+      prop = elementIdToAppdataProp(this.id);
+      console.log('prop is: ' + prop);
+      // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appdata property.
+      // !VA NOTE: This can probably replace the blur statements in handleKeydown
+      if (prop === 'imgW' || prop === 'imgH') {
+          this.value = '';
+      } else {
+
+        this.value = Appdata[prop];
+      }
+    }
+
     // !VA Branch rewriteHandleUserAction061119 
     // !VA appController private handleMouseEvents. Preprocess mouse events and route them to respective eval handler.
     function handleMouseEvents(evt) {
@@ -829,8 +837,11 @@ var Witty = (function () {
     }
           
     // !VA appController private function
-
-    // !VA NOTE: This isn't DRY -- should remove the duplicate sections from handleKeyup and make a separate function.
+    /* !VA This is a bit complicated but it expresses non-default field behavior:
+      --imgW and imgH fields should never show entereed values but rather only placeholders. This is because they actual values are reflected upon entering in the DISPLAY SIZE dimViewers and because any value entered in one of the fields would require an aspect ratio calculation to display in the other one. So one of the field values would have to update automatically which is distracting and confusing IMO especially since the values are presented clearly elsewhere.
+      --The other fields should show the current Appdata value, i.e. the actual DOM element dimensions or data property value, because these values are NOT reflected anywhere in a dimViewer. So when they are changed, they need to be updated and when a user makes a bad entry, they have to be restored to what they were previously.
+      --Default Tab behavior, i.e. cycling through the tab order, has to be maintained under consideration of the above 2 points.
+    */
     function handleKeydown(evt) {
       // !VA Get the keypress
       keydown = evt.which || evt.keyCode || evt.key;
@@ -851,10 +862,8 @@ var Witty = (function () {
         // !VA Set a flag if the the Tab key was pressed, for readability
         (keydown == 9) ? isTab = true : isTab = false;
         // !VA If Tab was pressed and this.value is either empty or equals the Appdata value, then there's been no change to the field, so let Tab just cycle through the fields as per its default.
-
-
         if ((isTab) && ((this.value === '' || this.value == Appdata[args.prop]))) {
-          // !VA Only if imgW or imgH, delete the existing value to display the placeholders
+          // !VA Only if imgW or imgH, delete the existing value to display the placeholders. Otherwise, tab through and leave the existing value from Appdata
           if (args.prop === 'imgW' || args.prop === 'imgH') {
             this.onblur = function() {
               this.value = '';
@@ -866,11 +875,9 @@ var Witty = (function () {
           if (isErr) {
             // !VA If it returns an error, select the input and show the error message so the user can correct it or ESC out of the field. If Tab, prevent advancing to the next field until the error is corrected or ESC is pressed.
             isEnter ? isEnter : evt.preventDefault(); 
-            console.log('Not an integer, enter an integer or ESC to leave the input field.');
-              // !VA We have to leave the bad value in the field so the user can correct it or press Esc to blur without change.  
-              this.select();
+            // !VA We have to leave the bad value in the field so the user can correct it or press Esc to blur without change, otherwise it will conflict with the default tab order behavior.
+            this.select();
           } else {
-              console.log('not error');
               // !VA If the value was entered in the imgW or imgH field, show the value selected first so the user can view and change it before implementing. Only on Tab can the value be implemented and advance to the next field.
               if (args.prop === 'imgW' || args.prop === 'imgH') {
                 if (isEnter) {
@@ -879,24 +886,11 @@ var Witty = (function () {
                 console.log('tab pressed');
                 this.value = '';
                 this.blur();
-          }
-              // !VA For viewerW, sPhonesW and lPhonesW, on Enter we want to stay in the field and display the value so the user can change it after seeing the resulting image size change. On Tab, we want to keep the value and Tab to the next field. In either case:
-              // this.select();
-        }
+                }
+              }
             // !VA Pass the target, prop and value to evalToolbarInput.
             Appdata = evalToolbarInput(args);
-          
-          
-          
-          
-          
-        }
-            
-
-
-
-
-
+          }
         } 
       }
     }
@@ -1335,26 +1329,73 @@ var Witty = (function () {
 
     //  !VA ERROR HANDLING
     // ==============================
-    var errorHandler = function(isErr, errCode) {
-      console.log('errorHandler running');
+    // !VA Stores for all app error and status messages
+    var errMessages = function(isErr, errCode) {
+      console.log('appMessages running');
       var Appdata = appController.getAppdata();
-      var errorMessages = {
+      var messages = {
+        // !VA Error messages
         not_Integer: 'This value has to be a positive whole number - try again or press ESC.',
         imgW_GT_viewerW: `The image width has to be less than the width of its container table, which is now&nbsp;set&nbsp;to&nbsp;${Appdata.viewerW}px.`,
         tbButton_LT_zero: 'Sorry, that would make one of the image dimensions less than 0.',
         tbButton_GT_viewerW: `Sorry, that would make the image wider than its container, which is currently set at ${Appdata.viewerW}px`,
         // !VA maxViewerWidth issue here, see message below;
         viewerW_GT_maxViewerWidth: `The container table width can't be greater than the width of the app itself &mdash; 800px.`,
-        not_an_integer: 'Not an integer: please enter a positive whole number for width.'
-      };
+        not_an_integer: 'Not an integer: please enter a positive whole number for width.',
 
+
+
+        // !VA TODO: Status messages 
+        // 'ccp-img-build-html-but': '<img> HTML element copied to Clipboard',
+        // 'ccp-td-build-html-but': '<td> HTML element copied to Clipboard',
+        // 'ccp-table-build-html-but': '<table> HTML element copied to Clipboard',
+        // 'ccp-img-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard',
+        // 'ccp-img-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard',
+        // 'ccp-img-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard',
+        // 'ccp-td-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard!',
+        // 'ccp-td-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard',
+        // 'ccp-td-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard',
+        // 'ccp-table-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard',
+        // 'ccp-table-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard',
+        // 'ccp-table-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard',
+      };
       // !VA Loop through the error ID/message pairs and find the match
-      for (const [key, value] of Object.entries(errorMessages)) { 
+      for (const [key, value] of Object.entries(messages)) { 
         if (key === errCode ) {
-          showAppMessage(value);
+          mess = value;
         }
       }
-      return true;
+
+      return [isErr, mess];
+
+
+    }
+
+
+
+
+    function messageHandler(isErr, messCode) {
+      console.log('messageHandler running');
+      console.log('isErr is: ' + isErr);
+      console.log('messCode is: ' + messCode);
+      var Appdata = appController.getAppdata();
+      var messArray = [];
+      if (isErr) {
+        retArray = errMessages(true, messCode);
+        console.log('retArray is...');
+        console.dir(retArray);
+      }
+
+      UIController.flashAppMessage(retArray[0], retArray[1]);
+
+
+      // !VA Loop through the error ID/message pairs and find the match
+      // for (const [key, value] of Object.entries(messages)) { 
+      //   if (key === errCode ) {
+      //     showAppMessage(value);
+      //   }
+      // }
+      // return true;
     };
 
     // !VA Might be good to fold this into error handling
@@ -1479,7 +1520,8 @@ var Witty = (function () {
     return {
       // !VA Were putting this here so it can be accessed from either other module -- all it does it get the code and pass it on to the private appController function that finds the error code from the string and passes that on to UIController for display.
       initError: function(isErr, errCode) {
-        errorHandler(isErr, errCode);
+        console.log('initError running');
+        messageHandler(isErr, errCode);
       },
       // !VA appController public getAppdata
       // !VA This needs to be just a pass-on function so we can get this junk out of the appController public functions.
