@@ -1,9 +1,7 @@
 
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
-06.19.19
-TODO: Fix sPhonesw and lPhonesW user input.
-Branch 0619FixPhonesInput
+06.19.19 
 
 
 
@@ -24,6 +22,10 @@ TODO: THe CCP should store all the currently selected options and restore them w
 TODO: Assign keyboard  shortcuts
 TODO: Assign tab order
 
+DONE: Fix flashAppMessage to include status messages and cleanup
+DONE: Fix showElementOnInput in CCP
+Merge Branch 0619FixPhonesInput
+DONE: fixed sPhonesw and lPhonesW user input.
 Merge fixAppMessages
 DONE: Fixed, imgW field on tab doesn't reset to placeholders. 
 DONE: Rewrite updateAppdata to be parameters... with key/value pairs as parameter.
@@ -281,33 +283,26 @@ var Witty = (function () {
 
       // UIController: Flash a status message in the app message area
       // !VA NEW - review this. We could probably fold this into the error handler but that's going to be complicated enough as it is and this is just for status messages
-      flashAppMessage: function(isErr, mess) {
-
-        console.log('isErr is: ' + isErr);
-        console.log('mess is: ' + mess);
-        // !VA Passes in the id of the element that triggered the action for which a status message is displayed.
+      flashAppMessage: function(messArray) {
+        // !VA Receives an array of a boolean error flag and the message to be displayed.
+        var isErr, mess;
+        isErr = messArray[0];
+        mess = messArray[1];
 
         // !VA Get the message container and display text into variables
         var appMessContainer = document.querySelector(staticRegions.appMessContainer);
         var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
         var ccpBlocker = document.querySelector(staticRegions.ccpBlocker);
         var messType;
+        // !VA If it's an error, show class show-err, otherwise it's a status message so show-mess
         isErr ? messType = 'show-err' : messType = 'show-mess';
-
         // !VA First, overlay the CCP blocker to prevent user input while the CSS transitions run and the status message is displayed. Cheap, but effective solution.
         ccpBlocker.style.display = 'block';
-
         // !VA Add the class that displays the message
         appMessContainer.classList.add(messType);
-        // // !VA Loop through the status id/message pairs and find the match for the trigger
-        // for (const [key, value] of Object.entries(appMessages)) { 
-        //   if (key === id ) {
-        //     var mess = value;
-        //   }
-        // }
-        // !VA Write the success message to the message display area
+        // !VA Write the message to the message display area
         appMessDisplay.innerHTML = mess;
-        // !VA Show the message
+        // !VA Add the class to show the message
         appMessContainer.classList.add(messType);
         // !VA Show the message for two seconds
         window.setTimeout(function() {
@@ -315,16 +310,15 @@ var Witty = (function () {
           appMessContainer.classList.add('hide-mess');
           ccpBlocker.style.display = 'none';
           setTimeout(function(){
-            // !VA Once the opacity transition for the message has completed, remove the show-mess class from the element and set the textContent back to empty
+            // !VA Once the opacity transition for the message has completed, remove the show-mess class from the element and set the innerHTML back to empty
             appMessContainer.classList.remove(messType);
             appMessContainer.classList.remove('hide-mess');
-            appMessDisplay.textContent = '';
+            appMessDisplay.innerHTML = '';
 
           },250);
         }, 
         2000);
       },
-
     };
 
     
@@ -345,6 +339,31 @@ var Witty = (function () {
     var ccpMakeClipBut = UIController.getCcpMakeClipButIDs();
 
     
+
+    // CBController private imgClipboardBut: Clipboard output for build html image button
+    var imgClipboardBut = new Clipboard(ccpMakeClipBut.ccpImgWriteHTMLToCB, {
+      text: function(trigger) {
+        var clipboardStr = ccpGetCBImgHTML();
+        // !VA Write success message to app message area on success
+        imgClipboardBut.on('success', function(event) {
+          appController.initError(false, 'copied_2_CB');
+          // debugger;
+        });
+
+        imgClipboardBut.on('error', function(e) {
+          console.error('Action:', e.action);
+          console.error('Trigger:', e.trigger);
+        });
+        // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
+        return clipboardStr;
+      }
+    });
+
+
+
+
+
+
     // !VA Constructor for the clipboard output objects. These are all the properties all the clipboard output objects (img, td and table) will have. We store these key/value pairs in instances of the ClipboardOutput  because they're easier to manage. Then we write the output into an HTML string.
     function ClipboardOutput(classAtt, alignAtt ) {
       this.classAtt = classAtt;
@@ -429,53 +448,36 @@ var Witty = (function () {
       return imgTagStr;
     } 
 
-  // CBController private imgClipboardBut: Clipboard output for build html image button
-  var imgClipboardBut = new Clipboard(ccpMakeClipBut.ccpImgWriteHTMLToCB, {
-    text: function(trigger) {
-      var clipboardStr = ccpGetCBImgHTML();
-      // !VA Write success message to app message area on success
-      imgClipboardBut.on('success', function(event) {
-        // debugger;
-      });
-      UIController.flashAppMessage(trigger.id);
-      imgClipboardBut.on('error', function(e) {
-        console.error('Action:', e.action);
-        console.error('Trigger:', e.trigger);
-      });
-      // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
-      return clipboardStr;
-    }
-  });
 
-      // clipboardController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
-      // !VA TODO: THis should be in handleUserInput
-      function ccpIfNoUserInput(att, value) {
-        // !VA We need get the filename from Appdata in case the user leaves 'path' empty
-        var Appdata = appController.getAppdata();
-        var str;
-        // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
-        if (value && att) {
-          // !VA I might want to change this to include the # in the string itself.
-          if (value === '#') {
-            str = '';
-          } else {
-            str = `${att}="${value}"`;
-          }
-
-        } else {
-          // !VA If the path field is empty, we need to return the filename without the path.
-          if (att === 'src' && value === '' ) {
-            str = `${att}="${Appdata.filename}" `;
-          } else if ( att === '#' || att === '') {
-            str = '';
-          } else {
-            // !VA If there is no input, exclude the attribute entry.
-            str = '';
-          }
-        }
-        return str;
-
+  // clipboardController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
+  // !VA TODO: THis should be in handleUserInput
+  function ccpIfNoUserInput(att, value) {
+    // !VA We need get the filename from Appdata in case the user leaves 'path' empty
+    var Appdata = appController.getAppdata();
+    var str;
+    // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
+    if (value && att) {
+      // !VA I might want to change this to include the # in the string itself.
+      if (value === '#') {
+        str = '';
+      } else {
+        str = `${att}="${value}"`;
       }
+
+    } else {
+      // !VA If the path field is empty, we need to return the filename without the path.
+      if (att === 'src' && value === '' ) {
+        str = `${att}="${Appdata.filename}" `;
+      } else if ( att === '#' || att === '') {
+        str = '';
+      } else {
+        // !VA If there is no input, exclude the attribute entry.
+        str = '';
+      }
+    }
+    return str;
+
+  }
 
     // !VA CBController public functions 
     return {
@@ -779,7 +781,6 @@ var Witty = (function () {
       var Appdata = {};
       Appdata = appController.getAppdata();
       prop = elementIdToAppdataProp(this.id);
-      console.log('prop is: ' + prop);
       // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appdata property.
       // !VA NOTE: This can probably replace the blur statements in handleKeydown
       if (prop === 'imgW' || prop === 'imgH') {
@@ -1093,7 +1094,6 @@ var Witty = (function () {
       }
 
       Appdata = appController.getAppdata(false);
-      console.table(Appdata);
     }
 
     // !VA NEW appController private calcViewerSize
@@ -1205,33 +1205,6 @@ var Witty = (function () {
       // !VA Now that the image and its containers are written to the DOM, go ahead and write the dimViewers.
       UICtrl.writeDimViewers();
     }
-      
-    //appController private: getAspectRatio
-    function getAspectRatio (var1, var2) {
-      var aspectReal = (var1 / var2);
-      var aspectInt = function() {
-        //get the aspect ratio by getting the gcd (greatest common denominator) and dividing W and H by it
-        //This is a single line function that wraps over two lines 
-        function gcd(var1,var2) {if ( var2 > var1 ) { 
-          // !VA Added variable declaration
-          var temp = var1; 
-          var1 = var2; 
-          var2 = temp; } while(var2!= 0) { 
-          // !VA Added variable declaration
-          var m = var1%var2; 
-          var1 = var2;
-          var2 = m; } 
-        return var1;}
-        var gcdVal = gcd( var1 , var2 );
-        //divide the W and H by the gcd
-        var w = (var1 / gcdVal);
-        var h = (var2 / gcdVal);
-        //Express and return the aspect ratio as an integer pair
-        aspectInt = (w + ' : ' + h);
-        return aspectInt;
-      }();
-      return [aspectReal, aspectInt];  
-    }
 
     // !VA NEW So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. Here, there are 5 mutable elements and 5 properties. Only one of the properties has changed. So we loop through them all, find the match for the prop argument, then update only the element/data property that matches. This is a mickey-mouse solution but it works for now. Ideally we will pass in a key/value pair including the property name and the ID alias so we can use properties... in case there are more than one.
 
@@ -1322,19 +1295,18 @@ var Witty = (function () {
       elems[6] = document.querySelector(ccpMakeClipBut.tableDisplayWriteCSSToCB);
       elems[7] = document.querySelector(ccpMakeClipBut.tableSPhoneWriteCSSToCB);
       elems[8] = document.querySelector(ccpMakeClipBut.tableLPhoneWriteCSSToCB);
-      console.dir(elems);
       // !VA We only want to show the buttons in each respective fieldset
-      // !VA If the input is in the img fieldset, only show the first three buttons in the array
-      if (event.target.id === 'img-class-input') {
+      // !VA If the input is in the img fieldset, only show the first three buttons in the array. Add the hash # to the target ID to find the match with the ID in ccpUserInput
+      if (('#' + event.target.id) == ccpUserInput.imgClass) {
         for (let i = 0; i <= 2; i++) {
           this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
         }
-      } else if (event.target.id === 'td-class-input') { 
+      } else if (('#' + event.target.id) === ccpUserInput.tdClass) { 
         // !VA If the input is in the td fieldset, only show the next three buttons in the array
         for (let i = 3; i <= 5 ; i++) {
           this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
         }
-      } else if (event.target.id === 'table-class-input') {
+      } else if (('#' + event.target.id) === ccpUserInput.tableClass) {
         // !VA If the input is in the table fieldset, only show the next buttons in the array
         for (let i = 6; i <= 8 ; i++) {
           this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
@@ -1345,7 +1317,7 @@ var Witty = (function () {
     //  !VA ERROR HANDLING
     // ==============================
     // !VA Stores for all app error and status messages
-    var errMessages = function(isErr, errCode) {
+    function appMessages(isErr, messCode) {
       var Appdata = appController.getAppdata();
       var messages = {
         // !VA Error messages
@@ -1357,8 +1329,8 @@ var Witty = (function () {
         viewerW_GT_maxViewerWidth: `The container table width can't be greater than the width of the app itself &mdash; 800px.`,
         not_an_integer: 'Not an integer: please enter a positive whole number for width.',
 
-
-
+        // !VA Status messages
+        copied_2_CB: 'Code snippet copied to Clipboard!',
         // !VA TODO: Status messages 
         // 'ccp-img-build-html-but': '<img> HTML element copied to Clipboard',
         // 'ccp-td-build-html-but': '<td> HTML element copied to Clipboard',
@@ -1375,40 +1347,20 @@ var Witty = (function () {
       };
       // !VA Loop through the error ID/message pairs and find the match
       for (const [key, value] of Object.entries(messages)) { 
-        if (key === errCode ) {
+        if (key === messCode ) {
           mess = value;
         }
       }
-
       return [isErr, mess];
-
-
     }
 
-
-
-
+    // !VA appController private function
     function messageHandler(isErr, messCode) {
-      console.log('isErr is: ' + isErr);
-      console.log('messCode is: ' + messCode);
-      var Appdata = appController.getAppdata();
-      var messArray = [];
-      if (isErr) {
-        retArray = errMessages(true, messCode);
-        console.log('retArray is...');
-        console.dir(retArray);
-      }
-
-      UIController.flashAppMessage(retArray[0], retArray[1]);
-
-
-      // !VA Loop through the error ID/message pairs and find the match
-      // for (const [key, value] of Object.entries(messages)) { 
-      //   if (key === errCode ) {
-      //     showAppMessage(value);
-      //   }
-      // }
-      // return true;
+      // !VA This doesn't really do anything but pass the code to appMessages, return the message and convert the isErr/message pair to an array so it can be passed as array to flashAppMessage which then breaks it down again into strings...pretty useless. 
+      var retArray = [];
+      // !VA Call appMessages to get the message for the messCode provided, returned as array with a bool and a string.
+      retArray = appMessages(isErr, messCode);
+      UIController.flashAppMessage(retArray);
     };
 
     // !VA Might be good to fold this into error handling
@@ -1428,34 +1380,8 @@ var Witty = (function () {
       return isErr;
     }
 
-
-    // !VA appController private showAppMessage
-    // !VA Here we can show a message bypassing errorHandler - not all messages are errors.
-    var showAppMessage = function(errMess) {
-      //Set the time the message will display
-      // let displayTime;
-      // Get the elements to manipulate for the error message display
-      // // !VA Create objects for all the UI elements used in this function
-      var appMessContainer = document.querySelector(staticRegions.appMessContainer);
-      var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
-      // var dimViewers = document.querySelector('#dim-viewers');
-      // var toolsContainer = document.querySelector('#tools-container');
-      // Put the respective error message in the error message container
-      appMessDisplay.innerHTML = errMess;
-      // Swap dimViewers with appMessDisplay and drop toolsContainer behind viewport;
-
-
-      appMessContainer.classList.add('show-err');
-
-
-      // !VA Reset the value of the element into which the error was entered to empty. 
-      // document.getElementById(id).value = '';
-      // appMessContainer.classList.remove('hide-err');
-      // appMessContainer.classList.add('show-err');
-      // console.log('Error: reset the value of the element to its original value and select it.');
-
-    };
-
+    // !VA Misc Functions
+    // !VA ================================================================
     // !VA Need to get the Appdata property that corresponds to the ID of the DOM input element that sets it. It's easier to just create a list of these correspondences than to rename the whole UI elements and Appdata properties so they correspond, or to create functions that use string methods to extract them from each other.
     //  clipboardController: GET APPDATA PROPERTY NAME FROM AN HTML ELEMENT ID
     function elementIdToAppdataProp(str) {
@@ -1471,6 +1397,33 @@ var Witty = (function () {
       var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
       // alert(ret);
       return ret;
+    }
+
+    // !VAS appController private function getAspectRatio
+    function getAspectRatio (var1, var2) {
+      var aspectReal = (var1 / var2);
+      var aspectInt = function() {
+        //get the aspect ratio by getting the gcd (greatest common denominator) and dividing W and H by it
+        //This is a single line function that wraps over two lines 
+        function gcd(var1,var2) {if ( var2 > var1 ) { 
+          // !VA Added variable declaration
+          var temp = var1; 
+          var1 = var2; 
+          var2 = temp; } while(var2!= 0) { 
+          // !VA Added variable declaration
+          var m = var1%var2; 
+          var1 = var2;
+          var2 = m; } 
+        return var1;}
+        var gcdVal = gcd( var1 , var2 );
+        //divide the W and H by the gcd
+        var w = (var1 / gcdVal);
+        var h = (var2 / gcdVal);
+        //Express and return the aspect ratio as an integer pair
+        aspectInt = (w + ' : ' + h);
+        return aspectInt;
+      }();
+      return [aspectReal, aspectInt];  
     }
 
 
