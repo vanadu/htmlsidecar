@@ -1,17 +1,17 @@
 
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
-06.18.19
-Branch fixAppMessages
+06.19.19
+TODO: Fix sPhonesw and lPhonesW user input.
+Branch 0619FixPhonesInput
 
-TODO: imgW field on tab doesn't reset to placeholders. 
 
 
+
+TODO: Finish reviewing and implementing write to clipboard buttons.
 TODO: rewrite getAppdata to only query specific items in the array, or at least use destructuring to only make a const out of which ever Appdata property is needed in the respective function.
-
 TOD0: Think about making getAppdata only query a specific property if possible.
 TODO: Fix being able to resize viewerW smaller than imgW - current behavior is imgw resizes with viewerW. If that's the desired behavior, imgW still doesn't write the udpated width to Appdata, that needs to be fixed.
-TODO: Finish reviewing and implementing write to clipboard buttons.
 TODO: Implement Td and table copy to clipboard buttons.
 TODO: Make mrk => box function...not sure where though or whether it's necessary since it's just a one-liner.
 TODO: Fix error messages - they don't fade out. Loop that in with flashAppMessage
@@ -24,6 +24,8 @@ TODO: THe CCP should store all the currently selected options and restore them w
 TODO: Assign keyboard  shortcuts
 TODO: Assign tab order
 
+Merge fixAppMessages
+DONE: Fixed, imgW field on tab doesn't reset to placeholders. 
 DONE: Rewrite updateAppdata to be parameters... with key/value pairs as parameter.
 DONE: Fold handleToolbarClicks into checkUserInput and rename to checkUserInput
 Branch checkUserInput
@@ -501,16 +503,7 @@ var Witty = (function () {
     var setupEventListeners = function() {
 
       //DRAG AND DROP PROCESSING START
-      //Drag and Drop Handler 
-      function handleDragOver(evt) {
-        //prevent the bubbling of the event to the parent event handler
-        evt.stopPropagation();
-        //prevent the default action of the element from executing -- so in this case
-        //I think since it is a div the default event would be for some browsers to 
-        //open the file in the browser when dropped
-        evt.preventDefault();
-        evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-      }
+
 
       // Event Listeners for Drag and Drop
       // !VA dropZone is the screen region that will accept the drop event 
@@ -759,7 +752,20 @@ var Witty = (function () {
     // !VA INPUT HANDLING
     // !VA ============================================================
 
-    // !VA appController private handleFocus
+    // !VA Drag and Drop Handler 
+    // !VA appController public function
+    function handleDragOver(evt) {
+      //prevent the bubbling of the event to the parent event handler
+      evt.stopPropagation();
+      //prevent the default action of the element from executing -- so in this case
+      //I think since it is a div the default event would be for some browsers to 
+      //open the file in the browser when dropped
+      evt.preventDefault();
+      evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+    }
+
+
+    // !VA appController private function
     // !VA Handle behavior when an element gets the focus. Pertains only to keyboard input, actually, I'm not sure whether buttons or CCP elements need special handling.
     function handleFocus(evt) {
       // !VA Get the target element of the click
@@ -768,6 +774,7 @@ var Witty = (function () {
       this.select();
     }
 
+    // !VA appController private function
     function handleBlur(evt) {
       // !VA Handle blur
       console.log('handleBlur running');
@@ -842,6 +849,7 @@ var Witty = (function () {
       --The other fields should show the current Appdata value, i.e. the actual DOM element dimensions or data property value, because these values are NOT reflected anywhere in a dimViewer. So when they are changed, they need to be updated and when a user makes a bad entry, they have to be restored to what they were previously.
       --Default Tab behavior, i.e. cycling through the tab order, has to be maintained under consideration of the above 2 points.
     */
+    // !VA Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
     function handleKeydown(evt) {
       // !VA Get the keypress
       keydown = evt.which || evt.keyCode || evt.key;
@@ -1314,7 +1322,7 @@ var Witty = (function () {
         for (let i = 0; i <= 2; i++) {
           this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
         }
-      } else if (event.target.id === 'td-class-input') {
+      } else if (event.target.id === 'td-class-input') { 
         // !VA If the input is in the td fieldset, only show the next three buttons in the array
         for (let i = 3; i <= 5 ; i++) {
           this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
