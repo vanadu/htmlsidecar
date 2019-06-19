@@ -283,7 +283,6 @@ var Witty = (function () {
       // !VA NEW - review this. We could probably fold this into the error handler but that's going to be complicated enough as it is and this is just for status messages
       flashAppMessage: function(isErr, mess) {
 
-        console.log('flashAppMessage running');
         console.log('isErr is: ' + isErr);
         console.log('mess is: ' + mess);
         // !VA Passes in the id of the element that triggered the action for which a status message is displayed.
@@ -777,7 +776,6 @@ var Witty = (function () {
     // !VA appController private function
     function handleBlur(evt) {
       // !VA Handle blur
-      console.log('handleBlur running');
       var Appdata = {};
       Appdata = appController.getAppdata();
       prop = elementIdToAppdataProp(this.id);
@@ -932,7 +930,6 @@ var Witty = (function () {
     // !VA NEW Parsing keyboard input based on Appdata property passed in from handleKeyup.
     // !VA TODO: rename to checkUserInput and include parsing of the toolbutton mouseclicks from handleToolbarClicks.
     function checkUserInput(args) {
-      console.log('checkUserInput running');
       // !VA Destructure args
       const { target, prop, val } = args;
       var errCode;
@@ -976,8 +973,8 @@ var Witty = (function () {
               }
               break;
           // !VA TODO: Handle the imageheight toolButton input
-          case (prop === 'imgW') :
-              console.log('Error handling for imagewidth input not implemented!');
+          case (prop === 'imgH') :
+              console.log('Error handling for imageheight input not implemented!');
               break;
 
               // !VA TODO: Handle the small phone input
@@ -1007,10 +1004,13 @@ var Witty = (function () {
     // !VA args is the target, prop and val passed in from handleKeyUp and handleMouseEvents. 
     function evalToolbarInput(args) {
       console.log('evalToolbarInput running');
+      console.log('args is...');
+      console.dir(args);
       // !VA ES6 Destructure args into constants.
       const { target, prop, val } = args;
       // !VA Get Appdata properties.
       var Appdata = {};
+      var sPhonesH, sPhonesW;
       // !VA All we really need here is Appdata.aspect. Everything else is calculated based on the user's input.
       Appdata = appController.getAppdata(false);
       // !VA Initialize vars for imgH and imgW since we need to calculate one based on the value of the other and Appdata.aspect. 
@@ -1024,6 +1024,7 @@ var Witty = (function () {
 
         case (prop === 'imgW') :
           // !VA If the value was entered in imgwidth, calc imgH based on val and aspect. Then put prop and val in arg1, and put the imgH property name and the calculated imgH into arg2. These will be passed on avia the spread operator to updateAppdata. 
+          console.log('evalToolbarInput handling sPhonesw... ');      
           imgH =  val * (1 / Appdata.aspect[0]);
           // updateAppdata(prop, val); 
           arg1 = [ prop, val ]
@@ -1038,15 +1039,19 @@ var Witty = (function () {
           arg2 = [ 'imgW', imgW ] 
           break;
 
-        case (prop === 'sPhonesW') :
-          // !VA TODO: needs handling
-          console.log('evalToolbarInput sPhonesw: not yet handled');          
+        case (prop === 'sPhonesW' || prop === 'lPhonesW') :
+          console.log('Appdata.sPhonesW is: ' + Appdata.sPhonesW);   
+            // sPhonesH =  val * (1 / Appdata.aspect[0]);
+            arg1 = [prop, val];
+            arg2 = '';
           break;
 
-        case (prop === 'lPhonesW') :
-          // !VA TODO: needs handling
-          console.log('evalToolbarInput lPhonesw: not yet handled');  
-          break;
+        // case (prop === 'lPhonesW') :
+        //   // !VA TODO: needs handling
+        //   arg1 = [prop, val];
+        //   // arg2 = ['sPhonesH', sPhonesH ];
+        //   arg2 = '';
+        //   break;
       }
       
       // !VA Call updateAppdata to resize the DOM elements and data properties that correspond to the Appdata properties above.
@@ -1056,7 +1061,6 @@ var Witty = (function () {
     }
 
     function updateAppdata( ...params ) {
-      console.log('updateAppdata running');
       var Appdata = {};
       var prop, val;
       
@@ -1064,7 +1068,12 @@ var Witty = (function () {
       for (let i = 0; i < params.length; i++) {
           prop = params[i][0];
           val = params[i][1];
+          console.log('params[i][0] is: ' + params[i][0]);
+          console.log('params[i][1] is: ' + params[i][1]);
           switch(true) {
+          case (!prop) :
+            console.log('no prop');
+            break;
           case prop === 'viewerW' :
             document.querySelector(dynamicRegions.imgViewer).style.width = val + 'px';  
             break;
@@ -1074,22 +1083,22 @@ var Witty = (function () {
           case prop === 'imgH' :
             document.querySelector(dynamicRegions.curImg).style.height = val + 'px';
           break;
-          case prop === 'sPhoneW' :
-            document.querySelector(toolButtons.sPhonesW).setAttribute('data-sphonesw') = val + 'px';
+          case prop === 'sPhonesW' :
+            document.querySelector(toolButtons.sPhonesW).setAttribute('data-sphonesw', val);
           break;
-          case prop === 'lPhoneW ' :
-            document.querySelector(toolButtons.lPhonesW).setAttribute('data-lphonesw') = val + 'px';
+          case prop === 'lPhonesW' :
+            document.querySelector(toolButtons.lPhonesW).setAttribute('data-lphonesw', val);
           break;
         }
       }
 
       Appdata = appController.getAppdata(false);
+      console.table(Appdata);
     }
 
     // !VA NEW appController private calcViewerSize
     // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH
     function calcViewerSize() {
-      console.log('calcViewerSize running');
       var Appdata = {};
       Appdata = appController.getAppdata(false);
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
@@ -1231,7 +1240,6 @@ var Witty = (function () {
     // !VA appController private initCCP
     function initCCP() {
       // !VA Copy Appdata to local object
-      console.log('initCCP running');
       var Appdata = appController.getAppdata();
       // !VA The app initializes with the CCP closed, so toggle it on and off here.
       document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
@@ -1266,7 +1274,6 @@ var Witty = (function () {
       
     // !VA  appController: Toggle checkboxes and run any associated actions
     function handleCCPInput(event) {
-      console.log('handleCCPInput running');
       // !VA Get the Appdata for the input default value
       var data = appController.getAppdata();
 
@@ -1339,7 +1346,6 @@ var Witty = (function () {
     // ==============================
     // !VA Stores for all app error and status messages
     var errMessages = function(isErr, errCode) {
-      console.log('appMessages running');
       var Appdata = appController.getAppdata();
       var messages = {
         // !VA Error messages
@@ -1383,7 +1389,6 @@ var Witty = (function () {
 
 
     function messageHandler(isErr, messCode) {
-      console.log('messageHandler running');
       console.log('isErr is: ' + isErr);
       console.log('messCode is: ' + messCode);
       var Appdata = appController.getAppdata();
@@ -1427,7 +1432,6 @@ var Witty = (function () {
     // !VA appController private showAppMessage
     // !VA Here we can show a message bypassing errorHandler - not all messages are errors.
     var showAppMessage = function(errMess) {
-      console.log('showAppMessage running');
       //Set the time the message will display
       // let displayTime;
       // Get the elements to manipulate for the error message display
@@ -1475,7 +1479,6 @@ var Witty = (function () {
     // !VA NEW appController private
     var initDev = function() {
       // !VA This is where we initialize Dev mode, which is where we can start the app with a hard-coded img element in the HTML file. THis is very useful, otherwise we'd have to drop files to initialize or dink with the FileReader object to hard-code a test file.
-      console.log('initDev running');
       // !VA Get Appdata so we can store the filename
       // var Appdata = appController.getAppdata();
       // !VA Get the current (devimg) image dimensions and write the dimViewers
@@ -1528,7 +1531,6 @@ var Witty = (function () {
     return {
       // !VA Were putting this here so it can be accessed from either other module -- all it does it get the code and pass it on to the private appController function that finds the error code from the string and passes that on to UIController for display.
       initError: function(isErr, errCode) {
-        console.log('initError running');
         messageHandler(isErr, errCode);
       },
       // !VA appController public getAppdata
