@@ -1,8 +1,8 @@
 
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
-06.19.19 
-
+06.20.19 
+TODO: Uncheck and Hide Wrapper table options when CCP is opened.
 
 
 
@@ -1227,11 +1227,12 @@ var Witty = (function () {
           document.querySelector(ccpCheckmarks[i]).addEventListener('click', handleCCPInput, false);
         }
 
-        // !VA Initialize with all the 'include wrapper table' options undisplayed - uncomment this for DEV
-        // var wrapperItemsToHide = ['#table-wrapper-class', '#table-wrapper-width', '#table-wrapper-align', '#table-wrapper-bgcolor' ]; 
-        // for (let i = 0; i < wrapperItemsToHide.length; i++) {
-        //   document.querySelector(wrapperItemsToHide[i]).style.display = 'none'; 
-        // }
+        // !VA Initialize with all the 'Wrapper table' options undisplayed - uncomment this for DEV
+        var wrapperItemsToHide = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
+        var wrapperItemsToHide = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
+        for (let i = 0; i < wrapperItemsToHide.length; i++) {
+          document.querySelector(wrapperItemsToHide[i]).style.display = 'none'; 
+        }
 
         // !VA Initialize with 'include wrapper table' unchecked, or true for DEV
         // var includeWrapperTable = document.querySelector((ccpUserInput.tableIncludeWrapper.replace('mrk', 'box')));
@@ -1267,8 +1268,8 @@ var Witty = (function () {
       document.querySelector(ccpUserInput.tableWrapperWidth).value = `${data.viewerW}`;
       document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
       // !VA Show wrapper table options if the checked element is 'table-include-wrapper-checkbox'
-      if (checkbox.id === 'table-include-wrapper-checkbox') {
-        wrapperItemsToShow = ['#table-wrapper-class', '#table-wrapper-width', '#table-wrapper-align', '#table-wrapper-bgcolor' ]; 
+      if (checkbox.id === 'ccp-table-include-wrapper-checkbox') {
+        wrapperItemsToShow = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
         if (checkbox.checked) {
           for (let i = 0; i < wrapperItemsToShow.length; i++) {
             document.querySelector(wrapperItemsToShow[i]).style.display = 'block'; 
