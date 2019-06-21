@@ -3,6 +3,15 @@
 ===========================================================
 06.21.19 
 Branch 062119_CBMods
+-- The first thing is to move getAppdata out of public appController. I want to keep getAspectRatio in appController but have all the actual DOM access in UIController.
+
+* appController public initGetAppdata calls appController private getAppdata 
+* appController private getAppdata calls UIController.queryDOM ONLY to access DOM elements and data properties. 
+* getAppdata then runs any calcs necessary and returns Appdata to initGetAppdata
+* initGetAppdata then returns APpdata to the calling function.
+
+IMPORTANT: This works but getAppdata is called four times each time the page loads...not sure if that's good. Branching to 062119_CBMods2.
+
 
 
 
@@ -168,7 +177,7 @@ var Witty = (function () {
       dimViewers = UIController.getDimViewerIDs();
       // !VA Query Appdata
       var Appdata = {};
-      Appdata = appController.getAppdata(false);
+      Appdata = appController.initGetAppdata(false);
       
       // !VA Size On Disk is NOT 2X the Display Size: flag Size on Disk and Retina
       var curDimViewer = [];
@@ -222,6 +231,46 @@ var Witty = (function () {
         return ccpMakeClipBut;
       },
 
+      // !VA UIController public getAppdata
+      // !VA Moving getAppdata from appController to UIController because Appdata is derived from the DOM elements and data properties that reside in the DOM. 
+
+      queryDOMElements: function() {
+
+        // !VA NEW This needs to ONLY return the non-calculated DOM elements and data properties: curImg.imgW, curImg.imgW, curImg.imgNW, curImg.NH and viewerW. Aspect is calculated so we don't need to get that here, leave that to appController.
+        // !VA NEW We will get the individual properties and return them as an ES6 array.
+        // !VA Declare the local vars
+        var filename, viewerW, viewerH, imgW, imgH, imgNW, imgNH, sPhonesW, lPhonesW;
+        var els = {filename, viewerW, viewerH, imgW, imgH, imgNW, imgNH, sPhonesW, lPhonesW};
+
+        // !VA Get the filename from the dimViewer
+        els.filename = document.querySelector(dimViewers.filename).textContent;
+        // !VA Get the curImg and imgViewer
+        var curImg = document.querySelector(dynamicRegions.curImg);
+        var imgViewer = document.querySelector(dynamicRegions.imgViewer);
+        // !VA Get the computed width and height of imgViewer
+        var cStyles = window.getComputedStyle(imgViewer);
+        els.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
+        els.viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
+        // !VA Get the dimensions of curImg
+        els.imgW = curImg.width;
+        els.imgH = curImg.height;
+        els.imgNW = curImg.naturalWidth;
+        els.imgNH = curImg.naturalHeight;
+        // !VA Get the data properties for sPhonesW and sPhonesH
+        // !VA This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
+        els.sPhonesW = parseInt(document.querySelector(toolButtons.sPhonesW).getAttribute('data-sphonesw'), 10);
+        els.lPhonesW = parseInt(document.querySelector(toolButtons.lPhonesW).getAttribute('data-lphonesw'), 10);
+        els.sPhonesW ? els.sPhonesW : Appdata.sPhonesW = parseInt(document.querySelector(toolButtons.sPhonesW).placeholder, 10);
+        els.lPhonesW ? els.lPhonesW : Appdata.lPhonesW = parseInt(document.querySelector(toolButtons.lPhonesW).placeholder, 10);
+
+
+
+        return els;
+
+      },
+
+
+
       // !VA UIController public initUI
       initUI: function() {
         console.log('initUI');
@@ -252,7 +301,7 @@ var Witty = (function () {
         // !VA We need the current value in dimViewers.smallphones and dimViewers.largephones to display all the dimViewers. So, if it's not explicitly user-defined, then use the default placeholder value from the HTML, then get the height from getAspectRatio
         var Appdata = {};
         // !VA Get the current Appdata
-        Appdata = appController.getAppdata();
+        Appdata = appController.initGetAppdata();
         // !VA Hide the dropArea
         document.querySelector(staticRegions.dropArea).style.display = 'none';
         // Write the dimViewers
@@ -263,13 +312,13 @@ var Witty = (function () {
         document.querySelector(dimViewers.smallphones).innerHTML = `<span class='pop-font'><span id='small-phones-width'>${Appdata.sPhonesW}</span> X <span id='small-phones-height'>${Appdata.sPhonesH}</span></span>` ;
         document.querySelector(dimViewers.largephones).innerHTML = `<span class='pop-font'><span id='large-phones-width'>${Appdata.lPhonesW}</span> X <span id='large-phones-height'>${Appdata.lPhonesH}</span></span>` ;
         document.querySelector(dimViewers.retina).innerHTML = `<span class='pop-font'>${2 * Appdata.imgW}</span> X <span class='pop-font'>${2 * Appdata.imgH}`;
-        // !VA NEW Display the clipboard button
+        // !VA  Display the clipboard button
         document.querySelector(dimViewers.clipboardBut).style.display = 'block';
         // !VA Call evalDimAlerts to calculate which dimViewer values don't meet HTML email specs.
         evalDimAlerts();
       },
 
-      // !VA NEW I had this as private but moved to public, not sure why.
+      // !VA  I had this as private but moved to public, not sure why.
       //UIController public writeDimAlerts
       writeDimAlerts: function(curDimViewers, bool) {
         // !VA if evalDimAlerts returns true, then the dimViewer should be displayed in red. To reset the dim alert, set to style color to 'auto'.
@@ -286,7 +335,7 @@ var Witty = (function () {
       },
 
       // UIController: Flash a status message in the app message area
-      // !VA NEW - review this. We could probably fold this into the error handler but that's going to be complicated enough as it is and this is just for status messages
+      // !VA  - review this. We could probably fold this into the error handler but that's going to be complicated enough as it is and this is just for status messages
       flashAppMessage: function(messArray) {
         // !VA Receives an array of a boolean error flag and the message to be displayed.
         var isErr, mess;
@@ -343,10 +392,15 @@ var Witty = (function () {
     var ccpMakeClipBut = UIController.getCcpMakeClipButIDs();
 
     
+    function doClipboard() {
+      
+    }
+
 
     // CBController private imgClipboardBut: Clipboard output for build html image button
     var imgClipboardBut = new Clipboard(ccpMakeClipBut.ccpImgWriteHTMLToCB, {
       text: function(trigger) {
+        console.log('new Clipboard here');
         var clipboardStr = ccpGetCBImgHTML();
         // !VA Write success message to app message area on success
         imgClipboardBut.on('success', function(event) {
@@ -377,7 +431,7 @@ var Witty = (function () {
     // CBController: GET STRINGS FOR THE IMG CLIPBOARD OUTPUT
     function ccpGetCBImgHTML() {
       // !VA Get Appdata - we need it for the filename
-      var data = appController.getAppdata();
+      var data = appController.initGetAppdata();
       // !VA The string that passes the HTML img tag
       var str; 
       // !VA Create the instance for img tag clipboard object and add img-specific properties.
@@ -457,7 +511,7 @@ var Witty = (function () {
   // !VA TODO: THis should be in handleUserInput
   function ccpIfNoUserInput(att, value) {
     // !VA We need get the filename from Appdata in case the user leaves 'path' empty
-    var Appdata = appController.getAppdata();
+    var Appdata = appController.initGetAppdata();
     var str;
     // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
     if (value && att) {
@@ -492,7 +546,7 @@ var Witty = (function () {
 
 
   // GLOBAL APP MODULE
-  var appController = (function(calcCtrl, UICtrl) {
+  var appController = (function(CBCtrl, UICtrl) {
 
     
     // !VA Getting DOM ID strings from UIController
@@ -679,9 +733,9 @@ var Witty = (function () {
           
           // !VA Hide the dropArea - not sure if this is the right place for this.
           document.querySelector(staticRegions.dropArea).style.display = 'none';
-          // !VA NEW Once the current image has loaded, initialize the dinViewers by querying the current image properties from UICtrl and passing them to writeDimViewers.
+          // !VA  Once the current image has loaded, initialize the dinViewers by querying the current image properties from UICtrl and passing them to writeDimViewers.
           function initDimViewers() { 
-            // !VA NEW Initialize the variable that will contain the new image's height, width, naturalHeight and naturalWidth
+            // !VA  Initialize the variable that will contain the new image's height, width, naturalHeight and naturalWidth
             var curImgDimensions;
             // !VA Review
             // !VA Set a short timeout while the blob loads, then run the onload function before displaying the image and getting its properties. This is probably overkill, but noone will notice the 250ms anyway and better safe then no-workie. But now that the image is loaded, we can display it and get its properties.
@@ -701,7 +755,7 @@ var Witty = (function () {
                 // !VA Instead of managing Appdata based on some huge object with four HTML elements and all those unneeded properties thereof, we will just update Appdata by creating a local copy with just the properties we want to add.
                 // !VA Review this - it might be an older comment...
                 // !VA The problem is that Appdata is a global object in the public functions, as it is now in master. I don't want to put all that stuff in the appController's public functions, so I have to either leave it in UIController or pass it between private functions, which will get very complicated.   I think it will be much cleaner if I only use updateAppData to loop through the items to update and don't use the klunky getAppData. Also, the refreshAppUI function refreshes all the values when it's called - it should only refresh the changed values.
-                // !VA NEW Now that the blob image has been displayed and has DOM properties that can be queried, query them and write them to Appdata.
+                // !VA  Now that the blob image has been displayed and has DOM properties that can be queried, query them and write them to Appdata.
                 // !VA Now that we have a current image in the DOM, Get Appdata so we can store the filename in it.
 
                 // !VA Initialize the value in the toolbar viewerW input field to its initial CSS value.
@@ -783,7 +837,7 @@ var Witty = (function () {
     function handleBlur(evt) {
       // !VA Handle blur
       var Appdata = {};
-      Appdata = appController.getAppdata();
+      Appdata = appController.initGetAppdata();
       prop = elementIdToAppdataProp(this.id);
       // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appdata property.
       // !VA NOTE: This can probably replace the blur statements in handleKeydown
@@ -814,7 +868,7 @@ var Witty = (function () {
             var prop, val;
             // !VA We need to query Appdata properties to get the current value of imgW so we can add the toolbutton increments to id
             var Appdata = {};
-            Appdata = appController.getAppdata();
+            Appdata = appController.initGetAppdata();
             // !VA This is a click on one of the toolbutton increment buttons, so we're dealing with the Appdata.imgW property.
             args.prop = 'imgW';
             // !VA The last 2 chars of the id indicate the value by which the img dimension should be incremented,so get the last 2 chars and convert to integer
@@ -861,7 +915,7 @@ var Witty = (function () {
         var el, isErr, isEnter, isTab
         var args = { }, Appdata = { };
         // !VA We need Appdata to restore fields to previous values on error or tabbing through fields without changing their values.
-        Appdata = appController.getAppdata();
+        Appdata = appController.initGetAppdata();
         // !VA Get the target element
         el = document.getElementById(this.id);
         // !VA Args is target, prop, val
@@ -900,7 +954,7 @@ var Witty = (function () {
                 }
               }
             // !VA Pass the target, prop and value to evalToolbarInput.
-            Appdata = evalToolbarInput(args);
+            evalToolbarInput(args);
           }
         } 
       }
@@ -917,7 +971,7 @@ var Witty = (function () {
       // !VA Find out which key was struck
       keyup = evt.which || evt.keyCode || evt.key;
       // !VA Get the current Appdata object because we need the previous Appdata value to restore when the ESC key is pressed
-      var Appdata = appController.getAppdata();
+      var Appdata = appController.initGetAppdata();
       // !VA  On ESC, we want imgW and imgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the dimViewers and there's no need to recalc the W and H each time the user makes and entry - that would just be confusing. 
       if (keyup == 27 ) {
         // !VA If the value was entered into the W or H field, escape out of the field and reset the values to the placeholders
@@ -932,7 +986,7 @@ var Witty = (function () {
       }
     }
 
-    // !VA NEW Parsing keyboard input based on Appdata property passed in from handleKeyup.
+    // !VA  Parsing keyboard input based on Appdata property passed in from handleKeyup.
     // !VA TODO: rename to checkUserInput and include parsing of the toolbutton mouseclicks from handleToolbarClicks.
     function checkUserInput(args) {
       // !VA Destructure args
@@ -941,7 +995,7 @@ var Witty = (function () {
       var isErr;
       isErr = false;
       var Appdata= {};
-      Appdata = appController.getAppdata();
+      Appdata = appController.initGetAppdata();
       // !VA TODO: Setting maxViewerWidth just for now
       var maxViewerWidth = 800;
 
@@ -1009,15 +1063,18 @@ var Witty = (function () {
     // !VA args is the target, prop and val passed in from handleKeyUp and handleMouseEvents. 
     function evalToolbarInput(args) {
       console.log('evalToolbarInput running');
-      console.log('args is...');
-      console.dir(args);
+      // console.log('args is...');
+      // console.dir(args);
       // !VA ES6 Destructure args into constants.
       const { target, prop, val } = args;
       // !VA Get Appdata properties.
       var Appdata = {};
       var sPhonesH, sPhonesW;
       // !VA All we really need here is Appdata.aspect. Everything else is calculated based on the user's input.
-      Appdata = appController.getAppdata(false);
+
+      // !VA NEW
+      var Appdata = appController.initGetAppdata();
+
       // !VA Initialize vars for imgH and imgW since we need to calculate one based on the value of the other and Appdata.aspect. 
       var imgH, imgW;
       switch(true) {
@@ -1029,6 +1086,10 @@ var Witty = (function () {
 
         case (prop === 'imgW') :
           // !VA If the value was entered in imgwidth, calc imgH based on val and aspect. Then put prop and val in arg1, and put the imgH property name and the calculated imgH into arg2. These will be passed on avia the spread operator to updateAppdata. 
+
+
+
+
           console.log('evalToolbarInput handling sPhonesw... ');      
           imgH =  val * (1 / Appdata.aspect[0]);
           // updateAppdata(prop, val); 
@@ -1097,16 +1158,16 @@ var Witty = (function () {
         }
       }
 
-      Appdata = appController.getAppdata(false);
+      Appdata = appController.initGetAppdata(false);
     }
 
-    // !VA NEW appController private calcViewerSize
+    // !VA  appController private calcViewerSize
     // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH
     function calcViewerSize() {
       var Appdata = {};
-      Appdata = appController.getAppdata(false);
+      Appdata = appController.initGetAppdata(false);
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
-      // !VA NEW Get the actual viewerW from getComputedStyle
+      // !VA  Get the actual viewerW from getComputedStyle
       var viewerW;
       var viewerH;
       var compStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
@@ -1210,19 +1271,23 @@ var Witty = (function () {
       UICtrl.writeDimViewers();
     }
 
-    // !VA NEW So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. Here, there are 5 mutable elements and 5 properties. Only one of the properties has changed. So we loop through them all, find the match for the prop argument, then update only the element/data property that matches. This is a mickey-mouse solution but it works for now. Ideally we will pass in a key/value pair including the property name and the ID alias so we can use properties... in case there are more than one.
+    // !VA So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. Here, there are 5 mutable elements and 5 properties. Only one of the properties has changed. So we loop through them all, find the match for the prop argument, then update only the element/data property that matches. This is a mickey-mouse solution but it works for now. Ideally we will pass in a key/value pair including the property name and the ID alias so we can use properties... in case there are more than one.
 
 
     // !VA CCP Functions
     // !VA appController private initCCP
     function initCCP() {
       // !VA Copy Appdata to local object
-      var Appdata = appController.getAppdata();
+      var Appdata = appController.initGetAppdata();
       // !VA The app initializes with the CCP closed, so toggle it on and off here.
       document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
       // !VA If the CCP is open:
       if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
         // !VA We have to initialize CCP DOM elements here because they don't exist until the CCP is displayed.
+
+
+
+
 
         // !VA CCP Checkboxes - these are mock checkboxes with custom styling, so the ID names have to be converted to checkbox names in order to select or deselect them. We attach the event handler to the checkmark, not the checkbox. The checkmark is converted to checkbox for handling in toggleCheckbox.
         var ccpCheckmarks = [ ccpUserInput.imgIncludeStyles, ccpUserInput.tdBgimage, ccpUserInput.tableIncludeWrapper ]
@@ -1253,7 +1318,7 @@ var Witty = (function () {
     // !VA  appController: Toggle checkboxes and run any associated actions
     function handleCCPInput(event) {
       // !VA Get the Appdata for the input default value
-      var data = appController.getAppdata();
+      var data = appController.initGetAppdata();
 
       // !VA Toggle CCP checkboxes and run associated operations. The CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
 
@@ -1323,7 +1388,7 @@ var Witty = (function () {
     // ==============================
     // !VA Stores for all app error and status messages
     function appMessages(isErr, messCode) {
-      var Appdata = appController.getAppdata();
+      var Appdata = appController.initGetAppdata();
       var messages = {
         // !VA Error messages
         not_Integer: 'This value has to be a positive whole number - try again or press ESC.',
@@ -1434,17 +1499,17 @@ var Witty = (function () {
 
 
 
-    // !VA NEW appController private
+    // !VA  appController private
     var initDev = function() {
       // !VA This is where we initialize Dev mode, which is where we can start the app with a hard-coded img element in the HTML file. THis is very useful, otherwise we'd have to drop files to initialize or dink with the FileReader object to hard-code a test file.
       // !VA Get Appdata so we can store the filename
-      // var Appdata = appController.getAppdata();
+      // var Appdata = appController.initGetAppdata();
       // !VA Get the current (devimg) image dimensions and write the dimViewers
       // !VA Turn on the toolbars
       document.querySelector(staticRegions.toolsContainer).style.display = 'block';
       document.querySelector(dynamicRegions.curImg).style.display = 'block';
 
-      // !VA NEW Get the filename of the devImg in the HTML. This is the only time we'll have an actual source file -- in user mode all the images are blobs -- so we can do this as a one-off.
+      // !VA  Get the filename of the devImg in the HTML. This is the only time we'll have an actual source file -- in user mode all the images are blobs -- so we can do this as a one-off.
       
       var filename = document.querySelector(dynamicRegions.curImg).src;
       filename = filename.split('/');
@@ -1485,6 +1550,24 @@ var Witty = (function () {
       initCCP();
     };
 
+
+    function getAppdata() {
+      console.log('getAppdata running');
+      var foo;
+      var arr = [];
+      var Appdata = {};
+      
+      var Appdata = UIController.queryDOMElements();
+
+      // !VA Now compute the rest of Appdat
+      Appdata.aspect = getAspectRatio(Appdata.imgNW,  Appdata.imgNH);
+      Appdata.sPhonesH = Math.round(Appdata.sPhonesW * (1 / Appdata.aspect[0]));
+      Appdata.lPhonesH = Math.round(Appdata.lPhonesW * (1 / Appdata.aspect[0]));
+      console.log('Appdata is:');
+      console.dir(Appdata);
+      return Appdata;
+    }
+
     // !VA appController public
     return {
       // !VA Were putting this here so it can be accessed from either other module -- all it does it get the code and pass it on to the private appController function that finds the error code from the string and passes that on to UIController for display.
@@ -1494,45 +1577,16 @@ var Witty = (function () {
       // !VA appController public getAppdata
       // !VA This needs to be just a pass-on function so we can get this junk out of the appController public functions.
       
-      getAppdata: function() {
-        // !VA NEW Initialize Appdata here and pass it along - we put it here because it's called from both the other modules 
-        var Appdata = {};
-        // !VA Get dynamicRegions
-        dynamicRegions = UICtrl.getDynamicRegionIDs();
-        dimViewers = UICtrl.getDimViewerIDs();
-        // !VA NEW Read required values into Appdata.
-        Appdata.filename = document.querySelector(dimViewers.filename).textContent;
-
-
-        var curImg = document.querySelector(dynamicRegions.curImg);
-        var imgViewer = document.querySelector(dynamicRegions.imgViewer);
-        // !VA Get the computed styles for viewerW and viewerH
-        var cStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
-        var viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
-        var viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
-
-        // !VA Assign property values
-        Appdata.imgW = curImg.width;
-        Appdata.imgH = curImg.height;
-        Appdata.imgNW = curImg.naturalWidth;
-        Appdata.imgNH = curImg.naturalHeight;
-        // !VA NEW We need the aspect ratio to calculate the other dimension when the user only inputs one, i.e. when width or height is entered into one of the toolbars' custom width/height fields.
-        Appdata.aspect = getAspectRatio(curImg.naturalWidth,  curImg.naturalHeight);
-        // !VA NEW We need new imgW and imgH properties to store the user input values. We don't want to overwrite the original imgW/imgH values because it appears it's not possible since Javascript passes values by reference, so any changes to properties are lost outside the current function's scope. Plus, we need to have the original values persist for the duration of the session, at which point the app and Appdata are reinitialized. 
-        Appdata.sPhonesW = parseInt(document.querySelector(toolButtons.sPhonesW).getAttribute('data-sphonesw'), 10);
-        Appdata.lPhonesW = parseInt(document.querySelector(toolButtons.lPhonesW).getAttribute('data-lphonesw'), 10);
-
-        Appdata.sPhonesW ? Appdata.sPhonesW : Appdata.sPhonesW = parseInt(document.querySelector(toolButtons.sPhonesW).placeholder, 10);
-        Appdata.lPhonesW ? Appdata.lPhonesW : Appdata.lPhonesW = parseInt(document.querySelector(toolButtons.lPhonesW).placeholder, 10);
-        Appdata.sPhonesH = Math.round(Appdata.sPhonesW * (1 / Appdata.aspect[0]));
-        Appdata.lPhonesH = Math.round(Appdata.lPhonesW * (1 / Appdata.aspect[0]));
-        Appdata.viewerH = viewerH;
-        Appdata.viewerW = viewerW;
+      // !VA NEW
+      initGetAppdata: function() {
+        // !VA Initialize the functions to access the DOM (public UIController) and calculate the non-DOM Appdata properties (private appController)
+        var Appdata = getAppdata();
         return Appdata;
       },
+
       init: function(){
         console.log('App initialized.');
-        // !VA NEW Make sure the CCP is off
+        // !VA  Make sure the CCP is off
         document.querySelector(staticRegions.ccpContainer).classList.remove('active');
         setupEventListeners();
         // !VA  Test if there is currently #cur-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
@@ -1540,7 +1594,7 @@ var Witty = (function () {
         if (curImgExists) {
           initDev();
         } else {
-          // !VA NEW - Initialize the app UI and wait for input
+          // !VA  - Initialize the app UI and wait for input
           UICtrl.initUI();
         }
       }
