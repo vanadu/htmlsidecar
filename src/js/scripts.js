@@ -1,8 +1,8 @@
 
 /* !VA  - SWITCHED TO ARNIE on UBUNTU
 ===========================================================
-06.20.19 
-TODO: Uncheck and Hide Wrapper table options when CCP is opened.
+06.21.19 
+
 
 
 
@@ -22,6 +22,9 @@ TODO: THe CCP should store all the currently selected options and restore them w
 TODO: Assign keyboard  shortcuts
 TODO: Assign tab order
 
+
+
+DONE: Uncheck and Hide Wrapper table options when CCP is opened.
 DONE: Fix flashAppMessage to include status messages and cleanup
 DONE: Fix showElementOnInput in CCP
 Merge Branch 0619FixPhonesInput
