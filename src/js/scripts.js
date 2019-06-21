@@ -10,7 +10,8 @@ Branch 062119_CBMods
 * getAppdata then runs any calcs necessary and returns Appdata to initGetAppdata
 * initGetAppdata then returns APpdata to the calling function.
 
-IMPORTANT: This works but getAppdata is called four times each time the page loads...not sure if that's good. Branching to 062119_CBMods2.
+IMPORTANT: This works but getAppdata is called four times each time the page loads...not sure if that's good. Better to pass Appdata where possible than call a DOM access.
+Branching to 062119_CBMods2.
 
 
 
@@ -391,31 +392,127 @@ var Witty = (function () {
     var ccpUserInput = UIController.getCcpUserInputIDs();
     var ccpMakeClipBut = UIController.getCcpMakeClipButIDs();
 
-    
-    function doClipboard() {
+    // !VA Function to get the key in a key/value pair by providing its value
+    // !VA https://stackoverflow.com/questions/9907419/how-to-get-a-key-in-a-javascript-object-by-its-value
+    function getKeyByValue(object, value) {
+      return Object.keys(object).find(key => object[key] === value);
+    }
+
+    function ccpGetSnippet(makeClipButID) {
+      // !VA The target element's ID is passed in from the ccpMakeClipBut array so it doesn't have the hash that makes it a valid ID string. So, add the hash.
+      makeClipButID = '#' + makeClipButID;
+      console.log('makeClipButID is: ' + makeClipButID);
+
+      // !VA Now we need the key name in the ccpMakeClipBut array that corresponds to the target ID passed in from the click event handler. We could use the actual ID, but this way if the makeClipBut array changes so will this...well, not really...but...
+      var ccpMakeClipButKey = getKeyByValue(ccpMakeClipBut, makeClipButID);
+      console.log('ccpMakeClipButKey is: ' + ccpMakeClipButKey);
       
+      console.dir(ccpMakeClipBut);
+      
+
+
+
+      // !VA List of all the clipboard build functions and the corresponding keys in ccpMakeClipBut
+      var clipFunctions = [
+        getImgWriteHTMLToCB(),
+        getTableWriteHTMLToCB(),
+        getTdWriteHTMLToCB(),
+        getImgDisplayWriteCSSToCB(),
+        getImgLPhoneWriteCSSToCB(),
+        getImgSPhoneWriteCSSToCB(),
+        getTableDisplayWriteCSSToCB(),
+        getTableLPhoneWriteCSSToCB(),
+        getTableLPhoneWriteCSSToCB(),
+        getTdDisplayWriteCSSToCB(),
+        getTdLPhoneWriteCSSToCB(),
+        getTdSPhoneWriteCSSToCB()
+      ]
+
+      // for (let i = 0; i < clipFunctions.length; i++) {
+      //   console.log('clipFunctions[i] is' +  clipFunctions[i]);
+      // }
+
+
+
+
+
+      // var snippetStr = clipFunctions.ccpImgWriteHTMLToCB;
+      // console.log('snippetStr is: ' + snippetStr);
+
+      console.log(typeof(ccpMakeClipButKey));
+
+
+      var snippet = new Clipboard(makeClipButID, {
+        text: function(trigger) {
+          console.log('new Clipboard here');
+          // var snippetStr = getImgWriteHTMLToCB();
+          // !VA Write success message to app message area on success
+          snippet.on('success', function(event) {
+            appController.initMessage(false, 'copied_2_CB');
+            // debugger;
+          });
+  
+          snippet.on('error', function(e) {
+            console.error('Action:', e.action);
+            console.error('Trigger:', e.trigger);
+          });
+          // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
+          return 'ugh';
+        }
+      });
+
+
     }
 
 
-    // CBController private imgClipboardBut: Clipboard output for build html image button
-    var imgClipboardBut = new Clipboard(ccpMakeClipBut.ccpImgWriteHTMLToCB, {
-      text: function(trigger) {
-        console.log('new Clipboard here');
-        var clipboardStr = ccpGetCBImgHTML();
-        // !VA Write success message to app message area on success
-        imgClipboardBut.on('success', function(event) {
-          appController.initError(false, 'copied_2_CB');
-          // debugger;
-        });
+  function getTableWriteHTMLToCB() {
+    console.log('function...');
+  }
 
-        imgClipboardBut.on('error', function(e) {
-          console.error('Action:', e.action);
-          console.error('Trigger:', e.trigger);
-        });
-        // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
-        return clipboardStr;
-      }
-    });
+  function getTdWriteHTMLToCB() {
+    console.log('function...');
+  }
+
+  function getImgDisplayWriteCSSToCB()  {
+    console.log('function...');
+  }
+
+  function getImgLPhoneWriteCSSToCB() {
+    console.log('function...');
+  }
+
+  function getImgSPhoneWriteCSSToCB()  {
+    console.log('function...');
+  }
+  function getTableDisplayWriteCSSToCB() {
+    console.log('function...');
+  }
+
+  function getTableLPhoneWriteCSSToCB() {
+    console.log('function...');
+  }
+
+  function getTableLPhoneWriteCSSToCB() {
+    console.log('function...');
+  }
+
+  function getTdDisplayWriteCSSToCB()  {
+    console.log('function...');
+  }
+
+  function getTdLPhoneWriteCSSToCB()  {
+    console.log('function...');
+  }
+
+  function getTdSPhoneWriteCSSToCB() {
+
+  }
+
+
+
+    // !VA Working 062119_CBMods2
+
+
 
 
 
@@ -429,7 +526,7 @@ var Witty = (function () {
     }
 
     // CBController: GET STRINGS FOR THE IMG CLIPBOARD OUTPUT
-    function ccpGetCBImgHTML() {
+    function getImgWriteHTMLToCB() {
       // !VA Get Appdata - we need it for the filename
       var data = appController.initGetAppdata();
       // !VA The string that passes the HTML img tag
@@ -539,7 +636,15 @@ var Witty = (function () {
 
     // !VA CBController public functions 
     return {
+      doClipboard: function(evt) {
+        console.log('doingClipboard');
+        console.dir(evt);
+        console.log('evt.target is: ' + evt.target);
+        console.log('evt.target.id is: ' + evt.target.id);
 
+
+        ccpGetSnippet(evt.target.id);
+      }
 
     };
   })();
@@ -616,22 +721,15 @@ var Witty = (function () {
         // addEventHandler(tbKeypresses[i],'drop',handleUserAction,false);
       }
 
+
       // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. Currently only the img class input does that.
       var ccpKeypresses = [ ccpUserInput.imgClass, ccpUserInput.tdClass, ccpUserInput.tableClass ];
       for (let i = 0; i < ccpKeypresses.length; i++) {
         // !VA convert the ID string to the object inside the loop
         ccpKeypresses[i] = document.querySelector(ccpKeypresses[i]);
         addEventHandler((ccpKeypresses[i]),'input',showElementOnInput,false);
-        // addEventHandler((ioKeypresses[i]),'focus',handleUserAction,false);
-        // addEventHandler(ioKeypresses[i],'blur',handleUserAction,false);
-        // addEventHandler(ioKeypresses[i],'dragover',handleUserAction,false);
-        // addEventHandler(ioKeypresses[i],'drop',handleUserAction,false);
       }
-      
-      // addEventHandler(ccpUserInput.imgClass,'keypress',showMobileImageButtons,false);
-      // ccpUserInput.imgAlt.addEventListener('keypress', showMobileImageButtons);
-      // ccpUserInput.imgClass.addEventListener('keypress', showMobileImageButtons);
-      // ccpUserInput.imgRelPath.addEventListener('keypress', showMobileImageButtons);
+
       // !VA Add click handlers for dimViewer - there's only the clipboard button now but there could be more. 
       var dvClickables = [ dimViewers.clipboardBut ];
       for (let i = 0; i < dvClickables.length; i++) {
@@ -639,6 +737,16 @@ var Witty = (function () {
         dvClickables[i] = document.querySelector(dvClickables[i]);
         addEventHandler((dvClickables[i]),'click',initCCP,false);
       }
+
+
+      // !VA We need eventListeners for ALL the clipboard buttons so make an eventListener for each value in the ccpMakeClipBut object
+      var makeClipButIDs = Object.values(ccpMakeClipBut);
+      for (let i = 0; i < makeClipButIDs.length; i++) {
+        // !VA convert the ID string to the object inside the loop
+        makeClipButIDs[i] = document.querySelector(makeClipButIDs[i]);
+        addEventHandler((makeClipButIDs[i]),'click',CBCtrl.doClipboard,false);
+      }
+
 
 
 
@@ -1050,7 +1158,7 @@ var Witty = (function () {
 
       if (isErr) {
         // !VA IF Error pass the code to errorHandler to get the error message
-        appController.initError(isErr, errCode);
+        appController.initMessage(isErr, errCode);
       } else {
         // !VA If no error, pass false back to handleKeyup and continue.
         isErr = false;
@@ -1277,14 +1385,13 @@ var Witty = (function () {
     // !VA CCP Functions
     // !VA appController private initCCP
     function initCCP() {
-      // !VA Copy Appdata to local object
+      // !VA Get Appdata
       var Appdata = appController.initGetAppdata();
       // !VA The app initializes with the CCP closed, so toggle it on and off here.
       document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
       // !VA If the CCP is open:
       if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
         // !VA We have to initialize CCP DOM elements here because they don't exist until the CCP is displayed.
-
 
 
 
@@ -1544,7 +1651,7 @@ var Witty = (function () {
       calcViewerSize();
       // !VA Open the CCP by default in dev mode
       // !VA First, set it to the opposite of how you want to start it.
-      document.querySelector(staticRegions.ccpContainer).classList.add('active');
+      document.querySelector(staticRegions.ccpContainer).classList.remove('active');
       // !VA Then run initCCP to initialize
 
       initCCP();
@@ -1552,7 +1659,7 @@ var Witty = (function () {
 
 
     function getAppdata() {
-      console.log('getAppdata running');
+      // console.log('getAppdata running');
       var foo;
       var arr = [];
       var Appdata = {};
@@ -1563,15 +1670,15 @@ var Witty = (function () {
       Appdata.aspect = getAspectRatio(Appdata.imgNW,  Appdata.imgNH);
       Appdata.sPhonesH = Math.round(Appdata.sPhonesW * (1 / Appdata.aspect[0]));
       Appdata.lPhonesH = Math.round(Appdata.lPhonesW * (1 / Appdata.aspect[0]));
-      console.log('Appdata is:');
-      console.dir(Appdata);
+      // console.log('Appdata is:');
+      // console.dir(Appdata);
       return Appdata;
     }
 
     // !VA appController public
     return {
       // !VA Were putting this here so it can be accessed from either other module -- all it does it get the code and pass it on to the private appController function that finds the error code from the string and passes that on to UIController for display.
-      initError: function(isErr, errCode) {
+      initMessage: function(isErr, errCode) {
         messageHandler(isErr, errCode);
       },
       // !VA appController public getAppdata
@@ -1579,7 +1686,7 @@ var Witty = (function () {
       
       // !VA NEW
       initGetAppdata: function() {
-        // !VA Initialize the functions to access the DOM (public UIController) and calculate the non-DOM Appdata properties (private appController)
+        // !VA This is a pass-thru to access queryDOMElements (public UIController)  to get the current dimensions of the dynamic DOM elements and data attributes, and getAppdata (private appController) to calculate the non-DOM Appdata properties. We do this here because Appdata has to be queried in all three modules, so it has to be accessible in all of them, and because getAppdata needs getAspectRatio which belongs in appController.
         var Appdata = getAppdata();
         return Appdata;
       },
