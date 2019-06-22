@@ -400,124 +400,367 @@ var Witty = (function () {
 
     function ccpGetSnippet(makeClipButID) {
       // !VA The target element's ID is passed in from the ccpMakeClipBut array so it doesn't have the hash that makes it a valid ID string. So, add the hash.
+      console.log('ccpGetSnippet running');
       makeClipButID = '#' + makeClipButID;
       console.log('makeClipButID is: ' + makeClipButID);
+      var makeClipButKey = getKeyByValue(ccpMakeClipBut, makeClipButID)
+      console.log('makeClipButKey is: ' + makeClipButKey);
+      console.dir(ccpMakeClipBut);
+
+      switch (true) {
+        case ( makeClipButID === ccpMakeClipBut.ccpImgWriteHTMLToCB) :
+          clipboardStr = getImgWriteHTMLToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.ccpTdWriteHTMLToCB) :
+          clipboardStr = getTdWriteHTMLToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.ccpTableWriteHTMLToCB) :
+          clipboardStr = getTableWriteHTMLToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.imgDisplayWriteCSSToCB) :
+          clipboardStr = getImgDisplayWriteCSSToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.imgSPhoneWriteCSSToCB) :
+          clipboardStr = getImgSPhoneWriteCSSToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.imgLPhoneWriteCSSToCB) :
+          clipboardStr = getImgLPhoneWriteCSSToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.tdDisplayWriteCSSToCB) :
+          clipboardStr = getTdDisplayWriteCSSToCB();
+          break;
+
+        case ( makeClipButID === ccpMakeClipBut.tdSPhoneWriteCSSToCB) :
+          clipboardStr = getTdSPhoneWriteCSSToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.tdLPhoneWriteCSSToCB) :
+          clipboardStr = getTdLPhoneWriteCSSToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.tableDisplayWriteCSSToCB) :
+          clipboardStr = getTableDisplayWriteCSSToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.tableSPhoneWriteCSSToCB) :
+          clipboardStr = getTableSPhoneWriteCSSToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.tableLPhoneWriteCSSToCB) :
+          clipboardStr = getTableLPhoneWriteCSSToCB();
+          break;
+
+
+      }
 
       // !VA Now we need the key name in the ccpMakeClipBut array that corresponds to the target ID passed in from the click event handler. We could use the actual ID, but this way if the makeClipBut array changes so will this...well, not really...but...
-      var ccpMakeClipButKey = getKeyByValue(ccpMakeClipBut, makeClipButID);
-      console.log('ccpMakeClipButKey is: ' + ccpMakeClipButKey);
+      // var ccpMakeClipButKey = getKeyByValue(ccpMakeClipBut, makeClipButID);
+      // console.log('ccpMakeClipButKey is: ' + ccpMakeClipButKey);
       
-      console.dir(ccpMakeClipBut);
-      
-
-
-
-      // !VA List of all the clipboard build functions and the corresponding keys in ccpMakeClipBut
-      var clipFunctions = [
-        getImgWriteHTMLToCB(),
-        getTableWriteHTMLToCB(),
-        getTdWriteHTMLToCB(),
-        getImgDisplayWriteCSSToCB(),
-        getImgLPhoneWriteCSSToCB(),
-        getImgSPhoneWriteCSSToCB(),
-        getTableDisplayWriteCSSToCB(),
-        getTableLPhoneWriteCSSToCB(),
-        getTableLPhoneWriteCSSToCB(),
-        getTdDisplayWriteCSSToCB(),
-        getTdLPhoneWriteCSSToCB(),
-        getTdSPhoneWriteCSSToCB()
-      ]
-
-      // for (let i = 0; i < clipFunctions.length; i++) {
-      //   console.log('clipFunctions[i] is' +  clipFunctions[i]);
-      // }
-
-
-
-
-
-      // var snippetStr = clipFunctions.ccpImgWriteHTMLToCB;
-      // console.log('snippetStr is: ' + snippetStr);
-
-      console.log(typeof(ccpMakeClipButKey));
-
-
-      var snippet = new Clipboard(makeClipButID, {
+      var currentCB = new Clipboard(makeClipButID, {
         text: function(trigger) {
           console.log('new Clipboard here');
-          // var snippetStr = getImgWriteHTMLToCB();
+          // var clipboardStr = getImgWriteHTMLToCB();
           // !VA Write success message to app message area on success
-          snippet.on('success', function(event) {
+          currentCB.on('success', function(event) {
             appController.initMessage(false, 'copied_2_CB');
             // debugger;
           });
   
-          snippet.on('error', function(e) {
+          currentCB.on('error', function(e) {
             console.error('Action:', e.action);
             console.error('Trigger:', e.trigger);
           });
           // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
-          return 'ugh';
+          return clipboardStr;
         }
       });
-
-
     }
 
 
-  function getTableWriteHTMLToCB() {
-    console.log('function...');
+    function getTdWriteHTMLToCB() {
+      console.log('getTdWriteHTMLToCB...');
+      // !VA We don't need this yet, but we will if we decide to add a width style property which is useful for Outlook 120dpi 
+      var data = appController.initGetAppdata();
+      // !VA Declare the string that gets the clipboard output
+      var clipboardStr;
+
+
+      var tdTag = new ClipboardOutput('tdTag');
+      tdTag.classAtt = 
+        // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
+        ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tdClass).value);
+
+      tdTag.alignAtt = (function (id) {
+        // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
+        // !VA Pass in the id of the select dropdown
+        var str;
+        // !VA Get the selection index
+        var selInd = document.querySelector(id).selectedIndex;
+        // !VA Put the available options in an array
+        var tdAlignOptions = [ 'none', 'left', 'center', 'right' ];
+        // !VA Put the desired output strings in an array
+        var clipboardOutput = [ '', 'align="left" ', 'align="center" ', 'align="right" '];
+        // !VA If the selected index matches the index of the available options array, then output the string that matches that index
+        for (let i = 0; i < tdAlignOptions.length; i++) {
+          if ( selInd === i) {
+            str = `${clipboardOutput[i]}`;
+          }
+        }
+        return str;
+      })(ccpUserInput.tdAlign);
+      // !VA tdAlign END
+
+      tdTag.valignAtt = (function (id) {
+        // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
+        // !VA Pass in the id of the select dropdown
+        var str;
+        // !VA Get the selection index
+        var selInd = document.querySelector(id).selectedIndex;
+        // !VA Put the available options in an array
+        var tdValignOptions = [ 'none', 'top', 'middle', 'bottom' ];
+        // !VA Put the desired output strings in an array
+        var clipboardOutput = [ '', 'valign="top"', 'valign="middle" ', 'valign="bottom" '];
+        // !VA If the selected index matches the index of the available options array, then output the string that matches that index
+        for (let i = 0; i < tdValignOptions.length; i++) {
+          if ( selInd === i) {
+            str = `${clipboardOutput[i]}`;
+          }
+        }
+        return str;
+      })(ccpUserInput.tdValign);
+      // !VA tdValign END
+
+      // !VA Pass the input value, prepending it hex # character 
+      tdTag.bgcolorAtt =
+        ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tdBgcolor).value);
+      // !VA tdBgcolor  END
+
+
+      tdTag.tdContents =    (function () {
+        // !VA Get the img tag output and put in between the td tags
+        var str = getImgWriteHTMLToCB();
+        return str;
+      })();
+
+      tdTag.BgimageAtt =  (function (id) {
+        // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
+        var str;
+        id = id.replace('mrk', 'box');
+        // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
+
+        if (document.querySelector(id).checked === true) {
+          str = 
+          
+                
+`
+  <td background="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" ${tdTag.bgcolorAtt}" width="${data.imgW}" height="${data.imgH}" ${tdTag.valignAtt}">
+  <!--[if gte mso 9]>
+    <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${data.imgW}px;height:${data.imgH}px;">
+    <v:fill type="tile" src="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" color="${tdTag.bgcolorAtt}" />
+    <v:textbox inset="0,0,0,0">
+    <![endif]-->
+      <div>
+      <!-- Put Foreground Content Here -->
+      </div>
+    <!--[if gte mso 9]>
+      </v:textbox>
+    </v:rect>
+    <![endif]-->
+  </td>
+`;
+    
+    
+        
+      } else {
+      // !VA The regular TD element
+        str = 
+    
+`    <td ${tdTag.classAtt + ' '}${tdTag.alignAtt + ' '}${tdTag.valignAtt + ' '}${tdTag.bgcolorAtt + ' '}>
+      ${tdTag.tdContents}
+    </td>`;
+    
+        }
+        clipboardStr = str;
+        // return clipboardStr;
+      })(ccpUserInput.tdBgimage);
+
+      return clipboardStr;
   }
 
-  function getTdWriteHTMLToCB() {
-    console.log('function...');
+  function getTableWriteHTMLToCB() {
+    console.log('getTableWriteHTMLToCB...');
+    // !VA We need this to get Appdata.viewerW
+    var data = appController.initGetAppdata();
+    // !VA Variable returning the HTML to the clipboard object 
+    var clipboardStr;
+    // !VA Create the object for storing the individual tag attributes
+    var tableTag = new ClipboardOutput('tableTag');
+    // !VA Base Table options----------------------------------------------
+    tableTag.classAtt = 
+      // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
+      ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tableClass).value);
+
+
+    tableTag.alignAtt = (function (id) {
+      // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
+      // !VA Pass in the id of the select dropdown
+      var str;
+      // !VA Get the selection index
+      var selInd = document.querySelector(id).selectedIndex;
+      // !VA Put the available options in an array
+      var tableAlignOptions = [ 'none', 'left', 'center', 'right' ];
+      // !VA Put the desired output strings in an array
+      var clipboardOutput = [ '', 'align="left"', 'align="center"', 'align="right"'];
+      // !VA If the selected index matches the index of the available options array, then output the string that matches that index
+      for (let i = 0; i < tableAlignOptions.length; i++) {
+        if ( selInd === i) {
+          str = `${clipboardOutput[i]}`;
+        }
+      }
+      return str;
+    })(ccpUserInput.tableAlign);
+    // !VA tableAlign END
+
+    tableTag.tableContents = (function () {
+      var str = getTdWriteHTMLToCB();
+      return str;
+    })();
+
+    // !VA Wrapper Width Attribute
+    tableTag.widthAtt = (function (id, data) {
+      // !VA Get Appdata
+      var data = appController.initGetAppdata();
+      var tableWidthInput = document.querySelector(ccpUserInput.tableWidth);
+      // !VA TODO: Error handling
+      // !VA If there 
+      if (!tableWidthInput.value) {
+        tableTag.tableWidthInput.value = '0';
+      } else {
+        tableTag.tableWidth = `width="${tableWidthInput.value}"`;
+      }
+
+      var str = tableTag.tableWidth;
+      return str;
+    })(ccpUserInput.tableWidth, data);
+    
+    // !VA Pass the input value 
+    tableTag.bgcolorAtt =
+    ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tableBgcolor).value);
+    // !VA tdBgcolor
+    // !VA Base Table Tag END------------------------------------------------------
+
+    // !VA Table WRAPPER Start ------------------------------------------------------
+    // !VA !IMPORTANT! The 'Include wrapper table' option is shown/hidden in the UIController toggleCheckbox function for the CCP
+    // !VA Wrapper Class Attribute
+    tableTag.wrapperclassAtt = 
+    // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
+    ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tableWrapperClass).value);
+
+    // !VA Wrapper Width Attribute
+    tableTag.wrapperWidthAtt = (function (id, data) {
+      // !VA Get Appdata
+      // var data = UIController.accessAppdata();
+      var tableWrapperInput = document.querySelector(ccpUserInput.tableWrapperWidth);
+      // !VA If there 
+      if (!tableWrapperInput.value) {
+        tableTag.wrapperWidthAtt = '';
+      } else {
+        tableTag.wrapperWidthAtt = `width="${tableWrapperInput.value}"`;
+      }
+
+      var str = tableTag.wrapperWidthAtt;
+      return str;
+    })(ccpUserInput.tableWrapperWidth, data);
+
+    // !VA Wrapper align attribute
+    tableTag.wrapperAlignAtt = (function (id) {
+      // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
+      // !VA Pass in the id of the select dropdown
+      var str;
+      // !VA Get the selection index
+      var selInd = document.querySelector(id).selectedIndex;
+      // !VA Put the available options in an array
+      var tableWrapperAlignOptions = [ 'none', 'left', 'center', 'right' ];
+      // !VA Put the desired output strings in an array
+      var clipboardOutput = [ '', 'align="left" ', 'align="center" ', 'align="right" '];
+      // !VA If the selected index matches the index of the available options array, then output the string that matches that index
+      for (let i = 0; i < tableWrapperAlignOptions.length; i++) {
+        if ( selInd === i) {
+          str = `${clipboardOutput[i]}`;
+        }
+      }
+      return str;
+    })(ccpUserInput.tableWrapperAlign);
+
+
+    // !VA Wrapper bgcolor attributePass the input value 
+    tableTag.wrapperBgcolorAtt =
+    ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tableWrapperBgColor).value);
+    // !VA tdBgcolor
+
+    // !VA Get the checked status of Include table wrapper, and if it's 'checked' output the base table AND the table wrapper
+    if ( document.querySelector('#ccp-table-include-wrapper-checkbox').checked) {
+      clipboardStr = 
+
+`<table ${tableTag.wrapperclassAtt + ' '}${tableTag.wrapperWidthAtt + ' '}${tableTag.wrapperAlignAtt + ' '}${tableTag.wrapperBgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
+ <tr>
+   <td align="center" valign="top">
+     <table ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
+       <tr>
+     ${tableTag.tableContents}
+       </tr>
+     </table>
+   </td>
+ </tr>
+</table>`;
+
+      // !VA If the option is unchecked, output just the base table
+    } else {
+      clipboardStr = 
+
+`<table ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
+   <tr>
+      ${tableTag.tableContents}
+   </tr>
+</table>`;
+
+    }
+    return clipboardStr;
+
   }
 
   function getImgDisplayWriteCSSToCB()  {
-    console.log('function...');
-  }
-
-  function getImgLPhoneWriteCSSToCB() {
-    console.log('function...');
+    console.log('functgetImgDisplayWriteCSSToCBion...');
   }
 
   function getImgSPhoneWriteCSSToCB()  {
-    console.log('function...');
+    console.log('getImgSPhoneWriteCSSToCB...');
   }
-  function getTableDisplayWriteCSSToCB() {
-    console.log('function...');
-  }
-
-  function getTableLPhoneWriteCSSToCB() {
-    console.log('function...');
-  }
-
-  function getTableLPhoneWriteCSSToCB() {
-    console.log('function...');
+  function getImgLPhoneWriteCSSToCB() {
+    console.log('getImgLPhoneWriteCSSToCB...');
   }
 
   function getTdDisplayWriteCSSToCB()  {
-    console.log('function...');
+    console.log('getTdDisplayWriteCSSToCB...');
   }
 
   function getTdLPhoneWriteCSSToCB()  {
-    console.log('function...');
+    console.log('getTdLPhoneWriteCSSToCB...');
   }
 
   function getTdSPhoneWriteCSSToCB() {
-
+    console.log('getTdgetTdSPhoneWriteCSSToCB...');
+  }
+  function getTableDisplayWriteCSSToCB() {
+    console.log('getTableDisplayWriteCSSToCB...');
   }
 
+  function getTableSPhoneWriteCSSToCB() {
+    console.log('getTableSPhoneWriteCSSToCB...');
+  }
 
+  function getTableLPhoneWriteCSSToCB() {
+    console.log('getTableLPhoneWriteCSSToCB...');
+  }
 
     // !VA Working 062119_CBMods2
-
-
-
-
-
-
-
 
     // !VA Constructor for the clipboard output objects. These are all the properties all the clipboard output objects (img, td and table) will have. We store these key/value pairs in instances of the ClipboardOutput  because they're easier to manage. Then we write the output into an HTML string.
     function ClipboardOutput(classAtt, alignAtt ) {
