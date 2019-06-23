@@ -16,6 +16,9 @@ Branching to 062119_CBMods2.
 06.22.19
 I have the eternal problem here that func in ccpMakeClips is initialized in UIController, so any calls to it don't run it in situ but rather in it's initialized location in UIController which is not accessible from CBController public functions. I am trying to avoid a switch/case in ccpGetSnippet by integrating the function to run in the ccpMakeClipBut object. But I can't get the function to run unless I put all those functions in CBController public with a switch/case statement which defeats the whole purpose anyway.
 
+NOTES: Object.create doesn't copy an object, it creates an object whose prototype contains the source object. I don't know what this is good for.
+Object.assign doesn't copy an object. 
+
 
 
 
@@ -150,86 +153,28 @@ var Witty = (function () {
       tableWrapperWidth: '#ccp-input-table-wrapper-width',
       tableWrapperAlign: '#ccp-select-table-wrapper-align',
       tableWrapperBgColor: '#ccp-input-table-wrapper-bgcolor',
-    };
+    };dimViewers.clipboardBut
 
-    // !VA ccpMakeClip ID Strings
-    // !VA Stores the ccpMakeTag object for assembling the clipboard create tag buttons. We also store the functions that are run in the CBController module to build the clipboard snippets when each of these elements is clicked so that we can just loop through the properties, get the current event target and run the associated function without an extra switch statement or other conditional at that stage.
+    //dimViewers.clipboardBut
+    //dimViewers.clipboardBut for assembling the clipboard create tag buttons. We also store the functions that are run in the CBController module to build the clipboard snippets when each of these elements is clicked so that we can just loop through the properties, get the current event target and run the associated function without an extra switch statement or other conditional at that stage.
 
     var ccpMakeClipBut = {
       // !VA Build HTML Clipboard Buttons
-      ccpImgWriteHTMLToCB: {
-        id: '#ccp-img-build-html-but',
-        func: function() {
-          getImgWriteHTMLToCB();
-        }
-      },
-      ccpTdWriteHTMLToCB: {
-        id: '#ccp-td-build-html-but',
-        func: function() {
-          ccpTdWriteHTMLToCB();
-        }
-      },
-      ccpTableWriteHTMLToCB: {
-        id: '#ccp-table-build-html-but',
-        func: function() {
-          getTableWriteHTMLToCB();
-        }
-      },
+      ccpImgWriteHTMLToCB: '#ccp-img-build-html-but',
+      ccpTdWriteHTMLToCB: '#ccp-td-build-html-but',
+      ccpTableWriteHTMLToCB: '#ccp-table-build-html-but',
       // !VA Make CSS Clip Buttons
-      imgDisplayWriteCSSToCB: {
-        id: '#ccp-img-display-css-to-clipboard-but',
-        func: function() {
-          getImgDisplayWriteCSSToCB();
-        }
-      },
-      imgSPhoneWriteCSSToCB: {
-        id: '#ccp-img-sphone-css-to-clipboard-but',
-        func: function() {
-          getImgSPhoneWriteCSSToCB();
-        }
-      },
-      imgLPhoneWriteCSSToCB: {
-        id: '#ccp-img-lphone-css-to-clipboard-but',
-        func: function() {
-          getImgLPhoneWriteCSSToCB();
-        }
-      },
-      tdDisplayWriteCSSToCB: {
-        id: '#ccp-td-display-css-to-clipboard-but',
-        func: function() {
-          getTdDisplayWriteCSSToCB();
-        }
-      },
-      tdSPhoneWriteCSSToCB: {
-        id: '#ccp-td-sphone-css-to-clipboard-but',
-        func: function() {
-          getTdSPhoneWriteCSSToCB();
-        }
-      },
-      tdLPhoneWriteCSSToCB: {
-        id: '#ccp-td-lphone-css-to-clipboard-but',
-        func: function() {
-          getTdLPhoneWriteCSSToCB();
-        }
-      },
-      tableDisplayWriteCSSToCB: {
-        id: '#ccp-table-display-css-to-clipboard-but',
-        func: function() {
-          getTableDisplayWriteCSSToCB();
-        }
-      },
-      tableSPhoneWriteCSSToCB: {
-        id: '#ccp-table-sphone-css-to-clipboard-but',
-        func: function() {
-          getTableSPhoneWriteCSSToCB();
-        }
-      },
-      tableLPhoneWriteCSSToCB: {
-        id: '#ccp-table-lphone-css-to-clipboard-but',
-        func: function() {
-          getTableLPhoneWriteCSSToCB();
-        }
-      },
+      imgDisplayWriteCSSToCB: '#ccp-img-display-css-to-clipboard-but',
+      imgSPhoneWriteCSSToCB: '#ccp-img-sphone-css-to-clipboard-but',
+      imgLPhoneWriteCSSToCB: '#ccp-img-lphone-css-to-clipboard-but',
+        
+      tdDisplayWriteCSSToCB:  '#ccp-td-display-css-to-clipboard-but',
+      tdSPhoneWriteCSSToCB: '#ccp-td-sphone-css-to-clipboard-but',
+      tdLPhoneWriteCSSToCB: '#ccp-td-lphone-css-to-clipboard-but',
+      tableDisplayWriteCSSToCB:  '#ccp-table-display-css-to-clipboard-but',
+      tableSPhoneWriteCSSToCB: '#ccp-table-sphone-css-to-clipboard-but',
+      tableLPhoneWriteCSSToCB: '#ccp-table-lphone-css-to-clipboard-but',
+      
     };
 
 
@@ -454,6 +399,82 @@ var Witty = (function () {
     var ccpMakeClipBut = UIController.getCcpMakeClipButIDs();
 
 
+    function getKeyByValue(object, value) {
+      return Object.keys(object).find(key => object[key] === value);
+    }
+
+
+    function ccpGetSnippet(id) {
+      console.log('id is: ' + id);
+      console.log('ccpGetSnippet running...');
+      var clipboardStr, clipButs, makeClipButID;
+      // !VA 1) Identify the clicked clipboard button
+      // !VA Get the ccpMakeClipBut elements
+      var clipButs = UIController.getCcpMakeClipButIDs();
+      console.table(clipButs);
+      // !VA The target element's ID is passed in from the ccpMakeClipBut array so it doesn't have the hash that makes it a valid ID string. So, add the hash.
+      makeClipButID = '#' + id;
+      // !VA Now we just match the clicked element with the ccpMakeClipBut property to run call the function that builds the corresponding snippet.
+      // !VA Note: I tried for two days to avoid using the switch but nothing beats this for readability and comprehensibility. I could pull the switch out to a different function but that is trivial, so leave this for now, it works.
+      switch (true) {
+        case ( makeClipButID === ccpMakeClipBut.ccpImgWriteHTMLToCB) :
+          clipboardStr = getImgWriteHTMLToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.ccpTdWriteHTMLToCB) :
+          clipboardStr = getTdWriteHTMLToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.ccpTableWriteHTMLToCB) :
+          clipboardStr = getTableWriteHTMLToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.imgDisplayWriteCSSToCB) :
+          clipboardStr = getImgDisplayWriteCSSToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.imgSPhoneWriteCSSToCB) :
+          clipboardStr = getImgSPhoneWriteCSSToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.imgLPhoneWriteCSSToCB) :
+          clipboardStr = getImgLPhoneWriteCSSToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.tdDisplayWriteCSSToCB) :
+          clipboardStr = getTdDisplayWriteCSSToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.tdSPhoneWriteCSSToCB) :
+          clipboardStr = getTdSPhoneWriteCSSToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.tdLPhoneWriteCSSToCB) :
+          clipboardStr = getTdLPhoneWriteCSSToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.tableDisplayWriteCSSToCB) :
+          clipboardStr = getTableDisplayWriteCSSToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.tableSPhoneWriteCSSToCB) :
+          clipboardStr = getTableSPhoneWriteCSSToCB();
+          break;
+        case ( makeClipButID === ccpMakeClipBut.tableLPhoneWriteCSSToCB) :
+          clipboardStr = getTableLPhoneWriteCSSToCB();
+          break;
+      }
+
+      // !VA Now that we've gotten the snippet, we create the clipboard object.
+      var currentCB = new Clipboard(makeClipButID, {
+        text: function(trigger) {
+
+          // var clipboardStr = getImgWriteHTMLToCB();
+          // !VA Write success message to app message area on success
+          currentCB.on('success', function(event) {
+            appController.initMessage(false, 'copied_2_CB');
+            // debugger;
+          });
+  
+          currentCB.on('error', function(e) {
+            console.error('Action:', e.action);
+            console.error('Trigger:', e.trigger);
+          });
+          // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
+          return clipboardStr;
+        }
+      });
+    }
 
     // !VA Constructor for the clipboard output objects. These are all the properties all the clipboard output objects (img, td and table) will have. We store these key/value pairs in instances of the ClipboardOutput  because they're easier to manage. Then we write the output into an HTML string.
     function ClipboardOutput(classAtt, alignAtt ) {
@@ -870,121 +891,9 @@ var Witty = (function () {
       doClipboard: function(evt) {
         console.log('doingClipboard');
         ccpGetSnippet(evt.target.id);
-      },
-
-      ccpGetSnippet: function(evt) {
-        UIController.getCcpMakeClipButIDs();
-        console.log('ccpMakeClipBut is:');
-        console.dir(ccpMakeClipBut);
-        var clipboardStr, makeClipButID;
-        console.log('evt is: ' + evt);
-        console.log('evt.target is: ' + evt.target);
-        console.log('evt.target.id is: ' + evt.target.id);
-        // !VA The target element's ID is passed in from the ccpMakeClipBut array so it doesn't have the hash that makes it a valid ID string. So, add the hash.
-        console.log('ccpGetSnippet running');
-        makeClipButID = '#' + evt.target.id;
-        
-
-        console.log('makeClipButID is: ' + makeClipButID);
-        // console.log('makeClipButID is: ' + makeClipButID);
-  
-        console.dir(ccpMakeClipBut);
-        
-
-        var runme;
-        // !VA Loop through the top-level properties in foo
-        for(var i in ccpMakeClipBut) {
-            // !VA loop through the second-level objects, the objects that contain the id and func properties.
-            if(ccpMakeClipBut.hasOwnProperty(i)){
-              console.log('ccpMakeClipBut[i] is: ' + ccpMakeClipBut[i]);
-              console.log('ccpMakeClipBut[i].id is: ' + ccpMakeClipBut[i].id);
-              // !VA If the value of id equals value in makeClipButID (the event target) then run the function associated with that ID.
-              if (ccpMakeClipBut[i].id == makeClipButID) {
-                console.log('match');
-                runme = ccpMakeClipBut[i].func;
-                console.log('runme is: ' + runme);
-                runme();
-              }
-  
-            }
-        }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-        // switch (true) {
-        //   case ( makeClipButID === ccpMakeClipBut.ccpImgWriteHTMLToCB) :
-        //     clipboardStr = getImgWriteHTMLToCB();
-        //     break;
-        //   case ( makeClipButID === ccpMakeClipBut.ccpTdWriteHTMLToCB) :
-        //     clipboardStr = getTdWriteHTMLToCB();
-        //     break;
-        //   case ( makeClipButID === ccpMakeClipBut.ccpTableWriteHTMLToCB) :
-        //     clipboardStr = getTableWriteHTMLToCB();
-        //     break;
-        //   case ( makeClipButID === ccpMakeClipBut.imgDisplayWriteCSSToCB) :
-        //     clipboardStr = getImgDisplayWriteCSSToCB();
-        //     break;
-        //   case ( makeClipButID === ccpMakeClipBut.imgSPhoneWriteCSSToCB) :
-        //     clipboardStr = getImgSPhoneWriteCSSToCB();
-        //     break;
-        //   case ( makeClipButID === ccpMakeClipBut.imgLPhoneWriteCSSToCB) :
-        //     clipboardStr = getImgLPhoneWriteCSSToCB();
-        //     break;
-        //   case ( makeClipButID === ccpMakeClipBut.tdDisplayWriteCSSToCB) :
-        //     clipboardStr = getTdDisplayWriteCSSToCB();
-        //     break;
-        //   case ( makeClipButID === ccpMakeClipBut.tdSPhoneWriteCSSToCB) :
-        //     clipboardStr = getTdSPhoneWriteCSSToCB();
-        //     break;
-        //   case ( makeClipButID === ccpMakeClipBut.tdLPhoneWriteCSSToCB) :
-        //     clipboardStr = getTdLPhoneWriteCSSToCB();
-        //     break;
-        //   case ( makeClipButID === ccpMakeClipBut.tableDisplayWriteCSSToCB) :
-        //     clipboardStr = getTableDisplayWriteCSSToCB();
-        //     break;
-        //   case ( makeClipButID === ccpMakeClipBut.tableSPhoneWriteCSSToCB) :
-        //     clipboardStr = getTableSPhoneWriteCSSToCB();
-        //     break;
-        //   case ( makeClipButID === ccpMakeClipBut.tableLPhoneWriteCSSToCB) :
-        //     clipboardStr = getTableLPhoneWriteCSSToCB();
-        //     break;
-  
-  
-        // }
-  
-        // !VA Now we need the key name in the ccpMakeClipBut array that corresponds to the target ID passed in from the click event handler. We could use the actual ID, but this way if the makeClipBut array changes so will this...well, not really...but...
-        // var ccpMakeClipButKey = getKeyByValue(ccpMakeClipBut, makeClipButID);
-        // console.log('ccpMakeClipButKey is: ' + ccpMakeClipButKey);
-        
-        var currentCB = new Clipboard(makeClipButID, {
-          text: function(trigger) {
-  
-            // var clipboardStr = getImgWriteHTMLToCB();
-            // !VA Write success message to app message area on success
-            currentCB.on('success', function(event) {
-              appController.initMessage(false, 'copied_2_CB');
-              // debugger;
-            });
-    
-            currentCB.on('error', function(e) {
-              console.error('Action:', e.action);
-              console.error('Trigger:', e.trigger);
-            });
-            // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
-            return clipboardStr;
-          }
-        });
       }
+
+
 
 
 
@@ -1023,60 +932,16 @@ var Witty = (function () {
 
 
       function runMe() {
-        console.log('runMe running');
-      var foo = {
-        // !VA Build HTML Clipboard Buttons
-        img: {
-          id: '#ccp-img-build-html-but',
-          func: function() {
-            console.log('this is ccpImgWriteHTMLToCB');
-          }
-        },
-        td: {
-          id: '#ccp-td-build-html-but',
-          func: function() {
-            console.log('this is ccpTdWriteHTMLToCB');
-          }
-        },
-        table: {
-          id: '#ccp-table-build-html-but',
-          func: function() {
-            console.log('this is ccpTableWriteHTMLToCB');
-          }
-        }
-      };
-      // console.log('foo.img.id is: ' + foo.img.id); 
-      for(var i in foo) {
-          if(foo.hasOwnProperty(i)){
-            console.log('foo[i].id is: ' + foo[i].id);
-            foo[i].func();
-          }
-      }
-
-      var elems = [];
-      elems[0] = document.querySelector(ccpMakeClipBut.imgDisplayWriteCSSToCB).id;
-      elems[1] = document.querySelector(ccpMakeClipBut.imgSPhoneWriteCSSToCB).id;
-      elems[2] = document.querySelector(ccpMakeClipBut.imgLPhoneWriteCSSToCB).id;
-      elems[3] = document.querySelector(ccpMakeClipBut.tdDisplayWriteCSSToCB).id;
-      elems[4] = document.querySelector(ccpMakeClipBut.tdSPhoneWriteCSSToCB).id;
-      elems[5] = document.querySelector(ccpMakeClipBut.tdLPhoneWriteCSSToCB).id;
-      elems[6] = document.querySelector(ccpMakeClipBut.tableDisplayWriteCSSToCB).id;
-      elems[7] = document.querySelector(ccpMakeClipBut.tableSPhoneWriteCSSToCB).id;
-      elems[8] = document.querySelector(ccpMakeClipBut.tableLPhoneWriteCSSToCB).id;
-      console.log('elems is:');
-      console.dir(elems);
-        
-        // const myArray = [{x:100}, {x:200}, {x:300}];
-
-        // myArray.forEach((element, index, array) => {
-        //     console.log(element.x); // 100, 200, 300
-        //     console.log(index); // 0, 1, 2
-        //     console.log(array); // same myArray object 3 times
-        // });
-
+        console.log('runMe');
+        var clipboardStr, makeClipButID;
+        var clipButs;
+        clipButs = UIController.getCcpMakeClipButIDs();
+        console.dir(clipButs);
 
 
       }
+
+
 
 
 
@@ -1154,15 +1019,13 @@ var Witty = (function () {
       }
 
 
-      // !VA We need eventListeners for ALL the clipboard buttons so make an eventListener for each value in the ccpMakeClipBut object. So we loop through the top-level objects in ccpMakeClipBut, get the id's in the second-level objects and put an eventListener on them.
-      var clipBut;
+      // !VA We need eventListeners for ALL the clipboard buttons so make an eventListener for each value in the ccpMakeClipBut object. We need a for in loop for objects
       for(var i in ccpMakeClipBut) {
-        // !VA loop through the second-level objects, the objects that contain the id and func properties.
+        // !VA loop through the object that contain the id and func properties.
+        var clipBut;
         if(ccpMakeClipBut.hasOwnProperty(i)){
-          // !VA Get the object corresponding to the id
-          clipBut = document.querySelector(ccpMakeClipBut[i].id);
-          // !VA add the eventListener with addEventHandler
-          addEventHandler(clipBut,'click',CBCtrl.ccpGetSnippet,false);
+          clipBut = document.querySelector(ccpMakeClipBut[i]);
+          addEventHandler(clipBut,'click',CBController.doClipboard,false);
         }
       }
 

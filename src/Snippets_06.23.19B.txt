@@ -1,0 +1,53 @@
+      
+	// This shows that using Object. assign just creates a copy of the object where the property values are references, not new properties of a new object. So changing values of the copy changes the original object as well. What use is that? I don't understand at all what the point of that is.
+	// Also it shows that Chrome doesn't process console.table correctly. It shows the way I WISH it worked, not the way it actually works. Don't forget this, it's cost many hours of confusion so far. It works properly in Firefox, showing that the properties of the source object always change when changes are made to the properties of the target new object.
+	function runMe() {
+        console.log('runMe');
+
+        // Create object
+        const sobj = { };
+        const sobj2 = { };
+        sobj.prop1 = 'sobj 1';
+        sobj.prop2 = 'sobj 2';
+        sobj2.prop1 = 'sobj2 1';
+        sobj2.prop2 = 'sobj2 2';
+        console.log('sobj console.table output:');
+        console.table(sobj);
+        // console.log('sobj console.dir output:');
+        // console.dir(sobj);
+
+        // Copy object
+        const tobj = Object.assign(sobj);
+        console.log('tobj console.table output:');
+        console.table(tobj);
+        // console.log('tobj console.dir output:');
+        // console.dir(tobj);
+
+        // Change prop values of copy target
+        tobj.prop1 = 'tobj 1';
+        tobj.prop2 = 'tobj 2';
+        console.log('tobj console.table output after prop change:');
+        console.table(tobj);
+
+        console.log('sobj.prop1 is: ' + sobj.prop1);
+        console.log('sobj.prop2 is: ' + sobj.prop2);
+        console.log('tobj.prop1 is: ' + tobj.prop1);
+        console.log('tobj.prop2 is: ' + tobj.prop2);
+
+
+
+        (function () {
+          console.log('IIFE');
+          const tobj2 = Object.assign(sobj2);
+          console.log('inside IIFE');
+          console.table(tobj2);
+
+          tobj2.prop1 = 'new tobj2.prop1'
+          tobj2.prop2 = 'new tobj2.prop2'
+          console.log('sobj2.prop1 is: ' + sobj2.prop1);
+          console.log('sobj2.prop2 is: ' + sobj2.prop2);
+          
+          
+        })(sobj2);
+
+      }
