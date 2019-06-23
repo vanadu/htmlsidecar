@@ -106,3 +106,67 @@ DONE: Fix the retina calculations: it should alert if the disk size isn't 2X the
 DONE: Reset the customH and customW fields on blur to their placeholders on blur when blur is on mouseclick
 DONE: Fix the images on viewerW and phone input fields
 DONE: fix small phones and lartge phones toolbuttons.
+
+
+As of 06.23.19
+---------------
+06.21.19 
+Branch 062119_CBMods
+-- The first thing is to move getAppdata out of public appController. I want to keep getAspectRatio in appController but have all the actual DOM access in UIController.
+
+* appController public initGetAppdata calls appController private getAppdata 
+* appController private getAppdata calls UIController.queryDOM ONLY to access DOM elements and data properties. 
+* getAppdata then runs any calcs necessary and returns Appdata to initGetAppdata
+* initGetAppdata then returns APpdata to the calling function.
+
+IMPORTANT: This works but getAppdata is called four times each time the page loads...not sure if that's good. Better to pass Appdata where possible than call a DOM access.
+Branching to 062119_CBMods2.
+
+06.22.19
+I have the eternal problem here that func in ccpMakeClips is initialized in UIController, so any calls to it don't run it in situ but rather in it's initialized location in UIController which is not accessible from CBController public functions. I am trying to avoid a switch/case in ccpGetSnippet by integrating the function to run in the ccpMakeClipBut object. But I can't get the function to run unless I put all those functions in CBController public with a switch/case statement which defeats the whole purpose anyway.
+
+06.23.19
+Object.create doesn't copy an object, it creates an object whose prototype contains the source object. I don't know what this is good for.
+Object.assign doesn't copy an object, same issue. Spent a couple days trying to make this work without switch and without putting everything into public functions. Ended up just using switch. See 
+
+
+
+
+
+
+TODO: Finish reviewing and implementing write to clipboard buttons.
+TODO: rewrite getAppdata to only query specific items in the array, or at least use destructuring to only make a const out of which ever Appdata property is needed in the respective function.
+TOD0: Think about making getAppdata only query a specific property if possible.
+TODO: Fix being able to resize viewerW smaller than imgW - current behavior is imgw resizes with viewerW. If that's the desired behavior, imgW still doesn't write the udpated width to Appdata, that needs to be fixed.
+TODO: Implement Td and table copy to clipboard buttons.
+TODO: Make mrk => box function...not sure where though or whether it's necessary since it's just a one-liner.
+TODO: Fix error messages - they don't fade out. Loop that in with flashAppMessage
+TODO: Fix bug - load 400X1000, multiple click on +50, Display Size shows 450 but the img doesn't grow...
+TODO: Implement image swap 
+TODO: Parent table class att only shows in CB output if Wrapper is selected, not in just the Partent table output.
+TODO: Make bgcolor add the hash if it's not in the value
+TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
+TODO: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- I think. Not sure if this is the right behavior...think bout it. Probably not.
+TODO: Assign keyboard  shortcuts
+TODO: Assign tab order
+
+
+
+DONE: Uncheck and Hide Wrapper table options when CCP is opened.
+DONE: Fix flashAppMessage to include status messages and cleanup
+DONE: Fix showElementOnInput in CCP
+Merge Branch 0619FixPhonesInput
+DONE: fixed sPhonesw and lPhonesW user input.
+Merge fixAppMessages
+DONE: Fixed, imgW field on tab doesn't reset to placeholders. 
+DONE: Rewrite updateAppdata to be parameters... with key/value pairs as parameter.
+DONE: Fold handleToolbarClicks into checkUserInput and rename to checkUserInput
+Branch checkUserInput
+DONE: Branch rewriteHandleUserAction061119
+DONE: Fix that smallphones and largephones input fields show undefined and show in Appdata as pixel values.
+DONE: Fix default value in viewerW field - Fixed, added to calcViewerSize
+DONE: resize viewerW doesn't work Fixed, reconfigured updateAppdata to include viewerW
+DONE: - imgheight and imgwidth don't work Fixed, added evalToolbarInput to follow checkUserInput
+DONE: Rename UI.
+DONE: Show/Hide CCP, make checkboxes functional.
+*/

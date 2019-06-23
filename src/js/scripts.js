@@ -1,45 +1,24 @@
 
-/* !VA  - SWITCHED TO ARNIE on UBUNTU
-===========================================================
-06.21.19 
-Branch 062119_CBMods
--- The first thing is to move getAppdata out of public appController. I want to keep getAspectRatio in appController but have all the actual DOM access in UIController.
+/* !VA  - 06.23.19
+=========================================================
 
-* appController public initGetAppdata calls appController private getAppdata 
-* appController private getAppdata calls UIController.queryDOM ONLY to access DOM elements and data properties. 
-* getAppdata then runs any calcs necessary and returns Appdata to initGetAppdata
-* initGetAppdata then returns APpdata to the calling function.
-
-IMPORTANT: This works but getAppdata is called four times each time the page loads...not sure if that's good. Better to pass Appdata where possible than call a DOM access.
-Branching to 062119_CBMods2.
-
-06.22.19
-I have the eternal problem here that func in ccpMakeClips is initialized in UIController, so any calls to it don't run it in situ but rather in it's initialized location in UIController which is not accessible from CBController public functions. I am trying to avoid a switch/case in ccpGetSnippet by integrating the function to run in the ccpMakeClipBut object. But I can't get the function to run unless I put all those functions in CBController public with a switch/case statement which defeats the whole purpose anyway.
-
-NOTES: Object.create doesn't copy an object, it creates an object whose prototype contains the source object. I don't know what this is good for.
-Object.assign doesn't copy an object. 
-
-
-
-
-TODO: Finish reviewing and implementing write to clipboard buttons.
+TODO: Finish reviewing and implementing write to clipboard buttons. NOTE: Need to thing about how to make that DRYer...there's a lot of repetition.
 TODO: rewrite getAppdata to only query specific items in the array, or at least use destructuring to only make a const out of which ever Appdata property is needed in the respective function.
 TOD0: Think about making getAppdata only query a specific property if possible.
 TODO: Fix being able to resize viewerW smaller than imgW - current behavior is imgw resizes with viewerW. If that's the desired behavior, imgW still doesn't write the udpated width to Appdata, that needs to be fixed.
-TODO: Implement Td and table copy to clipboard buttons.
 TODO: Make mrk => box function...not sure where though or whether it's necessary since it's just a one-liner.
-TODO: Fix error messages - they don't fade out. Loop that in with flashAppMessage
 TODO: Fix bug - load 400X1000, multiple click on +50, Display Size shows 450 but the img doesn't grow...
 TODO: Implement image swap 
 TODO: Parent table class att only shows in CB output if Wrapper is selected, not in just the Partent table output.
 TODO: Make bgcolor add the hash if it's not in the value
-TODO: FIx, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
+TODO: Fix, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
 TODO: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- I think. Not sure if this is the right behavior...think bout it. Probably not.
 TODO: Assign keyboard  shortcuts
 TODO: Assign tab order
 
-
-
+DONE: Reduce timeout on clicking clipboard buttons...too slow. There has to be two implementations of messages - one for status messages that only last a half a second and use the blocker, and one for error messages that last two seconds and don't use the blocker.
+DONE: Fixed error messages - they didn't fade out. Loop that in with flashAppMessage
+DONE: Implement Td and table copy to clipboard buttons.
 DONE: Uncheck and Hide Wrapper table options when CCP is opened.
 DONE: Fix flashAppMessage to include status messages and cleanup
 DONE: Fix showElementOnInput in CCP
@@ -345,9 +324,11 @@ var Witty = (function () {
       // !VA  - review this. We could probably fold this into the error handler but that's going to be complicated enough as it is and this is just for status messages
       flashAppMessage: function(messArray) {
         // !VA Receives an array of a boolean error flag and the message to be displayed.
-        var isErr, mess;
+        // !VA Init error flag, message string and timeout delay
+        var isErr, mess, del;
         isErr = messArray[0];
         mess = messArray[1];
+        var del;
 
         // !VA Get the message container and display text into variables
         var appMessContainer = document.querySelector(staticRegions.appMessContainer);
@@ -356,14 +337,20 @@ var Witty = (function () {
         var messType;
         // !VA If it's an error, show class show-err, otherwise it's a status message so show-mess
         isErr ? messType = 'show-err' : messType = 'show-mess';
-        // !VA First, overlay the CCP blocker to prevent user input while the CSS transitions run and the status message is displayed. Cheap, but effective solution.
-        ccpBlocker.style.display = 'block';
+
+        // !VA If isErr is false, then it's a status message, overlay the CCP blocker to prevent user input while the CSS transitions run and the status message is displayed. Cheap, but effective solution.
+        isErr ? isErr : ccpBlocker.style.display = 'block';
         // !VA Add the class that displays the message
         appMessContainer.classList.add(messType);
         // !VA Write the message to the message display area
         appMessDisplay.innerHTML = mess;
         // !VA Add the class to show the message
         appMessContainer.classList.add(messType);
+        // !VA If it's an error, let it display for 2.5 seconds. If it's a status, just flash it because while it's onscreen the CCP blocker is active and we want that to be short.
+        isErr ? del = 2500 : del = 500;
+
+
+
         // !VA Show the message for two seconds
         window.setTimeout(function() {
         // !VA After two seconds, hide the message and remove the blocker
@@ -377,7 +364,7 @@ var Witty = (function () {
 
           },250);
         }, 
-        2000);
+        del);
       },
     };
 
@@ -405,53 +392,56 @@ var Witty = (function () {
 
 
     function ccpGetSnippet(id) {
-      console.log('id is: ' + id);
       console.log('ccpGetSnippet running...');
+
+      
       var clipboardStr, clipButs, makeClipButID;
-      // !VA 1) Identify the clicked clipboard button
+      var Appdata = {};
+      // !VA Get Appdata - we will pass it so the DOM doesn't have be accessed every time a snippet is build.
+      Appdata = appController.initGetAppdata();
       // !VA Get the ccpMakeClipBut elements
+      
       var clipButs = UIController.getCcpMakeClipButIDs();
-      console.table(clipButs);
       // !VA The target element's ID is passed in from the ccpMakeClipBut array so it doesn't have the hash that makes it a valid ID string. So, add the hash.
       makeClipButID = '#' + id;
       // !VA Now we just match the clicked element with the ccpMakeClipBut property to run call the function that builds the corresponding snippet.
       // !VA Note: I tried for two days to avoid using the switch but nothing beats this for readability and comprehensibility. I could pull the switch out to a different function but that is trivial, so leave this for now, it works.
       switch (true) {
         case ( makeClipButID === ccpMakeClipBut.ccpImgWriteHTMLToCB) :
-          clipboardStr = getImgWriteHTMLToCB();
+          clipboardStr = getImgWriteHTMLToCB(Appdata);
           break;
         case ( makeClipButID === ccpMakeClipBut.ccpTdWriteHTMLToCB) :
-          clipboardStr = getTdWriteHTMLToCB();
+          clipboardStr = getTdWriteHTMLToCB(Appdata);
           break;
         case ( makeClipButID === ccpMakeClipBut.ccpTableWriteHTMLToCB) :
-          clipboardStr = getTableWriteHTMLToCB();
+          clipboardStr = getTableWriteHTMLToCB(Appdata);
           break;
         case ( makeClipButID === ccpMakeClipBut.imgDisplayWriteCSSToCB) :
-          clipboardStr = getImgDisplayWriteCSSToCB();
+          clipboardStr = getImgDisplayWriteCSSToCB(Appdata);
           break;
         case ( makeClipButID === ccpMakeClipBut.imgSPhoneWriteCSSToCB) :
-          clipboardStr = getImgSPhoneWriteCSSToCB();
+          clipboardStr = getImgSPhoneWriteCSSToCB(Appdata);
           break;
         case ( makeClipButID === ccpMakeClipBut.imgLPhoneWriteCSSToCB) :
-          clipboardStr = getImgLPhoneWriteCSSToCB();
+          clipboardStr = getImgLPhoneWriteCSSToCB(Appdata);
           break;
         case ( makeClipButID === ccpMakeClipBut.tdDisplayWriteCSSToCB) :
-          clipboardStr = getTdDisplayWriteCSSToCB();
+          clipboardStr = getTdDisplayWriteCSSToCB(Appdata);
           break;
         case ( makeClipButID === ccpMakeClipBut.tdSPhoneWriteCSSToCB) :
-          clipboardStr = getTdSPhoneWriteCSSToCB();
+          clipboardStr = getTdSPhoneWriteCSSToCB(Appdata);
           break;
         case ( makeClipButID === ccpMakeClipBut.tdLPhoneWriteCSSToCB) :
-          clipboardStr = getTdLPhoneWriteCSSToCB();
+          clipboardStr = getTdLPhoneWriteCSSToCB(Appdata);
           break;
         case ( makeClipButID === ccpMakeClipBut.tableDisplayWriteCSSToCB) :
-          clipboardStr = getTableDisplayWriteCSSToCB();
+          clipboardStr = getTableDisplayWriteCSSToCB(Appdata);
           break;
         case ( makeClipButID === ccpMakeClipBut.tableSPhoneWriteCSSToCB) :
           clipboardStr = getTableSPhoneWriteCSSToCB();
           break;
         case ( makeClipButID === ccpMakeClipBut.tableLPhoneWriteCSSToCB) :
-          clipboardStr = getTableLPhoneWriteCSSToCB();
+          clipboardStr = getTableLPhoneWriteCSSToCB(Appdata);
           break;
       }
 
@@ -483,10 +473,8 @@ var Witty = (function () {
     }
 
     // CBController: GET STRINGS FOR THE IMG CLIPBOARD OUTPUT
-    function getImgWriteHTMLToCB() {
+    function getImgWriteHTMLToCB(Appdata) {
       console.log('running getImgWriteHTMLToCB');
-      // !VA Get Appdata - we need it for the filename
-      var data = appController.initGetAppdata();
       // !VA The string that passes the HTML img tag
       var str; 
       // !VA Create the instance for img tag clipboard object and add img-specific properties.
@@ -503,7 +491,7 @@ var Witty = (function () {
         ccpIfNoUserInput('alt',document.querySelector(ccpUserInput.imgAlt).value);
       // !VA imgTag.altAtt END
 
-      imgTag.srcAtt = (function (id, data) {
+      imgTag.srcAtt = (function (id, Appdata) {
         // !VA Get the filename from the dimViewer
         
         var str;
@@ -514,17 +502,17 @@ var Witty = (function () {
           str = document.querySelector(dimViewers.filename).textContent;
         }
         return str;
-      })(ccpUserInput.imgRelPath, data);
+      })(ccpUserInput.imgRelPath, Appdata);
       // !VA imgTag.srcAtt END
-      imgTag.heightAtt = `height="${data.imgH}"`;
-      imgTag.widthAtt = `width="${data.imgW}"`;
+      imgTag.heightAtt = `height="${Appdata.imgH}"`;
+      imgTag.widthAtt = `width="${Appdata.imgW}"`;
       imgTag.styleAtt =  (function (id) {
         // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
         var str;
         id = id.replace('mrk', 'box');
         // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
         if (document.querySelector(id).checked === true) {
-          str = `border="0" style="width: ${data.imgW}px; height: ${data.imgH}px; border: none; outline: none; text-decoration: none; display: block;" `;
+          str = `border="0" style="width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; border: none; outline: none; text-decoration: none; display: block;" `;
         } else {
           str = 'border="0" style="border: none; outline: none; text-decoration: none; display: block;"';
         }
@@ -561,10 +549,10 @@ var Witty = (function () {
       return imgTagStr;
     } 
 
-    function getTdWriteHTMLToCB() {
+    function getTdWriteHTMLToCB(Appdata) {
       console.log('getTdWriteHTMLToCB...');
-      // !VA We don't need this yet, but we will if we decide to add a width style property which is useful for Outlook 120dpi 
-      var data = appController.initGetAppdata();
+      // !VA We need Appdata for the background image snippet.
+
       // !VA Declare the string that gets the clipboard output
       var clipboardStr;
 
@@ -622,7 +610,7 @@ var Witty = (function () {
 
       tdTag.tdContents =    (function () {
         // !VA Get the img tag output and put in between the td tags
-        var str = getImgWriteHTMLToCB();
+        var str = getImgWriteHTMLToCB(Appdata);
         return str;
       })();
 
@@ -637,10 +625,10 @@ var Witty = (function () {
           
                 
 `
-  <td background="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" ${tdTag.bgcolorAtt}" width="${data.imgW}" height="${data.imgH}" ${tdTag.valignAtt}">
+  <td background="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" ${tdTag.bgcolorAtt}" width="${Appdata.imgW}" height="${Appdata.imgH}" ${tdTag.valignAtt}">
   <!--[if gte mso 9]>
-    <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${data.imgW}px;height:${data.imgH}px;">
-    <v:fill type="tile" src="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.filename}" color="${tdTag.bgcolorAtt}" />
+    <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Appdata.imgW}px;height:${Appdata.imgH}px;">
+    <v:fill type="tile" src="${document.querySelector(ccpUserInput.imgRelPath).value}/${Appdata.filename}" color="${tdTag.bgcolorAtt}" />
     <v:textbox inset="0,0,0,0">
     <![endif]-->
       <div>
@@ -671,10 +659,10 @@ var Witty = (function () {
       return clipboardStr;
     }
 
-    function getTableWriteHTMLToCB() {
+    function getTableWriteHTMLToCB(Appdata) {
       console.log('getTableWriteHTMLToCB...');
-      // !VA We need this to get Appdata.viewerW
-      var data = appController.initGetAppdata();
+      // !VA We need Appdata to get Appdata.viewerW
+
       // !VA Variable returning the HTML to the clipboard object 
       var clipboardStr;
       // !VA Create the object for storing the individual tag attributes
@@ -706,14 +694,14 @@ var Witty = (function () {
       // !VA tableAlign END
 
       tableTag.tableContents = (function () {
-        var str = getTdWriteHTMLToCB();
+        var str = getTdWriteHTMLToCB(Appdata);
         return str;
       })();
 
       // !VA Wrapper Width Attribute
-      tableTag.widthAtt = (function (id, data) {
+      tableTag.widthAtt = (function (id, Appdata) {
         // !VA Get Appdata
-        var data = appController.initGetAppdata();
+
         var tableWidthInput = document.querySelector(ccpUserInput.tableWidth);
         // !VA TODO: Error handling
         // !VA If there 
@@ -725,7 +713,7 @@ var Witty = (function () {
 
         var str = tableTag.tableWidth;
         return str;
-      })(ccpUserInput.tableWidth, data);
+      })(ccpUserInput.tableWidth, Appdata);
       
       // !VA Pass the input value 
       tableTag.bgcolorAtt =
@@ -741,9 +729,8 @@ var Witty = (function () {
       ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tableWrapperClass).value);
 
       // !VA Wrapper Width Attribute
-      tableTag.wrapperWidthAtt = (function (id, data) {
-        // !VA Get Appdata
-        // var data = UIController.accessAppdata();
+      tableTag.wrapperWidthAtt = (function (id, Appdata) {
+
         var tableWrapperInput = document.querySelector(ccpUserInput.tableWrapperWidth);
         // !VA If there 
         if (!tableWrapperInput.value) {
@@ -754,7 +741,7 @@ var Witty = (function () {
 
         var str = tableTag.wrapperWidthAtt;
         return str;
-      })(ccpUserInput.tableWrapperWidth, data);
+      })(ccpUserInput.tableWrapperWidth, Appdata);
 
       // !VA Wrapper align attribute
       tableTag.wrapperAlignAtt = (function (id) {
@@ -813,16 +800,49 @@ var Witty = (function () {
 
     }
 
-    function getImgDisplayWriteCSSToCB()  {
-      console.log('functgetImgDisplayWriteCSSToCBion...');
+    function getImgDisplayWriteCSSToCB(Appdata)  {
+      console.log('getImgDisplayWriteCSSToCB...');
+        // !VA The string to pass the CSS declaration to the clipboard object
+        var clipboardStr;
+        // !VA Clipboard output object 
+        var imgCSSTag = new ClipboardOutput('imgCSSTag');
+        // !VA Put the user-entered class into this property
+        imgCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
+
+        // !VA Build the css class declaration with width and height properties
+        clipboardStr = `img.${imgCSSTag.classAtt} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important }`;
+        // !VA Return the css string to the clipboard object.
+        return clipboardStr;
+
     }
 
-    function getImgSPhoneWriteCSSToCB()  {
+    function getImgSPhoneWriteCSSToCB(Appdata)  {
       console.log('getImgSPhoneWriteCSSToCB...');
+      // !VA The string to pass the CSS declaration to the clipboard object
+      var clipboardStr;
+      // !VA Clipboard output object 
+      var smallPhonesCSSTag = new ClipboardOutput('smallPhonesTag');
+      // !VA Put the user-entered class into this property
+      smallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
+      // !VA Build the css class declaration with and Appdata large phone width and height properties
+      clipboardStr = `img.${smallPhonesCSSTag.classAtt} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
+      // !VA Return the css string to the clipboard object.
+      return clipboardStr;
     }
 
-    function getImgLPhoneWriteCSSToCB() {
+    function getImgLPhoneWriteCSSToCB(Appdata) {
       console.log('getImgLPhoneWriteCSSToCB...');
+      // !VA The string to pass the CSS declaration to the clipboard object
+      console.table(Appdata);
+      var clipboardStr;
+      // !VA Clipboard output object 
+      var largePhonesCSSTag = new ClipboardOutput('largePhonesCSSTag');
+      // !VA Put the user-entered class into this property
+      largePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
+      // !VA Build the css class declaration with and Appdata large phone width and height properties
+      clipboardStr = `img.${largePhonesCSSTag.classAtt} { width: ${Appdata.lPhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
+      // !VA Return the css string to the clipboard object.
+      return clipboardStr;
     }
 
     function getTdDisplayWriteCSSToCB()  {
@@ -883,7 +903,6 @@ var Witty = (function () {
       }
     }
     return str;
-
   }
 
     // !VA CBController public functions 
@@ -892,14 +911,6 @@ var Witty = (function () {
         console.log('doingClipboard');
         ccpGetSnippet(evt.target.id);
       }
-
-
-
-
-
-
-
-
     };
   })();
 

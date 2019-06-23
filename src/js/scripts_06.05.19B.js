@@ -1008,49 +1008,7 @@ console.log('event.target.id is: ' + event.target.id);
         console.dir(data);
         // !VA The string to pass the CSS declaration to the clipboard object
         var clipboardStr;
-        window.addEventListener('load', function() {
-          // !VA TODO: Dev mode doesn't work any more...
-          console.log('initializeDevMode running...');
-            
-          // !VA Get the imgViewer dimensions as set in CSS:
-          var initViewerW = parseInt(document.querySelector(dynamicRegions.imgViewer).style.width);
-          // !VA Not sure why this isn't used.
-          var initViewerH = parseInt(document.querySelector(dynamicRegions.imgViewer).style.height);
-          // !VA Initalize the imgViewer width input field value to the default of 650
-          document.querySelector(toolButtons.viewerW).placeholder = initViewerW;
-          // !VA  Test if there is currently #cur-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
-          var curImgExists = document.querySelector(dynamicRegions.curImg);
-          // !VA  Now we have to populate Appdata with data. We can do it manually here and just pass the object on to refresh the screen elements.
-          // !VA If there's no current image, then return false. This is the flag to the initializeDOM function that there is no DEV image in the HTML. The init then shows the drop area and 'No Image' in the dimViewers.
-  
-          // !VA  There is a current image, so first populate Appdata manually and then populate getAppData based on the object properties in Appdata
-          var AppobjDev = {
-            currentimg: document.querySelector(dynamicRegions.curImg),
-            viewer: document.querySelector(dynamicRegions.imgViewer),
-            viewport: document.querySelector(dynamicRegions.imgViewport),
-            appcontainer: document.querySelector(dynamicRegions.appContainer)
-          }; 
-  
-          var filename = clipboardController.getFilenameFromSource(AppobjDev.currentimg.src);
-          // !VA Hide the drop area.
-          document.querySelector(staticRegions.dropArea).style.display = 'none';
-          // !VA  Show the toolbar
-          document.querySelector(staticRegions.toolsContainer).style.display = 'block';
-          // !VA This is where we run writeImgToDOM to:
-          /* 1) Insert the cur-img-container insider the cur-img element
-            2) Include logic to exclude inserting the image unless it doesn't exist already, i.e. is the FileReader blob and not the hard-coded image from the HTML file.
-          */
-          // !VA AppobjDev returns NaN for the viewer containers because they don't have values yet... not sure I understand why since height and width are initially declared in CSS.
-          var Appdata = UIController.getAppData(AppobjDev, filename);
-          // !VA evaluate the viewer containers and adjust their size based on the returned Appdata
-          var evalViewerSize = clipboardController.evalViewerSize(Appdata);
-  
-          // !VA Open the CCP by default in dev mode
-          // !VA First, make sure it's closed
-          document.querySelector(staticRegions.ccpContainer).classList.remove('active');
-          // !VA Then run ccpToggle to initialize the dynamic values and open it
-          UIController.ccpToggle();
-        });   // !VA Clipboard output object 
+// !VA Clipboard output object 
         var smallPhonesCSSTag = new ClipboardOutput('smallPhonesTag');
         // !VA Put the user-entered class into this property
         smallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
