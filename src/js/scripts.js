@@ -12,7 +12,7 @@ TODO: Implement image swap
 TODO: Parent table class att only shows in CB output if Wrapper is selected, not in just the Partent table output.
 TODO: Make bgcolor add the hash if it's not in the value
 TODO: Fix, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
-TODO: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- I think. Not sure if this is the right behavior...think bout it. Probably not.
+TODO: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- I think. Not sure if this is the right behavior...think bout it. Probably not.YOUTBV
 TODO: Assign keyboard  shortcuts
 TODO: Assign tab order
 
@@ -438,7 +438,7 @@ var Witty = (function () {
           clipboardStr = getTableDisplayWriteCSSToCB(Appdata);
           break;
         case ( makeClipButID === ccpMakeClipBut.tableSPhoneWriteCSSToCB) :
-          clipboardStr = getTableSPhoneWriteCSSToCB();
+          clipboardStr = getTableSPhoneWriteCSSToCB(Appdata);
           break;
         case ( makeClipButID === ccpMakeClipBut.tableLPhoneWriteCSSToCB) :
           clipboardStr = getTableLPhoneWriteCSSToCB(Appdata);
@@ -805,12 +805,12 @@ var Witty = (function () {
         // !VA The string to pass the CSS declaration to the clipboard object
         var clipboardStr;
         // !VA Clipboard output object 
-        var imgCSSTag = new ClipboardOutput('imgCSSTag');
+        var imgDisplayCSSTag = new ClipboardOutput('imgDisplayCSSTag');
         // !VA Put the user-entered class into this property
-        imgCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
+        imgDisplayCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
 
         // !VA Build the css class declaration with width and height properties
-        clipboardStr = `img.${imgCSSTag.classAtt} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important }`;
+        clipboardStr = `img.${imgDisplayCSSTag.classAtt} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important }`;
         // !VA Return the css string to the clipboard object.
         return clipboardStr;
 
@@ -821,11 +821,11 @@ var Witty = (function () {
       // !VA The string to pass the CSS declaration to the clipboard object
       var clipboardStr;
       // !VA Clipboard output object 
-      var smallPhonesCSSTag = new ClipboardOutput('smallPhonesTag');
+      var imgSmallPhonesCSSTag = new ClipboardOutput('imgSmallPhonesTag');
       // !VA Put the user-entered class into this property
-      smallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
+      imgSmallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
       // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `img.${smallPhonesCSSTag.classAtt} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
+      clipboardStr = `img.${imgSmallPhonesCSSTag.classAtt} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
       // !VA Return the css string to the clipboard object.
       return clipboardStr;
     }
@@ -833,40 +833,95 @@ var Witty = (function () {
     function getImgLPhoneWriteCSSToCB(Appdata) {
       console.log('getImgLPhoneWriteCSSToCB...');
       // !VA The string to pass the CSS declaration to the clipboard object
-      console.table(Appdata);
       var clipboardStr;
       // !VA Clipboard output object 
-      var largePhonesCSSTag = new ClipboardOutput('largePhonesCSSTag');
+      var imgLargePhonesCSSTag = new ClipboardOutput('imgLargePhonesCSSTag');
       // !VA Put the user-entered class into this property
-      largePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
+      imgLargePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
       // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `img.${largePhonesCSSTag.classAtt} { width: ${Appdata.lPhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
+      clipboardStr = `img.${imgLargePhonesCSSTag.classAtt} { width: ${Appdata.lPhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
       // !VA Return the css string to the clipboard object.
       return clipboardStr;
     }
 
-    function getTdDisplayWriteCSSToCB()  {
+    function getTdDisplayWriteCSSToCB(Appdata)  {
       console.log('getTdDisplayWriteCSSToCB...');
+      // !VA The string to pass the CSS declaration to the clipboard object
+      var clipboardStr;
+      // !VA Clipboard output object 
+      var tdDisplayCSSTag = new ClipboardOutput('tdLargePhonesCSSTag');
+      // !VA Put the user-entered class into this property
+      tdDisplayCSSTag.classAtt = document.querySelector(ccpUserInput.tdClass).value;
+      // !VA Build the css class declaration with and Appdata large phone width and height properties
+      clipboardStr = `td.${tdDisplayCSSTag.classAtt} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important }`;
+      // !VA Return the css string to the clipboard object.
+      return clipboardStr;
     }
 
-    function getTdLPhoneWriteCSSToCB()  {
-      console.log('getTdLPhoneWriteCSSToCB...');
-    }
-
-    function getTdSPhoneWriteCSSToCB() {
+    function getTdSPhoneWriteCSSToCB(Appdata) {
       console.log('getTdgetTdSPhoneWriteCSSToCB...');
+      var clipboardStr;
+      // !VA Clipboard output object 
+      var tdSmallPhonesCSSTag = new ClipboardOutput('tdSmallPhonesCSSTag');
+      // !VA Put the user-entered class into this property
+      tdSmallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.tdClass).value;
+      // !VA Build the css class declaration with and Appdata large phone width and height properties
+      clipboardStr = `td.${tdSmallPhonesCSSTag.classAtt} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
+      // !VA Return the css string to the clipboard object.
+      return clipboardStr;
     }
 
-    function getTableDisplayWriteCSSToCB() {
+    function getTdLPhoneWriteCSSToCB(Appdata)  {
+      console.log('getTdLPhoneWriteCSSToCB...');
+       var clipboardStr;
+      // !VA Clipboard output object 
+      var tdLargePhonesCSSTag = new ClipboardOutput('tdLargePhonesCSSTag');
+      // !VA Put the user-entered class into this property
+      tdLargePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.tdClass).value;
+      // !VA Build the css class declaration with and Appdata large phone width and height properties
+      clipboardStr = `td.${tdLargePhonesCSSTag.classAtt} { width: ${Appdata.lPhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
+      // !VA Return the css string to the clipboard object.
+      return clipboardStr;
+    }
+
+    function getTableDisplayWriteCSSToCB(Appdata) {
       console.log('getTableDisplayWriteCSSToCB...');
+      // !VA The string to pass the CSS declaration to the clipboard object
+      var clipboardStr;
+      // !VA Clipboard output object 
+      var tableDisplayCSSTag = new ClipboardOutput('tableLargePhonesCSSTag');
+      // !VA Put the user-entered class into this property
+      tableDisplayCSSTag.classAtt = document.querySelector(ccpUserInput.tableClass).value;
+      // !VA Build the css class declaration with and Appdata large phone width and height properties
+      clipboardStr = `table.${tableDisplayCSSTag.classAtt} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important }`;
+      // !VA Return the css string to the clipboard object.
+      return clipboardStr;
     }
 
-    function getTableSPhoneWriteCSSToCB() {
+    function getTableSPhoneWriteCSSToCB(Appdata) {
       console.log('getTableSPhoneWriteCSSToCB...');
+      var clipboardStr;
+      // !VA Clipboard output object 
+      var tableSmallPhonesCSSTag = new ClipboardOutput('tableSmallPhonesCSSTag');
+      // !VA Put the user-entered class into this property
+      tableSmallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.tableClass).value;
+      // !VA Build the css class declaration with and Appdata large phone width and height properties
+      clipboardStr = `table.${tableSmallPhonesCSSTag.classAtt} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
+      // !VA Return the css string to the clipboard object.
+      return clipboardStr;
     }
 
-    function getTableLPhoneWriteCSSToCB() {
+    function getTableLPhoneWriteCSSToCB(Appdata) {
       console.log('getTableLPhoneWriteCSSToCB...');
+      var clipboardStr;
+      // !VA Clipboard output object 
+      var tableLargePhonesCSSTag = new ClipboardOutput('tableLargePhonesCSSTag');
+      // !VA Put the user-entered class into this property
+      tableLargePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.tableClass).value;
+      // !VA Build the css class declaration with and Appdata large phone width and height properties
+      clipboardStr = `table.${tableLargePhonesCSSTag.classAtt} { width: ${Appdata.lPhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
+      // !VA Return the css string to the clipboard object.
+      return clipboardStr;
     }
 
     // !VA Working 062119_CBMods2
