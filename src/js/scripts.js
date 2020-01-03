@@ -1,3 +1,8 @@
+// !VA REBOOT 12/29/19
+// ===================
+// See C:\Users\VANA\OneDrive\WhittyReview_12.30.19.docx
+
+
 
 /* !VA  - 06.23.19
 =========================================================
@@ -185,10 +190,6 @@ var Witty = (function () {
     }
 
 
-
-
-
-
     // !VA UIController public functions
     return {
       // !VA V2 Return all the strings for the UI element's IDs
@@ -249,10 +250,7 @@ var Witty = (function () {
         els.sPhonesW ? els.sPhonesW : Appdata.sPhonesW = parseInt(document.querySelector(toolButtons.sPhonesW).placeholder, 10);
         els.lPhonesW ? els.lPhonesW : Appdata.lPhonesW = parseInt(document.querySelector(toolButtons.lPhonesW).placeholder, 10);
 
-
-
         return els;
-
       },
 
 
@@ -407,42 +405,42 @@ var Witty = (function () {
       // !VA Now we just match the clicked element with the ccpMakeClipBut property to run call the function that builds the corresponding snippet.
       // !VA Note: I tried for two days to avoid using the switch but nothing beats this for readability and comprehensibility. I could pull the switch out to a different function but that is trivial, so leave this for now, it works.
       switch (true) {
-        case ( makeClipButID === ccpMakeClipBut.ccpImgWriteHTMLToCB) :
-          clipboardStr = getImgWriteHTMLToCB(Appdata);
-          break;
-        case ( makeClipButID === ccpMakeClipBut.ccpTdWriteHTMLToCB) :
-          clipboardStr = getTdWriteHTMLToCB(Appdata);
-          break;
-        case ( makeClipButID === ccpMakeClipBut.ccpTableWriteHTMLToCB) :
-          clipboardStr = getTableWriteHTMLToCB(Appdata);
-          break;
-        case ( makeClipButID === ccpMakeClipBut.imgDisplayWriteCSSToCB) :
-          clipboardStr = getImgDisplayWriteCSSToCB(Appdata);
-          break;
-        case ( makeClipButID === ccpMakeClipBut.imgSPhoneWriteCSSToCB) :
-          clipboardStr = getImgSPhoneWriteCSSToCB(Appdata);
-          break;
-        case ( makeClipButID === ccpMakeClipBut.imgLPhoneWriteCSSToCB) :
-          clipboardStr = getImgLPhoneWriteCSSToCB(Appdata);
-          break;
-        case ( makeClipButID === ccpMakeClipBut.tdDisplayWriteCSSToCB) :
-          clipboardStr = getTdDisplayWriteCSSToCB(Appdata);
-          break;
-        case ( makeClipButID === ccpMakeClipBut.tdSPhoneWriteCSSToCB) :
-          clipboardStr = getTdSPhoneWriteCSSToCB(Appdata);
-          break;
-        case ( makeClipButID === ccpMakeClipBut.tdLPhoneWriteCSSToCB) :
-          clipboardStr = getTdLPhoneWriteCSSToCB(Appdata);
-          break;
-        case ( makeClipButID === ccpMakeClipBut.tableDisplayWriteCSSToCB) :
-          clipboardStr = getTableDisplayWriteCSSToCB(Appdata);
-          break;
-        case ( makeClipButID === ccpMakeClipBut.tableSPhoneWriteCSSToCB) :
-          clipboardStr = getTableSPhoneWriteCSSToCB(Appdata);
-          break;
-        case ( makeClipButID === ccpMakeClipBut.tableLPhoneWriteCSSToCB) :
-          clipboardStr = getTableLPhoneWriteCSSToCB(Appdata);
-          break;
+      case ( makeClipButID === ccpMakeClipBut.ccpImgWriteHTMLToCB) :
+        clipboardStr = getImgWriteHTMLToCB(Appdata);
+        break;
+      case ( makeClipButID === ccpMakeClipBut.ccpTdWriteHTMLToCB) :
+        clipboardStr = getTdWriteHTMLToCB(Appdata);
+        break;
+      case ( makeClipButID === ccpMakeClipBut.ccpTableWriteHTMLToCB) :
+        clipboardStr = getTableWriteHTMLToCB(Appdata);
+        break;
+      case ( makeClipButID === ccpMakeClipBut.imgDisplayWriteCSSToCB) :
+        clipboardStr = getImgDisplayWriteCSSToCB(Appdata);
+        break;
+      case ( makeClipButID === ccpMakeClipBut.imgSPhoneWriteCSSToCB) :
+        clipboardStr = getImgSPhoneWriteCSSToCB(Appdata);
+        break;
+      case ( makeClipButID === ccpMakeClipBut.imgLPhoneWriteCSSToCB) :
+        clipboardStr = getImgLPhoneWriteCSSToCB(Appdata);
+        break;
+      case ( makeClipButID === ccpMakeClipBut.tdDisplayWriteCSSToCB) :
+        clipboardStr = getTdDisplayWriteCSSToCB(Appdata);
+        break;
+      case ( makeClipButID === ccpMakeClipBut.tdSPhoneWriteCSSToCB) :
+        clipboardStr = getTdSPhoneWriteCSSToCB(Appdata);
+        break;
+      case ( makeClipButID === ccpMakeClipBut.tdLPhoneWriteCSSToCB) :
+        clipboardStr = getTdLPhoneWriteCSSToCB(Appdata);
+        break;
+      case ( makeClipButID === ccpMakeClipBut.tableDisplayWriteCSSToCB) :
+        clipboardStr = getTableDisplayWriteCSSToCB(Appdata);
+        break;
+      case ( makeClipButID === ccpMakeClipBut.tableSPhoneWriteCSSToCB) :
+        clipboardStr = getTableSPhoneWriteCSSToCB(Appdata);
+        break;
+      case ( makeClipButID === ccpMakeClipBut.tableLPhoneWriteCSSToCB) :
+        clipboardStr = getTableLPhoneWriteCSSToCB(Appdata);
+        break;
       }
 
       // !VA Now that we've gotten the snippet, we create the clipboard object.
@@ -643,9 +641,9 @@ var Witty = (function () {
     
     
         
-      } else {
-      // !VA The regular TD element
-        str = 
+        } else {
+        // !VA The regular TD element
+          str = 
     
 `    <td ${tdTag.classAtt + ' '}${tdTag.alignAtt + ' '}${tdTag.valignAtt + ' '}${tdTag.bgcolorAtt + ' '}>
       ${tdTag.tdContents}
@@ -802,17 +800,17 @@ var Witty = (function () {
 
     function getImgDisplayWriteCSSToCB(Appdata)  {
       console.log('getImgDisplayWriteCSSToCB...');
-        // !VA The string to pass the CSS declaration to the clipboard object
-        var clipboardStr;
-        // !VA Clipboard output object 
-        var imgDisplayCSSTag = new ClipboardOutput('imgDisplayCSSTag');
-        // !VA Put the user-entered class into this property
-        imgDisplayCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
+      // !VA The string to pass the CSS declaration to the clipboard object
+      var clipboardStr;
+      // !VA Clipboard output object 
+      var imgDisplayCSSTag = new ClipboardOutput('imgDisplayCSSTag');
+      // !VA Put the user-entered class into this property
+      imgDisplayCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
 
-        // !VA Build the css class declaration with width and height properties
-        clipboardStr = `img.${imgDisplayCSSTag.classAtt} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important }`;
-        // !VA Return the css string to the clipboard object.
-        return clipboardStr;
+      // !VA Build the css class declaration with width and height properties
+      clipboardStr = `img.${imgDisplayCSSTag.classAtt} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important }`;
+      // !VA Return the css string to the clipboard object.
+      return clipboardStr;
 
     }
 
@@ -873,7 +871,7 @@ var Witty = (function () {
 
     function getTdLPhoneWriteCSSToCB(Appdata)  {
       console.log('getTdLPhoneWriteCSSToCB...');
-       var clipboardStr;
+      var clipboardStr;
       // !VA Clipboard output object 
       var tdLargePhonesCSSTag = new ClipboardOutput('tdLargePhonesCSSTag');
       // !VA Put the user-entered class into this property
@@ -931,34 +929,34 @@ var Witty = (function () {
 
 
 
-  // clipboardController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
-  // !VA TODO: THis should be in handleUserInput
-  function ccpIfNoUserInput(att, value) {
-    // !VA We need get the filename from Appdata in case the user leaves 'path' empty
-    var Appdata = appController.initGetAppdata();
-    var str;
-    // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
-    if (value && att) {
-      // !VA I might want to change this to include the # in the string itself.
-      if (value === '#') {
-        str = '';
-      } else {
-        str = `${att}="${value}"`;
-      }
+    // clipboardController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
+    // !VA TODO: THis should be in handleUserInput
+    function ccpIfNoUserInput(att, value) {
+      // !VA We need get the filename from Appdata in case the user leaves 'path' empty
+      var Appdata = appController.initGetAppdata();
+      var str;
+      // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
+      if (value && att) {
+        // !VA I might want to change this to include the # in the string itself.
+        if (value === '#') {
+          str = '';
+        } else {
+          str = `${att}="${value}"`;
+        }
 
-    } else {
-      // !VA If the path field is empty, we need to return the filename without the path.
-      if (att === 'src' && value === '' ) {
-        str = `${att}="${Appdata.filename}" `;
-      } else if ( att === '#' || att === '') {
-        str = '';
       } else {
-        // !VA If there is no input, exclude the attribute entry.
-        str = '';
+        // !VA If the path field is empty, we need to return the filename without the path.
+        if (att === 'src' && value === '' ) {
+          str = `${att}="${Appdata.filename}" `;
+        } else if ( att === '#' || att === '') {
+          str = '';
+        } else {
+          // !VA If there is no input, exclude the attribute entry.
+          str = '';
+        }
       }
+      return str;
     }
-    return str;
-  }
 
     // !VA CBController public functions 
     return {
@@ -1026,8 +1024,8 @@ var Witty = (function () {
       // Drag and Drop Listener 
       //DRAG AND DROP PROCESSING END
 
-    // !VA This was in the old version but it doesn't look necessary
-    // function initializeHandlers() {
+      // !VA This was in the old version but it doesn't look necessary
+      // function initializeHandlers() {
 
       //EVENT HANDLING START 
       function addEventHandler(oNode, evt, oFunc, bCaptures) {
@@ -1297,7 +1295,7 @@ var Witty = (function () {
       // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appdata property.
       // !VA NOTE: This can probably replace the blur statements in handleKeydown
       if (prop === 'imgW' || prop === 'imgH') {
-          this.value = '';
+        this.value = '';
       } else {
 
         this.value = Appdata[prop];
@@ -1318,41 +1316,41 @@ var Witty = (function () {
       // !VA Handle the increment toolbuttons
       if (event.type === 'click') {
         switch (true) {
-          case ( el.id.includes('tb-but')) :
-            // !VA Variable to hold the name of the Appdata property the event corresponds to
-            var prop, val;
-            // !VA We need to query Appdata properties to get the current value of imgW so we can add the toolbutton increments to id
-            var Appdata = {};
-            Appdata = appController.initGetAppdata();
-            // !VA This is a click on one of the toolbutton increment buttons, so we're dealing with the Appdata.imgW property.
-            args.prop = 'imgW';
-            // !VA The last 2 chars of the id indicate the value by which the img dimension should be incremented,so get the last 2 chars and convert to integer
-            val = parseInt(el.id.slice(-2));
-            // !VA If the target ID includes 'grow' then the image dimension will be incremented, if 'shrink' then it will be decremented
-            (el.id.includes('grow')) ? val : val = -val;
-            // !VA Add val to the current imgW to get the value to be passed to checkUserInput for error parsing.
-            val = Appdata.imgW + val;
-            args.val = val;
-            isErr = checkUserInput(args);
-            if (isErr) {
-              // !VA If it returns an error, select the input and show the error message so the user can correct it or ESC out of the field.
-              console.log('handleMouseEvents: ERROR MESSAGE SHOULD BE SHOWN NOW!');
-              // !VA Post-error button handling?
-            } else {
-              // !VA If no error, pass the Appdata property name and the entered value for further processing.
-              // !VA NOTE: We might have to include the target ID in the error handling because this button should trigger a different message than the keyboard message. Revisit.
-              // !VA Passing arguments as object
-              evalToolbarInput(args);
-            } 
-            break;
-          }
-          // !VA TODO: Revisit this
-        }  else if ( event.type === 'drop') {
-          e.preventDefault;
-          // !VA TODO: Revisit this
-        } else if ( event.type === 'dragover') {
-          e.preventDefault;
-        } 
+        case ( el.id.includes('tb-but')) :
+          // !VA Variable to hold the name of the Appdata property the event corresponds to
+          var prop, val;
+          // !VA We need to query Appdata properties to get the current value of imgW so we can add the toolbutton increments to id
+          var Appdata = {};
+          Appdata = appController.initGetAppdata();
+          // !VA This is a click on one of the toolbutton increment buttons, so we're dealing with the Appdata.imgW property.
+          args.prop = 'imgW';
+          // !VA The last 2 chars of the id indicate the value by which the img dimension should be incremented,so get the last 2 chars and convert to integer
+          val = parseInt(el.id.slice(-2));
+          // !VA If the target ID includes 'grow' then the image dimension will be incremented, if 'shrink' then it will be decremented
+          (el.id.includes('grow')) ? val : val = -val;
+          // !VA Add val to the current imgW to get the value to be passed to checkUserInput for error parsing.
+          val = Appdata.imgW + val;
+          args.val = val;
+          isErr = checkUserInput(args);
+          if (isErr) {
+            // !VA If it returns an error, select the input and show the error message so the user can correct it or ESC out of the field.
+            console.log('handleMouseEvents: ERROR MESSAGE SHOULD BE SHOWN NOW!');
+            // !VA Post-error button handling?
+          } else {
+            // !VA If no error, pass the Appdata property name and the entered value for further processing.
+            // !VA NOTE: We might have to include the target ID in the error handling because this button should trigger a different message than the keyboard message. Revisit.
+            // !VA Passing arguments as object
+            evalToolbarInput(args);
+          } 
+          break;
+        }
+        // !VA TODO: Revisit this
+      }  else if ( event.type === 'drop') {
+        e.preventDefault;
+        // !VA TODO: Revisit this
+      } else if ( event.type === 'dragover') {
+        e.preventDefault;
+      } 
     }
           
     // !VA appController private function
@@ -1398,16 +1396,16 @@ var Witty = (function () {
             // !VA We have to leave the bad value in the field so the user can correct it or press Esc to blur without change, otherwise it will conflict with the default tab order behavior.
             this.select();
           } else {
-              // !VA If the value was entered in the imgW or imgH field, show the value selected first so the user can view and change it before implementing. Only on Tab can the value be implemented and advance to the next field.
-              if (args.prop === 'imgW' || args.prop === 'imgH') {
-                if (isEnter) {
-                  this.select();
-                } else {
+            // !VA If the value was entered in the imgW or imgH field, show the value selected first so the user can view and change it before implementing. Only on Tab can the value be implemented and advance to the next field.
+            if (args.prop === 'imgW' || args.prop === 'imgH') {
+              if (isEnter) {
+                this.select();
+              } else {
                 console.log('tab pressed');
                 this.value = '';
                 this.blur();
-                }
               }
+            }
             // !VA Pass the target, prop and value to evalToolbarInput.
             evalToolbarInput(args);
           }
@@ -1462,44 +1460,44 @@ var Witty = (function () {
       } else {
         // !VA Now, we handle the error cases if user has entered a value in the imgViewer field 
         switch (true) {
-          case (prop === 'viewerW') :
-            // !VA The user has selected a viewerW that's smaller than the currently displayed image. Undetermined how to deal with this but for now the current image is shrunk to the selected viewerW. But Appdata is not updated accordingly, needs to be fixed.
-            if (val < Appdata.imgW ) {
-              // !VA Do nothing for now, see above.
-            } else if (val > maxViewerWidth ) {
-              // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px - and the user-entered value exceeds this, so error.
-              isErr = true;
-              errCode = 'viewerW_GT_maxViewerWidth';
-            } else {
-              // !VA first write val to the viewerW input's value
-              // document.querySelector(dynamicRegions.imgViewer).value = val;
-              // !VA  The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running calcViewerSize. So, return no error and continue in handleKeyup.
-              isErr = false;
-            }
-            break;
-            // !VA Handle the imagewidth toolButton input
-          case (prop === 'imgW') :
-              // !VA If the new image width is greater than the viewer width, then show message. 
-              if (val > Appdata.viewerW ) {
-                // !VA errorHandler!
-                isErr = true;
-                errCode = 'imgW_GT_viewerW';
-              }
-              break;
-          // !VA TODO: Handle the imageheight toolButton input
-          case (prop === 'imgH') :
-              console.log('Error handling for imageheight input not implemented!');
-              break;
+        case (prop === 'viewerW') :
+          // !VA The user has selected a viewerW that's smaller than the currently displayed image. Undetermined how to deal with this but for now the current image is shrunk to the selected viewerW. But Appdata is not updated accordingly, needs to be fixed.
+          if (val < Appdata.imgW ) {
+            // !VA Do nothing for now, see above.
+          } else if (val > maxViewerWidth ) {
+            // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px - and the user-entered value exceeds this, so error.
+            isErr = true;
+            errCode = 'viewerW_GT_maxViewerWidth';
+          } else {
+            // !VA first write val to the viewerW input's value
+            // document.querySelector(dynamicRegions.imgViewer).value = val;
+            // !VA  The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running calcViewerSize. So, return no error and continue in handleKeyup.
+            isErr = false;
+          }
+          break;
+          // !VA Handle the imagewidth toolButton input
+        case (prop === 'imgW') :
+          // !VA If the new image width is greater than the viewer width, then show message. 
+          if (val > Appdata.viewerW ) {
+            // !VA errorHandler!
+            isErr = true;
+            errCode = 'imgW_GT_viewerW';
+          }
+          break;
+        // !VA TODO: Handle the imageheight toolButton input
+        case (prop === 'imgH') :
+          console.log('Error handling for imageheight input not implemented!');
+          break;
 
-              // !VA TODO: Handle the small phone input
-          case (prop === 'sPhoneW') :
-              console.log('Error handling for sPhonesW input not implemented!');
-            break;
-          
-          // !VA Handle the small phone input
-          case (prop === 'sPhoneW') :
-              console.log('Error handling for imagewidth input not implemented!');
-              break;
+          // !VA TODO: Handle the small phone input
+        case (prop === 'sPhoneW') :
+          console.log('Error handling for sPhonesW input not implemented!');
+          break;
+        
+        // !VA Handle the large phone input
+        case (prop === 'lPhoneW') :
+          console.log('Error handling for imagewidth input not implemented!');
+          break;
         }
       } 
 
@@ -1533,39 +1531,35 @@ var Witty = (function () {
       // !VA Initialize vars for imgH and imgW since we need to calculate one based on the value of the other and Appdata.aspect. 
       var imgH, imgW;
       switch(true) {
-        // !VA If the value was entered in the imgViewer field, just pass prop and val through to updateAppdata.
-        case (prop === 'viewerW') :
-          arg1 = [ prop, val ]
-          arg2 = '';
-          break;          
+      // !VA If the value was entered in the imgViewer field, just pass prop and val through to updateAppdata.
+      case (prop === 'viewerW') :
+        arg1 = [ prop, val ]
+        arg2 = '';
+        break;          
 
-        case (prop === 'imgW') :
-          // !VA If the value was entered in imgwidth, calc imgH based on val and aspect. Then put prop and val in arg1, and put the imgH property name and the calculated imgH into arg2. These will be passed on avia the spread operator to updateAppdata. 
+      case (prop === 'imgW') :
+        // !VA If the value was entered in imgwidth, calc imgH based on val and aspect. Then put prop and val in arg1, and put the imgH property name and the calculated imgH into arg2. These will be passed on avia the spread operator to updateAppdata. 
+        console.log('evalToolbarInput handling sPhonesw... ');      
+        imgH =  val * (1 / Appdata.aspect[0]);
+        // updateAppdata(prop, val); 
+        arg1 = [ prop, val ]
+        arg2 = [ 'imgH', imgH ] 
+        // updateAppdata('imgH', imgH); 
+        break;
 
+      case (prop === 'imgH') :
+        // !VA If the value was entered in imgheight, calc imgW based on val and aspect. Then put prop and val in arg1, and put the imgW property name and the calculated imgW into arg2. These will be passed on via the ES6 spread operator to updateAppdata.
+        imgW =  val * (Appdata.aspect[0]);
+        arg1 = [ prop, val ]
+        arg2 = [ 'imgW', imgW ] 
+        break;
 
-
-
-          console.log('evalToolbarInput handling sPhonesw... ');      
-          imgH =  val * (1 / Appdata.aspect[0]);
-          // updateAppdata(prop, val); 
-          arg1 = [ prop, val ]
-          arg2 = [ 'imgH', imgH ] 
-          // updateAppdata('imgH', imgH); 
-          break;
-
-        case (prop === 'imgH') :
-          // !VA If the value was entered in imgheight, calc imgW based on val and aspect. Then put prop and val in arg1, and put the imgW property name and the calculated imgW into arg2. These will be passed on via the ES6 spread operator to updateAppdata.
-          imgW =  val * (Appdata.aspect[0]);
-          arg1 = [ prop, val ]
-          arg2 = [ 'imgW', imgW ] 
-          break;
-
-        case (prop === 'sPhonesW' || prop === 'lPhonesW') :
-          console.log('Appdata.sPhonesW is: ' + Appdata.sPhonesW);   
-            // sPhonesH =  val * (1 / Appdata.aspect[0]);
-            arg1 = [prop, val];
-            arg2 = '';
-          break;
+      case (prop === 'sPhonesW' || prop === 'lPhonesW') :
+        console.log('Appdata.sPhonesW is: ' + Appdata.sPhonesW);   
+        // sPhonesH =  val * (1 / Appdata.aspect[0]);
+        arg1 = [prop, val];
+        arg2 = '';
+        break;
 
         // case (prop === 'lPhonesW') :
         //   // !VA TODO: needs handling
@@ -1587,28 +1581,28 @@ var Witty = (function () {
       
       // !VA Each param pair is a property name prop and a value val. evalToolbarInput passes in one or more such pairs whose corresponding Appdata DOM element/data attribute has to be updated. So, loop through the argument arrays and update the corresponding DOM elements
       for (let i = 0; i < params.length; i++) {
-          prop = params[i][0];
-          val = params[i][1];
-          console.log('params[i][0] is: ' + params[i][0]);
-          console.log('params[i][1] is: ' + params[i][1]);
-          switch(true) {
-          case (!prop) :
-            console.log('no prop');
-            break;
-          case prop === 'viewerW' :
-            document.querySelector(dynamicRegions.imgViewer).style.width = val + 'px';  
-            break;
-          case prop === 'imgW' :
-            document.querySelector(dynamicRegions.curImg).style.width = val + 'px';
+        prop = params[i][0];
+        val = params[i][1];
+        console.log('params[i][0] is: ' + params[i][0]);
+        console.log('params[i][1] is: ' + params[i][1]);
+        switch(true) {
+        case (!prop) :
+          console.log('no prop');
           break;
-          case prop === 'imgH' :
-            document.querySelector(dynamicRegions.curImg).style.height = val + 'px';
+        case prop === 'viewerW' :
+          document.querySelector(dynamicRegions.imgViewer).style.width = val + 'px';  
           break;
-          case prop === 'sPhonesW' :
-            document.querySelector(toolButtons.sPhonesW).setAttribute('data-sphonesw', val);
+        case prop === 'imgW' :
+          document.querySelector(dynamicRegions.curImg).style.width = val + 'px';
           break;
-          case prop === 'lPhonesW' :
-            document.querySelector(toolButtons.lPhonesW).setAttribute('data-lphonesw', val);
+        case prop === 'imgH' :
+          document.querySelector(dynamicRegions.curImg).style.height = val + 'px';
+          break;
+        case prop === 'sPhonesW' :
+          document.querySelector(toolButtons.sPhonesW).setAttribute('data-sphonesw', val);
+          break;
+        case prop === 'lPhonesW' :
+          document.querySelector(toolButtons.lPhonesW).setAttribute('data-lphonesw', val);
           break;
         }
       }
@@ -1949,9 +1943,6 @@ var Witty = (function () {
       }();
       return [aspectReal, aspectInt];  
     }
-
-
-
 
     // !VA  appController private
     var initDev = function() {
