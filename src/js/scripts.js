@@ -2,6 +2,8 @@
 // ===================
 // See C:\Users\VANA\OneDrive\WhittyReview_12.30.19.docx
 
+// !VA 01.03.20 b94eeb2 ESLint fixes
+
 
 
 /* !VA  - 06.23.19

@@ -756,7 +756,7 @@ var Dimwhit = (function () {
     return {
       init: function(){
         calcController.tst();
-
+        console.log('here');
         console.log('App initialized.');
         // !VA  Initialize the ImgViewer to accomodate the dragArea. This should be the same as the CSS definition.
         document.querySelector(dynamicRegions.imgViewer).style.width = '650px';
