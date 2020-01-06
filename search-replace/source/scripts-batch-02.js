@@ -18,8 +18,9 @@ TODO: Update icon and button names to reflect new naming scheme
 /* !VA  
   DONE: Batch rename HTML elements in index-batch-01.html 
   DONE: Batch rename HTML elemetns in scripts-batch-01.js
-  DONE: Manually rename filename
-  TODO: Manually rename dimViewers.
+  DONE: Manually rename iFilename
+  DONE: Manually rename iInspectors.
+  DONE: Batch rename Aliases.
 
 
 
@@ -51,14 +52,14 @@ DONE: Uncheck and Hide Wrapper table options when CCP is opened.
 DONE: Fix flashAppMessage to include status messages and cleanup
 DONE: Fix showElementOnInput in CCP
 Merge Branch 0619FixPhonesInput
-DONE: fixed sPhonesw and lPhonesW user input.
+DONE: fixed sPhonesw and iptTbrLargePhonesW user input.
 Merge fixAppMessages
 DONE: Fixed, imgW field on tab doesn't reset to placeholders. 
 DONE: Rewrite updateAppdata to be parameters... with key/value pairs as parameter.
 DONE: Fold handleToolbarClicks into checkUserInput and rename to checkUserInput
 Branch checkUserInput
 DONE: Branch rewriteHandleUserAction061119
-DONE: Fix that smallphones and largephones input fields show undefined and show in Appdata as pixel values.
+DONE: Fix that iSmallPhones and iLargePhones input fields show undefined and show in Appdata as pixel values.
 DONE: Fix default value in viewerW field - Fixed, added to calcViewerSize
 DONE: resize viewerW doesn't work Fixed, reconfigured updateAppdata to include viewerW
 DONE: - imgheight and imgwidth don't work Fixed, added evalToolbarInput to follow checkUserInput
@@ -88,30 +89,30 @@ var Witty = (function () {
 
     // !VA UIController: Inspector ID strings
     var iInspectors = {
-      ifilename: '#i-filename',
+      ifilename: '#i-iFilename',
       iDisplay: '#i-display-size',
       iDisksize: '#i-disk-size',
       iAspect: '#i-aspect',
       iSmallphones: '#i-small-phones',
       iLargePhones: '#i-large-phones',
-      iRetina: '#i-retina',
+      iRetina: '#i-iRetina',
       btnToggleCcp: '#btn-toggle-ccp'
     };
 
     // !VA UIController: toolButton ID Strings
-    var toolButtons = {
+    var toolBar = {
       viewerW: '#ipt-tbr-viewerw',
-      grow50: '#btn-tbr-incr50',
-      grow10: '#btn-tbr-incr10',
-      grow01: '#btn-tbr-incr01',
-      imgWidth: '#ipt-tbr-imgwidth',
+      btnTbrIncr50: '#btn-tbr-incr50',
+      btnTbrIncr10: '#btn-tbr-incr10',
+      btnTbrIncr01: '#btn-tbr-incr01',
+      iptTbrImgWidth: '#ipt-tbr-imgwidth',
       toggleImgSize: '#toggle-image-size',
-      imgHeight: '#ipt-tbr-imgheight',
-      shrink01:'#btn-tbr-decr01',
-      shrink10: '#btn-tbr-decr10',
-      shrink50: '#btn-tbr-decr50',
-      sPhonesW: '#ipt-tbr-sphones-width',
-      lPhonesW: '#ipt-tbr-lphones-width',
+      iptTbrImgHeight: '#ipt-tbr-imgheight',
+      btnTbrDecr01:'#btn-tbr-decr01',
+      btnTbrDecr10: '#btn-tbr-decr10',
+      btnTbrDecr50: '#btn-tbr-decr50',
+      iptTbrSmallPhonesW: '#ipt-tbr-sphones-width',
+      iptTbrLargePhonesW: '#ipt-tbr-lphones-width',
     };
 
     //!VA If we separate this out into UI objects that correspond to the objects we want to create, then we can just loop through them rather than define each property separately. So, dynamicElements are those that resize based on the current image... but I haven't figured out how to loop through them yet.
@@ -126,61 +127,61 @@ var Witty = (function () {
     // !VA UIController: staticRegions
     var staticRegions = {
       dropArea: '#drop-area',
-      toolsContainer: '#toolbar-container',
+      tbrContainer: '#toolbar-container',
       ccpContainer: '#ccp',
-      appMessContainer: '#msg-container',
-      appMessDisplay: '#msg-content',
+      msgContainer: '#msg-container',
+      msgDisplay: '#msg-content',
       ccpBlocker: '#ccp-blocker'
     };
 
     // !VA  UIController: ccpUserInput ID Strings
     // !VA imgAnchor is just a flag for the status of the checkbox. The actual propStrings have to have an Open and Close property.
     var ccpUserInput = {
-      imgClass: '#ipt-ccp-img-class',
+      iptCcpImgClass: '#ipt-ccp-img-class',
       // imgAnchor: '#chk-ccp-img-anchor',
       imgAlt: '#ipt-ccp-img-alt',
       // !VA This isn't even a thing... probably delete it 04.28.19
       // !VA Not renaming the checkbox/checkmarks for now because they already have code that queries the last three characters to determine if mrk or box...
       imgIncludeStyles: '#chk-ccp-img-include-css',
-      imgAlign: '#sel-ccp-img-align',
-      imgRelPath: '#ipt-ccp-img-relpath',
-      tdClass: '#ipt-ccp-td-class',
-      tdAlign: '#sel-ccp-td-align',
+      selCcpImgAlign: '#sel-ccp-img-align',
+      iptCcpImgRelPath: '#ipt-ccp-img-relpath',
+      iptCcpTdClass: '#ipt-ccp-td-class',
+      selCcpTdAlign: '#sel-ccp-td-align',
       tdValign: '#sel-ccp-td-valign',
-      tdBgcolor: '#ipt-ccp-td-bgcolor',
-      tdBgimage: '#chk-ccp-td-bgimage',
-      tableClass: '#ipt-ccp-table-class',
-      tableAlign: '#sel-ccp-table-align',
+      iptCcpTdBgColor: '#ipt-ccp-td-bgcolor',
+      chkCcpTdBgImg: '#chk-ccp-td-bgimage',
+      iptCcpTableClass: '#ipt-ccp-table-class',
+      selCcpTableAlign: '#sel-ccp-table-align',
       tableWidth: '#ipt-ccp-table-width',
       // !VA Not in use yet
       // tableMaxWidth: '#ipt-ccp-table-max-width',
-      tableBgcolor: '#ipt-ccp-table-bgcolor',
-      tableIncludeWrapper: '#chk-ccp-table-include-wrapper',
-      tableWrapperClass: '#ipt-ccp-table-wrapper-class',
-      tableWrapperWidth: '#ipt-ccp-table-wrapper-width',
-      tableWrapperAlign: '#sel-ccp-table-wrapper-align',
+      iptCcpTableBgColor: '#ipt-ccp-table-bgcolor',
+      chkCcpTableIncludeWrapper: '#chk-ccp-table-include-wrapper',
+      iptCcpTableWrapperClass: '#ipt-ccp-table-wrapper-class',
+      iptCcpTableWrapperWidth: '#ipt-ccp-table-wrapper-width',
+      selCcpTableWrapperAlign: '#sel-ccp-table-wrapper-align',
       tableWrapperBgColor: '#ipt-ccp-table-wrapper-bgcolor',
     };
 
-    //iInspectors.clipboardBut
-    //iInspectors.clipboardBut for assembling the clipboard create tag buttons. We also store the functions that are run in the CBController module to build the clipboard snippets when each of these elements is clicked so that we can just loop through the properties, get the current event target and run the associated function without an extra switch statement or other conditional at that stage.
+    //iInspectors.btnToggleCcp
+    //iInspectors.btnToggleCcp for assembling the clipboard create tag buttons. We also store the functions that are run in the CBController module to build the clipboard snippets when each of these elements is clicked so that we can just loop through the properties, get the current event target and run the associated function without an extra switch statement or other conditional at that stage.
 
-    var ccpMakeClipBut = {
+    var btnCcpBuildClips = {
       // !VA Build HTML Clipboard Buttons
-      ccpImgWriteHTMLToCB: '#btn-ccp-img-build-html-clip',
-      ccpTdWriteHTMLToCB: '#btn-ccp-td-build-html-clip',
-      ccpTableWriteHTMLToCB: '#btn-ccp-table-build-html-clip',
+      btnCcpImgBuildHtmlClip: '#btn-ccp-img-build-html-clip',
+      btnCcpTDBuildHtmlClip: '#btn-ccp-td-build-html-clip',
+      btnCcpTableBuildHtmlClip: '#btn-ccp-table-build-html-clip',
       // !VA Make CSS Clip Buttons
-      imgDisplayWriteCSSToCB: '#btn-ccp-img-dsktp-build-css-clip-but',
-      imgSPhoneWriteCSSToCB: '#btn-ccp-img-smphn-build-css-clip-but',
-      imgLPhoneWriteCSSToCB: '#btn-ccp-img-lgphn-build-css-clip-but',
+      btnCcpImgDsktpBuildCssClip: '#btn-ccp-img-dsktp-build-css-clip-but',
+      btnCcpImgSmphnBuildCssClip: '#btn-ccp-img-smphn-build-css-clip-but',
+      btnCcpImgLgphnBuildCssClip: '#btn-ccp-img-lgphn-build-css-clip-but',
         
-      tdDisplayWriteCSSToCB:  '#btn-ccp-td-dsktp-build-css-clip-but',
-      tdSPhoneWriteCSSToCB: '#btn-ccp-td-smphn-build-css-clip-but',
-      tdLPhoneWriteCSSToCB: '#btn-ccp-td-lgphn-build-css-clip-but',
-      tableDisplayWriteCSSToCB:  '#btn-ccp-table-dsktp-build-css-clip-but',
-      tableSPhoneWriteCSSToCB: '#btn-ccp-table-smphn-build-css-clip-but',
-      tableLPhoneWriteCSSToCB: '#btn-ccp-table-lgphn-build-css-clip-but',
+      btnCcpTdDsktpBuildCssClip:  '#btn-ccp-td-dsktp-build-css-clip-but',
+      btnCcpTdSmphnBuildCssClip: '#btn-ccp-td-smphn-build-css-clip-but',
+      btnCcpTdLgphnBuildCssClip: '#btn-ccp-td-lgphn-build-css-clip-but',
+      btnCcpTableDsktpBuildCssClip:  '#btn-ccp-table-dsktp-build-css-clip-but',
+      btnCcpTableSmphnBuildCssClip: '#btn-ccp-table-smphn-build-css-clip-but',
+      btnCcpTableLgphnBuildCssClip: '#btn-ccp-table-lgphn-build-css-clip-but',
       
     };
 
@@ -199,17 +200,17 @@ var Witty = (function () {
         curInspector.push(iInspectors.diskimg);
       } 
       // !VA Small phones isn't at least 2X size on Disk and Retina
-      if (Appdata.imgNW < (Appdata.sPhonesW * 2) ) {
-        curInspector.push(iInspectors.smallphones);
+      if (Appdata.imgNW < (Appdata.iptTbrSmallPhonesW * 2) ) {
+        curInspector.push(iInspectors.iSmallPhones);
       } 
       // !VA Large phones isn't at least 2X Size on Disk and Retina
-      if (Appdata.imgNW < (Appdata.lPhonesW * 2) ) {
-        curInspector.push(iInspectors.largephones);
+      if (Appdata.imgNW < (Appdata.iptTbrLargePhonesW * 2) ) {
+        curInspector.push(iInspectors.iLargePhones);
       } 
       // !VA Reset all the dim viewer alerts by passing in the entire Inspector array
-      UIController.writeDimAlerts(iInspectors, false);
+      UIController.writeInspectorAlerts(iInspectors, false);
       // !VA Now set the individual dim viewer alerts for the current image.
-      UIController.writeDimAlerts(curInspector, true);
+      UIController.writeInspectorAlerts(curInspector, true);
     }
 
 
@@ -219,8 +220,9 @@ var Witty = (function () {
       getInspectorIDs: function() {
         return iInspectors;
       },
+      // !VA Reboot: This is wrong now after renaming
       getToolButtonIDs: function() {
-        return toolButtons;
+        return toolBar;
       },
       getDynamicRegionIDs: function() {
         return dynamicRegions;
@@ -234,11 +236,13 @@ var Witty = (function () {
       getCcpUserInputIDs: function() {
         return ccpUserInput;
       },
+      // !VA Reboot: This is wrong now after renaming
       getCcpBuildTagIDs: function() {
         return ccpMakeClip;
       },
+      // !VA Reboot: This is wrong now after renaming
       getCcpMakeClipButIDs: function() {
-        return ccpMakeClipBut;
+        return btnCcpBuildClips;
       },
 
       // !VA UIController public getAppdata
@@ -249,11 +253,11 @@ var Witty = (function () {
         // !VA NEW This needs to ONLY return the non-calculated DOM elements and data properties: curImg.imgW, curImg.imgW, curImg.imgNW, curImg.NH and viewerW. Aspect is calculated so we don't need to get that here, leave that to appController.
         // !VA NEW We will get the individual properties and return them as an ES6 array.
         // !VA Declare the local vars
-        // !VA Reboot - should these vars be renamed according to the new scheme? I am going to use the convention fname - filename when used in variable name.
-        var fname, viewerW, viewerH, imgW, imgH, imgNW, imgNH, sPhonesW, lPhonesW;
-        var els = {fname, viewerW, viewerH, imgW, imgH, imgNW, imgNH, sPhonesW, lPhonesW};
+        // !VA Reboot - should these vars be renamed according to the new scheme? I am going to use the convention fname - iFilename when used in variable name.
+        var fname, viewerW, viewerH, imgW, imgH, imgNW, imgNH, iptTbrSmallPhonesW, iptTbrLargePhonesW;
+        var els = {fname, viewerW, viewerH, imgW, imgH, imgNW, imgNH, iptTbrSmallPhonesW, iptTbrLargePhonesW};
 
-        // !VA Get the filename from the Inspector
+        // !VA Get the iFilename from the Inspector
         els.fname = document.querySelector(iInspectors.iFilename).textContent;
         // !VA Get the curImg and imgViewer
         var curImg = document.querySelector(dynamicRegions.curImg);
@@ -267,12 +271,12 @@ var Witty = (function () {
         els.imgH = curImg.height;
         els.imgNW = curImg.naturalWidth;
         els.imgNH = curImg.naturalHeight;
-        // !VA Get the data properties for sPhonesW and sPhonesH
+        // !VA Get the data properties for iptTbrSmallPhonesW and sPhonesH
         // !VA This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
-        els.sPhonesW = parseInt(document.querySelector(toolButtons.sPhonesW).getAttribute('data-sphonesw'), 10);
-        els.lPhonesW = parseInt(document.querySelector(toolButtons.lPhonesW).getAttribute('data-lphonesw'), 10);
-        els.sPhonesW ? els.sPhonesW : Appdata.sPhonesW = parseInt(document.querySelector(toolButtons.sPhonesW).placeholder, 10);
-        els.lPhonesW ? els.lPhonesW : Appdata.lPhonesW = parseInt(document.querySelector(toolButtons.lPhonesW).placeholder, 10);
+        els.iptTbrSmallPhonesW = parseInt(document.querySelector(toolBar.iptTbrSmallPhonesW).getAttribute('data-sphonesw'), 10);
+        els.iptTbrLargePhonesW = parseInt(document.querySelector(toolBar.iptTbrLargePhonesW).getAttribute('data-lphonesw'), 10);
+        els.iptTbrSmallPhonesW ? els.iptTbrSmallPhonesW : Appdata.iptTbrSmallPhonesW = parseInt(document.querySelector(toolBar.iptTbrSmallPhonesW).placeholder, 10);
+        els.iptTbrLargePhonesW ? els.iptTbrLargePhonesW : Appdata.iptTbrLargePhonesW = parseInt(document.querySelector(toolBar.iptTbrLargePhonesW).placeholder, 10);
 
         return els;
       },
@@ -290,15 +294,15 @@ var Witty = (function () {
         // console.log('viewerW is: ' + viewerW); 
         // console.log('viewerH is: ' + viewerH); 
 
-        // !VA Make sure the toolsContainer is off and the dropArea is on.
+        // !VA Make sure the tbrContainer is off and the dropArea is on.
         document.querySelector(staticRegions.dropArea).style.display = 'block';
-        document.querySelector(staticRegions.toolsContainer).style.display = 'none';
-        document.querySelector(iInspectors.clipboardBut).style.display = 'none';
+        document.querySelector(staticRegions.tbrContainer).style.display = 'none';
+        document.querySelector(iInspectors.btnToggleCcp).style.display = 'none';
 
 
         const dimarray = Object.values(iInspectors);
         for ( let i = 0; i < dimarray.length; i++ ) {
-          if ( dimarray[i] !== '#btn-toggle-ccp' &&  dimarray[i] !== '#i-filename' ) {
+          if ( dimarray[i] !== '#btn-toggle-ccp' &&  dimarray[i] !== '#i-iFilename' ) {
             document.querySelector(dimarray[i]).innerHTML = '<span class="pop-font">&nbsp;&nbsp;No Image</span>';
           } 
         } 
@@ -306,7 +310,7 @@ var Witty = (function () {
 
       // !VA UIController public writeInspectors
       writeInspectors: function() {
-        // !VA We need the current value in iInspectors.smallphones and iInspectors.largephones to display all the iInspectors. So, if it's not explicitly user-defined, then use the default placeholder value from the HTML, then get the height from getAspectRatio
+        // !VA We need the current value in iInspectors.iSmallPhones and iInspectors.iLargePhones to display all the iInspectors. So, if it's not explicitly user-defined, then use the default placeholder value from the HTML, then get the height from getAspectRatio
         var Appdata = {};
         // !VA Get the current Appdata
         Appdata = appController.initGetAppdata();
@@ -317,18 +321,18 @@ var Witty = (function () {
         document.querySelector(iInspectors.display).innerHTML = `<span class='pop-font'><span id="display-size-width">${Appdata.imgW}</span> X <span id="display-size-height">${Appdata.imgH}</span></span>`;
         document.querySelector(iInspectors.diskimg).innerHTML = `<span class='pop-font'>${Appdata.imgNW} X ${Appdata.imgNH}</span>`;
         document.querySelector(iInspectors.aspect).innerHTML = `<span class='pop-font'>${Appdata.aspect[1]}</span>` ;
-        document.querySelector(iInspectors.smallphones).innerHTML = `<span class='pop-font'><span id='small-phones-width'>${Appdata.sPhonesW}</span> X <span id='small-phones-height'>${Appdata.sPhonesH}</span></span>` ;
-        document.querySelector(iInspectors.largephones).innerHTML = `<span class='pop-font'><span id='large-phones-width'>${Appdata.lPhonesW}</span> X <span id='large-phones-height'>${Appdata.lPhonesH}</span></span>` ;
-        document.querySelector(iInspectors.retina).innerHTML = `<span class='pop-font'>${2 * Appdata.imgW}</span> X <span class='pop-font'>${2 * Appdata.imgH}`;
+        document.querySelector(iInspectors.iSmallPhones).innerHTML = `<span class='pop-font'><span id='small-phones-width'>${Appdata.iptTbrSmallPhonesW}</span> X <span id='small-phones-height'>${Appdata.sPhonesH}</span></span>` ;
+        document.querySelector(iInspectors.iLargePhones).innerHTML = `<span class='pop-font'><span id='large-phones-width'>${Appdata.iptTbrLargePhonesW}</span> X <span id='large-phones-height'>${Appdata.lPhonesH}</span></span>` ;
+        document.querySelector(iInspectors.iRetina).innerHTML = `<span class='pop-font'>${2 * Appdata.imgW}</span> X <span class='pop-font'>${2 * Appdata.imgH}`;
         // !VA  Display the clipboard button
-        document.querySelector(iInspectors.clipboardBut).style.display = 'block';
+        document.querySelector(iInspectors.btnToggleCcp).style.display = 'block';
         // !VA Call evalDimAlerts to calculate which Inspector values don't meet HTML email specs.
         evalDimAlerts();
       },
 
       // !VA  I had this as private but moved to public, not sure why.
-      //UIController public writeDimAlerts
-      writeDimAlerts: function(curInspectors, bool) {
+      //UIController public writeInspectorAlerts
+      writeInspectorAlerts: function(curInspectors, bool) {
         // !VA if evalDimAlerts returns true, then the Inspector should be displayed in red. To reset the dim alert, set to style color to 'auto'.
         var att = bool;
         bool ? att = 'red': att = 'inherit';
@@ -353,8 +357,8 @@ var Witty = (function () {
         var del;
 
         // !VA Get the message container and display text into variables
-        var appMessContainer = document.querySelector(staticRegions.appMessContainer);
-        var appMessDisplay = document.querySelector(staticRegions.appMessDisplay);
+        var msgContainer = document.querySelector(staticRegions.msgContainer);
+        var msgDisplay = document.querySelector(staticRegions.msgDisplay);
         var ccpBlocker = document.querySelector(staticRegions.ccpBlocker);
         var messType;
         // !VA If it's an error, show class show-err, otherwise it's a status message so show-mess
@@ -363,11 +367,11 @@ var Witty = (function () {
         // !VA If isErr is false, then it's a status message, overlay the CCP blocker to prevent user input while the CSS transitions run and the status message is displayed. Cheap, but effective solution.
         isErr ? isErr : ccpBlocker.style.display = 'block';
         // !VA Add the class that displays the message
-        appMessContainer.classList.add(messType);
+        msgContainer.classList.add(messType);
         // !VA Write the message to the message display area
-        appMessDisplay.innerHTML = mess;
+        msgDisplay.innerHTML = mess;
         // !VA Add the class to show the message
-        appMessContainer.classList.add(messType);
+        msgContainer.classList.add(messType);
         // !VA If it's an error, let it display for 2.5 seconds. If it's a status, just flash it because while it's onscreen the CCP blocker is active and we want that to be short.
         isErr ? del = 2500 : del = 500;
 
@@ -376,13 +380,13 @@ var Witty = (function () {
         // !VA Show the message for two seconds
         window.setTimeout(function() {
         // !VA After two seconds, hide the message and remove the blocker
-          appMessContainer.classList.add('hide-mess');
+          msgContainer.classList.add('hide-mess');
           ccpBlocker.style.display = 'none';
           setTimeout(function(){
             // !VA Once the opacity transition for the message has completed, remove the show-mess class from the element and set the innerHTML back to empty
-            appMessContainer.classList.remove(messType);
-            appMessContainer.classList.remove('hide-mess');
-            appMessDisplay.innerHTML = '';
+            msgContainer.classList.remove(messType);
+            msgContainer.classList.remove('hide-mess');
+            msgDisplay.innerHTML = '';
 
           },250);
         }, 
@@ -402,10 +406,10 @@ var Witty = (function () {
     // !VA If we want to access any of the DOM IDs we have to call them from UIController where they're defined.
     var dynamicRegions = UIController.getDynamicRegionIDs();
     var staticRegions = UIController.getStaticRegionIDs();
-    var toolButtons = UIController.getToolButtonIDs();
+    var toolBar = UIController.getToolButtonIDs();
     var iInspectors = UIController.getInspectorIDs();
     var ccpUserInput = UIController.getCcpUserInputIDs();
-    var ccpMakeClipBut = UIController.getCcpMakeClipButIDs();
+    var btnCcpBuildClips = UIController.getCcpMakeClipButIDs();
 
 
     function getKeyByValue(object, value) {
@@ -421,48 +425,48 @@ var Witty = (function () {
       var Appdata = {};
       // !VA Get Appdata - we will pass it so the DOM doesn't have be accessed every time a snippet is build.
       Appdata = appController.initGetAppdata();
-      // !VA Get the ccpMakeClipBut elements
-      
+      // !VA Get the btnCcpBuildClips elements
+      // !VA Reboot: These funciton names are all wrong now after renaming
       var clipButs = UIController.getCcpMakeClipButIDs();
-      // !VA The target element's ID is passed in from the ccpMakeClipBut array so it doesn't have the hash that makes it a valid ID string. So, add the hash.
+      // !VA The target element's ID is passed in from the btnCcpBuildClips array so it doesn't have the hash that makes it a valid ID string. So, add the hash.
       makeClipButID = '#' + id;
-      // !VA Now we just match the clicked element with the ccpMakeClipBut property to run call the function that builds the corresponding snippet.
+      // !VA Now we just match the clicked element with the btnCcpBuildClips property to run call the function that builds the corresponding snippet.
       // !VA Note: I tried for two days to avoid using the switch but nothing beats this for readability and comprehensibility. I could pull the switch out to a different function but that is trivial, so leave this for now, it works.
       switch (true) {
-      case ( makeClipButID === ccpMakeClipBut.ccpImgWriteHTMLToCB) :
+      case ( makeClipButID === btnCcpBuildClips.btnCcpImgBuildHtmlClip) :
         clipboardStr = getImgWriteHTMLToCB(Appdata);
         break;
-      case ( makeClipButID === ccpMakeClipBut.ccpTdWriteHTMLToCB) :
+      case ( makeClipButID === btnCcpBuildClips.btnCcpTDBuildHtmlClip) :
         clipboardStr = getTdWriteHTMLToCB(Appdata);
         break;
-      case ( makeClipButID === ccpMakeClipBut.ccpTableWriteHTMLToCB) :
+      case ( makeClipButID === btnCcpBuildClips.btnCcpTableBuildHtmlClip) :
         clipboardStr = getTableWriteHTMLToCB(Appdata);
         break;
-      case ( makeClipButID === ccpMakeClipBut.imgDisplayWriteCSSToCB) :
+      case ( makeClipButID === btnCcpBuildClips.btnCcpImgDsktpBuildCssClip) :
         clipboardStr = getImgDisplayWriteCSSToCB(Appdata);
         break;
-      case ( makeClipButID === ccpMakeClipBut.imgSPhoneWriteCSSToCB) :
+      case ( makeClipButID === btnCcpBuildClips.btnCcpImgSmphnBuildCssClip) :
         clipboardStr = getImgSPhoneWriteCSSToCB(Appdata);
         break;
-      case ( makeClipButID === ccpMakeClipBut.imgLPhoneWriteCSSToCB) :
+      case ( makeClipButID === btnCcpBuildClips.btnCcpImgLgphnBuildCssClip) :
         clipboardStr = getImgLPhoneWriteCSSToCB(Appdata);
         break;
-      case ( makeClipButID === ccpMakeClipBut.tdDisplayWriteCSSToCB) :
+      case ( makeClipButID === btnCcpBuildClips.btnCcpTdDsktpBuildCssClip) :
         clipboardStr = getTdDisplayWriteCSSToCB(Appdata);
         break;
-      case ( makeClipButID === ccpMakeClipBut.tdSPhoneWriteCSSToCB) :
+      case ( makeClipButID === btnCcpBuildClips.btnCcpTdSmphnBuildCssClip) :
         clipboardStr = getTdSPhoneWriteCSSToCB(Appdata);
         break;
-      case ( makeClipButID === ccpMakeClipBut.tdLPhoneWriteCSSToCB) :
+      case ( makeClipButID === btnCcpBuildClips.btnCcpTdLgphnBuildCssClip) :
         clipboardStr = getTdLPhoneWriteCSSToCB(Appdata);
         break;
-      case ( makeClipButID === ccpMakeClipBut.tableDisplayWriteCSSToCB) :
+      case ( makeClipButID === btnCcpBuildClips.btnCcpTableDsktpBuildCssClip) :
         clipboardStr = getTableDisplayWriteCSSToCB(Appdata);
         break;
-      case ( makeClipButID === ccpMakeClipBut.tableSPhoneWriteCSSToCB) :
+      case ( makeClipButID === btnCcpBuildClips.btnCcpTableSmphnBuildCssClip) :
         clipboardStr = getTableSPhoneWriteCSSToCB(Appdata);
         break;
-      case ( makeClipButID === ccpMakeClipBut.tableLPhoneWriteCSSToCB) :
+      case ( makeClipButID === btnCcpBuildClips.btnCcpTableLgphnBuildCssClip) :
         clipboardStr = getTableLPhoneWriteCSSToCB(Appdata);
         break;
       }
@@ -506,7 +510,7 @@ var Witty = (function () {
       // !VA ---------------------------
       imgTag.classAtt = 
         // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
-        ccpIfNoUserInput('class',document.querySelector(ccpUserInput.imgClass).value);
+        ccpIfNoUserInput('class',document.querySelector(ccpUserInput.iptCcpImgClass).value);
 
       imgTag.altAtt =    
         // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output
@@ -517,14 +521,14 @@ var Witty = (function () {
         // !VA Get the iFilename from the Inspector
         
         var str;
-        // !VA If the path input element is empty, just include the filename and omit the path.
+        // !VA If the path input element is empty, just include the iFilename and omit the path.
         if (document.querySelector(id).value) {
-          str = `src="${document.querySelector(ccpUserInput.imgRelPath).value}/${document.querySelector(iInspectors.iFilename).textContent} `;
+          str = `src="${document.querySelector(ccpUserInput.iptCcpImgRelPath).value}/${document.querySelector(iInspectors.iFilename).textContent} `;
         } else {
           str = document.querySelector(iInspectors.iFilename).textContent;
         }
         return str;
-      })(ccpUserInput.imgRelPath, Appdata);
+      })(ccpUserInput.iptCcpImgRelPath, Appdata);
       // !VA imgTag.srcAtt END
       imgTag.heightAtt = `height="${Appdata.imgH}"`;
       imgTag.widthAtt = `width="${Appdata.imgW}"`;
@@ -557,7 +561,7 @@ var Witty = (function () {
           }
         }
         return str;
-      })(ccpUserInput.imgAlign);
+      })(ccpUserInput.selCcpImgAlign);
       // !VA imgTag Object END ------------------------
 
       var imgTagStr; 
@@ -582,7 +586,7 @@ var Witty = (function () {
       var tdTag = new ClipboardOutput('tdTag');
       tdTag.classAtt = 
         // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
-        ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tdClass).value);
+        ccpIfNoUserInput('class',document.querySelector(ccpUserInput.iptCcpTdClass).value);
 
       tdTag.alignAtt = (function (id) {
         // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
@@ -601,8 +605,8 @@ var Witty = (function () {
           }
         }
         return str;
-      })(ccpUserInput.tdAlign);
-      // !VA tdAlign END
+      })(ccpUserInput.selCcpTdAlign);
+      // !VA selCcpTdAlign END
 
       tdTag.valignAtt = (function (id) {
         // !VA TODO: The default 'left' is currently set in the HTML, that should be done programmatically
@@ -626,8 +630,8 @@ var Witty = (function () {
 
       // !VA Pass the input value, prepending it hex # character 
       tdTag.bgcolorAtt =
-        ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tdBgcolor).value);
-      // !VA tdBgcolor  END
+        ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.iptCcpTdBgColor).value);
+      // !VA iptCcpTdBgColor  END
 
 
       tdTag.tdContents =    (function () {
@@ -647,10 +651,10 @@ var Witty = (function () {
           
                 
 `
-  <td background="${document.querySelector(ccpUserInput.imgRelPath).value}/${data.fname}" ${tdTag.bgcolorAtt}" width="${Appdata.imgW}" height="${Appdata.imgH}" ${tdTag.valignAtt}">
+  <td background="${document.querySelector(ccpUserInput.iptCcpImgRelPath).value}/${data.fname}" ${tdTag.bgcolorAtt}" width="${Appdata.imgW}" height="${Appdata.imgH}" ${tdTag.valignAtt}">
   <!--[if gte mso 9]>
     <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Appdata.imgW}px;height:${Appdata.imgH}px;">
-    <v:fill type="tile" src="${document.querySelector(ccpUserInput.imgRelPath).value}/${Appdata.fname}" color="${tdTag.bgcolorAtt}" />
+    <v:fill type="tile" src="${document.querySelector(ccpUserInput.iptCcpImgRelPath).value}/${Appdata.fname}" color="${tdTag.bgcolorAtt}" />
     <v:textbox inset="0,0,0,0">
     <![endif]-->
       <div>
@@ -676,7 +680,7 @@ var Witty = (function () {
         }
         clipboardStr = str;
         // return clipboardStr;
-      })(ccpUserInput.tdBgimage);
+      })(ccpUserInput.chkCcpTdBgImg);
 
       return clipboardStr;
     }
@@ -692,7 +696,7 @@ var Witty = (function () {
       // !VA Base Table options----------------------------------------------
       tableTag.classAtt = 
         // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
-        ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tableClass).value);
+        ccpIfNoUserInput('class',document.querySelector(ccpUserInput.iptCcpTableClass).value);
 
 
       tableTag.alignAtt = (function (id) {
@@ -712,8 +716,8 @@ var Witty = (function () {
           }
         }
         return str;
-      })(ccpUserInput.tableAlign);
-      // !VA tableAlign END
+      })(ccpUserInput.selCcpTableAlign);
+      // !VA selCcpTableAlign END
 
       tableTag.tableContents = (function () {
         var str = getTdWriteHTMLToCB(Appdata);
@@ -739,8 +743,8 @@ var Witty = (function () {
       
       // !VA Pass the input value 
       tableTag.bgcolorAtt =
-      ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tableBgcolor).value);
-      // !VA tdBgcolor
+      ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.iptCcpTableBgColor).value);
+      // !VA iptCcpTdBgColor
       // !VA Base Table Tag END------------------------------------------------------
 
       // !VA Table WRAPPER Start ------------------------------------------------------
@@ -748,12 +752,12 @@ var Witty = (function () {
       // !VA Wrapper Class Attribute
       tableTag.wrapperclassAtt = 
       // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
-      ccpIfNoUserInput('class',document.querySelector(ccpUserInput.tableWrapperClass).value);
+      ccpIfNoUserInput('class',document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value);
 
       // !VA Wrapper Width Attribute
       tableTag.wrapperWidthAtt = (function (id, Appdata) {
 
-        var tableWrapperInput = document.querySelector(ccpUserInput.tableWrapperWidth);
+        var tableWrapperInput = document.querySelector(ccpUserInput.iptCcpTableWrapperWidth);
         // !VA If there 
         if (!tableWrapperInput.value) {
           tableTag.wrapperWidthAtt = '';
@@ -763,7 +767,7 @@ var Witty = (function () {
 
         var str = tableTag.wrapperWidthAtt;
         return str;
-      })(ccpUserInput.tableWrapperWidth, Appdata);
+      })(ccpUserInput.iptCcpTableWrapperWidth, Appdata);
 
       // !VA Wrapper align attribute
       tableTag.wrapperAlignAtt = (function (id) {
@@ -783,13 +787,13 @@ var Witty = (function () {
           }
         }
         return str;
-      })(ccpUserInput.tableWrapperAlign);
+      })(ccpUserInput.selCcpTableWrapperAlign);
 
 
       // !VA Wrapper bgcolor attributePass the input value 
       tableTag.wrapperBgcolorAtt =
       ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tableWrapperBgColor).value);
-      // !VA tdBgcolor
+      // !VA iptCcpTdBgColor
 
       // !VA Get the checked status of Include table wrapper, and if it's 'checked' output the base table AND the table wrapper
       if ( document.querySelector('#ccp-table-include-wrapper-checkbox').checked) {
@@ -829,7 +833,7 @@ var Witty = (function () {
       // !VA Clipboard output object 
       var imgDisplayCSSTag = new ClipboardOutput('imgDisplayCSSTag');
       // !VA Put the user-entered class into this property
-      imgDisplayCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
+      imgDisplayCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpImgClass).value;
 
       // !VA Build the css class declaration with width and height properties
       clipboardStr = `img.${imgDisplayCSSTag.classAtt} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important }`;
@@ -845,9 +849,9 @@ var Witty = (function () {
       // !VA Clipboard output object 
       var imgSmallPhonesCSSTag = new ClipboardOutput('imgSmallPhonesTag');
       // !VA Put the user-entered class into this property
-      imgSmallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
+      imgSmallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpImgClass).value;
       // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `img.${imgSmallPhonesCSSTag.classAtt} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
+      clipboardStr = `img.${imgSmallPhonesCSSTag.classAtt} { width: ${Appdata.iptTbrSmallPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
       // !VA Return the css string to the clipboard object.
       return clipboardStr;
     }
@@ -859,9 +863,9 @@ var Witty = (function () {
       // !VA Clipboard output object 
       var imgLargePhonesCSSTag = new ClipboardOutput('imgLargePhonesCSSTag');
       // !VA Put the user-entered class into this property
-      imgLargePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.imgClass).value;
+      imgLargePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpImgClass).value;
       // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `img.${imgLargePhonesCSSTag.classAtt} { width: ${Appdata.lPhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
+      clipboardStr = `img.${imgLargePhonesCSSTag.classAtt} { width: ${Appdata.iptTbrLargePhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
       // !VA Return the css string to the clipboard object.
       return clipboardStr;
     }
@@ -873,7 +877,7 @@ var Witty = (function () {
       // !VA Clipboard output object 
       var tdDisplayCSSTag = new ClipboardOutput('tdLargePhonesCSSTag');
       // !VA Put the user-entered class into this property
-      tdDisplayCSSTag.classAtt = document.querySelector(ccpUserInput.tdClass).value;
+      tdDisplayCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpTdClass).value;
       // !VA Build the css class declaration with and Appdata large phone width and height properties
       clipboardStr = `td.${tdDisplayCSSTag.classAtt} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important }`;
       // !VA Return the css string to the clipboard object.
@@ -886,9 +890,9 @@ var Witty = (function () {
       // !VA Clipboard output object 
       var tdSmallPhonesCSSTag = new ClipboardOutput('tdSmallPhonesCSSTag');
       // !VA Put the user-entered class into this property
-      tdSmallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.tdClass).value;
+      tdSmallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpTdClass).value;
       // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `td.${tdSmallPhonesCSSTag.classAtt} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
+      clipboardStr = `td.${tdSmallPhonesCSSTag.classAtt} { width: ${Appdata.iptTbrSmallPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
       // !VA Return the css string to the clipboard object.
       return clipboardStr;
     }
@@ -899,9 +903,9 @@ var Witty = (function () {
       // !VA Clipboard output object 
       var tdLargePhonesCSSTag = new ClipboardOutput('tdLargePhonesCSSTag');
       // !VA Put the user-entered class into this property
-      tdLargePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.tdClass).value;
+      tdLargePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpTdClass).value;
       // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `td.${tdLargePhonesCSSTag.classAtt} { width: ${Appdata.lPhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
+      clipboardStr = `td.${tdLargePhonesCSSTag.classAtt} { width: ${Appdata.iptTbrLargePhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
       // !VA Return the css string to the clipboard object.
       return clipboardStr;
     }
@@ -913,7 +917,7 @@ var Witty = (function () {
       // !VA Clipboard output object 
       var tableDisplayCSSTag = new ClipboardOutput('tableLargePhonesCSSTag');
       // !VA Put the user-entered class into this property
-      tableDisplayCSSTag.classAtt = document.querySelector(ccpUserInput.tableClass).value;
+      tableDisplayCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpTableClass).value;
       // !VA Build the css class declaration with and Appdata large phone width and height properties
       clipboardStr = `table.${tableDisplayCSSTag.classAtt} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important }`;
       // !VA Return the css string to the clipboard object.
@@ -926,9 +930,9 @@ var Witty = (function () {
       // !VA Clipboard output object 
       var tableSmallPhonesCSSTag = new ClipboardOutput('tableSmallPhonesCSSTag');
       // !VA Put the user-entered class into this property
-      tableSmallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.tableClass).value;
+      tableSmallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpTableClass).value;
       // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `table.${tableSmallPhonesCSSTag.classAtt} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
+      clipboardStr = `table.${tableSmallPhonesCSSTag.classAtt} { width: ${Appdata.iptTbrSmallPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
       // !VA Return the css string to the clipboard object.
       return clipboardStr;
     }
@@ -939,9 +943,9 @@ var Witty = (function () {
       // !VA Clipboard output object 
       var tableLargePhonesCSSTag = new ClipboardOutput('tableLargePhonesCSSTag');
       // !VA Put the user-entered class into this property
-      tableLargePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.tableClass).value;
+      tableLargePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpTableClass).value;
       // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `table.${tableLargePhonesCSSTag.classAtt} { width: ${Appdata.lPhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
+      clipboardStr = `table.${tableLargePhonesCSSTag.classAtt} { width: ${Appdata.iptTbrLargePhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
       // !VA Return the css string to the clipboard object.
       return clipboardStr;
     }
@@ -956,7 +960,7 @@ var Witty = (function () {
     // clipboardController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
     // !VA TODO: THis should be in handleUserInput
     function ccpIfNoUserInput(att, value) {
-      // !VA We need get the filename from Appdata in case the user leaves 'path' empty
+      // !VA We need get the iFilename from Appdata in case the user leaves 'path' empty
       var Appdata = appController.initGetAppdata();
       var str;
       // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
@@ -969,7 +973,7 @@ var Witty = (function () {
         }
 
       } else {
-        // !VA If the path field is empty, we need to return the filename without the path.
+        // !VA If the path field is empty, we need to return the iFilename without the path.
         if (att === 'src' && value === '' ) {
           str = `${att}="${Appdata.fname}" `;
         } else if ( att === '#' || att === '') {
@@ -1000,9 +1004,9 @@ var Witty = (function () {
     var iInspectors = UICtrl.getInspectorIDs();
     var dynamicRegions = UICtrl.getDynamicRegionIDs();
     var staticRegions = UICtrl.getStaticRegionIDs();
-    var toolButtons = UICtrl.getToolButtonIDs();
+    var toolBar = UICtrl.getToolButtonIDs();
     var ccpUserInput = UICtrl.getCcpUserInputIDs();
-    var ccpMakeClipBut =  UICtrl.getCcpMakeClipButIDs();
+    var btnCcpBuildClips =  UICtrl.getCcpMakeClipButIDs();
     
 
     // !VA appController private setupEventListeners
@@ -1038,13 +1042,13 @@ var Witty = (function () {
 
 
       // Event Listeners for Drag and Drop
-      // !VA dropZone is the screen region that will accept the drop event 
-      var dropZone = document.querySelector(dynamicRegions.appContainer);
-      dropZone.addEventListener('dragover', handleDragOver, false);
+      // !VA dropArea is the screen region that will accept the drop event 
+      var dropArea = document.querySelector(dynamicRegions.appContainer);
+      dropArea.addEventListener('dragover', handleDragOver, false);
     
       // !VA Initiates the FileReader function to get the dropped image data
-      dropZone.addEventListener('drop', handleFileSelect, false);
-      // dropZone.addEventListener('drop', startNewDrop, false);
+      dropArea.addEventListener('drop', handleFileSelect, false);
+      // dropArea.addEventListener('drop', startNewDrop, false);
       // Drag and Drop Listener 
       //DRAG AND DROP PROCESSING END
 
@@ -1059,10 +1063,10 @@ var Witty = (function () {
         // else
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
-      // addEventHandler(document.getElementById(toolButtons.grow01),'click',doit,false);
+      // addEventHandler(document.getElementById(toolBar.btnTbrIncr01),'click',doit,false);
       
-      // !VA Add click and blur event handlers for clickable toolButtons: 
-      var tbClickables = [ toolButtons.grow50, toolButtons.grow10, toolButtons.grow01, toolButtons.shrink50, toolButtons.shrink10, toolButtons.shrink01,  ];
+      // !VA Add click and blur event handlers for clickable toolBar: 
+      var tbClickables = [ toolBar.btnTbrIncr50, toolBar.btnTbrIncr10, toolBar.btnTbrIncr01, toolBar.btnTbrDecr50, toolBar.btnTbrDecr10, toolBar.btnTbrDecr01,  ];
       for (let i = 0; i < tbClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         tbClickables[i] = document.querySelector(tbClickables[i]);
@@ -1070,8 +1074,8 @@ var Witty = (function () {
 
       }
       
-      // !VA Add event handlers for input toolButtons
-      var tbKeypresses = [ toolButtons.viewerW, toolButtons.imgWidth, toolButtons.imgHeight, toolButtons.sPhonesW, toolButtons.lPhonesW ];
+      // !VA Add event handlers for input toolBar
+      var tbKeypresses = [ toolBar.viewerW, toolBar.iptTbrImgWidth, toolBar.iptTbrImgHeight, toolBar.iptTbrSmallPhonesW, toolBar.iptTbrLargePhonesW ];
       for (let i = 0; i < tbKeypresses.length; i++) {
         // !VA convert the ID string to the object inside the loop
         tbKeypresses[i] = document.querySelector(tbKeypresses[i]);
@@ -1091,7 +1095,7 @@ var Witty = (function () {
 
 
       // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. Currently only the img class input does that.
-      var ccpKeypresses = [ ccpUserInput.imgClass, ccpUserInput.tdClass, ccpUserInput.tableClass ];
+      var ccpKeypresses = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass ];
       for (let i = 0; i < ccpKeypresses.length; i++) {
         // !VA convert the ID string to the object inside the loop
         ccpKeypresses[i] = document.querySelector(ccpKeypresses[i]);
@@ -1099,7 +1103,7 @@ var Witty = (function () {
       }
 
       // !VA Add click handlers for Inspector - there's only the clipboard button now but there could be more. 
-      var dvClickables = [ iInspectors.clipboardBut ];
+      var dvClickables = [ iInspectors.btnToggleCcp ];
       for (let i = 0; i < dvClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         dvClickables[i] = document.querySelector(dvClickables[i]);
@@ -1107,12 +1111,12 @@ var Witty = (function () {
       }
 
 
-      // !VA We need eventListeners for ALL the clipboard buttons so make an eventListener for each value in the ccpMakeClipBut object. We need a for in loop for objects
-      for(var i in ccpMakeClipBut) {
+      // !VA We need eventListeners for ALL the clipboard buttons so make an eventListener for each value in the btnCcpBuildClips object. We need a for in loop for objects
+      for(var i in btnCcpBuildClips) {
         // !VA loop through the object that contain the id and func properties.
         var clipBut;
-        if(ccpMakeClipBut.hasOwnProperty(i)){
-          clipBut = document.querySelector(ccpMakeClipBut[i]);
+        if(btnCcpBuildClips.hasOwnProperty(i)){
+          clipBut = document.querySelector(btnCcpBuildClips[i]);
           addEventHandler(clipBut,'click',CBController.doClipboard,false);
         }
       }
@@ -1122,25 +1126,25 @@ var Witty = (function () {
       // Click handlers - Misc
       // =============================
       // !VA This was moved to initCCP I think
-      // addEventHandler(iInspectors.clipboardBut,'click',toggleCCP,false);
+      // addEventHandler(iInspectors.btnToggleCcp,'click',toggleCCP,false);
 
       // Keypress handlers - showMobileImageButtons
       // ==================================
       
       // Keypress handlers - Misc
       // ==================================
-      // addEventHandler(iInspectors.clipboardBut,'keypress',toggleCCP,false);
+      // addEventHandler(iInspectors.btnToggleCcp,'keypress',toggleCCP,false);
 
       // Blur handlers - handleInputBlur
       // =================================
-      // addEventHandler(ccpUserInput.imgClass,'blur',showMobileImageButtons,false);
+      // addEventHandler(ccpUserInput.iptCcpImgClass,'blur',showMobileImageButtons,false);
       // ccpUserInput.imgAlt.addEventListener('blur', showMobileImageButtons);
-      // ccpUserInput.imgClass.addEventListener('blur', showMobileImageButtons);
-      // ccpUserInput.imgRelPath.addEventListener('blur', showMobileImageButtons);
+      // ccpUserInput.iptCcpImgClass.addEventListener('blur', showMobileImageButtons);
+      // ccpUserInput.iptCcpImgRelPath.addEventListener('blur', showMobileImageButtons);
       
       // Change handlers - handleOnChange
       // =================================
-      // addEventHandler(ccpUserInput.imgWidth,'change',handleOnChange,false);
+      // addEventHandler(ccpUserInput.iptTbrImgWidth,'change',handleOnChange,false);
       // addEventHandler(ccpUserInput.tableWidth,'change',handleOnChange,false);
 
       // !VA The closing bracket below belongs to initializeHandlers(), see the top of this function
@@ -1203,9 +1207,9 @@ var Witty = (function () {
           // curImg.src = e.target.result;
           curImg.src = e.target.result;
           let fileName;
-          // Read the filename of the FileReader object into a variable to pass to the getAppData function, otherwise the blob has no name
+          // Read the iFilename of the FileReader object into a variable to pass to the getAppData function, otherwise the blob has no name
           fileName = theFile.name;
-          // !VA Write the filename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
+          // !VA Write the iFilename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
           document.querySelector(iInspectors.iFilename).textContent = fileName;
           
           // !VA Hide the dropArea - not sure if this is the right place for this.
@@ -1222,7 +1226,7 @@ var Witty = (function () {
               // !VA Hide the drop area.
                 document.querySelector(staticRegions.dropArea).style.display = 'none';
                 // !VA  Show the toolbar
-                document.querySelector(staticRegions.toolsContainer).style.display = 'block';
+                document.querySelector(staticRegions.tbrContainer).style.display = 'block';
 
                 // !VA Display the current image
                 curImg.style.display = 'block';
@@ -1233,18 +1237,18 @@ var Witty = (function () {
                 // !VA Review this - it might be an older comment...
                 // !VA The problem is that Appdata is a global object in the public functions, as it is now in master. I don't want to put all that stuff in the appController's public functions, so I have to either leave it in UIController or pass it between private functions, which will get very complicated.   I think it will be much cleaner if I only use updateAppData to loop through the items to update and don't use the klunky getAppData. Also, the refreshAppUI function refreshes all the values when it's called - it should only refresh the changed values.
                 // !VA  Now that the blob image has been displayed and has DOM properties that can be queried, query them and write them to Appdata.
-                // !VA Now that we have a current image in the DOM, Get Appdata so we can store the filename in it.
+                // !VA Now that we have a current image in the DOM, Get Appdata so we can store the iFilename in it.
 
                 // !VA Initialize the value in the toolbar viewerW input field to its initial CSS value.
-                // !VA Commenting this out since I changed it to hard-coded in the HTML file along with sPhonesW and sPhonesH.
+                // !VA Commenting this out since I changed it to hard-coded in the HTML file along with iptTbrSmallPhonesW and sPhonesH.
                 // console.log('document.querySelector(dynamicRegions.imgViewer) is: ' + document.querySelector(dynamicRegions.imgViewer));
                 // console.dir(document.querySelector(dynamicRegions.imgViewer));
-                // document.querySelector(toolButtons.viewerW).value = document.querySelector(dynamicRegions.imgViewer).style.width;
+                // document.querySelector(toolBar.viewerW).value = document.querySelector(dynamicRegions.imgViewer).style.width;
                 
                 // !VA Set the data attribute for small phone and large phone width. We need this because there is not actual HTML element that corresponds to these properties, and thus no way to persist them globally. So the data attribute sphonew and sphoneh will be written to the toolbar input field as surrogate for an actual DOM element that Appdata can query.
                 var sphonesw, lphonesw;
-                sphonesw = document.querySelector(toolButtons.sPhonesW);
-                lphonesw = document.querySelector(toolButtons.lPhonesW)                
+                sphonesw = document.querySelector(toolBar.iptTbrSmallPhonesW);
+                lphonesw = document.querySelector(toolBar.iptTbrLargePhonesW)                
                 sphonesw.setAttribute('data-sphonesw', '320')
                 lphonesw.setAttribute('data-lphonesw', '480')
                 sphonesw.value = sphonesw.getAttribute('data-sphonesw');
@@ -1455,7 +1459,7 @@ var Witty = (function () {
         if (prop === 'imgW' || prop === 'imgH') {
           this.value = ('');
           this.blur();
-        // !VA For viewerW, sPhonesW and lPhonesW we want to exit the field and restore the preexisting value from Appdata.
+        // !VA For viewerW, iptTbrSmallPhonesW and iptTbrLargePhonesW we want to exit the field and restore the preexisting value from Appdata.
         } else {
           this.value = Appdata[prop];
           this.blur();
@@ -1515,7 +1519,7 @@ var Witty = (function () {
 
           // !VA TODO: Handle the small phone input
         case (prop === 'sPhoneW') :
-          console.log('Error handling for sPhonesW input not implemented!');
+          console.log('Error handling for iptTbrSmallPhonesW input not implemented!');
           break;
         
         // !VA Handle the large phone input
@@ -1546,7 +1550,7 @@ var Witty = (function () {
       const { target, prop, val } = args;
       // !VA Get Appdata properties.
       var Appdata = {};
-      var sPhonesH, sPhonesW;
+      var sPhonesH, iptTbrSmallPhonesW;
       // !VA All we really need here is Appdata.aspect. Everything else is calculated based on the user's input.
 
       // !VA NEW
@@ -1578,14 +1582,14 @@ var Witty = (function () {
         arg2 = [ 'imgW', imgW ] 
         break;
 
-      case (prop === 'sPhonesW' || prop === 'lPhonesW') :
-        console.log('Appdata.sPhonesW is: ' + Appdata.sPhonesW);   
+      case (prop === 'iptTbrSmallPhonesW' || prop === 'iptTbrLargePhonesW') :
+        console.log('Appdata.iptTbrSmallPhonesW is: ' + Appdata.iptTbrSmallPhonesW);   
         // sPhonesH =  val * (1 / Appdata.aspect[0]);
         arg1 = [prop, val];
         arg2 = '';
         break;
 
-        // case (prop === 'lPhonesW') :
+        // case (prop === 'iptTbrLargePhonesW') :
         //   // !VA TODO: needs handling
         //   arg1 = [prop, val];
         //   // arg2 = ['sPhonesH', sPhonesH ];
@@ -1623,11 +1627,11 @@ var Witty = (function () {
         case prop === 'imgH' :
           document.querySelector(dynamicRegions.curImg).style.height = val + 'px';
           break;
-        case prop === 'sPhonesW' :
-          document.querySelector(toolButtons.sPhonesW).setAttribute('data-sphonesw', val);
+        case prop === 'iptTbrSmallPhonesW' :
+          document.querySelector(toolBar.iptTbrSmallPhonesW).setAttribute('data-sphonesw', val);
           break;
-        case prop === 'lPhonesW' :
-          document.querySelector(toolButtons.lPhonesW).setAttribute('data-lphonesw', val);
+        case prop === 'iptTbrLargePhonesW' :
+          document.querySelector(toolBar.iptTbrLargePhonesW).setAttribute('data-lphonesw', val);
           break;
         }
       }
@@ -1648,7 +1652,7 @@ var Witty = (function () {
       viewerW = parseInt(compStyles.getPropertyValue('width'), 10);
       viewerH = parseInt(compStyles.getPropertyValue('height'), 10);
       // !VA Write the viewerW to the toolbar input field
-      document.querySelector(toolButtons.viewerW).value = viewerW;
+      document.querySelector(toolBar.viewerW).value = viewerW;
 
       // !VA If we're initializing a new image, use the naturalWidth and naturalHeight. If we're updating via user input, we need to use the display image and height, imgW and imgH. If we're initializing, then Appdata.imgW and Appdata.imgH will be 0 or falsy because it hasn't been resized yet. So we need to make the following decision based on the _actual_ image width and height, which will be different based on whether we're initializing or updating.
       // !VA I thought I fixed this...it appears to only apply to dev mode.
@@ -1763,7 +1767,7 @@ var Witty = (function () {
 
 
         // !VA CCP Checkboxes - these are mock checkboxes with custom styling, so the ID names have to be converted to checkbox names in order to select or deselect them. We attach the event handler to the checkmark, not the checkbox. The checkmark is converted to checkbox for handling in toggleCheckbox.
-        var ccpCheckmarks = [ ccpUserInput.imgIncludeStyles, ccpUserInput.tdBgimage, ccpUserInput.tableIncludeWrapper ]
+        var ccpCheckmarks = [ ccpUserInput.imgIncludeStyles, ccpUserInput.chkCcpTdBgImg, ccpUserInput.chkCcpTableIncludeWrapper ]
         var ccpCheckboxes = [];
         for (let i = 0; i < ccpCheckmarks.length; i++) {
           document.querySelector(ccpCheckmarks[i]).addEventListener('click', handleCCPInput, false);
@@ -1777,13 +1781,13 @@ var Witty = (function () {
         }
 
         // !VA Initialize with 'include wrapper table' unchecked, or true for DEV
-        // var includeWrapperTable = document.querySelector((ccpUserInput.tableIncludeWrapper.replace('mrk', 'box')));
+        // var includeWrapperTable = document.querySelector((ccpUserInput.chkCcpTableIncludeWrapper.replace('mrk', 'box')));
         // includeWrapperTable.checked = true;
         // !VA Default for table width
         document.querySelector(ccpUserInput.tableWidth).value = `${Appdata.imgW}`;
         // !VA Defaults for wrapper width and class
-        document.querySelector(ccpUserInput.tableWrapperWidth).value = `${Appdata.viewerW}`;
-        document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
+        document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value = `${Appdata.viewerW}`;
+        document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
 
       }
     }
@@ -1807,8 +1811,8 @@ var Witty = (function () {
       // !VA TODO: This value needs to be refreshed when the CCP is opened. In fact, entering new values in any of the toolButton inputs has to call a refresh of Appdata and a closing-reopening of the CCP so the values can refresh.
       
       // !VA Defaults for wrapper width and class
-      document.querySelector(ccpUserInput.tableWrapperWidth).value = `${data.viewerW}`;
-      document.querySelector(ccpUserInput.tableWrapperClass).value = 'devicewidth';
+      document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value = `${data.viewerW}`;
+      document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
       // !VA Show wrapper table options if the checked element is 'table-include-wrapper-checkbox'
       if (checkbox.id === 'ccp-table-include-wrapper-checkbox') {
         wrapperItemsToShow = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
@@ -1829,27 +1833,27 @@ var Witty = (function () {
     function showElementOnInput(event) {
       // !VA Here we catch the event handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
       var elems = [];
-      elems[0] = document.querySelector(ccpMakeClipBut.imgDisplayWriteCSSToCB);
-      elems[1] = document.querySelector(ccpMakeClipBut.imgSPhoneWriteCSSToCB);
-      elems[2] = document.querySelector(ccpMakeClipBut.imgLPhoneWriteCSSToCB);
-      elems[3] = document.querySelector(ccpMakeClipBut.tdDisplayWriteCSSToCB);
-      elems[4] = document.querySelector(ccpMakeClipBut.tdSPhoneWriteCSSToCB);
-      elems[5] = document.querySelector(ccpMakeClipBut.tdLPhoneWriteCSSToCB);
-      elems[6] = document.querySelector(ccpMakeClipBut.tableDisplayWriteCSSToCB);
-      elems[7] = document.querySelector(ccpMakeClipBut.tableSPhoneWriteCSSToCB);
-      elems[8] = document.querySelector(ccpMakeClipBut.tableLPhoneWriteCSSToCB);
+      elems[0] = document.querySelector(btnCcpBuildClips.btnCcpImgDsktpBuildCssClip);
+      elems[1] = document.querySelector(btnCcpBuildClips.btnCcpImgSmphnBuildCssClip);
+      elems[2] = document.querySelector(btnCcpBuildClips.btnCcpImgLgphnBuildCssClip);
+      elems[3] = document.querySelector(btnCcpBuildClips.btnCcpTdDsktpBuildCssClip);
+      elems[4] = document.querySelector(btnCcpBuildClips.btnCcpTdSmphnBuildCssClip);
+      elems[5] = document.querySelector(btnCcpBuildClips.btnCcpTdLgphnBuildCssClip);
+      elems[6] = document.querySelector(btnCcpBuildClips.btnCcpTableDsktpBuildCssClip);
+      elems[7] = document.querySelector(btnCcpBuildClips.btnCcpTableSmphnBuildCssClip);
+      elems[8] = document.querySelector(btnCcpBuildClips.btnCcpTableLgphnBuildCssClip);
       // !VA We only want to show the buttons in each respective fieldset
       // !VA If the input is in the img fieldset, only show the first three buttons in the array. Add the hash # to the target ID to find the match with the ID in ccpUserInput
-      if (('#' + event.target.id) == ccpUserInput.imgClass) {
+      if (('#' + event.target.id) == ccpUserInput.iptCcpImgClass) {
         for (let i = 0; i <= 2; i++) {
           this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
         }
-      } else if (('#' + event.target.id) === ccpUserInput.tdClass) { 
+      } else if (('#' + event.target.id) === ccpUserInput.iptCcpTdClass) { 
         // !VA If the input is in the td fieldset, only show the next three buttons in the array
         for (let i = 3; i <= 5 ; i++) {
           this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
         }
-      } else if (('#' + event.target.id) === ccpUserInput.tableClass) {
+      } else if (('#' + event.target.id) === ccpUserInput.iptCcpTableClass) {
         // !VA If the input is in the table fieldset, only show the next buttons in the array
         for (let i = 6; i <= 8 ; i++) {
           this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
@@ -1932,8 +1936,8 @@ var Witty = (function () {
         viewerW:  'ipt-tbr-viewerw',
         imgW: 'ipt-tbr-imgwidth',
         imgH: 'ipt-tbr-imgheight',
-        sPhonesW: 'ipt-tbr-sphones-width',
-        lPhonesW: 'ipt-tbr-lphones-width'
+        iptTbrSmallPhonesW: 'ipt-tbr-sphones-width',
+        iptTbrLargePhonesW: 'ipt-tbr-lphones-width'
 
       };
       // !VA This should return directly wihout a ret variable as tmp storage.
@@ -1972,19 +1976,19 @@ var Witty = (function () {
     // !VA  appController private
     var initDev = function() {
       // !VA This is where we initialize Dev mode, which is where we can start the app with a hard-coded img element in the HTML file. THis is very useful, otherwise we'd have to drop files to initialize or dink with the FileReader object to hard-code a test file.
-      // !VA Get Appdata so we can store the filename
+      // !VA Get Appdata so we can store the iFilename
       // var Appdata = appController.initGetAppdata();
       // !VA Get the current (devimg) image dimensions and write the Inspectors
       // !VA Turn on the toolbars
-      document.querySelector(staticRegions.toolsContainer).style.display = 'block';
+      document.querySelector(staticRegions.tbrContainer).style.display = 'block';
       document.querySelector(dynamicRegions.curImg).style.display = 'block';
 
-      // !VA  Get the filename of the devImg in the HTML. This is the only time we'll have an actual source file -- in user mode all the images are blobs -- so we can do this as a one-off.
+      // !VA  Get the iFilename of the devImg in the HTML. This is the only time we'll have an actual source file -- in user mode all the images are blobs -- so we can do this as a one-off.
       
       var fname = document.querySelector(dynamicRegions.curImg).src;
       fname = fname.split('/');
       fname = fname[fname.length - 1];
-      // !VA Write the filename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
+      // !VA Write the iFilename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
       document.querySelector(iInspectors.iFilename).textContent = fname;
 
       
@@ -1995,16 +1999,16 @@ var Witty = (function () {
 
 
       // !VA Initialize the value in the toolbar viewerW input field to its initial CSS value.
-      // !VA Commenting this out since I changed it to hard-coded in the HTML file along with sPhonesW and sPhonesH.
+      // !VA Commenting this out since I changed it to hard-coded in the HTML file along with iptTbrSmallPhonesW and sPhonesH.
       // console.log('document.querySelector(dynamicRegions.imgViewer) is: ' + document.querySelector(dynamicRegions.imgViewer));
       // console.dir(document.querySelector(dynamicRegions.imgViewer));
-      // document.querySelector(toolButtons.viewerW).value = document.querySelector(dynamicRegions.imgViewer).style.width;
+      // document.querySelector(toolBar.viewerW).value = document.querySelector(dynamicRegions.imgViewer).style.width;
       
       // !VA THis is duplicated in handleFileSelect, only included here to initialize dev mode.
       // !VA Set the data attribute for small phone and large phone width. We need this because there is not actual HTML element that corresponds to these properties, and thus no way to persist them globally. So the data attribute sphonew and sphoneh will be written to the toolbar input field as surrogate for an actual DOM element that Appdata can query.
       var sphonesw, lphonesw;
-      sphonesw = document.querySelector(toolButtons.sPhonesW);
-      lphonesw = document.querySelector(toolButtons.lPhonesW)                
+      sphonesw = document.querySelector(toolBar.iptTbrSmallPhonesW);
+      lphonesw = document.querySelector(toolBar.iptTbrLargePhonesW)                
       sphonesw.setAttribute('data-sphonesw', '320')
       lphonesw.setAttribute('data-lphonesw', '480')
       sphonesw.value = sphonesw.getAttribute('data-sphonesw');
@@ -2031,8 +2035,8 @@ var Witty = (function () {
 
       // !VA Now compute the rest of Appdat
       Appdata.aspect = getAspectRatio(Appdata.imgNW,  Appdata.imgNH);
-      Appdata.sPhonesH = Math.round(Appdata.sPhonesW * (1 / Appdata.aspect[0]));
-      Appdata.lPhonesH = Math.round(Appdata.lPhonesW * (1 / Appdata.aspect[0]));
+      Appdata.sPhonesH = Math.round(Appdata.iptTbrSmallPhonesW * (1 / Appdata.aspect[0]));
+      Appdata.lPhonesH = Math.round(Appdata.iptTbrLargePhonesW * (1 / Appdata.aspect[0]));
       // console.log('Appdata is:');
       // console.dir(Appdata);
       return Appdata;

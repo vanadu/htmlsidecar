@@ -1,0 +1,234 @@
+[Script for Search and Replace]
+[Search /w]
+tableDisplayWriteCSSToCB
+[Replace]
+btnCcpTableDsktpBuildCssClip
+[Search /w]
+tableSPhoneWriteCSSToCB
+[Replace]
+btnCcpTableSmphnBuildCssClip
+[Search /w]
+tableLPhoneWriteCSSToCB
+[Replace]
+btnCcpTableLgphnBuildCssClip
+[Search /w]
+imgDisplayWriteCSSToCB
+[Replace]
+btnCcpImgDsktpBuildCssClip
+[Search /w]
+ccpTableWriteHTMLToCB
+[Replace]
+btnCcpTableBuildHtmlClip
+[Search /w]
+imgSPhoneWriteCSSToCB
+[Replace]
+btnCcpImgSmphnBuildCssClip
+[Search /w]
+imgLPhoneWriteCSSToCB
+[Replace]
+btnCcpImgLgphnBuildCssClip
+[Search /w]
+tdDisplayWriteCSSToCB
+[Replace]
+btnCcpTdDsktpBuildCssClip
+[Search /w]
+tdSPhoneWriteCSSToCB
+[Replace]
+btnCcpTdSmphnBuildCssClip
+[Search /w]
+tdLPhoneWriteCSSToCB
+[Replace]
+btnCcpTdLgphnBuildCssClip
+[Search /w]
+tableIncludeWrapper
+[Replace]
+chkCcpTableIncludeWrapper
+[Search /w]
+tableWrapperBgcolor
+[Replace]
+iptCcpTableWrapperBgColor
+[Search /w]
+ccpImgWriteHTMLToCB
+[Replace]
+btnCcpImgBuildHtmlClip
+[Search /w]
+ccpTdWriteHTMLToCB
+[Replace]
+btnCcpTDBuildHtmlClip
+[Search /w]
+tableWrapperClass
+[Replace]
+iptCcpTableWrapperClass
+[Search /w]
+tableWrapperWidth
+[Replace]
+iptCcpTableWrapperWidth
+[Search /w]
+tableWrapperAlign
+[Replace]
+selCcpTableWrapperAlign
+[Search /w]
+appMessContainer
+[Replace]
+msgContainer
+[Search /w]
+toolsContainer
+[Replace]
+tbrContainer
+[Search /w]
+appMessDisplay
+[Replace]
+msgDisplay
+[Search /w]
+ccpMakeClipBut
+[Replace]
+btnCcpBuildClips
+[Search /w]
+clipboardBut
+[Replace]
+btnToggleCcp
+[Search /w]
+tableBgcolor
+[Replace]
+iptCcpTableBgColor
+[Search /w]
+smallphones
+[Replace]
+iSmallPhones
+[Search /w]
+largephones
+[Replace]
+iLargePhones
+[Search /w]
+toolButtons
+[Replace]
+toolBar
+[Search /w]
+dimViewers
+[Replace]
+iInspectors
+[Search /w]
+imgRelPath
+[Replace]
+iptCcpImgRelPath
+[Search /w]
+tableClass
+[Replace]
+iptCcpTableClass
+[Search /w]
+tableAlign
+[Replace]
+selCcpTableAlign
+[Search /w]
+TableWidth
+[Replace]
+iptCcpTableWidth
+[Search /w]
+dimViewer
+[Replace]
+iInspector
+[Search /w]
+imgHeight
+[Replace]
+iptTbrImgHeight
+[Search /w]
+tdBgcolor
+[Replace]
+iptCcpTdBgColor
+[Search /w]
+tdBgimage
+[Replace]
+chkCcpTdBgImg
+[Search /w]
+filename
+[Replace]
+iFilename
+[Search /w]
+filename
+[Replace]
+iDisksize
+[Search /w]
+imgWidth
+[Replace]
+iptTbrImgWidth
+[Search /w]
+shrink50
+[Replace]
+btnTbrDecr50
+[Search /w]
+shrink10
+[Replace]
+btnTbrDecr10
+[Search /w]
+shrink01
+[Replace]
+btnTbrDecr01
+[Search /w]
+sPhonesW
+[Replace]
+iptTbrSmallPhonesW
+[Search /w]
+lPhonesW
+[Replace]
+iptTbrLargePhonesW
+[Search /w]
+dropArea
+[Replace]
+dropZone
+[Search /w]
+imgClass
+[Replace]
+iptCcpImgClass
+[Search /w]
+imgAlign
+[Replace]
+selCcpImgAlign
+[Search /w]
+tdVAlign
+[Replace]
+selCcpTdVAlign
+[Search /w]
+display
+[Replace]
+iDisplaySize
+[Search /w]
+viewerW
+[Replace]
+iptTbrViewerW
+[Search /w]
+tdClass
+[Replace]
+iptCcpTdClass
+[Search /w]
+tdAlign
+[Replace]
+selCcpTdAlign
+[Search /w]
+aspect
+[Replace]
+iAspect
+[Search /w]
+retina
+[Replace]
+iRetina
+[Search /w]
+grow50
+[Replace]
+btnTbrIncr50
+[Search /w]
+grow10
+[Replace]
+btnTbrIncr10
+[Search /w]
+grow01
+[Replace]
+btnTbrIncr01
+[Search /w]
+smallphones
+[Replace]
+iSmallPhones
+[Search /w]
+largephones
+[Replace]
+iLargePhones
+[End of Search and Replace Script]

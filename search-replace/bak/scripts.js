@@ -3,9 +3,7 @@
 // See C:\Users\VANA\OneDrive\WhittyReview_12.30.19.docx
 
 // !VA 01.03.20 b94eeb2 ESLint fixes
-// !VA 01.05.20 Naming Scheme Changes 1
-// !VA 01.06 Renaming with S&R Scripts in progress
-
+// !VA 02.05.20 Naming Scheme Changes 1
 
 /* !VA  01.05.20
 ==================
@@ -78,30 +76,30 @@ var Witty = (function () {
 
     // !VA UIController: DimViewer ID strings
     var dimViewers = {
-      filename: '#i-filename',
-      display: '#i-display-size',
-      diskimg: '#i-disk-size',
-      aspect: '#i-aspect',
-      smallphones: '#i-small-phones',
-      largephones: '#i-large-phones',
-      retina: '#i-retina',
-      clipboardBut: '#btn-toggle-ccp'
+      filename: '#dv-filename-viewer',
+      display: '#dv-display',
+      diskimg: '#dv-disk-img',
+      aspect: '#dv-aspect',
+      smallphones: '#dv-small-phones',
+      largephones: '#dv-large-phones',
+      retina: '#dv-retina',
+      clipboardBut: '#dv-clipboard-but'
     };
 
     // !VA UIController: toolButton ID Strings
     var toolButtons = {
-      viewerW: '#ipt-tbr-viewerw',
-      grow50: '#btn-tbr-incr50',
-      grow10: '#btn-tbr-incr10',
-      grow01: '#btn-tbr-incr01',
-      imgWidth: '#ipt-tbr-imgwidth',
+      viewerW: '#tb-input-viewerwidth',
+      grow50: '#tb-but-grow50',
+      grow10: '#tb-but-grow10',
+      grow01: '#tb-but-grow01',
+      imgWidth: '#tb-input-imgwidth',
       toggleImgSize: '#toggle-image-size',
-      imgHeight: '#ipt-tbr-imgheight',
-      shrink01:'#btn-tbr-decr01',
-      shrink10: '#btn-tbr-decr10',
-      shrink50: '#btn-tbr-decr50',
-      sPhonesW: '#ipt-tbr-sphones-width',
-      lPhonesW: '#ipt-tbr-lphones-width',
+      imgHeight: '#tb-input-imgheight',
+      shrink01:'#tb-but-shrink01',
+      shrink10: '#tb-but-shrink10',
+      shrink50: '#tb-but-shrink50',
+      sPhonesW: '#tb-input-sphones-width',
+      lPhonesW: '#tb-input-lphones-width',
     };
 
     //!VA If we separate this out into UI objects that correspond to the objects we want to create, then we can just loop through them rather than define each property separately. So, dynamicElements are those that resize based on the current image... but I haven't figured out how to loop through them yet.
@@ -116,61 +114,61 @@ var Witty = (function () {
     // !VA UIController: staticRegions
     var staticRegions = {
       dropArea: '#drop-area',
-      toolsContainer: '#toolbar-container',
+      toolsContainer: '#tools-container',
       ccpContainer: '#ccp',
-      appMessContainer: '#msg-container',
-      appMessDisplay: '#msg-content',
+      appMessContainer: '#app-message-container',
+      appMessDisplay: '#app-message-display',
       ccpBlocker: '#ccp-blocker'
     };
 
     // !VA  UIController: ccpUserInput ID Strings
     // !VA imgAnchor is just a flag for the status of the checkbox. The actual propStrings have to have an Open and Close property.
     var ccpUserInput = {
-      imgClass: '#ipt-ccp-img-class',
-      // imgAnchor: '#chk-ccp-img-anchor',
-      imgAlt: '#ipt-ccp-img-alt',
+      imgClass: '#ccp-input-img-class',
+      // imgAnchor: '#ccp-img-anchor-checkbox',
+      imgAlt: '#ccp-input-img-alt',
       // !VA This isn't even a thing... probably delete it 04.28.19
       // !VA Not renaming the checkbox/checkmarks for now because they already have code that queries the last three characters to determine if mrk or box...
-      imgIncludeStyles: '#chk-ccp-img-include-css',
-      imgAlign: '#sel-ccp-img-align',
-      imgRelPath: '#ipt-ccp-img-relpath',
-      tdClass: '#ipt-ccp-td-class',
-      tdAlign: '#sel-ccp-td-align',
-      tdValign: '#sel-ccp-td-valign',
-      tdBgcolor: '#ipt-ccp-td-bgcolor',
-      tdBgimage: '#chk-ccp-td-bgimage',
-      tableClass: '#ipt-ccp-table-class',
-      tableAlign: '#sel-ccp-table-align',
-      tableWidth: '#ipt-ccp-table-width',
+      imgIncludeStyles: '#ccp-img-include-css-checkmrk',
+      imgAlign: '#ccp-select-img-align',
+      imgRelPath: '#ccp-input-img-relpath',
+      tdClass: '#ccp-input-td-class',
+      tdAlign: '#ccp-select-td-align',
+      tdValign: '#ccp-select-td-valign',
+      tdBgcolor: '#ccp-input-td-bgcolor',
+      tdBgimage: '#ccp-td-bgimage-checkmrk',
+      tableClass: '#ccp-input-table-class',
+      tableAlign: '#ccp-select-table-align',
+      tableWidth: '#ccp-input-table-width',
       // !VA Not in use yet
-      // tableMaxWidth: '#ipt-ccp-table-max-width',
-      tableBgcolor: '#ipt-ccp-table-bgcolor',
-      tableIncludeWrapper: '#chk-ccp-table-include-wrapper',
-      tableWrapperClass: '#ipt-ccp-table-wrapper-class',
-      tableWrapperWidth: '#ipt-ccp-table-wrapper-width',
-      tableWrapperAlign: '#sel-ccp-table-wrapper-align',
-      tableWrapperBgColor: '#ipt-ccp-table-wrapper-bgcolor',
-    };
+      // tableMaxWidth: '#table-max-width-input',
+      tableBgcolor: '#ccp-input-table-bgcolor',
+      tableIncludeWrapper: '#ccp-table-include-wrapper-checkmrk',
+      tableWrapperClass: '#ccp-input-table-wrapper-class',
+      tableWrapperWidth: '#ccp-input-table-wrapper-width',
+      tableWrapperAlign: '#ccp-select-table-wrapper-align',
+      tableWrapperBgColor: '#ccp-input-table-wrapper-bgcolor',
+    };dimViewers.clipboardBut
 
     //dimViewers.clipboardBut
     //dimViewers.clipboardBut for assembling the clipboard create tag buttons. We also store the functions that are run in the CBController module to build the clipboard snippets when each of these elements is clicked so that we can just loop through the properties, get the current event target and run the associated function without an extra switch statement or other conditional at that stage.
 
     var ccpMakeClipBut = {
       // !VA Build HTML Clipboard Buttons
-      ccpImgWriteHTMLToCB: '#btn-ccp-img-build-html-clip',
-      ccpTdWriteHTMLToCB: '#btn-ccp-td-build-html-clip',
-      ccpTableWriteHTMLToCB: '#btn-ccp-table-build-html-clip',
+      ccpImgWriteHTMLToCB: '#ccp-img-build-html-but',
+      ccpTdWriteHTMLToCB: '#ccp-td-build-html-but',
+      ccpTableWriteHTMLToCB: '#ccp-table-build-html-but',
       // !VA Make CSS Clip Buttons
-      imgDisplayWriteCSSToCB: '#btn-ccp-img-dsktp-build-css-clip-but',
-      imgSPhoneWriteCSSToCB: '#btn-ccp-img-smphn-build-css-clip-but',
-      imgLPhoneWriteCSSToCB: '#btn-ccp-img-lgphn-build-css-clip-but',
+      imgDisplayWriteCSSToCB: '#ccp-img-display-css-to-clipboard-but',
+      imgSPhoneWriteCSSToCB: '#ccp-img-sphone-css-to-clipboard-but',
+      imgLPhoneWriteCSSToCB: '#ccp-img-lphone-css-to-clipboard-but',
         
-      tdDisplayWriteCSSToCB:  '#btn-ccp-td-dsktp-build-css-clip-but',
-      tdSPhoneWriteCSSToCB: '#btn-ccp-td-smphn-build-css-clip-but',
-      tdLPhoneWriteCSSToCB: '#btn-ccp-td-lgphn-build-css-clip-but',
-      tableDisplayWriteCSSToCB:  '#btn-ccp-table-dsktp-build-css-clip-but',
-      tableSPhoneWriteCSSToCB: '#btn-ccp-table-smphn-build-css-clip-but',
-      tableLPhoneWriteCSSToCB: '#btn-ccp-table-lgphn-build-css-clip-but',
+      tdDisplayWriteCSSToCB:  '#ccp-td-display-css-to-clipboard-but',
+      tdSPhoneWriteCSSToCB: '#ccp-td-sphone-css-to-clipboard-but',
+      tdLPhoneWriteCSSToCB: '#ccp-td-lphone-css-to-clipboard-but',
+      tableDisplayWriteCSSToCB:  '#ccp-table-display-css-to-clipboard-but',
+      tableSPhoneWriteCSSToCB: '#ccp-table-sphone-css-to-clipboard-but',
+      tableLPhoneWriteCSSToCB: '#ccp-table-lphone-css-to-clipboard-but',
       
     };
 
@@ -287,7 +285,7 @@ var Witty = (function () {
 
         const dimarray = Object.values(dimViewers);
         for ( let i = 0; i < dimarray.length; i++ ) {
-          if ( dimarray[i] !== '#btn-toggle-ccp' &&  dimarray[i] !== '#i-filename' ) {
+          if ( dimarray[i] !== '#dv-clipboard-but' &&  dimarray[i] !== '#dv-filename-viewer' ) {
             document.querySelector(dimarray[i]).innerHTML = '<span class="pop-font">&nbsp;&nbsp;No Image</span>';
           } 
         } 
@@ -1864,18 +1862,18 @@ var Witty = (function () {
         // !VA Status messages
         copied_2_CB: 'Code snippet copied to Clipboard!',
         // !VA TODO: Status messages 
-        // 'btn-ccp-img-build-html-clip': '<img> HTML element copied to Clipboard',
-        // 'btn-ccp-td-build-html-clip': '<td> HTML element copied to Clipboard',
-        // 'btn-ccp-table-build-html-clip': '<table> HTML element copied to Clipboard',
-        // 'btn-ccp-img-dsktp-build-css-clip-but': 'CSS class delaration copied to the Clipboard',
-        // 'btn-ccp-img-lgphn-build-css-clip-but': 'CSS class delaration for tablets copied to the Clipboard',
-        // 'btn-ccp-img-smphn-build-css-clip-but': 'CSS class delaration for phones copied to the Clipboard',
-        // 'btn-ccp-td-dsktp-build-css-clip-but': 'CSS class delaration copied to the Clipboard!',
-        // 'btn-ccp-td-lgphn-build-css-clip-but': 'CSS class delaration for tablets copied to the Clipboard',
-        // 'btn-ccp-td-smphn-build-css-clip-but': 'CSS class delaration for phones copied to the Clipboard',
-        // 'btn-ccp-table-dsktp-build-css-clip-but': 'CSS class delaration copied to the Clipboard',
-        // 'btn-ccp-table-lgphn-build-css-clip-but': 'CSS class delaration for tablets copied to the Clipboard',
-        // 'btn-ccp-table-smphn-build-css-clip-but': 'CSS class delaration for phones copied to the Clipboard',
+        // 'ccp-img-build-html-but': '<img> HTML element copied to Clipboard',
+        // 'ccp-td-build-html-but': '<td> HTML element copied to Clipboard',
+        // 'ccp-table-build-html-but': '<table> HTML element copied to Clipboard',
+        // 'ccp-img-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard',
+        // 'ccp-img-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard',
+        // 'ccp-img-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard',
+        // 'ccp-td-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard!',
+        // 'ccp-td-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard',
+        // 'ccp-td-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard',
+        // 'ccp-table-display-css-to-clipboard-but': 'CSS class delaration copied to the Clipboard',
+        // 'ccp-table-lphone-css-to-clipboard-but': 'CSS class delaration for tablets copied to the Clipboard',
+        // 'ccp-table-sphone-css-to-clipboard-but': 'CSS class delaration for phones copied to the Clipboard',
       };
       // !VA Loop through the error ID/message pairs and find the match
       for (const [key, value] of Object.entries(messages)) { 
@@ -1918,11 +1916,11 @@ var Witty = (function () {
     //  clipboardController: GET APPDATA PROPERTY NAME FROM AN HTML ELEMENT ID
     function elementIdToAppdataProp(str) {
       var IDtoProp = {
-        viewerW:  'ipt-tbr-viewerw',
-        imgW: 'ipt-tbr-imgwidth',
-        imgH: 'ipt-tbr-imgheight',
-        sPhonesW: 'ipt-tbr-sphones-width',
-        lPhonesW: 'ipt-tbr-lphones-width'
+        viewerW:  'tb-input-viewerwidth',
+        imgW: 'tb-input-imgwidth',
+        imgH: 'tb-input-imgheight',
+        sPhonesW: 'tb-input-sphones-width',
+        lPhonesW: 'tb-input-lphones-width'
 
       };
       // !VA This should return directly wihout a ret variable as tmp storage.
