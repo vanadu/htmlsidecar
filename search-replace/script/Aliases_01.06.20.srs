@@ -1,0 +1,60 @@
+[Script for Search and Replace]
+[Search /i]
+dimViewers
+[Replace]
+iInspectors
+[Search /i]dimViewer[Replace]iInspector
+[Search /i]filename[Replace]iFilename
+[Search /i]display[Replace]iDisplaySize
+[Search /i]disksize[Replace]iDisksize
+[Search /i]aspect[Replace]iAspect
+[Search /i]smallphones[Replace]iSmallPhones
+[Search /i]largephones[Replace]iLargePhones
+[Search /i]retina[Replace]iRetina
+[Search /i]clipboardBut[Replace]btnToggleCcp
+[Search /i]toolButtons[Replace]toolBar
+[Search /i]viewerW[Replace]iptTbrViewerW
+[Search /i]grow50[Replace]btnTbrIncr50
+[Search /i]grow10[Replace]btnTbrIncr10
+[Search /i]grow01[Replace]btnTbrIncr01
+[Search /i]imgWidth[Replace]iptTbrImgWidth
+[Search /i]imgHeight[Replace]iptTbrImgHeight
+[Search /i]shrink50[Replace]btnTbrDecr50
+[Search /i]shrink10[Replace]btnTbrDecr10
+[Search /i]shrink01[Replace]btnTbrDecr01
+[Search /i]sPhonesW[Replace]iptTbrSmallPhonesW
+[Search /i]lPhonesW[Replace]iptTbrLargePhonesW
+[Search /i]dropArea[Replace]dropZone
+[Search /i]toolsContainer[Replace]tbrContainer
+[Search /i]appMessContainer[Replace]msgContainer
+[Search /i]appMessDisplay[Replace]msgDisplay
+[Search /i]imgClass[Replace]iptCcpImgClass
+[Search /i]imgAlign[Replace]selCcpImgAlign
+[Search /i]imgRelPath[Replace]iptCcpImgRelPath
+[Search /i]tdClass[Replace]iptCcpTdClass
+[Search /i]tdALign[Replace]selCcpTdAlign
+[Search /i]tdValign[Replace]selCcpTdVAlign
+[Search /i]tdBgcolor[Replace]iptCcpTdBgColor
+[Search /i]tdBgimage[Replace]chkCcpTdBgImg
+[Search /i]tableClass[Replace]iptCcpTableClass
+[Search /i]tableAlign[Replace]selCcpTableAlign
+[Search /i]TableWidth[Replace]iptCcpTableWidth
+[Search /i]tableBgcolor[Replace]iptCcpTableBgColor
+[Search /i]tableIncludeWrapper[Replace]chkCcpTableIncludeWrapper
+[Search /i]tableWrapperClass[Replace]iptCcpTableWrapperClass
+[Search /i]tableWrapperWidth[Replace]iptCcpTableWrapperWidth
+[Search /i]tableWrapperAlign[Replace]selCcpTableWrapperAlign
+[Search /i]tableWrapperBgcolor[Replace]iptCcpTableWrapperBgColor
+[Search /i]ccpMakeClipBut[Replace]btnCcpBuildClips
+[Search /i]ccpImgWriteHTMLToCB[Replace]btnCcpImgBuildHtmlClip
+[Search /i]ccpTdWriteHTMLToCB[Replace]btnCcpTDBuildHtmlClip
+[Search /i]ccpTableWriteHTMLToCB[Replace]btnCcpTableBuildHtmlClip
+[Search /i]imgDisplayWriteCSSToCB[Replace]btnCcpImgDsktpBuildCssClip
+[Search /i]imgSPhoneWriteCSSToCB[Replace]btnCcpImgSmphnBuildCssClip
+[Search /i]imgLPhoneWriteCSSToCB[Replace]btnCcpImgLgphnBuildCssClip
+[Search /i]tdDisplayWriteCSSToCB[Replace]btnCcpTdDsktpBuildCssClip
+[Search /i]tdSPhoneWriteCSSToCB[Replace]btnCcpTdSmphnBuildCssClip
+[Search /i]tdLPhoneWriteCSSToCB[Replace]btnCcpTdLgphnBuildCssClip
+[Search /i]tableDisplayWriteCSSToCB[Replace]btnCcpTableDsktpBuildCssClip
+[Search /i]tableSPhoneWriteCSSToCB[Replace]btnCcpTableSmphnBuildCssClip
+[Search /i]tableLPhoneWriteCSSToCB[Replace]btnCcpTableLgphnBuildCssClip

@@ -3,8 +3,17 @@
 // See C:\Users\VANA\OneDrive\WhittyReview_12.30.19.docx
 
 // !VA 01.03.20 b94eeb2 ESLint fixes
+// !VA 02.05.20 Naming Scheme Changes 1
+
+/* !VA  01.05.20
+==================
+TODO: Naming Scheme changes
+TODO: CSS changes to Flexbox
+TODO: Update header and content
+TODO: Update icon and button names to reflect new naming scheme
 
 
+*/
 
 /* !VA  - 06.23.19
 =========================================================
@@ -1576,6 +1585,7 @@ var Witty = (function () {
       // !VA Once those DOM properties and data properties have been updated, recalculate the image's containers.
       calcViewerSize();
     }
+
 
     function updateAppdata( ...params ) {
       var Appdata = {};
