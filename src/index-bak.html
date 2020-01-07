@@ -102,29 +102,29 @@
 
     
     <!-- #dim-viewer-container -->
-    <div id="inspector-container">
+    <div id="dim-viewer-container">
       <!-- #dim-viewers -->
-      <div id="inspector-content">
+      <div id="dim-viewers">
         <!-- Dim Viewer Labels are in ::before pseudoclass in CSS -->
-        <div id="i-filename">
+        <div id="dv-filename-viewer">
           <p></p>
         </div>
-        <div id="btn-toggle-ccp-container">
-          <button id="btn-toggle-ccp"></button>
+        <div id="clipboard-but-container">
+          <button id="dv-clipboard-but"></button>
         </div>
-        <div class="inspectors-left-col">
+        <div class="dim-viewers-left-col">
           <ul>
-            <li id="i-display-size"></li>
-            <li id="i-disk-size"></li>
-            <li id="i-aspect"></li>
+            <li id="dv-display"></li>
+            <li id="dv-disk-img"></li>
+            <li id="dv-aspect"></li>
           </ul>
         </div>
         
-        <div class="inspectors-right-col">
+        <div class="dim-viewers-right-col">
           <ul>
-            <li id="i-small-phones" class="i-inspector"></li>
-            <li id="i-large-phones" class="i-inspector"></li>
-            <li id="i-retina" class="i-inspector"></li>
+            <li id="dv-small-phones" class="img-dim-viewer"></li>
+            <li id="dv-large-phones" class="img-dim-viewer"></li>
+            <li id="dv-retina" class="img-dim-viewer"></li>
           </ul>
         </div>
       </div>
@@ -136,35 +136,34 @@
     <!-- /dim-viewer container -->
 
     <!-- #tools-container -->
-    <div id="toolbar-container">
+    <div id="tools-container">
       <!-- #img-toolbar -->
-      <div class="toolbar">
+      <div class="img-toolbar">
 
         <!-- #img-toolbar-buttons -->
-        <ul class="toolbar-elements btn-group" role="group" aria-label="...">
+        <ul class="img-toolbar-buttons btn-group" role="group" aria-label="...">
           <!-- <li><div class="ttip"><button id="toggle-retina" type="button" class="btn btn-default" tabindex="3"></button><span class="ttiptext">Toggle Retina Dimensioning</span></div></li> -->
           
-            <!-- VA! N/A in Whitty -->
-            <!-- <li><div class="ttip"><button id="tb-but-mobile-swap" type="button" class="btn btn-default"  tabindex="1"><img src="img/display-button.png" alt="Whitty-JS" /></button><span class="ttiptext">Swap mobile image</span></div></li> -->
+            <li><div class="ttip"><button id="tb-but-mobile-swap" type="button" class="btn btn-default"  tabindex="1"><img src="img/display-button.png" alt="witty.JS" /></button><span class="ttiptext">Swap mobile image</span></div></li>
             <!-- TODO: Replace this image with a SGV or HTML entity -->
-            <li role="separator"><img class="divider" src="img/divider.png" alt="Whitty-JS"></li>
-            <li><div class="ttip"><input id="ipt-tbr-viewerw" class="toolbar-buttons btn btn-default" type="text" value="650" tabindex="1"><span class="ttiptext">Enter container width as positive integer</span></div></li>
+            <li role="separator"><img class="divider" src="img/divider.png" alt="witty.JS"></li>
+            <li><div class="ttip"><input id="tb-input-viewerwidth" class="toolbar-buttons btn btn-default" type="text" value="650" tabindex="1"><span class="ttiptext">Enter container width as positive integer</span></div></li>
             <!-- TODO: Replace this image with a SGV or HTML entity -->
-            <li role="separator"><img class="divider" src="img/divider.png" alt="Whitty-JS"></li>
-            <li><div class="ttip"><button id="btn-tbr-incr50" type="button" class="btn btn-default"  tabindex="7"><img src="img/grow50-button.png" alt="Whitty-JS" /></button><span class="ttiptext">Grow image 50px</span></div></li>
-            <li><div class="ttip"><button id="btn-tbr-incr10" type="button" class="btn btn-default" tabindex="8"><img src="img/grow10-button.png" alt="Whitty-JS"/></button><span class="ttiptext">Grow image 10px</span></div></li>
-            <li><div class="ttip"><button id="btn-tbr-incr01" type="button" class="btn btn-default" tabindex="9"><img src="img/grow1-button.png" alt="Whitty-JS"/></button><span class="ttiptext">Grow image 1px</span></div></li>
+            <li role="separator"><img class="divider" src="img/divider.png" alt="witty.JS"></li>
+            <li><div class="ttip"><button id="tb-but-grow50" type="button" class="btn btn-default"  tabindex="7"><img src="img/grow50-button.png" alt="witty.JS" /></button><span class="ttiptext">Grow image 50px</span></div></li>
+            <li><div class="ttip"><button id="tb-but-grow10" type="button" class="btn btn-default" tabindex="8"><img src="img/grow10-button.png" alt="witty.JS"/></button><span class="ttiptext">Grow image 10px</span></div></li>
+            <li><div class="ttip"><button id="tb-but-grow01" type="button" class="btn btn-default" tabindex="9"><img src="img/grow1-button.png" alt="witty.JS"/></button><span class="ttiptext">Grow image 1px</span></div></li>
     
-            <li><div class="ttip"><input id="ipt-tbr-imgwidth" class="toolbox-buttons btn btn-default" type="text" placeholder="W (px)" tabindex="2"><span class="ttiptext">Enter image width as integer</span></div></li>
+            <li><div class="ttip"><input id="tb-input-imgwidth" class="toolbox-buttons btn btn-default" type="text" placeholder="W (px)" tabindex="2"><span class="ttiptext">Enter image width as integer</span></div></li>
     
     
-            <li><div class="ttip"><input id="ipt-tbr-imgheight" class="toolbox-buttons btn btn-default" type="text" placeholder="H (px)" tabindex="3"><span class="ttiptext">Enter image height as integer</span></div></li>
+            <li><div class="ttip"><input id="tb-input-imgheight" class="toolbox-buttons btn btn-default" type="text" placeholder="H (px)" tabindex="3"><span class="ttiptext">Enter image height as integer</span></div></li>
     
-            <li><div class="ttip"><button id="btn-tbr-decr01" type="button" class="btn btn-default" tabindex="10"><img src="img/shrink1-button.png" alt="Whitty-JS"/></button><span class="ttiptext">Shrink image 1px</span></div></li>
-            <li><div class="ttip"><button id="btn-tbr-decr10" type="button" class="btn btn-default" tabindex="11"><img src="img/shrink10-button.png" alt="Whitty-JS" /></button><span class="ttiptext">Shrink image 10px</span></div></li>
-            <li><div class="ttip"><button id="btn-tbr-decr01" type="button" class="btn btn-default" tabindex="12"><img src="img/shrink50-button.png" alt="Whitty-JS" /></button><span class="ttiptext">Shrink image 50px</span></div></li>
+            <li><div class="ttip"><button id="tb-but-shrink01" type="button" class="btn btn-default" tabindex="10"><img src="img/shrink1-button.png" alt="witty.JS"/></button><span class="ttiptext">Shrink image 1px</span></div></li>
+            <li><div class="ttip"><button id="tb-but-shrink10" type="button" class="btn btn-default" tabindex="11"><img src="img/shrink10-button.png" alt="witty.JS" /></button><span class="ttiptext">Shrink image 10px</span></div></li>
+            <li><div class="ttip"><button id="tb-but-shrink50" type="button" class="btn btn-default" tabindex="12"><img src="img/shrink50-button.png" alt="witty.JS" /></button><span class="ttiptext">Shrink image 50px</span></div></li>
 
-          <li role="separator"><img class="divider" src="img/divider.png" alt="Whitty-JS"></li>
+          <li role="separator"><img class="divider" src="img/divider.png" alt="witty.JS"></li>
           <li><div class="ttip"><input id="tb-input-sphones-width" class="toolbar-buttons btn btn-default" data-sphonesw="320" value="900" type="text" tabindex="4"><span class="ttiptext">Enter small phone width as positive integer</span></div></li>
           <li><div class="ttip"><input id="tb-input-lphones-width" class="toolbar-buttons btn btn-default" data-lphonesw="blib" value="900" type="text" tabindex="5"><span class="ttiptext">Enter large phone width as positive integer</span></div></li>
 
@@ -193,7 +192,7 @@
 
                 <div class="ccp-options-col-1"> 
 
-                    <button id="btn-ccp-img-build-html-clip" class="ccp-but"></button> 
+                    <button id="ccp-img-build-html-but" class="ccp-but"></button> 
                 </div> 
                 <div class="ccp-options-col-2"> 
                   <div id="ccp-img-class"> 
@@ -272,7 +271,7 @@
               <legend>&lt;td&gt; Options</legend> 
 
                 <div class="ccp-options-col-1"> 
-                    <button id="btn-ccp-td-build-html-clip" class="ccp-but"></button> 
+                    <button id="ccp-td-build-html-but" class="ccp-but"></button> 
                 </div> 
       
                 <div class="ccp-options-col-2"> 
@@ -340,8 +339,7 @@
               <legend>&lt;table&gt; Options</legend> 
               <div id="ccp-table-options" class="ccp-options"> 
                 <div class="ccp-options-col-1"> 
-                    <!-- VA! Stopped here -->
-                    <button id="btn-ccp-table-build-html-clip" class="ccp-but"></button> 
+                    <button id="ccp-table-build-html-but" class="ccp-but"></button> 
                 </div> 
       
                 <div class="ccp-options-col-2">

@@ -88,7 +88,7 @@
   <!-- #app-container -->
   <div id="app-container">
 
-    <!-- #app-message-container -->
+    <!-- #msg-container -->
     <div id="msg-container" >
       <table id="msg-table">
         <tr>
@@ -98,33 +98,33 @@
         </tr>
       </table>
     </div>
-    <!-- /#app-message-container -->
+    <!-- /#msg-container -->
 
     
-    <!-- #dim-viewer-container -->
-    <div id="dim-viewer-container">
-      <!-- #dim-viewers -->
-      <div id="dim-viewers">
+    <!-- #inspector-container -->
+    <div id="inspector-container">
+      <!-- #inspectors -->
+      <div id="inspectors-left-col">
         <!-- Dim Viewer Labels are in ::before pseudoclass in CSS -->
-        <div id="dv-filename-viewer">
+        <div id="i-filename">
           <p></p>
         </div>
         <div id="clipboard-but-container">
-          <button id="dv-clipboard-but"></button>
+          <button id="btn-toggle-ccp"></button>
         </div>
-        <div class="dim-viewers-left-col">
+        <div class="inspectors-left-col">
           <ul>
-            <li id="dv-display"></li>
-            <li id="dv-disk-img"></li>
-            <li id="dv-aspect"></li>
+            <li id="i-display-size"></li>
+            <li id="i-disk-size"></li>
+            <li id="i-aspect"></li>
           </ul>
         </div>
         
-        <div class="dim-viewers-right-col">
+        <div class="inspectors-right-col">
           <ul>
-            <li id="dv-small-phones" class="img-dim-viewer"></li>
-            <li id="dv-large-phones" class="img-dim-viewer"></li>
-            <li id="dv-retina" class="img-dim-viewer"></li>
+            <li id="i-small-phones" class="i-inspector"></li>
+            <li id="i-large-phones" class="i-inspector"></li>
+            <li id="i-retina" class="i-inspector"></li>
           </ul>
         </div>
       </div>
@@ -135,46 +135,47 @@
     </div>
     <!-- /dim-viewer container -->
 
-    <!-- #tools-container -->
-    <div id="tools-container">
-      <!-- #img-toolbar -->
-      <div class="img-toolbar">
+    <!-- #toolbar-container -->
+    <div id="toolbar-container">
+      <!-- #toolbar -->
+      <div class="toolbar-content">
 
-        <!-- #img-toolbar-buttons -->
-        <ul class="img-toolbar-buttons btn-group" role="group" aria-label="...">
+        <!-- #toolbar-buttons -->
+        <ul class="toolbar-buttons btn-group" role="group" aria-label="...">
           <!-- <li><div class="ttip"><button id="toggle-retina" type="button" class="btn btn-default" tabindex="3"></button><span class="ttiptext">Toggle Retina Dimensioning</span></div></li> -->
           
             <li><div class="ttip"><button id="tb-but-mobile-swap" type="button" class="btn btn-default"  tabindex="1"><img src="img/display-button.png" alt="witty.JS" /></button><span class="ttiptext">Swap mobile image</span></div></li>
             <!-- TODO: Replace this image with a SGV or HTML entity -->
             <li role="separator"><img class="divider" src="img/divider.png" alt="witty.JS"></li>
-            <li><div class="ttip"><input id="tb-input-viewerwidth" class="toolbar-buttons btn btn-default" type="text" value="650" tabindex="1"><span class="ttiptext">Enter container width as positive integer</span></div></li>
+            <li><div class="ttip"><input id="ipt-tbr-viewerw" class="toolbar-buttons btn btn-default" type="text" value="650" tabindex="1"><span class="ttiptext">Enter container width as positive integer</span></div></li>
             <!-- TODO: Replace this image with a SGV or HTML entity -->
             <li role="separator"><img class="divider" src="img/divider.png" alt="witty.JS"></li>
-            <li><div class="ttip"><button id="tb-but-grow50" type="button" class="btn btn-default"  tabindex="7"><img src="img/grow50-button.png" alt="witty.JS" /></button><span class="ttiptext">Grow image 50px</span></div></li>
-            <li><div class="ttip"><button id="tb-but-grow10" type="button" class="btn btn-default" tabindex="8"><img src="img/grow10-button.png" alt="witty.JS"/></button><span class="ttiptext">Grow image 10px</span></div></li>
-            <li><div class="ttip"><button id="tb-but-grow01" type="button" class="btn btn-default" tabindex="9"><img src="img/grow1-button.png" alt="witty.JS"/></button><span class="ttiptext">Grow image 1px</span></div></li>
+            <li><div class="ttip"><button id="btn-tbr-incr50" type="button" class="btn btn-default"  tabindex="7"><img src="img/grow50-button.png" alt="witty.JS" /></button><span class="ttiptext">Grow image 50px</span></div></li>
+            <li><div class="ttip"><button id="btn-tbr-incr10" type="button" class="btn btn-default" tabindex="8"><img src="img/grow10-button.png" alt="witty.JS"/></button><span class="ttiptext">Grow image 10px</span></div></li>
+            <li><div class="ttip"><button id="btn-tbr-incr01" type="button" class="btn btn-default" tabindex="9"><img src="img/grow1-button.png" alt="witty.JS"/></button><span class="ttiptext">Grow image 1px</span></div></li>
     
-            <li><div class="ttip"><input id="tb-input-imgwidth" class="toolbox-buttons btn btn-default" type="text" placeholder="W (px)" tabindex="2"><span class="ttiptext">Enter image width as integer</span></div></li>
+            <li><div class="ttip"><input id="ipt-tbr-imgwidth" class="toolbox-buttons btn btn-default" type="text" placeholder="W (px)" tabindex="2"><span class="ttiptext">Enter image width as integer</span></div></li>
     
     
-            <li><div class="ttip"><input id="tb-input-imgheight" class="toolbox-buttons btn btn-default" type="text" placeholder="H (px)" tabindex="3"><span class="ttiptext">Enter image height as integer</span></div></li>
+            <li><div class="ttip"><input id="ipt-tbr-imgheight" class="toolbox-buttons btn btn-default" type="text" placeholder="H (px)" tabindex="3"><span class="ttiptext">Enter image height as integer</span></div></li>
     
-            <li><div class="ttip"><button id="tb-but-shrink01" type="button" class="btn btn-default" tabindex="10"><img src="img/shrink1-button.png" alt="witty.JS"/></button><span class="ttiptext">Shrink image 1px</span></div></li>
-            <li><div class="ttip"><button id="tb-but-shrink10" type="button" class="btn btn-default" tabindex="11"><img src="img/shrink10-button.png" alt="witty.JS" /></button><span class="ttiptext">Shrink image 10px</span></div></li>
-            <li><div class="ttip"><button id="tb-but-shrink50" type="button" class="btn btn-default" tabindex="12"><img src="img/shrink50-button.png" alt="witty.JS" /></button><span class="ttiptext">Shrink image 50px</span></div></li>
+            <li><div class="ttip"><button id="btn-tbr-decr01" type="button" class="btn btn-default" tabindex="10"><img src="img/shrink1-button.png" alt="witty.JS"/></button><span class="ttiptext">Shrink image 1px</span></div></li>
+            <li><div class="ttip"><button id="btn-tbr-decr10" type="button" class="btn btn-default" tabindex="11"><img src="img/shrink10-button.png" alt="witty.JS" /></button><span class="ttiptext">Shrink image 10px</span></div></li>
+            <li><div class="ttip"><button id="btn-tbr-decr50" type="button" class="btn btn-default" tabindex="12"><img src="img/shrink50-button.png" alt="witty.JS" /></button><span class="ttiptext">Shrink image 50px</span></div></li>
 
           <li role="separator"><img class="divider" src="img/divider.png" alt="witty.JS"></li>
-          <li><div class="ttip"><input id="tb-input-sphones-width" class="toolbar-buttons btn btn-default" data-sphonesw="320" value="900" type="text" tabindex="4"><span class="ttiptext">Enter small phone width as positive integer</span></div></li>
-          <li><div class="ttip"><input id="tb-input-lphones-width" class="toolbar-buttons btn btn-default" data-lphonesw="blib" value="900" type="text" tabindex="5"><span class="ttiptext">Enter large phone width as positive integer</span></div></li>
+          <!-- VA! 900 is a dummy value that should be overwritten programmatically by the setAttribute property -->
+          <li><div class="ttip"><input id="ipt-tbr-sphones-width" class="toolbar-buttons btn btn-default" data-sphonesw="900" value="900" type="text" tabindex="4"><span class="ttiptext">Enter small phone width as positive integer</span></div></li>
+          <li><div class="ttip"><input id="ipt-tbr-lphones-width" class="toolbar-buttons btn btn-default" data-lphonesw="900" value="900" type="text" tabindex="5"><span class="ttiptext">Enter large phone width as positive integer</span></div></li>
 
           <!-- !VA toggle image size is deprecated -->
           <!-- <li><div class="ttip"><button id="toggle-image-size" type="button" class="btn btn-default" tabindex="6"></button><span class="ttiptext">Toggle display size/size on disk</span></div></li> -->
           <!--<li><div class="ttip"><button id="main-container-shrink-10" type="button" class="btn btn-default"><img src="img/container-shrink-button.png" /></button><span class="ttiptext">Shrink table 10px</span></div></li>-->
         </ul> 
-        <!-- /#img-toolbar-buttons -->
+        <!-- /#toolbar-buttons -->
 
-      </div><!-- /#img-toolbar -->
-    </div><!-- /#tools-container -->
+      </div><!-- /#toolbar -->
+    </div><!-- /#toolbar-container -->
 
     <!-- #image-viewport -->
     <div id="image-viewport">
@@ -192,25 +193,25 @@
 
                 <div class="ccp-options-col-1"> 
 
-                    <button id="ccp-img-build-html-but" class="ccp-but"></button> 
+                    <button id="btn-ccp-img-build-html-clip" class="ccp-but"></button> 
                 </div> 
                 <div class="ccp-options-col-2"> 
                   <div id="ccp-img-class"> 
-                    <label for="ccp-input-img-class-input">class=</label> 
-                    <input id="ccp-input-img-class" value="" placeholder="none" />  
+                    <label for="ipt-ccp-img-class-input">class=</label> 
+                    <input id="ipt-ccp-img-class" value="" placeholder="none" />  
                   </div> 
                   <div id="ccp-img-alt"> 
-                    <label for="ccp-input-img-alt">alt=</label> 
-                    <input id="ccp-input-img-alt" value="" placeholder="none" /> 
+                    <label for="ipt-ccp-img-alt">alt=</label> 
+                    <input id="ipt-ccp-img-alt" value="" placeholder="none" /> 
                   </div> 
                   <div id="ccp-img-relpath"> 
-                    <label id="ccp-img-relpath-label" for="ccp-input-img-relpath">path=</label> 
-                    <input id="ccp-input-img-relpath" value="img" placeholder="none" />
+                    <label id="ccp-img-relpath-label" for="ipt-ccp-img-relpath">path=</label> 
+                    <input id="ipt-ccp-img-relpath" value="img" placeholder="none" />
                     <!-- <span class="slash">&nbsp;/</span>  -->
                   </div> 
                   <div id="ccp-img-align"> 
-                    <label id="ccp-img-align-label" for="ccp-select-img-align">align=</label> 
-                    <select id="ccp-select-img-align"> 
+                    <label id="ccp-img-align-label" for="sel-ccp-img-align">align=</label> 
+                    <select id="sel-ccp-img-align"> 
                       <option selected="selected">none</option> 
                       <option>left</option> 
                       <option>middle</option> 
@@ -237,7 +238,7 @@
                       Include width and height in style attribute</label>
                     <!-- The default checkbox is hidden -->
                     <input type="checkbox" id="ccp-img-include-css-checkbox">
-                    <span id="ccp-img-include-css-checkmrk"></span>
+                    <span id="chk-ccp-img-include-css"></span>
                     <!-- VA! These options are set in handleTableWidth -->
                   </label> 
                   </div> 
@@ -250,14 +251,14 @@
                     </div> -->
                 </div>
                 <div class="ccp-options-col-4"> 
-                  <div id="ccp-img-display-css-to-clipboard" class="ccp-but-container"> 
-                    <button id="ccp-img-display-css-to-clipboard-but" class="ccp-but"></button> 
+                  <div id="btn-ccp-img-dsktp-build-css-clip" class="ccp-but-container"> 
+                    <button id="btn-ccp-img-dsktp-build-css-clip-but" class="ccp-but"></button> 
                   </div>  
-                  <div id="ccp-img-lphone-css-to-clipboard" class="ccp-but-container"> 
-                    <button id="ccp-img-lphone-css-to-clipboard-but" class="ccp-but"></button> 
+                  <div id="btn-ccp-img-lgphn-build-css-clip" class="ccp-but-container"> 
+                    <button id="btn-ccp-img-lgphn-build-css-clip-but" class="ccp-but"></button> 
                   </div> 
-                  <div id="ccp-img-sphone-css-to-clipboard" class="ccp-but-container"> 
-                    <button id="ccp-img-sphone-css-to-clipboard-but" class="ccp-but"></button> 
+                  <div id="btn-ccp-img-smphn-build-css-clip" class="ccp-but-container"> 
+                    <button id="btn-ccp-img-smphn-build-css-clip-but" class="ccp-but"></button> 
                   </div> 
                 </div> 
 
@@ -271,17 +272,17 @@
               <legend>&lt;td&gt; Options</legend> 
 
                 <div class="ccp-options-col-1"> 
-                    <button id="ccp-td-build-html-but" class="ccp-but"></button> 
+                    <button id="btn-ccp-td-build-html-clip" class="ccp-but"></button> 
                 </div> 
       
                 <div class="ccp-options-col-2"> 
                   <div id="ccp-td-class"> 
-                    <label for="ccp-input-td-class">class=</label> 
-                    <input id="ccp-input-td-class" value="" placeholder="none" />  
+                    <label for="ipt-ccp-td-class">class=</label> 
+                    <input id="ipt-ccp-td-class" value="" placeholder="none" />  
                   </div> 
                   <div id="ccp-td-align"> 
-                    <label id="ccp-td-align-label" for="ccp-select-td-align">align=</label> 
-                    <select id="ccp-select-td-align">
+                    <label id="ccp-td-align-label" for="sel-ccp-td-align">align=</label> 
+                    <select id="sel-ccp-td-align">
                       <option>none</option> 
                       <option selected="selected">left</option> 
                       <option>center</option> 
@@ -289,8 +290,8 @@
                     </select>  
                   </div> 
                   <div id="ccp-td-valign"> 
-                    <label id="ccp-td-valign-label" for="ccp-select-td-valign">valign=</label>
-                    <select id="ccp-select-td-valign"> 
+                    <label id="ccp-td-valign-label" for="sel-ccp-td-valign">valign=</label>
+                    <select id="sel-ccp-td-valign"> 
                       <option>none</option> 
                       <option selected="selected">top</option> 
                       <option>middle</option> 
@@ -300,8 +301,8 @@
                 </div> 
                 <div class="ccp-options-col-3">
                   <div id="ccp-td-bgcolor">
-                    <label for="ccp-input-td-bgcolor" id="ccp-td-bgcolor-label">bgcolor=</label>
-                    <input type="text" id="ccp-input-td-bgcolor" placeholder="none" value="" />
+                    <label for="ipt-ccp-td-bgcolor" id="ccp-td-bgcolor-label">bgcolor=</label>
+                    <input type="text" id="ipt-ccp-td-bgcolor" placeholder="none" value="" />
                   </div>
   
                   <div id="ccp-td-bgimage" > 
@@ -313,20 +314,20 @@
                         </label>
                       <!-- The default checkbox is hidden -->
                       <input type="checkbox" id="ccp-td-bgimage-checkbox">
-                      <span id="ccp-td-bgimage-checkmrk"></span>
+                      <span id="chk-ccp-td-bgimage"></span>
                       <!-- VA! These options are set in handleTableWidth -->
                     </label> 
                   </div> 
                 </div>
                 <div class="ccp-options-col-4"> 
-                  <div id="ccp-td-display-css-to-clipboard" class="ccp-but-container"> 
-                    <button id="ccp-td-display-css-to-clipboard-but" class="ccp-but"></button> 
+                  <div id="btn-ccp-td-dsktp-build-css-clip" class="ccp-but-container"> 
+                    <button id="btn-ccp-td-dsktp-build-css-clip-but" class="ccp-but"></button> 
                   </div>  
-                  <div id="ccp-td-lphone-css-to-clipboard" class="ccp-but-container"> 
-                    <button id="ccp-td-lphone-css-to-clipboard-but" class="ccp-but"></button> 
+                  <div id="btn-ccp-td-lgphn-build-css-clip" class="ccp-but-container"> 
+                    <button id="btn-ccp-td-lgphn-build-css-clip-but" class="ccp-but"></button> 
                   </div> 
-                  <div id="ccp-td-sphone-css-to-clipboard" class="ccp-but-container"> 
-                    <button id="ccp-td-sphone-css-to-clipboard-but" class="ccp-but"></button> 
+                  <div id="btn-ccp-td-smphn-build-css-clip" class="ccp-but-container"> 
+                    <button id="btn-ccp-td-smphn-build-css-clip-but" class="ccp-but"></button> 
                   </div> 
                 </div> 
 
@@ -339,19 +340,19 @@
               <legend>&lt;table&gt; Options</legend> 
               <div id="ccp-table-options" class="ccp-options"> 
                 <div class="ccp-options-col-1"> 
-                    <button id="ccp-table-build-html-but" class="ccp-but"></button> 
+                    <button id="btn-ccp-table-build-html-clip" class="ccp-but"></button> 
                 </div> 
       
                 <div class="ccp-options-col-2">
                     <p><span class="ccp-heading">Parent Table</span></p>
                   <div id="ccp-table-class"> 
-                    <label for="ccp-input-table-class">class=</label>
-                    <input id="ccp-input-table-class" placeholder="none" />  
+                    <label for="ipt-ccp-table-class">class=</label>
+                    <input id="ipt-ccp-table-class" placeholder="none" />  
                   </div> 
                   <div id="ccp-table-align"> 
-                    <label id="ccp-table-align-label" for="ccp-select-table-align">align=</label> 
+                    <label id="ccp-table-align-label" for="sel-ccp-table-align">align=</label> 
                     <!-- We can hard code these because there isn't any dynamic data -->
-                    <select id="ccp-select-table-align"> 
+                    <select id="sel-ccp-table-align"> 
                       <option>none</option>
                       <option>left</option> 
                       <option selected="selected">center</option> 
@@ -359,12 +360,12 @@
                     </select>
                   </div>
                   <div id="ccp-table-width">
-                      <label id="ccp-table-width-label" for="ccp-input-table-width">width=</label> 
-                      <input id="ccp-input-table-width" value="" placeholder="" />
+                      <label id="ccp-table-width-label" for="ipt-ccp-table-width">width=</label> 
+                      <input id="ipt-ccp-table-width" value="" placeholder="" />
                   </div>
                   <div id="ccp-table-bgcolor">
-                      <label for="ccp-input-table-bgcolor" id="ccp-table-bgcolor-label">bgcolor=</label>
-                      <input type="text" id="ccp-input-table-bgcolor" placeholder="none" value="" />
+                      <label for="ipt-ccp-table-bgcolor" id="ccp-table-bgcolor-label">bgcolor=</label>
+                      <input type="text" id="ipt-ccp-table-bgcolor" placeholder="none" value="" />
                   </div> 
                   <!--  
                   <div id="ccp-table-max-width">
@@ -383,21 +384,21 @@
                         Wrapper table</label>
                       <!-- The default checkbox is hidden -->
                       <input type="checkbox" id="ccp-table-include-wrapper-checkbox">
-                      <span id="ccp-table-include-wrapper-checkmrk"></span>
+                      <span id="chk-ccp-table-include-wrapper"></span>
                       <!-- VA! These options are set in handleTableWidth -->
                     </label> 
                   </div> 
                   <div id="ccp-table-wrapper-class"> 
-                      <label for="ccp-input-table-wrapper-class">class=</label>
-                      <input id="ccp-input-table-wrapper-class" placeholder="none" />  
+                      <label for="ipt-ccp-table-wrapper-class">class=</label>
+                      <input id="ipt-ccp-table-wrapper-class" placeholder="none" />  
                   </div> 
                   <div id="ccp-table-wrapper-width"> 
-                      <label id="ccp-table-wrapper-width-label" for="ccp-input-table-wrapper-width">width=</label>
-                      <input id="ccp-input-table-wrapper-width" placeholder="none" />  
+                      <label id="ccp-table-wrapper-width-label" for="ipt-ccp-table-wrapper-width">width=</label>
+                      <input id="ipt-ccp-table-wrapper-width" placeholder="none" />  
                   </div> 
                   <div id="ccp-table-wrapper-align"> 
-                    <label id="ccp-table-wrapper-align-label" for="ccp-select-table-wrapper-align">align=</label>
-                    <select id="ccp-select-table-wrapper-align"> 
+                    <label id="ccp-table-wrapper-align-label" for="sel-ccp-table-wrapper-align">align=</label>
+                    <select id="sel-ccp-table-wrapper-align"> 
                       <option>none</option>
                       <option>left</option> 
                       <option selected="selected">center</option> 
@@ -411,14 +412,14 @@
                 </div>
 
                 <div class="ccp-options-col-4"> 
-                  <div id="ccp-table-display-css-to-clipboard" class="ccp-but-container"> 
-                    <button id="ccp-table-display-css-to-clipboard-but" class="ccp-but"></button> 
+                  <div id="btn-ccp-table-dsktp-build-css-clip" class="ccp-but-container"> 
+                    <button id="btn-ccp-table-dsktp-build-css-clip-but" class="ccp-but"></button> 
                   </div>  
-                  <div id="ccp-table-lphone-css-to-clipboard" class="ccp-but-container"> 
-                    <button id="ccp-table-lphone-css-to-clipboard-but" class="ccp-but"></button> 
+                  <div id="btn-ccp-table-lgphn-build-css-clip" class="ccp-but-container"> 
+                    <button id="btn-ccp-table-lgphn-build-css-clip-but" class="ccp-but"></button> 
                   </div> 
-                  <div id="ccp-table-sphone-css-to-clipboard" class="ccp-but-container"> 
-                    <button id="ccp-table-sphone-css-to-clipboard-but" class="ccp-but"></button> 
+                  <div id="btn-ccp-table-smphn-build-css-clip" class="ccp-but-container"> 
+                    <button id="btn-ccp-table-smphn-build-css-clip-but" class="ccp-but"></button> 
                   </div> 
                 </div> 
               </div><!-- /#ccp-table-options -->
@@ -443,7 +444,7 @@
           <!-- /#drop-area -->
             <!-- DEVIMG HERE -->
             <div id="cur-img-container">
-              <img src="img/TEST/KittiesHuge.jpg" data-is-dev1=true id="cur-img" alt="">
+              <img src="img/TEST/_625X525.png" data-is-dev1=true id="cur-img" alt="">
             </div>
             <!-- USER-SELECTED IMAGE PROGRAMMATICALLY INSERTED HERE -->
             </div>

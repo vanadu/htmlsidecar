@@ -85,7 +85,7 @@ button:disabled  {
     float: left;
     margin-top: 8px;
     h1 {
-      font-family: $dim-viewer-font-family;
+      font-family: $inspector-font-family;
       position: absolute;
       top: 0;
       font-size: 48px;
@@ -177,7 +177,7 @@ button:disabled  {
 
 
 // IMAGE TOOLBAR
-.img-toolbar {
+.toolbar {
   display: block;
   position: relative;
   width: 100%;
@@ -188,7 +188,7 @@ button:disabled  {
 }
 
 // UL -- Toolbar button container 
-.img-toolbar-buttons {
+.toolbar-buttons {
   display: block;
   width: 840px;
   margin: 0 auto;
@@ -229,19 +229,19 @@ button:disabled  {
       text-align: center;
 
     }
-    #tb-input-viewerwidth {
+    #ipt-tbr-viewerw {
       width: 80px;
       padding-left: 30px;
       text-align: center;
       background: url('../img/table-icon.png') no-repeat scroll 7px 7px;
     }
-    #tb-input-sphones-width {
+    #ipt-tbr-sphones-width {
       width: 70px;
       padding-left: 30px;
       background: url('../img/small-phones-toolbar-icon.png') no-repeat scroll 12px 2px;
       background-size: 15px 26px;
     }
-    #tb-input-lphones-width {
+    #ipt-tbr-lphones-width {
       width: 90px;
       padding-left: 30px;
       background: url('../img/large-phones-toolbar-icon.png') no-repeat scroll 7px 2px;
@@ -271,7 +271,7 @@ button:disabled  {
   }
 }
 
-// TODO: Nest this under img-toolbar-buttons so that the JS works to make it
+// TODO: Nest this under toolbar-buttons so that the JS works to make it
 // disappear on focus
 input:focus::-webkit-input-placeholder { color:transparent; }
 input:focus:-moz-placeholder { color:transparent; } /* FF 4-18 */
@@ -287,11 +287,10 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   min-height: 679px;
   // padding: 0 30px;
   margin: 15px auto 100px;
-  // border: 1px solid red;
 }
 
 // TOOLS
-#tools-container {
+#toolbar-container {
   display: none;
   position: absolute;
   // top: -150px;
@@ -336,7 +335,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 }
 
 // DIM VIEWER
-#dim-viewer-container {
+#inspector-container {
   display: block;
   position: absolute;
   top: 45px;
@@ -351,8 +350,8 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 
 }
 
-#dim-viewers {
-  font-family: $dim-viewer-font-family;
+#inspector-container {
+  font-family: $inspector-font-family;
   font-weight: normal;
   font-size: 1em;
   display: block;
@@ -374,7 +373,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
     // -webkit-transform: scaleX(0);
     // -webkit-transition: -webkit-transform 500ms;
   }
-  #dv-filename-viewer {
+  #i-filename {
     display: block;
     position: absolute;
     top: 5px;
@@ -387,7 +386,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
     // color: #FFFFFF;
     text-align: center;
   }
-  .dim-viewers-left-col {
+  .inspectors-left-col {
     position: relative;
     top: 15px;
     width: 260px;
@@ -397,7 +396,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
       float: right;
     }
   }
-  .dim-viewers-right-col {
+  .inspectors-right-col {
     position: relative;
     top: 15px;
     width: 300px;
@@ -409,19 +408,19 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   li {
     padding: 2px 2px 2px 0px;
     border: 0;
-    color: $dim-viewers-font-color;
+    color: $inspector-font-color;
     font-size: 1.365em;
     text-transform: uppercase;
     list-style-type: none;
-    &#dv-display::before {content: 'Display size: '}
-    &#dv-disk-img::before {content: 'Size on Disk: '}
-    &#dv-aspect::before {content: 'Aspect Ratio: '}
-    &#dv-small-phones::before {content: 'Small Phones: '}
-    &#dv-large-phones::before {content: 'Large Phones: '}
-    &#dv-retina::before {content: 'Retina: '}
+    &#i-display-size::before {content: 'Display size: '}
+    &#i-disk-size::before {content: 'Size on Disk: '}
+    &#i-aspect::before {content: 'Aspect Ratio: '}
+    &#i-small-phones::before {content: 'Small Phones: '}
+    &#i-large-phones::before {content: 'Large Phones: '}
+    &#i-retina::before {content: 'Retina: '}
     // Make the data font defined in the span in the JS pop out against the label.
     .pop-font {
-      color: $dim-viewers-pop-font-color;
+      color: $inspector-pop-font-color;
     }
   }
 }
@@ -432,7 +431,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   left: 50%;
   width: 100%;
   margin-left: -40px;
-  #dv-clipboard-but {
+  #btn-toggle-ccp {
     width: 40px;
     height: 47px;
     margin-right: 20px;
@@ -448,7 +447,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 }
 
 // APP ERROR DISPLAY
-#app-message-container {
+#msg-container {
   display: block;
   position: relative;
   top: -65px;
@@ -499,7 +498,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
     width: 650px;
     height: 100%;
     margin: 0 auto;
-    // app-message-display
+    // msg-content
     td {
       width: 650px;
       height: 65px;
@@ -752,20 +751,20 @@ output {
         border: none;
         background-size: 90px 46px !important;
       }
-      #ccp-img-build-html-but {
+      #btn-ccp-img-build-html-clip {
         background: #000000 url('../img/img-to-cb-html.png') no-repeat center;
         background-size: 90px 46px;
         &:hover {
           background-image: url('../img/img-to-cb-html-hover.png');
         }
       }
-      #ccp-td-build-html-but {
+      #btn-ccp-td-build-html-clip {
         background: #000000 url('../img/td-to-cb-html-icon.png') no-repeat center;
         &:hover {
           background-image: url('../img/td-to-cb-html-icon-hover.png');
         }
       }
-      #ccp-table-build-html-but {
+      #btn-ccp-table-build-html-clip {
         background: #000000 url('../img/table-to-cb-html-icon.png') no-repeat center;
         &:hover {
           background-image: url('../img/table-to-cb-html-icon-hover.png');
@@ -829,7 +828,7 @@ output {
       }
       
       /* Create a custom checkbox */
-      #ccp-img-include-css-checkmrk, #ccp-td-bgimage-checkmrk, #ccp-table-include-wrapper-checkmrk {
+      #chk-ccp-img-include-css, #chk-ccp-td-bgimage, #chk-ccp-table-include-wrapper {
         position: absolute;
         top: 3px;
         left: 40px;
@@ -841,29 +840,29 @@ output {
       }
       
       /* On mouse-over, add a grey background color */
-      .ccp-img-include-css-container:hover input ~ #ccp-img-include-css-checkmrk, .ccp-td-bgimage-container:hover input ~ #ccp-td-bgimage-checkmrk, .ccp-table-include-wrapper-container:hover input ~ #ccp-table-include-wrapper-checkmrk {
+      .ccp-img-include-css-container:hover input ~ #chk-ccp-img-include-css, .ccp-td-bgimage-container:hover input ~ #chk-ccp-td-bgimage, .ccp-table-include-wrapper-container:hover input ~ #chk-ccp-table-include-wrapper {
         background-color: #ccc;
       }
       /* When the checkbox is checked, add a gray background */
-      .ccp-img-include-css-container input:checked ~ #ccp-img-include-css-checkmrk, .ccp-td-bgimage-container input:checked ~ #ccp-td-bgimage-checkmrk, .ccp-table-include-wrapper-container input:checked ~ #ccp-table-include-wrapper-checkmrk {
+      .ccp-img-include-css-container input:checked ~ #chk-ccp-img-include-css, .ccp-td-bgimage-container input:checked ~ #chk-ccp-td-bgimage, .ccp-table-include-wrapper-container input:checked ~ #chk-ccp-table-include-wrapper {
         background-color: #5f5e5e;
       }
 
       /* Create the checkmrk/indicator (hidden when not checked) */
-      #ccp-img-include-css-checkmrk:after, #ccp-td-bgimage-checkmrk:after, #ccp-table-include-wrapper-checkmrk:after  {
+      #chk-ccp-img-include-css:after, #chk-ccp-td-bgimage:after, #chk-ccp-table-include-wrapper:after  {
         content: "";
         position: absolute;
         display: none;
       }
       
       /* Show the checkmrk when checked */
-      .ccp-img-include-css-container input:checked ~ #ccp-img-include-css-checkmrk:after, .ccp-td-bgimage-container input:checked ~ #ccp-td-bgimage-checkmrk:after, .ccp-table-include-wrapper-container input:checked ~ #ccp-table-include-wrapper-checkmrk:after  {
+      .ccp-img-include-css-container input:checked ~ #chk-ccp-img-include-css:after, .ccp-td-bgimage-container input:checked ~ #chk-ccp-td-bgimage:after, .ccp-table-include-wrapper-container input:checked ~ #chk-ccp-table-include-wrapper:after  {
         display: block;
       }
       
       
       /* Style the checkmrk/indicator */
-      .ccp-img-include-css-container #ccp-img-include-css-checkmrk:after, .ccp-td-bgimage-container #ccp-td-bgimage-checkmrk:after, .ccp-table-include-wrapper-container #ccp-table-include-wrapper-checkmrk:after {
+      .ccp-img-include-css-container #chk-ccp-img-include-css:after, .ccp-td-bgimage-container #chk-ccp-td-bgimage:after, .ccp-table-include-wrapper-container #chk-ccp-table-include-wrapper:after {
         left: 5px;
         top: 2px;
         width: 5px;
@@ -883,7 +882,7 @@ output {
         text-align: left;
       }
       // VA! The Wrapper table label has to align left because it also serves as the option group heading
-      #ccp-table-include-wrapper-checkmrk,  .ccp-table-include-wrapper-label{
+      #chk-ccp-table-include-wrapper,  .ccp-table-include-wrapper-label{
         margin-left: -40px;
       }
       
@@ -917,57 +916,57 @@ output {
         }
       }
 
-      #ccp-img-display-css-to-clipboard-but.active {
+      #btn-ccp-img-dsktp-build-css-clip-but.active {
         background:  #000000 url('../img/img-display-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
           background-image:  url('../img/img-display-css-to-clipboard-icon-hover.png');
         }
       }
-      #ccp-img-lphone-css-to-clipboard-but.active {
+      #btn-ccp-img-lgphn-build-css-clip-but.active {
         background:  #000000 url('../img/img-lphone-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
           background-image:  url('../img/img-lphone-css-to-clipboard-icon-hover.png');
         }
       }
-      #ccp-img-sphone-css-to-clipboard-but.active {
+      #btn-ccp-img-smphn-build-css-clip-but.active {
         background:  #000000 url('../img/img-sphone-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
           background-image:  url('../img/img-sphone-css-to-clipboard-icon-hover.png');
         }
       }
 
-      #ccp-td-display-css-to-clipboard-but.active {
+      #btn-ccp-td-dsktp-build-css-clip-but.active {
         background:  #000000 url('../img/td-display-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
           background-image:  url('../img/td-display-css-to-clipboard-icon-hover.png');
         }
       }
-      #ccp-td-lphone-css-to-clipboard-but.active {
+      #btn-ccp-td-lgphn-build-css-clip-but.active {
         background:  #000000 url('../img/td-lphone-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
           background-image:  url('../img/td-lphone-css-to-clipboard-icon-hover.png');
         }
       }
-      #ccp-td-sphone-css-to-clipboard-but.active {
+      #btn-ccp-td-smphn-build-css-clip-but.active {
         background:  #000000 url('../img/td-sphone-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
           background-image:  url('../img/td-sphone-css-to-clipboard-icon-hover.png');
         }
       }
 
-      #ccp-table-display-css-to-clipboard-but.active {
+      #btn-ccp-table-dsktp-build-css-clip-but.active {
         background:  #000000 url('../img/table-display-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
           background-image:  url('../img/table-display-css-to-clipboard-icon-hover.png');
         }
       }
-      #ccp-table-lphone-css-to-clipboard-but.active {
+      #btn-ccp-table-lgphn-build-css-clip-but.active {
         background:  #000000 url('../img/table-lphone-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
           background-image:  url('../img/table-lphone-css-to-clipboard-icon-hover.png');
         }
       }
-      #ccp-table-sphone-css-to-clipboard-but.active {
+      #btn-ccp-table-smphn-build-css-clip-but.active {
         background:  #000000 url('../img/table-sphone-css-to-clipboard-icon.png') no-repeat center;
         &:hover {
           background-image:  url('../img/table-sphone-css-to-clipboard-icon-hover.png');
@@ -1103,7 +1102,7 @@ figure {
   }
   img {
     margin-bottom: 10px;
-    &.qs-dim-viewers {
+    &.qs-inspector-content {
       width: 800px;
       height: 102px;
     }

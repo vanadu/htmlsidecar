@@ -1,0 +1,535 @@
+<!--   Copyright 2018 Van L. Albert
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License. -->
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr" itemscope itemtype="http://schema.org/Article">
+<head>
+  <meta charset="utf-8">
+  <title>DimWHIT.IO</title>
+  <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,400italic,600,800|Source+Code+Pro" rel="stylesheet">
+  <!-- <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16" /> -->
+  <link rel="shortcut icon" href="http://dimwhit.io/img/favicon-32x32.ico" />
+  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
+  <link rel="stylesheet" media="all" href="css/style.css">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5-els.js"></script>
+  <![endif]-->
+
+</head>
+<!-- <html> -->
+<!-- /this script on the body tag prevents unwanted triggering of the handleFileSelect function if app elements are inadvertently dragged; not sure if this is the best way to do this. -->
+<BODY ondragstart="return false;" ondrop="return false;">
+
+
+
+  <!-- HEADER -->
+  <!-- /.header-container -->
+  <div class="header-container">
+    <!-- .header-content -->
+    <div class="header-content">
+      <!-- .header-headline -->
+      <div class="header-headline">
+
+        <!-- .header-image-left -->
+        <div class="header-image">
+          <img src="img/dimwhit-icon.png" alt="DimWHIT" class="header-img left">
+        </div>
+        <!-- /.header-image-left -->
+        <!-- .logo-img-container -->
+        <div class="header-logo">
+            <img src="img/dimwhit-logo.png" alt="DimWHIT" id="logo-img">
+            <div class="header-version"><p>v 0.98</p></div>
+        </div>
+          <!-- /.logo-img-container -->
+        <!-- .header-divider -->
+        <!-- </div> -->
+        <div class="header-divider">
+          
+        </div>
+        <!-- /.header-divider -->
+      </div>
+      <!-- /.header-headline -->
+
+
+      <!-- .header-subtext -->
+      <div class="header-subtext">
+        <h2><a href="#"  tabindex="-1"> <span class="dim-initial-cap initial-cap">Dim</span>ensioning &amp; Codebuilding<br/><span class="whit-initial-cap initial-cap">W</span>ebapp for <span class="whit-initial-cap initial-cap">H</span>TML EMail <span class="whit-initial-cap initial-cap">I</span>mage <span class="whit-initial-cap initial-cap">T</span>ags</a></h2> 
+      </div>
+      <!-- /.header-subtext -->
+
+      <!-- .header-slug -->
+      <!-- <div class="header-slug">
+        <h2></h2>
+      </div> -->
+
+
+
+    </div><!-- /.header-content -->
+  </div><!-- /.header-container -->
+
+  <!-- APP -->
+  <!-- #app-container -->
+  <div id="app-container">
+
+
+    
+    <!-- #dim-viewer-container -->
+    <div id="dim-viewer-container">
+      <!-- #dim-viewers -->
+      <div id="dim-viewers">
+        <!-- Dim Viewer Labels are in ::before pseudoclass in CSS -->
+        <div id="filename-viewer">
+          <p></p>
+        </div>
+        <div id="clipboard-but-container">
+          <button id="clipboard-but"></button>
+        </div>
+        <div class="dim-viewers-left-col">
+          <ul>
+            <li id="dim-viewer-display"></li>
+            <li id="dim-viewer-disk-img"></li>
+            <li id="dim-viewer-aspect"></li>
+          </ul>
+        </div>
+        
+        <div class="dim-viewers-right-col">
+          <ul>
+            <li id="dim-viewer-small-phones" class="img-dim-viewer"></li>
+            <li id="dim-viewer-large-phones" class="img-dim-viewer"></li>
+            <li id="dim-viewer-retina" class="img-dim-viewer"></li>
+          </ul>
+        </div>
+      </div>
+            
+      <!-- #dim-error-container -->
+      <div id="dim-error-container" class="" >
+        <table id="dim-errors">
+          <tr>
+            <td id="dim-error-message">
+              Placeholder error message
+            </td>
+          </tr>
+        </table>
+      </div>
+      <!-- /#dim-error-container -->
+      
+      <!-- /dim-viewers -->
+    </div>
+    <!-- /dim-viewer container -->
+
+    <!-- #tools-container -->
+    <div id="tools-container">
+      <!-- #img-toolbar -->
+      <div class="img-toolbar">
+
+        <!-- #img-toolbar-buttons -->
+        <ul class="img-toolbar-buttons btn-group" role="group" aria-label="...">
+          <!-- <li><div class="ttip"><button id="toggle-retina" type="button" class="btn btn-default" tabindex="3"></button><span class="ttiptext">Toggle Retina Dimensioning</span></div></li> -->
+          
+            <li><div class="ttip"><input id="main-image-viewer-wdth" class="toolbar-buttons btn btn-default" type="text" placeholder="W (px)" tabindex="1"><span class="ttiptext">Enter container width as positive integer</span></div></li>
+            <!-- TODO: Replace this image with a SGV or HTML entity -->
+            <li role="separator"><img class="divider" src="img/divider.png" alt="DimWHIT"></li>
+            <li><div class="ttip"><button id="main-image-grow-50" type="button" class="btn btn-default"  tabindex="7"><img src="img/grow50-button.png" alt="DimWHIT" /></button><span class="ttiptext">Grow image 50px</span></div></li>
+            <li><div class="ttip"><button id="main-image-grow-10" type="button" class="btn btn-default" tabindex="8"><img src="img/grow10-button.png" alt="DimWHIT"/></button><span class="ttiptext">Grow image 10px</span></div></li>
+            <li><div class="ttip"><button id="main-image-grow-01" type="button" class="btn btn-default" tabindex="9"><img src="img/grow1-button.png" alt="DimWHIT"/></button><span class="ttiptext">Grow image 1px</span></div></li>
+    
+            <li><div class="ttip"><input id="main-img-custom-wdth" class="toolbox-buttons btn btn-default" type="text" placeholder="W (px)" tabindex="2"><span class="ttiptext">Enter image width as integer</span></div></li>
+    
+    
+            <li><div class="ttip"><input id="main-img-custom-hght" class="toolbox-buttons btn btn-default" type="text" placeholder="H (px)" tabindex="3"><span class="ttiptext">Enter image height as integer</span></div></li>
+    
+            <li><div class="ttip"><button id="main-image-shrink-01" type="button" class="btn btn-default" tabindex="10"><img src="img/shrink1-button.png" alt="DimWHIT"/></button><span class="ttiptext">Shrink image 1px</span></div></li>
+            <li><div class="ttip"><button id="main-image-shrink-10" type="button" class="btn btn-default" tabindex="11"><img src="img/shrink10-button.png" alt="DimWHIT" /></button><span class="ttiptext">Shrink image 10px</span></div></li>
+            <li><div class="ttip"><button id="main-image-shrink-50" type="button" class="btn btn-default" tabindex="12"><img src="img/shrink50-button.png" alt="DimWHIT" /></button><span class="ttiptext">Shrink image 50px</span></div></li>
+
+          <li role="separator"><img class="divider" src="img/divider.png" alt="DimWHIT"></li>
+          <li><div class="ttip"><input id="small-phones-wdth" class="toolbar-buttons btn btn-default" type="text" placeholder="320" tabindex="4"><span class="ttiptext">Enter small phone width as positive integer</span></div></li>
+          <li><div class="ttip"><input id="large-phones-wdth" class="toolbar-buttons btn btn-default" type="text" placeholder="480" tabindex="5"><span class="ttiptext">Enter large phone width as positive integer</span></div></li>
+
+          <!-- !VA toggle image size is deprecated -->
+          <!-- <li><div class="ttip"><button id="toggle-image-size" type="button" class="btn btn-default" tabindex="6"></button><span class="ttiptext">Toggle display size/size on disk</span></div></li> -->
+          <!--<li><div class="ttip"><button id="main-container-shrink-10" type="button" class="btn btn-default"><img src="img/container-shrink-button.png" /></button><span class="ttiptext">Shrink table 10px</span></div></li>-->
+        </ul> 
+        <!-- /#img-toolbar-buttons -->
+
+      </div><!-- /#img-toolbar -->
+    </div><!-- /#tools-container -->
+
+    <!-- #image-viewport -->
+    <div id="image-viewport">
+
+      <!-- #ccp clipboard control panel -->
+      <div id="ccp">
+        <h2>Clipboard Options</h2>
+        <!-- #ccp-content -->
+        <div id="ccp-content">
+          <!-- #ccp-content -->
+          <fieldset id="img-options" class="ccp-fieldset">
+            <legend>&lt;img&gt; Options</legend>
+            <div id="img-ccp-options" class="ccp-options">
+                <div class="ccp-options-left"> 
+                  <div id="img-build-html" class="ccp-button"> 
+                    <button id="img-build-html-but" class="ccp-but"></button> 
+                  </div>  
+                </div> 
+                <div class="ccp-options-center"> 
+                  <div id="img-class"> 
+                    <label for="img-class-input">class=</label> 
+                    <input id="img-class-input" value="" placeholder="none" />  
+                  </div> 
+                  <div id="img-alt"> 
+                    <label for="img-alt-input">alt=</label> 
+                    <input id="img-alt-input" value="" placeholder="none" /> 
+                  </div> 
+                  <div id="img-align"> 
+                    <label id="img-align-label" for="img-align-select">align=</label> 
+                    <select id="img-align-select"> 
+                      <option>left</option> 
+                      <option>middle</option> 
+                      <option>right</option> 
+                    </select> 
+                  </div> 
+                  <div id="img-relpath"> 
+                    <label id="img-relpath-label" for="img-relpath-input">path=</label> 
+                    <input id="img-relpath-input" value="img" placeholder="none" /><span class="slash">&nbsp;/</span> 
+                  </div> 
+                </div> 
+                <div class="ccp-options-right"> 
+                  <div id="ccp-build-css-img" class="ccp-button"> 
+                    <button id="img-build-css-but" class="ccp-but"></button> 
+                  </div>  
+                  <div id="small-phones-css"> 
+                    <button id="small-phones-css-but"></button> 
+                  </div> 
+                  <div id="large-phones-css"> 
+                    <button id="large-phones-css-but"></button> 
+                  </div> 
+                </div> 
+              </div>
+            <!-- /This element is populated dynamically in scripts.js -->
+          </fieldset>
+          <!-- /fieldset #image-options -->
+
+          
+          <fieldset id="td-options" class="ccp-fieldset">
+          <!-- /This element is populated dynamically in scripts.js -->
+
+            <legend>&lt;td&gt; Options</legend> 
+            <div id="ccp-td-options" class="ccp-options"> 
+              <div class="ccp-options-left"> 
+                <div id="ccp-build-html-td"> 
+                  <button id="td-build-html-but" class="ccp-but"></button> 
+                </div><!-- /#ccp-build-html-td --> 
+              </div> 
+    
+              <div class="ccp-options-center"> 
+                <div id="td-class"> 
+                  <label for="td-class-input">class=</label> 
+                  <input id="td-class-input" value="" placeholder="none" />  
+                </div> 
+                <div id="td-align"> 
+                  <label id="td-align-label" for="td-align">align=</label> 
+                  <select id="td-align-select"> 
+                    <option>left</option> 
+                    <option>center</option> 
+                    <option>right</option> 
+                  </select>  
+                </div> 
+                <div id="td-valign"> 
+                  <label id="td-valign-label" for="td-valign-select">valign=</label>
+                  <select id="td-valign-select"> 
+                    <option>top</option> 
+                    <option>middle</option> 
+                    <option>bottom</option> 
+                  </select> 
+                </div> 
+              </div> 
+            </div><!-- /#ccp-td-options -->
+          </fieldset>
+
+
+          <fieldset id="table-options" class="ccp-fieldset">
+          <!-- /This element is populated dynamically in scripts.js -->
+
+            <legend>&lt;table&gt; Options</legend> 
+            <div id="ccp-table-options" class="ccp-options"> 
+              <div class="ccp-options-left"> 
+                <div id="ccp-build-html-table"> 
+                  <button id="table-build-html-but" class="ccp-but"></button> 
+                </div><!-- /#ccp-build-html-table --> 
+              </div> 
+    
+              <div class="ccp-options-center"> 
+                <div id="table-class"> 
+                  <label for="table-class-input">class=</label>
+                  <input id="table-class-input" value="devicewidth" placeholder="none" />  
+                </div> 
+                <div id="table-align"> 
+                  <label id="table-align-label" for="table-align">align=</label> 
+                  <select id="table-align-select"> 
+                    <option>left</option> 
+                    <option>center</option> 
+                    <option>right</option> 
+                  </select>
+                </div>
+                <div id="table-width">
+                    <label id="table-width-label" for="table-width">width=</label> 
+                    <select id="table-width-select"> 
+                    <!-- VA! These options are set in handleBLOB -->
+                    </select>
+                </div> 
+                <div id="table-max-width">
+                    <!-- VA! These options are set in handleBLOB -->
+                    <label for="table-max-width-input">max-width= </label>
+                    <input id="table-max-width-input" value="" placeholder="" />
+                </div>
+              </div> 
+            </div><!-- /#ccp-table-options -->
+
+          </fieldset>
+          <!-- /fieldset #image-options -->
+        </div><!-- /#ccp-content -->
+      </div>
+      <!-- /#ccp clipboard control panel -->
+
+      <!-- #main-image-viewer -->
+      <div id="main-image-viewer">
+        <!-- #main-image -->
+        <div id="main-image">
+          <!-- #drop-area -->
+          <div id="drop-area">
+  
+            <p class="drop-callout">Drop Image File Here</p>
+            <p class="drop-area-content"><span class="dimwhit">DimWHIT</span> is a keyboard-centric web app for working with HTML email images. With <span class="dimwhit">DimWHIT</span> and a few keystrokes, you can gather all the image dimensioning data you need for a specific image and table width and copy your <span class="code">&lt;img&gt;</span> tag and media queries to the clipboard with just a few keystrokes.</p>
+            <p class="drop-area-content">Working with <span class="dimwhit">DimWHIT</span> is self-explanatory. Just drop the image in the drop area and get to work. If you need any tips on getting the most out of <span class="dimwhit">DimWHIT</span>, click <a href="#">here</a>.</p>
+  
+          </div>
+          <!-- /#drop-area -->
+          <!-- DEVIMG HERE -->
+          <!-- <img src="img/TEST/_625X525.png" data-is-dev1=true id="main-img" alt="DimWHIT"> -->
+          <!-- USER-SELECTED IMAGE HERE -->
+          <!--<output id="list">    </output>-->
+        </div>
+        <!-- #main-image -->
+      </div>
+      <!-- /main-image-viewer -->
+
+    </div>
+    <!-- /image-viewport -->
+
+  </div>
+  <!-- /#app-container -->
+
+
+
+
+  <div class="page-content-heading">
+      <p class="tl-dr"><span class="dim-color">!tl</span><span class="whit-color">;dr </span><span class="dim-color">quick</span><span class="whit-color">start</span></p>
+  </div>
+  <!-- Separator 1 -->
+  <div class="separator1">
+
+  </div>
+  <!-- Separator 1 -->
+
+
+  <!-- #quickstart -->
+  <section class="content-section" id="quickstart">
+    <h2><span class="dim-text">DIM</span><span class="whit-text">WHIT</span> is:</h2>
+    <ul>
+      <li>A compact web app that runs in any modern browser and gives coders all the image data they need to create HTML emails quickly and efficiently.</li>
+      <li>A one-click tool for outputting fully dimensioned <code>&lt;img&gt;</code>, <code>&lt;td&gt;</code>; and <code>&lt;table&gt;</code> code blocks into a code document.</li>
+    </ul>
+    <p>The best way to learn what <span class="dim-text">DIM</span><span class="whit-text">WHIT</span> can do for you is to just drop some images onto the image viewer area, click the <span class="ui-element">Clipboard</span> button ( <img class="qs-clipboard-but-icon" src="img/qs/qs-clipboard-but-icon.png" alt="DimWHIT" /> ), add a class name, play around with the selections, paste the Clipboard into your text editor and have a look-see. Then come back and read the tl;dr description below for details.</p>
+
+
+  </section>
+
+  <div class="page-content-heading">
+    <p class="tl-dr"><span class="dim-color">!tl</span><span class="whit-color">;dr </span> <span class="dim-color">DIM</span><span class="whit-color">WHIT</span> <span class="dim-color">User's</span> <span class="whit-color">Guide</span></p>
+  </div>
+  <!-- Separator 1 -->
+  <div class="separator1">
+  </div>
+  <!-- Separator 1 -->
+  
+  <section class="content-section" id="users-guide">
+    
+    <h3>Dimension Viewers</h3>
+    <p>When you drop an image in the drop area, <span class="dim-text">DIM</span><span class="whit-text">WHIT</span> displays dimension data in the <span class="ui-element">Dimension Viewers</span>.
+    </p>
+
+
+    <figure class="dim-viewers">
+      <h4>Dimension Viewers</h4>
+      <img class="qs-dim-viewers" src="img/qs/qs-dim-viewers.png" alt="DimWHIT" />
+      <aside>
+          <span class="note">IMPORTANT &mdash;</span> Some of the Dimension Viewer labels may appear in red, depending on the image dimensions and the value in the <span class="ui-element">Viewer Width></span>&nbsp;(&nbsp;<img class="qs-viewer-width-icon" src="img/qs/qs-viewer-width-icon.png" alt="DimWHIT" />&nbsp;) field. These alerts indicate that your image may have insufficient resolution for retina or mobile devices.
+      </aside>
+    </figure>
+
+    <h3>Display Resize Tools</h3>
+    <p>You can change the display size of the image using the <span class="ui-element">Display Resize Tools</span> on the <span class="dim-text">DIM</span><span class="whit-text">WHIT</span> toolbar. Use the <img class="qs-image-button-icon" src="img/qs/qs-image-button-icon.png" alt="DimWHIT" > buttons to increase the display width of the image by the increment shown. Use the <span class="ui-element">W (px)</span> and <span class="ui-element">H (px)</span> fields to enter custom pixel width and height values as positive integers (px units are added automatically).</p>
+
+    <figure class="qs-toolbar">
+      <h4>Image Resize Tools</h4>
+      <img class="qs-image-resize-tools" src="img/qs/qs-image-resize-tools.png" alt="DimWHIT" />
+      <aside><span class="note">IMPORTANT &mdash;</span> If the values you select result in a display width that is greater than the value in the <span class="ui-element">Viewer Width</span>&nbsp;(&nbsp;<img class="qs-viewer-width-icon" src="img/qs/qs-viewer-width-icon.png" alt="DimWHIT" />&nbsp;) field, <span class="dim-text">DIM</span><span class="whit-text">WHIT</span> flashes an error. That's because the Viewer represents the images' parent table, and an image can't be wider than the container it resides in.</aside>
+    </figure>
+
+      
+    <p><span class="dim-text">DIM</span><span class="whit-text">WHIT</span> resizes the image, keeping the same aspect ratio, and updates the <span class="ui-element">Display Size</span> values as well as any applicable alerts.</p>
+    
+    <p>
+    </p>
+
+
+    <h3>Viewer Width Field</h3>
+    <!-- !VA need to determine the final behavior here. -->
+    <p>The <span class="ui-element">Viewer</span > is the area with the white email icon pattern on the background. It corresponds to the size of the images’ parent table in the Clipboard output. You set the width of the <span class="ui-element">Viewer</span> with the <span class="ui-element">Viewer Width</span > field.</p>
+    <p>The default value in the <span class="ui-element">Viewer Width</span> field is 650, which is a common <code>max-width</code> for the content area of HTML emails. You can set it to any table width up to 800 or smaller, depending on whether you want to create a full-width  or narrower table, i.e. for a multi-column layout.</p>
+    <figure>
+      <h4>Viewer Width Field</h4>
+      <img class="viewer-width-field" src="img/qs/qs-viewer-width-field.png" alt="DimWHIT" />
+      <aside><span class="note">TIP &mdash;</span>With PNG transparencies, the white email icons on the background show through so you know at a glance whether your PNG is transparent or opaque. </aside>
+      <aside><span class="note">IMPORTANT &mdash;</span> The value you set in the <span class="ui-element">Viewer Width</span> field will persist no matter how many consecutive images you load. However, if you refresh the browser, the <span class="ui-element">Viewer Width</span > will reset to the default of 650.</aside>
+    </figure>
+    
+    <p>To change the viewer width, enter a value in the <span class="ui-element">Viewer Width</span> field. If the value is greater than the current images' display width, <span class="dim-text">DIM</span><span class="whit-text">WHIT</span> resizes the Viewer up to the maximum app width of 800px and updates applicable alerts. If you enter a Viewer width that is smaller than the current image display width, <span class="dim-text">DIM</span><span class="whit-text">WHIT</span> flashes an error. To set a viewer width that is smaller than the current images' display width, first change the display width of the image, then change the viewer width accordingly.</p>
+    <!-- !VA This is how it works as of 3/17/18 -->
+
+    <h3>Clipboard Functions</h3>    
+    <p>When you click on the Clipboard button, <span class="dim-text">DIM</span><span class="whit-text">WHIT</span> shows you options for outputting an <code>&lt;img&gt;</code>, <code>&lt;td&gt;</code>, <code>&lt;table&gt;</code> tag and/or <code>img.class</code> definitions to the Clipboard so you can paste them into your code document.</p>
+    <figure class="qs-clipboard-functions">
+      <div class="qs-clipboard-functions-left">
+        <h4>Build <code>&lt;img&gt;</code> Tag Button</h4>
+
+        <aside class="qs-ccp-but-caption">
+          <img class="qs-ccp-but" src="img/qs/qs-build-img-tag-but.png" alt="DimWHIT" />
+          Writes a code block with an <code>&lt;img&gt;</code> tag to the Clipboard. The <code>&lt;img&gt;</code> tag includes the <span class="ui-element">Display Size</span> dimensions for width and height both as HTML attributes and inline CSS style properties, as well as other inline CSS style properties often used for cross-client HTML email. 
+        </aside>
+        <h4>Build <code>img.class</code> CSS Button</h4>
+
+        <aside class="qs-ccp-but-caption">
+          <img class="qs-ccp-but" src="img/qs/qs-build-img-display-size-css-but.png" alt="DimWHIT" />
+          Writes a CSS code block that includes Display Size dimensions in the width and height properties plus <code>!important </code>declarations to the Clipboard. <br /><span class="note">NOTE - </span>This button is only displayed when a class name is entered in the Class field of the <span class="ui-element">&lt;img&gt;</span> Options section.
+        </aside>
+        <h4>Build <code>img.class</code> Large Phones CSS Button</h4>
+
+        <aside class="qs-ccp-but-caption">
+            <img class="qs-ccp-but" src="img/qs/qs-build-img-large-phones-css-but.png" alt="DimWHIT" />
+            Writes a CSS code block that includes that uses the width X height values in the Large Phones dimension viewer for the width and height properties plus <code>!important </code>declarations to the Clipboard. <br /><span class="note">NOTE - </span>This button is only displayed when a class name is entered in the Class field of the <span class="ui-element">&lt;img&gt;</span> Options section.
+        </aside>
+
+      </div>
+
+      <div class="qs-clipboard-functions-right">
+          <h4>Build <code>img.class</code> Small Phones CSS Class Button</h4>
+          <img class="qs-ccp-but" src="img/qs/qs-build-img-small-phones-css-but.png" alt="DimWHIT" >
+          <aside class="qs-ccp-but-caption">
+              Writes a CSS code block that uses the width X height values in the Small Phones dimension viewer for the width and height properties plus <code>!important </code>declarations to the Clipboard. <br /><span class="note">NOTE - </span>This button is only displayed when a class name is entered in the Class field of the <span class="ui-element">&lt;img&gt;</span> Options section.
+          </aside>
+          <h4>Build <code>&lt;td&gt;</code> Tag Button</h4>
+          <img class="qs-ccp-but" src="img/qs/qs-build-td-tag-but.png" alt="DimWHIT" />
+          <aside class="qs-ccp-but-caption">
+              Writes a code block with a <code>&lt;td&gt;</code> tag to the Clipboard. The <code>&lt;td&gt;</code> tag contains the selections in the <span class="ui-element">&lt;td&gt;</span> Options section and the <code>&lt;img&gt;</code> defined in the <span class="ui-element">&lt;img&gt; Options</span> section as child element.
+          </aside>
+          <h4>Build <code>&lt;table&gt;</code> Tag Button</h4>
+          <img class="qs-ccp-but" src="img/qs/qs-build-table-tag-but.png" alt="DimWHIT" >
+          <aside class="qs-ccp-but-caption">
+              Writes a code block with a <code>&lt;table&gt;</code> tag to the Clipboard. The <code>&lt;table&gt;</code> tag contains the selections in the <span class="ui-element">&lt;table&gt;</span> Options section and the <code>&lt;img&gt;</code> and <code>&lt;td&gt;</code> tags defined in the <span class="ui-element">&lt;img&gt; Options</span> and <span class="ui-element">&lt;img&gt; Options</span> sections as child&nbsp;elements.
+          </aside>
+      </div>
+ 
+      
+    </figure>
+
+  </section>
+
+
+    <!-- Separator 1 -->
+    <div class="separator1">
+
+      </div>
+  <!-- Separator 1 -->
+
+
+  <section class="content-section">
+    <h3>Next Update: V 0.981 &mdash; 03.29.18</h3>
+    <ul class="new-features">
+      <li>Fix MS Edge Input Field Issue</li>
+      <li>HTML Validation</li>
+      <li>Fix IE 11 clipboard issue </li>
+      <li>Fix valign attribute in clipboard table cell output</li>
+      <li>Set default table align option to 'center'</li>
+      <li>Add skip link from drop area to Quickstart content</li>
+      <li>Add 'none' option to table cell align options to remove any align table cell clipboard output</li>
+      <li>Add 'none' option to table cell valign options to remove any valign table cell clipboard outputXXX</li>
+      <li>Fix max-width in clipboard output to be style instead of invalid attribute</li>
+      <li>Add 100% option to image width dropdown and add max-width to img tag in Clipboard output </li>
+      <li>Add 100% option to table width dropdown and add max-width to table tag in Clipboard output</li>
+      <li>Fix hover on large phones clipboard button in CCP </li>
+
+
+    </ul>
+
+
+  </section>
+
+
+
+
+      <!-- Separator 1 -->
+      <div class="separator1">
+
+      </div>
+  <!-- Separator 1 -->
+
+  <section class="content-section">
+    <div class="end-matter" style="padding: 30px">
+      <p style="font-size: 14px; text-align: center;">&copy;2018 Van Albert&nbsp;&nbsp;&nbsp;&nbsp;All rights reserved.</p>
+    </div>
+  </section>
+
+
+
+
+
+
+<!--<script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI="-->
+<!--crossorigin="anonymous"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.16/clipboard.min.js"></script>
+<script src="js/scripts.js"></script>
+<script src="js/test.js"></script>
+<script src="js/scrap.js"></script>
+
+
+
+<script>
+
+
+
+
+
+</script>
+
+
+
+</body>
+</html>
