@@ -192,7 +192,7 @@
             <legend>&lt;img&gt; Options</legend>
 
                 <div class="ccp-options-col-1"> 
-
+                    <!-- VA! Reboot: why no parent div here?-->
                     <button id="btn-ccp-img-build-html-clip" class="ccp-but"></button> 
                 </div> 
                 <div class="ccp-options-col-2"> 
@@ -205,12 +205,12 @@
                     <input id="ipt-ccp-img-alt" value="" placeholder="none" /> 
                   </div> 
                   <div id="ccp-img-relpath"> 
-                    <label id="ccp-img-relpath-label" for="ipt-ccp-img-relpath">path=</label> 
+                    <label id="ipt-ccp-img-relpath" for="ipt-ccp-img-relpath">path=</label> 
                     <input id="ipt-ccp-img-relpath" value="img" placeholder="none" />
                     <!-- <span class="slash">&nbsp;/</span>  -->
                   </div> 
                   <div id="ccp-img-align"> 
-                    <label id="ccp-img-align-label" for="sel-ccp-img-align">align=</label> 
+                    <label id="sel-ccp-img-align-label" for="sel-ccp-img-align">align=</label> 
                     <select id="sel-ccp-img-align"> 
                       <option selected="selected">none</option> 
                       <option>left</option> 
@@ -230,15 +230,16 @@
 
                 </div> 
                 <div class="ccp-options-col-3"> 
-                  <div id="ccp-img-include-css" > 
-                    <label class="ccp-img-include-css-container" id="ccp-img-include-css-container" for="img-include-css">
-                      
-                      <label class="ccp-img-include-css-label" id="ccp-img-include-css-label" for="ccp-img-include-css">
+                  <div id="ccp-img-include-width-height" > 
+                    <!-- VA! Reboot: This is the label that goes with the fake checkbox hack -->
+                    <label class="ccp-img-include-width-height-container" id="ccp-img-include-width-height-container" for="img-include-width-height">
+                      <!-- VA! Reboot: This is the label I added to allow positioning of the text label  -->
+                      <label class="ccp-img-include-width-height-label" id="ccp-img-include-width-height-label" for="ccp-img-include-width-height">
                       
                       Include width and height in style attribute</label>
                     <!-- The default checkbox is hidden -->
-                    <input type="checkbox" id="ccp-img-include-css-checkbox">
-                    <span id="chk-ccp-img-include-css"></span>
+                    <input type="checkbox" id="chk-ccp-img-include-width-height-checkbox">
+                    <span id="spn-ccp-img-include-width-height-checkmrk"></span>
                     <!-- VA! These options are set in handleTableWidth -->
                   </label> 
                   </div> 
@@ -251,14 +252,14 @@
                     </div> -->
                 </div>
                 <div class="ccp-options-col-4"> 
-                  <div id="btn-ccp-img-dsktp-build-css-clip" class="ccp-but-container"> 
-                    <button id="btn-ccp-img-dsktp-build-css-clip-but" class="ccp-but"></button> 
+                  <div id="ccp-img-dsktp-build-css-clip" class="ccp-but-container"> 
+                    <button id="btn-ccp-img-dsktp-build-css-clip" class="ccp-but"></button> 
                   </div>  
-                  <div id="btn-ccp-img-lgphn-build-css-clip" class="ccp-but-container"> 
-                    <button id="btn-ccp-img-lgphn-build-css-clip-but" class="ccp-but"></button> 
+                  <div id="ccp-img-lgphn-build-css-clip" class="ccp-but-container"> 
+                    <button id="btn-ccp-img-lgphn-build-css-clip" class="ccp-but"></button> 
                   </div> 
-                  <div id="btn-ccp-img-smphn-build-css-clip" class="ccp-but-container"> 
-                    <button id="btn-ccp-img-smphn-build-css-clip-but" class="ccp-but"></button> 
+                  <div id="ccp-img-smphn-build-css-clip" class="ccp-but-container"> 
+                    <button id="btn-ccp-img-smphn-build-css-clip" class="ccp-but"></button> 
                   </div> 
                 </div> 
 
@@ -272,6 +273,7 @@
               <legend>&lt;td&gt; Options</legend> 
 
                 <div class="ccp-options-col-1"> 
+                  <!-- VA! Reboot: why no parent div here? -->
                     <button id="btn-ccp-td-build-html-clip" class="ccp-but"></button> 
                 </div> 
       
@@ -281,7 +283,7 @@
                     <input id="ipt-ccp-td-class" value="" placeholder="none" />  
                   </div> 
                   <div id="ccp-td-align"> 
-                    <label id="ccp-td-align-label" for="sel-ccp-td-align">align=</label> 
+                    <label id="sel-ccp-td-align-label" for="sel-ccp-td-align">align=</label> 
                     <select id="sel-ccp-td-align">
                       <option>none</option> 
                       <option selected="selected">left</option> 
@@ -290,7 +292,7 @@
                     </select>  
                   </div> 
                   <div id="ccp-td-valign"> 
-                    <label id="ccp-td-valign-label" for="sel-ccp-td-valign">valign=</label>
+                    <label id="sel-ccp-td-valign-label" for="sel-ccp-td-valign">valign=</label>
                     <select id="sel-ccp-td-valign"> 
                       <option>none</option> 
                       <option selected="selected">top</option> 
@@ -301,33 +303,34 @@
                 </div> 
                 <div class="ccp-options-col-3">
                   <div id="ccp-td-bgcolor">
-                    <label for="ipt-ccp-td-bgcolor" id="ccp-td-bgcolor-label">bgcolor=</label>
+                    <label for="ipt-ccp-td-bgcolor" id="ipt-ccp-td-bgcolor-label">bgcolor=</label>
                     <input type="text" id="ipt-ccp-td-bgcolor" placeholder="none" value="" />
                   </div>
   
                   <div id="ccp-td-bgimage" > 
-                      <label class="ccp-td-bgimage-container" id="ccp-td-bgimage-container" for="ccp-td-bgimage">
+
+                      <label class="devgreen ccp-td-bgimage-container" id="ccp-td-bgimage-container" for="ccp-td-bgimage">
                         
-                      <label class="ccp-td-bgimage-label" id="ccp-td-bgimage-label" for="ccp-td-bgimage">
+                      <label class="devred ccp-td-bgimage-label" id="ccp-td-bgimage-label" for="ccp-td-bgimage">
                         
                         Background image by <a href="https://backgrounds.cm/">Stig</a>
                         </label>
                       <!-- The default checkbox is hidden -->
-                      <input type="checkbox" id="ccp-td-bgimage-checkbox">
-                      <span id="chk-ccp-td-bgimage"></span>
+                      <input type="checkbox" id="chk-ccp-td-bgimage-checkbox">
+                      <span id="spn-ccp-td-bgimage-checkmrk"></span>
                       <!-- VA! These options are set in handleTableWidth -->
                     </label> 
                   </div> 
                 </div>
                 <div class="ccp-options-col-4"> 
-                  <div id="btn-ccp-td-dsktp-build-css-clip" class="ccp-but-container"> 
-                    <button id="btn-ccp-td-dsktp-build-css-clip-but" class="ccp-but"></button> 
+                  <div id="ccp-td-dsktp-build-css-clip" class="ccp-but-container"> 
+                    <button id="btn-ccp-td-dsktp-build-css-clip" class="ccp-but"></button> 
                   </div>  
-                  <div id="btn-ccp-td-lgphn-build-css-clip" class="ccp-but-container"> 
-                    <button id="btn-ccp-td-lgphn-build-css-clip-but" class="ccp-but"></button> 
+                  <div id="ccp-td-lgphn-build-css-clip" class="ccp-but-container"> 
+                    <button id="btn-ccp-td-lgphn-build-css-clip" class="ccp-but"></button> 
                   </div> 
-                  <div id="btn-ccp-td-smphn-build-css-clip" class="ccp-but-container"> 
-                    <button id="btn-ccp-td-smphn-build-css-clip-but" class="ccp-but"></button> 
+                  <div id="ccp-td-smphn-build-css-clip" class="ccp-but-container"> 
+                    <button id="btn-ccp-td-smphn-build-css-clip" class="ccp-but"></button> 
                   </div> 
                 </div> 
 
@@ -339,7 +342,8 @@
   
               <legend>&lt;table&gt; Options</legend> 
               <div id="ccp-table-options" class="ccp-options"> 
-                <div class="ccp-options-col-1"> 
+                <div class="ccp-options-col-1">
+                    <!-- VA! Reboot: why no parent div here-->
                     <button id="btn-ccp-table-build-html-clip" class="ccp-but"></button> 
                 </div> 
       
@@ -360,11 +364,11 @@
                     </select>
                   </div>
                   <div id="ccp-table-width">
-                      <label id="ccp-table-width-label" for="ipt-ccp-table-width">width=</label> 
+                      <label id="ipt-ccp-table-width-label" for="ipt-ccp-table-width">width=</label> 
                       <input id="ipt-ccp-table-width" value="" placeholder="" />
                   </div>
                   <div id="ccp-table-bgcolor">
-                      <label for="ipt-ccp-table-bgcolor" id="ccp-table-bgcolor-label">bgcolor=</label>
+                      <label for="ipt-ccp-table-bgcolor" id="ipt-ccp-table-bgcolor-label">bgcolor=</label>
                       <input type="text" id="ipt-ccp-table-bgcolor" placeholder="none" value="" />
                   </div> 
                   <!--  
@@ -379,25 +383,28 @@
                 <div class="ccp-options-col-3"> 
                   <div id="ccp-table-include-wrapper"> 
                     <!-- !VA watch out... the 'for' might be wrong -->
-                      <label class="ccp-table-include-wrapper-container" id="ccp-table-include-wrapper-container" for="table-include-wrapper-checkbox">
-                        <label class="ccp-table-include-wrapper-label ccp-heading" id="ccp-table-include-wrapper-label" for="ccp-table-include-wrapper">
-                        Wrapper table</label>
+                    <!-- VA! Reboot: This is still wrong...see how it renders-->
+                    <!-- VA! This is the outer label-->
+                      <label class="devgreen ccp-table-include-wrapper-container" id="ccp-table-include-wrapper-container" for="chk-ccp-table-include-wrapper-checkbox">
+                        <!-- VA! This is the inner label - the click area for the checkbox-->
+                        <label class="devred ccp-table-include-wrapper-label ccp-heading" id="ccp-table-include-wrapper-label" for="chk-ccp-table-include-wrapper-checkbox">Wrapper Table
+                        </label>
                       <!-- The default checkbox is hidden -->
-                      <input type="checkbox" id="ccp-table-include-wrapper-checkbox">
-                      <span id="chk-ccp-table-include-wrapper"></span>
+                      <input type="checkbox" id="chk-ccp-table-include-wrapper-checkbox">
+                      <span id="spn-ccp-table-include-wrapper-checkmrk"></span>
                       <!-- VA! These options are set in handleTableWidth -->
                     </label> 
                   </div> 
                   <div id="ccp-table-wrapper-class"> 
-                      <label for="ipt-ccp-table-wrapper-class">class=</label>
+                      <label label="ipt-ccp-table-wrapper-class-label" for="ipt-ccp-table-wrapper-class">class=</label>
                       <input id="ipt-ccp-table-wrapper-class" placeholder="none" />  
                   </div> 
                   <div id="ccp-table-wrapper-width"> 
-                      <label id="ccp-table-wrapper-width-label" for="ipt-ccp-table-wrapper-width">width=</label>
+                      <label id="ipt-ccp-table-wrapper-width-label" for="ipt-ccp-table-wrapper-width">width=</label>
                       <input id="ipt-ccp-table-wrapper-width" placeholder="none" />  
                   </div> 
                   <div id="ccp-table-wrapper-align"> 
-                    <label id="ccp-table-wrapper-align-label" for="sel-ccp-table-wrapper-align">align=</label>
+                    <label id="sel-ccp-table-wrapper-align-label" for="sel-ccp-table-wrapper-align">align=</label>
                     <select id="sel-ccp-table-wrapper-align"> 
                       <option>none</option>
                       <option>left</option> 
@@ -406,8 +413,8 @@
                     </select>
                   </div> 
                   <div id="ccp-table-wrapper-bgcolor"> 
-                      <label id="ccp-table-wrapper-bgcolor-label" for="ccp-input-table-wrapper-bgcolor">bgcolor=</label>
-                      <input id="ccp-input-table-wrapper-bgcolor" placeholder="none" />  
+                      <label id="ipt-ccp-table-wrapper-bgcolor-label" for="ipt-ccp-input-table-wrapper-bgcolor">bgcolor=</label>
+                      <input id="ipt-ccp-input-table-wrapper-bgcolor" placeholder="none" />  
                   </div> 
                 </div>
 

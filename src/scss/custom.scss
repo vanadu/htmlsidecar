@@ -6,6 +6,9 @@
   border: 1px solid blue !important;
 }
 
+.devgreen {
+  border: 1px solid green !important;
+}
 
 body {
   font-family: $primary-font-family;
@@ -798,8 +801,8 @@ output {
       }
       
       // VA! Custom checkbox
-
-      .ccp-img-include-css-container, .ccp-td-bgimage-container, .ccp-table-include-wrapper-container  {
+      /* These are the actual text labels for the checkboxes. */
+      .ccp-img-include-width-height-container, .ccp-td-bgimage-container, .ccp-table-include-wrapper-container  {
         width: 100%;
         display: block;
         position: relative;
@@ -818,8 +821,8 @@ output {
           text-decoration: underline;
         }
       }
-      /* Hide the browser's default checkbox */
-      .ccp-img-include-css-container input,.ccp-td-bgimage-container input, .ccp-table-include-wrapper-container input {
+      /* These are the hidden browser's default checkboxes. VA! It appears they are attached to the first label element in the parent container */
+      .ccp-img-include-width-height-container input,.ccp-td-bgimage-container input, .ccp-table-include-wrapper-container input {
         position: absolute;
         opacity: 0;
         cursor: pointer;
@@ -827,8 +830,8 @@ output {
         width: 0;
       }
       
-      /* Create a custom checkbox */
-      #chk-ccp-img-include-css, #chk-ccp-td-bgimage, #chk-ccp-table-include-wrapper {
+      /* Create a custom checkbox -- this is the span after the checkbox input element. */
+      #spn-ccp-img-include-width-height-checkmrk, #spn-ccp-td-bgimage-checkmrk, #spn-ccp-table-include-wrapper-checkmrk {
         position: absolute;
         top: 3px;
         left: 40px;
@@ -837,32 +840,35 @@ output {
         background-color: #eee;
         display: block;
         z-index: 100;
+        border: 1px solid blue;
       }
       
       /* On mouse-over, add a grey background color */
-      .ccp-img-include-css-container:hover input ~ #chk-ccp-img-include-css, .ccp-td-bgimage-container:hover input ~ #chk-ccp-td-bgimage, .ccp-table-include-wrapper-container:hover input ~ #chk-ccp-table-include-wrapper {
+      .ccp-img-include-width-height-container:hover input ~ #spn-ccp-img-include-width-height-checkmrk, .ccp-td-bgimage-container:hover input ~ #spn-ccp-td-bgimage-checkmrk, .ccp-table-include-wrapper-container:hover input ~ #spn-ccp-table-include-wrapper-checkmrk {
         background-color: #ccc;
       }
       /* When the checkbox is checked, add a gray background */
-      .ccp-img-include-css-container input:checked ~ #chk-ccp-img-include-css, .ccp-td-bgimage-container input:checked ~ #chk-ccp-td-bgimage, .ccp-table-include-wrapper-container input:checked ~ #chk-ccp-table-include-wrapper {
+      .ccp-img-include-width-height-container input:checked ~ #spn-ccp-img-include-width-height-checkmrk, .ccp-td-bgimage-container input:checked ~ #spn-ccp-td-bgimage-checkmrk, .ccp-table-include-wrapper-container input:checked ~ #spn-ccp-table-include-wrapper-checkmrk {
         background-color: #5f5e5e;
       }
 
       /* Create the checkmrk/indicator (hidden when not checked) */
-      #chk-ccp-img-include-css:after, #chk-ccp-td-bgimage:after, #chk-ccp-table-include-wrapper:after  {
+      #spn-ccp-img-include-width-height-checkmrk:after, #spn-ccp-td-bgimage-checkmrk:after, #spn-ccp-table-include-wrapper-checkmrk:after  {
         content: "";
         position: absolute;
         display: none;
+        border: 1px solid magenta;
       }
       
       /* Show the checkmrk when checked */
-      .ccp-img-include-css-container input:checked ~ #chk-ccp-img-include-css:after, .ccp-td-bgimage-container input:checked ~ #chk-ccp-td-bgimage:after, .ccp-table-include-wrapper-container input:checked ~ #chk-ccp-table-include-wrapper:after  {
+      .ccp-img-include-width-height-container input:checked ~ #spn-ccp-img-include-width-height-checkmrk:after, .ccp-td-bgimage-container input:checked ~ #spn-ccp-td-bgimage-checkmrk:after, .ccp-table-include-wrapper-container input:checked ~ #spn-ccp-table-include-wrapper-checkmrk:after  {
         display: block;
+
       }
       
       
       /* Style the checkmrk/indicator */
-      .ccp-img-include-css-container #chk-ccp-img-include-css:after, .ccp-td-bgimage-container #chk-ccp-td-bgimage:after, .ccp-table-include-wrapper-container #chk-ccp-table-include-wrapper:after {
+      .ccp-img-include-width-height-container #spn-ccp-img-include-width-height-checkmrk:after, .ccp-td-bgimage-container #spn-ccp-td-bgimage-checkmrk:after, .ccp-table-include-wrapper-container #spn-ccp-table-include-wrapper-checkmrk:after {
         left: 5px;
         top: 2px;
         width: 5px;
@@ -872,14 +878,20 @@ output {
         -webkit-transform: rotate(45deg);
         -ms-transform: rotate(45deg);
         transform: rotate(45deg);
-        
+
       }
+
+      // .ccp-table-include-wrapper-container {
+      //   border: 1px solid green;
+      //   display: block !important;
+      // }
       
       // VA! This is the extra label I added because the prodecure I used for the mock checkbox didn't include a label
-      #ccp-img-include-css-label, #ccp-td-bgimage-label, #ccp-table-include-wrapper-label  {
+      #ccp-img-include-width-height-label, #ccp-td-bgimage-label, #ccp-table-include-wrapper-label  {
         width: 220px;
         padding-left: 34px;
         text-align: left;
+        border: 1px solid magenta;
       }
       // VA! The Wrapper table label has to align left because it also serves as the option group heading
       #chk-ccp-table-include-wrapper,  .ccp-table-include-wrapper-label{

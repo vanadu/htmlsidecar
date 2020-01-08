@@ -1011,6 +1011,9 @@ body {
 .devblue {
   border: 1px solid blue !important; }
 
+.devgreen {
+  border: 1px solid green !important; }
+
 body {
   font-family: "Open Sans", Arial, Helvetica, sans-serif;
   font-size: 1rem;
@@ -1598,8 +1601,9 @@ output {
       left: 350px;
       width: 280px;
       margin-left: 10px;
-      /* Hide the browser's default checkbox */
-      /* Create a custom checkbox */
+      /* These are the actual text labels for the checkboxes. */
+      /* These are the hidden browser's default checkboxes. VA! It appears they are attached to the first label element in the parent container */
+      /* Create a custom checkbox -- this is the span after the checkbox input element. */
       /* On mouse-over, add a grey background color */
       /* When the checkbox is checked, add a gray background */
       /* Create the checkmrk/indicator (hidden when not checked) */
@@ -1610,7 +1614,7 @@ output {
         margin-bottom: 5px;
         padding-right: 2px;
         text-align: right; }
-      #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-css-container, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container {
+      #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-width-height-container, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container {
         width: 100%;
         display: block;
         position: relative;
@@ -1623,16 +1627,16 @@ output {
         -ms-user-select: none;
         user-select: none;
         z-index: 100; }
-        #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-css-container a, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container a, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container a {
+        #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-width-height-container a, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container a, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container a {
           font-weight: bold;
           text-decoration: underline; }
-      #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-css-container input, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container input, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container input {
+      #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-width-height-container input, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container input, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container input {
         position: absolute;
         opacity: 0;
         cursor: pointer;
         height: 0;
         width: 0; }
-      #ccp-content fieldset .ccp-options-col-3 #chk-ccp-img-include-css, #ccp-content fieldset .ccp-options-col-3 #chk-ccp-td-bgimage, #ccp-content fieldset .ccp-options-col-3 #chk-ccp-table-include-wrapper {
+      #ccp-content fieldset .ccp-options-col-3 #spn-ccp-img-include-width-height-checkmrk, #ccp-content fieldset .ccp-options-col-3 #spn-ccp-td-bgimage-checkmrk, #ccp-content fieldset .ccp-options-col-3 #spn-ccp-table-include-wrapper-checkmrk {
         position: absolute;
         top: 3px;
         left: 40px;
@@ -1640,18 +1644,20 @@ output {
         width: 15px;
         background-color: #eee;
         display: block;
-        z-index: 100; }
-      #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-css-container:hover input ~ #chk-ccp-img-include-css, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container:hover input ~ #chk-ccp-td-bgimage, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container:hover input ~ #chk-ccp-table-include-wrapper {
+        z-index: 100;
+        border: 1px solid blue; }
+      #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-width-height-container:hover input ~ #spn-ccp-img-include-width-height-checkmrk, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container:hover input ~ #spn-ccp-td-bgimage-checkmrk, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container:hover input ~ #spn-ccp-table-include-wrapper-checkmrk {
         background-color: #ccc; }
-      #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-css-container input:checked ~ #chk-ccp-img-include-css, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container input:checked ~ #chk-ccp-td-bgimage, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container input:checked ~ #chk-ccp-table-include-wrapper {
+      #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-width-height-container input:checked ~ #spn-ccp-img-include-width-height-checkmrk, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container input:checked ~ #spn-ccp-td-bgimage-checkmrk, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container input:checked ~ #spn-ccp-table-include-wrapper-checkmrk {
         background-color: #5f5e5e; }
-      #ccp-content fieldset .ccp-options-col-3 #chk-ccp-img-include-css:after, #ccp-content fieldset .ccp-options-col-3 #chk-ccp-td-bgimage:after, #ccp-content fieldset .ccp-options-col-3 #chk-ccp-table-include-wrapper:after {
+      #ccp-content fieldset .ccp-options-col-3 #spn-ccp-img-include-width-height-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 #spn-ccp-td-bgimage-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 #spn-ccp-table-include-wrapper-checkmrk:after {
         content: "";
         position: absolute;
-        display: none; }
-      #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-css-container input:checked ~ #chk-ccp-img-include-css:after, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container input:checked ~ #chk-ccp-td-bgimage:after, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container input:checked ~ #chk-ccp-table-include-wrapper:after {
+        display: none;
+        border: 1px solid magenta; }
+      #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-width-height-container input:checked ~ #spn-ccp-img-include-width-height-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container input:checked ~ #spn-ccp-td-bgimage-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container input:checked ~ #spn-ccp-table-include-wrapper-checkmrk:after {
         display: block; }
-      #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-css-container #chk-ccp-img-include-css:after, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container #chk-ccp-td-bgimage:after, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container #chk-ccp-table-include-wrapper:after {
+      #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-width-height-container #spn-ccp-img-include-width-height-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container #spn-ccp-td-bgimage-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container #spn-ccp-table-include-wrapper-checkmrk:after {
         left: 5px;
         top: 2px;
         width: 5px;
@@ -1661,10 +1667,11 @@ output {
         -webkit-transform: rotate(45deg);
         -ms-transform: rotate(45deg);
         transform: rotate(45deg); }
-      #ccp-content fieldset .ccp-options-col-3 #ccp-img-include-css-label, #ccp-content fieldset .ccp-options-col-3 #ccp-td-bgimage-label, #ccp-content fieldset .ccp-options-col-3 #ccp-table-include-wrapper-label {
+      #ccp-content fieldset .ccp-options-col-3 #ccp-img-include-width-height-label, #ccp-content fieldset .ccp-options-col-3 #ccp-td-bgimage-label, #ccp-content fieldset .ccp-options-col-3 #ccp-table-include-wrapper-label {
         width: 220px;
         padding-left: 34px;
-        text-align: left; }
+        text-align: left;
+        border: 1px solid magenta; }
       #ccp-content fieldset .ccp-options-col-3 #chk-ccp-table-include-wrapper, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-label {
         margin-left: -40px; }
     #ccp-content fieldset .ccp-options-col-4 {

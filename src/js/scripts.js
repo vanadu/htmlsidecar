@@ -25,16 +25,22 @@ TODO: Update icon and button names to reflect new naming scheme
   */
 /* !VA  01.07.20 
   DONE: Batch rename SCSS.
-  TODO: Manual changes to HTML and JS
-
+  DONE: Manual changes to HTML and JS
 */
   
-// !VA GENERAL NOTES
+/* !VA  01.08.20 
+  DONE: Make CCP HTML element names consistent with new naming scheme. THe scheme for CCP elements is: div = no 3-char element identifier prefix on the container. All the children get the 3-char element identifier prefix. Problem: ccp-but class is also appled to the container div as well as on the button itself, that needs to be fixed during the flexbox overhaul.
+  DONE: Updated checkbox naming in JS, SCSS and HTML 
+  TODO: Make image and img tags consistent with new naming scheme.
+*/
 
-/* !VA  - 01.07.20
+// !VA GENERAL NOTES
+/* !VA  - January Reboot Notes
 =========================================================
+TODO: The select kist is wonky on Ubuntu Firefox but OK on Windows browsers. WHat's up with that?
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer WIDTH. That's no good.
 TODO: There's extra whitespace above the Inspector pane. That should go away when we convert to flexbox. 
+TODO: The Wrapper Table checkbox doesn't select when clicked - you have to click somewhere else on the span element. That needs to be fixed in the flexbox overhaul.
 /*
 
 
@@ -149,24 +155,28 @@ var Whitty = (function () {
     var ccpUserInput = {
       iptCcpImgClass: '#ipt-ccp-img-class',
       // imgAnchor: '#chk-ccp-img-anchor',
-      imgAlt: '#ipt-ccp-img-alt',
+      // !VA iptCcpImgAlt
+      iptCcpImgAlt: '#ipt-ccp-img-alt',
       // !VA This isn't even a thing... probably delete it 04.28.19
       // !VA Not renaming the checkbox/checkmarks for now because they already have code that queries the last three characters to determine if mrk or box...
-      imgIncludeStyles: '#chk-ccp-img-include-css',
+      spnCcpImgIncludeWidthHeightCheckmrk: '#spn-ccp-img-include-width-height-checkmrk',
       selCcpImgAlign: '#sel-ccp-img-align',
       iptCcpImgRelPath: '#ipt-ccp-img-relpath',
       iptCcpTdClass: '#ipt-ccp-td-class',
       selCcpTdAlign: '#sel-ccp-td-align',
       tdValign: '#sel-ccp-td-valign',
       iptCcpTdBgColor: '#ipt-ccp-td-bgcolor',
-      chkCcpTdBgImg: '#chk-ccp-td-bgimage',
+      // !VA spn-ccp-td-bgimage-checkmrk
+      spnCcpTdBgimageCheckmrk: '#spn-ccp-td-bgimage-checkmrk',
       iptCcpTableClass: '#ipt-ccp-table-class',
       selCcpTableAlign: '#sel-ccp-table-align',
-      tableWidth: '#ipt-ccp-table-width',
+      // !VA iptCcpTableWidth
+      iptCcpTableWidth: '#ipt-ccp-table-width',
       // !VA Not in use yet
       // tableMaxWidth: '#ipt-ccp-table-max-width',
       iptCcpTableBgColor: '#ipt-ccp-table-bgcolor',
-      chkCcpTableIncludeWrapper: '#chk-ccp-table-include-wrapper',
+      spnCcpTableIncludeWrapperCheckmrk: '#spn-ccp-table-include-wrapper-checkmrk',
+      // !VA spn-ccp-table-include-wrapper-checkmrk
       iptCcpTableWrapperClass: '#ipt-ccp-table-wrapper-class',
       iptCcpTableWrapperWidth: '#ipt-ccp-table-wrapper-width',
       selCcpTableWrapperAlign: '#sel-ccp-table-wrapper-align',
@@ -182,16 +192,16 @@ var Whitty = (function () {
       btnCcpTDBuildHtmlClip: '#btn-ccp-td-build-html-clip',
       btnCcpTableBuildHtmlClip: '#btn-ccp-table-build-html-clip',
       // !VA Make CSS Clip Buttons
-      btnCcpImgDsktpBuildCssClip: '#btn-ccp-img-dsktp-build-css-clip-but',
-      btnCcpImgSmphnBuildCssClip: '#btn-ccp-img-smphn-build-css-clip-but',
-      btnCcpImgLgphnBuildCssClip: '#btn-ccp-img-lgphn-build-css-clip-but',
+      btnCcpImgDsktpBuildCssClip: '#btn-ccp-img-dsktp-build-css-clip',
+      btnCcpImgSmphnBuildCssClip: '#btn-ccp-img-smphn-build-css-clip',
+      btnCcpImgLgphnBuildCssClip: '#btn-ccp-img-lgphn-build-css-clip',
         
-      btnCcpTdDsktpBuildCssClip:  '#btn-ccp-td-dsktp-build-css-clip-but',
-      btnCcpTdSmphnBuildCssClip: '#btn-ccp-td-smphn-build-css-clip-but',
-      btnCcpTdLgphnBuildCssClip: '#btn-ccp-td-lgphn-build-css-clip-but',
-      btnCcpTableDsktpBuildCssClip:  '#btn-ccp-table-dsktp-build-css-clip-but',
-      btnCcpTableSmphnBuildCssClip: '#btn-ccp-table-smphn-build-css-clip-but',
-      btnCcpTableLgphnBuildCssClip: '#btn-ccp-table-lgphn-build-css-clip-but',
+      btnCcpTdDsktpBuildCssClip:  '#btn-ccp-td-dsktp-build-css-clip',
+      btnCcpTdSmphnBuildCssClip: '#btn-ccp-td-smphn-build-css-clip',
+      btnCcpTdLgphnBuildCssClip: '#btn-ccp-td-lgphn-build-css-clip',
+      btnCcpTableDsktpBuildCssClip:  '#btn-ccp-table-dsktp-build-css-clip',
+      btnCcpTableSmphnBuildCssClip: '#btn-ccp-table-smphn-build-css-clip',
+      btnCcpTableLgphnBuildCssClip: '#btn-ccp-table-lgphn-build-css-clip',
       
     };
 
@@ -532,7 +542,7 @@ var Whitty = (function () {
 
       imgTag.altAtt =    
         // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output
-        ccpIfNoUserInput('alt',document.querySelector(ccpUserInput.imgAlt).value);
+        ccpIfNoUserInput('alt',document.querySelector(ccpUserInput.iptCcpImgAlt).value);
       // !VA imgTag.altAtt END
 
       imgTag.srcAtt = (function (id, Appdata) {
@@ -553,7 +563,9 @@ var Whitty = (function () {
       imgTag.styleAtt =  (function (id) {
         // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
         var str;
+        // !VA Reboot: Find a better way to do this than with two replace methods
         id = id.replace('mrk', 'box');
+        id = id.replace('spn', 'chk');
         // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
         if (document.querySelector(id).checked === true) {
           str = `border="0" style="width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; border: none; outline: none; text-decoration: none; display: block;" `;
@@ -561,7 +573,7 @@ var Whitty = (function () {
           str = 'border="0" style="border: none; outline: none; text-decoration: none; display: block;"';
         }
         return str;
-      })(ccpUserInput.imgIncludeStyles);
+      })(ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk);
       // !VA imgTag.styleAtt END
       imgTag.alignAtt = (function (id) {
         // !VA Pass in the id of the select dropdown
@@ -661,7 +673,9 @@ var Whitty = (function () {
       tdTag.BgimageAtt =  (function (id) {
         // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
         var str;
+        // !VA Reboot: Find a better way to do this than with two replace methods
         id = id.replace('mrk', 'box');
+        id = id.replace('spn', 'chk');
         // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
 
         if (document.querySelector(id).checked === true) {
@@ -698,7 +712,7 @@ var Whitty = (function () {
         }
         clipboardStr = str;
         // return clipboardStr;
-      })(ccpUserInput.chkCcpTdBgImg);
+      })(ccpUserInput.spnCcpTdBgimageCheckmrk);
 
       return clipboardStr;
     }
@@ -746,7 +760,7 @@ var Whitty = (function () {
       tableTag.widthAtt = (function (id, Appdata) {
         // !VA Get Appdata
 
-        var tableWidthInput = document.querySelector(ccpUserInput.tableWidth);
+        var tableWidthInput = document.querySelector(ccpUserInput.iptCcpTableWidth);
         // !VA TODO: Error handling
         // !VA If there 
         if (!tableWidthInput.value) {
@@ -808,9 +822,9 @@ var Whitty = (function () {
       })(ccpUserInput.selCcpTableWrapperAlign);
 
 
-      // !VA Wrapper bgcolor attributePass the input value 
-      tableTag.wrapperBgcolorAtt =
-      ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tableWrapperBgColor).value);
+      // !VA Wrapper bgcolor attribute Pass the input value 
+      // tableTag.wrapperBgcolorAtt =
+      // ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.tableWrapperBgColor).value);
       // !VA iptCcpTdBgColor
 
       // !VA Get the checked status of Include table wrapper, and if it's 'checked' output the base table AND the table wrapper
@@ -1079,6 +1093,7 @@ var Whitty = (function () {
         // if (typeof(window.event) != "undefined")
         // 	oNode.attachEvent("on"+evt, oFunc);
         // else
+        console.log('oNode.id is: ' + oNode.id);
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
       // addEventHandler(document.getElementById(toolbarElements.btnTbrIncr01),'click',doit,false);
@@ -1087,6 +1102,8 @@ var Whitty = (function () {
       var tbClickables = [ toolbarElements.btnTbrIncr50, toolbarElements.btnTbrIncr10, toolbarElements.btnTbrIncr01, toolbarElements.btnTbrDecr50, toolbarElements.btnTbrDecr10, toolbarElements.btnTbrDecr01  ];
       for (let i = 0; i < tbClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
+        // console.log('i is: ' + i);
+        // console.log('tbClickables[i] is: ' + tbClickables[i]);
         tbClickables[i] = document.querySelector(tbClickables[i]);
         addEventHandler(tbClickables[i],'click',handleMouseEvents,false);
 
@@ -1097,6 +1114,8 @@ var Whitty = (function () {
       for (let i = 0; i < tbKeypresses.length; i++) {
         // !VA convert the ID string to the object inside the loop
         tbKeypresses[i] = document.querySelector(tbKeypresses[i]);
+        // console.log('i is: ' + i);
+        // console.log('tbKeypresses[i].id is: ' + tbKeypresses[i].id);
         // !VA Handles all key events except TAB, which require keyDown to get the value of the current input rather than the input being tabbed to.
         addEventHandler((tbKeypresses[i]),'keydown',handleKeydown,false);
         addEventHandler((tbKeypresses[i]),'keyup',handleKeyup,false);
@@ -1113,6 +1132,8 @@ var Whitty = (function () {
       // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. Currently only the img class input does that.
       var ccpKeypresses = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass ];
       for (let i = 0; i < ccpKeypresses.length; i++) {
+        console.log('i is: ' + i);
+        console.log('ccpKeypresses[i] is: ' + ccpKeypresses[i]);
         // !VA convert the ID string to the object inside the loop
         ccpKeypresses[i] = document.querySelector(ccpKeypresses[i]);
         addEventHandler((ccpKeypresses[i]),'input',showElementOnInput,false);
@@ -1133,6 +1154,7 @@ var Whitty = (function () {
         var clipBut;
         if(btnCcpBuildClips.hasOwnProperty(i)){
           clipBut = document.querySelector(btnCcpBuildClips[i]);
+          // console.log('clipBut.id is: ' + clipBut.id);
           addEventHandler(clipBut,'click',CBController.doClipboard,false);
         }
       }
@@ -1154,7 +1176,7 @@ var Whitty = (function () {
       // Blur handlers - handleInputBlur
       // =================================
       // addEventHandler(ccpUserInput.iptCcpImgClass,'blur',showMobileImageButtons,false);
-      // ccpUserInput.imgAlt.addEventListener('blur', showMobileImageButtons);
+      // ccpUserInput.iptCcpImgAlt.addEventListener('blur', showMobileImageButtons);
       // ccpUserInput.iptCcpImgClass.addEventListener('blur', showMobileImageButtons);
       // ccpUserInput.iptCcpImgRelPath.addEventListener('blur', showMobileImageButtons);
       
@@ -1788,7 +1810,7 @@ var Whitty = (function () {
 
 
         // !VA CCP Checkboxes - these are mock checkboxes with custom styling, so the ID names have to be converted to checkbox names in order to select or deselect them. We attach the event handler to the checkmark, not the checkbox. The checkmark is converted to checkbox for handling in toggleCheckbox.
-        var ccpCheckmarks = [ ccpUserInput.imgIncludeStyles, ccpUserInput.chkCcpTdBgImg, ccpUserInput.chkCcpTableIncludeWrapper ]
+        var ccpCheckmarks = [ ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk, ccpUserInput.spnCcpTdBgimageCheckmrk, ccpUserInput.spnCcpTableIncludeWrapperCheckmrk ]
         var ccpCheckboxes = [];
         for (let i = 0; i < ccpCheckmarks.length; i++) {
           document.querySelector(ccpCheckmarks[i]).addEventListener('click', handleCCPInput, false);
@@ -1802,10 +1824,10 @@ var Whitty = (function () {
         }
 
         // !VA Initialize with 'include wrapper table' unchecked, or true for DEV
-        // var includeWrapperTable = document.querySelector((ccpUserInput.chkCcpTableIncludeWrapper.replace('mrk', 'box')));
-        // includeWrapperTable.checked = true;
+        var includeWrapperTable = document.querySelector((ccpUserInput.spnCcpTableIncludeWrapperCheckmrk.replace('mrk', 'box')));
+        includeWrapperTable.checked = true;
         // !VA Default for table width
-        document.querySelector(ccpUserInput.tableWidth).value = `${Appdata.imgW}`;
+        document.querySelector(ccpUserInput.iptCcpTableWidth).value = `${Appdata.imgW}`;
         // !VA Defaults for wrapper width and class
         document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value = `${Appdata.viewerW}`;
         document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
@@ -1817,15 +1839,20 @@ var Whitty = (function () {
     function handleCCPInput(event) {
       // !VA Get the Appdata for the input default value
       var data = appController.initGetAppdata();
-
+      var chkId, checkbox;
+      console.log('event.target.id is: ' + event.target.id);
       // !VA Toggle CCP checkboxes and run associated operations. The CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
 
       // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
       var wrapperItemsToShow = [];
 
-      // !VA With this faux checkmark structure, the clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it.
-      var checkbox = document.getElementById(event.target.id.replace('mrk', 'box'));
-      // !VA Toggle the target's checkbox 
+      // !VA With this faux checkmark structure, the clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it. 
+      // !VA Reboot: Also have to replace the 3-char element identifier.
+      chkId = event.target.id;
+      chkId = chkId.replace('mrk', 'box');
+      chkId = chkId.replace('spn', 'chk');
+      console.log('chkId is: ' + chkId);
+      checkbox = document.getElementById(chkId);
       checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
 
       // !VA Now run any actions associated with the checkbox
