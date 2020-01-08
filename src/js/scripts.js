@@ -5,34 +5,9 @@
 // !VA 01.03.20 b94eeb2 ESLint fixes
 // !VA 01.05.20 Naming Scheme Changes 1
 // !VA 01.06 Renaming with S&R Scripts in progress
- 
 
-/* !VA  01.05.20
-==================
-TODO: Naming Scheme changes
-TODO: CSS changes to Flexbox
-TODO: Update header and content
-TODO: Update icon and button names to reflect new naming scheme
+/* !VA  01.08.20 Branch: ToolbarFlexboxOverhaul */
 
-
-// !VA 01.06.20
-/* !VA  
-  DONE: Batch rename HTML elements in index-batch-01.html 
-  DONE: Batch rename HTML elemetns in scripts-batch-01.js
-  DONE: Manually rename iFilename
-  DONE: Manually rename iInspectors.
-  DONE: Batch rename Aliases.
-  */
-/* !VA  01.07.20 
-  DONE: Batch rename SCSS.
-  DONE: Manual changes to HTML and JS
-*/
-  
-/* !VA  01.08.20 
-  DONE: Make CCP HTML element names consistent with new naming scheme. THe scheme for CCP elements is: div = no 3-char element identifier prefix on the container. All the children get the 3-char element identifier prefix. Problem: ccp-but class is also appled to the container div as well as on the button itself, that needs to be fixed during the flexbox overhaul.
-  DONE: Updated checkbox naming in JS, SCSS and HTML 
-  TODO: Make image and img tags consistent with new naming scheme.
-*/
 
 // !VA GENERAL NOTES
 /* !VA  - January Reboot Notes
@@ -1264,7 +1239,8 @@ var Whitty = (function () {
               // !VA Hide the drop area.
                 document.querySelector(staticRegions.dropArea).style.display = 'none';
                 // !VA  Show the toolbar
-                document.querySelector(staticRegions.tbrContainer).style.display = 'block';
+                // !VA Reboot: block => flex
+                document.querySelector(staticRegions.tbrContainer).style.display = 'flex';
 
                 // !VA Display the current image
                 curImg.style.display = 'block';
@@ -2028,6 +2004,7 @@ var Whitty = (function () {
       // var Appdata = appController.initGetAppdata();
       // !VA Get the current (devimg) image dimensions and write the Inspectors
       // !VA Turn on the toolbars
+      // !VA Reboot 
       document.querySelector(staticRegions.tbrContainer).style.display = 'block';
       document.querySelector(dynamicRegions.curImg).style.display = 'block';
 

@@ -138,35 +138,39 @@
     <!-- #toolbar-container -->
     <div id="toolbar-container">
       <!-- #toolbar -->
-      <div class="toolbar-content">
+
 
         <!-- #toolbar-buttons -->
         <ul class="toolbar-buttons btn-group" role="group" aria-label="...">
           <!-- <li><div class="ttip"><button id="toggle-retina" type="button" class="btn btn-default" tabindex="3"></button><span class="ttiptext">Toggle Retina Dimensioning</span></div></li> -->
-          
-            <li><div class="ttip"><button id="tb-but-mobile-swap" type="button" class="btn btn-default"  tabindex="1"><img src="img/display-button.png" alt="witty.JS" /></button><span class="ttiptext">Swap mobile image</span></div></li>
+            <!-- VA! Reboot: removed -->
+            <!-- <li><div class="ttip"><button id="tb-but-mobile-swap" type="button" class="btn btn-default"  tabindex="1"><img src="img/display-button.png" alt="witty.JS" /></button><span class="ttiptext">Swap mobile image</span></div></li> -->
+            <!-- VA! Reboot: removed -->
+            <!-- <li role="separator"><img class="divider" src="img/divider.png" alt="witty.JS"></li> -->
             <!-- TODO: Replace this image with a SGV or HTML entity -->
-            <li role="separator"><img class="divider" src="img/divider.png" alt="witty.JS"></li>
-            <li><div class="ttip"><input id="ipt-tbr-viewerw" class="toolbar-buttons btn btn-default" type="text" value="650" tabindex="1"><span class="ttiptext">Enter container width as positive integer</span></div></li>
+            <li><div class="ttip"><input id="ipt-tbr-viewerw" class="toolbar-input btn btn-default" type="text" value="650" tabindex="1"><span class="ttiptext">Enter container width as positive integer</span></div></li>
             <!-- TODO: Replace this image with a SGV or HTML entity -->
+
+
+
             <li role="separator"><img class="divider" src="img/divider.png" alt="witty.JS"></li>
-            <li><div class="ttip"><button id="btn-tbr-incr50" type="button" class="btn btn-default"  tabindex="7"><img src="img/grow50-button.png" alt="witty.JS" /></button><span class="ttiptext">Grow image 50px</span></div></li>
-            <li><div class="ttip"><button id="btn-tbr-incr10" type="button" class="btn btn-default" tabindex="8"><img src="img/grow10-button.png" alt="witty.JS"/></button><span class="ttiptext">Grow image 10px</span></div></li>
-            <li><div class="ttip"><button id="btn-tbr-incr01" type="button" class="btn btn-default" tabindex="9"><img src="img/grow1-button.png" alt="witty.JS"/></button><span class="ttiptext">Grow image 1px</span></div></li>
+            <li><div class="ttip"><button id="btn-tbr-incr50" type="button" class="toolbar-but btn btn-default"  tabindex="7"></button><span class="ttiptext">Grow image 50px</span></div></li>
+            <li><div class="ttip"><button id="btn-tbr-incr10" type="button" class="toolbar-but btn btn-default" tabindex="8"></button><span class="ttiptext">Grow image 10px</span></div></li>
+            <li><div class="ttip"><button id="btn-tbr-incr01" type="button" class="toolbar-but btn btn-default" tabindex="9"></button><span class="ttiptext">Grow image 1px</span></div></li>
     
-            <li><div class="ttip"><input id="ipt-tbr-imgwidth" class="toolbox-buttons btn btn-default" type="text" placeholder="W (px)" tabindex="2"><span class="ttiptext">Enter image width as integer</span></div></li>
+            <li><div class="ttip"><input id="ipt-tbr-imgwidth" class="toolbar-input btn btn-default" type="text" placeholder="W (px)" tabindex="2"><span class="ttiptext">Enter image width as integer</span></div></li>
     
     
-            <li><div class="ttip"><input id="ipt-tbr-imgheight" class="toolbox-buttons btn btn-default" type="text" placeholder="H (px)" tabindex="3"><span class="ttiptext">Enter image height as integer</span></div></li>
+            <li><div class="ttip"><input id="ipt-tbr-imgheight" class="toolbar-input btn btn-default" type="text" placeholder="H (px)" tabindex="3"><span class="ttiptext">Enter image height as integer</span></div></li>
     
-            <li><div class="ttip"><button id="btn-tbr-decr01" type="button" class="btn btn-default" tabindex="10"><img src="img/shrink1-button.png" alt="witty.JS"/></button><span class="ttiptext">Shrink image 1px</span></div></li>
-            <li><div class="ttip"><button id="btn-tbr-decr10" type="button" class="btn btn-default" tabindex="11"><img src="img/shrink10-button.png" alt="witty.JS" /></button><span class="ttiptext">Shrink image 10px</span></div></li>
-            <li><div class="ttip"><button id="btn-tbr-decr50" type="button" class="btn btn-default" tabindex="12"><img src="img/shrink50-button.png" alt="witty.JS" /></button><span class="ttiptext">Shrink image 50px</span></div></li>
+            <li><div class="ttip"><button id="btn-tbr-decr01" type="button" class="toolbar-but btn btn-default" tabindex="10"></button><span class="ttiptext">Shrink image 1px</span></div></li>
+            <li><div class="ttip"><button id="btn-tbr-decr10" type="button" class="toolbar-but btn btn-default" tabindex="11"></button><span class="ttiptext">Shrink image 10px</span></div></li>
+            <li><div class="ttip"><button id="btn-tbr-decr50" type="button" class="toolbar-but btn btn-default" tabindex="12"></button><span class="ttiptext">Shrink image 50px</span></div></li>
 
           <li role="separator"><img class="divider" src="img/divider.png" alt="witty.JS"></li>
           <!-- VA! 900 is a dummy value that should be overwritten programmatically by the setAttribute property -->
-          <li><div class="ttip"><input id="ipt-tbr-sphones-width" class="toolbar-buttons btn btn-default" data-sphonesw="900" value="900" type="text" tabindex="4"><span class="ttiptext">Enter small phone width as positive integer</span></div></li>
-          <li><div class="ttip"><input id="ipt-tbr-lphones-width" class="toolbar-buttons btn btn-default" data-lphonesw="900" value="900" type="text" tabindex="5"><span class="ttiptext">Enter large phone width as positive integer</span></div></li>
+          <li><div class="ttip"><input id="ipt-tbr-sphones-width" class="toolbar-input btn btn-default" data-sphonesw="900" value="900" type="text" tabindex="4"><span class="ttiptext">Enter small phone width as positive integer</span></div></li>
+          <li><div class="ttip"><input id="ipt-tbr-lphones-width" class="toolbar-input btn btn-default" data-lphonesw="900" value="900" type="text" tabindex="5"><span class="ttiptext">Enter large phone width as positive integer</span></div></li>
 
           <!-- !VA toggle image size is deprecated -->
           <!-- <li><div class="ttip"><button id="toggle-image-size" type="button" class="btn btn-default" tabindex="6"></button><span class="ttiptext">Toggle display size/size on disk</span></div></li> -->
@@ -174,7 +178,7 @@
         </ul> 
         <!-- /#toolbar-buttons -->
 
-      </div><!-- /#toolbar -->
+
     </div><!-- /#toolbar-container -->
 
     <!-- #image-viewport -->

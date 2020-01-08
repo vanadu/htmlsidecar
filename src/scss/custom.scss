@@ -10,23 +10,33 @@
   border: 1px solid green !important;
 }
 
-body {
-  font-family: $primary-font-family;
-  font-size: 1rem;
-
-  // position: relative;
-  // height: auto;
-  // min-height: 100% !important;
-  min-height:100% !important; 
+.devmag {
+  border: 1px solid magenta !important;
 }
 
-/* TYPE */
+// VA! START STYLING
 
+// VA! Reboot: Overriding the default Bootstrap root font size of 10px
+html {
+  font-size: 16px;
+}
+
+
+body {
+  // VA!Reboot: not sure what this does.
+  min-height: 100% !important; 
+  font-family: $primary-font-family;
+  font-size: 1rem;
+}
+
+/* TYPOGRAPHY */
+
+// VA! Reboot: only for content, probably can delete
 span.code {
   font-family: 'Courier New', monospace;
 }
 
-
+// VA! Reboot: not sure what this does
 // FIX
 button:disabled  {
   opacity: .45;
@@ -178,109 +188,6 @@ button:disabled  {
 }
 
 
-
-// IMAGE TOOLBAR
-.toolbar {
-  display: block;
-  position: relative;
-  width: 100%;
-  height: 35px;
-  margin: 0 auto;
-  background: $image-toolbar-bkgd-color;
-  // z-index: 100;
-}
-
-// UL -- Toolbar button container 
-.toolbar-buttons {
-  display: block;
-  width: 840px;
-  margin: 0 auto;
-  padding: 0;
-  li {
-    display: inline;
-    margin: 0;
-    padding: 0;
-    button {
-      display: inline;
-      margin: 0;
-      padding: 0;
-    }
-    input {
-      width: 50px;
-      height: 32px;
-      margin:0;
-      padding:0;
-      font-size: 14px;
-      font-style: italic;
-      line-height: 18px;
-      text-align: center;
-    }
-    img {
-      width: 50px;
-      height: 30px;
-      margin: 0;
-      vertical-align: middle;
-      &.divider {
-        width: 5px;
-        height: 18px;
-        margin: 0 7px;
-        opacity: .2;
-      }
-    }
-    #tb-but-mobile-swap {
-      width: 90px;
-      text-align: center;
-
-    }
-    #ipt-tbr-viewerw {
-      width: 80px;
-      padding-left: 30px;
-      text-align: center;
-      background: url('../img/table-icon.png') no-repeat scroll 7px 7px;
-    }
-    #ipt-tbr-sphones-width {
-      width: 70px;
-      padding-left: 30px;
-      background: url('../img/small-phones-toolbar-icon.png') no-repeat scroll 12px 2px;
-      background-size: 15px 26px;
-    }
-    #ipt-tbr-lphones-width {
-      width: 90px;
-      padding-left: 30px;
-      background: url('../img/large-phones-toolbar-icon.png') no-repeat scroll 7px 2px;
-      background-size: 34px 24px;
-    }
-    #toggle-retina, #toggle-image-size {
-      width: 50px;
-      height: 32px;
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: 45px 27px;
-    }
-    #toggle-retina {
-      background-image: url('../img/retina-button.png');
-    }
-    
-    #toggle-retina.active {
-    background-image: url('../img/retina-button-active.png');
-    }
-    
-    #toggle-image-size {
-      background-image: url('../img/display-button.png');
-      .active {
-        background-image: url('../img/disk-button.png');
-      }
-    }
-  }
-}
-
-// TODO: Nest this under toolbar-buttons so that the JS works to make it
-// disappear on focus
-input:focus::-webkit-input-placeholder { color:transparent; }
-input:focus:-moz-placeholder { color:transparent; } /* FF 4-18 */
-input:focus::-moz-placeholder { color:transparent; } /* FF 19+ */
-input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
-
 // APP-CONTAINER
 #app-container {
   display: block;
@@ -288,18 +195,20 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   // VA! This yields a viewport width of 802, which allows a user-entered width of 800 max
   width: 850px;
   min-height: 679px;
-  // padding: 0 30px;
   margin: 15px auto 100px;
+  border: 1px solid blue;
 }
 
 // TOOLS
+// VA! Reboot 
 #toolbar-container {
   display: none;
   position: absolute;
-  // top: -150px;
   top: 0;
   left: 0;
   width: 100%;
+  height: 35px;
+  border: 1px solid magenta;
   &.show-err {
     transform: translate(0, 50px);
     transition: transform 250ms;
@@ -313,6 +222,131 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
     // -webkit-transition: -webkit-transform 500ms;
   }
 }
+
+// IMAGE TOOLBAR
+// VA! Reboot: not even sure this one is necessary
+/* VA! Reboot: removed this in HTML
+.toolbar-content {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 35px;
+  background: $image-toolbar-bkgd-color;
+}
+*/
+
+// UL -- Toolbar button container 
+.toolbar-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
+  margin: 0 auto;
+  padding: 0;
+  list-style-type: none;
+  // VA! Reboot: replacing all the element selectors with class selectors and removing their parent li selector from the hierarchy
+  .btn {
+    // VA! Overrides Bootstrap default padding in buttons.less
+    padding: 0;
+  }
+  // VA! Reboot: deleted input selector, moved input styling to class .toolbar-input
+  .toolbar-input {
+    width: 50px;
+    height: 32px;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    font-style: italic;
+    line-height: 18px;
+    text-align: center;
+  }
+  // VA! Reboot: Style all the toolbar buttons
+  .toolbar-but {
+    width: 50px;
+    height: 30px;
+    background-size: cover;
+  }
+  // VA! Reboot: deleted img selector, moved img styling to class .toolbar-but
+  // VA! Reboot: deleted .divider child selector under input selector, moved divider styling to class .divider
+  .divider {
+    width: 5px;
+    height: 18px;
+    margin: 0 7px;
+    opacity: .2;
+  }
+  // VA! Reboot: deleted img element in HTML and set the background image of each toolbar-button to its corresponding image
+  #btn-tbr-incr50 {
+    background-image: url('../img/incr50-button.png');
+  }
+  #btn-tbr-incr10 {
+    background-image: url('../img/incr10-button.png');
+  }
+  #btn-tbr-incr01 {
+    background-image: url('../img/incr01-button.png');
+  }
+  #btn-tbr-decr01 {
+    background-image: url('../img/decr01-button.png');
+  }
+  #btn-tbr-decr10 {
+    background-image: url('../img/decr10-button.png');
+  }
+  #btn-tbr-decr50 {
+    background-image: url('../img/decr50-button.png');
+  }
+  // VA! Reboot: Deleted #tb-but-mobile-swap 
+  #ipt-tbr-viewerw {
+    width: 80px;
+    padding-left: 30px;
+    text-align: center;
+    background: url('../img/table-icon.png') no-repeat scroll 7px 7px;
+  }
+  #ipt-tbr-sphones-width {
+    width: 70px;
+    padding-left: 30px;
+    background: url('../img/small-phones-toolbar-icon.png') no-repeat scroll 12px 2px;
+    background-size: 15px 26px;
+  }
+  #ipt-tbr-lphones-width {
+    width: 85px;
+    padding-left: 30px;
+    background: url('../img/large-phones-toolbar-icon.png') no-repeat scroll 7px 2px;
+    background-size: 34px 24px;
+  }
+  /* VA! Reboot: Removing all this superluous functionality
+  #toggle-retina, #toggle-image-size {
+    width: 50px;
+    height: 32px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 45px 27px;
+  }
+  #toggle-retina {
+    background-image: url('../img/retina-button.png');
+  }
+  
+  #toggle-retina.active {
+  background-image: url('../img/retina-button-active.png');
+  }
+  
+  #toggle-image-size {
+    background-image: url('../img/display-button.png');
+    .active {
+      background-image: url('../img/disk-button.png');
+    }
+  }
+  */
+}
+
+// TODO: Nest this under toolbar-buttons so that the JS works to make it
+// disappear on focus
+// VA! Reboot: I don't know what this does.
+input:focus::-webkit-input-placeholder { color:transparent; }
+input:focus:-moz-placeholder { color:transparent; } /* FF 4-18 */
+input:focus::-moz-placeholder { color:transparent; } /* FF 19+ */
+input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
+
+
+
 
 // IMAGE-VIEWPORT- contains dim viewer, dim-error-container and ccp
 #image-viewport {
