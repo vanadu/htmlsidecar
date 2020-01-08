@@ -15,19 +15,27 @@ TODO: Update header and content
 TODO: Update icon and button names to reflect new naming scheme
 
 
-// !VA 01.07.20
+// !VA 01.06.20
 /* !VA  
   DONE: Batch rename HTML elements in index-batch-01.html 
   DONE: Batch rename HTML elemetns in scripts-batch-01.js
   DONE: Manually rename iFilename
   DONE: Manually rename iInspectors.
   DONE: Batch rename Aliases.
+  */
+/* !VA  01.07.20 
   DONE: Batch rename SCSS.
-
-
-
+  TODO: Manual changes to HTML and JS
 
 */
+  
+// !VA GENERAL NOTES
+
+/* !VA  - 01.07.20
+=========================================================
+TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer WIDTH. That's no good.
+TODO: There's extra whitespace above the Inspector pane. That should go away when we convert to flexbox. 
+/*
 
 
 /* !VA  - 06.23.19
@@ -72,7 +80,7 @@ DONE: Show/Hide CCP, make checkboxes functional.
 //PAGE SETUP START
 
 // Namespace
-var Witty = (function () {
+var Whitty = (function () {
 
   // !VA DEV Test function to get the clicked element to the console
   // (function () {
@@ -202,8 +210,6 @@ var Witty = (function () {
       // console.log('Appdata queried here is:');
       // console.log('iInspectors is: ' + iInspectors);
       // console.dir(iInspectors);
-      console.log('Appdata is:');
-      console.dir(Appdata);
       // !VA Size On Disk is NOT 2X the Display Size: flag Size on Disk and Retina
       var curInspector = [];
       if (Appdata.imgNW <= (Appdata.imgW * 2) ) {
@@ -217,12 +223,6 @@ var Witty = (function () {
       if (Appdata.imgNW < (Appdata.lPhonesW * 2) ) {
         curInspector.push(allInspectors.iLargePhones);
       } 
-
-
-      console.log('allInspectors is:');
-      console.dir(allInspectors);
-      console.log('curInspector is:');
-      console.dir(curInspector);
 
       // !VA Reset all the dim viewer alerts by passing in the entire Inspector array
       UIController.writeInspectorAlerts(iInspectors, false);
@@ -352,10 +352,6 @@ var Witty = (function () {
       //UIController public writeInspectorAlerts
       writeInspectorAlerts: function(curInspectors, bool) {
         // !VA if evalInspectorAlerts returns true, then the Inspector should be displayed in red. To reset the dim alert, set to style color to 'auto'.
-        console.log('writeInspectorAlerts');
-        console.dir(curInspectors);
-
-
         var att = bool;
         bool ? att = 'red': att = 'inherit';
         // !VA We want to use this same function to reset the dim alerts when a new image is loaded. For that, we need to pass in an array of all the Inspector IDs, not just an array of the ones that are already red. So, first test if the argument is an object, and if it is convert it into a list of values so the loop will accept it.
@@ -1356,7 +1352,8 @@ var Witty = (function () {
       console.log('handleMouseEvents');
       // !VA Carryover from earlier handleUserAction
       // !VA Get the target element of the click
-      el = document.getElementById(this.id);
+      var el = document.getElementById(this.id);
+      console.log('el.id is: ' + el.id);
       var args = { };
       args.target = el.id;
       
@@ -1364,9 +1361,11 @@ var Witty = (function () {
       // !VA Handle the increment toolbuttons
       if (event.type === 'click') {
         switch (true) {
-        case ( el.id.includes('tb-but')) :
+        case ( el.id.includes('tbr')) :
           // !VA Variable to hold the name of the Appdata property the event corresponds to
-          var prop, val;
+          // !VA prop not defined
+          //var prop, val, isErr; 
+          var val, isErr;
           // !VA We need to query Appdata properties to get the current value of imgW so we can add the toolbutton increments to id
           var Appdata = {};
           Appdata = appController.initGetAppdata();
@@ -1375,7 +1374,7 @@ var Witty = (function () {
           // !VA The last 2 chars of the id indicate the value by which the img dimension should be incremented,so get the last 2 chars and convert to integer
           val = parseInt(el.id.slice(-2));
           // !VA If the target ID includes 'grow' then the image dimension will be incremented, if 'shrink' then it will be decremented
-          (el.id.includes('grow')) ? val : val = -val;
+          (el.id.includes('incr')) ? val : val = -val;
           // !VA Add val to the current imgW to get the value to be passed to checkUserInput for error parsing.
           val = Appdata.imgW + val;
           args.val = val;
@@ -1394,10 +1393,10 @@ var Witty = (function () {
         }
         // !VA TODO: Revisit this
       }  else if ( event.type === 'drop') {
-        e.preventDefault;
+        evt.preventDefault;
         // !VA TODO: Revisit this
       } else if ( event.type === 'dragover') {
-        e.preventDefault;
+        evt.preventDefault;
       } 
     }
           
@@ -1491,6 +1490,8 @@ var Witty = (function () {
     // !VA TODO: rename to checkUserInput and include parsing of the toolbutton mouseclicks from handleToolbarClicks.
     function checkUserInput(args) {
       // !VA Destructure args
+      console.log('checkUserInput running...');
+      console.dir(args);
       const { target, prop, val } = args;
       var errCode;
       var isErr;

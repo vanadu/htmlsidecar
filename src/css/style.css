@@ -1335,22 +1335,22 @@ input:focus:-ms-input-placeholder {
     #inspector-container li .pop-font {
       color: rgba(255, 255, 255, 0.9); }
 
-#clipboard-but-container {
+#btn-toggle-ccp-container {
   position: absolute;
   top: 36px;
   left: 50%;
   width: 100%;
   margin-left: -40px; }
-  #clipboard-but-container #btn-toggle-ccp {
+  #btn-toggle-ccp-container #btn-toggle-ccp {
     width: 40px;
     height: 47px;
     margin-right: 20px;
     border: 0;
     background-color: transparent;
-    background-image: url(../img/clipboard.png);
+    background-image: url("../img/clipboard.png");
     background-position: center top;
     background-size: 40px 47px; }
-    #clipboard-but-container #btn-toggle-ccp.active {
+    #btn-toggle-ccp-container #btn-toggle-ccp.active {
       background-image: url("../img/clipboard-hover.png"); }
 
 #msg-container {

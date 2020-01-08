@@ -425,7 +425,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   }
 }
 
-#clipboard-but-container {
+#btn-toggle-ccp-container {
   position: absolute;
   top: 36px;
   left: 50%;
@@ -437,7 +437,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
     margin-right: 20px;
     border: 0;
     background-color: transparent;
-    background-image: url(../img/clipboard.png);
+    background-image: url('../img/clipboard.png');
     background-position: center top;
     background-size: 40px 47px; 
     &.active {
