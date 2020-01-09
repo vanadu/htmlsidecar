@@ -2045,7 +2045,7 @@ var Whitty = (function () {
       calcViewerSize();
       // !VA Open the CCP by default in dev mode
       // !VA First, set it to the opposite of how you want to start it.
-      document.querySelector(staticRegions.ccpContainer).classList.add('active');
+      document.querySelector(staticRegions.ccpContainer).classList.remove('active');
       // !VA Then run initCCP to initialize
 
       initCCP();
