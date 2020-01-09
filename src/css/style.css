@@ -1,16 +1,4 @@
 @charset "UTF-8";
-.dim-text {
-  color: #B7B233;
-  font-family: "Ubuntu", Arial, Helvetica, sans-serif;
-  font-size: 110%;
-  font-weight: bold; }
-
-.whit-text {
-  color: #B77033;
-  font-family: "Ubuntu", Arial, Helvetica, sans-serif;
-  font-size: 110%;
-  font-weight: normal; }
-
 /*! normalize.css v5.0.0 | MIT License | github.com/necolas/normalize.css */
 /**
  * 1. Change the default font family in all browsers (opinionated).
@@ -1158,8 +1146,7 @@ button:disabled {
   top: 0;
   left: 0;
   width: 100%;
-  height: 35px;
-  border: 1px solid magenta; }
+  height: 35px; }
   #toolbar-container.show-err {
     transform: translate(0, 50px);
     transition: transform 250ms; }
@@ -1242,8 +1229,8 @@ button:disabled {
   .toolbar-buttons #ipt-tbr-viewerw {
     width: 80px;
     padding-left: 30px;
-    text-align: center;
-    background: url("../img/table-icon.png") no-repeat scroll 7px 7px; }
+    background: url("../img/table-icon.png") no-repeat scroll 7px 7px;
+    text-align: center; }
   .toolbar-buttons #ipt-tbr-sphones-width {
     width: 70px;
     padding-left: 30px;
@@ -1287,98 +1274,95 @@ input:focus:-ms-input-placeholder {
   z-index: 2; }
 
 #inspector-container {
-  display: block;
+  display: flex;
   position: absolute;
-  top: 45px;
+  top: 50px;
+  justify-content: space-evenly;
   width: 100%;
-  height: 100px;
-  margin: 0 auto 10px;
-  background-color: #000000;
-  z-index: 3;
-  overflow: hidden; }
-
-#inspector-container {
-  font-family: "Ubuntu", Arial, Helvetica, sans-serif;
-  font-weight: normal;
-  font-size: 1em;
-  display: block;
-  position: relative;
-  top: 0;
-  width: 98%;
   height: 95px;
-  margin: 0 auto;
-  color: #FFFFFF; }
+  margin: 0;
+  padding: 0;
+  background-color: #000000;
+  color: #a0a0a0;
+  overflow: hidden;
+  z-index: 3; }
   #inspector-container.show-err {
     transform: translate(0, -85px);
     transition: transform 250ms; }
   #inspector-container.hide-err {
     transform: translate(0, 0);
     transition: transform 250ms; }
-  #inspector-container #i-filename {
-    display: block;
-    position: absolute;
-    top: 5px;
-    width: 100%;
-    height: 22px;
-    margin: 0 auto;
-    padding: 0 40px 0 0;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 1.365em;
-    text-align: center; }
-  #inspector-container .inspectors-left-col {
-    position: relative;
-    top: 15px;
-    width: 260px;
-    float: left; }
-    #inspector-container .inspectors-left-col ul {
-      width: 220px;
-      float: right; }
-  #inspector-container .inspectors-right-col {
-    position: relative;
-    top: 15px;
-    width: 300px;
-    float: right; }
-    #inspector-container .inspectors-right-col ul {
-      float: left; }
-  #inspector-container li {
-    padding: 2px 2px 2px 0px;
-    border: 0;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 1.365em;
-    text-transform: uppercase;
-    list-style-type: none; }
-    #inspector-container li#i-display-size::before {
-      content: 'Display size: '; }
-    #inspector-container li#i-disk-size::before {
-      content: 'Size on Disk: '; }
-    #inspector-container li#i-aspect::before {
-      content: 'Aspect Ratio: '; }
-    #inspector-container li#i-small-phones::before {
-      content: 'Small Phones: '; }
-    #inspector-container li#i-large-phones::before {
-      content: 'Large Phones: '; }
-    #inspector-container li#i-retina::before {
-      content: 'Retina: '; }
-    #inspector-container li .pop-font {
-      color: rgba(255, 255, 255, 0.9); }
 
-#btn-toggle-ccp-container {
-  position: absolute;
-  top: 36px;
-  left: 50%;
-  width: 100%;
-  margin-left: -40px; }
-  #btn-toggle-ccp-container #btn-toggle-ccp {
-    width: 40px;
-    height: 47px;
-    margin-right: 20px;
-    border: 0;
-    background-color: transparent;
-    background-image: url("../img/clipboard.png");
-    background-position: center top;
-    background-size: 40px 47px; }
-    #btn-toggle-ccp-container #btn-toggle-ccp.active {
-      background-image: url("../img/clipboard-hover.png"); }
+.inspectors-left-col, .inspectors-right-col, .inspectors-center-col {
+  display: flex; }
+
+.inspector-list {
+  width: 240px;
+  margin: 0;
+  padding: 0; }
+
+.inspectors-left-col {
+  justify-content: flex-end;
+  width: 280px; }
+
+.inspectors-right-col {
+  justify-content: flex-end;
+  width: 300px; }
+
+.inspectors-center-col {
+  flex-direction: column;
+  justify-content: center;
+  width: 200px;
+  margin-top: -15px; }
+
+.inspector {
+  padding: 2px 2px 2px 0px;
+  border: 0;
+  font-family: "Ubuntu", Arial, Helvetica, sans-serif;
+  font-size: 1em;
+  font-weight: normal;
+  text-transform: uppercase;
+  list-style-type: none; }
+
+#btn-toggle-ccp-container #btn-toggle-ccp {
+  display: block;
+  width: 40px;
+  height: 47px;
+  margin: 10px auto 0;
+  border: 0;
+  background-color: transparent;
+  background-image: url("../img/clipboard.png");
+  background-position: center top;
+  background-size: 40px 47px; }
+  #btn-toggle-ccp-container #btn-toggle-ccp.active {
+    background-image: url("../img/clipboard-hover.png"); }
+
+#i-filename {
+  height: 22px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  text-align: center; }
+
+#i-display-size::before {
+  content: 'Display size: '; }
+
+#i-disk-size::before {
+  content: 'Size on Disk: '; }
+
+#i-aspect::before {
+  content: 'Aspect Ratio: '; }
+
+#i-small-phones::before {
+  content: 'Small Phones: '; }
+
+#i-large-phones::before {
+  content: 'Large Phones: '; }
+
+#i-retina::before {
+  content: 'Retina: '; }
+
+.pop-font {
+  color: rgba(255, 255, 255, 0.9); }
 
 #msg-container {
   display: block;

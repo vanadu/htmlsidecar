@@ -1,4 +1,4 @@
-@import '../scss/variables/variables';
+// @import '../scss/variables';
 @import '../scss/base/normalize';
 @import '../scss/base/grid-system';
 @import '../scss/base/web-font';
@@ -8,4 +8,4 @@
 @import '../scss/form/form';
 @import '../scss/layouts/layouts';
 @import '../scss/helpers/helpers';
-@import 'custom';
+@import '../scss/custom';

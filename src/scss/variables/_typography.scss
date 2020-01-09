@@ -4,16 +4,19 @@ $inspector-font-family: 'Ubuntu', Arial, Helvetica, sans-serif;
 // VA! This is the old logo font, has nothing to do with the app
 $dimwhit-font-family: 'Ubuntu', Arial, Helvetica, sans-serif;
 
-.dim-text { 
-  color: $dim-color; 
-  font-family: $dimwhit-font-family;
-  font-size: 110%;
-  font-weight: bold;
-}
-
-.whit-text { 
-  color: $whit-color; 
-  font-family: $dimwhit-font-family;
-  font-size: 110%;
-  font-weight: normal;
-}
+// VA! Reboot: not used
+// .dim-text { 
+//   color: $dim-color; 
+//   font-family: $dimwhit-font-family;
+//   font-size: 110%;
+//   font-weight: bold;
+// }
+  
+  
+// VA! Reboot: not used
+// .whit-text { 
+//   color: $whit-color; 
+//   font-family: $dimwhit-font-family;
+//   font-size: 110%;
+//   font-weight: normal;
+// }
