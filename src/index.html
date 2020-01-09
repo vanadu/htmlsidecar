@@ -196,7 +196,7 @@
           <!-- #ccp-content -->
           <fieldset id="ccp-img-options" class="ccp-fieldset">
             <legend>&lt;img&gt; Options</legend>
-
+              <div class="ccp-options-container">
                 <div class="ccp-options-col-1"> 
                     <!-- VA! Reboot: why no parent div here?-->
                     <button id="btn-ccp-img-build-html-clip" class="ccp-but"></button> 
@@ -268,7 +268,7 @@
                     <button id="btn-ccp-img-smphn-build-css-clip" class="ccp-but"></button> 
                   </div> 
                 </div> 
-
+              </div> <!-- VA! Test -->
             <!-- /This element is populated dynamically in scripts.js -->
           </fieldset>
           <!-- /fieldset #image-options -->
@@ -277,7 +277,7 @@
             <!-- /This element is populated dynamically in scripts.js -->
   
               <legend>&lt;td&gt; Options</legend> 
-
+              <div class="ccp-options-container">
                 <div class="ccp-options-col-1"> 
                   <!-- VA! Reboot: why no parent div here? -->
                     <button id="btn-ccp-td-build-html-clip" class="ccp-but"></button> 
@@ -333,7 +333,7 @@
                   <button id="btn-ccp-td-lgphn-build-css-clip" class="ccp-but"></button> 
                   <button id="btn-ccp-td-smphn-build-css-clip" class="ccp-but"></button> 
                 </div> 
-
+              </div>
             </fieldset>
   
   
@@ -341,91 +341,87 @@
           <!-- /This element is populated dynamically in scripts.js -->
 
             <legend>&lt;table&gt; Options</legend> 
-            <div id="ccp-table-options" class="ccp-options"> 
-              <div class="ccp-options-col-1">
-                  <!-- VA! Reboot: why no parent div here-->
-                <button id="btn-ccp-table-build-html-clip" class="ccp-but"></button> 
-              </div> 
-    
-              <div class="ccp-options-col-2">
+              <div id="ccp-table-options" class="ccp-options"> 
+
+              <div class="ccp-options-container">  
+                <div class="ccp-options-col-1">
+                    <!-- VA! Reboot: why no parent div here-->
+                  <button id="btn-ccp-table-build-html-clip" class="ccp-but"></button> 
+                </div> 
+                <div class="ccp-options-col-2">
                   <p class="ccp-heading">Parent Table</p>
-                <div id="ccp-table-class"> 
-                  <label for="ipt-ccp-table-class">class=</label>
-                  <input id="ipt-ccp-table-class" placeholder="none" />  
-                </div> 
-                <div id="ccp-table-align"> 
-                  <label id="ccp-table-align-label" for="sel-ccp-table-align">align=</label> 
-                  <!-- We can hard code these because there isn't any dynamic data -->
-                  <select id="sel-ccp-table-align"> 
-                    <option>none</option>
-                    <option>left</option> 
-                    <option selected="selected">center</option> 
-                    <option>right</option> 
-                  </select>
+                  <div id="ccp-table-class"> 
+                    <label for="ipt-ccp-table-class">class=</label>
+                    <input id="ipt-ccp-table-class" placeholder="none" />  
+                  </div> 
+                  <div id="ccp-table-align"> 
+                    <label id="ccp-table-align-label" for="sel-ccp-table-align">align=</label> 
+                    <!-- We can hard code these because there isn't any dynamic data -->
+                    <select id="sel-ccp-table-align"> 
+                      <option>none</option>
+                      <option>left</option> 
+                      <option selected="selected">center</option> 
+                      <option>right</option> 
+                    </select>
+                  </div>
+                  <div id="ccp-table-width">
+                      <label id="ipt-ccp-table-width-label" for="ipt-ccp-table-width">width=</label> 
+                      <input id="ipt-ccp-table-width" value="" placeholder="" />
+                  </div>
+                  <div id="ccp-table-bgcolor">
+                      <label for="ipt-ccp-table-bgcolor" id="ipt-ccp-table-bgcolor-label">bgcolor=</label>
+                      <input type="text" id="ipt-ccp-table-bgcolor" placeholder="none" value="" />
+                  </div> 
                 </div>
-                <div id="ccp-table-width">
-                    <label id="ipt-ccp-table-width-label" for="ipt-ccp-table-width">width=</label> 
-                    <input id="ipt-ccp-table-width" value="" placeholder="" />
+                <div class="ccp-options-col-3"> 
+                  <div id="ccp-table-include-wrapper"> 
+                    <!-- !VA watch out... the 'for' might be wrong -->
+                    <!-- VA! Reboot: This is still wrong...see how it renders-->
+                    <!-- VA! This is the outer label-->
+                    <p class="ccp-heading">Wrapper Table</p>
+                      <label class="ccp-table-include-wrapper-container mock-checkbox-container" id="ccp-table-include-wrapper-container" for="chk-ccp-table-include-wrapper-checkbox">
+                        <!-- VA! This is the inner label - the click area for the checkbox-->
+                        <label class="ccp-table-include-wrapper-label mock-checkbox" id="ccp-table-include-wrapper-label" for="chk-ccp-table-include-wrapper-checkbox">Include wrapper table
+                        </label>
+                      <!-- The default checkbox is hidden -->
+                      <input type="checkbox" id="chk-ccp-table-include-wrapper-checkbox">
+                      <span id="spn-ccp-table-include-wrapper-checkmrk"></span>
+                      <!-- VA! These options are set in handleTableWidth -->
+                    </label> 
+                  </div> 
+                  <div id="ccp-table-wrapper-class"> 
+                      <label label="ipt-ccp-table-wrapper-class-label" for="ipt-ccp-table-wrapper-class">class=</label>
+                      <input id="ipt-ccp-table-wrapper-class" placeholder="none" />  
+                  </div> 
+                  <div id="ccp-table-wrapper-width"> 
+                      <label id="ipt-ccp-table-wrapper-width-label" for="ipt-ccp-table-wrapper-width">width=</label>
+                      <input id="ipt-ccp-table-wrapper-width" placeholder="none" />  
+                  </div> 
+                  <div id="ccp-table-wrapper-align"> 
+                    <label id="sel-ccp-table-wrapper-align-label" for="sel-ccp-table-wrapper-align">align=</label>
+                    <select id="sel-ccp-table-wrapper-align"> 
+                      <option>none</option>
+                      <option>left</option> 
+                      <option selected="selected">center</option> 
+                      <option>right</option> 
+                    </select>
+                  </div> 
+                  <div id="ccp-table-wrapper-bgcolor"> 
+                      <label id="ipt-ccp-table-wrapper-bgcolor-label" for="ipt-ccp-input-table-wrapper-bgcolor">bgcolor=</label>
+                      <input id="ipt-ccp-input-table-wrapper-bgcolor" placeholder="none" />  
+                  </div> 
                 </div>
-                <div id="ccp-table-bgcolor">
-                    <label for="ipt-ccp-table-bgcolor" id="ipt-ccp-table-bgcolor-label">bgcolor=</label>
-                    <input type="text" id="ipt-ccp-table-bgcolor" placeholder="none" value="" />
+
+                <div class="ccp-options-col-4"> 
+                  <button id="btn-ccp-table-dsktp-build-css-clip" class="ccp-but"></button> 
+                  <button id="btn-ccp-table-lgphn-build-css-clip" class="ccp-but"></button> 
+                  <button id="btn-ccp-table-smphn-build-css-clip" class="ccp-but"></button> 
                 </div> 
-                <!--  
-                <div id="ccp-table-max-width">
-                    <label for="ccp-input-table-max-width">max-width:</label>
-                    <input id="ccp-input-table-max-width" value="" placeholder="" />
+
                 </div>
-                -->
-              </div>
 
-
-              <div class="ccp-options-col-3"> 
-                <div id="ccp-table-include-wrapper"> 
-                  <!-- !VA watch out... the 'for' might be wrong -->
-                  <!-- VA! Reboot: This is still wrong...see how it renders-->
-                  <!-- VA! This is the outer label-->
-                  <p class="ccp-heading">Wrapper Table</p>
-                    <label class="ccp-table-include-wrapper-container mock-checkbox-container" id="ccp-table-include-wrapper-container" for="chk-ccp-table-include-wrapper-checkbox">
-                      <!-- VA! This is the inner label - the click area for the checkbox-->
-                      <label class="ccp-table-include-wrapper-label mock-checkbox" id="ccp-table-include-wrapper-label" for="chk-ccp-table-include-wrapper-checkbox">Include wrapper table
-                      </label>
-                    <!-- The default checkbox is hidden -->
-                    <input type="checkbox" id="chk-ccp-table-include-wrapper-checkbox">
-                    <span id="spn-ccp-table-include-wrapper-checkmrk"></span>
-                    <!-- VA! These options are set in handleTableWidth -->
-                  </label> 
-                </div> 
-                <div id="ccp-table-wrapper-class"> 
-                    <label label="ipt-ccp-table-wrapper-class-label" for="ipt-ccp-table-wrapper-class">class=</label>
-                    <input id="ipt-ccp-table-wrapper-class" placeholder="none" />  
-                </div> 
-                <div id="ccp-table-wrapper-width"> 
-                    <label id="ipt-ccp-table-wrapper-width-label" for="ipt-ccp-table-wrapper-width">width=</label>
-                    <input id="ipt-ccp-table-wrapper-width" placeholder="none" />  
-                </div> 
-                <div id="ccp-table-wrapper-align"> 
-                  <label id="sel-ccp-table-wrapper-align-label" for="sel-ccp-table-wrapper-align">align=</label>
-                  <select id="sel-ccp-table-wrapper-align"> 
-                    <option>none</option>
-                    <option>left</option> 
-                    <option selected="selected">center</option> 
-                    <option>right</option> 
-                  </select>
-                </div> 
-                <div id="ccp-table-wrapper-bgcolor"> 
-                    <label id="ipt-ccp-table-wrapper-bgcolor-label" for="ipt-ccp-input-table-wrapper-bgcolor">bgcolor=</label>
-                    <input id="ipt-ccp-input-table-wrapper-bgcolor" placeholder="none" />  
-                </div> 
-              </div>
-
-              <div class="ccp-options-col-4"> 
-                <button id="btn-ccp-table-dsktp-build-css-clip" class="ccp-but"></button> 
-                <button id="btn-ccp-table-lgphn-build-css-clip" class="ccp-but"></button> 
-                <button id="btn-ccp-table-smphn-build-css-clip" class="ccp-but"></button> 
-              </div> 
-            </div><!-- /#ccp-table-options -->
-
+              </div><!-- /#ccp-table-options -->
+            </div>
           </fieldset>
 
         </div><!-- /#ccp-content -->

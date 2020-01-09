@@ -749,7 +749,6 @@ output {
   // margin: 0 auto;
   padding: 0 10px;
   // Global CCP character styles
-
   input, label {
     color: #FFFFFF;
     font-size: 14px;
@@ -772,12 +771,13 @@ output {
 
   // VA! Set the width of the 4 options columns in each fieldset
   fieldset {
+    // VA! Reboot - Applying flex to fieldset didn't work
+    display: block;
     position: relative;
     width: 100%;
     margin-bottom: 5px;
     border: 1px solid $fieldset-border-color;
     border-radius: 5px;
-
     legend {
       width: 145px;
       height: 20px;
@@ -817,11 +817,22 @@ output {
 
   }
 }
+// VA! This fixes the discrepancy between Firefox and Chrome with the alignment of the ccp-columns
+.ccp-options-container {
+  position: relative;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+
 // VA! Reboot: NEW
 // VA! All the columns are absolutely positioned 2px from top
 .ccp-options-col-1, .ccp-options-col-2, .ccp-options-col-3, .ccp-options-col-4 {
-  position: absolute;
+  // VA! Reboot: positioning now done by flex on the parent container
+  display: block;
   top: 2px;
+  margin: 0;
+  padding: 0;
 }
 .ccp-options-col-1 {
   // !VA Width is actually irrelevant here since these elements are absolutely positioned
@@ -1324,6 +1335,21 @@ figure {
 }
 
 #test-right * {
-  border: 1px solid magenta;
 }
 
+
+
+/* VA! Fix for Firefox displaying extra styling on Select elements on Linux. Note: the dropdown options still show with white text on black background but I can live with that. Thanks to: https://stackoverflow.com/questions/44147362/firefox-overriding-style-of-html-select-option
+But note that it's possible that I've disabled Multiprocess (about:support) on my Windows Firefox versions. That needs to be tested before I go shooting my mouth off about this on SO.
+*/
+/* VA! ALSO: about the @supports rule...
+https://developer.mozilla.org/en-US/docs/Web/CSS/@supports   */
+@supports (-moz-appearance:none) {
+  select
+  {
+  -moz-appearance:none !important;
+  background: white url('data:image/gif;base64,R0lGODlhBgAGAKEDAFVVVX9/f9TU1CgmNyH5BAEKAAMALAAAAAAGAAYAAAIODA4hCDKWxlhNvmCnGwUAOw==') right center no-repeat !important;
+  background-position: calc(100% - 5px) center !important;
+  
+  }
+}
