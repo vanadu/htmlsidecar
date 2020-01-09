@@ -40,19 +40,24 @@ $inspector-font-family: 'Ubuntu', Arial, Helvetica, sans-serif;
 $dimwhit-font-family: 'Ubuntu', Arial, Helvetica, sans-serif;
 
 // VA! STYLES
+// VA! Reboot: box-sizing from Bootstrap in case I decide to remove Bootstrap
+* {
+  box-sizing: border-box;
+}
+*, ::after, ::before {
+  box-sizing: border-box;
+}
+
 // VA! Reboot: Overriding the default Bootstrap root font size of 10px
 html {
   font-size: 16px;
 }
-
 body {
   // VA!Reboot: not sure what this does.
   min-height: 100% !important; 
   font-family: $primary-font-family;
   font-size: 1rem;
 }
-
-/* TYPOGRAPHY */
 
 // VA! Reboot: only for content, probably can delete
 span.code {
@@ -408,7 +413,6 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   // VA! Testing
   overflow: hidden;
   z-index: 3;
-  
   // VA! Reboot: I can't remember what this does.
   &.show-err {
     transform: translate(0, -85px);
@@ -436,16 +440,17 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 .inspectors-left-col {
   justify-content: flex-end;
   width: 280px;
+  margin-top: 3px;
 }
 .inspectors-right-col {
   justify-content: flex-end;
   width: 300px;
+  margin-top: 3px;
 }
 .inspectors-center-col {
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   width: 200px;
-  margin-top: -15px;
 }
 .inspector {
   padding: 2px 2px 2px 0px;
@@ -457,21 +462,19 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   text-transform: uppercase;
   list-style-type: none;
 }
-#btn-toggle-ccp-container {
-  #btn-toggle-ccp {
-    display: block;
-    width: 40px;
-    height: 47px;
-    margin: 10px auto 0;
-    border: 0;
-    background-color: transparent;
-    background-image: url('../img/clipboard.png');
-    background-position: center top;
-    background-size: 40px 47px; 
-    &.active {
-      // VA! Reboot: bg image not swapping on active and the image is misnamed - it should be clipboard-active. There should be a different hover image.
-      background-image: url('../img/clipboard-hover.png');
-    }
+#btn-toggle-ccp {
+  display: block;
+  width: 40px;
+  height: 47px;
+  margin: 10px auto 0;
+  border: 0;
+  background-color: transparent;
+  background-image: url('../img/clipboard.png');
+  background-position: center top;
+  background-size: 40px 47px; 
+  &.active {
+    // VA! Reboot: bg image not swapping on active and the image is misnamed - it should be clipboard-active. There should be a different hover image.
+    background-image: url('../img/clipboard-hover.png');
   }
 }
 #i-filename {
@@ -479,6 +482,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   color: $filename-viewer-font-color;
   font-size: 1rem;
   text-align: center;
+
 }
 #i-display-size {
   &::before {content: 'Display size: '}

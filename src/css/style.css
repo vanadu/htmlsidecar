@@ -1005,6 +1005,12 @@ body {
 .devmag {
   border: 1px solid magenta !important; }
 
+* {
+  box-sizing: border-box; }
+
+*, ::after, ::before {
+  box-sizing: border-box; }
+
 html {
   font-size: 16px; }
 
@@ -1013,7 +1019,6 @@ body {
   font-family: "Open Sans", Arial, Helvetica, sans-serif;
   font-size: 1rem; }
 
-/* TYPOGRAPHY */
 span.code {
   font-family: 'Courier New', monospace; }
 
@@ -1303,17 +1308,18 @@ input:focus:-ms-input-placeholder {
 
 .inspectors-left-col {
   justify-content: flex-end;
-  width: 280px; }
+  width: 280px;
+  margin-top: 3px; }
 
 .inspectors-right-col {
   justify-content: flex-end;
-  width: 300px; }
+  width: 300px;
+  margin-top: 3px; }
 
 .inspectors-center-col {
   flex-direction: column;
-  justify-content: center;
-  width: 200px;
-  margin-top: -15px; }
+  justify-content: flex-start;
+  width: 200px; }
 
 .inspector {
   padding: 2px 2px 2px 0px;
@@ -1324,7 +1330,7 @@ input:focus:-ms-input-placeholder {
   text-transform: uppercase;
   list-style-type: none; }
 
-#btn-toggle-ccp-container #btn-toggle-ccp {
+#btn-toggle-ccp {
   display: block;
   width: 40px;
   height: 47px;
@@ -1334,7 +1340,7 @@ input:focus:-ms-input-placeholder {
   background-image: url("../img/clipboard.png");
   background-position: center top;
   background-size: 40px 47px; }
-  #btn-toggle-ccp-container #btn-toggle-ccp.active {
+  #btn-toggle-ccp.active {
     background-image: url("../img/clipboard-hover.png"); }
 
 #i-filename {

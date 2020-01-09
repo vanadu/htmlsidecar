@@ -16,6 +16,7 @@ TODO: The select kist is wonky on Ubuntu Firefox but OK on Windows browsers. WHa
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer WIDTH. That's no good.
 TODO: There's extra whitespace above the Inspector pane. That should go away when we convert to flexbox. 
 TODO: The Wrapper Table checkbox doesn't select when clicked - you have to click somewhere else on the span element. That needs to be fixed in the flexbox overhaul.
+TODO: Select boxes are rendering differently in Ubuntu. May have to do with the font. Make sure all fonts are cross-browser.
 /*
 
 
