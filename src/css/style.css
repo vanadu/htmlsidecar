@@ -1492,6 +1492,16 @@ output {
       border-color: #555 transparent transparent transparent;
       content: ''; }
 
+#ccp-blocker {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 800px;
+  height: 530px !important;
+  background: transparent;
+  z-index: 999; }
+
 #ccp {
   position: relative;
   width: 98%;
@@ -1518,23 +1528,14 @@ output {
     font-size: 14px;
     text-align: center; }
 
-#ccp-blocker {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 530px !important;
-  width: 800px;
-  background: transparent;
-  display: none;
-  z-index: 999; }
-
 #ccp-content {
-  display: block;
+  display: flex;
+  flex-direction: column;
   position: relative;
-  width: 94%;
-  height: 470px;
-  margin: 0 auto;
-  padding: 0; }
+  width: 100%;
+  height: 500px;
+  padding: 0 10px;
+  border: 1px solid magenta; }
   #ccp-content input, #ccp-content label {
     color: #FFFFFF;
     font-size: 14px;
@@ -1554,12 +1555,6 @@ output {
     margin-bottom: 5px;
     border: 1px solid #959595;
     border-radius: 5px; }
-    #ccp-content fieldset span.ccp-heading, #ccp-content fieldset label.ccp-heading {
-      font-size: 13px;
-      font-weight: bold;
-      color: #a8a8a8;
-      margin: 0 0 8px 0;
-      padding: 0; }
     #ccp-content fieldset legend {
       height: 20px;
       width: 145px;
@@ -1575,46 +1570,7 @@ output {
       top: 2px;
       margin: 0;
       padding: 0; }
-    #ccp-content fieldset .ccp-options-col-1 {
-      width: 105px;
-      height: 120px;
-      margin: 0 7px;
-      border: 1px solid transparent; }
-      #ccp-content fieldset .ccp-options-col-1 .ccp-but {
-        width: 90px;
-        height: 90px;
-        padding-right: 7px;
-        float: left;
-        display: block;
-        border: none;
-        background-size: 90px 46px !important; }
-      #ccp-content fieldset .ccp-options-col-1 #btn-ccp-img-build-html-clip {
-        background: #000000 url("../img/img-to-cb-html.png") no-repeat center;
-        background-size: 90px 46px; }
-        #ccp-content fieldset .ccp-options-col-1 #btn-ccp-img-build-html-clip:hover {
-          background-image: url("../img/img-to-cb-html-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-1 #btn-ccp-td-build-html-clip {
-        background: #000000 url("../img/td-to-cb-html-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-1 #btn-ccp-td-build-html-clip:hover {
-          background-image: url("../img/td-to-cb-html-icon-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-1 #btn-ccp-table-build-html-clip {
-        background: #000000 url("../img/table-to-cb-html-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-1 #btn-ccp-table-build-html-clip:hover {
-          background-image: url("../img/table-to-cb-html-icon-hover.png"); }
-    #ccp-content fieldset .ccp-options-col-2 {
-      left: 120px;
-      width: 230px; }
-      #ccp-content fieldset .ccp-options-col-2 label {
-        width: 60px;
-        margin-bottom: 5px;
-        padding-right: 2px;
-        text-align: right; }
-      #ccp-content fieldset .ccp-options-col-2 input {
-        width: 150px; }
     #ccp-content fieldset .ccp-options-col-3 {
-      left: 350px;
-      width: 280px;
-      margin-left: 10px;
       /* These are the actual text labels for the checkboxes. */
       /* These are the hidden browser's default checkboxes. VA! It appears they are attached to the first label element in the parent container */
       /* Create a custom checkbox -- this is the span after the checkbox input element. */
@@ -1623,11 +1579,6 @@ output {
       /* Create the checkmrk/indicator (hidden when not checked) */
       /* Show the checkmrk when checked */
       /* Style the checkmrk/indicator */ }
-      #ccp-content fieldset .ccp-options-col-3 label {
-        width: 60px;
-        margin-bottom: 5px;
-        padding-right: 2px;
-        text-align: right; }
       #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-width-height-container, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container {
         width: 100%;
         display: block;
@@ -1658,8 +1609,7 @@ output {
         width: 15px;
         background-color: #eee;
         display: block;
-        z-index: 100;
-        border: 1px solid blue; }
+        z-index: 100; }
       #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-width-height-container:hover input ~ #spn-ccp-img-include-width-height-checkmrk, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container:hover input ~ #spn-ccp-td-bgimage-checkmrk, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container:hover input ~ #spn-ccp-table-include-wrapper-checkmrk {
         background-color: #ccc; }
       #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-width-height-container input:checked ~ #spn-ccp-img-include-width-height-checkmrk, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container input:checked ~ #spn-ccp-td-bgimage-checkmrk, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container input:checked ~ #spn-ccp-table-include-wrapper-checkmrk {
@@ -1667,8 +1617,7 @@ output {
       #ccp-content fieldset .ccp-options-col-3 #spn-ccp-img-include-width-height-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 #spn-ccp-td-bgimage-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 #spn-ccp-table-include-wrapper-checkmrk:after {
         content: "";
         position: absolute;
-        display: none;
-        border: 1px solid magenta; }
+        display: none; }
       #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-width-height-container input:checked ~ #spn-ccp-img-include-width-height-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container input:checked ~ #spn-ccp-td-bgimage-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container input:checked ~ #spn-ccp-table-include-wrapper-checkmrk:after {
         display: block; }
       #ccp-content fieldset .ccp-options-col-3 .ccp-img-include-width-height-container #spn-ccp-img-include-width-height-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 .ccp-td-bgimage-container #spn-ccp-td-bgimage-checkmrk:after, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-container #spn-ccp-table-include-wrapper-checkmrk:after {
@@ -1686,59 +1635,137 @@ output {
         padding-left: 34px;
         text-align: left;
         border: 1px solid magenta; }
-      #ccp-content fieldset .ccp-options-col-3 #chk-ccp-table-include-wrapper, #ccp-content fieldset .ccp-options-col-3 .ccp-table-include-wrapper-label {
+      #ccp-content fieldset .ccp-options-col-3 #chk-ccp-table-include-wrapper {
         margin-left: -40px; }
-    #ccp-content fieldset .ccp-options-col-4 {
-      left: 620px;
-      width: 70px; }
-      #ccp-content fieldset .ccp-options-col-4 .ccp-but {
-        display: none;
-        width: 60px;
-        height: 35px;
-        margin-bottom: 9px;
-        background: none;
-        cursor: default;
-        border: none;
-        background-size: 60px 35px !important; }
-        #ccp-content fieldset .ccp-options-col-4 .ccp-but.active {
-          display: block;
-          cursor: pointer; }
-      #ccp-content fieldset .ccp-options-col-4 #btn-ccp-img-dsktp-build-css-clip-but.active {
-        background: #000000 url("../img/img-display-css-to-clipboard-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #btn-ccp-img-dsktp-build-css-clip-but.active:hover {
-          background-image: url("../img/img-display-css-to-clipboard-icon-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-4 #btn-ccp-img-lgphn-build-css-clip-but.active {
-        background: #000000 url("../img/img-lphone-css-to-clipboard-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #btn-ccp-img-lgphn-build-css-clip-but.active:hover {
-          background-image: url("../img/img-lphone-css-to-clipboard-icon-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-4 #btn-ccp-img-smphn-build-css-clip-but.active {
-        background: #000000 url("../img/img-sphone-css-to-clipboard-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #btn-ccp-img-smphn-build-css-clip-but.active:hover {
-          background-image: url("../img/img-sphone-css-to-clipboard-icon-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-4 #btn-ccp-td-dsktp-build-css-clip-but.active {
-        background: #000000 url("../img/td-display-css-to-clipboard-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #btn-ccp-td-dsktp-build-css-clip-but.active:hover {
-          background-image: url("../img/td-display-css-to-clipboard-icon-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-4 #btn-ccp-td-lgphn-build-css-clip-but.active {
-        background: #000000 url("../img/td-lphone-css-to-clipboard-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #btn-ccp-td-lgphn-build-css-clip-but.active:hover {
-          background-image: url("../img/td-lphone-css-to-clipboard-icon-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-4 #btn-ccp-td-smphn-build-css-clip-but.active {
-        background: #000000 url("../img/td-sphone-css-to-clipboard-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #btn-ccp-td-smphn-build-css-clip-but.active:hover {
-          background-image: url("../img/td-sphone-css-to-clipboard-icon-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-4 #btn-ccp-table-dsktp-build-css-clip-but.active {
-        background: #000000 url("../img/table-display-css-to-clipboard-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #btn-ccp-table-dsktp-build-css-clip-but.active:hover {
-          background-image: url("../img/table-display-css-to-clipboard-icon-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-4 #btn-ccp-table-lgphn-build-css-clip-but.active {
-        background: #000000 url("../img/table-lphone-css-to-clipboard-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #btn-ccp-table-lgphn-build-css-clip-but.active:hover {
-          background-image: url("../img/table-lphone-css-to-clipboard-icon-hover.png"); }
-      #ccp-content fieldset .ccp-options-col-4 #btn-ccp-table-smphn-build-css-clip-but.active {
-        background: #000000 url("../img/table-sphone-css-to-clipboard-icon.png") no-repeat center; }
-        #ccp-content fieldset .ccp-options-col-4 #btn-ccp-table-smphn-build-css-clip-but.active:hover {
-          background-image: url("../img/table-sphone-css-to-clipboard-icon-hover.png"); }
+
+.ccp-options-col-1 {
+  width: 92px;
+  height: 120px;
+  margin: 0 7px;
+  border: 1px solid transparent;
+  border: 1px solid blue; }
+  .ccp-options-col-1 .ccp-but {
+    width: 90px;
+    height: 90px;
+    padding-right: 7px;
+    float: left;
+    display: block;
+    border: none;
+    background-size: 90px 46px !important; }
+
+.ccp-options-col-2 {
+  position: absolute;
+  left: 120px;
+  width: 230px;
+  border: 1px solid red; }
+  .ccp-options-col-2 label {
+    width: 60px;
+    margin-bottom: 5px;
+    padding-right: 2px;
+    text-align: right; }
+  .ccp-options-col-2 input {
+    width: 150px; }
+
+.ccp-options-col-3 {
+  position: absolute;
+  left: 350px;
+  width: 280px;
+  margin-left: 10px;
+  border: 1px solid green; }
+  .ccp-options-col-3 label {
+    width: 60px;
+    margin-bottom: 5px;
+    padding-right: 2px;
+    text-align: right; }
+
+.ccp-options-col-4 {
+  position: absolute;
+  left: 680px;
+  width: 70px; }
+  .ccp-options-col-4 .ccp-but {
+    display: block;
+    width: 60px;
+    height: 35px;
+    margin-bottom: 9px;
+    background-color: transparent;
+    cursor: default;
+    border: none;
+    background-size: 60px 35px !important; }
+    .ccp-options-col-4 .ccp-but.active {
+      display: block;
+      cursor: pointer; }
+
+.ccp-heading {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: bold;
+  color: #a8a8a8;
+  margin: 0;
+  padding: 0;
+  color: #FFFFFF;
+  border: 1px solid blue; }
+
+#btn-ccp-img-build-html-clip {
+  background: #000000 url("../img/img-to-cb-html.png") no-repeat center;
+  background-size: 90px 46px; }
+  #btn-ccp-img-build-html-clip:hover {
+    background-image: url("../img/img-to-cb-html-hover.png"); }
+
+#btn-ccp-td-build-html-clip {
+  background: #000000 url("../img/td-to-cb-html-icon.png") no-repeat center; }
+  #btn-ccp-td-build-html-clip:hover {
+    background-image: url("../img/td-to-cb-html-icon-hover.png"); }
+
+#btn-ccp-table-build-html-clip {
+  background: #000000 url("../img/table-to-cb-html-icon.png") no-repeat center; }
+  #btn-ccp-table-build-html-clip:hover {
+    background-image: url("../img/table-to-cb-html-icon-hover.png"); }
+
+#btn-ccp-img-dsktp-build-css-clip.active {
+  background: #000000 url("../img/img-display-css-to-clipboard-icon.png") no-repeat center; }
+  #btn-ccp-img-dsktp-build-css-clip.active:hover {
+    background-image: url("../img/img-display-css-to-clipboard-icon-hover.png"); }
+
+#btn-ccp-img-lgphn-build-css-clip.active {
+  background: #000000 url("../img/img-lphone-css-to-clipboard-icon.png") no-repeat center; }
+  #btn-ccp-img-lgphn-build-css-clip.active:hover {
+    background-image: url("../img/img-lphone-css-to-clipboard-icon-hover.png"); }
+
+#btn-ccp-img-smphn-build-css-clip.active {
+  background: #000000 url("../img/img-sphone-css-to-clipboard-icon.png") no-repeat center; }
+  #btn-ccp-img-smphn-build-css-clip.active:hover {
+    background-image: url("../img/img-sphone-css-to-clipboard-icon-hover.png"); }
+
+#btn-ccp-td-dsktp-build-css-clip.active {
+  background: #000000 url("../img/td-display-css-to-clipboard-icon.png") no-repeat center; }
+  #btn-ccp-td-dsktp-build-css-clip.active:hover {
+    background-image: url("../img/td-display-css-to-clipboard-icon-hover.png"); }
+
+#btn-ccp-td-lgphn-build-css-clip.active {
+  background: #000000 url("../img/td-lphone-css-to-clipboard-icon.png") no-repeat center; }
+  #btn-ccp-td-lgphn-build-css-clip.active:hover {
+    background-image: url("../img/td-lphone-css-to-clipboard-icon-hover.png"); }
+
+#btn-ccp-td-smphn-build-css-clip.active {
+  background: #000000 url("../img/td-sphone-css-to-clipboard-icon.png") no-repeat center; }
+  #btn-ccp-td-smphn-build-css-clip.active:hover {
+    background-image: url("../img/td-sphone-css-to-clipboard-icon-hover.png"); }
+
+#btn-ccp-table-dsktp-build-css-clip.active {
+  background: #000000 url("../img/table-display-css-to-clipboard-icon.png") no-repeat center;
+  border: 1px solid green; }
+  #btn-ccp-table-dsktp-build-css-clip.active:hover {
+    background-image: url("../img/table-display-css-to-clipboard-icon-hover.png"); }
+
+#btn-ccp-table-lgphn-build-css-clip.active {
+  background: #000000 url("../img/table-lphone-css-to-clipboard-icon.png") no-repeat center; }
+  #btn-ccp-table-lgphn-build-css-clip.active:hover {
+    background-image: url("../img/table-lphone-css-to-clipboard-icon-hover.png"); }
+
+#btn-ccp-table-smphn-build-css-clip.active {
+  background: #000000 url("../img/table-sphone-css-to-clipboard-icon.png") no-repeat center; }
+  #btn-ccp-table-smphn-build-css-clip.active:hover {
+    background-image: url("../img/table-sphone-css-to-clipboard-icon-hover.png"); }
 
 #table-max-width {
   display: none; }

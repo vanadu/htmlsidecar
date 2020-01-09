@@ -1801,8 +1801,11 @@ var Whitty = (function () {
         }
 
         // !VA Initialize with 'include wrapper table' unchecked, or true for DEV
-        var includeWrapperTable = document.querySelector((ccpUserInput.spnCcpTableIncludeWrapperCheckmrk.replace('mrk', 'box')));
-        includeWrapperTable.checked = true;
+        // !VA Reboot: Commenting out for now
+        // var includeWrapperTable = document.querySelector((ccpUserInput.spnCcpTableIncludeWrapperCheckmrk.replace('mrk', 'box')));
+        // includeWrapperTable.checked = true;
+
+
         // !VA Default for table width
         document.querySelector(ccpUserInput.iptCcpTableWidth).value = `${Appdata.imgW}`;
         // !VA Defaults for wrapper width and class
