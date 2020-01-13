@@ -22,6 +22,17 @@
 DONE: Fixed - See bottom of _custom.scs. the select list is wonky on Ubuntu Firefox but OK on Windows browsers. WHat's up with that?
 DONE: Fixed duplicated div closing tags that cause main image not to display
 DONE: Fixed -- mock checkbox label 'for' attribute has to refer to input ID. The Wrapper Table checkbox doesn't select when clicked - you have to click somewhere else on the span element. That needs to be fixed in the flexbox overhaul.
+DONE: large phones  inspector height value is wrong! Wrong var in getAppdata
+DONE: large phones css clip button writes undefined for width, fixed: global replace changed wrong var name
+
+TODO: Figure out why queryDOMElements is running mutliple times per CB build.
+TODO: Finish reviewing and implementing write to clipboard buttons. NOTE: Need to thing about how to make that DRYer...there's a lot of repetition.
+
+
+
+
+
+
 
 TODO: Why does browser sync page refresh cause image display to fail? Does this with Arnie too.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer WIDTH. That's no good.
@@ -34,7 +45,7 @@ TODO: Select boxes are rendering differently in Ubuntu. May have to do with the 
 /* !VA  - 06.23.19
 =========================================================
 
-TODO: Finish reviewing and implementing write to clipboard buttons. NOTE: Need to thing about how to make that DRYer...there's a lot of repetition.
+
 TODO: rewrite getAppdata to only query specific items in the array, or at least use destructuring to only make a const out of which ever Appdata property is needed in the respective function.
 TOD0: Think about making getAppdata only query a specific property if possible.
 TODO: Fix being able to resize viewerW smaller than imgW - current behavior is imgw resizes with viewerW. If that's the desired behavior, imgW still doesn't write the udpated width to Appdata, that needs to be fixed.
@@ -176,7 +187,7 @@ var Whitty = (function () {
     var btnCcpBuildClips = {
       // !VA Build HTML Clipboard Buttons
       btnCcpImgBuildHtmlClip: '#btn-ccp-img-build-html-clip',
-      btnCcpTDBuildHtmlClip: '#btn-ccp-td-build-html-clip',
+      btnCcpTdBuildHtmlClip: '#btn-ccp-td-build-html-clip',
       btnCcpTableBuildHtmlClip: '#btn-ccp-table-build-html-clip',
       // !VA Make CSS Clip Buttons
       btnCcpImgDsktpBuildCssClip: '#btn-ccp-img-dsktp-build-css-clip',
@@ -263,7 +274,7 @@ var Whitty = (function () {
       // !VA Moving getAppdata from appController to UIController because Appdata is derived from the DOM elements and data properties that reside in the DOM. 
 
       queryDOMElements: function() {
-
+        console.log('queryDOMElements running...');
         // !VA NEW This needs to ONLY return the non-calculated DOM elements and data properties: curImg.imgW, curImg.imgW, curImg.imgNW, curImg.NH and viewerW. Aspect is calculated so we don't need to get that here, leave that to appController.
         // !VA NEW We will get the individual properties and return them as an ES6 array.
         // !VA Declare the local vars
@@ -291,7 +302,7 @@ var Whitty = (function () {
         els.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
         els.iptTbrSPhonesWidth ? els.iptTbrSPhonesWidth : Appdata.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
         els.iptTbrLPhonesWidth ? els.iptTbrLPhonesWidth : Appdata.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
-
+        // console.dir(els);
         return els;
       },
 
@@ -449,40 +460,41 @@ var Whitty = (function () {
       // !VA Note: I tried for two days to avoid using the switch but nothing beats this for readability and comprehensibility. I could pull the switch out to a different function but that is trivial, so leave this for now, it works.
       switch (true) {
       case ( makeClipButID === btnCcpBuildClips.btnCcpImgBuildHtmlClip) :
-        clipboardStr = getImgWriteHTMLToCB(Appdata);
+        clipboardStr = ccpImgBuildHtmlClip(Appdata);
         break;
-      case ( makeClipButID === btnCcpBuildClips.btnCcpTDBuildHtmlClip) :
-        clipboardStr = getTdWriteHTMLToCB(Appdata);
+        // !VA Reboot fix below
+      case ( makeClipButID === btnCcpBuildClips.btnCcpTdBuildHtmlClip) :
+        clipboardStr = ccpTdBuildHtmlClip(Appdata);
         break;
       case ( makeClipButID === btnCcpBuildClips.btnCcpTableBuildHtmlClip) :
-        clipboardStr = getTableWriteHTMLToCB(Appdata);
+        clipboardStr = ccpTableBuildHtmlClip(Appdata);
         break;
       case ( makeClipButID === btnCcpBuildClips.btnCcpImgDsktpBuildCssClip) :
-        clipboardStr = getImgDisplayWriteCSSToCB(Appdata);
+        clipboardStr = ccpImgDsktpBuildCssClip(Appdata);
         break;
       case ( makeClipButID === btnCcpBuildClips.btnCcpImgSmphnBuildCssClip) :
-        clipboardStr = getImgSPhoneWriteCSSToCB(Appdata);
+        clipboardStr = ccpImgSmphnBuildCssClip(Appdata);
         break;
       case ( makeClipButID === btnCcpBuildClips.btnCcpImgLgphnBuildCssClip) :
-        clipboardStr = getImgLPhoneWriteCSSToCB(Appdata);
+        clipboardStr = ccpImgLgphnBuildCssClip(Appdata);
         break;
       case ( makeClipButID === btnCcpBuildClips.btnCcpTdDsktpBuildCssClip) :
-        clipboardStr = getTdDisplayWriteCSSToCB(Appdata);
+        clipboardStr = ccpTdDsktpBuildCssClip(Appdata);
         break;
       case ( makeClipButID === btnCcpBuildClips.btnCcpTdSmphnBuildCssClip) :
-        clipboardStr = getTdSPhoneWriteCSSToCB(Appdata);
+        clipboardStr = ccpTdSmphnBuildCssClip(Appdata);
         break;
       case ( makeClipButID === btnCcpBuildClips.btnCcpTdLgphnBuildCssClip) :
-        clipboardStr = getTdLPhoneWriteCSSToCB(Appdata);
+        clipboardStr = ccpTdLgphnBuildCssClip(Appdata);
         break;
       case ( makeClipButID === btnCcpBuildClips.btnCcpTableDsktpBuildCssClip) :
-        clipboardStr = getTableDisplayWriteCSSToCB(Appdata);
+        clipboardStr = ccpTableDsktpBuildCssClip(Appdata);
         break;
       case ( makeClipButID === btnCcpBuildClips.btnCcpTableSmphnBuildCssClip) :
-        clipboardStr = getTableSPhoneWriteCSSToCB(Appdata);
+        clipboardStr = ccpTableSmphnBuildCssClip(Appdata);
         break;
       case ( makeClipButID === btnCcpBuildClips.btnCcpTableLgphnBuildCssClip) :
-        clipboardStr = getTableLPhoneWriteCSSToCB(Appdata);
+        clipboardStr = ccpTableLgphnBuildCssClip(Appdata);
         break;
       }
 
@@ -490,7 +502,7 @@ var Whitty = (function () {
       var currentCB = new Clipboard(makeClipButID, {
         text: function(trigger) {
 
-          // var clipboardStr = getImgWriteHTMLToCB();
+          // var clipboardStr = ccpImgBuildHtmlClip();
           // !VA Write success message to app message area on success
           currentCB.on('success', function(event) {
             appController.initMessage(false, 'copied_2_CB');
@@ -514,8 +526,8 @@ var Whitty = (function () {
     }
 
     // CBController: GET STRINGS FOR THE IMG CLIPBOARD OUTPUT
-    function getImgWriteHTMLToCB(Appdata) {
-      console.log('running getImgWriteHTMLToCB');
+    function ccpImgBuildHtmlClip(Appdata) {
+      console.log('running ccpImgBuildHtmlClip');
       // !VA The string that passes the HTML img tag
       var str; 
       // !VA Create the instance for img tag clipboard object and add img-specific properties.
@@ -592,8 +604,8 @@ var Whitty = (function () {
       return imgTagStr;
     } 
 
-    function getTdWriteHTMLToCB(Appdata) {
-      console.log('getTdWriteHTMLToCB...');
+    function ccpTdBuildHtmlClip(Appdata) {
+      console.log('ccpTdBuildHtmlClip...');
       // !VA We need Appdata for the background image snippet.
 
       // !VA Declare the string that gets the clipboard output
@@ -653,7 +665,7 @@ var Whitty = (function () {
 
       tdTag.tdContents =    (function () {
         // !VA Get the img tag output and put in between the td tags
-        var str = getImgWriteHTMLToCB(Appdata);
+        var str = ccpImgBuildHtmlClip(Appdata);
         return str;
       })();
 
@@ -704,8 +716,8 @@ var Whitty = (function () {
       return clipboardStr;
     }
 
-    function getTableWriteHTMLToCB(Appdata) {
-      console.log('getTableWriteHTMLToCB...');
+    function ccpTableBuildHtmlClip(Appdata) {
+      console.log('ccpTableBuildHtmlClip...');
       // !VA We need Appdata to get Appdata.viewerW
 
       // !VA Variable returning the HTML to the clipboard object 
@@ -739,7 +751,7 @@ var Whitty = (function () {
       // !VA selCcpTableAlign END
 
       tableTag.tableContents = (function () {
-        var str = getTdWriteHTMLToCB(Appdata);
+        var str = ccpTdBuildHtmlClip(Appdata);
         return str;
       })();
 
@@ -845,8 +857,8 @@ var Whitty = (function () {
 
     }
 
-    function getImgDisplayWriteCSSToCB(Appdata)  {
-      console.log('getImgDisplayWriteCSSToCB...');
+    function ccpImgDsktpBuildCssClip(Appdata)  {
+      console.log('ccpImgDsktpBuildCssClip...');
       // !VA The string to pass the CSS declaration to the clipboard object
       var clipboardStr;
       // !VA Clipboard output object 
@@ -861,8 +873,8 @@ var Whitty = (function () {
 
     }
 
-    function getImgSPhoneWriteCSSToCB(Appdata)  {
-      console.log('getImgSPhoneWriteCSSToCB...');
+    function ccpImgSmphnBuildCssClip(Appdata)  {
+      console.log('ccpImgSmphnBuildCssClip...');
       // !VA The string to pass the CSS declaration to the clipboard object
       var clipboardStr;
       // !VA Clipboard output object 
@@ -870,27 +882,29 @@ var Whitty = (function () {
       // !VA Put the user-entered class into this property
       imgSmallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpImgClass).value;
       // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `img.${imgSmallPhonesCSSTag.classAtt} { width: ${Appdata.iptTbrSmallPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
+      clipboardStr = `img.${imgSmallPhonesCSSTag.classAtt} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
       // !VA Return the css string to the clipboard object.
       return clipboardStr;
     }
 
-    function getImgLPhoneWriteCSSToCB(Appdata) {
-      console.log('getImgLPhoneWriteCSSToCB...');
+    function ccpImgLgphnBuildCssClip(Appdata) {
+      console.log('ccpImgLgphnBuildCssClip...');
       // !VA The string to pass the CSS declaration to the clipboard object
+      console.dir(Appdata);
       var clipboardStr;
       // !VA Clipboard output object 
       var imgLargePhonesCSSTag = new ClipboardOutput('imgLargePhonesCSSTag');
       // !VA Put the user-entered class into this property
       imgLargePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpImgClass).value;
       // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `img.${imgLargePhonesCSSTag.classAtt} { width: ${Appdata.iptTbrLargePhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
+      clipboardStr = `img.${imgLargePhonesCSSTag.classAtt} { width: ${Appdata.lPhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
       // !VA Return the css string to the clipboard object.
+      console.log('clipboardStr is: ' + clipboardStr);
       return clipboardStr;
     }
 
-    function getTdDisplayWriteCSSToCB(Appdata)  {
-      console.log('getTdDisplayWriteCSSToCB...');
+    function ccpTdDsktpBuildCssClip(Appdata)  {
+      console.log('ccpTdDsktpBuildCssClip...');
       // !VA The string to pass the CSS declaration to the clipboard object
       var clipboardStr;
       // !VA Clipboard output object 
@@ -903,34 +917,35 @@ var Whitty = (function () {
       return clipboardStr;
     }
 
-    function getTdSPhoneWriteCSSToCB(Appdata) {
-      console.log('getTdgetTdSPhoneWriteCSSToCB...');
+    function ccpTdSmphnBuildCssClip(Appdata) {
+      console.log('ccpTdSmphnBuildCssClip...');
       var clipboardStr;
       // !VA Clipboard output object 
       var tdSmallPhonesCSSTag = new ClipboardOutput('tdSmallPhonesCSSTag');
       // !VA Put the user-entered class into this property
       tdSmallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpTdClass).value;
       // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `td.${tdSmallPhonesCSSTag.classAtt} { width: ${Appdata.iptTbrSmallPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
+      clipboardStr = `td.${tdSmallPhonesCSSTag.classAtt} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
       // !VA Return the css string to the clipboard object.
       return clipboardStr;
     }
 
-    function getTdLPhoneWriteCSSToCB(Appdata)  {
-      console.log('getTdLPhoneWriteCSSToCB...');
+    function ccpTdLgphnBuildCssClip(Appdata)  {
+      console.log('ccpTdLgphnBuildCssClip...');
       var clipboardStr;
       // !VA Clipboard output object 
       var tdLargePhonesCSSTag = new ClipboardOutput('tdLargePhonesCSSTag');
       // !VA Put the user-entered class into this property
       tdLargePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpTdClass).value;
       // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `td.${tdLargePhonesCSSTag.classAtt} { width: ${Appdata.iptTbrLargePhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
+      clipboardStr = `td.${tdLargePhonesCSSTag.classAtt} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
       // !VA Return the css string to the clipboard object.
+      console.log('clipboardStr is: ' + clipboardStr);
       return clipboardStr;
     }
 
-    function getTableDisplayWriteCSSToCB(Appdata) {
-      console.log('getTableDisplayWriteCSSToCB...');
+    function ccpTableDsktpBuildCssClip(Appdata) {
+      console.log('ccpTableDsktpBuildCssClip...');
       // !VA The string to pass the CSS declaration to the clipboard object
       var clipboardStr;
       // !VA Clipboard output object 
@@ -943,28 +958,28 @@ var Whitty = (function () {
       return clipboardStr;
     }
 
-    function getTableSPhoneWriteCSSToCB(Appdata) {
-      console.log('getTableSPhoneWriteCSSToCB...');
+    function ccpTableSmphnBuildCssClip(Appdata) {
+      console.log('ccpTableSmphnBuildCssClip...');
       var clipboardStr;
       // !VA Clipboard output object 
       var tableSmallPhonesCSSTag = new ClipboardOutput('tableSmallPhonesCSSTag');
       // !VA Put the user-entered class into this property
       tableSmallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpTableClass).value;
       // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `table.${tableSmallPhonesCSSTag.classAtt} { width: ${Appdata.iptTbrSmallPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
+      clipboardStr = `table.${tableSmallPhonesCSSTag.classAtt} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
       // !VA Return the css string to the clipboard object.
       return clipboardStr;
     }
 
-    function getTableLPhoneWriteCSSToCB(Appdata) {
-      console.log('getTableLPhoneWriteCSSToCB...');
+    function ccpTableLgphnBuildCssClip(Appdata) {
+      console.log('ccpTableLgphnBuildCssClip...');
       var clipboardStr;
       // !VA Clipboard output object 
       var tableLargePhonesCSSTag = new ClipboardOutput('tableLargePhonesCSSTag');
       // !VA Put the user-entered class into this property
       tableLargePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpTableClass).value;
       // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `table.${tableLargePhonesCSSTag.classAtt} { width: ${Appdata.iptTbrLargePhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
+      clipboardStr = `table.${tableLargePhonesCSSTag.classAtt} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
       // !VA Return the css string to the clipboard object.
       return clipboardStr;
     }
@@ -1086,7 +1101,7 @@ var Whitty = (function () {
         // if (typeof(window.event) != "undefined")
         // 	oNode.attachEvent("on"+evt, oFunc);
         // else
-        console.log('oNode.id is: ' + oNode.id);
+        // console.log('oNode.id is: ' + oNode.id);
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
       // addEventHandler(document.getElementById(toolbarElements.btnTbrIncr01),'click',doit,false);
@@ -1125,8 +1140,8 @@ var Whitty = (function () {
       // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. Currently only the img class input does that.
       var ccpKeypresses = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass ];
       for (let i = 0; i < ccpKeypresses.length; i++) {
-        console.log('i is: ' + i);
-        console.log('ccpKeypresses[i] is: ' + ccpKeypresses[i]);
+        // console.log('i is: ' + i);
+        // console.log('ccpKeypresses[i] is: ' + ccpKeypresses[i]);
         // !VA convert the ID string to the object inside the loop
         ccpKeypresses[i] = document.querySelector(ccpKeypresses[i]);
         addEventHandler((ccpKeypresses[i]),'input',showElementOnInput,false);
@@ -1587,7 +1602,7 @@ var Whitty = (function () {
       const { target, prop, val } = args;
       // !VA Get Appdata properties.
       var Appdata = {};
-      var sPhonesH, iptTbrSmallPhonesW;
+      var sPhonesH, sPhonesW;
       // !VA All we really need here is Appdata.aspect. Everything else is calculated based on the user's input.
 
       // !VA NEW
@@ -1644,7 +1659,7 @@ var Whitty = (function () {
     function updateAppdata( ...params ) {
       var Appdata = {};
       var prop, val;
-      
+      console.log('updateAppData running...');
       // !VA Each param pair is a property name prop and a value val. evalToolbarInput passes in one or more such pairs whose corresponding Appdata DOM element/data attribute has to be updated. So, loop through the argument arrays and update the corresponding DOM elements
       for (let i = 0; i < params.length; i++) {
         prop = params[i][0];
@@ -2083,7 +2098,7 @@ var Whitty = (function () {
       // !VA Now compute the rest of Appdat
       Appdata.aspect = getAspectRatio(Appdata.imgNW,  Appdata.imgNH);
       Appdata.sPhonesH = Math.round(Appdata.sPhonesW * (1 / Appdata.aspect[0]));
-      Appdata.lPhonesH = Math.round(Appdata.sPhonesW * (1 / Appdata.aspect[0]));
+      Appdata.lPhonesH = Math.round(Appdata.lPhonesW * (1 / Appdata.aspect[0]));
       return Appdata;
     }
 
