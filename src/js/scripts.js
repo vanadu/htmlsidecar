@@ -9,13 +9,24 @@
 /* !VA  01.08.20 Branch: ToolbarFlexboxOverhaul */
 
 
+
+
+
+
+
+
+
 // !VA GENERAL NOTES
 /* !VA  - January Reboot Notes
 =========================================================
-TODO: The select kist is wonky on Ubuntu Firefox but OK on Windows browsers. WHat's up with that?
+DONE: Fixed - See bottom of _custom.scs. the select list is wonky on Ubuntu Firefox but OK on Windows browsers. WHat's up with that?
+DONE: Fixed duplicated div closing tags that cause main image not to display
+DONE: Fixed -- mock checkbox label 'for' attribute has to refer to input ID. The Wrapper Table checkbox doesn't select when clicked - you have to click somewhere else on the span element. That needs to be fixed in the flexbox overhaul.
+
+TODO: Why does browser sync page refresh cause image display to fail? Does this with Arnie too.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer WIDTH. That's no good.
 TODO: There's extra whitespace above the Inspector pane. That should go away when we convert to flexbox. 
-TODO: The Wrapper Table checkbox doesn't select when clicked - you have to click somewhere else on the span element. That needs to be fixed in the flexbox overhaul.
+
 TODO: Select boxes are rendering differently in Ubuntu. May have to do with the font. Make sure all fonts are cross-browser.
 /*
 
@@ -1042,7 +1053,13 @@ var Whitty = (function () {
       }
 
 
-
+      // document.addEventListener('click', function(e) {
+      //   e = e || window.event;
+      //   var target = e.target || e.srcElement,
+      //     text = target.textContent || target.innerText;  
+      //     console.log('target is: ' + target);
+      //   console.log('text is: ' + text); 
+      // }, false);
 
 
 
@@ -2048,7 +2065,7 @@ var Whitty = (function () {
       calcViewerSize();
       // !VA Open the CCP by default in dev mode
       // !VA First, set it to the opposite of how you want to start it.
-      document.querySelector(staticRegions.ccpContainer).classList.remove('active');
+      document.querySelector(staticRegions.ccpContainer).classList.add('active');
       // !VA Then run initCCP to initialize
 
       initCCP();

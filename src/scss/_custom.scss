@@ -809,9 +809,11 @@ output {
       #chk-ccp-table-include-wrapper {
         margin-left: -40px;
       }
+      /* VA! Moved out of parent hierarchy    
       .ccp-options-col-4 {
-      // VA! Reboot: Moved out of parent hierarchy
+
       }
+      */
 
     }
 
@@ -950,6 +952,7 @@ output {
 /* On mouse-over, add a grey background color */
 .ccp-img-include-width-height-container:hover input ~ #spn-ccp-img-include-width-height-checkmrk, .ccp-td-bgimage-container:hover input ~ #spn-ccp-td-bgimage-checkmrk, .ccp-table-include-wrapper-container:hover input ~ #spn-ccp-table-include-wrapper-checkmrk {
   background-color: #ccc;
+  border: 1px solid blue;
 }
 /* When the checkbox is checked, add a gray background */
 .ccp-img-include-width-height-container input:checked ~ #spn-ccp-img-include-width-height-checkmrk, .ccp-td-bgimage-container input:checked ~ #spn-ccp-td-bgimage-checkmrk, .ccp-table-include-wrapper-container input:checked ~ #spn-ccp-table-include-wrapper-checkmrk {
@@ -1071,6 +1074,11 @@ output {
   &:hover {
     background-image:  url('../img/table-sphone-css-to-clipboard-icon-hover.png');
   }
+}
+
+
+#chk-ccp-table-include-wrapper-checkbox {
+  border: 1px solid red;
 }
 
 

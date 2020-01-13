@@ -16,7 +16,7 @@
 <html lang="en" dir="ltr" itemscope itemtype="http://schema.org/Article">
 <head>
   <meta charset="utf-8">
-  <title>witty V2</title>
+  <title>Witty Reboot</title>
   <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,400italic,600,800|Source+Code+Pro" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Ubuntu&display=swap" rel="stylesheet">
   <!-- <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />
@@ -211,7 +211,7 @@
                     <input id="ipt-ccp-img-alt" value="" placeholder="none" /> 
                   </div> 
                   <div id="ccp-img-relpath"> 
-                    <label id="ipt-ccp-img-relpath" for="ipt-ccp-img-relpath">path=</label> 
+                    <label id="ipt-ccp-img-relpath-label" for="ipt-ccp-img-relpath">path=</label> 
                     <input id="ipt-ccp-img-relpath" value="img" placeholder="none" />
                     <!-- <span class="slash">&nbsp;/</span>  -->
                   </div> 
@@ -240,7 +240,7 @@
                     <!-- VA! Reboot: This is the label that goes with the fake checkbox hack -->
                     <label class="ccp-img-include-width-height-container mock-checkbox-container" id="ccp-img-include-width-height-container" for="img-include-width-height">
                       <!-- VA! Reboot: This is the label I added to allow positioning of the text label  -->
-                      <label class="ccp-img-include-width-height-label mock-checkbox" id="ccp-img-include-width-height-label" for="ccp-img-include-width-height">
+                      <label class="ccp-img-include-width-height-label mock-checkbox" id="ccp-img-include-width-height-label" for="chk-ccp-img-include-width-height-checkbox">
                       
                       Include width and height in style attribute</label>
                     <!-- The default checkbox is hidden -->
@@ -317,7 +317,7 @@
 
                       <label class="ccp-td-bgimage-container mock-checkbox-container" id="ccp-td-bgimage-container" for="ccp-td-bgimage">
                         
-                      <label class="ccp-td-bgimage-label mock-checkbox" id="ccp-td-bgimage-label" for="ccp-td-bgimage">
+                      <label class="ccp-td-bgimage-label mock-checkbox" id="ccp-td-bgimage-label" for="chk-ccp-td-bgimage-checkbox">
                         
                         Background image by <a href="https://backgrounds.cm/">Stig</a>
                         </label>
@@ -341,7 +341,6 @@
           <!-- /This element is populated dynamically in scripts.js -->
 
             <legend>&lt;table&gt; Options</legend> 
-              <div id="ccp-table-options" class="ccp-options"> 
 
               <div class="ccp-options-container">  
                 <div class="ccp-options-col-1">
@@ -379,7 +378,7 @@
                     <!-- VA! Reboot: This is still wrong...see how it renders-->
                     <!-- VA! This is the outer label-->
                     <p class="ccp-heading">Wrapper Table</p>
-                      <label class="ccp-table-include-wrapper-container mock-checkbox-container" id="ccp-table-include-wrapper-container" for="chk-ccp-table-include-wrapper-checkbox">
+                      <label class="ccp-table-include-wrapper-container mock-checkbox-container" id="ccp-table-include-wrapper-container" for="ccp-table-include-wrapper">
                         <!-- VA! This is the inner label - the click area for the checkbox-->
                         <label class="ccp-table-include-wrapper-label mock-checkbox" id="ccp-table-include-wrapper-label" for="chk-ccp-table-include-wrapper-checkbox">Include wrapper table
                         </label>
@@ -419,9 +418,6 @@
                 </div> 
 
               </div>
-
-              </div><!-- /#ccp-table-options -->
-            </div>
           </fieldset>
 
         </div><!-- /#ccp-content -->
@@ -446,8 +442,9 @@
               <img src="img/TEST/_625X525.png" data-is-dev1=true id="cur-img" alt="">
             </div>
             <!-- USER-SELECTED IMAGE PROGRAMMATICALLY INSERTED HERE -->
+            <!-- VA! Reboot are these two divs necessary?It appears not as of 01.13.20, I've commented them out and the file validates and the main image displays
             </div>
-          </div>
+          </div> -->
           <!--<output id="list">    </output>-->
         </div>
         <!-- #main-image -->

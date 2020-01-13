@@ -171,6 +171,8 @@ gulp.task('serve', ['sass'], function() {
     ui: {
       port: 3301
     }
+    // Tried to use reload delay but the main img still doesn't load 
+    // reloadDelay: 3000
     // Might need this... :VA
     // server: {
     //   baseDir: "public" // Change this to your web root dir
