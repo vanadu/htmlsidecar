@@ -33,7 +33,7 @@ TODO: Finish reviewing and implementing write to clipboard buttons. NOTE: Need t
 
 
 
-
+TODO: CB table html button doesn't work.
 TODO: Why does browser sync page refresh cause image display to fail? Does this with Arnie too.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer WIDTH. That's no good.
 TODO: There's extra whitespace above the Inspector pane. That should go away when we convert to flexbox. 
@@ -827,7 +827,7 @@ var Whitty = (function () {
       // !VA iptCcpTdBgColor
 
       // !VA Get the checked status of Include table wrapper, and if it's 'checked' output the base table AND the table wrapper
-      if ( document.querySelector('#ccp-table-include-wrapper-checkbox').checked) {
+      if ( document.querySelector('#chk-ccp-table-include-wrapper-checkbox').checked) {
         clipboardStr = 
 
   `<table ${tableTag.wrapperclassAtt + ' '}${tableTag.wrapperWidthAtt + ' '}${tableTag.wrapperAlignAtt + ' '}${tableTag.wrapperBgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
