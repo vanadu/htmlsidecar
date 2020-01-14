@@ -1333,7 +1333,7 @@ input:focus:-ms-input-placeholder {
   display: block;
   width: 40px;
   height: 47px;
-  margin: 10px auto 0;
+  margin: 15px auto 0;
   border: 0;
   background-color: transparent;
   background-image: url("../img/clipboard.png");
@@ -1536,14 +1536,15 @@ output {
     font-size: 14px;
     font-weight: 300; }
   #ccp-content select {
-    width: 80px;
+    width: 90px;
     font-size: 14px; }
   #ccp-content input {
     border: 1px solid #616161;
     background: #000000;
-    color: #FFFFFF; }
+    color: #FFFFFF;
+    width: 150px; }
   #ccp-content fieldset#ccp-img-options, #ccp-content fieldset#ccp-td-options, #ccp-content fieldset#ccp-table-options {
-    height: 160px; }
+    height: 162px; }
   #ccp-content fieldset {
     display: block;
     position: relative;
@@ -1570,13 +1571,13 @@ output {
         margin-left: -40px; }
 
 .ccp-options-container {
-  position: relative;
+  position: absolute;
+  top: 0;
   display: flex;
   justify-content: space-evenly; }
 
 .ccp-options-col-1, .ccp-options-col-2, .ccp-options-col-3, .ccp-options-col-4 {
   display: block;
-  top: 2px;
   margin: 0;
   padding: 0; }
 
@@ -1584,8 +1585,7 @@ output {
   left: 0;
   width: 92px;
   height: 120px;
-  margin: 0 7px;
-  border: 1px solid transparent; }
+  margin: 0 7px; }
   .ccp-options-col-1 .ccp-but {
     width: 90px;
     height: 90px;
@@ -1598,13 +1598,6 @@ output {
 .ccp-options-col-2 {
   left: 120px;
   width: 230px; }
-  .ccp-options-col-2 label {
-    width: 60px;
-    margin-bottom: 5px;
-    padding-right: 2px;
-    text-align: right; }
-  .ccp-options-col-2 input {
-    width: 150px; }
 
 .ccp-options-col-3 {
   left: 350px;
@@ -1634,8 +1627,13 @@ output {
   font-size: .85rem;
   font-weight: bold;
   color: #a8a8a8;
-  color: #FFFFFF;
-  font-style: italic; }
+  color: #FFFFFF; }
+
+.col-2-label, .col-3-label {
+  width: 60px;
+  margin-bottom: 5px;
+  padding-right: 2px;
+  text-align: right; }
 
 /* These are the actual text labels for the checkboxes. */
 .mock-checkbox-container {
@@ -1705,8 +1703,12 @@ output {
 
 #ccp-img-include-width-height-label, #ccp-td-bgimage-label, #ccp-table-include-wrapper-label {
   width: 100%;
-  padding-left: 34px;
+  padding: 0 0 0 25px;
   text-align: left; }
+
+#ccp-table-include-wrapper-label {
+  margin: 0;
+  font-weight: bold !important; }
 
 #btn-ccp-img-build-html-clip {
   background: #000000 url("../img/img-to-cb-html.png") no-repeat center;

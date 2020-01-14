@@ -465,7 +465,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   display: block;
   width: 40px;
   height: 47px;
-  margin: 10px auto 0;
+  margin: 15px auto 0;
   border: 0;
   background-color: transparent;
   background-image: url('../img/clipboard.png');
@@ -753,19 +753,21 @@ output {
     color: #FFFFFF;
     font-size: 14px;
     font-weight: 300;
+    
   }
   select {
-    width: 80px;
+    width: 90px;
     font-size: 14px;
   }
   input {
     border: 1px solid #616161;
     background: #000000;
     color: #FFFFFF;
+    width: 150px;
   }
   // VA! Set the height of each option fieldset
   fieldset#ccp-img-options, fieldset#ccp-td-options, fieldset#ccp-table-options {
-    height: 160px;
+    height: 162px;
   }
 
 
@@ -821,9 +823,11 @@ output {
 }
 // VA! This fixes the discrepancy between Firefox and Chrome with the alignment of the ccp-columns
 .ccp-options-container {
-  position: relative;
+  position: absolute;
+  top: 0;
   display: flex;
   justify-content: space-evenly;
+  // border: 1px solid magenta;
 }
 
 
@@ -832,9 +836,9 @@ output {
 .ccp-options-col-1, .ccp-options-col-2, .ccp-options-col-3, .ccp-options-col-4 {
   // VA! Reboot: positioning now done by flex on the parent container
   display: block;
-  top: 2px;
   margin: 0;
   padding: 0;
+  // border: 1px solid blue;
 }
 .ccp-options-col-1 {
   // !VA Width is actually irrelevant here since these elements are absolutely positioned
@@ -842,7 +846,7 @@ output {
   width: 92px;
   height: 120px;
   margin: 0 7px;
-  border: 1px solid transparent;
+  // border: 1px solid blue;
   .ccp-but {
     width: 90px;
     height: 90px; 
@@ -856,15 +860,9 @@ output {
 .ccp-options-col-2 {
   left: 120px;
   width: 230px;
-
-  label  {
-    width: 60px;
-    margin-bottom: 5px;
-    padding-right: 2px;
-    text-align: right;
-  }
+  // VA! Reboot Moved the label options to classes col-2-label and col-3-label
   input {
-    width: 150px;
+
   }
 }
 .ccp-options-col-3 {
@@ -901,10 +899,15 @@ output {
   font-weight: bold;
   color: #a8a8a8;
   color: #FFFFFF;
-  font-style: italic;
 }
 
-
+// VA! Reboot: need separate classes for the col 2 and col 3 labels that are NOT mock checkbox labels so we can set the width separately
+.col-2-label, .col-3-label {
+  width: 60px;
+  margin-bottom: 5px;
+  padding-right: 2px;
+  text-align: right;
+}
 
 // VA! Custom, i.e Mock checkbox
 /* These are the actual text labels for the checkboxes. */
@@ -988,13 +991,20 @@ output {
 }
 
 
-
-
-// VA! This is the extra label I added because the prodecure I used for the mock checkbox didn't include a label
+// VA! This is the extra label I added because the prodecure I used for the mock checkbox didn't include a label. 
 #ccp-img-include-width-height-label, #ccp-td-bgimage-label, #ccp-table-include-wrapper-label  {
   width: 100%;
-  padding-left: 34px;
+  padding: 0 0 0 25px;
   text-align: left;
+  // border: 1px solid magenta;
+}
+
+// VA! Reboot: 
+#ccp-table-include-wrapper-label {
+  margin: 0;
+  // padding: 0 0 0 34px;
+  // border: 1px solid red;
+  font-weight: bold !important;
 }
 
 

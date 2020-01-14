@@ -11,11 +11,6 @@
 
 
 
-
-
-
-
-
 // !VA GENERAL NOTES
 /* !VA  - January Reboot Notes
 =========================================================
@@ -34,7 +29,7 @@ TODO: Finish reviewing and implementing write to clipboard buttons. NOTE: Need t
 
 
 TODO: CB table html button doesn't work.
-TODO: Why does browser sync page refresh cause image display to fail? Does this with Arnie too.
+TODO: Why does browser sync page refresh cause image display to fail? Does this with Arnie too. This appears to only happen when refreshing html files.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer WIDTH. That's no good.
 TODO: There's extra whitespace above the Inspector pane. That should go away when we convert to flexbox. 
 
@@ -1858,7 +1853,7 @@ var Whitty = (function () {
       // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
       var wrapperItemsToShow = [];
 
-      // !VA With this faux checkmark structure, the clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it. 
+      // !VA With this mock checkmark structure, the clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it. 
       // !VA Reboot: Also have to replace the 3-char element identifier.
       chkId = event.target.id;
       chkId = chkId.replace('mrk', 'box');
@@ -1874,7 +1869,7 @@ var Whitty = (function () {
       document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value = `${data.viewerW}`;
       document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
       // !VA Show wrapper table options if the checked element is 'table-include-wrapper-checkbox'
-      if (checkbox.id === 'ccp-table-include-wrapper-checkbox') {
+      if (checkbox.id === 'chk-ccp-table-include-wrapper-checkbox') {
         wrapperItemsToShow = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
         if (checkbox.checked) {
           for (let i = 0; i < wrapperItemsToShow.length; i++) {

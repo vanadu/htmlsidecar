@@ -203,20 +203,20 @@
                 </div> 
                 <div class="ccp-options-col-2"> 
                   <div id="ccp-img-class"> 
-                    <label for="ipt-ccp-img-class-input">class=</label> 
+                    <label class="col-2-label" for="ipt-ccp-img-class-input">class=</label> 
                     <input id="ipt-ccp-img-class" value="" placeholder="none" />  
                   </div> 
                   <div id="ccp-img-alt"> 
-                    <label for="ipt-ccp-img-alt">alt=</label> 
+                    <label class="col-2-label" for="ipt-ccp-img-alt">alt=</label> 
                     <input id="ipt-ccp-img-alt" value="" placeholder="none" /> 
                   </div> 
                   <div id="ccp-img-relpath"> 
-                    <label id="ipt-ccp-img-relpath-label" for="ipt-ccp-img-relpath">path=</label> 
+                    <label id="ipt-ccp-img-relpath-label" class="col-2-label" for="ipt-ccp-img-relpath">path=</label> 
                     <input id="ipt-ccp-img-relpath" value="img" placeholder="none" />
                     <!-- <span class="slash">&nbsp;/</span>  -->
                   </div> 
                   <div id="ccp-img-align"> 
-                    <label id="sel-ccp-img-align-label" for="sel-ccp-img-align">align=</label> 
+                    <label id="sel-ccp-img-align-label" class="col-2-label" for="sel-ccp-img-align">align=</label> 
                     <select id="sel-ccp-img-align"> 
                       <option selected="selected">none</option> 
                       <option>left</option> 
@@ -285,11 +285,11 @@
       
                 <div class="ccp-options-col-2"> 
                   <div id="ccp-td-class"> 
-                    <label for="ipt-ccp-td-class">class=</label> 
+                    <label class="col-2-label" for="ipt-ccp-td-class">class=</label> 
                     <input id="ipt-ccp-td-class" value="" placeholder="none" />  
                   </div> 
                   <div id="ccp-td-align"> 
-                    <label id="sel-ccp-td-align-label" for="sel-ccp-td-align">align=</label> 
+                    <label id="sel-ccp-td-align-label" class="col-2-label" for="sel-ccp-td-align">align=</label> 
                     <select id="sel-ccp-td-align">
                       <option>none</option> 
                       <option selected="selected">left</option> 
@@ -298,7 +298,7 @@
                     </select>  
                   </div> 
                   <div id="ccp-td-valign"> 
-                    <label id="sel-ccp-td-valign-label" for="sel-ccp-td-valign">valign=</label>
+                    <label id="sel-ccp-td-valign-label" class="col-2-label" for="sel-ccp-td-valign">valign=</label>
                     <select id="sel-ccp-td-valign"> 
                       <option>none</option> 
                       <option selected="selected">top</option> 
@@ -309,10 +309,12 @@
                 </div> 
                 <div class="ccp-options-col-3">
                   <div id="ccp-td-bgcolor">
-                    <label for="ipt-ccp-td-bgcolor" id="ipt-ccp-td-bgcolor-label">bgcolor=</label>
+                    <label for="ipt-ccp-td-bgcolor" class="col-2-label" id="ipt-ccp-td-bgcolor-label">bgcolor=</label>
                     <input type="text" id="ipt-ccp-td-bgcolor" placeholder="none" value="" />
                   </div>
   
+
+
                   <div id="ccp-td-bgimage" > 
 
                       <label class="ccp-td-bgimage-container mock-checkbox-container" id="ccp-td-bgimage-container" for="ccp-td-bgimage">
@@ -350,11 +352,11 @@
                 <div class="ccp-options-col-2">
                   <p class="ccp-heading">Parent Table</p>
                   <div id="ccp-table-class"> 
-                    <label for="ipt-ccp-table-class">class=</label>
+                    <label class="col-2-label"for="ipt-ccp-table-class">class=</label>
                     <input id="ipt-ccp-table-class" placeholder="none" />  
                   </div> 
                   <div id="ccp-table-align"> 
-                    <label id="ccp-table-align-label" for="sel-ccp-table-align">align=</label> 
+                    <label class="col-2-label" id="ccp-table-align-label" for="sel-ccp-table-align">align=</label> 
                     <!-- We can hard code these because there isn't any dynamic data -->
                     <select id="sel-ccp-table-align"> 
                       <option>none</option>
@@ -364,11 +366,11 @@
                     </select>
                   </div>
                   <div id="ccp-table-width">
-                      <label id="ipt-ccp-table-width-label" for="ipt-ccp-table-width">width=</label> 
+                      <label id="ipt-ccp-table-width-label" class="col-2-label" for="ipt-ccp-table-width">width=</label> 
                       <input id="ipt-ccp-table-width" value="" placeholder="" />
                   </div>
                   <div id="ccp-table-bgcolor">
-                      <label for="ipt-ccp-table-bgcolor" id="ipt-ccp-table-bgcolor-label">bgcolor=</label>
+                      <label class="col-2-label" for="ipt-ccp-table-bgcolor" id="ipt-ccp-table-bgcolor-label">bgcolor=</label>
                       <input type="text" id="ipt-ccp-table-bgcolor" placeholder="none" value="" />
                   </div> 
                 </div>
@@ -376,8 +378,8 @@
                   <div id="ccp-table-include-wrapper"> 
                     <!-- !VA watch out... the 'for' might be wrong -->
                     <!-- VA! Reboot: This is still wrong...see how it renders-->
-                    <!-- VA! This is the outer label-->
-                    <p class="ccp-heading">Wrapper Table</p>
+                    <!-- VA! Reboot: Removing this outer header text, it's not necessary. In Arnie the checkbox label itself serves as the header.-->
+                    <!-- <p class="ccp-heading">Wrapper Table</p> -->
                       <label class="ccp-table-include-wrapper-container mock-checkbox-container" id="ccp-table-include-wrapper-container" for="ccp-table-include-wrapper">
                         <!-- VA! This is the inner label - the click area for the checkbox-->
                         <label class="ccp-table-include-wrapper-label mock-checkbox" id="ccp-table-include-wrapper-label" for="chk-ccp-table-include-wrapper-checkbox">Include wrapper table
@@ -389,15 +391,15 @@
                     </label> 
                   </div> 
                   <div id="ccp-table-wrapper-class"> 
-                      <label label="ipt-ccp-table-wrapper-class-label" for="ipt-ccp-table-wrapper-class">class=</label>
+                      <label class="col-3-label" id="ipt-ccp-table-wrapper-class-label" for="ipt-ccp-table-wrapper-class">class=</label>
                       <input id="ipt-ccp-table-wrapper-class" placeholder="none" />  
                   </div> 
                   <div id="ccp-table-wrapper-width"> 
-                      <label id="ipt-ccp-table-wrapper-width-label" for="ipt-ccp-table-wrapper-width">width=</label>
+                      <label id="ipt-ccp-table-wrapper-width-label" class="col-3-label" for="ipt-ccp-table-wrapper-width">width=</label>
                       <input id="ipt-ccp-table-wrapper-width" placeholder="none" />  
                   </div> 
                   <div id="ccp-table-wrapper-align"> 
-                    <label id="sel-ccp-table-wrapper-align-label" for="sel-ccp-table-wrapper-align">align=</label>
+                    <label id="sel-ccp-table-wrapper-align-label" class="col-3-label" for="sel-ccp-table-wrapper-align">align=</label>
                     <select id="sel-ccp-table-wrapper-align"> 
                       <option>none</option>
                       <option>left</option> 
@@ -406,7 +408,7 @@
                     </select>
                   </div> 
                   <div id="ccp-table-wrapper-bgcolor"> 
-                      <label id="ipt-ccp-table-wrapper-bgcolor-label" for="ipt-ccp-input-table-wrapper-bgcolor">bgcolor=</label>
+                      <label id="ipt-ccp-table-wrapper-bgcolor-label" class="col-3-label" for="ipt-ccp-input-table-wrapper-bgcolor">bgcolor=</label>
                       <input id="ipt-ccp-input-table-wrapper-bgcolor" placeholder="none" />  
                   </div> 
                 </div>
