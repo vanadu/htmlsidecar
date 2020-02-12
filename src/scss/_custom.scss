@@ -51,12 +51,14 @@ $dimwhit-font-family: 'Ubuntu', Arial, Helvetica, sans-serif;
 // VA! Reboot: Overriding the default Bootstrap root font size of 10px
 html {
   font-size: 16px;
+  box-sizing: border-box;
 }
 body {
   // VA!Reboot: not sure what this does.
   min-height: 100% !important; 
   font-family: $primary-font-family;
   font-size: 1rem;
+  
 }
 
 // VA! Reboot: only for content, probably can delete
@@ -109,7 +111,7 @@ button:disabled  {
   display: block;
   height: 70px;
   position: relative;
-  width: 1000px;
+  width: 1200px;
 }
 
 .header-headline {
@@ -121,7 +123,7 @@ button:disabled  {
   margin-left: 20px;
   .header-logo {
     position: relative;
-    width: 240px;
+    width: 320px;
     height: 46px;
     float: left;
     margin-top: 8px;
@@ -603,16 +605,22 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   }
   // DROP AREA
   #drop-area {
-    display: block;
+    // VA! display: flex is set programmatically
+    display: flex;
     position: relative;
+    flex-direction: column;
+    // align-content: center;
+    justify-content: flex-start;
+    align-items: flex-start;
     width: 600px;
     min-height: 400px;
     border: 2px dashed #bbb;
     border-radius: 10px;
-    // :VA Fix the vendor prefixes
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
     .drop-callout {
+      display: block;
+      position: relative;
+      height: 70px;
+      width: 100%;
       margin-top: 0;
       padding: 15px 25px;
       color: #959595;
@@ -624,8 +632,10 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
       display: block;
       margin: 0 20px 10px 40px;
       color: #959595;
-      font-size: 16px !important;
-
+      font-size: 1.125rem !important;
+      line-height: 1.365rem;
+      text-align: left;
+      
     }
     // span
     .witty {
@@ -748,23 +758,26 @@ output {
   height: 500px;
   // margin: 0 auto;
   padding: 0 10px;
-  // Global CCP character styles
+  // Character styles for CCP user input elements
   input, label {
     color: #FFFFFF;
     font-size: 14px;
     font-weight: 300;
-    
   }
   select {
     width: 90px;
     font-size: 14px;
   }
+  // CCP input element styles
   input {
     border: 1px solid #616161;
     background: #000000;
     color: #FFFFFF;
     width: 150px;
   }
+
+}
+
   // VA! Set the height of each option fieldset
   fieldset#ccp-img-options, fieldset#ccp-td-options, fieldset#ccp-table-options {
     height: 162px;
@@ -790,41 +803,13 @@ output {
       font-size: 16px;
       font-weight: 400;
     }
-
-    .ccp-options-col-1 {
-      // VA! Reboot: Moved out of parent hierarchy
-    }
-    .ccp-options-col-2 {
-      // VA! Reboot: Moved out of parent hierarchy
-    }
-    .ccp-options-col-3 {
-      // VA! Reboot: Moved out of parent hierarchy
-      
-
-  
-      // .ccp-table-include-wrapper-container {
-      //   display: block !important;
-      // }
-      
-
-      // VA! The Wrapper table label has to align left because it also serves as the option group heading
-      #chk-ccp-table-include-wrapper {
-        margin-left: -40px;
-      }
-      /* VA! Moved out of parent hierarchy    
-      .ccp-options-col-4 {
-
-      }
-      */
-
-    }
-
   }
-}
+
+
 // VA! This fixes the discrepancy between Firefox and Chrome with the alignment of the ccp-columns
 .ccp-options-container {
   position: absolute;
-  top: 0;
+  top: -1px;
   display: flex;
   justify-content: space-evenly;
   // border: 1px solid magenta;

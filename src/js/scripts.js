@@ -19,21 +19,16 @@ DONE: Fixed duplicated div closing tags that cause main image not to display
 DONE: Fixed -- mock checkbox label 'for' attribute has to refer to input ID. The Wrapper Table checkbox doesn't select when clicked - you have to click somewhere else on the span element. That needs to be fixed in the flexbox overhaul.
 DONE: large phones  inspector height value is wrong! Wrong var in getAppdata
 DONE: large phones css clip button writes undefined for width, fixed: global replace changed wrong var name
+DONE: Fixed - CB table html button doesn't work.
+DONE: Fixed - There's extra whitespace above the Inspector pane. That should go away when we convert to flexbox. 
+
 
 TODO: Figure out why queryDOMElements is running mutliple times per CB build.
 TODO: Finish reviewing and implementing write to clipboard buttons. NOTE: Need to thing about how to make that DRYer...there's a lot of repetition.
-
-
-
-
-
-
-TODO: CB table html button doesn't work.
-TODO: Why does browser sync page refresh cause image display to fail? Does this with Arnie too. This appears to only happen when refreshing html files.
+TODO: Why does browser sync page refresh cause image display to fail? Does this with Arnie too. This appears to only happen when refreshing html files. See the gulp file...html and js use on.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer WIDTH. That's no good.
-TODO: There's extra whitespace above the Inspector pane. That should go away when we convert to flexbox. 
 
-TODO: Select boxes are rendering differently in Ubuntu. May have to do with the font. Make sure all fonts are cross-browser.
+
 /*
 
 
@@ -315,7 +310,7 @@ var Whitty = (function () {
         // console.log('viewerH is: ' + viewerH); 
 
         // !VA Make sure the tbrContainer is off and the dropArea is on.
-        document.querySelector(staticRegions.dropArea).style.display = 'block';
+        document.querySelector(staticRegions.dropArea).style.display = 'flex';
         document.querySelector(staticRegions.tbrContainer).style.display = 'none';
         document.querySelector(iInspectors.btnToggleCcp).style.display = 'none';
 

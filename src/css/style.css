@@ -1012,7 +1012,8 @@ body {
   box-sizing: border-box; }
 
 html {
-  font-size: 16px; }
+  font-size: 16px;
+  box-sizing: border-box; }
 
 body {
   min-height: 100% !important;
@@ -1056,7 +1057,7 @@ button:disabled {
   display: block;
   height: 70px;
   position: relative;
-  width: 1000px; }
+  width: 1200px; }
 
 .header-headline {
   float: left;
@@ -1066,7 +1067,7 @@ button:disabled {
   margin-left: 20px; }
   .header-headline .header-logo {
     position: relative;
-    width: 240px;
+    width: 320px;
     height: 46px;
     float: left;
     margin-top: 8px; }
@@ -1427,15 +1428,20 @@ input:focus:-ms-input-placeholder {
   #main-image #main-img {
     border: 1px dotted #959595; }
   #main-image #drop-area {
-    display: block;
+    display: flex;
     position: relative;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
     width: 600px;
     min-height: 400px;
     border: 2px dashed #bbb;
-    border-radius: 10px;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px; }
+    border-radius: 10px; }
     #main-image #drop-area .drop-callout {
+      display: block;
+      position: relative;
+      height: 70px;
+      width: 100%;
       margin-top: 0;
       padding: 15px 25px;
       color: #959595;
@@ -1446,7 +1452,9 @@ input:focus:-ms-input-placeholder {
       display: block;
       margin: 0 20px 10px 40px;
       color: #959595;
-      font-size: 16px !important; }
+      font-size: 1.125rem !important;
+      line-height: 1.365rem;
+      text-align: left; }
     #main-image #drop-area .witty {
       color: #6a6a6a;
       font-size: 110%; }
@@ -1543,36 +1551,30 @@ output {
     background: #000000;
     color: #FFFFFF;
     width: 150px; }
-  #ccp-content fieldset#ccp-img-options, #ccp-content fieldset#ccp-td-options, #ccp-content fieldset#ccp-table-options {
-    height: 162px; }
-  #ccp-content fieldset {
-    display: block;
-    position: relative;
-    width: 100%;
-    margin-bottom: 5px;
-    border: 1px solid #959595;
-    border-radius: 5px; }
-    #ccp-content fieldset legend {
-      width: 145px;
-      height: 20px;
-      margin: 0 0 0 20px;
-      padding: 0 10px;
-      border: none;
-      color: #959595;
-      font-size: 16px;
-      font-weight: 400; }
-    #ccp-content fieldset .ccp-options-col-3 {
-      /* VA! Moved out of parent hierarchy    
-      .ccp-options-col-4 {
 
-      }
-      */ }
-      #ccp-content fieldset .ccp-options-col-3 #chk-ccp-table-include-wrapper {
-        margin-left: -40px; }
+fieldset#ccp-img-options, fieldset#ccp-td-options, fieldset#ccp-table-options {
+  height: 162px; }
+
+fieldset {
+  display: block;
+  position: relative;
+  width: 100%;
+  margin-bottom: 5px;
+  border: 1px solid #959595;
+  border-radius: 5px; }
+  fieldset legend {
+    width: 145px;
+    height: 20px;
+    margin: 0 0 0 20px;
+    padding: 0 10px;
+    border: none;
+    color: #959595;
+    font-size: 16px;
+    font-weight: 400; }
 
 .ccp-options-container {
   position: absolute;
-  top: 0;
+  top: -1px;
   display: flex;
   justify-content: space-evenly; }
 
