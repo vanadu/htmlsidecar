@@ -695,9 +695,8 @@ var Whitty = (function () {
         // !VA The regular TD element
           str = 
           
-`\xa0\xa0<td${tdTag.classAtt + ' '}${tdTag.alignAtt + ''}${tdTag.valignAtt + ''}${tdTag.bgcolorAtt + ''}>
-\xa0\xa0\xa0\xa0${tdTag.tdContents}
-\xa0\xa0</td>`;
+`<td${tdTag.classAtt + ' '}${tdTag.alignAtt + ''}${tdTag.valignAtt + ''}${tdTag.bgcolorAtt + ''}>` + 
+`\n ${tdTag.tdContents}` +  '\n</td>';
     
         }
         clipboardStr = str;
@@ -740,10 +739,21 @@ var Whitty = (function () {
       })(ccpUserInput.selCcpTableAlign);
       // !VA selCcpTableAlign END
 
-      tableTag.tableContents = (function () {
-        var str = ccpTdBuildHtmlClip(Appdata);
-        return str;
-      })();
+      // !VA For wrapper table
+      // var foo = ccpTdBuildHtmlClip(Appdata);
+      // console.log('foo before is: ' + foo);
+      // foo = foo.replace('<td', '    <td');
+      // foo = foo.replace('<img', '         <img');
+      // foo = foo.replace('</td', '          </td');
+      // console.log('foo after is: ' + foo);
+
+
+      // !VA This is the original function, looks just like the TD one
+      // tableTag.tableContents = (function () {
+      //   var str = ccpTdBuildHtmlClip(Appdata);
+      //   console.log('str is: ' + '{' + str + '}');
+      //   return str;
+      // })();
 
       // !VA Wrapper Width Attribute
       tableTag.widthAtt = (function (id, Appdata) {
@@ -817,35 +827,46 @@ var Whitty = (function () {
       // !VA iptCcpTdBgColor
 
       // !VA Get the checked status of Include table wrapper, and if it's 'checked' output the base table AND the table wrapper
+      // !VA Also, we are separating out the spaces from the template strings and including them as separate text to help deal with the indent spacing issue.
+
+      // !VA INDENT SPACING HACK
+      // !VA The newline \n always sets the next line all the way to the left border. That means that the embedded td and img elements from the always align to the far left which screws up the table indent scheme. There is probably a better solution but I didn't find it today or yesterday, so I'm going to hack this just to get it out the door. 
+
+      var tdContent1 = null;
+      var tdContent2 = null;
+      // !VA For regular table, we will apply the spacing manually to the TD snippet so it indents properly.
+      tdContent1 = ccpTdBuildHtmlClip(Appdata);
+      tdContent1 = tdContent1.replace('<td', '    <td');
+      tdContent1 = tdContent1.replace('<img', '    <img');
+      tdContent1 = tdContent1.replace('</td', '    </td');
+      console.log('tdContent1 after is: ' + tdContent1);
+
+      // !VA For the table with wrapper table, the spacing looks like this.
+      tdContent2 = ccpTdBuildHtmlClip(Appdata);
+      tdContent2 = tdContent2.replace('<td', '    <td');
+      tdContent2 = tdContent2.replace('<img', '         <img');
+      tdContent2 = tdContent2.replace('</td', '          </td');
+      console.log('tdContent2 after is: ' + tdContent2);
+
+
+
+
+
       if ( document.querySelector('#chk-ccp-table-include-wrapper-checkbox').checked) {
         clipboardStr = 
 
-`<table ${tableTag.wrapperclassAtt + ' '}${tableTag.wrapperWidthAtt + ' '}${tableTag.wrapperAlignAtt + ' '}${tableTag.wrapperBgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
-\xa0\xa0<tr>
-\xa0\xa0\xa0\xa0<td align="center" valign="top">
-\xa0\xa0\xa0\xa0\xa0\xa0<table ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
-\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0<tr>
-\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0${tableTag.tableContents}
-\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0</tr>
-\xa0\xa0\xa0\xa0\xa0\xa0</table>
-\xa0\xa0\xa0\xa0</td>
-\xa0\xa0</tr>
-</table>`;
+// !VA Use tdContent2 below to hack the indent spacing
+'<table ' + `${tableTag.wrapperclassAtt}` + ' ' + `${tableTag.wrapperWidthAtt}` + ' ' + `${tableTag.wrapperAlignAtt}` + ' ' + `${tableTag.wrapperBgcolorAtt}`  + ' border="0" cellpadding="0" cellspacing="0">' + '\n  <tr>' + '\n    <td align="center" valign="top">' + '\n      <table' +  `${tableTag.classAtt}` +  ' ' + `${tableTag.alignAtt}`  + ' ' + `${tableTag.widthAtt}`  + ' ' + `${tableTag.bgcolorAtt}`  + ' border="0" cellpadding="0" cellspacing="0">' + '\n        <tr>' +  '\n      ' + tdContent2 + '\n        </tr>' + '\n      </table>' + '\n    </td>' + '\n   </tr>' + '\n</table>';
 
         // !VA If the option is unchecked, output just the base table
       } else {
         clipboardStr = 
 
-`<table ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
-  <tr>
-  ${tableTag.tableContents}
-  </tr>
-</table>`;
+          // !VA Use tdContent1 below to hack the indent spacing
+ '<table ' + `${tableTag.classAtt}`  + ' ' + `${tableTag.alignAtt}`  + ' ' + `${tableTag.widthAtt}`  + ' ' + `${tableTag.bgcolorAtt}`  + ' border="0" cellpadding="0" cellspacing="0">' + '\n  <tr>' + '\n' +  tdContent1 + '\n  </tr>' +  '\n</table>';
 
       }
-      console.log('clipboardStr is: ' + '{' + clipboardStr + '}');
       return clipboardStr;
-
     }
 
     function ccpImgDsktpBuildCssClip(Appdata)  {
@@ -2081,7 +2102,6 @@ var Whitty = (function () {
 
     function getAppdata() {
       // console.log('getAppdata running');
-      var foo;
       var arr = [];
       var Appdata = {};
       
