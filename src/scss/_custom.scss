@@ -103,59 +103,54 @@ button:disabled  {
   margin: 0 auto;
   padding-top: 10px;
   padding-bottom: 5px;
-  // border-top: 1px solid $primary-bg-color;
-  // border-bottom: 1px solid $primary-bg-color;
 }
 
 .header-content {
   display: flex;
-  flex-direction: column;
-  height: 70px;
   position: relative;
-  width: 650px;
-  margin-left: 20px;
+  flex-direction: column;
+  align-content: center;
+  width: 100%;
+  height: 80px;
+  padding-left: 120px;
 }
 
 .header-headline {
   position: relative;
   width: 440px;
   height: 76px;
-
   float: left;
-  // margin: 0 auto;
-  .header-image {
-    // position: absolute;
-    // top: 0;
-    width: 90px;
-    margin-top: 4px;
-    margin-left: -8px;
-    float: left;
-    img {
-      width: 90px;
-      margin-top: -12px;
-      &.right, .left {position: absolute;}
-      &.right {right: 0;}
-      &.left {left: 0;}
-    }
+}
+
+.header-image {
+  position: absolute;
+  // top: 0;
+  width: 113px;
+  height: 113px;
+  margin-top: -8px;
+  margin-left: -8px;
+  float: left;
+  // VA! z-index is for the 'runMe' link, only for dev
+  z-index: 100;
+  img {
+    width: 100%;
+    height: auto;
   }
 }
 
-
 .header-logo {
   position: relative;
-  width: 320px;
-  height: 46px;
-  float: left;
-  margin-top: 8px;
+  width: 330px;
+  height: 48px;
+
   h1 {
-    font-family: $inspector-font-family;
-    position: absolute;
     top: 0;
-    font-size: 48px;
-    font-weight: bold;
     margin: 0;
     padding: 0;
     color: $whit-color;
+    font-family: $inspector-font-family;
+    font-size: 48px;
+    font-weight: bold;
   }
   .header-version {
     position: absolute;
@@ -168,16 +163,12 @@ button:disabled  {
       padding: 0;
     }
   }
-  // border: 1px solid black;
-  img {
-    display: block;
-    // margin: 0 auto;
-  }
 }
 
 
-.header-subtext, .header-slug {
-  float: right;
+.header-subtext {
+  position: relative;
+  width: 100%;
   h2 {
     width: 100%;
     margin-top: 6px;
@@ -206,22 +197,6 @@ button:disabled  {
   }
 }
 
-.header-divider {
-  position: absolute;
-  width: 18px;
-  height: 90px;
-  top: 0;
-  right: 0;
-  margin-top: 4px;
-  border-right: 8px solid #b77033;
-  border-left: 8px solid #b7b233;
-}
-
-.header-slug {
-  width: 600px;
-}
-
-
 // APP-CONTAINER
 #app-container {
   display: block;
@@ -229,7 +204,7 @@ button:disabled  {
   // VA! This yields a viewport width of 802, which allows a user-entered width of 800 max
   width: 850px;
   min-height: 679px;
-  margin: 15px auto 100px;
+  margin: 30px auto 100px;
 }
 
 // TOOLS
