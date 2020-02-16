@@ -1,0 +1,15 @@
+06.04.19
+
+init:
+-----
+*Test for curImg
+	if TRUE:
+		initDev
+	if FALSE:
+		initUI
+		showDimViewers ('no image')
+
+
+getCurImgDims
+-------------
+	load curImg

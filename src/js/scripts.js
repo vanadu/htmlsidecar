@@ -489,7 +489,7 @@ var Whitty = (function () {
       }
 
       // !VA Now that we've gotten the snippet, we create the clipboard object.
-      var currentCB = new Clipboard(makeClipButID, {
+      var currentCB = new ClipboardJS(makeClipButID, {
         text: function(trigger) {
 
           // var clipboardStr = ccpImgBuildHtmlClip();
@@ -519,7 +519,7 @@ var Whitty = (function () {
     function ccpImgBuildHtmlClip(Appdata) {
       console.log('running ccpImgBuildHtmlClip');
       // !VA The string that passes the HTML img tag
-      var str; 
+
       // !VA Create the instance for img tag clipboard object and add img-specific properties.
       // !VA We're doing this in an object and outputting to an array because the object is easier to manage and the array is easier to reorder. The Constructor is in this module in the private functions above.
       var imgTag = new ClipboardOutput('imgTag');
@@ -528,6 +528,7 @@ var Whitty = (function () {
       imgTag.classAtt = 
         // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
         ccpIfNoUserInput('class',document.querySelector(ccpUserInput.iptCcpImgClass).value);
+        // console.log('imgTag.classAtt is: ' + imgTag.classAtt);
 
       imgTag.altAtt =    
         // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output
@@ -540,10 +541,11 @@ var Whitty = (function () {
         var str;
         // !VA If the path input element is empty, just include the iFilename and omit the path.
         if (document.querySelector(id).value) {
-          str = `src="${document.querySelector(ccpUserInput.iptCcpImgRelPath).value}/${document.querySelector(iInspectors.iFilename).textContent} `;
+          str = `src="${document.querySelector(ccpUserInput.iptCcpImgRelPath).value}/${document.querySelector(iInspectors.iFilename).textContent}"`;
         } else {
           str = document.querySelector(iInspectors.iFilename).textContent;
         }
+
         return str;
       })(ccpUserInput.iptCcpImgRelPath, Appdata);
       // !VA imgTag.srcAtt END
@@ -557,10 +559,11 @@ var Whitty = (function () {
         id = id.replace('spn', 'chk');
         // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
         if (document.querySelector(id).checked === true) {
-          str = `border="0" style="width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; border: none; outline: none; text-decoration: none; display: block;" `;
+          str = `border="0" style="display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;" `;
         } else {
-          str = 'border="0" style="border: none; outline: none; text-decoration: none; display: block;"';
+          str = 'border="0" style="display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;"';
         }
+
         return str;
       })(ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk);
       // !VA imgTag.styleAtt END
@@ -572,7 +575,7 @@ var Whitty = (function () {
         // !VA Put the available options in an array
         var imgAlignOptions = [ 'none', 'left', 'middle', 'right' ];
         // !VA Put the desired output strings in an array
-        var clipboardOutput = [ '', 'align="left" ', 'align="middle" ', 'align="right" '];
+        var clipboardOutput = [ '', ' align="left"', ' align="middle"', ' align="right"'];
         // !VA If the selected index matches the index of the available options array, then output the string that matches that index
         for (let i = 0; i < imgAlignOptions.length; i++) {
           if ( selInd === i) {
@@ -588,7 +591,7 @@ var Whitty = (function () {
 
       // !VA Build the HTML tag
 
-      imgTagStr = `  <img ${imgTag.classAtt + ' '}${imgTag.altAtt + ''}${imgTag.alignAtt + ' '}${imgTag.widthAtt + ' '}${imgTag.heightAtt + ' '}${imgTag.srcAtt + ' '}${imgTag.styleAtt} />`;
+      imgTagStr = `  <img${imgTag.classAtt + ''}${imgTag.altAtt + ''}${imgTag.alignAtt + ' '}${imgTag.widthAtt + ' '}${imgTag.heightAtt + ' '}${imgTag.srcAtt + ' '}${imgTag.styleAtt} />`;
 
       // !VA Pass the imgTagArray and return it as string
       return imgTagStr;
@@ -666,13 +669,11 @@ var Whitty = (function () {
         id = id.replace('mrk', 'box');
         id = id.replace('spn', 'chk');
         // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
-
         if (document.querySelector(id).checked === true) {
           str = 
           
                 
-`
-  <td background="${document.querySelector(ccpUserInput.iptCcpImgRelPath).value}/${data.fname}" ${tdTag.bgcolorAtt}" width="${Appdata.imgW}" height="${Appdata.imgH}" ${tdTag.valignAtt}">
+` <td background="${document.querySelector(ccpUserInput.iptCcpImgRelPath).value}/${Appdata.fname}" ${tdTag.bgcolorAtt}" width="${Appdata.imgW}" height="${Appdata.imgH}" ${tdTag.valignAtt}">
   <!--[if gte mso 9]>
     <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Appdata.imgW}px;height:${Appdata.imgH}px;">
     <v:fill type="tile" src="${document.querySelector(ccpUserInput.iptCcpImgRelPath).value}/${Appdata.fname}" color="${tdTag.bgcolorAtt}" />
@@ -693,16 +694,15 @@ var Whitty = (function () {
         } else {
         // !VA The regular TD element
           str = 
-    
-`    <td ${tdTag.classAtt + ' '}${tdTag.alignAtt + ' '}${tdTag.valignAtt + ' '}${tdTag.bgcolorAtt + ' '}>
-      ${tdTag.tdContents}
-    </td>`;
+          
+`\xa0\xa0<td${tdTag.classAtt + ' '}${tdTag.alignAtt + ''}${tdTag.valignAtt + ''}${tdTag.bgcolorAtt + ''}>
+\xa0\xa0\xa0\xa0${tdTag.tdContents}
+\xa0\xa0</td>`;
     
         }
         clipboardStr = str;
         // return clipboardStr;
       })(ccpUserInput.spnCcpTdBgimageCheckmrk);
-
       return clipboardStr;
     }
 
@@ -820,29 +820,30 @@ var Whitty = (function () {
       if ( document.querySelector('#chk-ccp-table-include-wrapper-checkbox').checked) {
         clipboardStr = 
 
-  `<table ${tableTag.wrapperclassAtt + ' '}${tableTag.wrapperWidthAtt + ' '}${tableTag.wrapperAlignAtt + ' '}${tableTag.wrapperBgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
-  <tr>
-    <td align="center" valign="top">
-      <table ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
-        <tr>
-      ${tableTag.tableContents}
-        </tr>
-      </table>
-    </td>
-  </tr>
-  </table>`;
+`<table ${tableTag.wrapperclassAtt + ' '}${tableTag.wrapperWidthAtt + ' '}${tableTag.wrapperAlignAtt + ' '}${tableTag.wrapperBgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
+\xa0\xa0<tr>
+\xa0\xa0\xa0\xa0<td align="center" valign="top">
+\xa0\xa0\xa0\xa0\xa0\xa0<table ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
+\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0<tr>
+\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0${tableTag.tableContents}
+\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0</tr>
+\xa0\xa0\xa0\xa0\xa0\xa0</table>
+\xa0\xa0\xa0\xa0</td>
+\xa0\xa0</tr>
+</table>`;
 
         // !VA If the option is unchecked, output just the base table
       } else {
         clipboardStr = 
 
-  `<table ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
-    <tr>
-        ${tableTag.tableContents}
-    </tr>
-  </table>`;
+`<table ${tableTag.classAtt + ' '}${tableTag.alignAtt + ' '}${tableTag.widthAtt + ' '}${tableTag.bgcolorAtt + ' '}border="0" cellpadding="0" cellspacing="0">
+  <tr>
+  ${tableTag.tableContents}
+  </tr>
+</table>`;
 
       }
+      console.log('clipboardStr is: ' + '{' + clipboardStr + '}');
       return clipboardStr;
 
     }
@@ -993,7 +994,8 @@ var Whitty = (function () {
         if (value === '#') {
           str = '';
         } else {
-          str = `${att}="${value}"`;
+          // !VA Include the space here to ensure no duplicate spaces slip in when the clip is built
+          str = ` ${att}="${value}"`;
         }
 
       } else {
