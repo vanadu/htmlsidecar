@@ -85,6 +85,11 @@ var Whitty = (function () {
   //   }, false);
   // })();
 
+  // document.addEventListener("DOMContentLoaded", function() {
+    
+  //   console.log('onload running...');
+  // });
+
 
   var UIController = (function() {
 
@@ -414,7 +419,6 @@ var Whitty = (function () {
   })();
 
 
-
   var CBController = (function() {
 
 
@@ -510,10 +514,11 @@ var Whitty = (function () {
     }
 
 
-    function allClipboardStrings() {
-      // !VA 02.17.20
 
-    }
+
+    // document.addEventListener("DOMContentLoaded", function() {
+    //   allClipboardStrings();
+    // });
 
     // !VA Constructor for the clipboard output objects. These are all the properties all the clipboard output objects (img, td and table) will have. We store these key/value pairs in instances of the ClipboardOutput  because they're easier to manage. Then we write the output into an HTML string.
     function ClipboardOutput(classAtt, alignAtt ) {
@@ -533,11 +538,13 @@ var Whitty = (function () {
       // !VA ---------------------------
       imgTag.classAtt = 
         // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output 
-        ccpIfNoUserInput('class',document.querySelector(ccpUserInput.iptCcpImgClass).value);
-        // console.log('imgTag.classAtt is: ' + imgTag.classAtt);
+        // ccpIfNoUserInput('class',document.querySelector(ccpUserInput.iptCcpImgClass).value);
+
+      CBController.doClipboard();
+      console.log('imgTag.classAtt is: ' + imgTag.classAtt);
 
       imgTag.altAtt =    
-        // !VA If the user has input a value and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output
+        // !VA If the user has input a evalue and the value exists, then build the clipboard output string. Otherwise, exclude the attribute string from the clipboard output
         ccpIfNoUserInput('alt',document.querySelector(ccpUserInput.iptCcpImgAlt).value);
       // !VA imgTag.altAtt END
 
@@ -558,6 +565,7 @@ var Whitty = (function () {
       imgTag.heightAtt = `height="${Appdata.imgH}"`;
       imgTag.widthAtt = `width="${Appdata.imgW}"`;
       imgTag.styleAtt =  (function (id) {
+
         // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
         var str;
         // !VA Reboot: Find a better way to do this than with two replace methods
@@ -746,12 +754,12 @@ var Whitty = (function () {
       // !VA selCcpTableAlign END
 
       // !VA For wrapper table
-      // var foo = ccpTdBuildHtmlClip(Appdata);
-      // console.log('foo before is: ' + foo);
-      // foo = foo.replace('<td', '    <td');
-      // foo = foo.replace('<img', '         <img');
-      // foo = foo.replace('</td', '          </td');
-      // console.log('foo after is: ' + foo);
+      // var str = ccpTdBuildHtmlClip(Appdata);
+      // console.log('str before is: ' + str);
+      // str = str.replace('<td', '    <td');
+      // str = str.replace('<img', '         <img');
+      // str = str.replace('</td', '          </td');
+      // console.log('str after is: ' + str);
 
 
       // !VA This is the original function, looks just like the TD one
@@ -1004,8 +1012,34 @@ var Whitty = (function () {
 
     // !VA Working 062119_CBMods2
 
+    // !VA 02.17.20 This is the same as ccpIfNoUserInput except it returns ONLY the value, not the attribute name -- but we don't need this now, because if it has not value, then, well it has no value.
+    function ccpGetAttValue(att, value) {
+      // !VA We need get the iFilename from Appdata in case the user leaves 'path' empty
+      var Appdata = appController.initGetAppdata();
+      var str;
+      // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
+      if (value && att) {
+        // !VA I might want to change this to include the # in the string itself.
+        if (value === '#') {
+          str = '';
+        } else {
+          // !VA Include the space here to ensure no duplicate spaces slip in when the clip is built
+          str = value;
+        }
 
-
+      } else {
+        // !VA If the path field is empty, we need to return the iFilename without the path.
+        if (att === 'src' && value === '' ) {
+          str = `${att}="${Appdata.fname}" `;
+        } else if ( att === '#' || att === '') {
+          str = '';
+        } else {
+          // !VA If there is no input, exclude the attribute entry.
+          str = '';
+        }
+      }
+      return str;
+    }
 
 
 
@@ -1039,14 +1073,198 @@ var Whitty = (function () {
       return str;
     }
 
+    function buildImgTag(img) {
+      console.log('buildImgTag running...');
+      console.log('img is: ' + img);
+      var Appdata = appController.initGetAppdata();
+      let imgTagSrcAtt = null;
+      let imgTagClassAtt = null;
+      let imgTagWidthAtt  = null;
+      let imgTagHeightAtt  = null;
+      let imgTagAlignAtt  = null;
+      let imgTagAltAtt  = null;
+      let imgTagStyleAtt = null;
+      
+      
+      // !VA class attribute
+      imgTagClassAtt = ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpImgClass).value);
+      if (imgTagClassAtt) {
+        img.className = imgTagClassAtt;
+      }
+
+
+      // !VA Alt attribute
+      imgTagAltAtt = ccpGetAttValue('alt',document.querySelector(ccpUserInput.iptCcpImgAlt).value);
+      if (imgTagAltAtt) {
+        img.alt = imgTagAltAtt;
+      }
+
+      // !VA Src attribute
+      var srcstr;
+      if (document.querySelector(ccpUserInput.iptCcpImgRelPath).value) {
+        srcstr = document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + document.querySelector(iInspectors.iFilename).textContent;
+      }
+      else {
+        srcstr = document.querySelector(iInspectors.iFilename).textContent;
+      }
+
+      imgTagSrcAtt = srcstr;
+      console.log('imgTagSrcAtt is: ' + imgTagSrcAtt);
+      img.src = imgTagSrcAtt;
+
+      // !VA width attribute
+      imgTagWidthAtt = Appdata.imgW;
+      img.width = imgTagWidthAtt;
+
+      // !VA height attribute
+      imgTagHeightAtt  = Appdata.imgH;
+      img.height = imgTagHeightAtt;
+
+      // !VA style attribute
+      imgTagStyleAtt =  (function (id) {
+        // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
+        var str;
+        // !VA Reboot: Find a better way to do this than with two replace methods
+        id = id.replace('mrk', 'box');
+        id = id.replace('spn', 'chk');
+        // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
+        if (document.querySelector(id).checked === true) {
+          str = `border="0" style="display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;" `;
+        } else {
+          str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;';
+        }
+        return str;
+      })(ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk);
+      img.setAttribute('style', imgTagStyleAtt);
+
+      // !VA align attribute is deprecated in html5, so we need this hack if we want to include it, which we don't for now.
+
+      var id = ccpUserInput.selCcpImgAlign;
+      imgTagAlignAtt = (function (id) {
+        // !VA Pass in the id of the select dropdown
+        var str;
+        // !VA Get the selection index
+        var selInd = document.querySelector(id).selectedIndex;
+        console.log('selInd is: ' + selInd);
+        switch (true) {
+        case (selInd === 0):
+          str = '';
+          break;
+        case (selInd === 1):
+          str = 'left';
+          break;
+        case (selInd === 2):
+          str = 'middle';
+          break;
+        case (selInd === 3):
+          str = 'right';
+          break;
+        }
+        return str;
+      })(ccpUserInput.selCcpImgAlign);
+      if (imgTagAlignAtt) {
+        img.align = imgTagAlignAtt;
+      }
+      
+      // !VA border attribute
+      img.border = '0';
+      return img;
+
+    }
+
     // !VA CBController public functions 
     return {
       doClipboard: function(evt) {
         console.log('doingClipboard');
-        ccpGetSnippet(evt.target.id);
+        // !VA 02.17.20
+        // !VA We're redirecting for test to getAllCppOptions
+        console.log('evt is: ' + evt);
+        // ccpGetSnippet(evt.target.id);
+      },
+
+    
+
+
+      queryAllCcpOptions: function(evt) {
+        // !VA 02.17.20
+        console.log('queryAllCcpOptions running...');
+        console.log('evt.target.id is: ' + evt.target.id);
+        var Appdata = appController.initGetAppdata();
+        var outputElement;
+
+        let imgTagSrcAtt = null;
+        let imgTagClassAtt = null;
+        let imgTagWidthAtt  = null;
+        let imgTagHeightAtt  = null;
+        let imgTagAlignAtt  = null;
+        let imgTagAltAtt  = null;
+        let imgTagStyleAtt = null;
+        let tdTagClassAtt= null;
+        let tdTagAlignAtt= null;
+        let tdTagValignAtt= null;
+        let tdTagBgcolorAtt= null;
+        let tdTagBgimgAtt= null;
+        let tableTagClassAtt= null;
+        let tableTagWidthAtt= null; 
+        let tableTagAlignAtt= null;
+        let tableTagBgcolorAtt= null;
+        let tableTagWrapperWidthAtt= null;
+        let tableTagWrapperAlignAtt= null;
+
+        // !VA Create and format the table whose attributes will be populated
+        let table = document.createElement('table');
+        let tr = document.createElement('tr');
+        let td = document.createElement('td');
+        let img = document.createElement('img');
+
+
+        var imgTag = buildImgTag(img);
+        console.log('imgTag is: ' + imgTag);
+        console.log(img);
+        
+
+
+        table.appendChild(tr);
+        tr.appendChild(td);
+        td.appendChild(img);
+        tr.insertAdjacentHTML('beforebegin', '\n  ');
+        tr.insertAdjacentHTML('afterend', '\n');
+        td.insertAdjacentHTML('beforebegin', '\n    ');
+        td.insertAdjacentHTML('afterend', '\n  ');
+        img.insertAdjacentHTML('beforebegin', '\n      ');
+        img.insertAdjacentHTML('afterend', '\n    ');
+      
+
+
+        
+        var clipboardStr;
+        var currentCB = new ClipboardJS(btnCcpBuildClips.btnCcpImgBuildHtmlClip, {
+          text: function(trigger) {
+  
+            // var clipboardStr = ccpImgBuildHtmlClip();
+            // !VA Write success message to app message area on success
+            currentCB.on('success', function(event) {
+              appController.initMessage(false, 'copied_2_CB');
+              // debugger;
+            });
+    
+            currentCB.on('error', function(e) {
+              console.error('Action:', e.action);
+              console.error('Trigger:', e.trigger);
+            });
+            // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
+            return table.outerHTML;
+          }
+        });
       }
     };
+
   })();
+
+
+
+
+
 
 
   // GLOBAL APP MODULE
@@ -1182,7 +1400,7 @@ var Whitty = (function () {
         if(btnCcpBuildClips.hasOwnProperty(i)){
           clipBut = document.querySelector(btnCcpBuildClips[i]);
           // console.log('clipBut.id is: ' + clipBut.id);
-          addEventHandler(clipBut,'click',CBController.doClipboard,false);
+          addEventHandler(clipBut,'click',CBController.queryAllCcpOptions,false);
         }
       }
 
@@ -2104,7 +2322,7 @@ var Whitty = (function () {
         calcViewerSize();
         // !VA Open the CCP by default in dev mode
         // !VA First, set it to the opposite of how you want to start it.
-        document.querySelector(staticRegions.ccpContainer).classList.add('active');
+        document.querySelector(staticRegions.ccpContainer).classList.remove('active');
         // !VA Then run initCCP to initialize
   
         initCCP();
