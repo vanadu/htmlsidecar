@@ -856,14 +856,14 @@ var Whitty = (function () {
         clipboardStr = 
 
 // !VA Use tdContent2 below to hack the indent spacing
-'<table ' + `${tableTag.wrapperclassAtt}` + ' ' + `${tableTag.wrapperWidthAtt}` + ' ' + `${tableTag.wrapperAlignAtt}` + ' ' + `${tableTag.wrapperBgcolorAtt}`  + ' border="0" cellpadding="0" cellspacing="0">' + '\n  <tr>' + '\n    <td align="center" valign="top">' + '\n      <table' +  `${tableTag.classAtt}` +  ' ' + `${tableTag.alignAtt}`  + ' ' + `${tableTag.widthAtt}`  + ' ' + `${tableTag.bgcolorAtt}`  + ' border="0" cellpadding="0" cellspacing="0">' + '\n        <tr>' +  '\n      ' + tdContent2 + '\n        </tr>' + '\n      </table>' + '\n    </td>' + '\n   </tr>' + '\n</table>';
+'<table' + `${tableTag.wrapperclassAtt}` + ' ' + `${tableTag.wrapperWidthAtt}` + ' ' + `${tableTag.wrapperAlignAtt}` + ' ' + `${tableTag.wrapperBgcolorAtt}`  + ' border="0" cellpadding="0" cellspacing="0">' + '\n  <tr>' + '\n    <td align="center" valign="top">' + '\n      <table' +  `${tableTag.classAtt}` +  ' ' + `${tableTag.alignAtt}`  + ' ' + `${tableTag.widthAtt}`  + ' ' + `${tableTag.bgcolorAtt}`  + ' border="0" cellpadding="0" cellspacing="0">' + '\n        <tr>' +  '\n      ' + tdContent2 + '\n        </tr>' + '\n      </table>' + '\n    </td>' + '\n   </tr>' + '\n</table>';
 
         // !VA If the option is unchecked, output just the base table
       } else {
         clipboardStr = 
 
           // !VA Use tdContent1 below to hack the indent spacing
- '<table ' + `${tableTag.classAtt}`  + ' ' + `${tableTag.alignAtt}`  + ' ' + `${tableTag.widthAtt}`  + ' ' + `${tableTag.bgcolorAtt}`  + ' border="0" cellpadding="0" cellspacing="0">' + '\n  <tr>' + '\n' +  tdContent1 + '\n  </tr>' +  '\n</table>';
+ '<table' + `${tableTag.classAtt}`  + ' ' + `${tableTag.alignAtt}`  + ' ' + `${tableTag.widthAtt}`  + ' ' + `${tableTag.bgcolorAtt}`  + ' border="0" cellpadding="0" cellspacing="0">' + '\n  <tr>' + '\n' +  tdContent1 + '\n  </tr>' +  '\n</table>';
 
       }
       return clipboardStr;
