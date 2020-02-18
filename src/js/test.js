@@ -151,7 +151,7 @@ var Whitty = (function () {
       iptCcpImgRelPath: '#ipt-ccp-img-relpath',
       iptCcpTdClass: '#ipt-ccp-td-class',
       selCcpTdAlign: '#sel-ccp-td-align',
-      tdValign: '#sel-ccp-td-valign',
+      selCcpTdValign: '#sel-ccp-td-valign',
       iptCcpTdBgColor: '#ipt-ccp-td-bgcolor',
       // !VA spn-ccp-td-bgimage-checkmrk
       spnCcpTdBgimageCheckmrk: '#spn-ccp-td-bgimage-checkmrk',
@@ -263,7 +263,7 @@ var Whitty = (function () {
       // !VA Moving getAppdata from appController to UIController because Appdata is derived from the DOM elements and data properties that reside in the DOM. 
 
       queryDOMElements: function() {
-        console.log('queryDOMElements running...');
+        // console.log('queryDOMElements running...');
         // !VA NEW This needs to ONLY return the non-calculated DOM elements and data properties: curImg.imgW, curImg.imgW, curImg.imgNW, curImg.NH and viewerW. Aspect is calculated so we don't need to get that here, leave that to appController.
         // !VA NEW We will get the individual properties and return them as an ES6 array.
         // !VA Declare the local vars
@@ -689,7 +689,6 @@ var Whitty = (function () {
       </v:textbox>
     </v:rect>
     <![endif]-->
-  </td>
 `;
     
     
@@ -1045,7 +1044,7 @@ var Whitty = (function () {
           str = '';
         } else {
           // !VA Include the space here to ensure no duplicate spaces slip in when the clip is built
-          str = ` ${att}="${value}"`;
+          str = value;
         }
 
       } else {
@@ -1062,6 +1061,335 @@ var Whitty = (function () {
       return str;
     }
 
+    function makeImgTag(id, indentLevel) {
+      console.log('buildImgTag running...');
+      // console.log('indents is: ');
+      // console.dir(indents);
+      console.log('indentLevel is: ' + indentLevel);
+      
+      var Appdata = appController.initGetAppdata();
+      let imgTagSrcAtt = null;
+      let imgTagClassAtt = null;
+      let imgTagWidthAtt  = null;
+      let imgTagHeightAtt  = null;
+      let imgTagAlignAtt  = null;
+      let imgTagAltAtt  = null;
+      let imgTagStyleAtt = null;
+      
+      
+      // var el = document.querySelector('.header-container');
+      // var newel = document.createElement('div');
+      // el.parentNode.insertBefore(newel, el.nextSibling);
+      // newel.classList.add('output');
+      // newel.innerHTML = 'asldfkja;sldkfjas;ldfkj';
+      // newel = document.querySelector('.output');
+      
+      let img = document.createElement('img');
+      console.log('img is: ' + img);
+      console.log('img.outerHTML is: ' + img.outerHTML);
+
+      // newel.appendChild(table);
+      // table.appendChild(td);
+      // td.appendChild(img);
+
+ 
+      
+      // !VA class attribute
+      imgTagClassAtt = ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpImgClass).value);
+      if (imgTagClassAtt) {
+        img.className = imgTagClassAtt;
+      }
+
+
+      // !VA Alt attribute
+      imgTagAltAtt = ccpGetAttValue('alt',document.querySelector(ccpUserInput.iptCcpImgAlt).value);
+      if (imgTagAltAtt) {
+        img.alt = imgTagAltAtt;
+      }
+
+      // !VA Src attribute
+      var srcstr;
+      if (document.querySelector(ccpUserInput.iptCcpImgRelPath).value) {
+        srcstr = document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + document.querySelector(iInspectors.iFilename).textContent;
+      }
+      else {
+        srcstr = document.querySelector(iInspectors.iFilename).textContent;
+      }
+
+      imgTagSrcAtt = srcstr;
+      img.src = imgTagSrcAtt;
+
+      // !VA width attribute
+      imgTagWidthAtt = Appdata.imgW;
+      img.width = imgTagWidthAtt;
+
+      // !VA height attribute
+      imgTagHeightAtt  = Appdata.imgH;
+      img.height = imgTagHeightAtt;
+
+      // !VA style attribute
+      imgTagStyleAtt =  (function (chkboxid) {
+        // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
+        var str;
+        // !VA Reboot: Find a better way to do this than with two replace methods
+        chkboxid = chkboxid.replace('mrk', 'box');
+        chkboxid = chkboxid.replace('spn', 'chk');
+        // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
+        if (document.querySelector(chkboxid).checked === true) {
+          str = `border="0" style="display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;" `;
+        } else {
+          str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;';
+        }
+        return str;
+      })(ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk);
+      img.setAttribute('style', imgTagStyleAtt);
+
+      // !VA align attribute is deprecated in html5, so we need this hack if we want to include it, which we don't for now.
+      var selectid = ccpUserInput.selCcpImgAlign;
+      imgTagAlignAtt = (function (selectid) {
+        // !VA Pass in the id of the select dropdown
+        var str;
+        // !VA Get the selection index
+        var selInd = document.querySelector(selectid).selectedIndex;
+        switch (true) {
+        case (selInd === 0):
+          str = '';
+          break;
+        case (selInd === 1):
+          str = 'left';
+          break;
+        case (selInd === 2):
+          str = 'middle';
+          break;
+        case (selInd === 3):
+          str = 'right';
+          break;
+        }
+        return str;
+      })(ccpUserInput.selCcpImgAlign);
+      if (imgTagAlignAtt) {
+        img.align = imgTagAlignAtt;
+      }
+
+      // !VA border attribute
+      img.border = '0';
+
+      if (indentLevel === 0) {
+
+        writeClipboard(id, img);
+      } else {
+        return img;
+      }
+
+      // return img;
+      // !VA Need to build an array here to control when the img attributes are set. 
+    }
+
+    function makeTdTag(id, indents, indentLevel ) {
+      console.log('makeTdTag running...');
+      console.log('indents is: ');
+      console.dir(indents);
+      console.log('indentLevel is: ' + indentLevel);
+      console.log('id is: ' + id);
+      let Appdata = appController.initGetAppdata();
+      let tdTagClassAtt= null;
+      let tdTagAlignAtt= null;
+      let tdTagValignAtt= null;
+      let tdTagBgcolorAtt= null;
+      let td = document.createElement('td');
+      let selectid = null;
+      let str = null;
+
+
+      // !VA We need two different td outputs, one if the Stig bg image box is checked and another if it's not. So...
+      (function (chkboxid) {
+        // !VA Test if the checkbox is checked
+        // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
+        chkboxid = chkboxid.replace('mrk', 'box');
+        chkboxid = chkboxid.replace('spn', 'chk');
+        
+        // !VA STIG'S BG IMAGE NOT CHECKED
+        if (document.querySelector(chkboxid).checked === false) {
+          // !VA class attribute
+          tdTagClassAtt = ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpTdClass).value);
+          if (tdTagClassAtt) {
+            td.className = tdTagClassAtt;
+          }
+          // !VA align attribute
+          selectid = ccpUserInput.selCcpTdAlign;
+          tdTagAlignAtt = (function (selectid) {
+            // !VA Pass in the id of the select dropdown
+            var str;
+            // !VA Get the selection index
+            var selInd = document.querySelector(selectid).selectedIndex;
+            switch (true) {
+            case (selInd === 0):
+              str = '';
+              break;
+            case (selInd === 1):
+              str = 'left';
+              break;
+            case (selInd === 2):
+              str = 'middle';
+              break;
+            case (selInd === 3):
+              str = 'right';
+              break;
+            }
+            return str;
+          })(ccpUserInput.selCcpTdAlign);
+          if (tdTagAlignAtt) {
+            td.align = tdTagAlignAtt;
+          }
+          // !VA valign attribute
+          selectid = ccpUserInput.selCcpTdValign;
+          tdTagValignAtt = (function (selectid) {
+            // !VA Pass in the id of the select dropdown
+            var str;
+            // !VA Get the selection index
+            var selInd = document.querySelector(selectid).selectedIndex;
+            switch (true) {
+            case (selInd === 0):
+              str = '';
+              break;
+            case (selInd === 1):
+              str = 'top';
+              break;
+            case (selInd === 2):
+              str = 'middle';
+              break;
+            case (selInd === 3):
+              str = 'bottom';
+              break;
+            }
+            return str;
+          })(ccpUserInput.selCcpTdValign);
+          // !VA Note that the JS recognizes vAlign as the attribute
+          if (tdTagValignAtt) {
+            td.vAlign = tdTagValignAtt;
+          }
+
+          // !VA bgcolor attribute. Pass the input value, don't prepend hex # character for now
+          tdTagBgcolorAtt =
+          ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.iptCcpTdBgColor).value);
+          if (tdTagBgcolorAtt) {
+            td.bgColor = tdTagBgcolorAtt;
+          }
+
+          // !VA Now we add the img tag
+          // !VA Get the id of the img that will be the child of the td tag. Include the id of the build img HTML button (childId) to pass to makeImgTag(id, 1)
+          var childId = document.querySelector(btnCcpBuildClips.btnCcpImgBuildHtmlClip).id;
+          console.log('childId is: ' + childId);
+          // !VA Also pass the indent level that applies. Since this img will be a direct child of a single parent, we give it the indent level of 1. This also prevents makeImgTag from passing the img element to the clipboard -- if it did it would trigger an error.
+          var img = makeImgTag(childId, 1);
+          console.log(img);
+          // !VA Append the child img to the parent td.
+          td.appendChild(img);
+          // !VA Add the indent -- this is hardcoded for now, it needs to be formalized.
+          img.insertAdjacentHTML('beforebegin', '\n  ');
+          img.insertAdjacentHTML('afterend', '\n');
+          
+          
+          // td.appendChild(img);
+
+
+          // !VA END STIG'S BG IMAGE NOT CHECKED
+        } else {
+          // !VA STIG'S BG IMAGE IS CHECKED
+          // !VA If bgcolor is blank, use #7bceeb for default which is the same as Stig's default
+          tdTagBgcolorAtt ? tdTagBgcolorAtt : tdTagBgcolorAtt = '#7bceeb';
+          td.bgColor = tdTagBgcolorAtt;
+
+          // !VA Height and width
+          td.height = Appdata.imgH;
+          td.width = Appdata.imgW;
+          
+          // !VA valign attribute
+          selectid = ccpUserInput.selCcpTdValign;
+          tdTagValignAtt = (function (selectid) {
+            // !VA Pass in the id of the select dropdown
+            var str;
+            // !VA Get the selection index
+            var selInd = document.querySelector(selectid).selectedIndex;
+            switch (true) {
+            case (selInd === 0):
+              str = '';
+              break;
+            case (selInd === 1):
+              str = 'top';
+              break;
+            case (selInd === 2):
+              str = 'middle';
+              break;
+            case (selInd === 3):
+              str = 'bottom';
+              break;
+            }
+            return str;
+          })(ccpUserInput.selCcpTdValign);
+          // !VA Note that the JS recognizes vAlign as the attribute
+          if (tdTagValignAtt) {
+            td.vAlign = tdTagValignAtt;
+          }
+
+          // !VA Set the background attribute to the current path/filename
+          td.setAttribute('background', document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + (Appdata.fname));
+
+str = `
+<!--[if gte mso 9]>
+  <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Appdata.imgW}px;height:${Appdata.imgH}px;">
+  <v:fill type="tile" src="${document.querySelector(ccpUserInput.iptCcpImgRelPath).value}/${Appdata.fname}" color="${tdTagBgcolorAtt}" />
+  <v:textbox inset="0,0,0,0">
+  <![endif]-->
+    <div>
+    <!-- Put Foreground Content Here -->
+    </div>
+  <!--[if gte mso 9]>
+    </v:textbox>
+  </v:rect>
+  <![endif]-->
+`;
+
+          td.innerHTML = str;
+
+
+        }
+
+      // !VA This is where chkboxid comes from
+      })(ccpUserInput.spnCcpTdBgimageCheckmrk);
+
+
+      writeClipboard(id, td);
+
+    }
+
+    function writeClipboard(id, tag) {
+      console.log('writeClipboard running...');
+      // console.log('id is: ' + id);
+      // console.log('tag is: ' + tag);
+      // console.log(tag.outerHTML);
+      
+      var clipboardStr;
+      clipboardStr = tag.outerHTML;
+      var currentCB = new ClipboardJS('#' + id, {
+        text: function(trigger) {
+
+          // var clipboardStr = ccpImgBuildHtmlClip();
+          // !VA Write success message to app message area on success
+          currentCB.on('success', function(event) {
+            appController.initMessage(false, 'copied_2_CB');
+            // debugger;
+          });
+  
+          currentCB.on('error', function(e) {
+            console.error('Action:', e.action);
+            console.error('Trigger:', e.trigger);
+          });
+          // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
+          return clipboardStr;
+        }
+      });
+    }
 
 
     // !VA CBController public functions 
@@ -1070,143 +1398,31 @@ var Whitty = (function () {
         console.log('doingClipboard');
         // !VA 02.17.20
         // !VA We're redirecting for test to getAllCppOptions
-        console.log('evt is: ' + evt);
-        // ccpGetSnippet(evt.target.id);
+        let id = evt.target.id;
+
+        console.log('id is: ' + id);
+        const indents = {
+          0: '',
+          1: '  ',
+          2: '    ',
+          3: '      ',
+        };
+        switch(true) {
+        case (id === document.querySelector(btnCcpBuildClips.btnCcpImgBuildHtmlClip).id):
+          console.log('case 1');
+          makeImgTag(id, 0);
+          break;
+        case (id === document.querySelector(btnCcpBuildClips.btnCcpTdBuildHtmlClip).id):
+          console.log('case 2');
+          makeTdTag(id, 1);
+          break;
+        default:
+          console.log('no match');
+        } 
       },
 
     
-      buildImgTag: function(table, td, img) {
-        console.log('buildImgTag running...');
-        console.log('img is: ' + img);
-        var Appdata = appController.initGetAppdata();
-        let imgTagSrcAtt = null;
-        let imgTagClassAtt = null;
-        let imgTagWidthAtt  = null;
-        let imgTagHeightAtt  = null;
-        let imgTagAlignAtt  = null;
-        let imgTagAltAtt  = null;
-        let imgTagStyleAtt = null;
-        
-        
-        var el = document.querySelector('.header-container');
-        var newel = document.createElement('div');
-        el.parentNode.insertBefore(newel, el.nextSibling);
-        newel.classList.add('output');
-        // newel.innerHTML = 'asldfkja;sldkfjas;ldfkj';
-        // newel = document.querySelector('.output');
 
-        newel.appendChild(table);
-        table.appendChild(td);
-        td.appendChild(img);
-  
-   
-        
-        // !VA class attribute
-        imgTagClassAtt = ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpImgClass).value);
-        if (imgTagClassAtt) {
-          img.className = imgTagClassAtt;
-        }
-  
-  
-        // !VA Alt attribute
-        imgTagAltAtt = ccpGetAttValue('alt',document.querySelector(ccpUserInput.iptCcpImgAlt).value);
-        if (imgTagAltAtt) {
-          img.alt = imgTagAltAtt;
-        }
-  
-        // !VA Src attribute
-        var srcstr;
-        if (document.querySelector(ccpUserInput.iptCcpImgRelPath).value) {
-          srcstr = document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + document.querySelector(iInspectors.iFilename).textContent;
-        }
-        else {
-          srcstr = document.querySelector(iInspectors.iFilename).textContent;
-        }
-  
-        imgTagSrcAtt = srcstr;
-        console.log('imgTagSrcAtt is: ' + imgTagSrcAtt);
-        img.src = imgTagSrcAtt;
-  
-        // !VA width attribute
-        imgTagWidthAtt = Appdata.imgW;
-        img.width = imgTagWidthAtt;
-  
-        // !VA height attribute
-        imgTagHeightAtt  = Appdata.imgH;
-        img.height = imgTagHeightAtt;
-  
-        // !VA style attribute
-        imgTagStyleAtt =  (function (id) {
-          // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
-          var str;
-          // !VA Reboot: Find a better way to do this than with two replace methods
-          id = id.replace('mrk', 'box');
-          id = id.replace('spn', 'chk');
-          // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
-          if (document.querySelector(id).checked === true) {
-            str = `border="0" style="display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;" `;
-          } else {
-            str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;';
-          }
-          return str;
-        })(ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk);
-        img.setAttribute('style', imgTagStyleAtt);
-  
-        // !VA align attribute is deprecated in html5, so we need this hack if we want to include it, which we don't for now.
-  
-        var id = ccpUserInput.selCcpImgAlign;
-        imgTagAlignAtt = (function (id) {
-          // !VA Pass in the id of the select dropdown
-          var str;
-          // !VA Get the selection index
-          var selInd = document.querySelector(id).selectedIndex;
-          console.log('selInd is: ' + selInd);
-          switch (true) {
-          case (selInd === 0):
-            str = '';
-            break;
-          case (selInd === 1):
-            str = 'left';
-            break;
-          case (selInd === 2):
-            str = 'middle';
-            break;
-          case (selInd === 3):
-            str = 'right';
-            break;
-          }
-          return str;
-        })(ccpUserInput.selCcpImgAlign);
-        if (imgTagAlignAtt) {
-          img.align = imgTagAlignAtt;
-        }
-        
-        var clipboardStr;
-        var currentCB = new ClipboardJS(btnCcpBuildClips.btnCcpImgBuildHtmlClip, {
-          text: function(trigger) {
-  
-            // var clipboardStr = ccpImgBuildHtmlClip();
-            // !VA Write success message to app message area on success
-            currentCB.on('success', function(event) {
-              appController.initMessage(false, 'copied_2_CB');
-              // debugger;
-            });
-    
-            currentCB.on('error', function(e) {
-              console.error('Action:', e.action);
-              console.error('Trigger:', e.trigger);
-            });
-            // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
-            return table.outerHTML;
-          }
-        });
-        
-
-        // !VA border attribute
-        img.border = '0';
-        return img;
-        // !VA Need to build an array here to control when the img attributes are set. 
-      },
 
       queryAllCcpOptions: function(evt) {
         // !VA 02.17.20
@@ -1241,7 +1457,7 @@ var Whitty = (function () {
         let img = document.createElement('img');
 
 
-        var imgTag = CBController.buildImgTag(table, td, img);
+        var imgTag = CBController.buildImgTag(table, td,img);
         console.log('imgTag is: ' + imgTag);
         console.log(img);
         
@@ -1409,7 +1625,7 @@ var Whitty = (function () {
         if(btnCcpBuildClips.hasOwnProperty(i)){
           clipBut = document.querySelector(btnCcpBuildClips[i]);
           // console.log('clipBut.id is: ' + clipBut.id);
-          addEventHandler(clipBut,'click',CBController.queryAllCcpOptions,false);
+          addEventHandler(clipBut,'click',CBController.doClipboard,false);
         }
       }
 

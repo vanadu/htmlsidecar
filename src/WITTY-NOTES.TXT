@@ -1,15 +1,123 @@
-06.04.19
+02.18.20
+TODO:
 
-init:
------
-*Test for curImg
-	if TRUE:
-		initDev
-	if FALSE:
-		initUI
-		showDimViewers ('no image')
+If the build img button is clicked, only build the img tag.
+Current event handler on CB buttons is queryAllCcpOptions. So we need a handler that will determine which CB button is clicked and run the appropriate tag build handler.
+
+queryAllCcpOptions has table,  td and img declarations, appendChild and insertAdjacentHTML.
+
+So doClipboard should pass from the clicked button to the appropriate handler that will create the respective element. And it should contain in the indent level
 
 
-getCurImgDims
--------------
-	load curImg
+var ccpUserInput = {
+      iptCcpImgClass: '#ipt-ccp-img-class',
+      // imgAnchor: '#chk-ccp-img-anchor',
+      // !VA iptCcpImgAlt
+      iptCcpImgAlt: '#ipt-ccp-img-alt',
+      // !VA This isn't even a thing... probably delete it 04.28.19
+      // !VA Not renaming the checkbox/checkmarks for now because they already have code that queries the last three characters to determine if mrk or box...
+      spnCcpImgIncludeWidthHeightCheckmrk: '#spn-ccp-img-include-width-height-checkmrk',
+      selCcpImgAlign: '#sel-ccp-img-align',
+      iptCcpImgRelPath: '#ipt-ccp-img-relpath',
+      iptCcpTdClass: '#ipt-ccp-td-class',
+      selCcpTdAlign: '#sel-ccp-td-align',
+      stdValign: '#sel-ccp-td-valign',
+      iptCcpTdBgColor: '#ipt-ccp-td-bgcolor',
+      // !VA spn-ccp-td-bgimage-checkmrk
+      spnCcpTdBgimageCheckmrk: '#spn-ccp-td-bgimage-checkmrk',
+      iptCcpTableClass: '#ipt-ccp-table-class',
+      selCcpTableAlign: '#sel-ccp-table-align',
+      // !VA iptCcpTableWidth
+      iptCcpTableWidth: '#ipt-ccp-table-width',
+      // !VA Not in use yet
+      // tableMaxWidth: '#ipt-ccp-table-max-width',
+      iptCcpTableBgColor: '#ipt-ccp-table-bgcolor',
+      spnCcpTableIncludeWrapperCheckmrk: '#spn-ccp-table-include-wrapper-checkmrk',
+      // !VA spn-ccp-table-include-wrapper-checkmrk
+      iptCcpTableWrapperClass: '#ipt-ccp-table-wrapper-class',
+      iptCcpTableWrapperWidth: '#ipt-ccp-table-wrapper-width',
+      selCcpTableWrapperAlign: '#sel-ccp-table-wrapper-align',
+      tableWrapperBgColor: '#ipt-ccp-table-wrapper-bgcolor',
+    };
+
+
+
+
+
+    var btnCcpBuildClips = {
+      // !VA Build HTML Clipboard Buttons
+      btnCcpImgBuildHtmlClip: '#btn-ccp-img-build-html-clip',
+      btnCcpTdBuildHtmlClip: '#btn-ccp-td-build-html-clip',
+      btnCcpTableBuildHtmlClip: '#btn-ccp-table-build-html-clip',
+      // !VA Make CSS Clip Buttons
+      btnCcpImgDsktpBuildCssClip: '#btn-ccp-img-dsktp-build-css-clip',
+      btnCcpImgSmphnBuildCssClip: '#btn-ccp-img-smphn-build-css-clip',
+      btnCcpImgLgphnBuildCssClip: '#btn-ccp-img-lgphn-build-css-clip',
+        
+      btnCcpTdDsktpBuildCssClip:  '#btn-ccp-td-dsktp-build-css-clip',
+      btnCcpTdSmphnBuildCssClip: '#btn-ccp-td-smphn-build-css-clip',
+      btnCcpTdLgphnBuildCssClip: '#btn-ccp-td-lgphn-build-css-clip',
+      btnCcpTableDsktpBuildCssClip:  '#btn-ccp-table-dsktp-build-css-clip',
+      btnCcpTableSmphnBuildCssClip: '#btn-ccp-table-smphn-build-css-clip',
+      btnCcpTableLgphnBuildCssClip: '#btn-ccp-table-lgphn-build-css-clip',
+      
+    };
+	
+	
+      queryAllCcpOptions: function(evt) {
+        // !VA 02.17.20
+        console.log('queryAllCcpOptions running...');
+        console.log('evt.target.id is: ' + evt.target.id);
+        var Appdata = appController.initGetAppdata();
+        var outputElement;
+
+        let imgTagSrcAtt = null;
+        let imgTagClassAtt = null;
+        let imgTagWidthAtt  = null;
+        let imgTagHeightAtt  = null;
+        let imgTagAlignAtt  = null;
+        let imgTagAltAtt  = null;
+        let imgTagStyleAtt = null;
+        let tdTagClassAtt= null;
+        let tdTagAlignAtt= null;
+        let tdTagValignAtt= null;
+        let tdTagBgcolorAtt= null;
+        let tdTagBgimgAtt= null;
+        let tableTagClassAtt= null;
+        let tableTagWidthAtt= null; 
+        let tableTagAlignAtt= null;
+        let tableTagBgcolorAtt= null;
+        let tableTagWrapperWidthAtt= null;
+        let tableTagWrapperAlignAtt= null;
+
+        // !VA Create and format the table whose attributes will be populated
+        let table = document.createElement('table');
+        let tr = document.createElement('tr');
+        let td = document.createElement('td');
+        let img = document.createElement('img');
+
+
+        var imgTag = CBController.buildImgTag(table, td,img);
+        console.log('imgTag is: ' + imgTag);
+        console.log(img);
+        
+
+
+        table.appendChild(tr);
+        tr.appendChild(td);
+        td.appendChild(img);
+        tr.insertAdjacentHTML('beforebegin', '\n  ');
+        tr.insertAdjacentHTML('afterend', '\n');
+        td.insertAdjacentHTML('beforebegin', '\n    ');
+        td.insertAdjacentHTML('afterend', '\n  ');
+        img.insertAdjacentHTML('beforebegin', '\n      ');
+        img.insertAdjacentHTML('afterend', '\n    ');
+
+
+        // !VA Create and format the table whose attributes will be populated
+        // let table = document.createElement('table');
+        // let tr = document.createElement('tr');
+        // let td = document.createElement('td');
+        // let img = document.createElement('img');
+
+      }
