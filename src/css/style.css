@@ -1027,6 +1027,9 @@ button:disabled {
   opacity: .45;
   cursor: not-allowed; }
 
+.output {
+  border: 1px solid magenta; }
+
 .navbar-container {
   position: relative;
   height: 40px;
