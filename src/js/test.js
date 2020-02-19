@@ -1063,114 +1063,32 @@ var Whitty = (function () {
 
     // !VA UIController private makeImgTag
     function makeImgTag(id, indentLevel) {
-      // console.log('buildImgTag running...');
-      // console.log('indents is: ');
-      // console.dir(indents);
-      // console.log('indentLevel is: ' + indentLevel);
-      
-      var Appdata = appController.initGetAppdata();
-      let imgTagSrcAtt = null;
-      let imgTagClassAtt = null;
-      let imgTagWidthAtt  = null;
-      let imgTagHeightAtt  = null;
-      let imgTagAlignAtt  = null;
-      let imgTagAltAtt  = null;
-      let imgTagStyleAtt = null;
-      
-      
-      // var el = document.querySelector('.header-container');
-      // var newel = document.createElement('div');
-      // el.parentNode.insertBefore(newel, el.nextSibling);
-      // newel.classList.add('output');
-      // newel.innerHTML = 'asldfkja;sldkfjas;ldfkj';
-      // newel = document.querySelector('.output');
-      
-
+      // !VA Get the attributes
+      var Attributes = getAttributes();
+      // !VA Create the element
       let img = document.createElement('img');
       // !VA class attribute
-      imgTagClassAtt = ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpImgClass).value);
-      if (imgTagClassAtt) {
-        img.className = imgTagClassAtt;
-      }
-
-
-      // !VA Alt attribute
-      imgTagAltAtt = ccpGetAttValue('alt',document.querySelector(ccpUserInput.iptCcpImgAlt).value);
-      if (imgTagAltAtt) {
-        img.alt = imgTagAltAtt;
-      }
-
-      // !VA Src attribute
-      var srcstr;
-      if (document.querySelector(ccpUserInput.iptCcpImgRelPath).value) {
-        srcstr = document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + document.querySelector(iInspectors.iFilename).textContent;
-      }
-      else {
-        srcstr = document.querySelector(iInspectors.iFilename).textContent;
-      }
-
-      imgTagSrcAtt = srcstr;
-      img.src = imgTagSrcAtt;
-
+      if (Attributes.imgClass) { img.className = Attributes.imgClass; }
+      // !VA alt attribute
+      if (Attributes.imgAlt) { img.alt = Attributes.imgAlt; }
+      // src attribute;
+      img.src = Attributes.imgSrc;
       // !VA width attribute
-      imgTagWidthAtt = Appdata.imgW;
-      img.width = imgTagWidthAtt;
-
+      img.width = Attributes.imgWidth;
       // !VA height attribute
-      imgTagHeightAtt  = Appdata.imgH;
-      img.height = imgTagHeightAtt;
-
+      img.height = Attributes.imgHeight;
       // !VA style attribute
-      imgTagStyleAtt =  (function (chkboxid) {
-        // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
-        var str;
-        // !VA Reboot: Find a better way to do this than with two replace methods
-        chkboxid = chkboxid.replace('mrk', 'box');
-        chkboxid = chkboxid.replace('spn', 'chk');
-        // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
-        if (document.querySelector(chkboxid).checked === true) {
-          str = `border="0" style="display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;" `;
-        } else {
-          str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;';
-        }
-        return str;
-      })(ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk);
-      img.setAttribute('style', imgTagStyleAtt);
-
+      img.setAttribute('style', Attributes.imgStyle);
       // !VA align attribute is deprecated in html5, so we need this hack if we want to include it, which we don't for now.
-      var selectid = ccpUserInput.selCcpImgAlign;
-      imgTagAlignAtt = (function (selectid) {
-        // !VA Pass in the id of the select dropdown
-        var str;
-        // !VA Get the selection index
-        var selInd = document.querySelector(selectid).selectedIndex;
-        switch (true) {
-        case (selInd === 0):
-          str = '';
-          break;
-        case (selInd === 1):
-          str = 'left';
-          break;
-        case (selInd === 2):
-          str = 'middle';
-          break;
-        case (selInd === 3):
-          str = 'right';
-          break;
-        }
-        return str;
-      })(ccpUserInput.selCcpImgAlign);
-      if (imgTagAlignAtt) {
-        img.align = imgTagAlignAtt;
-      }
-
+      if (Attributes.imgAlign) { img.align = Attributes.imgAlign; }
       // !VA border attribute
       img.border = '0';
 
       if (indentLevel === 0) {
-
+        // !VA If the indent level is 0 then this is a singleton element
         writeClipboard(id, img);
       } else {
+        // !VA Still working on what to do with indents
         return img;
       }
     }
@@ -1622,6 +1540,85 @@ str = `
       return indent;
 
     }
+
+    // function getAttributes() {
+    //   // !VA Build the object containing the elements to access during the swap process. Each property returns a different value type, i.e. filename, classList etc depending on usage requirements.
+    //   // let imgSrc;
+    //   // let img;
+    //   // var Appdata = appController.initGetAppdata();
+    //   var Attributes = {
+    //     imgClass: (function() {
+    //       if (document.querySelector(dynamicRegions.mainImg)) {
+    //       return ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpImgClass).value);
+    //       }
+    //     })()
+
+    //   }
+    //   return Attributes,
+    // }
+
+    
+    function getAttributes() {
+      var Appdata = appController.initGetAppdata();
+      var Attributes = {
+        imgClass: (function() {
+          return ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpImgClass).value);
+        })(),
+        imgWidth: (function() {
+          return Appdata.imgW;
+        })(),
+        imgHeight: (function() {
+          return Appdata.imgH;
+        })(),
+        imgAlt: (function() {
+          return ccpGetAttValue('alt',document.querySelector(ccpUserInput.iptCcpImgAlt).value);
+        })(),
+        imgSrc: (function() {
+          if (document.querySelector(ccpUserInput.iptCcpImgRelPath).value) {
+            return document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + document.querySelector(iInspectors.iFilename).textContent;
+          }
+        })(),
+        imgStyle: (function() {
+          var chkboxid = ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk;
+          // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
+          var str;
+          chkboxid = chkboxid.replace('mrk', 'box');
+          chkboxid = chkboxid.replace('spn', 'chk');
+          // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
+          if (document.querySelector(chkboxid).checked === true) {
+            str = `border="0" style="display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;" `;
+          } else {
+            str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;';
+          }
+          return str;
+        })(),
+        imgAlign: (function() {
+          var selectid, selInd, str;
+          selectid = ccpUserInput.selCcpImgAlign;
+          // !VA Get the selection index
+          selInd = document.querySelector(selectid).selectedIndex;
+          switch (true) {
+          case (selInd === 0):
+            str = '';
+            break;
+          case (selInd === 1):
+            str = 'left';
+            break;
+          case (selInd === 2):
+            str = 'middle';
+            break;
+          case (selInd === 3):
+            str = 'right';
+            break;
+          }
+          return str;
+        })(),
+
+      };
+      return Attributes;
+    }
+
+
 
     // !VA CBController public functions 
     return {
