@@ -1098,6 +1098,7 @@ var Whitty = (function () {
     function makeTdTag(id, indentLevel, isWrapper ) {
       console.log('makeTdTag running...');
       let Appdata = appController.initGetAppdata();
+
       let tdTagClassAtt= null;
       let tdTagAlignAtt= null;
       let tdTagValignAtt= null;
@@ -1105,7 +1106,8 @@ var Whitty = (function () {
       let td = document.createElement('td');
       let selectid = null;
       let str = null;
-
+      var Attributes = getAttributes();
+      var foo = Attributes.tdBgimage;
 
       // !VA We need two different td outputs, one if the Stig bg image box is checked and another if it's not. So...
       (function (chkboxid) {
@@ -1114,7 +1116,7 @@ var Whitty = (function () {
         chkboxid = chkboxid.replace('mrk', 'box');
         chkboxid = chkboxid.replace('spn', 'chk');
         
-        if (document.querySelector(chkboxid).checked === false) {
+        if (Attributes.tdBgimage === false) {
           // !VA STIG'S BG IMAGE NOT CHECKED
 
           // !VA Now we have two td variants to build. 
@@ -1127,58 +1129,39 @@ var Whitty = (function () {
           
           // !VA We start with the two attributes that are present in both td variants.
           // !VA align attribute
-          selectid = ccpUserInput.selCcpTdAlign;
-          tdTagAlignAtt = (function (selectid) {
-            // !VA Pass in the id of the select dropdown
-            var str;
-            // !VA Get the selection index
-            var selInd = document.querySelector(selectid).selectedIndex;
-            switch (true) {
-            case (selInd === 0):
-              str = '';
-              break;
-            case (selInd === 1):
-              str = 'left';
-              break;
-            case (selInd === 2):
-              str = 'middle';
-              break;
-            case (selInd === 3):
-              str = 'right';
-              break;
-            }
-            return str;
-          })(ccpUserInput.selCcpTdAlign);
-          if (tdTagAlignAtt) {
-            td.align = tdTagAlignAtt;
-          }
+          console.log('Attributes.tdAlign is: ' + Attributes.tdAlign);
+          if (Attributes.tdAlign) { td.align = Attributes.tdAlign; }
+          
           // !VA valign attribute
-          selectid = ccpUserInput.selCcpTdValign;
-          tdTagValignAtt = (function (selectid) {
-            // !VA Pass in the id of the select dropdown
-            var str;
-            // !VA Get the selection index
-            var selInd = document.querySelector(selectid).selectedIndex;
-            switch (true) {
-            case (selInd === 0):
-              str = '';
-              break;
-            case (selInd === 1):
-              str = 'top';
-              break;
-            case (selInd === 2):
-              str = 'middle';
-              break;
-            case (selInd === 3):
-              str = 'bottom';
-              break;
-            }
-            return str;
-          })(ccpUserInput.selCcpTdValign);
-          // !VA Note that the JS recognizes vAlign as the attribute
-          if (tdTagValignAtt) {
-            td.vAlign = tdTagValignAtt;
-          }
+          if (Attributes.tdValign) { td.vAlign = Attributes.tdValign; }
+
+
+          // selectid = ccpUserInput.selCcpTdValign;
+          // tdTagValignAtt = (function (selectid) {
+          //   // !VA Pass in the id of the select dropdown
+          //   var str;
+          //   // !VA Get the selection index
+          //   var selInd = document.querySelector(selectid).selectedIndex;
+          //   switch (true) {
+          //   case (selInd === 0):
+          //     str = '';
+          //     break;
+          //   case (selInd === 1):
+          //     str = 'top';
+          //     break;
+          //   case (selInd === 2):
+          //     str = 'middle';
+          //     break;
+          //   case (selInd === 3):
+          //     str = 'bottom';
+          //     break;
+          //   }
+          //   return str;
+          // })(ccpUserInput.selCcpTdValign);
+          // // !VA Note that the JS recognizes vAlign as the attribute
+          // if (tdTagValignAtt) {
+          //   td.vAlign = tdTagValignAtt;
+          // }
 
           // !VA Now we conditionally add the user-defined attributes only if the isWrapper argument is false.
       
@@ -1613,7 +1596,60 @@ str = `
           }
           return str;
         })(),
-
+        tdBgimage: (function() {
+          let chkboxid, checked;
+          chkboxid = ccpUserInput.spnCcpTdBgimageCheckmrk;
+          chkboxid = chkboxid.replace('mrk', 'box');
+          chkboxid = chkboxid.replace('spn', 'chk');
+          // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
+          if (document.querySelector(chkboxid).checked === true) {
+            checked = true;
+          } else {
+            checked = false;
+          }
+          return checked;
+        })(),
+        tdAlign: (function() {
+          var str, selectid, selInd;
+          selectid = ccpUserInput.selCcpTdAlign;
+          selInd = document.querySelector(selectid).selectedIndex;
+          switch (true) {
+          case (selInd === 0):
+            str = '';
+            break;
+          case (selInd === 1):
+            str = 'left';
+            break;
+          case (selInd === 2):
+            str = 'center';
+            break;
+          case (selInd === 3):
+            str = 'right';
+            break;
+          }
+          console.log('str is: ' + str);
+          return str;
+        })(),
+        tdValign: (function() {
+          var str, selectid, selInd;
+          selectid = ccpUserInput.selCcpTdValign;
+          selInd = document.querySelector(selectid).selectedIndex;
+          switch (true) {
+          case (selInd === 0):
+            str = '';
+            break;
+          case (selInd === 1):
+            str = 'top';
+            break;
+          case (selInd === 2):
+            str = 'middle';
+            break;
+          case (selInd === 3):
+            str = 'bottom';
+            break;
+          }
+          return str;
+        })(),
       };
       return Attributes;
     }
