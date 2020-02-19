@@ -1,8 +1,13 @@
-02.18.20
+02.19.20
 
 
 BIG TODO!
 All tables must have cellspacing border and cellpadding attributes!
+Is including the id in the make element functions necessary?
+Need to include a way to clear all the CB options since they now persist until a new image is added, I think. Review this.
+Must add color picker to toolbar!
+
+
 
 TD functions:
 There are three variants.
