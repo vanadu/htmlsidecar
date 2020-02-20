@@ -1708,20 +1708,20 @@ fieldset {
   margin: 0;
   font-weight: bold !important; }
 
-#btn-ccp-img-build-html-clip {
+#btn-ccp-make-img-tag {
   background: #000000 url("../img/img-to-cb-html.png") no-repeat center;
   background-size: 90px 46px; }
-  #btn-ccp-img-build-html-clip:hover {
+  #btn-ccp-make-img-tag:hover {
     background-image: url("../img/img-to-cb-html-hover.png"); }
 
-#btn-ccp-td-build-html-clip {
+#btn-ccp-make-td-tag {
   background: #000000 url("../img/td-to-cb-html-icon.png") no-repeat center; }
-  #btn-ccp-td-build-html-clip:hover {
+  #btn-ccp-make-td-tag:hover {
     background-image: url("../img/td-to-cb-html-icon-hover.png"); }
 
-#btn-ccp-table-build-html-clip {
+#btn-ccp-make-table-tag {
   background: #000000 url("../img/table-to-cb-html-icon.png") no-repeat center; }
-  #btn-ccp-table-build-html-clip:hover {
+  #btn-ccp-make-table-tag:hover {
     background-image: url("../img/table-to-cb-html-icon-hover.png"); }
 
 #btn-ccp-img-dsktp-build-css-clip.active {

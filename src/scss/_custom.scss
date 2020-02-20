@@ -981,20 +981,20 @@ output {
 
 
 // VA! Reboot: Here are all the CCP button images and their hovers
-#btn-ccp-img-build-html-clip {
+#btn-ccp-make-img-tag {
   background: #000000 url('../img/img-to-cb-html.png') no-repeat center;
   background-size: 90px 46px;
   &:hover {
     background-image: url('../img/img-to-cb-html-hover.png');
   }
 }
-#btn-ccp-td-build-html-clip {
+#btn-ccp-make-td-tag {
   background: #000000 url('../img/td-to-cb-html-icon.png') no-repeat center;
   &:hover {
     background-image: url('../img/td-to-cb-html-icon-hover.png');
   }
 }
-#btn-ccp-table-build-html-clip {
+#btn-ccp-make-table-tag {
   background: #000000 url('../img/table-to-cb-html-icon.png') no-repeat center;
   &:hover {
     background-image: url('../img/table-to-cb-html-icon-hover.png');

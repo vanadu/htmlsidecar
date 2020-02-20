@@ -3,7 +3,7 @@
 
 BIG TODO!
 DONE: All tables must have cellspacing border and cellpadding attributes!
-TODO: Is including the id in the make element functions necessary?
+DONE: Is including the id in the make element functions necessary? YES, clipboardJS requires it!
 
 
 
