@@ -678,8 +678,7 @@ var Whitty = (function () {
     }
 
     function getAlignAttribute(selectid, options) {
-      console.log('getAlignAttribute running...');
-      var str, selectid, selInd;
+      var str, selInd;
       selectid = ccpUserInput.selCcpTdAlign;
       selInd = document.querySelector(selectid).selectedIndex;
       switch (true) {
@@ -697,6 +696,23 @@ var Whitty = (function () {
         break;
       }
       return str;
+    }
+
+    function getCheckboxSelection(target) {
+      console.log('getCheckboxSelection running');
+      let chkboxid, checked;
+      chkboxid = document.querySelector(target).id;
+      console.log('target is: ' + target);
+      chkboxid = chkboxid.replace('mrk', 'box');
+      chkboxid = chkboxid.replace('spn', 'chk');
+      if (document.querySelector('#' + chkboxid).checked === false) {
+        // !VA WRAPPER TABLE NOT CHECKED
+        checked = false;
+      } else {
+      // !VA WRAPPER TABLE IS CHECKED
+        checked = true;
+      }
+      return checked;
     }
 
     // clipboardController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
@@ -1071,23 +1087,16 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
           }
         })(),
         imgStyle: (function() {
-          var chkboxid = ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk;
-          // !VA The ID passed in isn't the checkbox, it's the 'proxy' checkmark used in the CSS checkbox styling. So we need to get the actual checkbox ID in order to get the checked state
-          var str;
-          chkboxid = chkboxid.replace('mrk', 'box');
-          chkboxid = chkboxid.replace('spn', 'chk');
-          // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
-          if (document.querySelector(chkboxid).checked === true) {
-            str = `border="0" style="display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;" `;
-          } else {
-            str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;';
-          }
-          return str;
+          let target, checked;
+          target = ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk;
+          checked = getCheckboxSelection(target);
+          console.log('checked is: ' + checked);
+          return checked;
         })(),
         imgAlign: (function() {  
           let str = '', options = [], selectid = '';
           selectid = ccpUserInput.selCcpImgAlign;
-          options = [ '0', 'left', 'center', 'right'];
+          options = [ '', 'left', 'center', 'right'];
           str = getAlignAttribute( selectid, options );
           return str;
         })(),
@@ -1100,22 +1109,16 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
           return Appdata.imgH;
         })(),
         tdBgimage: (function() {
-          let chkboxid, checked;
-          chkboxid = ccpUserInput.spnCcpTdBgimageCheckmrk;
-          chkboxid = chkboxid.replace('mrk', 'box');
-          chkboxid = chkboxid.replace('spn', 'chk');
-          // !VA Output the style attribute with width and height properties if the checkbox is checked, otherwise omit them
-          if (document.querySelector(chkboxid).checked === true) {
-            checked = true;
-          } else {
-            checked = false;
-          }
+          let target, checked;
+          target = ccpUserInput.spnCcpTdBgimageCheckmrk;
+          checked = getCheckboxSelection(target);
+          console.log('checked is: ' + checked);
           return checked;
         })(),
         tdAlign: (function() {
           let str = '', options = [], selectid = '';
           selectid = ccpUserInput.selCcpTdAlign;
-          options = [ '0', 'left', 'center', 'right'];
+          options = [ '', 'left', 'center', 'right'];
           str = getAlignAttribute( selectid, options );
           return str;
         })(),
@@ -1149,23 +1152,16 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
         tableAlign: (function() {
           let str = '', options = [], selectid = '';
           selectid = ccpUserInput.selCcpTableAlign;
-          options = [ '0', 'left', 'center', 'right'];
+          options = [ '', 'left', 'center', 'right'];
           str = getAlignAttribute( selectid, options );
           return str;
         })(),
         tableIncludeWrapper: (function() {
-          let chkboxid, includeWrapperTable;
-          chkboxid = document.querySelector(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk).id;
-          chkboxid = chkboxid.replace('mrk', 'box');
-          chkboxid = chkboxid.replace('spn', 'chk');
-          if (document.querySelector('#' + chkboxid).checked === false) {
-          // !VA WRAPPER TABLE NOT CHECKED
-            includeWrapperTable = false;
-          } else {
-          // !VA WRAPPER TABLE IS CHECKED
-            includeWrapperTable = true;
-          }
-          return includeWrapperTable;
+          let target, checked;
+          target = ccpUserInput.spnCcpTableIncludeWrapperCheckmrk;
+          checked = getCheckboxSelection(target);
+          console.log('checked is: ' + checked);
+          return checked;
         })(),
         tableTagWrapperClass: (function() {
           return ccpIfNoUserInput('class',document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value);
@@ -1173,7 +1169,7 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
         tableTagWrapperAlign: (function() {
           let str = '', options = [], selectid = '';
           selectid = ccpUserInput.selCcpTableWrapperAlign;
-          options = [ '0', 'left', 'center', 'right'];
+          options = [ '', 'left', 'center', 'right'];
           str = getAlignAttribute( selectid, options );
           return str;
         })(),
