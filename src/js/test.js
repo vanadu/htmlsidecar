@@ -746,7 +746,7 @@ var Whitty = (function () {
     }
 
     // !VA UIController private ccpMakeImgTag
-    function ccpMakeImgTag(id, indentLevel) {
+    function ccpMakeImgTag(indentLevel) {
       // !VA Get the attributes
       var Attributes = getAttributes();
       // !VA Create the element
@@ -1148,7 +1148,6 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
         tableBgcolor: (function() {
           return ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.iptCcpTableBgColor).value);
         })(),
-        
         tableAlign: (function() {
           let str = '', options = [], selectid = '';
           selectid = ccpUserInput.selCcpTableAlign;
@@ -1207,7 +1206,7 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
         switch(true) {
         case (id === document.querySelector(btnCcpBuildClips.btnCcpImgBuildHtmlClip).id):
           // console.log('case 1');
-          ccpMakeImgTag(id, 0);
+          ccpMakeImgTag(1);
           break;
         case (id === document.querySelector(btnCcpBuildClips.btnCcpTdBuildHtmlClip).id):
           // console.log('case 2');
@@ -1231,78 +1230,13 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
         default:
           console.log('no match');
         } 
-        
-
       },
 
     
-
-
-      queryAllCcpOptions: function(evt) {
-        // !VA 02.17.20
-        console.log('queryAllCcpOptions running...');
-        console.log('evt.target.id is: ' + evt.target.id);
-        var Appdata = appController.initGetAppdata();
-        var outputElement;
-
-        let imgTagSrcAtt = null;
-        let imgTagClassAtt = null;
-        let imgTagWidthAtt  = null;
-        let imgTagHeightAtt  = null;
-        let imgTagAlignAtt  = null;
-        let imgTagAltAtt  = null;
-        let imgTagStyleAtt = null;
-        let tdTagClassAtt= null;
-        let tdTagAlignAtt= null;
-        let tdTagValignAtt= null;
-        let tdTagBgcolorAtt= null;
-        let tdTagBgimgAtt= null;
-        let tableTagClassAtt= null;
-        let tableTagWidthAtt= null; 
-        let tableTagAlignAtt= null;
-        let tableTagBgcolorAtt= null;
-        let tableTagWrapperWidthAtt= null;
-        let tableTagWrapperAlignAtt= null;
-
-        // !VA Create and format the table whose attributes will be populated
-        let table = document.createElement('table');
-        let tr = document.createElement('tr');
-        let td = document.createElement('td');
-        let img = document.createElement('img');
-
-
-        var imgTag = CBController.buildImgTag(table, td,img);
-        console.log('imgTag is: ' + imgTag);
-        console.log(img);
-        
-
-
-        table.appendChild(tr);
-        tr.appendChild(td);
-        td.appendChild(img);
-        tr.insertAdjacentHTML('beforebegin', '\n  ');
-        tr.insertAdjacentHTML('afterend', '\n');
-        td.insertAdjacentHTML('beforebegin', '\n    ');
-        td.insertAdjacentHTML('afterend', '\n  ');
-        img.insertAdjacentHTML('beforebegin', '\n      ');
-        img.insertAdjacentHTML('afterend', '\n    ');
-
-
-        // !VA Create and format the table whose attributes will be populated
-        // let table = document.createElement('table');
-        // let tr = document.createElement('tr');
-        // let td = document.createElement('td');
-        // let img = document.createElement('img');
-
-      }
+      // !VA queryAllCcpOptions was a test function, deleted 02.20.20
     };
 
   })();
-
-
-
-
-
 
 
   // GLOBAL APP MODULE

@@ -2,12 +2,17 @@
 
 
 BIG TODO!
-All tables must have cellspacing border and cellpadding attributes!
-Is including the id in the make element functions necessary?
+DONE: All tables must have cellspacing border and cellpadding attributes!
+TODO: Is including the id in the make element functions necessary?
+
+
+
+
+
 Need to include a way to clear all the CB options since they now persist until a new image is added, I think. Review this.
 Must add color picker to toolbar!
 Now I have to do the same thing for all the CSS buttons :-(
-ANd I have to rename everything, including hte aliases :-(
+ANd I have to rename everything, including the aliases :-(
 
 
 
