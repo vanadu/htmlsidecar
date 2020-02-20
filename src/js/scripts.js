@@ -180,17 +180,19 @@ var Whitty = (function () {
       // btnCcpImgBuildHtmlClip: '#btn-ccp-img-build-html-clip',
       btnCcpMakeTdTag: '#btn-ccp-make-td-tag',
       btnCcpMakeTableTag: '#btn-ccp-make-table-tag',
-      // !VA Make CSS Clip Buttons
-      btnCcpImgDsktpBuildCssClip: '#btn-ccp-img-dsktp-build-css-clip',
-      btnCcpImgSmphnBuildCssClip: '#btn-ccp-img-smphn-build-css-clip',
-      btnCcpImgLgphnBuildCssClip: '#btn-ccp-img-lgphn-build-css-clip',
-        
-      btnCcpTdDsktpBuildCssClip:  '#btn-ccp-td-dsktp-build-css-clip',
-      btnCcpTdSmphnBuildCssClip: '#btn-ccp-td-smphn-build-css-clip',
-      btnCcpTdLgphnBuildCssClip: '#btn-ccp-td-lgphn-build-css-clip',
-      btnCcpTableDsktpBuildCssClip:  '#btn-ccp-table-dsktp-build-css-clip',
-      btnCcpTableSmphnBuildCssClip: '#btn-ccp-table-smphn-build-css-clip',
-      btnCcpTableLgphnBuildCssClip: '#btn-ccp-table-lgphn-build-css-clip',
+
+      // !VA Make Image CSS Rule Buttons
+      btnCcpMakeImgDsktpCssRule: '#btn-ccp-make-img-dsktp-css-rule',
+      btnCcpMakeImgSmphnCssRule: '#btn-ccp-make-img-smphn-css-rule',
+      btnCcpMakeImgLgphnCssRule: '#btn-ccp-make-img-lgphn-css-rule',
+      // !VA Make Td CSS Rule Buttons
+      btnCcpMakeTdDsktpCssRule:  '#btn-ccp-make-td-dsktp-css-rule',
+      btnCcpMakeTdSmphnCssRule: '#btn-ccp-make-td-smphn-css-rule',
+      btnCcpMakeTdLgphnCssRule: '#btn-ccp-make-td-lgphn-css-rule',
+      // !VA Make Table CSS Rule Buttons
+      btnCcpMakeTableDsktpCssRule:  '#btn-ccp-make-table-dsktp-css-rule',
+      btnCcpMakeTableSmphnCssRule: '#btn-ccp-make-table-smphn-css-rule',
+      btnCcpMakeTableLgphnCssRule: '#btn-ccp-make-table-lgphn-css-rule',
       
     };
 
@@ -459,25 +461,25 @@ var Whitty = (function () {
       case ( makeClipButID === btnCcpBuildClips.btnCcpMakeTableTag) :
         clipboardStr = ccpTableBuildHtmlClip(Appdata);
         break;
-      case ( makeClipButID === btnCcpBuildClips.btnCcpImgDsktpBuildCssClip) :
+      case ( makeClipButID === btnCcpBuildClips.btnCcpMakeImgDsktpCssRule) :
         clipboardStr = ccpImgDsktpBuildCssClip(Appdata);
         break;
       case ( makeClipButID === btnCcpBuildClips.btnCcpImgSmphnBuildCssClip) :
         clipboardStr = ccpImgSmphnBuildCssClip(Appdata);
         break;
-      case ( makeClipButID === btnCcpBuildClips.btnCcpImgLgphnBuildCssClip) :
+      case ( makeClipButID === btnCcpBuildClips.btnCcpMakeImgLgphnCssRule) :
         clipboardStr = ccpImgLgphnBuildCssClip(Appdata);
         break;
-      case ( makeClipButID === btnCcpBuildClips.btnCcpTdDsktpBuildCssClip) :
+      case ( makeClipButID === btnCcpBuildClips.btnCcpMakeTdDsktpCssRule) :
         clipboardStr = ccpTdDsktpBuildCssClip(Appdata);
         break;
-      case ( makeClipButID === btnCcpBuildClips.btnCcpTdSmphnBuildCssClip) :
+      case ( makeClipButID === btnCcpBuildClips.btnCcpMakeTdSmphnCssRule) :
         clipboardStr = ccpTdSmphnBuildCssClip(Appdata);
         break;
-      case ( makeClipButID === btnCcpBuildClips.btnCcpTdLgphnBuildCssClip) :
+      case ( makeClipButID === btnCcpBuildClips.btnCcpMakeTdLgphnCssRule) :
         clipboardStr = ccpTdLgphnBuildCssClip(Appdata);
         break;
-      case ( makeClipButID === btnCcpBuildClips.btnCcpTableDsktpBuildCssClip) :
+      case ( makeClipButID === btnCcpBuildClips.btnCcpMakeTableDsktpCssRule) :
         clipboardStr = ccpTableDsktpBuildCssClip(Appdata);
         break;
       case ( makeClipButID === btnCcpBuildClips.btnCcpTableSmphnBuildCssClip) :
@@ -1231,7 +1233,7 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
           // !VA If the Include wrapper table option is checked, run ccpMakeWrapperTableTag, otherwise run ccpMakeTableTag. 
           Attributes.tableIncludeWrapper ? ccpMakeWrapperTableTag(id, 1) : ccpMakeTableTag(id, 1);
           break;
-        case ( id === (btnCcpBuildClips.btnCcpImgDsktpBuildCssClip).id) :
+        case ( id === (btnCcpBuildClips.btnCcpMakeImgDsktpCssRule).id) :
           ccpImgDsktpBuildCssClip();
           break;
         default:
@@ -2110,13 +2112,13 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
     function showElementOnInput(event) {
       // !VA Here we catch the event handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
       var elems = [];
-      elems[0] = document.querySelector(btnCcpBuildClips.btnCcpImgDsktpBuildCssClip);
+      elems[0] = document.querySelector(btnCcpBuildClips.btnCcpMakeImgDsktpCssRule);
       elems[1] = document.querySelector(btnCcpBuildClips.btnCcpImgSmphnBuildCssClip);
-      elems[2] = document.querySelector(btnCcpBuildClips.btnCcpImgLgphnBuildCssClip);
-      elems[3] = document.querySelector(btnCcpBuildClips.btnCcpTdDsktpBuildCssClip);
-      elems[4] = document.querySelector(btnCcpBuildClips.btnCcpTdSmphnBuildCssClip);
-      elems[5] = document.querySelector(btnCcpBuildClips.btnCcpTdLgphnBuildCssClip);
-      elems[6] = document.querySelector(btnCcpBuildClips.btnCcpTableDsktpBuildCssClip);
+      elems[2] = document.querySelector(btnCcpBuildClips.btnCcpMakeImgLgphnCssRule);
+      elems[3] = document.querySelector(btnCcpBuildClips.btnCcpMakeTdDsktpCssRule);
+      elems[4] = document.querySelector(btnCcpBuildClips.btnCcpMakeTdSmphnCssRule);
+      elems[5] = document.querySelector(btnCcpBuildClips.btnCcpMakeTdLgphnCssRule);
+      elems[6] = document.querySelector(btnCcpBuildClips.btnCcpMakeTableDsktpCssRule);
       elems[7] = document.querySelector(btnCcpBuildClips.btnCcpTableSmphnBuildCssClip);
       elems[8] = document.querySelector(btnCcpBuildClips.btnCcpTableLgphnBuildCssClip);
       // !VA We only want to show the buttons in each respective fieldset
@@ -2159,15 +2161,15 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
         // 'btn-ccp-make-img-tag': '<img> HTML element copied to Clipboard',
         // 'btn-ccp-td-build-html-clip': '<td> HTML element copied to Clipboard',
         // 'btn-ccp-table-build-html-clip': '<table> HTML element copied to Clipboard',
-        // 'btn-ccp-img-dsktp-build-css-clip-but': 'CSS class delaration copied to the Clipboard',
+        // 'btn-ccp-make-img-dsktp-css-rule-but': 'CSS class delaration copied to the Clipboard',
         // 'btn-ccp-img-lgphn-build-css-clip-but': 'CSS class delaration for tablets copied to the Clipboard',
         // 'btn-ccp-img-smphn-build-css-clip-but': 'CSS class delaration for phones copied to the Clipboard',
-        // 'btn-ccp-td-dsktp-build-css-clip-but': 'CSS class delaration copied to the Clipboard!',
+        // 'btn-ccp-make-td-dsktp-css-rule-but': 'CSS class delaration copied to the Clipboard!',
         // 'btn-ccp-td-lgphn-build-css-clip-but': 'CSS class delaration for tablets copied to the Clipboard',
         // 'btn-ccp-td-smphn-build-css-clip-but': 'CSS class delaration for phones copied to the Clipboard',
         // 'btn-ccp-table-dsktp-build-css-clip-but': 'CSS class delaration copied to the Clipboard',
         // 'btn-ccp-table-lgphn-build-css-clip-but': 'CSS class delaration for tablets copied to the Clipboard',
-        // 'btn-ccp-table-smphn-build-css-clip-but': 'CSS class delaration for phones copied to the Clipboard',
+        // 'btn-ccp-make-table-smphn-css-rule-but': 'CSS class delaration for phones copied to the Clipboard',
       };
       // !VA Loop through the error ID/message pairs and find the match
       for (const [key, value] of Object.entries(messages)) { 
