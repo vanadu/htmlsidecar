@@ -6,6 +6,8 @@ All tables must have cellspacing border and cellpadding attributes!
 Is including the id in the make element functions necessary?
 Need to include a way to clear all the CB options since they now persist until a new image is added, I think. Review this.
 Must add color picker to toolbar!
+Now I have to do the same thing for all the CSS buttons :-(
+ANd I have to rename everything, including hte aliases :-(
 
 
 
@@ -52,3 +54,10 @@ if TABLE button click:
 			
 	
 	
+	
+<table class="" width="60" bgcolor="" align="left">  
+  <tr><td class="#FFFFFF" valign="top" align="center">  
+  <img alt="asdf" src="img/html-email-icon-blue.png" style="border=&quot;0&quot; style=&quot;display: block; width: 60px; height: 60px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;&quot; " width="60" height="60" border="0" align="left">
+</td></tr>  
+  
+</table>
