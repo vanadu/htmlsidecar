@@ -1,9 +1,18 @@
 02.19.20
 
+https://rutorrent.ac.seedbox.link/
+BQUDCq3YyJjs
+
 
 BIG TODO!
 DONE: All tables must have cellspacing border and cellpadding attributes!
 DONE: Is including the id in the make element functions necessary? YES, clipboardJS requires it!
+DONE: Renaming clipboard buttons and elements...
+TODO: Make clipboard CSS bvuttons work
+TODO: Td large phone width css is wrong
+TODO: Toolbar small and large phones don'g retain value on tab out
+TODO: The CSS output will need to be revisited. You'd never need to output the width AND height in CSS for tables and for td it probably has no effect for height. That means...ugh.
+
 
 
 

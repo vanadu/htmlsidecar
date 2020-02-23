@@ -85,6 +85,57 @@ var Whitty = (function () {
   //   }, false);
   // })();
 
+
+
+  // !VA Click on Witty logo to run test function
+  // var testbut = document.querySelector('#testme');
+  // console.log('testbut is: ' + testbut);
+  // testbut.addEventListener('click', runMe, false);
+  // // testBut.addEventListener('click', runMe, false);
+
+  // function runMe(evt) {
+  //   console.log('evt.target.id is: ' + evt.target.id);
+
+  //   var str = 'btn-ccp-make-table-dsktp-css-rule'
+  //   var str1 = str.slice(-4);
+  //   console.log('str1 is: ' + str1);
+
+  
+
+
+
+  //   console.log('running me');
+  //   let output;
+  //   let classname = 'alsdfadf';
+  //   let val = 848;
+  //   let id = 'runMe';
+  //   output = `${classname} { width: ${val}px !important}`;
+
+  //   var currentCB = new ClipboardJS('#' + id, {
+  //     text: function(trigger) {
+
+  //       // var clipboardStr = ccpImgBuildHtmlClip();
+  //       // !VA Write success message to app message area on success
+  //       currentCB.on('success', function(event) {
+  //         appController.initMessage(false, 'copied_2_CB');
+  //         // debugger;
+  //       });
+
+  //       currentCB.on('error', function(e) {
+  //         console.error('Action:', e.action);
+  //         console.error('Trigger:', e.trigger);
+  //       });
+  //       // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
+  //       return output;
+  //     }
+  //   });
+  // }
+
+
+
+
+
+
   var UIController = (function() {
 
     // !VA This is where Appdata should be initialized
@@ -173,7 +224,7 @@ var Whitty = (function () {
     //iInspectors.btnToggleCcp
     //iInspectors.btnToggleCcp for assembling the clipboard create tag buttons. We also store the functions that are run in the CBController module to build the clipboard snippets when each of these elements is clicked so that we can just loop through the properties, get the current event target and run the associated function without an extra switch statement or other conditional at that stage.
 
-    var btnCcpBuildClips = {
+    var btnCcpMakeClips = {
       // !VA Build HTML Clipboard Buttons
       // !VA NEW
       btnCcpMakeImgTag: '#btn-ccp-make-img-tag',
@@ -254,13 +305,11 @@ var Whitty = (function () {
       getCcpUserInputIDs: function() {
         return ccpUserInput;
       },
-      // !VA Reboot: This is wrong now after renaming
       getCcpBuildTagIDs: function() {
         return ccpMakeClip;
       },
-      // !VA Reboot: This is wrong now after renaming
       getCcpMakeClipButIDs: function() {
-        return btnCcpBuildClips;
+        return btnCcpMakeClips;
       },
 
       // !VA UIController public getAppdata
@@ -427,7 +476,7 @@ var Whitty = (function () {
     var toolbarElements = UIController.getToolButtonIDs();
     var iInspectors = UIController.getInspectorIDs();
     var ccpUserInput = UIController.getCcpUserInputIDs();
-    var btnCcpBuildClips = UIController.getCcpMakeClipButIDs();
+    var btnCcpMakeClips = UIController.getCcpMakeClipButIDs();
 
 
     function getKeyByValue(object, value) {
@@ -435,80 +484,58 @@ var Whitty = (function () {
     }
 
 
-    function ccpGetSnippet(id) {
-      console.log('ccpGetSnippet running...');
-
-      
-      var clipboardStr, clipButs, makeClipButID;
-      var Appdata = {};
-      // !VA Get Appdata - we will pass it so the DOM doesn't have be accessed every time a snippet is build.
+    function getCssProperties(id) {
+      console.log('getCssProperties running');
+      let Appdata = {};
       Appdata = appController.initGetAppdata();
-      // !VA Get the btnCcpBuildClips elements
-      // !VA Reboot: These funciton names are all wrong now after renaming
-      var clipButs = UIController.getCcpMakeClipButIDs();
-      // !VA The target element's ID is passed in from the btnCcpBuildClips array so it doesn't have the hash that makes it a valid ID string. So, add the hash.
-      makeClipButID = '#' + id;
-      // !VA Now we just match the clicked element with the btnCcpBuildClips property to run call the function that builds the corresponding snippet.
-      // !VA Note: I tried for two days to avoid using the switch but nothing beats this for readability and comprehensibility. I could pull the switch out to a different function but that is trivial, so leave this for now, it works.
+      var Attributes = getAttributes();
+      console.dir(Appdata); 
+      var str;
+      let classname, wval, hval;
+
       switch (true) {
-      case ( makeClipButID === btnCcpBuildClips.btnCcpMakeImgTag) :
-        clipboardStr = ccpImgBuildHtmlClip(Appdata);
+      case ( id === document.querySelector(btnCcpMakeClips.btnCcpMakeImgDsktpCssRule).id) :
+        classname = Attributes.imgClass;
+        wval = Appdata.imgW, hval = Appdata.imgH;
         break;
-        // !VA Reboot fix below
-      case ( makeClipButID === btnCcpBuildClips.btnCcpMakeTdTag) :
-        clipboardStr = ccpTdBuildHtmlClip(Appdata);
+      case ( id === document.querySelector(btnCcpMakeClips.btnCcpMakeImgLgphnCssRule).id) :
+        classname = Attributes.imgClass;
+        wval = Appdata.lPhonesW, hval = Appdata.lPhonesH;
         break;
-      case ( makeClipButID === btnCcpBuildClips.btnCcpMakeTableTag) :
-        clipboardStr = ccpTableBuildHtmlClip(Appdata);
+      case ( id === document.querySelector(btnCcpMakeClips.btnCcpMakeImgSmphnCssRule).id) :
+        classname = Attributes.imgClass;
+        wval = Appdata.sPhonesW, hval = Appdata.sPhonesH;
         break;
-      case ( makeClipButID === btnCcpBuildClips.btnCcpMakeImgDsktpCssRule) :
-        clipboardStr = ccpImgDsktpBuildCssClip(Appdata);
+      case ( id === document.querySelector(btnCcpMakeClips.btnCcpMakeTdDsktpCssRule).id) :
+        classname = Attributes.tdClass;
+        wval = Appdata.imgW, hval = Appdata.imgH;
         break;
-      case ( makeClipButID === btnCcpBuildClips.btnCcpImgSmphnBuildCssClip) :
-        clipboardStr = ccpImgSmphnBuildCssClip(Appdata);
+      case ( id === document.querySelector(btnCcpMakeClips.btnCcpMakeTdLgphnCssRule).id) :
+        classname = Attributes.tdClass;
+        wval = Appdata.lPhonesW, hval = Appdata.lPhonesH;
         break;
-      case ( makeClipButID === btnCcpBuildClips.btnCcpMakeImgLgphnCssRule) :
-        clipboardStr = ccpImgLgphnBuildCssClip(Appdata);
+      case ( id === document.querySelector(btnCcpMakeClips.btnCcpMakeTdSmphnCssRule).id) :
+        classname = Attributes.tdClass;
+        wval = Appdata.sPhonesW, hval = Appdata.sPhonesH;
         break;
-      case ( makeClipButID === btnCcpBuildClips.btnCcpMakeTdDsktpCssRule) :
-        clipboardStr = ccpTdDsktpBuildCssClip(Appdata);
+      case ( id === document.querySelector(btnCcpMakeClips.btnCcpMakeTableDsktpCssRule).id) :
+        classname = Attributes.tableClass;
+        wval = Appdata.imgW, hval = Appdata.imgH;
         break;
-      case ( makeClipButID === btnCcpBuildClips.btnCcpMakeTdSmphnCssRule) :
-        clipboardStr = ccpTdSmphnBuildCssClip(Appdata);
+      case ( id === document.querySelector(btnCcpMakeClips.btnCcpMakeTableLgphnCssRule).id) :
+        classname = Attributes.tableClass;
+        wval = Appdata.lPhonesW, hval = Appdata.lPhonesH;
         break;
-      case ( makeClipButID === btnCcpBuildClips.btnCcpMakeTdLgphnCssRule) :
-        clipboardStr = ccpTdLgphnBuildCssClip(Appdata);
+      case ( id === document.querySelector(btnCcpMakeClips.btnCcpMakeTableSmphnCssRule).id) :
+        classname = Attributes.tableClass;
+        wval = Appdata.sPhonesW, hval = Appdata.sPhonesH;
         break;
-      case ( makeClipButID === btnCcpBuildClips.btnCcpMakeTableDsktpCssRule) :
-        clipboardStr = ccpTableDsktpBuildCssClip(Appdata);
-        break;
-      case ( makeClipButID === btnCcpBuildClips.btnCcpTableSmphnBuildCssClip) :
-        clipboardStr = ccpTableSmphnBuildCssClip(Appdata);
-        break;
-      case ( makeClipButID === btnCcpBuildClips.btnCcpTableLgphnBuildCssClip) :
-        clipboardStr = ccpTableLgphnBuildCssClip(Appdata);
+      default:
+        console.log('id is: ' + id);
+        console.log('default');
         break;
       }
-
-      // !VA Now that we've gotten the snippet, we create the clipboard object.
-      var currentCB = new ClipboardJS(makeClipButID, {
-        text: function(trigger) {
-
-          // var clipboardStr = ccpImgBuildHtmlClip();
-          // !VA Write success message to app message area on success
-          currentCB.on('success', function(event) {
-            appController.initMessage(false, 'copied_2_CB');
-            // debugger;
-          });
-  
-          currentCB.on('error', function(e) {
-            console.error('Action:', e.action);
-            console.error('Trigger:', e.trigger);
-          });
-          // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
-          return clipboardStr;
-        }
-      });
+      makeCssRule(id, classname, wval, hval);
     }
 
 
@@ -522,6 +549,16 @@ var Whitty = (function () {
     // !VA function ccpTdBuildHtmlClip deprecated 02/19/20
     // !VA function ccpTableBuildHtmlClip deprecated 02/19/20
     // !VA function ccpImgBuildHtmlClip deprecated 02/19/20
+
+    // !VA New CSS RUle output functionality 02.20.20
+    function  makeCssRule( id, classname, wval, hval ) {
+      let clipboardStr;
+      clipboardStr = `.${classname} { width: ${wval}px !important; height: ${hval}px !important; }`;
+      writeClipboard(id, clipboardStr);
+
+    }
+
+
 
     function ccpImgDsktpBuildCssClip(Appdata)  {
       console.log('ccpImgDsktpBuildCssClip...');
@@ -540,7 +577,7 @@ var Whitty = (function () {
     }
 
     function ccpImgSmphnBuildCssClip(Appdata)  {
-      console.log('ccpImgSmphnBuildCssClip...');
+      console.log('ccpImgSmphnBuildCssClip running');
       // !VA The string to pass the CSS declaration to the clipboard object
       var clipboardStr;
       // !VA Clipboard output object 
@@ -554,7 +591,7 @@ var Whitty = (function () {
     }
 
     function ccpImgLgphnBuildCssClip(Appdata) {
-      console.log('ccpImgLgphnBuildCssClip...');
+      console.log('ccpImgLgphnBuildCssClip running');
       // !VA The string to pass the CSS declaration to the clipboard object
       console.dir(Appdata);
       var clipboardStr;
@@ -570,7 +607,7 @@ var Whitty = (function () {
     }
 
     function ccpTdDsktpBuildCssClip(Appdata)  {
-      console.log('ccpTdDsktpBuildCssClip...');
+      console.log('ccpTdDsktpBuildCssClip running');
       // !VA The string to pass the CSS declaration to the clipboard object
       var clipboardStr;
       // !VA Clipboard output object 
@@ -584,7 +621,7 @@ var Whitty = (function () {
     }
 
     function ccpTdSmphnBuildCssClip(Appdata) {
-      console.log('ccpTdSmphnBuildCssClip...');
+      console.log('ccpTdSmphnBuildCssClip running');
       var clipboardStr;
       // !VA Clipboard output object 
       var tdSmallPhonesCSSTag = new ClipboardOutput('tdSmallPhonesCSSTag');
@@ -597,7 +634,7 @@ var Whitty = (function () {
     }
 
     function ccpTdLgphnBuildCssClip(Appdata)  {
-      console.log('ccpTdLgphnBuildCssClip...');
+      console.log('ccpTdLgphnBuildCssClip running');
       var clipboardStr;
       // !VA Clipboard output object 
       var tdLargePhonesCSSTag = new ClipboardOutput('tdLargePhonesCSSTag');
@@ -611,7 +648,7 @@ var Whitty = (function () {
     }
 
     function ccpTableDsktpBuildCssClip(Appdata) {
-      console.log('ccpTableDsktpBuildCssClip...');
+      console.log('ccpTableDsktpBuildCssClip running');
       // !VA The string to pass the CSS declaration to the clipboard object
       var clipboardStr;
       // !VA Clipboard output object 
@@ -625,7 +662,7 @@ var Whitty = (function () {
     }
 
     function ccpTableSmphnBuildCssClip(Appdata) {
-      console.log('ccpTableSmphnBuildCssClip...');
+      console.log('ccpTableSmphnBuildCssClip running');
       var clipboardStr;
       // !VA Clipboard output object 
       var tableSmallPhonesCSSTag = new ClipboardOutput('tableSmallPhonesCSSTag');
@@ -638,7 +675,7 @@ var Whitty = (function () {
     }
 
     function ccpTableLgphnBuildCssClip(Appdata) {
-      console.log('ccpTableLgphnBuildCssClip...');
+      console.log('ccpTableLgphnBuildCssClip running');
       var clipboardStr;
       // !VA Clipboard output object 
       var tableLargePhonesCSSTag = new ClipboardOutput('tableLargePhonesCSSTag');
@@ -749,7 +786,6 @@ var Whitty = (function () {
 
     // !VA UIController private ccpMakeImgTag
     function ccpMakeImgTag(id, indentLevel) {
-      console.log('ccpMakeImgTag running');
       
       // !VA Get the attributes
       var Attributes = getAttributes();
@@ -771,14 +807,13 @@ var Whitty = (function () {
       if (Attributes.imgAlign) { img.align = Attributes.imgAlign; }
       // !VA border attribute
       img.border = '0';
-
+      var str = img.outerHTML;
       // if (indentLevel) {
-        // !VA Still working on what to do with indents
-        console.log('not working');
-        writeClipboard(id, img);
+      // !VA Still working on what to do with indents
+      writeClipboard(id, str);
       // } else {
-        // !VA Still working on what to do with indents
-        return img;
+      // !VA Still working on what to do with indents
+      return str;
       // }
     }
     // !VA END ccpMakeImgTag
@@ -786,7 +821,7 @@ var Whitty = (function () {
     // !VA UIController private ccpMakeTdTag
     // !VA On Build Td HTML button click, creates a td tag with the user-defined attributes.
     function ccpMakeTdTag(id, indentLevel ) {
-      console.log('ccpMakeTdTag running...');
+      console.log('ccpMakeTdTag running running');
 
       let td = document.createElement('td');
       var Attributes = getAttributes();
@@ -804,7 +839,7 @@ var Whitty = (function () {
 
       // !VA Now we add the img tag
       // !VA Get the id of the img that will be the child of the td tag. Include the id of the build img HTML button (childId) to pass to ccpMakeImgTag(id, 1)
-      var childId = document.querySelector(btnCcpBuildClips.btnCcpMakeImgTag).id;
+      var childId = document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).id;
       // !VA Also pass the indent level that applies. Since this img will be a direct child of a single parent, we give it the indent level of 1. This also prevents ccpMakeImgTag from passing the img element to the clipboard -- if it did it would trigger an error.
       var img = ccpMakeImgTag(childId, 1);
       // !VA If Include wrapper table is unchecked in table options, append the child img to the parent td. 
@@ -815,9 +850,10 @@ var Whitty = (function () {
       img.insertAdjacentHTML('beforebegin', indent);
       img.insertAdjacentHTML('afterend', '\n');
       // !VA Write the snippet to the clipboard 
-      writeClipboard(id, td);
+      var str = td.outerHTML;
+      writeClipboard(id, str);
       // !VA Return the td element if required. 
-      return td;
+      return str;
     }
     // !VA END ccpMakeTdTag
 
@@ -854,14 +890,14 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
 
       // td.insertAdjacentHTML('afterend', '\n');
       td.innerHTML = str;
-      console.log('td.innerHTML is: ' + td.innerHTML);
-      writeClipboard(id, td);
+      str = td.outerHTML;
+      writeClipboard(id, str);
 
     }
 
     // !VA UIController private ccpMakeTableTag
     function ccpMakeTableTag(id, indents, indentLevel ) {  
-      console.log('ccpMakeTableTag running...');
+      console.log('ccpMakeTableTag running running');
       var Attributes = getAttributes();
       let table = document.createElement('table');
       let tr = document.createElement('tr');
@@ -905,7 +941,7 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
       td.insertAdjacentHTML('beforebegin', '\n    ');
       td.insertAdjacentHTML('afterend', '\n  ');
       // !VA Get the child img's id
-      var childId = document.querySelector(btnCcpBuildClips.btnCcpMakeImgTag).id;
+      var childId = document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).id;
       // !VA Append the child img to the parent td.
       img = ccpMakeImgTag( childId, 1);
       td.appendChild(img);
@@ -913,7 +949,8 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
       img.insertAdjacentHTML('beforebegin', '\n      ');
       img.insertAdjacentHTML('afterend', '\n    ');
       // !VA Write table tag to clipboard
-      writeClipboard(id, table);
+      var str = table.outerHTML;
+      writeClipboard(id, str);
       // !VA Return, if necessary
       return table;
     }
@@ -921,7 +958,7 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
 
     // !VA UIController private ccpMakeWrapperTableTag
     function ccpMakeWrapperTableTag(id, indentLevel) { 
-      console.log('ccpMakeWrapperTableTag running...');
+      console.log('ccpMakeWrapperTableTag running running');
       var Attributes = getAttributes();
 
       let tableOuter = document.createElement('table')
@@ -1005,14 +1042,16 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
 
       // !VA Get the img tag
       // !VA Get the img tag id to pass to ccpMakeImgTag
-      var childId = document.querySelector(btnCcpBuildClips.btnCcpMakeImgTag).id;
+      var childId = document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).id;
       // !VA Append the child img to the parent td.
       img = ccpMakeImgTag( childId, 1);
       tdInner.appendChild(img);
       // !VA Add manual indents -- using getIndents is a hassle
       img.insertAdjacentHTML('beforebegin', '\n            ');
       img.insertAdjacentHTML('afterend', '\n          ');
-      writeClipboard(id, tableOuter);
+      var str = tableOuter.outerHTML;
+      console.log('str is: ' + str);
+      writeClipboard(id, str);
 
 
     }
@@ -1021,14 +1060,15 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
 
 
 
-    function writeClipboard(id, tag) {
+    function writeClipboard(id, str) {
       console.log('writeClipboard running');
       console.log('id is: ' + id);
-      // console.log('tag is: ' + tag);
-      console.log(tag.outerHTML);
+      console.log('str is: ' + str);
+
       
       var clipboardStr;
-      clipboardStr = tag.outerHTML;
+      clipboardStr = str;
+      // clipboardStr = tag.outerHTML;
       var currentCB = new ClipboardJS('#' + id, {
         text: function(trigger) {
 
@@ -1056,7 +1096,7 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
       indentChar = '  ';
 
 
-      // console.log('getIndent running...');
+      // console.log('getIndent running running');
       for (let i = 0; i < indentLevel; i++) {
         indent = indent + indentChar;
         // console.log('indentChar is: ' + indentChar);
@@ -1067,8 +1107,6 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
       return indent;
 
     }
-
-
 
     
     function getAttributes() {
@@ -1095,7 +1133,6 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
         imgStyle: (function() {
           let target, checked, str;
           target = ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk;
-          console.log('target is: ' + target);
           checked = getCheckboxSelection(target);
           if (checked === true) {
             str = `display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;" `;
@@ -1190,9 +1227,6 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
 
       };
 
-
-
-
       return Attributes;
     }
 
@@ -1205,6 +1239,8 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
         // !VA 02.19.20
         var Attributes = getAttributes();
         let id = evt.target.id;
+        let list, listvalues, isCSS;
+        console.log('id is: ' + id);
         const indents = {
           0: '',
           1: '  ',
@@ -1212,12 +1248,12 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
           3: '      ',
         };
         switch(true) {
-        case (id === document.querySelector(btnCcpBuildClips.btnCcpMakeImgTag).id):
+        case (id === document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).id):
           console.log('id is: ' + id);
           // console.log('case 1');
           ccpMakeImgTag(id, 1);
           break;
-        case (id === document.querySelector(btnCcpBuildClips.btnCcpMakeTdTag).id):
+        case (id === document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag).id):
           // console.log('case 2');
           if (Attributes.tdBgimage) {
             // !VA Background image by Stig checked. Create td tag with Stig's VML code in innerHTML and no child img tag.
@@ -1228,24 +1264,29 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
             ccpMakeTdTag(id, 1);
           }
           break;
-        case (id === document.querySelector(btnCcpBuildClips.btnCcpMakeTableTag).id):
+        case (id === document.querySelector(btnCcpMakeClips.btnCcpMakeTableTag).id):
           // console.log('case 2');
           // !VA If the Include wrapper table option is checked, run ccpMakeWrapperTableTag, otherwise run ccpMakeTableTag. 
           Attributes.tableIncludeWrapper ? ccpMakeWrapperTableTag(id, 1) : ccpMakeTableTag(id, 1);
           break;
-        case ( id === (btnCcpBuildClips.btnCcpMakeImgDsktpCssRule).id) :
-          ccpImgDsktpBuildCssClip();
+        // !VA If the last 4 chars of the id are 'rule', then it's a CSS Rule button so route to the makeCssRule function.
+        case ( id.slice(-4) === 'rule') :
+          console.log('cssRULE..');
+          getCssProperties(id);
           break;
         default:
-          console.log('no match');
+          console.log('default');
         } 
-      },
+      }
+
 
     
       // !VA queryAllCcpOptions was a test function, deleted 02.20.20
     };
 
   })();
+
+
 
 
   // GLOBAL APP MODULE
@@ -1258,33 +1299,12 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
     var staticRegions = UICtrl.getStaticRegionIDs();
     var toolbarElements = UICtrl.getToolButtonIDs();
     var ccpUserInput = UICtrl.getCcpUserInputIDs();
-    var btnCcpBuildClips =  UICtrl.getCcpMakeClipButIDs();
+    var btnCcpMakeClips =  UICtrl.getCcpMakeClipButIDs();
     
 
     // !VA appController private setupEventListeners
     var setupEventListeners = function() {
 
-      // !VA Click on Witty logo to run test function
-      var testBut = document.querySelector('#runMe');
-      // testBut.addEventListener('click', runMe, false);
-
-      // !VA Uncomment to run the test function runMe on document load
-      document.addEventListener("DOMContentLoaded", function() {
-        runMe();
-      });
-
-
-
-      function runMe() {
-
-       
-
-      // }
-      
-
-
-
-      }
 
 
       // document.addEventListener('click', function(e) {
@@ -1375,12 +1395,12 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
       }
 
 
-      // !VA We need eventListeners for ALL the clipboard buttons so make an eventListener for each value in the btnCcpBuildClips object. We need a for in loop for objects
-      for(var i in btnCcpBuildClips) {
+      // !VA We need eventListeners for ALL the clipboard buttons so make an eventListener for each value in the btnCcpMakeClips object. We need a for in loop for objects
+      for(var i in btnCcpMakeClips) {
         // !VA loop through the object that contain the id and func properties.
         var clipBut;
-        if(btnCcpBuildClips.hasOwnProperty(i)){
-          clipBut = document.querySelector(btnCcpBuildClips[i]);
+        if(btnCcpMakeClips.hasOwnProperty(i)){
+          clipBut = document.querySelector(btnCcpMakeClips[i]);
           // console.log('clipBut.id is: ' + clipBut.id);
           addEventHandler(clipBut,'click',CBController.doClipboard,false);
         }
@@ -1432,7 +1452,7 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
       // !VA Remove the current image if one exists so the user can drop another one over it and reboot the process rather than having to refresh the browser and drop another image. This way, all the current settings are maintained. If they want new settings they can refresh the browser.
       document.querySelector('#cur-img-container').parentNode.removeChild(document.querySelector('#cur-img-container'));
       //The drop event has been executed and handleFileSelect is running.
-      // !VA Can't remember what this does...    
+      // !VA Can't remember what this does running    
       evt.stopPropagation();
       evt.preventDefault();
       //dataTransfer object is used to hold object data during a drag operation
@@ -1500,7 +1520,7 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
                 // !VA Pass Appdata on to evalViewerSizes in order to resize the image containers dynamically based on the dimensions of the image.
                 // !VA Create and array of the Appdata properties to update
                 // !VA Instead of managing Appdata based on some huge object with four HTML elements and all those unneeded properties thereof, we will just update Appdata by creating a local copy with just the properties we want to add.
-                // !VA Review this - it might be an older comment...
+                // !VA Review this - it might be an older comment 
                 // !VA The problem is that Appdata is a global object in the public functions, as it is now in master. I don't want to put all that stuff in the appController's public functions, so I have to either leave it in UIController or pass it between private functions, which will get very complicated.   I think it will be much cleaner if I only use updateAppData to loop through the items to update and don't use the klunky getAppData. Also, the refreshAppUI function refreshes all the values when it's called - it should only refresh the changed values.
                 // !VA  Now that the blob image has been displayed and has DOM properties that can be queried, query them and write them to Appdata.
                 // !VA Now that we have a current image in the DOM, Get Appdata so we can store the iFilename in it.
@@ -1740,7 +1760,7 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
     // !VA TODO: rename to checkUserInput and include parsing of the toolbutton mouseclicks from handleToolbarClicks.
     function checkUserInput(args) {
       // !VA Destructure args
-      console.log('checkUserInput running...');
+      console.log('checkUserInput running');
       console.dir(args);
       const { target, prop, val } = args;
       var errCode;
@@ -1815,7 +1835,7 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
     // !VA args is the target, prop and val passed in from handleKeyUp and handleMouseEvents. 
     function evalToolbarInput(args) {
       console.log('evalToolbarInput running');
-      // console.log('args is...');
+      // console.log('args is running');
       // console.dir(args);
       // !VA ES6 Destructure args into constants.
       const { target, prop, val } = args;
@@ -1838,7 +1858,7 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
 
       case (prop === 'imgW') :
         // !VA If the value was entered in imgwidth, calc imgH based on val and aspect. Then put prop and val in arg1, and put the imgH property name and the calculated imgH into arg2. These will be passed on avia the spread operator to updateAppdata. 
-        console.log('evalToolbarInput handling sPhonesw... ');      
+        console.log('evalToolbarInput handling sPhonesw ');      
         imgH =  val * (1 / Appdata.aspect[0]);
         // updateAppdata(prop, val); 
         arg1 = [ prop, val ]
@@ -1869,6 +1889,7 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
       }
       
       // !VA Call updateAppdata to resize the DOM elements and data properties that correspond to the Appdata properties above.
+      // !VA IMPORTANT -- these args aren't used...???
       updateAppdata( arg1, arg2 );
       // !VA Once those DOM properties and data properties have been updated, recalculate the image's containers.
       calcViewerSize();
@@ -2112,15 +2133,19 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
     function showElementOnInput(event) {
       // !VA Here we catch the event handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
       var elems = [];
-      elems[0] = document.querySelector(btnCcpBuildClips.btnCcpMakeImgDsktpCssRule);
-      elems[1] = document.querySelector(btnCcpBuildClips.btnCcpImgSmphnBuildCssClip);
-      elems[2] = document.querySelector(btnCcpBuildClips.btnCcpMakeImgLgphnCssRule);
-      elems[3] = document.querySelector(btnCcpBuildClips.btnCcpMakeTdDsktpCssRule);
-      elems[4] = document.querySelector(btnCcpBuildClips.btnCcpMakeTdSmphnCssRule);
-      elems[5] = document.querySelector(btnCcpBuildClips.btnCcpMakeTdLgphnCssRule);
-      elems[6] = document.querySelector(btnCcpBuildClips.btnCcpMakeTableDsktpCssRule);
-      elems[7] = document.querySelector(btnCcpBuildClips.btnCcpTableSmphnBuildCssClip);
-      elems[8] = document.querySelector(btnCcpBuildClips.btnCcpTableLgphnBuildCssClip);
+      elems[0] = document.querySelector(btnCcpMakeClips.btnCcpMakeImgDsktpCssRule);
+      elems[1] = document.querySelector(btnCcpMakeClips.btnCcpMakeImgSmphnCssRule);
+      elems[2] = document.querySelector(btnCcpMakeClips.btnCcpMakeImgLgphnCssRule);
+      elems[3] = document.querySelector(btnCcpMakeClips.btnCcpMakeTdDsktpCssRule);
+      elems[4] = document.querySelector(btnCcpMakeClips.btnCcpMakeTdSmphnCssRule);
+      elems[5] = document.querySelector(btnCcpMakeClips.btnCcpMakeTdLgphnCssRule);
+      elems[6] = document.querySelector(btnCcpMakeClips.btnCcpMakeTableDsktpCssRule);
+      elems[7] = document.querySelector(btnCcpMakeClips.btnCcpMakeTableSmphnCssRule);
+      elems[8] = document.querySelector(btnCcpMakeClips.btnCcpMakeTableLgphnCssRule);
+
+
+      console.log('event is: ' + event.target.id);
+
       // !VA We only want to show the buttons in each respective fieldset
       // !VA If the input is in the img fieldset, only show the first three buttons in the array. Add the hash # to the target ID to find the match with the ID in ccpUserInput
       if (('#' + event.target.id) == ccpUserInput.iptCcpImgClass) {
