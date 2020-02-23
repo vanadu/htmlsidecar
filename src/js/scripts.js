@@ -5,13 +5,27 @@
 // !VA GENERAL NOTES
 /* !VA  - February Reboot Notes
 =========================================================
-TODO: Fix toolbar sm and lg phone width inputs
-branch: fixToolbarMobileInputs
+// !VA 02.23.20
+In progress:
+TODO: Deal with the indents and embedded tag issue.
+
+For later:
+TODO: The CSS output will need to be revisited. You'd never need to output the width AND height in CSS for tables and for td it probably has no effect for height. That means...ugh.
+TODO: It's bad that writeClipboard is called even when that clipboard isn't being output. ccpMakeTdTag calls ccpMakeImgTag which calls writeClipboard -- that makes no sense. 
+
+DONE: All tables must have cellspacing border and cellpadding attributes!
+DONE: Is including the id in the make element functions necessary? YES, clipboardJS requires it!
+DONE: Renaming clipboard buttons and elements...
+DONE: Fix type error in ccpMakeTdTag -- Done, ccpMakeImgTag now returns the img object but passes img.outerHTML to writeClipboard. writeClipboard doesn't parse anything now, only takes the string and outputs it.
+DONE: Make clipboard CSS bvuttons work.
+DONE: Td large phone width css is wrong. Somehow that got fixed but I don't know when.
+DONE: Toolbar small and large phones don'g retain value on tab out -- fixed.
+DONE: Fix the toolbar sm phone and lg phone buttons and set to iPhone width of 414pxl
 
 
+// !VA Long-term TODO
+----------------------
 TODO: Figure out why queryDOMElements is running mutliple times per CB build.
-TODO: Finish reviewing and implementing write to clipboard buttons. NOTE: Need to thing about how to make that DRYer...there's a lot of repetition.
-TODO: Why does browser sync page refresh cause image display to fail? Does this with Arnie too. This appears to only happen when refreshing html files. See the gulp file...html and js use on.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer WIDTH. That's no good.
 
 
@@ -832,8 +846,6 @@ var Whitty = (function () {
       var childId = document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).id;
       // !VA Also pass the indent level that applies. Since this img will be a direct child of a single parent, we give it the indent level of 1. This also prevents ccpMakeImgTag from passing the img element to the clipboard -- if it did it would trigger an error.
       var img = ccpMakeImgTag(childId, 1);
-      console.log('here');
-      console.log('img is: ' + img);
       // !VA If Include wrapper table is unchecked in table options, append the child img to the parent td. 
       td.appendChild(img);
       // !VA Add the indent -- this is hardcoded for now, it needs to be formalized.
@@ -1528,7 +1540,7 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
                 sphonesw = document.querySelector(toolbarElements.iptTbrSPhonesWidth);
                 lphonesw = document.querySelector(toolbarElements.iptTbrLPhonesWidth);              
                 sphonesw.setAttribute('data-sphonesw', '320');
-                lphonesw.setAttribute('data-lphonesw', '480');
+                lphonesw.setAttribute('data-lphonesw', '414');
                 sphonesw.value = sphonesw.getAttribute('data-sphonesw');
                 lphonesw.value = lphonesw.getAttribute('data-lphonesw');
 
@@ -1752,7 +1764,6 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
     // !VA TODO: rename to checkUserInput and include parsing of the toolbutton mouseclicks from handleToolbarClicks.
     function checkUserInput(args) {
       // !VA Destructure args
-      console.log('checkUserInput running');
       console.dir(args);
       const { target, prop, val } = args;
       var errCode;
@@ -1826,62 +1837,49 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
     // !VA appController private evalToolbarInput
     // !VA args is the target, prop and val passed in from handleKeyUp and handleMouseEvents. 
     function evalToolbarInput(args) {
-      console.log('evalToolbarInput running');
-      // console.log('args is running');
-      // console.dir(args);
+      // console.log('evalToolbarInput running');
+      // !VA Here we get the toolbar input from handleKeyDown, determine which input field it was entered in, and pass the value to the updateAppdata. Note that until updateAppdata is called, Appdata still retains the values prior to the user input in the fields that initiated this action.
+      // !VA Initialize vars for imgH and imgW since we need to calculate one based on the value of the other and Appdata.aspect. Also initialize arg1 and arg2 which will be passed to updateAppdata
+      let imgH, imgW, arg1, arg2;
+      // !VA Get Appdata properties. All we really need here is Appdata.aspect. Everything else is calculated based on the user's input.
+      let Appdata = {};
+      Appdata = appController.initGetAppdata();
+      // !VA TODO: Target isn't read in this function. Evaluate whether it needs to be passed in  from the caller (handleKeyDown, handleMouseEvents)
       // !VA ES6 Destructure args into constants.
       const { target, prop, val } = args;
-      // !VA Get Appdata properties.
-      var Appdata = {};
-      var sPhonesH, sPhonesW;
-      // !VA All we really need here is Appdata.aspect. Everything else is calculated based on the user's input.
 
-      // !VA NEW
-      var Appdata = appController.initGetAppdata();
-
-      // !VA Initialize vars for imgH and imgW since we need to calculate one based on the value of the other and Appdata.aspect. 
-      var imgH, imgW;
       switch(true) {
       // !VA If the value was entered in the imgViewer field, just pass prop and val through to updateAppdata.
       case (prop === 'viewerW') :
-        arg1 = [ prop, val ]
+        arg1 = [ prop, val ];
         arg2 = '';
         break;          
-
       case (prop === 'imgW') :
         // !VA If the value was entered in imgwidth, calc imgH based on val and aspect. Then put prop and val in arg1, and put the imgH property name and the calculated imgH into arg2. These will be passed on avia the spread operator to updateAppdata. 
-        console.log('evalToolbarInput handling sPhonesw ');      
+        console.log('evalToolbarInput handling imgW ');      
         imgH =  val * (1 / Appdata.aspect[0]);
         // updateAppdata(prop, val); 
-        arg1 = [ prop, val ]
-        arg2 = [ 'imgH', imgH ] 
+        arg1 = [ prop, val ];
+        arg2 = [ 'imgH', imgH ];
         // updateAppdata('imgH', imgH); 
         break;
-
       case (prop === 'imgH') :
         // !VA If the value was entered in imgheight, calc imgW based on val and aspect. Then put prop and val in arg1, and put the imgW property name and the calculated imgW into arg2. These will be passed on via the ES6 spread operator to updateAppdata.
         imgW =  val * (Appdata.aspect[0]);
         arg1 = [ prop, val ]
         arg2 = [ 'imgW', imgW ] 
         break;
-
-      case (prop === 'iptTbrSmallPhonesW' || prop === 'iptTbrLargePhonesW') :
-        console.log('Appdata.iptTbrSmallPhonesW is: ' + Appdata.iptTbrSmallPhonesW);   
+      case (prop === 'sPhonesW' || prop === 'lPhonesW') :
         // sPhonesH =  val * (1 / Appdata.aspect[0]);
         arg1 = [prop, val];
         arg2 = '';
         break;
-
-        // case (prop === 'iptTbrLargePhonesW') :
-        //   // !VA TODO: needs handling
-        //   arg1 = [prop, val];
-        //   // arg2 = ['sPhonesH', sPhonesH ];
-        //   arg2 = '';
-        //   break;
       }
       
       // !VA Call updateAppdata to resize the DOM elements and data properties that correspond to the Appdata properties above.
       // !VA IMPORTANT -- these args aren't used...???
+      console.log('args is:');
+      console.dir(args);
       updateAppdata( arg1, arg2 );
       // !VA Once those DOM properties and data properties have been updated, recalculate the image's containers.
       calcViewerSize();
@@ -1889,8 +1887,7 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
 
 
     function updateAppdata( ...params ) {
-      var Appdata = {};
-      var prop, val;
+      let prop, val;
       console.log('updateAppData running...');
       // !VA Each param pair is a property name prop and a value val. evalToolbarInput passes in one or more such pairs whose corresponding Appdata DOM element/data attribute has to be updated. So, loop through the argument arrays and update the corresponding DOM elements
       for (let i = 0; i < params.length; i++) {
@@ -1911,16 +1908,16 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
         case prop === 'imgH' :
           document.querySelector(dynamicRegions.curImg).style.height = val + 'px';
           break;
-        case prop === 'iptTbrSmallPhonesW' :
-          document.querySelector(toolbarElements.iptTbrSmallPhonesW).setAttribute('data-sphonesw', val);
+        case prop === 'sPhonesW' :
+          document.querySelector(toolbarElements.iptTbrSPhonesWidth).setAttribute('data-sphonesw', val);
           break;
-        case prop === 'iptTbrLargePhonesW' :
-          document.querySelector(toolbarElements.iptTbrLargePhonesW).setAttribute('data-lphonesw', val);
+        case prop === 'lPhonesW' :
+          document.querySelector(toolbarElements.iptTbrLPhonesWidth).setAttribute('data-lphonesw', val);
           break;
         }
       }
-
-      Appdata = appController.initGetAppdata(false);
+      // let Appdata = appController.initGetAppdata(false);
+      // console.dir(Appdata);
     }
 
     // !VA  appController private calcViewerSize
@@ -2313,7 +2310,7 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
         sphonesw = document.querySelector(toolbarElements.iptTbrSPhonesWidth);
         lphonesw = document.querySelector(toolbarElements.iptTbrLPhonesWidth);              
         sphonesw.setAttribute('data-sphonesw', '320');
-        lphonesw.setAttribute('data-lphonesw', '480');
+        lphonesw.setAttribute('data-lphonesw', '414');
         sphonesw.value = sphonesw.getAttribute('data-sphonesw');
         lphonesw.value = lphonesw.getAttribute('data-lphonesw');
         console.log('initDev');
@@ -2321,7 +2318,7 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
         calcViewerSize();
         // !VA Open the CCP by default in dev mode
         // !VA First, set it to the opposite of how you want to start it.
-        document.querySelector(staticRegions.ccpContainer).classList.remove('active');
+        document.querySelector(staticRegions.ccpContainer).classList.add('active');
         // !VA Then run initCCP to initialize
   
         initCCP();

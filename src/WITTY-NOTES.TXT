@@ -3,84 +3,13 @@
 https://rutorrent.ac.seedbox.link/
 BQUDCq3YyJjs
 
-TODO: Fix the toolbar sm phone and lg phone buttons and set to iPhone width of 414pxl 
-
-
-
-
-
 
 BIG TODO!
-DONE: All tables must have cellspacing border and cellpadding attributes!
-DONE: Is including the id in the make element functions necessary? YES, clipboardJS requires it!
-DONE: Renaming clipboard buttons and elements...
-DONE: Fix type error in ccpMakeTdTag -- in ccpMakeImgTag, writeClipboard takes img.outerHTML. But the funciton returns the img object.
-TODO: Make clipboard CSS bvuttons work
-TODO: Td large phone width css is wrong
-TODO: Toolbar small and large phones don'g retain value on tab out
+TODO: Deal with the indents and embedded tag issue.
+
+For later:
 TODO: The CSS output will need to be revisited. You'd never need to output the width AND height in CSS for tables and for td it probably has no effect for height. That means...ugh.
 TODO: It's bad that writeClipboard is called even when that clipboard isn't being output. ccpMakeTdTag calls ccpMakeImgTag which calls writeClipboard -- that makes no sense. 
-TODO: Fix the toolbar sm phone and lg phone buttons and set to iPhone width of 414pxl
 
 
 
-
-
-
-Need to include a way to clear all the CB options since they now persist until a new image is added, I think. Review this.
-Must add color picker to toolbar!
-Now I have to do the same thing for all the CSS buttons :-(
-ANd I have to rename everything, including the aliases :-(
-
-
-
-TD functions:
-There are three variants.
-1) Basic build TD
-	a	creates the td element
-	adds valign attribute which is common to all variants -- but that could change if I add options...we'll include it for now to keep it DRY
-	
-2) User-defined variants
-	a 	adds class, align, bgcolor and includes img tag
-	
-3) Stig variants
-	adds width, height, background
-	includes innerhtml with vml
-	
-I'm starting to thing it might be better to just include all the attributes in one object and then retrieve them as needed with ES6 arguments. That would look like getSwapObject in the arnie project. I was on the right track with that earlier -- all the element attributes in one big object that can be called as required.
-
-
-In doClipboard:
-
-if TD button click:
-	if Stig checkmark checked
-		function: makeStigTdTag
-			call the needed attributes
-			innerHTML included in function
-			write to clipboard
-	else
-		function: makeUserDefinedTdTag
-			call the needed attributes
-			include img tag
-			write to clipboard
-			
-		
-if TABLE button click:
-	if !Wrapper table
-		function: makeTableTag
-			call the needed attributes
-			include the user-defined version of the tag, which should also include the img tag
-			
-	else
-		function: 
-			
-			
-	
-	
-	
-<table class="" width="60" bgcolor="" align="left">  
-  <tr><td class="#FFFFFF" valign="top" align="center">  
-  <img alt="asdf" src="img/html-email-icon-blue.png" style="border=&quot;0&quot; style=&quot;display: block; width: 60px; height: 60px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;&quot; " width="60" height="60" border="0" align="left">
-</td></tr>  
-  
-</table>
