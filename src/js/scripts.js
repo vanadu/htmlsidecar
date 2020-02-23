@@ -2,25 +2,11 @@
 // ===================
 // See C:\Users\VANA\OneDrive\WhittyReview_12.30.19.docx
 
-// !VA 01.03.20 b94eeb2 ESLint fixes
-// !VA 01.05.20 Naming Scheme Changes 1
-// !VA 01.06 Renaming with S&R Scripts in progress
-
-/* !VA  01.08.20 Branch: ToolbarFlexboxOverhaul */
-
-
-
-
 // !VA GENERAL NOTES
-/* !VA  - January Reboot Notes
+/* !VA  - February Reboot Notes
 =========================================================
-DONE: Fixed - See bottom of _custom.scs. the select list is wonky on Ubuntu Firefox but OK on Windows browsers. WHat's up with that?
-DONE: Fixed duplicated div closing tags that cause main image not to display
-DONE: Fixed -- mock checkbox label 'for' attribute has to refer to input ID. The Wrapper Table checkbox doesn't select when clicked - you have to click somewhere else on the span element. That needs to be fixed in the flexbox overhaul.
-DONE: large phones  inspector height value is wrong! Wrong var in getAppdata
-DONE: large phones css clip button writes undefined for width, fixed: global replace changed wrong var name
-DONE: Fixed - CB table html button doesn't work.
-DONE: Fixed - There's extra whitespace above the Inspector pane. That should go away when we convert to flexbox. 
+TODO: Fix toolbar sm and lg phone width inputs
+branch: fixToolbarMobileInputs
 
 
 TODO: Figure out why queryDOMElements is running mutliple times per CB build.
@@ -807,14 +793,18 @@ var Whitty = (function () {
       if (Attributes.imgAlign) { img.align = Attributes.imgAlign; }
       // !VA border attribute
       img.border = '0';
+      // !VA Here we create the string for the CB output
       var str = img.outerHTML;
-      // if (indentLevel) {
+
       // !VA Still working on what to do with indents
+      // !VA This is where we need use the indentLevel to determine whether the funciton is being called directly from the event target (i.e. the button click) or from a caller. If a caller, then we don't need to writeClipboard, because that clipboard output will be immediately overwritten by the caller. 
+      // !VA Also, why are we outputting to clipboard here when the function is being called for its return value, not for the CB output? The CB output is just being overwritten in the next call.
       writeClipboard(id, str);
-      // } else {
+
       // !VA Still working on what to do with indents
-      return str;
-      // }
+      // !VA Here we're returning the img object, not the clipboard output string (img.outerHTML) because the makeTd function needs the object.
+      return img;
+
     }
     // !VA END ccpMakeImgTag
 
@@ -842,6 +832,8 @@ var Whitty = (function () {
       var childId = document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).id;
       // !VA Also pass the indent level that applies. Since this img will be a direct child of a single parent, we give it the indent level of 1. This also prevents ccpMakeImgTag from passing the img element to the clipboard -- if it did it would trigger an error.
       var img = ccpMakeImgTag(childId, 1);
+      console.log('here');
+      console.log('img is: ' + img);
       // !VA If Include wrapper table is unchecked in table options, append the child img to the parent td. 
       td.appendChild(img);
       // !VA Add the indent -- this is hardcoded for now, it needs to be formalized.
