@@ -258,10 +258,10 @@ var Whitty = (function () {
       
     };
 
-    // !VA Test click CCP make img tag button on page load
+    // !VA Test click CCP make img tag button onpageload
     document.addEventListener('DOMContentLoaded', function() {
       setTimeout(function(){ 
-        document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).click();
+        document.querySelector(btnCcpMakeClips.btnCcpMakeTableTag).click();
   
       }, 500);
     });
@@ -944,6 +944,7 @@ var Whitty = (function () {
         // !VA Pass the outer table to the tableNode.
         tableNode = tableOuter;
       }
+
       // console.log('tableNode.outerHTML is:');
       // console.log(tableNode.outerHTML);
       return tableNode;
@@ -951,32 +952,131 @@ var Whitty = (function () {
 
     function makeNodeList( id ) {
       // console.log('makeNodeList running');
-      let imgNode, tdNode, tableNode, nodeList;
+      let container, imgNode, tdNode, tableNode, topNode;
+      container = document.createElement('div');
       // !VA make the node for the img tag
       imgNode = makeImgNode( id );
       // !VA If the CCP make img tag button was clicked, return imgNode as the nodeList and send to doIndents for code indents
       if (id == document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).id) {
-        nodeList = imgNode;
+        topNode = imgNode;
       } 
       tdNode = makeTdNode( id );
       if (id == document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag).id) {
         console.log('td button clicked');
-        nodeList = tdNode;
+        topNode = tdNode;
         // !VA We do NOT append imgNode here...that has to be done in makeTdNode because if Bgimage is checked, no imgNode is included.
       }
       tableNode = makeTableNode( id );
-      if ( id == document.querySelector(btnCcpMakeClips.btnCcpMakeTableTag).id)  {
-        nodeList = tableNode;
+      if ( id == document.querySelector(btnCcpMakeClips.btnCcpMakeTableTag).id )  {
+        topNode = tableNode;
       }
-      doIndents( id, nodeList );
+      container.appendChild(topNode);
+
+      // console.log('container is: ');
+      // console.dir(container);
+      doIndents( id, container );
     }
 
-    function doIndents( id, nodeList ) {
+    function doIndents( id, container, nodeList, indentbefore, indentafter, moreIndent ) {
       console.log('doIndents running');
       console.log('id is: ' + id);
       console.log('nodeList is:');
-      console.log(nodeList);
-      
+      console.log(container);
+      console.log('container.children[0].outerHTML is: ' + container.children[0].outerHTML);
+      nodeList = container.querySelectorAll('*');
+      console.log('nodeList is: ');
+      console.dir(nodeList);
+      console.log('nodeList.length is: ' + nodeList.length);
+      let td;
+      // let i;
+      // for (i = 0; i < nodeList.length; i++) {
+      //   console.log('nodeList[i]: ' + nodeList[i].outerHTML);
+      // }
+      indentbefore = '\n  ';
+      indentafter = '\n';
+      moreIndent = '  ';
+
+      let output;
+      let el1, el2, foo, fa;
+      switch(true) {
+      case ( nodeList.length === 1 ):
+        output = nodeList[0].outerHTML;
+        break;
+      case ( nodeList.length === 2 ):
+        console.log('nodeList[0].outerHTML is: ' + nodeList[0].outerHTML);
+        foo = nodeList[0];
+        console.log('foo is: ' + foo);
+        nodeList[1].insertAdjacentHTML('beforebegin', indentbefore);
+        nodeList[1].insertAdjacentHTML('afterend', indentafter);
+        console.log('nodeList[0].outerHTML is: ' + nodeList[0].outerHTML);
+        output = nodeList[0].outerHTML;
+
+        break;
+      case ( nodeList.length === 4 ):
+        for (let i = 0; i < nodeList.length; i++) {
+        console.log(nodeList[i].outerHTML);
+          if (i === 1 )  {
+            nodeList[i].insertAdjacentHTML('beforebegin', indentbefore);
+            nodeList[i].insertAdjacentHTML('afterend', indentafter);
+            output = nodeList[0].outerHTML;
+          }
+          if (i === 2 )  {
+            nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent);
+            nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent);
+            output = nodeList[0].outerHTML;
+          }
+          if (i === 3 )  {
+            nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent  + moreIndent);
+            nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent  + moreIndent);
+            output = nodeList[0].outerHTML;
+          }
+        }
+
+        break;
+      case ( nodeList.length === 7 ):
+        for (let i = 0; i < nodeList.length; i++) {
+          console.log(nodeList[i].outerHTML);
+          if (i === 1 )  {
+            nodeList[i].insertAdjacentHTML('beforebegin', indentbefore);
+            nodeList[i].insertAdjacentHTML('afterend', indentafter);
+            output = nodeList[0].outerHTML;
+          }
+          if (i === 2 )  {
+            nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent);
+            nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent);
+            output = nodeList[0].outerHTML;
+          }
+          if (i === 3 )  {
+            nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent + moreIndent );
+            nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent + moreIndent );
+            output = nodeList[0].outerHTML;
+          }
+          if (i === 4 )  {
+            nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent + moreIndent + moreIndent);
+            nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent + moreIndent + moreIndent );
+            output = nodeList[0].outerHTML;
+          }
+          if (i === 5 )  {
+            nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent + moreIndent + moreIndent + moreIndent);
+            nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent + moreIndent + moreIndent + moreIndent);
+            output = nodeList[0].outerHTML;
+          }
+          if (i === 6 )  {
+            nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent + moreIndent + moreIndent + moreIndent + moreIndent);
+            nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent + moreIndent + moreIndent + moreIndent + moreIndent);
+            output = nodeList[0].outerHTML;
+          }
+          
+        }
+
+        break;
+      default:
+
+      } 
+      console.log('output is: ' + output);
+      writeClipboard( id, output);
+
+
     }
 
 
