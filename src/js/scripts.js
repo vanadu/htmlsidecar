@@ -76,6 +76,17 @@ DONE: Show/Hide CCP, make checkboxes functional.
 // Namespace
 var Whitty = (function () {
 
+  // !VA Run on page load
+  // document.addEventListener("DOMContentLoaded", function() {
+  //   setTimeout(function(){ 
+  //     console.log('timeout'); 
+  //     document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).click();
+
+  //   }, 3000);
+
+
+  // });
+
   // !VA DEV Test function to get the clicked element to the console
   // (function () {
   //   document.addEventListener('click', function(e) {
@@ -246,6 +257,16 @@ var Whitty = (function () {
       btnCcpMakeTableLgphnCssRule: '#btn-ccp-make-table-lgphn-css-rule',
       
     };
+
+    // !VA Test click CCP make img tag button on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function(){ 
+        document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).click();
+  
+      }, 500);
+    });
+
+
 
 
     // !VA UIController private evalInspectorAlerts
@@ -531,8 +552,6 @@ var Whitty = (function () {
         wval = Appdata.sPhonesW, hval = Appdata.sPhonesH;
         break;
       default:
-        console.log('id is: ' + id);
-        console.log('default');
         break;
       }
       makeCssRule(id, classname, wval, hval);
@@ -784,235 +803,93 @@ var Whitty = (function () {
       return str;
     }
 
-    // !VA UIController private ccpMakeImgTag
-    function ccpMakeImgTag(id, indentLevel) {
-      
-      // !VA Get the attributes
-      var Attributes = getAttributes();
-      // !VA Create the element
-      let img = document.createElement('img');
+    function makeImgNode () {
+      // console.log('makeImgNode running');
+      // !VA Id is passed but not used here,  because we're only building the node.
+      let Attributes;
+      Attributes = getAttributes();
+      let imgNode;
+      imgNode = document.createElement('img');
       // !VA class attribute
-      if (Attributes.imgClass) { img.className = Attributes.imgClass; }
+      if (Attributes.imgClass) { imgNode.className = Attributes.imgClass; }
       // !VA alt attribute
-      if (Attributes.imgAlt) { img.alt = Attributes.imgAlt; }
+      if (Attributes.imgAlt) { imgNode.alt = Attributes.imgAlt; }
       // src attribute;
-      img.src = Attributes.imgSrc;
+      imgNode.src = Attributes.imgSrc;
       // !VA width attribute
-      img.width = Attributes.imgWidth;
+      imgNode.width = Attributes.imgWidth;
       // !VA height attribute
-      img.height = Attributes.imgHeight;
+      imgNode.height = Attributes.imgHeight;
       // !VA style attribute
-      img.setAttribute('style', Attributes.imgStyle);
+      imgNode.setAttribute('style', Attributes.imgStyle);
       // !VA align attribute is deprecated in html5, so we need this hack if we want to include it, which we don't for now.
-      if (Attributes.imgAlign) { img.align = Attributes.imgAlign; }
+      if (Attributes.imgAlign) { imgNode.align = Attributes.imgAlign; }
       // !VA border attribute
-      img.border = '0';
-      // !VA Here we create the string for the CB output
-      var str = img.outerHTML;
-
-      // !VA Still working on what to do with indents
-      // !VA This is where we need use the indentLevel to determine whether the funciton is being called directly from the event target (i.e. the button click) or from a caller. If a caller, then we don't need to writeClipboard, because that clipboard output will be immediately overwritten by the caller. 
-      // !VA Also, why are we outputting to clipboard here when the function is being called for its return value, not for the CB output? The CB output is just being overwritten in the next call.
-      writeClipboard(id, str);
-
-      // !VA Still working on what to do with indents
-      // !VA Here we're returning the img object, not the clipboard output string (img.outerHTML) because the makeTd function needs the object.
-      return img;
-
+      imgNode.border = '0';
+      return imgNode;
     }
-    // !VA END ccpMakeImgTag
+    
+    function makeTdNode() {
+      // console.log('makeTdNode running');
+      let Attributes;
+      Attributes = getAttributes();
+      let tdInner, imgNode;
+      tdInner = document.createElement('td');
+      // !VA Add the attributes that are included in both the default and background image td
 
-    // !VA UIController private ccpMakeTdTag
-    // !VA On Build Td HTML button click, creates a td tag with the user-defined attributes.
-    function ccpMakeTdTag(id, indentLevel ) {
-      console.log('ccpMakeTdTag running running');
-
-      let td = document.createElement('td');
-      var Attributes = getAttributes();
-          
-      // !VA We start with the two attributes that are present in both td variants.
-      // !VA align attribute
-      if (Attributes.tdAlign) { td.align = Attributes.tdAlign; }
-      // !VA valign attribute
-      if (Attributes.tdValign) { td.vAlign = Attributes.tdValign; }
-      // !VA class attribute
-      if (Attributes.tdClass) { td.className = Attributes.tdClass; }
+      if (Attributes.tdValign) { tdInner.vAlign = Attributes.tdValign; }
       // !VA bgcolor attribute. Pass the input value, don't prepend hex # character for now
-      if (Attributes.tdBgcolor) { td.bgColor = Attributes.tdBgcolor; }
+      if (Attributes.tdBgcolor) { tdInner.bgColor = Attributes.tdBgcolor; }
+      // !VA Now add the attributes included only with the default Td configuration
+      if (!Attributes.tdBgimage) {
+        // !VA class attribute
+        if (Attributes.tdClass) { tdInner.className = Attributes.tdClass; }
+        // !VA valign attribute
+        if (Attributes.tdAlign) { tdInner.align = Attributes.tdAlign; }
+        // !VA The id is wrong here -- we're passing the td's id but that shouldn't matter
+        imgNode = makeImgNode();
+        // !VA We need to include the imgNode here ONLY if Bgimage is unchecked
+        tdInner.appendChild(imgNode);
+      } else {
+        // !VA Height and width
+        tdInner.width = Attributes.tdWidth;
+        tdInner.height = Attributes.tdHeight;
+        
+        // !VA valign attribute
+        tdInner.vAlign = Attributes.tdValign;
 
+        // !VA Set the background attribute to the current path/filename
+        tdInner.setAttribute('background', Attributes.tdBackground);
 
-      // !VA Now we add the img tag
-      // !VA Get the id of the img that will be the child of the td tag. Include the id of the build img HTML button (childId) to pass to ccpMakeImgTag(id, 1)
-      var childId = document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).id;
-      // !VA Also pass the indent level that applies. Since this img will be a direct child of a single parent, we give it the indent level of 1. This also prevents ccpMakeImgTag from passing the img element to the clipboard -- if it did it would trigger an error.
-      var img = ccpMakeImgTag(childId, 1);
-      // !VA If Include wrapper table is unchecked in table options, append the child img to the parent td. 
-      td.appendChild(img);
-      // !VA Add the indent -- this is hardcoded for now, it needs to be formalized.
-      let indent = getIndent(1);  
-      // !VA Insert the indents before the img and the line break after it.
-      img.insertAdjacentHTML('beforebegin', indent);
-      img.insertAdjacentHTML('afterend', '\n');
-      // !VA Write the snippet to the clipboard 
-      var str = td.outerHTML;
-      writeClipboard(id, str);
-      // !VA Return the td element if required. 
-      return str;
-    }
-    // !VA END ccpMakeTdTag
+        // !VA Include fallback color if no bgColor is selected. Use Stig's fallback: #7bceeb
+        var fallback;
+        fallback = '#7bceeb';
+        var bgcolor;
+        Attributes.tdBgcolor ? bgcolor = Attributes.tdBgcolor : bgcolor = fallback;
+        tdInner.bgColor = bgcolor;
 
-    function makeTdBgimageTag(id, indentLevel ) {
-      console.log('makeTdBgimageTag running');
-      let td = document.createElement('td');
-      var Attributes = getAttributes();
-      let str = '';
-      let indent = '';
+        // !VA Dummy indent for  now
+        let indent = '\n';
 
-
-
-      // !VA Height and width
-      td.width = Attributes.tdWidth;
-      td.height = Attributes.tdHeight;
-      
-      // !VA valign attribute
-      td.vAlign = Attributes.tdValign;
-
-
-      // !VA Set the background attribute to the current path/filename
-      td.setAttribute('background', Attributes.tdBackground);
-
-      // !VA Include fallback color if no bgColor is selected. Use Stig's fallback: #7bceeb
-      var fallback;
-      fallback = '#7bceeb';
-      var bgcolor;
-      Attributes.tdBgcolor ? bgcolor = Attributes.tdBgcolor : bgcolor = fallback;
-      td.bgColor = bgcolor;
-
-      indent = getIndent(indentLevel);
-
-str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${indent}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${indent}<v:textbox inset="0,0,0,0">${indent}<![endif]-->${indent}<div>${indent}<!-- Put Foreground Content Here -->${indent}</div>${indent}<!--[if gte mso 9]>${indent}</v:textbox>${indent}</v:rect><![endif]-->\n`;
-
-      // td.insertAdjacentHTML('afterend', '\n');
-      td.innerHTML = str;
-      str = td.outerHTML;
-      writeClipboard(id, str);
-
+        tdInner.innerHTML = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${indent}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${indent}<v:textbox inset="0,0,0,0">${indent}<![endif]-->${indent}<div>${indent}<!-- Put Foreground Content Here -->${indent}</div>${indent}<!--[if gte mso 9]>${indent}</v:textbox>${indent}</v:rect><![endif]-->\n`;
+      }
+      return tdInner;
     }
 
-    // !VA UIController private ccpMakeTableTag
-    function ccpMakeTableTag(id, indents, indentLevel ) {  
-      console.log('ccpMakeTableTag running running');
-      var Attributes = getAttributes();
-      let table = document.createElement('table');
-      let tr = document.createElement('tr');
-      let td = document.createElement('td');
-      let img;
-      let selectid = null;
-      let indent;
 
-      // !VA table class attribute
-      if (Attributes.tableClass) { table.className = Attributes.tableClass; }
-      // table.className = Attributes.tableClass;
-      // !VA table align attribute
-      if (Attributes.tableAlign) { table.align = Attributes.tableAlign; }
-      // !VA width attribute -- the default is the current display size, so it gets the value from the toolbar viewerW input field.
-      table.width = Attributes.tableWidth;
-      // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for now
-      if (Attributes.tableBgcolor) { table.bgColor = Attributes.tableBgcolor; }
-      // !VA Add border, cellspacing and cellpadding
-      table.border = '0', table.cellSpacing = '0', table.cellPadding = '0';
-      // !VA Build the table tag
-      // !VA get the indent characters for the tr element
-      indent = getIndent(1);
-      // !VA Append the tr to the table element
-      table.appendChild(tr);
-      // !VA Add the indent before the tr element
-      tr.insertAdjacentHTML('beforebegin', '\n  ');
-      tr.insertAdjacentHTML('afterend', '\n');
-      // !VA Append the td
-      tr.appendChild(td);
-      // !VA Now we add the td attributes we need to avoid having to deal with double-embedded element indents. Technically we're creating the td twice - once in ccpMakeTdTag and once here but we're saving lots of time and hassle with the embedded indents!
+    function makeTableNode() {
+      // console.log('makeTdNode running');
+      let Attributes;
+      Attributes = getAttributes();
+      let tableNode, tableInner, tableOuter, tdInner, tdOuter, trInner, trOuter;
+      tableOuter = document.createElement('table');
+      tableInner = document.createElement('table');
+      tdInner = document.createElement('td');
+      tdOuter = document.createElement('td');
+      trInner = document.createElement('tr');
+      trOuter = document.createElement('tr');
 
-      if (Attributes.tdAlign) { td.align = Attributes.tdAlign; }
-      // !VA valign attribute
-      if (Attributes.tdValign) { td.vAlign = Attributes.tdValign; }
-      // !VA class attribute
-      if (Attributes.tdClass) { td.className = Attributes.tdClass; }
-      // !VA bgcolor attribute. Pass the input value, don't prepend hex # character for now
-      if (Attributes.tdBgcolor) { td.bgColor = Attributes.tdBgcolor; }
-
-
-      td.insertAdjacentHTML('beforebegin', '\n    ');
-      td.insertAdjacentHTML('afterend', '\n  ');
-      // !VA Get the child img's id
-      var childId = document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).id;
-      // !VA Append the child img to the parent td.
-      img = ccpMakeImgTag( childId, 1);
-      td.appendChild(img);
-      // !VA Add manual indents -- using getIndents is a hassle
-      img.insertAdjacentHTML('beforebegin', '\n      ');
-      img.insertAdjacentHTML('afterend', '\n    ');
-      // !VA Write table tag to clipboard
-      var str = table.outerHTML;
-      writeClipboard(id, str);
-      // !VA Return, if necessary
-      return table;
-    }
-    // !VA END ccpMakeTableTag
-
-    // !VA UIController private ccpMakeWrapperTableTag
-    function ccpMakeWrapperTableTag(id, indentLevel) { 
-      console.log('ccpMakeWrapperTableTag running running');
-      var Attributes = getAttributes();
-
-      let tableOuter = document.createElement('table')
-      let trOuter = document.createElement('tr');
-      let tdOuter = document.createElement('td');
-      let tableInner = document.createElement('table');
-      let trInner = document.createElement('tr');
-      let tdInner = document.createElement('td');
-      let img;
-
-
-      // !VA table wrapper class
-      if (Attributes.tableTagWrapperAlign) { tableOuter.align = Attributes.tableTagWrapperAlign; }
-      // !VA wrapper table align attribute
-      if (Attributes.tableTagWrapperClass) { tableOuter.className = Attributes.tableTagWrapperClass; }
-
-      // !VA width attribute
-      // !VA the default is the current display size, so it gets the value from the field.
-      tableOuter.width = Attributes.tableTagWrapperWidth;
-
-      // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for nowtableTagWrapperBgcolor);
-      if (Attributes.tableTagWrapperBgcolor) { tableOuter.bgColor = Attributes.tableTagWrapperBgcolor; }
-
-      // !VA Add border, cellspacing and cellpadding
-      tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
-      
-
-      // tableTagWrapperBgcolorAtt =
-      // ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.iptCcpTableWrapperBgColor).value);
-      // if (tableTagWrapperBgcolorAtt) {
-      //   tableOuter.bgColor = tableTagWrapperBgcolorAtt;
-      // }
-
-      // !VA Build the outer (wrapper) table
-      tableOuter.appendChild(trOuter);
-      trOuter.appendChild(tdOuter);
-      trOuter.insertAdjacentHTML('beforebegin', '\n  ');
-      trOuter.insertAdjacentHTML('afterend', '\n');
-      tdOuter.insertAdjacentHTML('beforebegin', '\n    ');
-      tdOuter.insertAdjacentHTML('afterend', '\n  ');
-      // !VA Add the outer td attributes
-      if (Attributes.tdAlign) { tdOuter.align = Attributes.tdAlign; }
-      // !VA valign attribute
-      if (Attributes.tdValign) { tdOuter.vAlign = Attributes.tdValign; }
-
-
-      // !VA Build the inner table
-      tdOuter.appendChild(tableInner);
-      tableInner.insertAdjacentHTML('beforebegin', '\n      ');
-      tableInner.insertAdjacentHTML('afterend', '\n    ');
+      // !VA Make the inner table. If Include wrapper table is unchecked, we return just the inner table. If it's checked, we return the inner table and the outer table 
       // !VA Add inner table attributes
       // !VA table class attribute
       if (Attributes.tableClass) { tableInner.className = Attributes.tableClass; }
@@ -1028,47 +905,84 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
       
       // !VA Build the inner tr
       tableInner.appendChild(trInner);
-      trInner.insertAdjacentHTML('beforebegin', '\n        ');
-      trInner.insertAdjacentHTML('afterend', '\n      ');
-
-      // !VA Build the inner td
+      // !VA Get the inner TD and append it - id is not for the inner TD but that's not relevent here.
+      tdInner = makeTdNode();
       trInner.appendChild(tdInner);
-      tdInner.insertAdjacentHTML('beforebegin', '\n          ');
-      tdInner.insertAdjacentHTML('afterend', '\n        ');
-      // !VA Add the inner td attributes
-      if (Attributes.tdAlign) { tdInner.align = Attributes.tdAlign; }
-      // !VA valign attribute
-      if (Attributes.tdValign) { tdInner.vAlign = Attributes.tdValign; }
-      // !VA class attribute
-      if (Attributes.tdClass) { tdInner.className = Attributes.tdClass; }
-      // !VA bgcolor attribute. Pass the input value, don't prepend hex # character for now
-      if (Attributes.tdBgcolor) { tdInner.bgColor = Attributes.tdBgcolor; }
+      
+      if (!Attributes.tableIncludeWrapper) {
+        // !VA If Include table wrapper is unchecked, just return this inner table
+        tableNode = tableInner;
+      } else {
+        // !VA If include table wrapper is checked, build the outer table and return it
+        console.log('Include table wrapper checked');
+        // !VA table wrapper class
+        if (Attributes.tableTagWrapperAlign) { tableOuter.align = Attributes.tableTagWrapperAlign; }
+        // !VA wrapper table align attribute
+        if (Attributes.tableTagWrapperClass) { tableOuter.className = Attributes.tableTagWrapperClass; }
 
-      // !VA Get the img tag
-      // !VA Get the img tag id to pass to ccpMakeImgTag
-      var childId = document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).id;
-      // !VA Append the child img to the parent td.
-      img = ccpMakeImgTag( childId, 1);
-      tdInner.appendChild(img);
-      // !VA Add manual indents -- using getIndents is a hassle
-      img.insertAdjacentHTML('beforebegin', '\n            ');
-      img.insertAdjacentHTML('afterend', '\n          ');
-      var str = tableOuter.outerHTML;
-      console.log('str is: ' + str);
-      writeClipboard(id, str);
+        // !VA width attribute
+        // !VA the default is the current display size, so it gets the value from the field.
+        tableOuter.width = Attributes.tableTagWrapperWidth;
 
+        // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for nowtableTagWrapperBgcolor);
+        if (Attributes.tableTagWrapperBgcolor) { tableOuter.bgColor = Attributes.tableTagWrapperBgcolor; }
 
+        // !VA Add border, cellspacing and cellpadding
+        tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
+
+        // !VA Append the outer tr
+        tableOuter.appendChild(trOuter);
+        trOuter.appendChild(tdOuter);
+        // !VA Append the outer td
+        trOuter.appendChild(tdOuter);
+        // !VA Add the outer td attributes
+        if (Attributes.tdAlign) { tdOuter.align = Attributes.tdAlign; }
+        // !VA valign attribute
+        if (Attributes.tdValign) { tdOuter.vAlign = Attributes.tdValign; }
+        // !VA Append the inner table to the outer table's td
+        tdOuter.appendChild(tableInner);
+        // !VA Pass the outer table to the tableNode.
+        tableNode = tableOuter;
+      }
+      // console.log('tableNode.outerHTML is:');
+      // console.log(tableNode.outerHTML);
+      return tableNode;
     }
-    // !VA END ccpMakeWrapperTableTag
 
+    function makeNodeList( id ) {
+      // console.log('makeNodeList running');
+      let imgNode, tdNode, tableNode, nodeList;
+      // !VA make the node for the img tag
+      imgNode = makeImgNode( id );
+      // !VA If the CCP make img tag button was clicked, return imgNode as the nodeList and send to doIndents for code indents
+      if (id == document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).id) {
+        nodeList = imgNode;
+      } 
+      tdNode = makeTdNode( id );
+      if (id == document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag).id) {
+        console.log('td button clicked');
+        nodeList = tdNode;
+        // !VA We do NOT append imgNode here...that has to be done in makeTdNode because if Bgimage is checked, no imgNode is included.
+      }
+      tableNode = makeTableNode( id );
+      if ( id == document.querySelector(btnCcpMakeClips.btnCcpMakeTableTag).id)  {
+        nodeList = tableNode;
+      }
+      doIndents( id, nodeList );
+    }
+
+    function doIndents( id, nodeList ) {
+      console.log('doIndents running');
+      console.log('id is: ' + id);
+      console.log('nodeList is:');
+      console.log(nodeList);
+      
+    }
 
 
 
     function writeClipboard(id, str) {
-      console.log('writeClipboard running');
-      console.log('id is: ' + id);
-      console.log('str is: ' + str);
-
+      // console.log('writeClipboard running');
       
       var clipboardStr;
       clipboardStr = str;
@@ -1093,26 +1007,6 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
       });
     }
 
-    function getIndent(indentLevel) {
-
-      let indentChar = '',
-        indent  = '';
-      indentChar = '  ';
-
-
-      // console.log('getIndent running running');
-      for (let i = 0; i < indentLevel; i++) {
-        indent = indent + indentChar;
-        // console.log('indentChar is: ' + indentChar);
-      }
-
-      indent = indent + '\n' + indent;
-      // console.log('indent is: ' + indent);
-      return indent;
-
-    }
-
-    
     function getAttributes() {
       var Appdata = appController.initGetAppdata();
       var Attributes = {
@@ -1238,49 +1132,14 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
 
     // !VA CBController public functions 
     return {
+
+
+      // !VA Called from eventHandler to handle clipboard button clicks
       doClipboard: function(evt) {
         console.log('doingClipboard');
-        // !VA 02.19.20
-        var Attributes = getAttributes();
         let id = evt.target.id;
-        let list, listvalues, isCSS;
-        console.log('id is: ' + id);
-        const indents = {
-          0: '',
-          1: '  ',
-          2: '    ',
-          3: '      ',
-        };
-        switch(true) {
-        case (id === document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).id):
-          console.log('id is: ' + id);
-          // console.log('case 1');
-          ccpMakeImgTag(id, 1);
-          break;
-        case (id === document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag).id):
-          // console.log('case 2');
-          if (Attributes.tdBgimage) {
-            // !VA Background image by Stig checked. Create td tag with Stig's VML code in innerHTML and no child img tag.
-            makeTdBgimageTag(id, 1);
-
-          } else {
-            // !VA Background image by Stig unchecked. Create td tag including user-selected attributes and the child img tag.
-            ccpMakeTdTag(id, 1);
-          }
-          break;
-        case (id === document.querySelector(btnCcpMakeClips.btnCcpMakeTableTag).id):
-          // console.log('case 2');
-          // !VA If the Include wrapper table option is checked, run ccpMakeWrapperTableTag, otherwise run ccpMakeTableTag. 
-          Attributes.tableIncludeWrapper ? ccpMakeWrapperTableTag(id, 1) : ccpMakeTableTag(id, 1);
-          break;
-        // !VA If the last 4 chars of the id are 'rule', then it's a CSS Rule button so route to the makeCssRule function.
-        case ( id.slice(-4) === 'rule') :
-          console.log('cssRULE..');
-          getCssProperties(id);
-          break;
-        default:
-          console.log('default');
-        } 
+        makeNodeList( id );
+       
       }
 
 
@@ -1627,7 +1486,6 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
       // !VA Carryover from earlier handleUserAction
       // !VA Get the target element of the click
       var el = document.getElementById(this.id);
-      console.log('el.id is: ' + el.id);
       var args = { };
       args.target = el.id;
       
@@ -2081,7 +1939,6 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
       // !VA Get the Appdata for the input default value
       var data = appController.initGetAppdata();
       var chkId, checkbox;
-      console.log('event.target.id is: ' + event.target.id);
       // !VA Toggle CCP checkboxes and run associated operations. The CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
 
       // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
@@ -2092,7 +1949,6 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
       chkId = event.target.id;
       chkId = chkId.replace('mrk', 'box');
       chkId = chkId.replace('spn', 'chk');
-      console.log('chkId is: ' + chkId);
       checkbox = document.getElementById(chkId);
       checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
 
@@ -2287,7 +2143,6 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
         var fname = document.querySelector(dynamicRegions.curImg).src;
         fname = fname.split('/');
         fname = fname[fname.length - 1];
-        console.log('fname is: ' + fname);
         // !VA Write the iFilename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
         document.querySelector(iInspectors.iFilename).textContent = fname;
   
@@ -2318,7 +2173,7 @@ str = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microso
         calcViewerSize();
         // !VA Open the CCP by default in dev mode
         // !VA First, set it to the opposite of how you want to start it.
-        document.querySelector(staticRegions.ccpContainer).classList.add('active');
+        document.querySelector(staticRegions.ccpContainer).classList.remove('active');
         // !VA Then run initCCP to initialize
   
         initCCP();
