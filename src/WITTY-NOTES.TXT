@@ -5,11 +5,14 @@ BQUDCq3YyJjs
 
 
 BIG TODO!
-TODO: Deal with the indents and embedded tag issue.
+DONE: Deal with the indents and embedded tag issue.
+TODO: Add role="Presentation" to all tables
 
 
 Img is included as a child of td in the maketablenode function. Should it not only be passed as a child of td? Otherwise, how can the Td.Bgimage innerhtml be passed to the doIndent?
 
+
+        tdInner.innerHTML = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${indent}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${indent}<v:textbox inset="0,0,0,0">${indent}<![endif]-->${indent}<div>${indent}<!-- Put Foreground Content Here -->${indent}</div>${indent}<!--[if gte mso 9]>${indent}</v:textbox>${indent}</v:rect><![endif]-->\n`;
 
 
 

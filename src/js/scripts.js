@@ -897,6 +897,7 @@ var Whitty = (function () {
       if (Attributes.tableBgcolor) { tableInner.bgColor = Attributes.tableBgcolor; }
       // !VA Add border, cellspacing and cellpadding
       tableInner.border = '0', tableInner.cellSpacing = '0', tableInner.cellPadding = '0';
+      tableInner.setAttribute('role', 'presentation'); 
       
       // !VA Build the inner tr
       tableInner.appendChild(trInner);
@@ -924,6 +925,7 @@ var Whitty = (function () {
 
         // !VA Add border, cellspacing and cellpadding
         tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
+        tableOuter.setAttribute('role', 'presentation'); 
 
         // !VA Append the outer tr
         tableOuter.appendChild(trOuter);
