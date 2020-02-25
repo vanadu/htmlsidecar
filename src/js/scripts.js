@@ -261,7 +261,7 @@ var Whitty = (function () {
     // !VA Test click CCP make img tag button onpageload
     document.addEventListener('DOMContentLoaded', function() {
       setTimeout(function(){ 
-        document.querySelector(btnCcpMakeClips.btnCcpMakeTableTag).click();
+        // document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag).click();
   
       }, 500);
     });
@@ -872,7 +872,6 @@ var Whitty = (function () {
       return tdInner;
     }
 
-
     function makeTableNode() {
       // console.log('makeTdNode running');
       let Attributes;
@@ -949,6 +948,7 @@ var Whitty = (function () {
     function makeNodeList( id ) {
       // console.log('makeNodeList running');
       let container, imgNode, tdNode, tableNode, topNode;
+      // !VA Create the container div - we need this to access the descendant elements as children, including the parent table of all the descendent table elements.
       container = document.createElement('div');
       // !VA make the node for the img tag
       imgNode = makeImgNode( id );
@@ -956,40 +956,42 @@ var Whitty = (function () {
       if (id == document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).id) {
         topNode = imgNode;
       } 
+      // !VA If the CCP make td tag button was clicked, return tdNode as the nodeList and send to doIndents for code indents
       tdNode = makeTdNode( id );
       if (id == document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag).id) {
-        console.log('td button clicked');
         topNode = tdNode;
-        // !VA We do NOT append imgNode here...that has to be done in makeTdNode because if Bgimage is checked, no imgNode is included.
+        // !VA We do NOT append imgNode here...that has to be done in makeTdNode because if Bgimage is checked, no imgNode is included. If we do it here then we have to include the conditional if Bgimage = checked here too. That belongs in the makeTdNode function.
       }
+      // !VA If the CCP make table tag button was clicked, return tableNode as the nodeList and send to doIndents for code indents
       tableNode = makeTableNode( id );
       if ( id == document.querySelector(btnCcpMakeClips.btnCcpMakeTableTag).id )  {
         topNode = tableNode;
       }
+      // !VA Put the table and its descendents into the parent container
       container.appendChild(topNode);
-
-      // console.log('container is: ');
-      // console.dir(container);
+      // !VA Pass the clicked button id and parent container element to process the code indents
       doIndents( id, container );
     }
 
-    function doIndents( id, container, nodeList, indentbefore, indentafter, moreIndent ) {
-      console.log('doIndents running');
-      console.log('id is: ' + id);
-      console.log('nodeList is:');
+    // !VA This is totally hacked but it works and structurally it can be improved upon at some later date
+    function doIndents( id, container, nodeList, indentbefore, indentafter, moreIndent, str1, str2 ) {
+      // console.log('doIndents running');
+      // console.log('id is: ' + id);
+      console.log('container is:');
       console.log(container);
-      console.log('container.children[0].outerHTML is: ' + container.children[0].outerHTML);
+      // console.log('container.children[0].outerHTML is: ' + container.children[0].outerHTML);
       nodeList = container.querySelectorAll('*');
-      console.log('nodeList is: ');
-      console.dir(nodeList);
-      console.log('nodeList.length is: ' + nodeList.length);
+      // console.log('nodeList is: ');
+      // console.dir(nodeList);
+      // console.log('nodeList.length is: ' + nodeList.length);
+
+
 
       indentbefore = '\n  ';
       indentafter = '\n';
       moreIndent = '  ';
 
       let output;
-      let el1, el2, foo, fa;
       switch(true) {
       case ( nodeList.length === 1 ):
         // !VA This is the singleton image tag, no indent required
@@ -997,76 +999,107 @@ var Whitty = (function () {
         break;
       case ( nodeList.length === 2 ):
         // !VA td Tag - nodeList[1] = img, nodeList[0] = td. Put indents around the img
-        nodeList[1].insertAdjacentHTML('beforebegin', indentbefore);
-        nodeList[1].insertAdjacentHTML('afterend', indentafter);
+        // !VA Only the background image code references the MS VML schema, so we'll search for that to apply the indent scheme
+        // !VA If the VML schema is NOT present, then it's an img or other element node. Else, it's the background image code and the line breaks/indent is set in the makeTdNode function for now, so no else is necessary.
+        if (!nodeList[0].innerHTML.includes('urn:schemas-microsoft-com:vml')) {
+          nodeList[1].insertAdjacentHTML('beforebegin', indentbefore);
+          nodeList[1].insertAdjacentHTML('afterend', indentafter);
+          // console.log('nodeList[0].childNodes is: ');
+          // console.log(nodeList[0].childNodes);
+        } 
         output = nodeList[0].outerHTML;
 
         break;
       case ( nodeList.length === 4 ):
+        // !VA Parent table, without the wrapper table. 
+        // !VA nodeList[0] is the parent table
         for (let i = 0; i < nodeList.length; i++) {
-          console.log(nodeList[i].outerHTML);
           if (i === 1 )  {
+            // !VA nodeList[1] is the tr
             nodeList[i].insertAdjacentHTML('beforebegin', indentbefore);
             nodeList[i].insertAdjacentHTML('afterend', indentafter);
-            output = nodeList[0].outerHTML;
           }
           if (i === 2 )  {
-            nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent);
-            nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent);
-            output = nodeList[0].outerHTML;
+            // !VA nodeList[2] is the td. Trying to deal with the background image indents by processing the childNodes of the td would be hell, so we'll just add moreindents to the existing indents we set when we build the background image code block in tdMakeNode. This is not DRY, but it is clear and easily modifiable.
+            if (!nodeList[2].innerHTML.includes('urn:schemas-microsoft-com:vml')) {
+              nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent);
+              nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent);
+              // console.log('nodeList[0].childNodes is: ');
+              // console.log(nodeList[0].childNodes);
+            } else {
+
+              nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent);
+              nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent);
+              // !VA Replace all occurrences of '/n  ' with '/n     '  in the td.innerHTML to add space to the code indent and add a break and space before the closing /td.
+              str1 = nodeList[2].innerHTML;
+              str1 = str1.replace( /\n  /g, '\n      ' );
+              nodeList[2].innerHTML = str1;
+              nodeList[i].insertAdjacentHTML('beforeend', moreIndent + moreIndent);
+            }
+
           }
           if (i === 3 )  {
-            nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent  + moreIndent);
-            nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent  + moreIndent);
-            output = nodeList[0].outerHTML;
+            if (!nodeList[2].innerHTML.includes('urn:schemas-microsoft-com:vml')) {
+              // !VA nodeList[3] is the img which is only added if the td doesn't contain the background image code.
+              nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent  + moreIndent);
+              nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent  + moreIndent);
+            }
           }
         }
-
+        output = nodeList[0].outerHTML;
         break;
       case ( nodeList.length === 7 ):
         for (let i = 0; i < nodeList.length; i++) {
-          console.log(nodeList[i].outerHTML);
           if (i === 1 )  {
             nodeList[i].insertAdjacentHTML('beforebegin', indentbefore);
             nodeList[i].insertAdjacentHTML('afterend', indentafter);
-            output = nodeList[0].outerHTML;
           }
           if (i === 2 )  {
             nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent);
             nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent);
-            output = nodeList[0].outerHTML;
           }
           if (i === 3 )  {
             nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent + moreIndent );
             nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent + moreIndent );
-            output = nodeList[0].outerHTML;
           }
           if (i === 4 )  {
             nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent + moreIndent + moreIndent);
             nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent + moreIndent + moreIndent );
-            output = nodeList[0].outerHTML;
           }
           if (i === 5 )  {
-            nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent + moreIndent + moreIndent + moreIndent);
-            nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent + moreIndent + moreIndent + moreIndent);
-            output = nodeList[0].outerHTML;
+
+            if (!nodeList[2].innerHTML.includes('urn:schemas-microsoft-com:vml')) {
+              nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent + moreIndent + moreIndent + moreIndent);
+              nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent + moreIndent + moreIndent + moreIndent);
+            } 
+            else 
+            {
+              console.log('working--');
+              // !VA nodeList[5] is the innerTd
+              // !VA Replace all occurrences of '/n  ' with '\n            '  in the td.innerHTML to add space to the code indent and add a break and space before the closing /td.
+              var faa = nodeList[5].innerHTML;
+              faa = faa.replace( /\n  /g, '\n            ' );
+              console.log('faa is: ' + faa);
+              nodeList[5].innerHTML = faa;
+              nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent + moreIndent + moreIndent + moreIndent);
+              nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent + moreIndent + moreIndent + moreIndent); 
+              nodeList[i].insertAdjacentHTML('beforeend', moreIndent + moreIndent + moreIndent + moreIndent + moreIndent);          
+            }
           }
           if (i === 6 )  {
-            nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent + moreIndent + moreIndent + moreIndent + moreIndent);
-            nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent + moreIndent + moreIndent + moreIndent + moreIndent);
-            output = nodeList[0].outerHTML;
+            if (!nodeList[2].innerHTML.includes('urn:schemas-microsoft-com:vml')) {
+              // !VA nodeList[3] is the img which is only added if the td doesn't contain the background image code.
+              nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent + moreIndent + moreIndent + moreIndent + moreIndent);
+              nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent + moreIndent + moreIndent + moreIndent + moreIndent);
+            }
           }
-          
+          output = nodeList[0].outerHTML;
         }
-
         break;
       default:
-
       } 
-      console.log('output is: ' + output);
+      console.log('output is: \n' + output);
       writeClipboard( id, output);
-
-
     }
 
 
