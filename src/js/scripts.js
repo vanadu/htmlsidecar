@@ -854,22 +854,18 @@ var Whitty = (function () {
         // !VA Height and width
         tdInner.width = Attributes.tdWidth;
         tdInner.height = Attributes.tdHeight;
-        
         // !VA valign attribute
         tdInner.vAlign = Attributes.tdValign;
-
         // !VA Set the background attribute to the current path/filename
         tdInner.setAttribute('background', Attributes.tdBackground);
-
         // !VA Include fallback color if no bgColor is selected. Use Stig's fallback: #7bceeb
         var fallback;
         fallback = '#7bceeb';
         var bgcolor;
         Attributes.tdBgcolor ? bgcolor = Attributes.tdBgcolor : bgcolor = fallback;
         tdInner.bgColor = bgcolor;
-
         // !VA Dummy indent for  now
-        let indent = '\n';
+        let indent = '\n  ';
 
         tdInner.innerHTML = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${indent}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${indent}<v:textbox inset="0,0,0,0">${indent}<![endif]-->${indent}<div>${indent}<!-- Put Foreground Content Here -->${indent}</div>${indent}<!--[if gte mso 9]>${indent}</v:textbox>${indent}</v:rect><![endif]-->\n`;
       }
@@ -987,11 +983,7 @@ var Whitty = (function () {
       console.log('nodeList is: ');
       console.dir(nodeList);
       console.log('nodeList.length is: ' + nodeList.length);
-      let td;
-      // let i;
-      // for (i = 0; i < nodeList.length; i++) {
-      //   console.log('nodeList[i]: ' + nodeList[i].outerHTML);
-      // }
+
       indentbefore = '\n  ';
       indentafter = '\n';
       moreIndent = '  ';
@@ -1000,21 +992,19 @@ var Whitty = (function () {
       let el1, el2, foo, fa;
       switch(true) {
       case ( nodeList.length === 1 ):
+        // !VA This is the singleton image tag, no indent required
         output = nodeList[0].outerHTML;
         break;
       case ( nodeList.length === 2 ):
-        console.log('nodeList[0].outerHTML is: ' + nodeList[0].outerHTML);
-        foo = nodeList[0];
-        console.log('foo is: ' + foo);
+        // !VA td Tag - nodeList[1] = img, nodeList[0] = td. Put indents around the img
         nodeList[1].insertAdjacentHTML('beforebegin', indentbefore);
         nodeList[1].insertAdjacentHTML('afterend', indentafter);
-        console.log('nodeList[0].outerHTML is: ' + nodeList[0].outerHTML);
         output = nodeList[0].outerHTML;
 
         break;
       case ( nodeList.length === 4 ):
         for (let i = 0; i < nodeList.length; i++) {
-        console.log(nodeList[i].outerHTML);
+          console.log(nodeList[i].outerHTML);
           if (i === 1 )  {
             nodeList[i].insertAdjacentHTML('beforebegin', indentbefore);
             nodeList[i].insertAdjacentHTML('afterend', indentafter);
@@ -2288,8 +2278,7 @@ var Whitty = (function () {
       // console.log('getAppdata running');
       var arr = [];
       var Appdata = {};
-      
-      var Appdata = UIController.queryDOMElements();
+      Appdata = UIController.queryDOMElements();
 
       // !VA Now compute the rest of Appdat
       Appdata.aspect = getAspectRatio(Appdata.imgNW,  Appdata.imgNH);
