@@ -1699,10 +1699,22 @@ fieldset {
   -ms-transform: rotate(45deg);
   transform: rotate(45deg); }
 
-#ccp-img-include-width-height-label, #ccp-td-bgimage-label, #ccp-table-include-wrapper-label {
+#ccp-img-include-width-height-label, #ccp-table-include-wrapper-label {
   width: 100%;
   padding: 0 0 0 25px;
   text-align: left; }
+
+#ccp-td-basictd, #ccp-td-posswitch, #ccp-td-bgimage {
+  display: flex;
+  justify-content: space-evenly; }
+  #ccp-td-basictd input, #ccp-td-posswitch input, #ccp-td-bgimage input {
+    width: 5%;
+    padding-top: 5px; }
+  #ccp-td-basictd label, #ccp-td-posswitch label, #ccp-td-bgimage label {
+    text-align: left;
+    width: 80%;
+    line-height: 1.5rem;
+    margin: 0; }
 
 #ccp-table-include-wrapper-label {
   margin: 0;

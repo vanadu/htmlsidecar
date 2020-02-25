@@ -216,7 +216,13 @@ var Whitty = (function () {
       selCcpTdValign: '#sel-ccp-td-valign',
       iptCcpTdBgColor: '#ipt-ccp-td-bgcolor',
       // !VA spn-ccp-td-bgimage-checkmrk
-      spnCcpTdBgimageCheckmrk: '#spn-ccp-td-bgimage-checkmrk',
+      // !VA This is deprecated as of today
+      // spnCcpTdBgimageCheckmrk: '#spn-ccp-td-bgimage-checkmrk',
+      rdoCcpTdBasic: '#rdo-ccp-td-basic',
+      rdoCcpTdPosswitch: '#rdo-ccp-td-posswitch',
+      rdoCcpTdBgimage: '#rdo-ccp-td-bgimage',
+
+
       iptCcpTableClass: '#ipt-ccp-table-class',
       selCcpTableAlign: '#sel-ccp-table-align',
       // !VA iptCcpTableWidth
@@ -262,7 +268,10 @@ var Whitty = (function () {
     document.addEventListener('DOMContentLoaded', function() {
       setTimeout(function(){ 
         // document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag).click();
-  
+        // document.querySelector('input[name="tdoptions"]:checked').value;
+        var foo = document.querySelector('input[name=tdoptions]:checked').value;
+        console.log('foo is: ' + foo);
+        
       }, 500);
     });
 
@@ -773,6 +782,19 @@ var Whitty = (function () {
       return checked;
     }
 
+    function getRadioSelection(target) {
+      let radioid, checked;
+      radioid = document.querySelector(target).id; 
+      if (document.querySelector('#' + radioid).checked === false) {
+        // !VA Radio button is NOT CHECKED
+        checked = false;
+      } else {
+      // !VA Radio button IS CHECKED
+        checked = true;
+      }
+      return checked;
+    }
+
     // clipboardController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
     // !VA TODO: THis should be in handleUserInput
     function ccpIfNoUserInput(att, value) {
@@ -830,7 +852,7 @@ var Whitty = (function () {
     }
     
     function makeTdNode() {
-      // console.log('makeTdNode running');
+      console.log('makeTdNode running');
       let Attributes;
       Attributes = getAttributes();
       let tdInner, imgNode;
@@ -841,7 +863,15 @@ var Whitty = (function () {
       // !VA bgcolor attribute. Pass the input value, don't prepend hex # character for now
       if (Attributes.tdBgcolor) { tdInner.bgColor = Attributes.tdBgcolor; }
       // !VA Now add the attributes included only with the default Td configuration
-      if (!Attributes.tdBgimage) {
+
+
+      let fallback;
+      let bgcolor;
+      let indent;
+      var foo = document.querySelector('input[name=tdoptions]:checked').value;
+      console.log('foo is: ' + foo);
+      switch(true) {
+      case (foo === 'basic'):
         // !VA class attribute
         if (Attributes.tdClass) { tdInner.className = Attributes.tdClass; }
         // !VA valign attribute
@@ -850,8 +880,8 @@ var Whitty = (function () {
         imgNode = makeImgNode();
         // !VA We need to include the imgNode here ONLY if Bgimage is unchecked
         tdInner.appendChild(imgNode);
-      } else {
-        // !VA Height and width
+        break;
+      case (foo === 'bgimage'):
         tdInner.width = Attributes.tdWidth;
         tdInner.height = Attributes.tdHeight;
         // !VA valign attribute
@@ -859,15 +889,29 @@ var Whitty = (function () {
         // !VA Set the background attribute to the current path/filename
         tdInner.setAttribute('background', Attributes.tdBackground);
         // !VA Include fallback color if no bgColor is selected. Use Stig's fallback: #7bceeb
-        var fallback;
         fallback = '#7bceeb';
-        var bgcolor;
         Attributes.tdBgcolor ? bgcolor = Attributes.tdBgcolor : bgcolor = fallback;
         tdInner.bgColor = bgcolor;
         // !VA Dummy indent for  now
-        let indent = '\n  ';
+        indent = '\n  ';
 
         tdInner.innerHTML = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${indent}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${indent}<v:textbox inset="0,0,0,0">${indent}<![endif]-->${indent}<div>${indent}<!-- Put Foreground Content Here -->${indent}</div>${indent}<!--[if gte mso 9]>${indent}</v:textbox>${indent}</v:rect><![endif]-->\n`;
+        break;
+      case (foo === 'posswitch'):
+        tdInner.innerHTML = 'This will be a posswitch TD!'
+        break;
+      default:
+        // code block
+      } 
+
+
+
+
+      if (!Attributes.tdBgimage) {
+
+      } else {
+        // !VA Height and width
+
       }
       return tdInner;
     }
@@ -1179,10 +1223,22 @@ var Whitty = (function () {
         tdHeight: (function() {
           return Appdata.imgH;
         })(),
+        tdBasic: (function() {
+          let target, checked;
+          target = ccpUserInput.rdoCcpTdBasic;
+          console.log('target is: ' + target);
+          checked = getRadioSelection(target);
+          return checked;
+        })(),
         tdBgimage: (function() {
           let target, checked;
-          target = ccpUserInput.spnCcpTdBgimageCheckmrk;
-          checked = getCheckboxSelection(target);
+          target = ccpUserInput.rdoCcpTdBgimage;
+          return checked;
+        })(),
+        tdPosswitch: (function() {
+          let target, checked;
+          target = ccpUserInput.rdoCcpTdPosswitch;
+          checked = getRadioSelection(target);
           return checked;
         })(),
         tdAlign: (function() {
@@ -2031,14 +2087,13 @@ var Whitty = (function () {
 
 
         // !VA CCP Checkboxes - these are mock checkboxes with custom styling, so the ID names have to be converted to checkbox names in order to select or deselect them. We attach the event handler to the checkmark, not the checkbox. The checkmark is converted to checkbox for handling in toggleCheckbox.
-        var ccpCheckmarks = [ ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk, ccpUserInput.spnCcpTdBgimageCheckmrk, ccpUserInput.spnCcpTableIncludeWrapperCheckmrk ]
+        var ccpCheckmarks = [ ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk, ccpUserInput.spnCcpTableIncludeWrapperCheckmrk ];
         var ccpCheckboxes = [];
         for (let i = 0; i < ccpCheckmarks.length; i++) {
           document.querySelector(ccpCheckmarks[i]).addEventListener('click', handleCCPInput, false);
         }
 
         // !VA Initialize with all the 'Wrapper table' options undisplayed - uncomment this for DEV
-        var wrapperItemsToHide = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
         var wrapperItemsToHide = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
         for (let i = 0; i < wrapperItemsToHide.length; i++) {
           document.querySelector(wrapperItemsToHide[i]).style.display = 'none'; 
