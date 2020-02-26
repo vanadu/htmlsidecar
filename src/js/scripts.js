@@ -905,14 +905,6 @@ var Whitty = (function () {
       } 
 
 
-
-
-      if (!Attributes.tdBgimage) {
-
-      } else {
-        // !VA Height and width
-
-      }
       return tdInner;
     }
 
@@ -985,9 +977,8 @@ var Whitty = (function () {
         // !VA Pass the outer table to the tableNode.
         tableNode = tableOuter;
       }
-
-      // console.log('tableNode.outerHTML is:');
-      // console.log(tableNode.outerHTML);
+      console.log('tableNode.outerHTML is:');
+      console.log(tableNode.outerHTML);
       return tableNode;
     }
 
