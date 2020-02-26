@@ -1086,124 +1086,49 @@ var Whitty = (function () {
 
 
 
-
-      
-      indentbefore = '\n  ';
+      let foo;
       indentafter = '\n';
-      moreIndent = '  ';
-
+      moreIndent = 'YY';
+      console.clear();
+      
+      let lb = '\n';
+      let j;
       let output;
-      switch(true) {
-      case ( nodeList.length === 1 ):
-        // !VA This is the singleton image tag, no indent required
-        output = nodeList[0].outerHTML;
-        break;
-      case ( nodeList.length === 2 ):
-        // !VA td Tag - nodeList[1] = img, nodeList[0] = td. Put indents around the img
-        // !VA Only the background image code references the MS VML schema, so we'll search for that to apply the indent scheme
-        // !VA If the VML schema is NOT present, then it's an img or other element node. Else, it's the background image code and the line breaks/indent is set in the makeTdNode function for now, so no else is necessary.
-        if (!nodeList[0].innerHTML.includes('urn:schemas-microsoft-com:vml')) {
-          nodeList[1].insertAdjacentHTML('beforebegin', indentbefore);
-          nodeList[1].insertAdjacentHTML('afterend', indentafter);
-          // console.log('nodeList[0].childNodes is: ');
-          // console.log(nodeList[0].childNodes);
-        } 
-        output = nodeList[0].outerHTML;
+      let spacechar = 'XX';
+      let spacebefore;
+      spacebefore = 'XX';
+      let spaceafter;
+      spaceafter = '';
+      console.log('nodeList.length is: ' + nodeList.length);
+      for (let i = 0; i < nodeList.length - 1; i++) {
+        j = i + 1;
 
-        break;
-      case ( nodeList.length === 4 ):
-        // !VA Parent table, without the wrapper table. 
-        // !VA nodeList[0] is the parent table
-        for (let i = 0; i < nodeList.length; i++) {
-          if (i === 1 )  {
-            // !VA nodeList[1] is the tr
-            nodeList[i].insertAdjacentHTML('beforebegin', indentbefore);
-            nodeList[i].insertAdjacentHTML('afterend', indentafter);
-          }
-          if (i === 2 )  {
-            // !VA nodeList[2] is the td. Trying to deal with the background image indents by processing the childNodes of the td would be hell, so we'll just add moreindents to the existing indents we set when we build the background image code block in tdMakeNode. This is not DRY, but it is clear and easily modifiable.
-            if (!nodeList[2].innerHTML.includes('urn:schemas-microsoft-com:vml')) {
-              nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent);
-              nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent);
-              // console.log('nodeList[0].childNodes is: ');
-              // console.log(nodeList[0].childNodes);
-            } else {
 
-              nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent);
-              nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent);
-              // !VA Replace all occurrences of '/n  ' with '/n     '  in the td.innerHTML to add space to the code indent and add a break and space before the closing /td.
-              str1 = nodeList[2].innerHTML;
-              str1 = str1.replace( /\n  /g, '\n      ' );
-              nodeList[2].innerHTML = str1;
-              nodeList[i].insertAdjacentHTML('beforeend', moreIndent + moreIndent);
-            }
+        if ( j >= 0) {
+          if (j > 1) {
+            console.log('here');
+            spacebefore = spacebefore + spacechar;
+            spaceafter = spaceafter + spacechar;
+          }
+          // if (j > 2) {
+          //   console.log('here');
+          //   spacebefore = spaceafter + spaceafter;
+          // }
 
-          }
-          if (i === 3 )  {
-            if (!nodeList[2].innerHTML.includes('urn:schemas-microsoft-com:vml')) {
-              // !VA nodeList[3] is the img which is only added if the td doesn't contain the background image code.
-              nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent  + moreIndent);
-              nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent  + moreIndent);
-            }
-          }
+          console.log('j is: ' + j);
+          nodeList[j].insertAdjacentHTML('beforebegin', '\n' + spacebefore);
+          nodeList[j].insertAdjacentHTML('afterend', '\n' + spaceafter);
+          // console.log('nodeList[i].outerHTML is \n' + nodeList[i].outerHTML);
         }
-        output = nodeList[0].outerHTML;
-        break;
-      case ( nodeList.length === 7 || nodeList.length === 8 ):
-        for (let i = 0; i < nodeList.length; i++) {
-          if (i === 1 )  {
-            nodeList[i].insertAdjacentHTML('beforebegin', indentbefore);
-            nodeList[i].insertAdjacentHTML('afterend', indentafter);
-          }
-          if (i === 2 )  {
-            nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent);
-            nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent);
-          }
-          if (i === 3 )  {
-            nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent + moreIndent );
-            nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent + moreIndent );
-          }
-          if (i === 4 )  {
-            nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent + moreIndent + moreIndent);
-            nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent + moreIndent + moreIndent );
-          }
-          if (i === 5 )  {
+      }
+      console.log('nodeList[1].outerHTML is: \n ' + nodeList[0].outerHTML);
 
-            if (!nodeList[2].innerHTML.includes('urn:schemas-microsoft-com:vml')) {
-              nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent + moreIndent + moreIndent + moreIndent);
-              nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent + moreIndent + moreIndent + moreIndent);
-            } 
-            else 
-            {
-              console.log('working--');
-              // !VA nodeList[5] is the innerTd
-              // !VA Replace all occurrences of '/n  ' with '\n            '  in the td.innerHTML to add space to the code indent and add a break and space before the closing /td.
-              var faa = nodeList[5].innerHTML;
-              faa = faa.replace( /\n  /g, '\n            ' );
-              console.log('faa is: ' + faa);
-              nodeList[5].innerHTML = faa;
-              nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent + moreIndent + moreIndent + moreIndent);
-              nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent + moreIndent + moreIndent + moreIndent); 
-              nodeList[i].insertAdjacentHTML('beforeend', moreIndent + moreIndent + moreIndent + moreIndent + moreIndent);          
-            }
-          }
-          if (i === 6 )  {
-            if (!nodeList[2].innerHTML.includes('urn:schemas-microsoft-com:vml')) {
-              // !VA nodeList[3] is the img which is only added if the td doesn't contain the background image code.
-              nodeList[i].insertAdjacentHTML('beforebegin', indentbefore + moreIndent + moreIndent + moreIndent + moreIndent + moreIndent);
-              nodeList[i].insertAdjacentHTML('afterend', indentafter + moreIndent + moreIndent + moreIndent + moreIndent + moreIndent);
-            }
-          }
-          output = nodeList[0].outerHTML;
-        }
-        break;
-      default:
-      } 
+
       // !VA In case I want to use the beautifier, it's here:
       // var beautified = html_beautify( output, {indent_size: 2 });
       // console.log('beautified is: \n' + beautified);
       // console.log('output is: \n' + output);
-      writeClipboard( id, output);
+      // writeClipboard( id, output);
     }
 
 
