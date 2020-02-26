@@ -1007,6 +1007,13 @@ var Whitty = (function () {
       // !VA Put the table and its descendents into the parent container
       container.appendChild(topNode);
       // !VA Pass the clicked button id and parent container element to process the code indents
+
+      // !VA Should I choose to use HTML Beautify, it's here
+      // const str = html_beautify(tableNode.outerHTML, { indent_size: 2});
+      // console.log('str is:');
+      // console.log(str);
+      // writeClipboard( id, str);
+
       doIndents( id, container );
     }
 
