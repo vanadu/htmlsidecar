@@ -1042,23 +1042,23 @@ var Whitty = (function () {
       // !VA Create the container div - we need this to access the descendant elements as children, including the parent table of all the descendent table elements.
       container = document.createElement('div');
       // !VA make the node for the img tag
-      imgNode = makeImgNode( id );
       // !VA If the CCP make img tag button was clicked, return imgNode as the nodeList and send to doIndents for code indents
       if (id == document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).id) {
+        imgNode = makeImgNode( id );
         topNode = imgNode;
       } 
 
 
       // !VA If the CCP make td tag button was clicked, return tdNode as the nodeList and send to doIndents for code indents
-      tdNode = makeTdNode( id );
-      console.log('tdNode is: ' + tdNode);
       if (id == document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag).id) {
+        tdNode = makeTdNode( id );
+        console.log('tdNode is: ' + tdNode);
         topNode = tdNode;
         // !VA We do NOT append imgNode here...that has to be done in makeTdNode because if Bgimage is checked, no imgNode is included. If we do it here then we have to include the conditional if Bgimage = checked here too. That belongs in the makeTdNode function.
       }
       // !VA If the CCP make table tag button was clicked, return tableNode as the nodeList and send to doIndents for code indents
-      tableNode = makeTableNode( id );
       if ( id == document.querySelector(btnCcpMakeClips.btnCcpMakeTableTag).id )  {
+        tableNode = makeTableNode( id );
         topNode = tableNode;
       }
       // !VA Put the table and its descendents into the parent container
@@ -1070,7 +1070,7 @@ var Whitty = (function () {
       // console.log('str is:');
       // console.log(str);
       // writeClipboard( id, str);
-
+      console.log('doing indents');
       doIndents( id, container );
     }
 
@@ -1081,7 +1081,7 @@ var Whitty = (function () {
       // console.log('container.children[0].outerHTML is: ' + container.children[0].outerHTML);
       nodeList = container.querySelectorAll('*');
       // console.log('nodeList is: ');
-      // console.dir(nodeList);
+      console.dir(nodeList);
       // console.log('nodeList.length is: ' + nodeList.length);
 
 
@@ -1146,7 +1146,7 @@ var Whitty = (function () {
         }
         output = nodeList[0].outerHTML;
         break;
-      case ( nodeList.length === 7 ):
+      case ( nodeList.length === 7 || nodeList.length === 8 ):
         for (let i = 0; i < nodeList.length; i++) {
           if (i === 1 )  {
             nodeList[i].insertAdjacentHTML('beforebegin', indentbefore);
