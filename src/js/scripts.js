@@ -265,15 +265,12 @@ var Whitty = (function () {
     };
 
     // !VA Test click CCP make img tag button onpageload
-    document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(function(){ 
-        // document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag).click();
-        // document.querySelector('input[name="tdoptions"]:checked').value;
-        var foo = document.querySelector('input[name=tdoptions]:checked').value;
-        console.log('foo is: ' + foo);
+    // document.addEventListener('DOMContentLoaded', function() {
+    //   setTimeout(function(){ 
+
         
-      }, 500);
-    });
+    //   }, 500);
+    // });
 
 
 
@@ -852,7 +849,7 @@ var Whitty = (function () {
     }
     
     function makeTdNode() {
-      console.log('makeTdNode running');
+      // console.log('makeTdNode running');
       let Attributes;
       Attributes = getAttributes();
       let tdInner, imgNode;
@@ -868,10 +865,10 @@ var Whitty = (function () {
       let fallback;
       let bgcolor;
       let indent;
-      var foo = document.querySelector('input[name=tdoptions]:checked').value;
-      console.log('foo is: ' + foo);
+      let radioSelected;
+      radioSelected = document.querySelector('input[name=tdoptions]:checked').value;
       switch(true) {
-      case (foo === 'basic'):
+      case (radioSelected === 'basic'):
         // !VA class attribute
         if (Attributes.tdClass) { tdInner.className = Attributes.tdClass; }
         // !VA valign attribute
@@ -881,7 +878,7 @@ var Whitty = (function () {
         // !VA We need to include the imgNode here ONLY if Bgimage is unchecked
         tdInner.appendChild(imgNode);
         break;
-      case (foo === 'bgimage'):
+      case (radioSelected === 'bgimage'):
         tdInner.width = Attributes.tdWidth;
         tdInner.height = Attributes.tdHeight;
         // !VA valign attribute
@@ -897,7 +894,7 @@ var Whitty = (function () {
 
         tdInner.innerHTML = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${indent}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${indent}<v:textbox inset="0,0,0,0">${indent}<![endif]-->${indent}<div>${indent}<!-- Put Foreground Content Here -->${indent}</div>${indent}<!--[if gte mso 9]>${indent}</v:textbox>${indent}</v:rect><![endif]-->\n`;
         break;
-      case (foo === 'posswitch'):
+      case (radioSelected === 'posswitch'):
         tdInner.innerHTML = 'This will be a posswitch TD!'
         break;
       default:
@@ -946,7 +943,6 @@ var Whitty = (function () {
         tableNode = tableInner;
       } else {
         // !VA If include table wrapper is checked, build the outer table and return it
-        console.log('Include table wrapper checked');
         // !VA table wrapper class
         if (Attributes.tableTagWrapperAlign) { tableOuter.align = Attributes.tableTagWrapperAlign; }
         // !VA wrapper table align attribute
@@ -977,8 +973,7 @@ var Whitty = (function () {
         // !VA Pass the outer table to the tableNode.
         tableNode = tableOuter;
       }
-      console.log('tableNode.outerHTML is:');
-      console.log(tableNode.outerHTML);
+      // console.log(tableNode.outerHTML);
       return tableNode;
     }
 
@@ -1021,14 +1016,11 @@ var Whitty = (function () {
     function doIndents( id, container, nodeList, indentbefore, indentafter, moreIndent, str1, str2 ) {
       // console.log('doIndents running');
       // console.log('id is: ' + id);
-      console.log('container is:');
-      console.log(container);
       // console.log('container.children[0].outerHTML is: ' + container.children[0].outerHTML);
       nodeList = container.querySelectorAll('*');
       // console.log('nodeList is: ');
       // console.dir(nodeList);
       // console.log('nodeList.length is: ' + nodeList.length);
-
 
 
       indentbefore = '\n  ';
@@ -1142,7 +1134,10 @@ var Whitty = (function () {
         break;
       default:
       } 
-      console.log('output is: \n' + output);
+      // !VA In case I want to use the beautifier, it's here:
+      // var beautified = html_beautify( output, {indent_size: 2 });
+      // console.log('beautified is: \n' + beautified);
+      // console.log('output is: \n' + output);
       writeClipboard( id, output);
     }
 
@@ -1176,6 +1171,7 @@ var Whitty = (function () {
 
     function getAttributes() {
       var Appdata = appController.initGetAppdata();
+      let target, checked, str, options, selectid;
       var Attributes = {
         // !VA IMG attributes
         imgClass: (function() {
@@ -1207,7 +1203,7 @@ var Whitty = (function () {
           return str;
         })(),
         imgAlign: (function() {  
-          let str = '', options = [], selectid = '';
+          str = '', options = [], selectid = '';
           selectid = ccpUserInput.selCcpImgAlign;
           options = [ '', 'left', 'center', 'right'];
           str = getAlignAttribute( selectid, options );
@@ -1222,19 +1218,15 @@ var Whitty = (function () {
           return Appdata.imgH;
         })(),
         tdBasic: (function() {
-          let target, checked;
           target = ccpUserInput.rdoCcpTdBasic;
-          console.log('target is: ' + target);
           checked = getRadioSelection(target);
           return checked;
         })(),
         tdBgimage: (function() {
-          let target, checked;
           target = ccpUserInput.rdoCcpTdBgimage;
           return checked;
         })(),
         tdPosswitch: (function() {
-          let target, checked;
           target = ccpUserInput.rdoCcpTdPosswitch;
           checked = getRadioSelection(target);
           return checked;
