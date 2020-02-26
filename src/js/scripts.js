@@ -264,10 +264,10 @@ var Whitty = (function () {
       
     };
 
-    // !VA Test click CCP make img tag button onpageload
+    // !VA Run test function on page load
     // document.addEventListener('DOMContentLoaded', function() {
     //   setTimeout(function(){ 
-
+    //     CBController.runTest();
         
     //   }, 500);
     // });
@@ -822,6 +822,60 @@ var Whitty = (function () {
       return str;
     }
 
+    function makePosswitchNode() {
+      console.clear();
+      console.log('makePosswitchNode running');
+      let container, str, nodes, node;
+      let td1, table1, tr1, td2, table2, tr2, td3, img;
+      let Attributes;
+      Attributes = getAttributes();
+
+      td1 = document.createElement( 'td');
+      table1 = document.createElement( 'table');
+      td1.appendChild(table1);
+      tr1 = document.createElement( 'tr');
+      table1.appendChild(tr1);
+      td2 = document.createElement( 'td');
+      tr1.appendChild(td2);
+      table2 = document.createElement( 'table');
+      td2.appendChild(table2);
+      tr2 = document.createElement( 'tr');
+      table2.appendChild(tr2);
+      td3 = document.createElement('td');
+      tr2.appendChild(td3);
+      img = document.createElement( 'img');
+      td3.appendChild(img);
+
+      td1.setAttribute('dir', 'rtl'),
+      td1.width='100%';
+      td1.align='left';
+      td1.bgcolor='#FFFFFF';
+      td1.valign='top';
+      table1.setAttribute( 'role', 'presentation');
+      table1.border='0';
+      table1.width='100%';
+      table1.cellPadding='0';
+      table1.cellSpacing='0';
+      td2.width='50%';
+      td2.setAttribute( 'class', 'stack-column-center');
+      table2.setAttribute( 'role', 'presentation');
+      table2.width='100%';
+      table2.cellPadding='0';
+      table2.cellSpacing='0';
+      td3.setAttribute('dir', 'ltr'),
+      td3.align='left';
+      td3.vAlign='top';
+      img.width = Attributes.imgWidth;
+      img.height = Attributes.imgHeight;
+      img.style = Attributes.imgStyle;
+      img.src = Attributes.imgSrc;
+      img.alt = Attributes.imgAlt;
+      console.log('td1.outerHTML is: \n ' + td1.outerHTML);
+      console.log('td1 is: ' + td1);
+      return td1;
+
+    }
+
     function makeImgNode () {
       // console.log('makeImgNode running');
       // !VA Id is passed but not used here,  because we're only building the node.
@@ -895,13 +949,18 @@ var Whitty = (function () {
         tdInner.innerHTML = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${indent}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${indent}<v:textbox inset="0,0,0,0">${indent}<![endif]-->${indent}<div>${indent}<!-- Put Foreground Content Here -->${indent}</div>${indent}<!--[if gte mso 9]>${indent}</v:textbox>${indent}</v:rect><![endif]-->\n`;
         break;
       case (radioSelected === 'posswitch'):
-        tdInner.innerHTML = 'This will be a posswitch TD!'
+        console.log('radioSelected === posswitch running');
+        tdInner = makePosswitchNode();
+
+        console.log('tdInner.outerHTML is: ' + tdInner.outerHTML);
+
+
         break;
       default:
         // code block
       } 
 
-
+      console.log('tdInner.outerHTML here is: ' + tdInner.outerHTML);
       return tdInner;
     }
 
@@ -988,8 +1047,11 @@ var Whitty = (function () {
       if (id == document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).id) {
         topNode = imgNode;
       } 
+
+
       // !VA If the CCP make td tag button was clicked, return tdNode as the nodeList and send to doIndents for code indents
       tdNode = makeTdNode( id );
+      console.log('tdNode is: ' + tdNode);
       if (id == document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag).id) {
         topNode = tdNode;
         // !VA We do NOT append imgNode here...that has to be done in makeTdNode because if Bgimage is checked, no imgNode is included. If we do it here then we have to include the conditional if Bgimage = checked here too. That belongs in the makeTdNode function.
@@ -1312,6 +1374,9 @@ var Whitty = (function () {
         makeNodeList( id );
        
       }
+      // runTest: function() {
+      //   makePosswitchNode();
+      // }
 
 
     
