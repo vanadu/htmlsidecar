@@ -1075,50 +1075,31 @@ var Whitty = (function () {
     }
 
     // !VA This is totally hacked but it works and structurally it can be improved upon at some later date
-    function doIndents( id, container, nodeList, indentbefore, indentafter, moreIndent, str1, str2 ) {
-      // console.log('doIndents running');
-      // console.log('id is: ' + id);
-      // console.log('container.children[0].outerHTML is: ' + container.children[0].outerHTML);
+    function doIndents( id, container ) {
+      console.log('doIndents running');
+      let nodeList, j, output, spacechar, spacebefore, spaceafter;
       nodeList = container.querySelectorAll('*');
-      // console.log('nodeList is: ');
-      console.dir(nodeList);
-      // console.log('nodeList.length is: ' + nodeList.length);
-
-
-
-      let foo;
-      indentafter = '\n';
-      moreIndent = 'YY';
       console.clear();
-      
-      let lb = '\n';
-      let j;
-      let output;
-      let spacechar = '  ';
-      let spacebefore;
+      console.log('nodeList is: ');
+      console.dir(nodeList);
+      spacechar = '  ';
       spacebefore = '  ';
-      let spaceafter;
       spaceafter = '';
       console.log('nodeList.length is: ' + nodeList.length);
       for (let i = 0; i < nodeList.length - 1; i++) {
+        // !VA Apply the indent to the current element's next child in the nodeList 
         j = i + 1;
-
-
+        // !VA Start the loop... check this
         if ( j >= 0) {
+          // !VA Start processing with the 2nd element in the nodeList. 
           if (j > 1) {
             console.log('here');
             spacebefore = spacebefore + spacechar;
             spaceafter = spaceafter + spacechar;
           }
-          // if (j > 2) {
-          //   console.log('here');
-          //   spacebefore = spaceafter + spaceafter;
-          // }
-
           console.log('j is: ' + j);
           nodeList[j].insertAdjacentHTML('beforebegin', '\n' + spacebefore);
           nodeList[j].insertAdjacentHTML('afterend', '\n' + spaceafter);
-          // console.log('nodeList[i].outerHTML is \n' + nodeList[i].outerHTML);
         }
       }
       console.log('nodeList[1].outerHTML is: \n ' + nodeList[0].outerHTML);
