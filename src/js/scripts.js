@@ -1094,9 +1094,9 @@ var Whitty = (function () {
       let lb = '\n';
       let j;
       let output;
-      let spacechar = 'XX';
+      let spacechar = '  ';
       let spacebefore;
-      spacebefore = 'XX';
+      spacebefore = '  ';
       let spaceafter;
       spaceafter = '';
       console.log('nodeList.length is: ' + nodeList.length);
@@ -1122,13 +1122,13 @@ var Whitty = (function () {
         }
       }
       console.log('nodeList[1].outerHTML is: \n ' + nodeList[0].outerHTML);
-
+      output = nodeList[0].outerHTML;
 
       // !VA In case I want to use the beautifier, it's here:
       // var beautified = html_beautify( output, {indent_size: 2 });
       // console.log('beautified is: \n' + beautified);
       // console.log('output is: \n' + output);
-      // writeClipboard( id, output);
+      writeClipboard( id, output);
     }
 
 
