@@ -265,12 +265,12 @@ var Whitty = (function () {
     };
 
     // !VA Run test function on page load
-    // document.addEventListener('DOMContentLoaded', function() {
-    //   setTimeout(function(){ 
-    //     CBController.runTest();
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function(){ 
+        CBController.runTest();
         
-    //   }, 500);
-    // });
+      }, 500);
+    });
 
 
 
@@ -823,10 +823,9 @@ var Whitty = (function () {
     }
 
     function makePosswitchNode() {
-      console.clear();
       console.log('makePosswitchNode running');
       let container, str, nodes, node;
-      let td1, table1, tr1, td2, table2, tr2, td3, img;
+      let td1, table1, tr1, td2a, td2b, table2, tr2, td3, img;
       let Attributes;
       Attributes = getAttributes();
 
@@ -835,10 +834,13 @@ var Whitty = (function () {
       td1.appendChild(table1);
       tr1 = document.createElement( 'tr');
       table1.appendChild(tr1);
-      td2 = document.createElement( 'td');
-      tr1.appendChild(td2);
+      td2a = document.createElement( 'td');
+      td2b = document.createElement( 'td');
+      tr1.appendChild(td2a);
+      tr1.appendChild(td2b);
       table2 = document.createElement( 'table');
-      td2.appendChild(table2);
+      // td2a.appendChild(table2);
+      // td2b.appendChild(table2);
       tr2 = document.createElement( 'tr');
       table2.appendChild(tr2);
       td3 = document.createElement('td');
@@ -856,8 +858,11 @@ var Whitty = (function () {
       table1.width='100%';
       table1.cellPadding='0';
       table1.cellSpacing='0';
-      td2.width='50%';
-      td2.setAttribute( 'class', 'stack-column-center');
+      td2a.width='50%';
+      td2a.setAttribute( 'class', 'stack-column-center');
+      // td2b.width='50%';
+      // td2b.innerHTML = "<p>This is bs</p>";
+      // td2b.setAttribute( 'class', 'stack-column-center');
       table2.setAttribute( 'role', 'presentation');
       table2.width='100%';
       table2.cellPadding='0';
@@ -872,6 +877,11 @@ var Whitty = (function () {
       img.alt = Attributes.imgAlt;
       console.log('td1.outerHTML is: \n ' + td1.outerHTML);
       console.log('td1 is: ' + td1);
+
+      // !VA 
+      // writeClipboard(td1.outerHTML);
+
+
       return td1;
 
     }
@@ -950,9 +960,11 @@ var Whitty = (function () {
         break;
       case (radioSelected === 'posswitch'):
         console.log('radioSelected === posswitch running');
-        tdInner = makePosswitchNode();
-
-        console.log('tdInner.outerHTML is: ' + tdInner.outerHTML);
+        console.log('here!');
+        tdInner = makePosSwitchNodes();
+        console.log('mark=5');
+        console.log(tdInner);
+        
 
 
         break;
@@ -1064,6 +1076,8 @@ var Whitty = (function () {
       // !VA Put the table and its descendents into the parent container
       container.appendChild(topNode);
       // !VA Pass the clicked button id and parent container element to process the code indents
+      // console.log('container is: ' + container);
+      // console.dir(container);
 
       // !VA Should I choose to use HTML Beautify, it's here
       // const str = html_beautify(tableNode.outerHTML, { indent_size: 2});
@@ -1079,7 +1093,7 @@ var Whitty = (function () {
       console.log('doIndents running');
       let nodeList, j, output, spacechar, spacebefore, spaceafter;
       nodeList = container.querySelectorAll('*');
-      console.clear();
+      // console.clear();
       console.log('nodeList is: ');
       console.dir(nodeList);
       spacechar = '  ';
@@ -1087,21 +1101,36 @@ var Whitty = (function () {
       spaceafter = '';
       console.log('nodeList.length is: ' + nodeList.length);
       for (let i = 0; i < nodeList.length - 1; i++) {
+
         // !VA Apply the indent to the current element's next child in the nodeList 
         j = i + 1;
+
+
+        // if (nodeList[j].nextSibling) {
+        //   // !VA find out if it's a sibling
+        //   console.log('j is: ' + j);
+        //   console.log('nodeList[j].outerHTML is: ' + nodeList[j].outerHTML);
+        //   console.log('sibling!');
+
+        // } else {
+        //   console.log('j is: ' + j);
+        //   console.log('nodeList[j].outerHTML is: ' + nodeList[j].outerHTML);
+        //   console.log('not a sibling');
+        // }
+
+
         // !VA Start the loop... check this
-        if ( j >= 0) {
-          // !VA Start processing with the 2nd element in the nodeList. 
-          if (j > 1) {
-            console.log('here');
-            spacebefore = spacebefore + spacechar;
-            spaceafter = spaceafter + spacechar;
-          }
-          console.log('j is: ' + j);
-          nodeList[j].insertAdjacentHTML('beforebegin', '\n' + spacebefore);
-          nodeList[j].insertAdjacentHTML('afterend', '\n' + spaceafter);
+        // if ( j >= 0) {
+        // !VA Start processing with the 2nd element in the nodeList. 
+        if (j > 1) {
+          spacebefore = spacebefore + spacechar;
+          spaceafter = spaceafter + spacechar;
         }
+        // console.log('j is: ' + j);
+        nodeList[j].insertAdjacentHTML('beforebegin', '\n' + spacebefore);
+        nodeList[j].insertAdjacentHTML('afterend', '\n' + spaceafter);
       }
+      // }
       console.log('nodeList[1].outerHTML is: \n ' + nodeList[0].outerHTML);
       output = nodeList[0].outerHTML;
 
@@ -1270,6 +1299,128 @@ var Whitty = (function () {
       return Attributes;
     }
 
+    function makePosSwitchNodes() {
+      console.log('makePosSwitchNodes running');
+      // !VA Declare the arrays for new element names and new element types
+      let containerIds = [], containerElements = [], sibling1Ids = [], sibling1Elements = [], sibling2Ids = [], sibling2Elements = [], containerNodes = [], sibling1Nodes = [], sibling2Nodes = [];
+      // !VA Declare loop iterators
+      let i, j, k;
+      // !VA Populate the arrays with the new element names and their corresponding types
+      containerIds = [ 'container', 'td_switchcontainer', 'table_switchparent', 'tr_switchparent' ];
+      containerElements = [ 'div', 'td', 'table', 'tr' ];
+      sibling1Ids = [ 'container', 'td_switchsibling1', 'table_switchchild1', 'tr_switchchild1', 'td_switchcontent1', 'img_switchcontent1' ];
+      sibling1Elements = [ 'div', 'td', 'table', 'tr', 'td', 'img'];
+      sibling2Ids = [ 'container', 'td_switchsibling2', 'table_switchchild2', 'tr_switchchild2', 'td_switchcontent2', 'p_switchcontent2' ];
+      sibling2Elements = [ 'div', 'td', 'table', 'tr', 'td', 'p'];
+
+      // !VA Loop through the arrays and create the elements with name and corresponding type
+      for (i = 0; i < containerIds.length; i++) {
+        containerNodes[i] = document.createElement(containerElements[i]);
+        containerNodes[i].id = containerIds[i];
+        // console.log('containerNodes[i].outerHTML is: ' + containerNodes[i].outerHTML);
+      }
+      // !VA Append each element with its respective child
+      for (j = 0; j < containerNodes.length - 1; j++) {
+        k = j + 1;
+        containerNodes[j].appendChild(containerNodes[k]);
+      }
+      for (i = 0; i < sibling1Ids.length; i++) {
+        sibling1Nodes[i] = document.createElement(sibling1Elements[i]);
+        sibling1Nodes[i].id = sibling1Ids[i];
+        // console.log('sibling1Nodes[i].outerHTML is: ' + sibling1Nodes[i].outerHTML);
+        sibling2Nodes[i] = document.createElement(sibling2Elements[i]);
+        sibling2Nodes[i].id = sibling2Ids[i];
+        // console.log('sibling2Nodes[i].outerHTML is: ' + sibling2Nodes[i].outerHTML);
+      }
+      // !VA Append each element with its respective child
+      for (j = 0; j < sibling1Nodes.length - 1; j++) {
+        k = j + 1;
+        sibling1Nodes[j].appendChild(sibling1Nodes[k]);
+        sibling2Nodes[j].appendChild(sibling2Nodes[k]);
+      }
+
+      // !VA Append the siblings to the parent tr
+      containerNodes[3].appendChild(sibling1Nodes[1]);
+      containerNodes[3].appendChild(sibling2Nodes[1]);
+
+      let container = (containerNodes[0]);
+      // console.log('containerNodes[0] is: ' + containerNodes[0]);
+      // console.dir(containerNodes[0]);
+
+      // var nodeList = containerNodes[0].querySelectorAll( '*' );
+      // console.log('nodeList[0].outerHTML is: ' + nodeList[0].outerHTML);
+
+      container = setPosSwitchNodeAttributes(container);
+
+      return container;
+    }
+
+    function setPosSwitchNodeAttributes(container) {
+      console.log('setPosSwitchNodeAttributes running');
+      let Attributes = getAttributes();
+      
+      // console.log('container is: ' + container);
+      // console.dir(container);
+      var nodeList = container.querySelectorAll( '*' );
+      console.log('nodeList[0].outerHTML is: ' + nodeList[0].outerHTML);
+
+      
+      // !VA Parent container td
+      nodeList[0].setAttribute('dir', 'rtl');
+      nodeList[0].width='100%';
+      nodeList[0].align='left';
+      nodeList[0].bgcolor='#FFFFFF';
+      nodeList[0].valign='top';
+      // !VA Parent attributes
+      nodeList[1].setAttribute( 'role', 'presentation');
+      nodeList[1].border='0';
+      nodeList[1].width='100%';
+      nodeList[1].cellPadding='0';
+      nodeList[1].cellSpacing='0';
+      
+      // !VA Sibling 1
+      // !VA parent TD
+      nodeList[3].width='50%';
+      nodeList[3].setAttribute( 'class', 'stack-column-center');
+      // // !VA Parent Table
+      nodeList[4].width='100%';
+      nodeList[4].cellPadding='0';
+      nodeList[4].cellSpacing='0';
+      nodeList[4].border='0';
+      // !VA Content TD
+      nodeList[6].setAttribute('dir', 'ltr'),
+      nodeList[6].align='left';
+      nodeList[6].vAlign='top';
+      // !VA Content img
+      nodeList[7].width = Attributes.imgWidth;
+      nodeList[7].height = Attributes.imgHeight;
+      nodeList[7].style = Attributes.imgStyle;
+      nodeList[7].src = Attributes.imgSrc;
+      nodeList[7].alt = Attributes.imgAlt;
+      
+      console.log('Mark4');
+      console.log('nodeList is:');
+      console.dir(nodeList);
+      console.dir(container);
+
+      // !VA Sibling 2 - text content container
+      nodeList[8].width='50%';
+      nodeList[8].setAttribute( 'class', 'stack-column-center');
+      // // !VA Parent Table
+      nodeList[9].width='100%';
+      nodeList[9].cellPadding='0';
+      nodeList[9].cellSpacing='0';
+      nodeList[9].border='0';
+      // !VA Content TD
+      nodeList[11].setAttribute('dir', 'ltr'),
+      nodeList[11].align='left';
+      nodeList[11].vAlign='top';
+      // // !VA Content para
+      nodeList[12].style = 'margin: 10px';
+      nodeList[12].textContent = 'On larger devices, this content will appear to the left of the image. On smaller devices, the right-column content will appear above the left-column content.';
+
+      return container;
+    }
 
 
     // !VA CBController public functions 
@@ -1282,12 +1433,13 @@ var Whitty = (function () {
         let id = evt.target.id;
         makeNodeList( id );
        
+      },
+      runTest: function() {
+        // console.clear();
+        console.log('runTest running');
+        // makeNodes();
+        makePosSwitchNodes();
       }
-      // runTest: function() {
-      //   makePosswitchNode();
-      // }
-
-
     
       // !VA queryAllCcpOptions was a test function, deleted 02.20.20
     };

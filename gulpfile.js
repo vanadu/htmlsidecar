@@ -183,6 +183,8 @@ gulp.task('serve', ['sass'], function() {
   // gulp.watch("src/scss/*.scss", ['sass']);
   gulp.watch("src/scss/**/*.scss", ['sass']);
 
+  
+
   //enclose multiple file parameters in brackets -- works :VA
   gulp.watch(['src/*.html', 'src/js/*.js']).on('change', browserSync.reload);
   // gulp.watch("").on('change', browserSync.reload); don't need anymore, see above :VA
