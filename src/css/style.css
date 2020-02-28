@@ -1651,7 +1651,7 @@ fieldset {
     text-decoration: underline; }
 
 /* These are the hidden browser's default checkboxes. VA! It appears they are attached to the first label element in the parent container */
-.ccp-img-include-width-height-container input, .ccp-td-bgimage-container input, .ccp-table-include-wrapper-container input {
+.ccp-img-include-width-height-container input, .ccp-table-include-wrapper-container input {
   position: absolute;
   opacity: 0;
   cursor: pointer;
@@ -1659,7 +1659,7 @@ fieldset {
   width: 0; }
 
 /* Create a custom checkbox -- this is the span after the checkbox input element. */
-#spn-ccp-img-include-width-height-checkmrk, #spn-ccp-td-bgimage-checkmrk, #spn-ccp-table-include-wrapper-checkmrk {
+#spn-ccp-img-include-width-height-checkmrk, #spn-ccp-table-include-wrapper-checkmrk {
   position: absolute;
   top: 3px;
   height: 15px;
@@ -1669,26 +1669,26 @@ fieldset {
   z-index: 100; }
 
 /* On mouse-over, add a grey background color */
-.ccp-img-include-width-height-container:hover input ~ #spn-ccp-img-include-width-height-checkmrk, .ccp-td-bgimage-container:hover input ~ #spn-ccp-td-bgimage-checkmrk, .ccp-table-include-wrapper-container:hover input ~ #spn-ccp-table-include-wrapper-checkmrk {
+.ccp-img-include-width-height-container:hover input ~ #spn-ccp-img-include-width-height-checkmrk, .ccp-table-include-wrapper-container:hover input ~ #spn-ccp-table-include-wrapper-checkmrk {
   background-color: #ccc;
   border: 1px solid blue; }
 
 /* When the checkbox is checked, add a gray background */
-.ccp-img-include-width-height-container input:checked ~ #spn-ccp-img-include-width-height-checkmrk, .ccp-td-bgimage-container input:checked ~ #spn-ccp-td-bgimage-checkmrk, .ccp-table-include-wrapper-container input:checked ~ #spn-ccp-table-include-wrapper-checkmrk {
+.ccp-img-include-width-height-container input:checked ~ #spn-ccp-img-include-width-height-checkmrk, .ccp-table-include-wrapper-container input:checked ~ #spn-ccp-table-include-wrapper-checkmrk {
   background-color: #5f5e5e; }
 
 /* Create the checkmrk/indicator (hidden when not checked) */
-#spn-ccp-img-include-width-height-checkmrk:after, #spn-ccp-td-bgimage-checkmrk:after, #spn-ccp-table-include-wrapper-checkmrk:after {
+#spn-ccp-img-include-width-height-checkmrk:after, #spn-ccp-table-include-wrapper-checkmrk:after {
   content: "";
   position: absolute;
   display: none; }
 
 /* Show the checkmrk when checked */
-.ccp-img-include-width-height-container input:checked ~ #spn-ccp-img-include-width-height-checkmrk:after, .ccp-td-bgimage-container input:checked ~ #spn-ccp-td-bgimage-checkmrk:after, .ccp-table-include-wrapper-container input:checked ~ #spn-ccp-table-include-wrapper-checkmrk:after {
+.ccp-img-include-width-height-container input:checked ~ #spn-ccp-img-include-width-height-checkmrk:after, .ccp-table-include-wrapper-container input:checked ~ #spn-ccp-table-include-wrapper-checkmrk:after {
   display: block; }
 
 /* Style the checkmrk/indicator */
-.ccp-img-include-width-height-container #spn-ccp-img-include-width-height-checkmrk:after, .ccp-td-bgimage-container #spn-ccp-td-bgimage-checkmrk:after, .ccp-table-include-wrapper-container #spn-ccp-table-include-wrapper-checkmrk:after {
+.ccp-img-include-width-height-container #spn-ccp-img-include-width-height-checkmrk:after, .ccp-table-include-wrapper-container #spn-ccp-table-include-wrapper-checkmrk:after {
   left: 5px;
   top: 2px;
   width: 5px;

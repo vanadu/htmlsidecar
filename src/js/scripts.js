@@ -5,14 +5,19 @@
 // !VA GENERAL NOTES
 /* !VA  - February Reboot Notes
 =========================================================
-// !VA 02.23.20
-In progress:
-TODO: Deal with the indents and embedded tag issue.
-
+// !VA 02.28.20
 For later:
 TODO: The CSS output will need to be revisited. You'd never need to output the width AND height in CSS for tables and for td it probably has no effect for height. That means...ugh.
-TODO: It's bad that writeClipboard is called even when that clipboard isn't being output. ccpMakeTdTag calls ccpMakeImgTag which calls writeClipboard -- that makes no sense. 
+TODO: Figure out why queryDOMElements is running mutliple times per CB build.
+TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
 
+Status:
+TODO: Fix the bgimage clipboard output for parent tables
+
+
+DONE: Remove checkmark styles for bgimage
+DONE: Deal with the indents and embedded tag issue.
+DONE: It's bad that writeClipboard is called even when that clipboard isn't being output. ccpMakeTdTag calls ccpMakeImgTag which calls writeClipboard -- that makes no sense. 
 DONE: All tables must have cellspacing border and cellpadding attributes!
 DONE: Is including the id in the make element functions necessary? YES, clipboardJS requires it!
 DONE: Renaming clipboard buttons and elements...
@@ -23,13 +28,6 @@ DONE: Toolbar small and large phones don'g retain value on tab out -- fixed.
 DONE: Fix the toolbar sm phone and lg phone buttons and set to iPhone width of 414pxl
 
 
-// !VA Long-term TODO
-----------------------
-TODO: Figure out why queryDOMElements is running mutliple times per CB build.
-TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer WIDTH. That's no good.
-
-
-/*
 
 
 /* !VA  - 06.23.19
@@ -1090,6 +1088,10 @@ var Whitty = (function () {
     function doIndents(id, container) {
       console.log('doIndents running');
       var nodeList = container.querySelectorAll( '*' );
+      console.log('nodeList is:');
+      console.log(nodeList);
+      console.log('nodeList[0].innerHTML is: ' + nodeList[0].innerHTML);
+      
       let indentspacing, indent, i, nextSiblingIndex, previousSiblingIndex, numberOfSiblingDescendants, loopCount, output;
       // !VA Set the loop iterator to 0 and the indentspacing to two spaces
       i = 0, indentspacing = '  ';
@@ -1112,15 +1114,13 @@ var Whitty = (function () {
         }
         // !VA The number of elements below the sibling element is equal to the second sibling's index minus the first sibling's index -- that's the number of descendants separating the two siblings. Consequently, the first sibling's index is i and the second sibling's index is i + 5. So now loop through the siblings and their descendants, starting with the index of the first sibling. 
         numberOfSiblingDescendants = previousSiblingIndex - nextSiblingIndex;
-        loopCount = nextSiblingIndex + numberOfSiblingDescendants;
+        loopCount = nextSiblingIndex + (previousSiblingIndex - nextSiblingIndex);
         for (i = nextSiblingIndex; i < loopCount; i++) {
           // !VA Increase the indent with each iteration. 
           indent  =  '\n' + indentspacing.repeat([i]);
           // !VA The terminating element in the tree gets no indent and no line break - the indent and line break are covered by its parent.
-          if (i === nextSiblingIndex) {
-            indent = '';
-          }
-          // !VA Apply the indent to the nextSibling
+          if (i === nextSiblingIndex) { indent = ''; }
+          // !VA Apply the indent to the nextSibling. 
           nodeList[i].insertAdjacentHTML('beforebegin', indent);
           nodeList[i].insertAdjacentHTML('afterend', indent);
           // !VA Apply the indent to the previousSibling
@@ -1133,7 +1133,7 @@ var Whitty = (function () {
     }
 
     function writeClipboard(id, str) {
-      // console.log('writeClipboard running');
+      console.log('writeClipboard running');
       
       var clipboardStr;
       clipboardStr = str;
