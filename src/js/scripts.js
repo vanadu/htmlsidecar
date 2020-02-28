@@ -911,8 +911,9 @@ var Whitty = (function () {
       return imgNode;
     }
     
-    function makeTdNode() {
-      // console.log('makeTdNode running');
+    function makeTdNode( id ) {
+      console.log('makeTdNode running');
+      console.log('id is: ' + id);
       let Attributes;
       Attributes = getAttributes();
       let tdInner, imgNode;
@@ -952,8 +953,25 @@ var Whitty = (function () {
         fallback = '#7bceeb';
         Attributes.tdBgcolor ? bgcolor = Attributes.tdBgcolor : bgcolor = fallback;
         tdInner.bgColor = bgcolor;
-        // !VA Dummy indent for  now
-        indent = '\n  ';
+        console.log('Attributes.tableIncludeWrapper is: ' + Attributes.tableIncludeWrapper);
+        // We have set the indent here because it would be much too complicated to do loop through all these nodes in doIndents. Here, all we have to do is pass in the string with pre-defined indents based on the button that was clicked to generate the HTML.
+
+        switch(true) {
+        case (id === 'btn-ccp-make-td-tag'):
+          // !VA If the CCP Make Td button was clicked, apply a standard 2-space indent
+          indent = '\n  ';
+          break;
+        case (id === 'btn-ccp-make-table-tag' && !Attributes.tableIncludeWrapper):
+          // !VA If the CCP Make Table button was clicked and Include wrapper table is NOT checked, add 2 spaces for each table node for a total of 6 spaces
+          indent = '\n       ';
+          break;
+        case (id === 'btn-ccp-make-table-tag' && Attributes.tableIncludeWrapper):
+          // !VA If the CCP Make Table button was clicked and Include wrapper table IS checked, add 2 spaces for each additional table node for a total of 9 spaces
+          indent = '\n             ';
+          break;
+        default:
+          console.log('default');
+        } 
 
         tdInner.innerHTML = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${indent}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${indent}<v:textbox inset="0,0,0,0">${indent}<![endif]-->${indent}<div>${indent}<!-- Put Foreground Content Here -->${indent}</div>${indent}<!--[if gte mso 9]>${indent}</v:textbox>${indent}</v:rect><![endif]-->\n`;
         break;
@@ -971,8 +989,9 @@ var Whitty = (function () {
       return tdInner;
     }
 
-    function makeTableNode() {
+    function makeTableNode( id ) {
       // console.log('makeTdNode running');
+      console.log('id is: ' + id);
       let Attributes;
       Attributes = getAttributes();
       let tableNode, tableInner, tableOuter, tdInner, tdOuter, trInner, trOuter;
@@ -1001,7 +1020,7 @@ var Whitty = (function () {
       // !VA Build the inner tr
       tableInner.appendChild(trInner);
       // !VA Get the inner TD and append it - id is not for the inner TD but that's not relevent here.
-      tdInner = makeTdNode();
+      tdInner = makeTdNode( id );
       trInner.appendChild(tdInner);
       
       if (!Attributes.tableIncludeWrapper) {
@@ -1086,20 +1105,48 @@ var Whitty = (function () {
 
     // !VA This works for everything except embedded background image tags. This is totally hacked but it works and structurally it can be improved upon at some later date
     function doIndents(id, container) {
+      // console.clear();
       console.log('doIndents running');
       var nodeList = container.querySelectorAll( '*' );
-      console.log('nodeList is:');
-      console.log(nodeList);
-      console.log('nodeList[0].innerHTML is: ' + nodeList[0].innerHTML);
-      
-      let indentspacing, indent, i, nextSiblingIndex, previousSiblingIndex, numberOfSiblingDescendants, loopCount, output;
-      // !VA Set the loop iterator to 0 and the indentspacing to two spaces
+      // console.log('nodeList is:');
+      // console.log(nodeList);
+      // console.log('nodeList[0].innerHTML is: ' + nodeList[0].innerHTML);
+      // console.log('childNodes:');
+      // console.log(nodeList[0].childNodes);
+      // console.log('nodeList[0].childNodes.length is: ' + nodeList[0].childNodes.length);
+      // for (let i = 0; i < nodeList[0].childNodes.length; i++) {
+      //   console.log('nodeList[0].childNodes[i] is: ' +  nodeList[0].childNodes[i]);
+      // }
+      let indentspacing, indent, i, nextSiblingIndex, previousSiblingIndex, loopCount, output;
+      let j;
       i = 0, indentspacing = '  ';
+      // console.log('nextSibling is: ' + nodeList[0].childNodes[0].nextSibling);
+      // for (j = 0; j < nodeList.length; j++) {
+      //   console.log('nodeList[j].id is: ' + nodeList[j].id);
+      //   console.log('nodeList[j].childNodes.length is: ' + nodeList[j].childNodes.length);
+      //   console.log('nodeList[j] is: ' + nodeList[j]);
+      // }
+      // console.log('nodeList[0].childNodes.length is: ' + nodeList[0].childNodes.length);
+      // console.log('nodeList[0].childNodes is: ' + nodeList[0].childNodes);
+      // console.log('nodeList[1].childNodes[0] is: ' + nodeList[1].childNodes[0]);
+      // console.log('nodeList[1].childNodes[0].textContent is: \n' + nodeList[0].childNodes[1].textContent);
+      // nodeList[0].childNodes[0].insertAdjacentHTML('beforebegin', indent);
+
+
+
+      // for (let k = 0; k < nodeList[0].childNodes.length; k++) {
+      //   nodeList[0].childNodes[k].insertAdjacentHTML('beforebegin', indent);
+      //   nodeList[0].childNodes[k].insertAdjacentHTML('beforeend', indent);
+      // }
+      
+
+
+      // !VA Set the loop iterator to 0 and the indentspacing to two spaces
+
       // !VA If nodeList only contains a singleton img tag, nodeList[i] will be null, so we exclude that case
       if (nodeList.length > 0) {
         // !VA Get the index of the sibling nodes, i.e. the td nodes containing the two-column content.  
         for (i = 0; i < nodeList.length; i++) {
-          // !VA 
           if (nodeList[i].nextSibling) { nextSiblingIndex = i; }
           if (nodeList[i].previousSibling) {previousSiblingIndex = i;}
         }
@@ -1113,7 +1160,6 @@ var Whitty = (function () {
           nodeList[i].insertAdjacentHTML('beforeend', indent);
         }
         // !VA The number of elements below the sibling element is equal to the second sibling's index minus the first sibling's index -- that's the number of descendants separating the two siblings. Consequently, the first sibling's index is i and the second sibling's index is i + 5. So now loop through the siblings and their descendants, starting with the index of the first sibling. 
-        numberOfSiblingDescendants = previousSiblingIndex - nextSiblingIndex;
         loopCount = nextSiblingIndex + (previousSiblingIndex - nextSiblingIndex);
         for (i = nextSiblingIndex; i < loopCount; i++) {
           // !VA Increase the indent with each iteration. 
