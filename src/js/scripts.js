@@ -1083,9 +1083,57 @@ var Whitty = (function () {
       // writeClipboard( id, str);
 
       // doIndents( id, container );
-      doIndents2( id, container );
+      doIndents3( id, container );
     }
 
+    function doIndents3(id, container) {
+      console.log('doIndents3 running');
+      // console.clear();
+      console.log('container is:');
+      console.log(container);
+      var nodeList = container.querySelectorAll( '*' );
+      console.log('doIndents3 nodeList is: \n');
+      console.log(nodeList);
+      let spacechar = 'XX';
+      let spacebefore = 'XX';
+      let spaceafter = '';
+      let newspacebefore;
+      let newspaceafter;
+      let i;
+      i = 0;
+      do {
+        nodeList[i].insertAdjacentHTML('beforebegin', '\n' + spacebefore);
+        nodeList[i].insertAdjacentHTML('afterend', '\n' + spaceafter);
+        spacebefore = spacebefore + spacechar;
+        spaceafter = spaceafter + spacechar;
+        i++;
+      } while (!nodeList[i].nextSibling);
+      newspacebefore = spacebefore;
+      newspaceafter = spaceafter;
+      do {
+        // console.log('nodeList[i] is: ' + nodeList[i]);
+        nodeList[i].insertAdjacentHTML('beforebegin', '\n' + spacebefore);
+        nodeList[i].insertAdjacentHTML('afterend', '\n' + spaceafter);
+        spacebefore = spacebefore + spacechar;
+        spaceafter = spaceafter + spacechar;
+        i++;
+      } while (!nodeList[i].previousSibling);
+
+      do {
+        // console.log('nodeList[i] is: ' + nodeList[i]);
+        nodeList[i].insertAdjacentHTML('beforebegin', '\n' + newspacebefore);
+        nodeList[i].insertAdjacentHTML('afterend', '\n' + newspacebefore);
+        newspacebefore = newspacebefore + spacechar;
+        newspaceafter = newspaceafter + spacechar;
+        i++;
+      } while (nodeList[i]);
+
+
+      console.log('nodeList[1].outerHTML is: \n' + nodeList[1].outerHTML);
+      var output = nodeList[1].outerHTML; 
+      writeClipboard( id, output);
+
+    }
 
     function doIndents2(id, container) {
       let i, j, k, l, m;
@@ -1093,14 +1141,7 @@ var Whitty = (function () {
       1) Get the index of the firstSibling
       2) Get the index of the previousSibling
       3) Get the difference between firstSibling and previousSibling indexes - that will be the number of descendant elements for each sibling. Or - just get the index of the single parents (4), subtract that from that the total number of elemetns (10), and divide by 2 (5) - that is the number of descendants for each sibling. 
-
-      
-      
-      
       */
-
-
-
       console.log('container is:');
       console.log(container);
       var nodeList = container.querySelectorAll( '*' );
@@ -1407,15 +1448,19 @@ var Whitty = (function () {
       containerNodes[3].appendChild(sibling2Nodes[1]);
 
       let container = (containerNodes[0]);
-      // console.log('containerNodes[0] is: ' + containerNodes[0]);
-      // console.dir(containerNodes[0]);
-
-      // var nodeList = containerNodes[0].querySelectorAll( '*' );
-      // console.log('nodeList[0].outerHTML is: ' + nodeList[0].outerHTML);
+      console.log('containerNodes[0] is: ' + containerNodes[0]);
+      console.log(containerNodes[0]);
 
       container = setPosSwitchNodeAttributes(container);
-
-      return container;
+      var tdInner = container.childNodes[0]; 
+      console.log('makePosSwitchNodes tdInner is');
+      console.log(tdInner);
+      
+      var nodeList = container.querySelectorAll( '*' );
+      console.log('makePosSwitchNodes nodeList[0] is:');
+      console.log(nodeList[0]);
+      
+      return tdInner;
     }
 
     function setPosSwitchNodeAttributes(container) {
@@ -1425,7 +1470,9 @@ var Whitty = (function () {
       // console.log('container is: ' + container);
       // console.dir(container);
       var nodeList = container.querySelectorAll( '*' );
-      // console.log('nodeList[0].outerHTML is: ' + nodeList[0].outerHTML);
+      console.log('setPosSwitchNodeAttributes nodeList[0] is: ');
+      console.log(nodeList[0]);
+      
 
       
       // !VA Parent container td
@@ -1476,7 +1523,8 @@ var Whitty = (function () {
       // // !VA Content para
       nodeList[12].style = 'margin: 10px';
       nodeList[12].textContent = 'On larger devices, this content will appear to the left of the image. On smaller devices, the right-column content will appear above the left-column content.';
-
+      console.log('setPosSwitchNodeAttributes container is:');
+      console.log(container);
       return container;
     }
 
