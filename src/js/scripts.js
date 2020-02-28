@@ -1083,169 +1083,54 @@ var Whitty = (function () {
       // writeClipboard( id, str);
 
       // doIndents( id, container );
-      doIndents3( id, container );
+      doIndents( id, container );
     }
 
-    function doIndents3(id, container) {
-      console.log('doIndents3 running');
-      // console.clear();
-      console.log('container is:');
-      console.log(container);
-      var nodeList = container.querySelectorAll( '*' );
-      console.log('doIndents3 nodeList is: \n');
-      console.log(nodeList);
-      let spacechar = 'XX';
-      let spacebefore = 'XX';
-      let spaceafter = '';
-      let newspacebefore;
-      let newspaceafter;
-      let i;
-      i = 0;
-      do {
-        nodeList[i].insertAdjacentHTML('beforebegin', '\n' + spacebefore);
-        nodeList[i].insertAdjacentHTML('afterend', '\n' + spaceafter);
-        spacebefore = spacebefore + spacechar;
-        spaceafter = spaceafter + spacechar;
-        i++;
-      } while (!nodeList[i].nextSibling);
-      newspacebefore = spacebefore;
-      newspaceafter = spaceafter;
-      do {
-        // console.log('nodeList[i] is: ' + nodeList[i]);
-        nodeList[i].insertAdjacentHTML('beforebegin', '\n' + spacebefore);
-        nodeList[i].insertAdjacentHTML('afterend', '\n' + spaceafter);
-        spacebefore = spacebefore + spacechar;
-        spaceafter = spaceafter + spacechar;
-        i++;
-      } while (!nodeList[i].previousSibling);
-
-      do {
-        // console.log('nodeList[i] is: ' + nodeList[i]);
-        nodeList[i].insertAdjacentHTML('beforebegin', '\n' + newspacebefore);
-        nodeList[i].insertAdjacentHTML('afterend', '\n' + newspacebefore);
-        newspacebefore = newspacebefore + spacechar;
-        newspaceafter = newspaceafter + spacechar;
-        i++;
-      } while (nodeList[i]);
-
-
-      console.log('nodeList[1].outerHTML is: \n' + nodeList[1].outerHTML);
-      var output = nodeList[1].outerHTML; 
-      writeClipboard( id, output);
-
-    }
-
-    function doIndents2(id, container) {
-      let i, j, k, l, m;
-      /* !VA  
-      1) Get the index of the firstSibling
-      2) Get the index of the previousSibling
-      3) Get the difference between firstSibling and previousSibling indexes - that will be the number of descendant elements for each sibling. Or - just get the index of the single parents (4), subtract that from that the total number of elemetns (10), and divide by 2 (5) - that is the number of descendants for each sibling. 
-      */
-      console.log('container is:');
-      console.log(container);
-      var nodeList = container.querySelectorAll( '*' );
-      console.log('nodeList is: \n');
-      console.log(nodeList);
-      let singleParents;
-      let spacechar = 'XX';
-      let spacebefore = 'XX';
-      let spaceafter = '';
-      let sibling1Descendants = 10;
-      let sibling2Descendants = 13;
-      for ( i = 0; i < nodeList.length - 1; i++) {
-        // console.log('nodeList[i].id is: ' +  nodeList[i].id);
-        if (nodeList[i].nextSibling  ) {
-          console.log(nodeList[i].id + ' has a sibling');
-          singleParents = i;
-          console.log('singleParents is: ' + singleParents);
-        }
-      } 
-      for (k = 2;  k < singleParents + 2; k++) {
-        console.log('k is: ' + k);
-        console.log('nodeList[k] is: ' +  nodeList[k]);
-        nodeList[k].insertAdjacentHTML('beforebegin', '\n' + spacebefore);
-        nodeList[k].insertAdjacentHTML('afterend', '\n' + spaceafter);
-        spacebefore = spacebefore + spacechar;
-        spaceafter = spaceafter + spacechar;
-      }
-      // for (l = 6;  l < sibling1Descendants; l++) {
-      //   console.log('l is: ' + l);
-      //   console.log('nodeList[l] is: ' +  nodeList[l]);
-      //   nodeList[l].insertAdjacentHTML('beforebegin', '\n' + spacebefore);
-      //   nodeList[l].insertAdjacentHTML('afterend', '\n' + spaceafter);
-      //   spacebefore = spacebefore + spacechar;
-      //   spaceafter = spaceafter + spacechar;
-      // }
-      // for (m = 10;  m < sibling2Descendants; m++) {
-      //   console.log('m is: ' + m);
-      //   console.log('nodeList[m] is: ' +  nodeList[m]);
-      //   nodeList[m].insertAdjacentHTML('beforebegin', '\n' + spacebefore);
-      //   nodeList[m].insertAdjacentHTML('afterend', '\n' + spaceafter);
-      //    spacebefore = spacebefore + spacechar;
-      //    spaceafter = spaceafter + spacechar;
-      // }
-
-
-      console.log('nodeList[1].outerHTML is: \n' + nodeList[1].outerHTML);
-      var output = nodeList[1].outerHTML; 
-      writeClipboard( id, output);
-
-    }
-
-    // !VA This is totally hacked but it works and structurally it can be improved upon at some later date
-    function doIndents( id, container ) {
+    // !VA This works for everything except embedded background image tags. This is totally hacked but it works and structurally it can be improved upon at some later date
+    function doIndents(id, container) {
       console.log('doIndents running');
-      let nodeList, j, output, spacechar, spacebefore, spaceafter;
-      nodeList = container.querySelectorAll('*');
-      spacechar = '  ';
-      spacebefore = '  ';
-      spaceafter = '';
-      // console.log('nodeList.length is: ' + nodeList.length);
-      for (let i = 0; i < nodeList.length - 1; i++) {
-
-        // !VA Apply the indent to the current element's next child in the nodeList 
-        j = i + 1;
-
-
-        if (nodeList[j].nextSibling) {
-          // !VA find out if it's a sibling
-          console.log('nodeList[j].id is: ' + nodeList[j].id);
-          console.log('nodeList[j].nextSibling.id is: ' + nodeList[j].nextSibling.id);
-          console.log('sibling!');
-
-        } else {
-
-          console.log('not a sibling');
+      var nodeList = container.querySelectorAll( '*' );
+      let indentspacing, indent, i, nextSiblingIndex, previousSiblingIndex, numberOfSiblingDescendants, loopCount, output;
+      // !VA Set the loop iterator to 0 and the indentspacing to two spaces
+      i = 0, indentspacing = '  ';
+      // !VA If nodeList only contains a singleton img tag, nodeList[i] will be null, so we exclude that case
+      if (nodeList.length > 0) {
+        // !VA Get the index of the sibling nodes, i.e. the td nodes containing the two-column content.  
+        for (i = 0; i < nodeList.length; i++) {
+          // !VA 
+          if (nodeList[i].nextSibling) { nextSiblingIndex = i; }
+          if (nodeList[i].previousSibling) {previousSiblingIndex = i;}
         }
-
-
-        // !VA Start the loop... check this
-        // if ( j >= 0) {
-        // !VA Start processing with the 2nd element in the nodeList. 
-        if (j > 1) {
-          spacebefore = spacebefore + spacechar;
-          spaceafter = spaceafter + spacechar;
+        // !VA If there is an element with a sibling, then increment loopCount until that element's index is reached. If there's no element with a sibling, then set loopCount to the length of nodeList and process the entire nodeList.
+        nextSiblingIndex ? loopCount = nextSiblingIndex : loopCount = nodeList.length;
+        // !VA Loop through the elements and increase the indent with each iteration
+        for (i = 0; i < loopCount; i++) {
+          indent  =  '\n' + indentspacing.repeat([i]);
+          // !VA Apply the current indent to the current element before and after the tag
+          nodeList[i].insertAdjacentHTML('beforebegin', indent);
+          nodeList[i].insertAdjacentHTML('beforeend', indent);
         }
-        // console.log('j is: ' + j);
-        nodeList[j].insertAdjacentHTML('beforebegin', '\n' + spacebefore);
-        nodeList[j].insertAdjacentHTML('afterend', '\n' + spaceafter);
-        console.log('nodeList[j].outerHTML is: \n' + nodeList[j].outerHTML);
+        // !VA The number of elements below the sibling element is equal to the second sibling's index minus the first sibling's index -- that's the number of descendants separating the two siblings. Consequently, the first sibling's index is i and the second sibling's index is i + 5. So now loop through the siblings and their descendants, starting with the index of the first sibling. 
+        numberOfSiblingDescendants = previousSiblingIndex - nextSiblingIndex;
+        loopCount = nextSiblingIndex + numberOfSiblingDescendants;
+        for (i = nextSiblingIndex; i < loopCount; i++) {
+          // !VA Increase the indent with each iteration. 
+          indent  =  '\n' + indentspacing.repeat([i]);
+          // !VA The terminating element in the tree gets no indent and no line break - the indent and line break are covered by its parent.
+          if (i === nextSiblingIndex) {
+            indent = '';
+          }
+          // !VA Apply the indent to the nextSibling
+          nodeList[i].insertAdjacentHTML('beforebegin', indent);
+          nodeList[i].insertAdjacentHTML('afterend', indent);
+          // !VA Apply the indent to the previousSibling
+          nodeList[i + 5].insertAdjacentHTML('beforebegin', indent);
+          nodeList[i + 5].insertAdjacentHTML('afterend', indent);
         }
-      // }
-      output = nodeList[0].outerHTML;
-      // console.log('output is:');
-      console.log(output);
-      
-
-      // !VA In case I want to use the beautifier, it's here:
-      // var beautified = html_beautify( output, {indent_size: 2 });
-      // console.log('beautified is: \n' + beautified);
-      // console.log('output is: \n' + output);
-      // writeClipboard( id, output);
+      }
+      output = nodeList[0].outerHTML; 
+      writeClipboard( id, output);
     }
-
-
 
     function writeClipboard(id, str) {
       // console.log('writeClipboard running');
