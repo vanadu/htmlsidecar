@@ -267,8 +267,9 @@ var Whitty = (function () {
     // !VA Run test function on page load
     document.addEventListener('DOMContentLoaded', function() {
       setTimeout(function(){ 
-        CBController.runTest();
-        
+        var foo = document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag);
+        foo.click();
+
       }, 500);
     });
 
@@ -960,10 +961,8 @@ var Whitty = (function () {
         break;
       case (radioSelected === 'posswitch'):
         console.log('radioSelected === posswitch running');
-        console.log('here!');
         tdInner = makePosSwitchNodes();
-        console.log('mark=5');
-        console.log(tdInner);
+        // console.log(tdInner);
         
 
 
@@ -971,8 +970,6 @@ var Whitty = (function () {
       default:
         // code block
       } 
-
-      console.log('tdInner.outerHTML here is: ' + tdInner.outerHTML);
       return tdInner;
     }
 
@@ -1064,7 +1061,7 @@ var Whitty = (function () {
       // !VA If the CCP make td tag button was clicked, return tdNode as the nodeList and send to doIndents for code indents
       if (id == document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag).id) {
         tdNode = makeTdNode( id );
-        console.log('tdNode is: ' + tdNode);
+        // console.log('tdNode is: ' + tdNode);
         topNode = tdNode;
         // !VA We do NOT append imgNode here...that has to be done in makeTdNode because if Bgimage is checked, no imgNode is included. If we do it here then we have to include the conditional if Bgimage = checked here too. That belongs in the makeTdNode function.
       }
@@ -1084,8 +1081,75 @@ var Whitty = (function () {
       // console.log('str is:');
       // console.log(str);
       // writeClipboard( id, str);
-      console.log('doing indents');
-      doIndents( id, container );
+
+      // doIndents( id, container );
+      doIndents2( id, container );
+    }
+
+
+    function doIndents2(id, container) {
+      let i, j, k, l, m;
+      /* !VA  
+      1) Get the index of the firstSibling
+      2) Get the index of the previousSibling
+      3) Get the difference between firstSibling and previousSibling indexes - that will be the number of descendant elements for each sibling. Or - just get the index of the single parents (4), subtract that from that the total number of elemetns (10), and divide by 2 (5) - that is the number of descendants for each sibling. 
+
+      
+      
+      
+      */
+
+
+
+      console.log('container is:');
+      console.log(container);
+      var nodeList = container.querySelectorAll( '*' );
+      console.log('nodeList is: \n');
+      console.log(nodeList);
+      let singleParents;
+      let spacechar = 'XX';
+      let spacebefore = 'XX';
+      let spaceafter = '';
+      let sibling1Descendants = 10;
+      let sibling2Descendants = 13;
+      for ( i = 0; i < nodeList.length - 1; i++) {
+        // console.log('nodeList[i].id is: ' +  nodeList[i].id);
+        if (nodeList[i].nextSibling  ) {
+          console.log(nodeList[i].id + ' has a sibling');
+          singleParents = i;
+          console.log('singleParents is: ' + singleParents);
+        }
+      } 
+      for (k = 2;  k < singleParents + 2; k++) {
+        console.log('k is: ' + k);
+        console.log('nodeList[k] is: ' +  nodeList[k]);
+        nodeList[k].insertAdjacentHTML('beforebegin', '\n' + spacebefore);
+        nodeList[k].insertAdjacentHTML('afterend', '\n' + spaceafter);
+        spacebefore = spacebefore + spacechar;
+        spaceafter = spaceafter + spacechar;
+      }
+      // for (l = 6;  l < sibling1Descendants; l++) {
+      //   console.log('l is: ' + l);
+      //   console.log('nodeList[l] is: ' +  nodeList[l]);
+      //   nodeList[l].insertAdjacentHTML('beforebegin', '\n' + spacebefore);
+      //   nodeList[l].insertAdjacentHTML('afterend', '\n' + spaceafter);
+      //   spacebefore = spacebefore + spacechar;
+      //   spaceafter = spaceafter + spacechar;
+      // }
+      // for (m = 10;  m < sibling2Descendants; m++) {
+      //   console.log('m is: ' + m);
+      //   console.log('nodeList[m] is: ' +  nodeList[m]);
+      //   nodeList[m].insertAdjacentHTML('beforebegin', '\n' + spacebefore);
+      //   nodeList[m].insertAdjacentHTML('afterend', '\n' + spaceafter);
+      //    spacebefore = spacebefore + spacechar;
+      //    spaceafter = spaceafter + spacechar;
+      // }
+
+
+      console.log('nodeList[1].outerHTML is: \n' + nodeList[1].outerHTML);
+      var output = nodeList[1].outerHTML; 
+      writeClipboard( id, output);
+
     }
 
     // !VA This is totally hacked but it works and structurally it can be improved upon at some later date
@@ -1093,30 +1157,26 @@ var Whitty = (function () {
       console.log('doIndents running');
       let nodeList, j, output, spacechar, spacebefore, spaceafter;
       nodeList = container.querySelectorAll('*');
-      // console.clear();
-      console.log('nodeList is: ');
-      console.dir(nodeList);
       spacechar = '  ';
       spacebefore = '  ';
       spaceafter = '';
-      console.log('nodeList.length is: ' + nodeList.length);
+      // console.log('nodeList.length is: ' + nodeList.length);
       for (let i = 0; i < nodeList.length - 1; i++) {
 
         // !VA Apply the indent to the current element's next child in the nodeList 
         j = i + 1;
 
 
-        // if (nodeList[j].nextSibling) {
-        //   // !VA find out if it's a sibling
-        //   console.log('j is: ' + j);
-        //   console.log('nodeList[j].outerHTML is: ' + nodeList[j].outerHTML);
-        //   console.log('sibling!');
+        if (nodeList[j].nextSibling) {
+          // !VA find out if it's a sibling
+          console.log('nodeList[j].id is: ' + nodeList[j].id);
+          console.log('nodeList[j].nextSibling.id is: ' + nodeList[j].nextSibling.id);
+          console.log('sibling!');
 
-        // } else {
-        //   console.log('j is: ' + j);
-        //   console.log('nodeList[j].outerHTML is: ' + nodeList[j].outerHTML);
-        //   console.log('not a sibling');
-        // }
+        } else {
+
+          console.log('not a sibling');
+        }
 
 
         // !VA Start the loop... check this
@@ -1129,16 +1189,19 @@ var Whitty = (function () {
         // console.log('j is: ' + j);
         nodeList[j].insertAdjacentHTML('beforebegin', '\n' + spacebefore);
         nodeList[j].insertAdjacentHTML('afterend', '\n' + spaceafter);
-      }
+        console.log('nodeList[j].outerHTML is: \n' + nodeList[j].outerHTML);
+        }
       // }
-      console.log('nodeList[1].outerHTML is: \n ' + nodeList[0].outerHTML);
       output = nodeList[0].outerHTML;
+      // console.log('output is:');
+      console.log(output);
+      
 
       // !VA In case I want to use the beautifier, it's here:
       // var beautified = html_beautify( output, {indent_size: 2 });
       // console.log('beautified is: \n' + beautified);
       // console.log('output is: \n' + output);
-      writeClipboard( id, output);
+      // writeClipboard( id, output);
     }
 
 
@@ -1300,7 +1363,7 @@ var Whitty = (function () {
     }
 
     function makePosSwitchNodes() {
-      console.log('makePosSwitchNodes running');
+      // console.log('makePosSwitchNodes running');
       // !VA Declare the arrays for new element names and new element types
       let containerIds = [], containerElements = [], sibling1Ids = [], sibling1Elements = [], sibling2Ids = [], sibling2Elements = [], containerNodes = [], sibling1Nodes = [], sibling2Nodes = [];
       // !VA Declare loop iterators
@@ -1356,13 +1419,13 @@ var Whitty = (function () {
     }
 
     function setPosSwitchNodeAttributes(container) {
-      console.log('setPosSwitchNodeAttributes running');
+      // console.log('setPosSwitchNodeAttributes running');
       let Attributes = getAttributes();
       
       // console.log('container is: ' + container);
       // console.dir(container);
       var nodeList = container.querySelectorAll( '*' );
-      console.log('nodeList[0].outerHTML is: ' + nodeList[0].outerHTML);
+      // console.log('nodeList[0].outerHTML is: ' + nodeList[0].outerHTML);
 
       
       // !VA Parent container td
@@ -1397,12 +1460,7 @@ var Whitty = (function () {
       nodeList[7].style = Attributes.imgStyle;
       nodeList[7].src = Attributes.imgSrc;
       nodeList[7].alt = Attributes.imgAlt;
-      
-      console.log('Mark4');
-      console.log('nodeList is:');
-      console.dir(nodeList);
-      console.dir(container);
-
+    
       // !VA Sibling 2 - text content container
       nodeList[8].width='50%';
       nodeList[8].setAttribute( 'class', 'stack-column-center');
