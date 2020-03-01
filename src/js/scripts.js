@@ -17,6 +17,7 @@ TODO: Add a link wrapper to img options
 TODO: Add no-image option to td options select - think about how that will affect indents first
 TODO: Change msg-table to flex div
 TODO: Fix the Chrome display in Ubuntu
+TODO: Make Stig clearly a link
 
 DONE: Figure out what to do about the px units in the height/width input fields. Only applies to td and table width and table height fields. The filter needs to be between the makeCssRule function and the clipboardStr
 DONE : Fix CSS Rule CB output
@@ -219,6 +220,7 @@ var Whitty = (function () {
       spnCcpImgIncludeWidthHeightCheckmrk: '#spn-ccp-img-include-width-height-checkmrk',
       selCcpImgAlign: '#sel-ccp-img-align',
       iptCcpImgRelPath: '#ipt-ccp-img-relpath',
+      spnCcpImgIncludeAnchorCheckmrk: '#spn-ccp-img-include-anchor-checkmrk',
       iptCcpTdClass: '#ipt-ccp-td-class',
       selCcpTdAlign: '#sel-ccp-td-align',
       selCcpTdValign: '#sel-ccp-td-valign',
@@ -524,9 +526,6 @@ var Whitty = (function () {
 
     // !VA New CSS RUle output functionality 02.20.20
     function  makeCssRule( id, classname, wval, hval ) {
-      console.log('makeCssRule running');
-      console.clear();
-      console.log('id is: ' + id);
       let Attributes = [];
       Attributes = getAttributes();
       console.log(Attributes);
@@ -625,6 +624,7 @@ var Whitty = (function () {
     }
 
     function getCheckboxSelection(target) {
+      // console.clear();
       let chkboxid, checked;
       chkboxid = document.querySelector(target).id;
       chkboxid = chkboxid.replace('mrk', 'box');
@@ -751,7 +751,7 @@ var Whitty = (function () {
       // !VA Id is passed but not used here,  because we're only building the node.
       let Attributes;
       Attributes = getAttributes();
-      let imgNode;
+      let imgNode, returnNode;
       imgNode = document.createElement('img');
       // !VA class attribute
       if (Attributes.imgClass) { imgNode.className = Attributes.imgClass; }
@@ -769,7 +769,21 @@ var Whitty = (function () {
       if (Attributes.imgAlign) { imgNode.align = Attributes.imgAlign; }
       // !VA border attribute
       imgNode.border = '0';
-      return imgNode;
+
+      // !VA If the include anchor option is checked, create the anchor element, add the attributes, append the imgNode to it, and return it.
+      if(Attributes.imgIncludeAnchor === true) {
+        let anchor = document.createElement('a');
+        anchor.href = '#';
+        // console.log(anchor.outerHTML);
+        anchor.appendChild(imgNode);
+        // console.log(anchor.outerHTML);
+        returnNode = anchor;
+      } else {
+        // !VA Otherwise, set returnNode to imgNode without the anchor.
+        returnNode = imgNode;
+      }
+      
+      return returnNode;
     }
     
     function makeTdNode( id ) {
@@ -951,8 +965,6 @@ var Whitty = (function () {
         tableNode = makeTableNode( id );
         topNode = tableNode;
       }
-      console.log('topNode  is:');
-      console.log('topNode is: ' + topNode);
       // !VA Put the table and its descendents into the parent container
       container.appendChild(topNode);
       // !VA Pass the clicked button id and parent container element to process the code indents
@@ -1024,6 +1036,14 @@ var Whitty = (function () {
           // !VA Apply the current indent to the current element before and after the tag
           nodeList[i].insertAdjacentHTML('beforebegin', indent);
           nodeList[i].insertAdjacentHTML('beforeend', indent);
+          // !VA This ALMOST takes care of the indented anchor -- but sadly the break on the closing a tag is handled by the parent...ugh.
+          // console.log('loopCount is: ' + loopCount);
+          // console.log('i  is: ' + i );
+          // if (i === loopCount - 1 && nodeList[i - 1].nodeName === 'A') {
+          //   console.log(' one before terminated');
+          //   console.log('nodeList[i].nodeName is: ' + nodeList[i - 1].nodeName);
+          //   console.log('bingo');
+          // } 
         }
         // !VA The number of elements below the sibling element is equal to the second sibling's index minus the first sibling's index -- that's the number of descendants separating the two siblings. Consequently, the first sibling's index is i and the second sibling's index is i + 5. So now loop through the siblings and their descendants, starting with the index of the first sibling. 
         loopCount = nextSiblingIndex + (previousSiblingIndex - nextSiblingIndex);
@@ -1109,6 +1129,12 @@ var Whitty = (function () {
           options = [ '', 'left', 'center', 'right'];
           str = getAlignAttribute( selectid, options );
           return str;
+        })(),
+        imgIncludeAnchor: (function() {
+          let target, checked;
+          target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
+          checked = getCheckboxSelection(target);
+          return checked;
         })(),
         // !VA TD Attributes
         // !VA TD Width and height from Appdata = imgW and imgW -- only used for Stig's BG image 
@@ -2111,7 +2137,7 @@ var Whitty = (function () {
 
 
         // !VA CCP Checkboxes - these are mock checkboxes with custom styling, so the ID names have to be converted to checkbox names in order to select or deselect them. We attach the event handler to the checkmark, not the checkbox. The checkmark is converted to checkbox for handling in toggleCheckbox.
-        var ccpCheckmarks = [ ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk, ccpUserInput.spnCcpTableIncludeWrapperCheckmrk ];
+        var ccpCheckmarks = [ ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk, ccpUserInput.spnCcpImgIncludeAnchorCheckmrk, ccpUserInput.spnCcpTableIncludeWrapperCheckmrk ];
         var ccpCheckboxes = [];
         for (let i = 0; i < ccpCheckmarks.length; i++) {
           document.querySelector(ccpCheckmarks[i]).addEventListener('click', handleCCPInput, false);
