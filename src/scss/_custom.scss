@@ -796,7 +796,7 @@ output {
 // VA! This fixes the discrepancy between Firefox and Chrome with the alignment of the ccp-columns
 .ccp-options-container {
   position: absolute;
-  top: -1px;
+  top: 3px;
   display: flex;
   justify-content: space-evenly;
   // border: 1px solid magenta;
@@ -818,8 +818,6 @@ output {
   width: 92px;
   height: 120px;
   margin: 0 7px;
-  // VA! otherwise it obscures te fieldset label
-  z-index: -999;
   // border: 1px solid blue;
   .ccp-but {
     width: 90px;

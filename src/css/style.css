@@ -1570,7 +1570,7 @@ fieldset {
 
 .ccp-options-container {
   position: absolute;
-  top: -1px;
+  top: 3px;
   display: flex;
   justify-content: space-evenly; }
 
@@ -1583,8 +1583,7 @@ fieldset {
   left: 0;
   width: 92px;
   height: 120px;
-  margin: 0 7px;
-  z-index: -999; }
+  margin: 0 7px; }
   .ccp-options-col-1 .ccp-but {
     width: 90px;
     height: 90px;

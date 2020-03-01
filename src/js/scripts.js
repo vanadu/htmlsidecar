@@ -12,12 +12,15 @@ TODO: Figure out why queryDOMElements is running mutliple times per CB build.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
 
 Status:
-TODO: Add height attribute input field to CPP TD options
+TODO: Fix CSS Rule CB output
 TODO: Add a link wrapper to img options
+TODO: Add no-image option to td options select - think about how that will affect indents first
+TODO: Change msg-table to flex div
 TODO: Fix the Chrome display in Ubuntu
 
-
 DONE: Fix <img> options bottom is cut 
+
+DONE: Add height attribute input field to CPP TD options
 DONE: Pre-select Include width and height in style attributes option
 DONE: Fix the img output to get rid of quote string
 DONE: Fix the bgimage clipboard output for parent tables
@@ -218,6 +221,7 @@ var Whitty = (function () {
       iptCcpTdClass: '#ipt-ccp-td-class',
       selCcpTdAlign: '#sel-ccp-td-align',
       selCcpTdValign: '#sel-ccp-td-valign',
+      iptCcpTdHeight: '#ipt-ccp-td-height',
       iptCcpTdBgColor: '#ipt-ccp-td-bgcolor',
       // !VA spn-ccp-td-bgimage-checkmrk
       // !VA This is deprecated as of today
@@ -269,13 +273,13 @@ var Whitty = (function () {
     };
 
     // !VA Run test function on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(function(){ 
-        var foo = document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag);
-        foo.click();
+    // document.addEventListener('DOMContentLoaded', function() {
+    //   setTimeout(function(){ 
+    //     var foo = document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag);
+    //     foo.click();
 
-      }, 500);
-    });
+    //   }, 500);
+    // });
 
 
 
@@ -582,6 +586,11 @@ var Whitty = (function () {
 
     // !VA New CSS RUle output functionality 02.20.20
     function  makeCssRule( id, classname, wval, hval ) {
+      console.log('makeCssRule running');
+      console.log('id is: ' + id);
+      let Attributes = [];
+      Attributes = getAttributes();
+      console.dir(Attributes);
       let clipboardStr;
       clipboardStr = `.${classname} { width: ${wval}px !important; height: ${hval}px !important; }`;
       writeClipboard(id, clipboardStr);
@@ -943,14 +952,16 @@ var Whitty = (function () {
         if (Attributes.tdClass) { tdInner.className = Attributes.tdClass; }
         // !VA valign attribute
         if (Attributes.tdAlign) { tdInner.align = Attributes.tdAlign; }
+        // !VA height attribute
+        if (Attributes.tdHeight) { tdInner.height = Attributes.tdHeight; }
         // !VA The id is wrong here -- we're passing the td's id but that shouldn't matter
         imgNode = makeImgNode();
         // !VA We need to include the imgNode here ONLY if Bgimage is unchecked
         tdInner.appendChild(imgNode);
         break;
       case (radioSelected === 'bgimage'):
-        tdInner.width = Attributes.tdWidth;
-        tdInner.height = Attributes.tdHeight;
+        tdInner.width = Attributes.tdAppdataWidth;
+        tdInner.height = Attributes.tdAppdataHeight;
         // !VA valign attribute
         tdInner.vAlign = Attributes.tdValign;
         // !VA Set the background attribute to the current path/filename
@@ -1069,7 +1080,8 @@ var Whitty = (function () {
     }
 
     function makeNodeList( id ) {
-      // console.log('makeNodeList running');
+      console.log('makeNodeList running');
+      console.log('id is: ' + id);
       let container, imgNode, tdNode, tableNode, topNode;
       // !VA Create the container div - we need this to access the descendant elements as children, including the parent table of all the descendent table elements.
       container = document.createElement('div');
@@ -1093,6 +1105,8 @@ var Whitty = (function () {
         tableNode = makeTableNode( id );
         topNode = tableNode;
       }
+      console.log('topNode  is:');
+      console.log('topNode is: ' + topNode);
       // !VA Put the table and its descendents into the parent container
       container.appendChild(topNode);
       // !VA Pass the clicked button id and parent container element to process the code indents
@@ -1251,12 +1265,15 @@ var Whitty = (function () {
           return str;
         })(),
         // !VA TD Attributes
-        // !VA TD Width and height = imgW and imgW -- only used for Stig's BG image 
-        tdWidth: (function() {
+        // !VA TD Width and height from Appdata = imgW and imgW -- only used for Stig's BG image 
+        tdAppdataWidth: (function() {
           return Appdata.imgW;
         })(),
-        tdHeight: (function() {
+        tdAppdataHeight: (function() {
           return Appdata.imgH;
+        })(),
+        tdHeight: (function() {
+          return ccpIfNoUserInput('height',document.querySelector(ccpUserInput.iptCcpTdHeight).value);
         })(),
         tdBasic: (function() {
           target = ccpUserInput.rdoCcpTdBasic;
@@ -1474,7 +1491,9 @@ var Whitty = (function () {
       doClipboard: function(evt) {
         console.log('doingClipboard');
         let id = evt.target.id;
-        makeNodeList( id );
+        // !VA If the clicked element id is a Make Tag button, run makeNodeList, otherwise run makeCSSRule.
+        id.includes('tag') ? makeNodeList(id) : makeCssRule(id);
+        
        
       },
       runTest: function() {
