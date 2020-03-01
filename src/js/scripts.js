@@ -10,15 +10,15 @@ For later:
 TODO: The CSS output will need to be revisited. You'd never need to output the width AND height in CSS for tables and for td it probably has no effect for height. That means...ugh.
 TODO: Figure out why queryDOMElements is running mutliple times per CB build.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
-TODO: Add some kind of fluid option to the img options. Cerberus hard codes it into the img tag. That needs to be tested. Litmus overrides the width and height style properties in the CSS media queries. Need to test before that is implemented.
+TODO: Add some kind of fluid option to the img options. Cerberus hard codes it into the img tag. That needs to be tested. Litmus overrides the width and height style properties in the CSS media queries. Need to test before that is implemented - but there's no reason to include a fluid option if that's settable in CSS.
 
 Status:
-TODO: Figure out what to do about the px units in the height/width input fields. This is only a problem for fields where percent values make sense, and that is ONLY the td and table width and table height fields. So for those fields, we can detect if a percent sign is used and replace the px with it. That's going to be a pain in the ass. 
 TODO: Add a link wrapper to img options
 TODO: Add no-image option to td options select - think about how that will affect indents first
 TODO: Change msg-table to flex div
 TODO: Fix the Chrome display in Ubuntu
 
+DONE: Figure out what to do about the px units in the height/width input fields. Only applies to td and table width and table height fields. The filter needs to be between the makeCssRule function and the clipboardStr
 DONE : Fix CSS Rule CB output
 DONE: Fix <img> options bottom is cut 
 DONE: Add height attribute input field to CPP TD options
@@ -521,66 +521,6 @@ var Whitty = (function () {
     }
 
 
-    function getCssProperties(id) {
-      console.log('getCssProperties running');
-      let Appdata = {};
-      Appdata = appController.initGetAppdata();
-      var Attributes = getAttributes();
-      console.dir(Appdata); 
-      var str;
-      let classname, wval, hval;
-
-      switch (true) {
-      case ( id === document.querySelector(btnCcpMakeClips.btnCcpMakeImgDsktpCssRule).id) :
-        classname = Attributes.imgClass;
-        wval = Appdata.imgW, hval = Appdata.imgH;
-        break;
-      case ( id === document.querySelector(btnCcpMakeClips.btnCcpMakeImgLgphnCssRule).id) :
-        classname = Attributes.imgClass;
-        wval = Appdata.lPhonesW, hval = Appdata.lPhonesH;
-        break;
-      case ( id === document.querySelector(btnCcpMakeClips.btnCcpMakeImgSmphnCssRule).id) :
-        classname = Attributes.imgClass;
-        wval = Appdata.sPhonesW, hval = Appdata.sPhonesH;
-        break;
-      case ( id === document.querySelector(btnCcpMakeClips.btnCcpMakeTdDsktpCssRule).id) :
-        classname = Attributes.tdClass;
-        wval = Appdata.imgW, hval = Appdata.imgH;
-        break;
-      case ( id === document.querySelector(btnCcpMakeClips.btnCcpMakeTdLgphnCssRule).id) :
-        classname = Attributes.tdClass;
-        wval = Appdata.lPhonesW, hval = Appdata.lPhonesH;
-        break;
-      case ( id === document.querySelector(btnCcpMakeClips.btnCcpMakeTdSmphnCssRule).id) :
-        classname = Attributes.tdClass;
-        wval = Appdata.sPhonesW, hval = Appdata.sPhonesH;
-        break;
-      case ( id === document.querySelector(btnCcpMakeClips.btnCcpMakeTableDsktpCssRule).id) :
-        classname = Attributes.tableClass;
-        wval = Appdata.imgW, hval = Appdata.imgH;
-        break;
-      case ( id === document.querySelector(btnCcpMakeClips.btnCcpMakeTableLgphnCssRule).id) :
-        classname = Attributes.tableClass;
-        wval = Appdata.lPhonesW, hval = Appdata.lPhonesH;
-        break;
-      case ( id === document.querySelector(btnCcpMakeClips.btnCcpMakeTableSmphnCssRule).id) :
-        classname = Attributes.tableClass;
-        wval = Appdata.sPhonesW, hval = Appdata.sPhonesH;
-        break;
-      default:
-        break;
-      }
-      makeCssRule(id, classname, wval, hval);
-    }
-
-
-
-    // !VA Constructor for the clipboard output objects. These are all the properties all the clipboard output objects (img, td and table) will have. We store these key/value pairs in instances of the ClipboardOutput  because they're easier to manage. Then we write the output into an HTML string.
-    function ClipboardOutput(classAtt, alignAtt ) {
-      this.classAtt = classAtt;
-      this.alignAtt = alignAtt;
-    }
-
 
     // !VA New CSS RUle output functionality 02.20.20
     function  makeCssRule( id, classname, wval, hval ) {
@@ -608,7 +548,7 @@ var Whitty = (function () {
         break;
       case (id.includes('td-dsktp') || id.includes('td-smphn') || id.includes('td-lgphn')) :
         if ( Attributes.tdHeight) {
-          clipboardStr = `.${Attributes.tdClass} { height: ${Attributes.tdClass}px !important; }`;
+          clipboardStr = `.${Attributes.tdClass} { height: ${Attributes.tdHeight}px !important; }`;
         } else {
           clipboardStr = `.${Attributes.tdClass} {  }`;
         }
@@ -625,9 +565,10 @@ var Whitty = (function () {
       default:
         // code block
       } 
-      console.dir(args);
-      // let clipboardStr;
-      // clipboardStr = `.${classname} { width: ${wval}px !important; height: ${hval}px !important; }`;
+
+      // !VA If the input includes a percent char, remove the hard-coded trailing px on the value and just output the value with the user-entered percent char.
+      clipboardStr.includes('%')  ? clipboardStr = clipboardStr.replace('%px', '%') : clipboardStr;
+
       writeClipboard(id, clipboardStr);
 
     }
