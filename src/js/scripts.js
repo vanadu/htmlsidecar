@@ -12,9 +12,13 @@ TODO: Figure out why queryDOMElements is running mutliple times per CB build.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
 
 Status:
-TODO: Fix the bgimage clipboard output for parent tables
+TODO: Fix the img output to get rid of quote string
+TODO: Add height attribute input field to CPP TD options
+TODO: Add a link wrapper to img options
+TODO: Fix the Chrome display in Ubuntu
 
 
+DONE: Fix the bgimage clipboard output for parent tables
 DONE: Remove checkmark styles for bgimage
 DONE: Deal with the indents and embedded tag issue.
 DONE: It's bad that writeClipboard is called even when that clipboard isn't being output. ccpMakeTdTag calls ccpMakeImgTag which calls writeClipboard -- that makes no sense. 
