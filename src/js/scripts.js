@@ -10,16 +10,17 @@ For later:
 TODO: The CSS output will need to be revisited. You'd never need to output the width AND height in CSS for tables and for td it probably has no effect for height. That means...ugh.
 TODO: Figure out why queryDOMElements is running mutliple times per CB build.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
+TODO: Add some kind of fluid option to the img options. Cerberus hard codes it into the img tag. That needs to be tested. Litmus overrides the width and height style properties in the CSS media queries. Need to test before that is implemented.
 
 Status:
-TODO: Fix CSS Rule CB output
+TODO: Figure out what to do about the px units in the height/width input fields. This is only a problem for fields where percent values make sense, and that is ONLY the td and table width and table height fields. So for those fields, we can detect if a percent sign is used and replace the px with it. That's going to be a pain in the ass. 
 TODO: Add a link wrapper to img options
 TODO: Add no-image option to td options select - think about how that will affect indents first
 TODO: Change msg-table to flex div
 TODO: Fix the Chrome display in Ubuntu
 
+DONE : Fix CSS Rule CB output
 DONE: Fix <img> options bottom is cut 
-
 DONE: Add height attribute input field to CPP TD options
 DONE: Pre-select Include width and height in style attributes option
 DONE: Fix the img output to get rid of quote string
@@ -580,153 +581,57 @@ var Whitty = (function () {
       this.alignAtt = alignAtt;
     }
 
-    // !VA function ccpTdBuildHtmlClip deprecated 02/19/20
-    // !VA function ccpTableBuildHtmlClip deprecated 02/19/20
-    // !VA function ccpImgBuildHtmlClip deprecated 02/19/20
 
     // !VA New CSS RUle output functionality 02.20.20
     function  makeCssRule( id, classname, wval, hval ) {
       console.log('makeCssRule running');
+      console.clear();
       console.log('id is: ' + id);
       let Attributes = [];
       Attributes = getAttributes();
-      console.dir(Attributes);
+      console.log(Attributes);
+      let Appdata = [];
+      Appdata = appController.initGetAppdata();
+      console.log(Appdata);
       let clipboardStr;
-      clipboardStr = `.${classname} { width: ${wval}px !important; height: ${hval}px !important; }`;
+      let args = [];
+      switch(true) {
+      case (id.includes('img-dsktp')):
+        // args[0] = Attributes.imgClass, args[1] = Attributes.imgWidth, args[2] = Attributes.imgHeight;
+        clipboardStr = `.${Attributes.imgClass} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important; }`;
+        break;
+      case (id.includes('img-smphn')):
+        clipboardStr = `.${Attributes.imgClass} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important; }`;
+        break;
+      case (id.includes('img-lgphn')):
+        clipboardStr = `.${Attributes.imgClass} { width: ${Appdata.lPhonesW}px !important; height: ${Appdata.lPhonesH}px !important; }`;
+        break;
+      case (id.includes('td-dsktp') || id.includes('td-smphn') || id.includes('td-lgphn')) :
+        if ( Attributes.tdHeight) {
+          clipboardStr = `.${Attributes.tdClass} { height: ${Attributes.tdClass}px !important; }`;
+        } else {
+          clipboardStr = `.${Attributes.tdClass} {  }`;
+        }
+        break;
+      case (id.includes('table-dsktp')):
+        clipboardStr = `.${Attributes.tableClass} { width: ${Attributes.tableWidth}px !important; align: ${Attributes.tableAlign} !important; }`;
+        break;
+      case (id.includes('table-smphn')):
+        clipboardStr = `.${Attributes.tableClass} { width: ${Appdata.sPhonesW}px !important; align: ${Attributes.tableAlign} !important; }`;
+        break;
+      case (id.includes('table-lgphn')):
+        clipboardStr = `.${Attributes.tableClass} { width: ${Appdata.lPhonesW}px !important; align: ${Attributes.tableAlign} !important; }`;
+        break;
+      default:
+        // code block
+      } 
+      console.dir(args);
+      // let clipboardStr;
+      // clipboardStr = `.${classname} { width: ${wval}px !important; height: ${hval}px !important; }`;
       writeClipboard(id, clipboardStr);
 
     }
 
-
-
-    function ccpImgDsktpBuildCssClip(Appdata)  {
-      console.log('ccpImgDsktpBuildCssClip...');
-      // !VA The string to pass the CSS declaration to the clipboard object
-      var clipboardStr;
-      // !VA Clipboard output object 
-      var imgDisplayCSSTag = new ClipboardOutput('imgDisplayCSSTag');
-      // !VA Put the user-entered class into this property
-      imgDisplayCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpImgClass).value;
-
-      // !VA Build the css class declaration with width and height properties
-      clipboardStr = `img.${imgDisplayCSSTag.classAtt} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important }`;
-      // !VA Return the css string to the clipboard object.
-      return clipboardStr;
-
-    }
-
-    function ccpImgSmphnBuildCssClip(Appdata)  {
-      console.log('ccpImgSmphnBuildCssClip running');
-      // !VA The string to pass the CSS declaration to the clipboard object
-      var clipboardStr;
-      // !VA Clipboard output object 
-      var imgSmallPhonesCSSTag = new ClipboardOutput('imgSmallPhonesTag');
-      // !VA Put the user-entered class into this property
-      imgSmallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpImgClass).value;
-      // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `img.${imgSmallPhonesCSSTag.classAtt} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
-      // !VA Return the css string to the clipboard object.
-      return clipboardStr;
-    }
-
-    function ccpImgLgphnBuildCssClip(Appdata) {
-      console.log('ccpImgLgphnBuildCssClip running');
-      // !VA The string to pass the CSS declaration to the clipboard object
-      console.dir(Appdata);
-      var clipboardStr;
-      // !VA Clipboard output object 
-      var imgLargePhonesCSSTag = new ClipboardOutput('imgLargePhonesCSSTag');
-      // !VA Put the user-entered class into this property
-      imgLargePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpImgClass).value;
-      // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `img.${imgLargePhonesCSSTag.classAtt} { width: ${Appdata.lPhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
-      // !VA Return the css string to the clipboard object.
-      console.log('clipboardStr is: ' + clipboardStr);
-      return clipboardStr;
-    }
-
-    function ccpTdDsktpBuildCssClip(Appdata)  {
-      console.log('ccpTdDsktpBuildCssClip running');
-      // !VA The string to pass the CSS declaration to the clipboard object
-      var clipboardStr;
-      // !VA Clipboard output object 
-      var tdDisplayCSSTag = new ClipboardOutput('tdLargePhonesCSSTag');
-      // !VA Put the user-entered class into this property
-      tdDisplayCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpTdClass).value;
-      // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `td.${tdDisplayCSSTag.classAtt} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important }`;
-      // !VA Return the css string to the clipboard object.
-      return clipboardStr;
-    }
-
-    function ccpTdSmphnBuildCssClip(Appdata) {
-      console.log('ccpTdSmphnBuildCssClip running');
-      var clipboardStr;
-      // !VA Clipboard output object 
-      var tdSmallPhonesCSSTag = new ClipboardOutput('tdSmallPhonesCSSTag');
-      // !VA Put the user-entered class into this property
-      tdSmallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpTdClass).value;
-      // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `td.${tdSmallPhonesCSSTag.classAtt} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
-      // !VA Return the css string to the clipboard object.
-      return clipboardStr;
-    }
-
-    function ccpTdLgphnBuildCssClip(Appdata)  {
-      console.log('ccpTdLgphnBuildCssClip running');
-      var clipboardStr;
-      // !VA Clipboard output object 
-      var tdLargePhonesCSSTag = new ClipboardOutput('tdLargePhonesCSSTag');
-      // !VA Put the user-entered class into this property
-      tdLargePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpTdClass).value;
-      // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `td.${tdLargePhonesCSSTag.classAtt} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
-      // !VA Return the css string to the clipboard object.
-      console.log('clipboardStr is: ' + clipboardStr);
-      return clipboardStr;
-    }
-
-    function ccpTableDsktpBuildCssClip(Appdata) {
-      console.log('ccpTableDsktpBuildCssClip running');
-      // !VA The string to pass the CSS declaration to the clipboard object
-      var clipboardStr;
-      // !VA Clipboard output object 
-      var tableDisplayCSSTag = new ClipboardOutput('tableLargePhonesCSSTag');
-      // !VA Put the user-entered class into this property
-      tableDisplayCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpTableClass).value;
-      // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `table.${tableDisplayCSSTag.classAtt} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important }`;
-      // !VA Return the css string to the clipboard object.
-      return clipboardStr;
-    }
-
-    function ccpTableSmphnBuildCssClip(Appdata) {
-      console.log('ccpTableSmphnBuildCssClip running');
-      var clipboardStr;
-      // !VA Clipboard output object 
-      var tableSmallPhonesCSSTag = new ClipboardOutput('tableSmallPhonesCSSTag');
-      // !VA Put the user-entered class into this property
-      tableSmallPhonesCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpTableClass).value;
-      // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `table.${tableSmallPhonesCSSTag.classAtt} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important }`;
-      // !VA Return the css string to the clipboard object.
-      return clipboardStr;
-    }
-
-    function ccpTableLgphnBuildCssClip(Appdata) {
-      console.log('ccpTableLgphnBuildCssClip running');
-      var clipboardStr;
-      // !VA Clipboard output object 
-      var tableLargePhonesCSSTag = new ClipboardOutput('tableLargePhonesCSSTag');
-      // !VA Put the user-entered class into this property
-      tableLargePhonesCSSTag.classAtt = document.querySelector(ccpUserInput.iptCcpTableClass).value;
-      // !VA Build the css class declaration with and Appdata large phone width and height properties
-      clipboardStr = `table.${tableLargePhonesCSSTag.classAtt} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.lPhonesH}px !important }`;
-      // !VA Return the css string to the clipboard object.
-      return clipboardStr;
-    }
-
-    // !VA Working 062119_CBMods2
 
     // !VA 02.17.20 This is the same as ccpIfNoUserInput except it returns ONLY the value, not the attribute name -- but we don't need this now, because if it has not value, then, well it has no value.
     function ccpGetAttValue(att, value) {
