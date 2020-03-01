@@ -818,6 +818,8 @@ output {
   width: 92px;
   height: 120px;
   margin: 0 7px;
+  // VA! otherwise it obscures te fieldset label
+  z-index: -999;
   // border: 1px solid blue;
   .ccp-but {
     width: 90px;
@@ -826,6 +828,7 @@ output {
     float: left;
     display: block;
     border: none;
+    background-color: transparent;
     background-size: 90px 46px !important;
   }
 }

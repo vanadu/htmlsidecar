@@ -12,12 +12,14 @@ TODO: Figure out why queryDOMElements is running mutliple times per CB build.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
 
 Status:
-TODO: Fix the img output to get rid of quote string
 TODO: Add height attribute input field to CPP TD options
 TODO: Add a link wrapper to img options
 TODO: Fix the Chrome display in Ubuntu
 
 
+DONE: Fix <img> options bottom is cut 
+DONE: Pre-select Include width and height in style attributes option
+DONE: Fix the img output to get rid of quote string
 DONE: Fix the bgimage clipboard output for parent tables
 DONE: Remove checkmark styles for bgimage
 DONE: Deal with the indents and embedded tag issue.
@@ -1235,9 +1237,9 @@ var Whitty = (function () {
           target = ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk;
           checked = getCheckboxSelection(target);
           if (checked === true) {
-            str = `display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;" `;
+            str = `display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;`;
           } else {
-            str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none;border: none; outline: none;';
+            str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;';
           }
           return str;
         })(),

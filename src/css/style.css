@@ -1583,7 +1583,8 @@ fieldset {
   left: 0;
   width: 92px;
   height: 120px;
-  margin: 0 7px; }
+  margin: 0 7px;
+  z-index: -999; }
   .ccp-options-col-1 .ccp-but {
     width: 90px;
     height: 90px;
@@ -1591,6 +1592,7 @@ fieldset {
     float: left;
     display: block;
     border: none;
+    background-color: transparent;
     background-size: 90px 46px !important; }
 
 .ccp-options-col-2 {
