@@ -21,7 +21,7 @@ TODO: Fix the Chrome display
 
 
 
-
+DONE: Just spent all morning trying to fix the ONE little quirk about the RTL Position Swith CB output -- DONE WITH THAT for now. Can't waste any more time on it!
 DONE: Make Stig clearly a link
 DONE: Add a link wrapper to img options
 DONE: Figure out what to do about the px units in the height/width input fields. Only applies to td and table width and table height fields. The filter needs to be between the makeCssRule function and the clipboardStr
@@ -1060,6 +1060,7 @@ var Whitty = (function () {
       output = nodeList[0].outerHTML; 
       writeClipboard( id, output);
     }
+
 
     function writeClipboard(id, str) {
       console.log('writeClipboard running');
