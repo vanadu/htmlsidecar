@@ -995,31 +995,11 @@ var Whitty = (function () {
       // for (let i = 0; i < nodeList[0].childNodes.length; i++) {
       //   console.log('nodeList[0].childNodes[i] is: ' +  nodeList[0].childNodes[i]);
       // }
-      let indentspacing, indent, i, nextSiblingIndex, previousSiblingIndex, loopCount, output;
+      let indentspacing, indent, i, nextSiblingIndex, previousSiblingIndex, loopCount, target, hasAnchor, output;
+      // !VA Set the loop iterator to 0 and the indentspacing to two spaces
       let j;
       i = 0, indentspacing = '  ';
-      // console.log('nextSibling is: ' + nodeList[0].childNodes[0].nextSibling);
-      // for (j = 0; j < nodeList.length; j++) {
-      //   console.log('nodeList[j].id is: ' + nodeList[j].id);
-      //   console.log('nodeList[j].childNodes.length is: ' + nodeList[j].childNodes.length);
-      //   console.log('nodeList[j] is: ' + nodeList[j]);
-      // }
-      // console.log('nodeList[0].childNodes.length is: ' + nodeList[0].childNodes.length);
-      // console.log('nodeList[0].childNodes is: ' + nodeList[0].childNodes);
-      // console.log('nodeList[1].childNodes[0] is: ' + nodeList[1].childNodes[0]);
-      // console.log('nodeList[1].childNodes[0].textContent is: \n' + nodeList[0].childNodes[1].textContent);
-      // nodeList[0].childNodes[0].insertAdjacentHTML('beforebegin', indent);
 
-
-
-      // for (let k = 0; k < nodeList[0].childNodes.length; k++) {
-      //   nodeList[0].childNodes[k].insertAdjacentHTML('beforebegin', indent);
-      //   nodeList[0].childNodes[k].insertAdjacentHTML('beforeend', indent);
-      // }
-      
-
-
-      // !VA Set the loop iterator to 0 and the indentspacing to two spaces
 
       // !VA If nodeList only contains a singleton img tag, nodeList[i] will be null, so we exclude that case
       if (nodeList.length > 0) {
@@ -1030,20 +1010,33 @@ var Whitty = (function () {
         }
         // !VA If there is an element with a sibling, then increment loopCount until that element's index is reached. If there's no element with a sibling, then set loopCount to the length of nodeList and process the entire nodeList.
         nextSiblingIndex ? loopCount = nextSiblingIndex : loopCount = nodeList.length;
+        // !VA If the terminating img tag has an anchor tag wrapper, we don't want the terminating img element to be indented.So we need to find out whether the anchor is present
+        target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
+        hasAnchor = getCheckboxSelection(target);
         // !VA Loop through the elements and increase the indent with each iteration
         for (i = 0; i < loopCount; i++) {
           indent  =  '\n' + indentspacing.repeat([i]);
-          // !VA Apply the current indent to the current element before and after the tag
-          nodeList[i].insertAdjacentHTML('beforebegin', indent);
-          nodeList[i].insertAdjacentHTML('beforeend', indent);
-          // !VA This ALMOST takes care of the indented anchor -- but sadly the break on the closing a tag is handled by the parent...ugh.
-          // console.log('loopCount is: ' + loopCount);
-          // console.log('i  is: ' + i );
-          // if (i === loopCount - 1 && nodeList[i - 1].nodeName === 'A') {
-          //   console.log(' one before terminated');
-          //   console.log('nodeList[i].nodeName is: ' + nodeList[i - 1].nodeName);
-          //   console.log('bingo');
-          // } 
+          // !VA If insert  anchor is checked
+          if (hasAnchor) {
+            // !VA Don't apply indents to the img element if insert anchor is checked 
+            if (nodeList[i].nodeName === 'IMG') {
+              // !VA This should be rewritten to deal with the empty if statement before the else
+            } else {
+              // !VA For all other elements, if insert anchor is checked and the current element is the A tag, apply the indent only to the opening tag
+              if (nodeList[i].nodeName === 'A') {
+                nodeList[i].insertAdjacentHTML('beforebegin', indent);
+              } else {
+                // !VA For all other elements except the A tag, apply the normal indents
+                nodeList[i].insertAdjacentHTML('beforebegin', indent);
+                nodeList[i].insertAdjacentHTML('beforeend', indent);
+              }
+            }
+            // !VA Insert anchor is not checked, so apply the normal indents to all elements
+          } else {
+            nodeList[i].insertAdjacentHTML('beforebegin', indent);
+            nodeList[i].insertAdjacentHTML('beforeend', indent);
+
+          }
         }
         // !VA The number of elements below the sibling element is equal to the second sibling's index minus the first sibling's index -- that's the number of descendants separating the two siblings. Consequently, the first sibling's index is i and the second sibling's index is i + 5. So now loop through the siblings and their descendants, starting with the index of the first sibling. 
         loopCount = nextSiblingIndex + (previousSiblingIndex - nextSiblingIndex);
