@@ -91,15 +91,14 @@ DONE: Show/Hide CCP, make checkboxes functional.
 var Whitty = (function () {
 
   // !VA Run on page load
-  // document.addEventListener("DOMContentLoaded", function() {
-  //   setTimeout(function(){ 
-  //     console.log('timeout'); 
-  //     document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).click();
+  document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(function(){ 
+      console.log('timeout'); 
+      // !VA Don't forget you can't use button aliases here..
+      document.querySelector('#btn-ccp-make-td-tag').click();
 
-  //   }, 3000);
-
-
-  // });
+    }, 1000);
+  });
 
   // !VA DEV Test function to get the clicked element to the console
   // (function () {
@@ -687,70 +686,6 @@ var Whitty = (function () {
       return str;
     }
 
-    function makePosswitchNode() {
-      console.log('makePosswitchNode running');
-      let container, str, nodes, node;
-      let td1, table1, tr1, td2a, td2b, table2, tr2, td3, img;
-      let Attributes;
-      Attributes = getAttributes();
-
-      td1 = document.createElement( 'td');
-      table1 = document.createElement( 'table');
-      td1.appendChild(table1);
-      tr1 = document.createElement( 'tr');
-      table1.appendChild(tr1);
-      td2a = document.createElement( 'td');
-      td2b = document.createElement( 'td');
-      tr1.appendChild(td2a);
-      tr1.appendChild(td2b);
-      table2 = document.createElement( 'table');
-      // td2a.appendChild(table2);
-      // td2b.appendChild(table2);
-      tr2 = document.createElement( 'tr');
-      table2.appendChild(tr2);
-      td3 = document.createElement('td');
-      tr2.appendChild(td3);
-      img = document.createElement( 'img');
-      td3.appendChild(img);
-
-      td1.setAttribute('dir', 'rtl'),
-      td1.width='100%';
-      td1.align='left';
-      td1.bgcolor='#FFFFFF';
-      td1.valign='top';
-      table1.setAttribute( 'role', 'presentation');
-      table1.border='0';
-      table1.width='100%';
-      table1.cellPadding='0';
-      table1.cellSpacing='0';
-      td2a.width='50%';
-      td2a.setAttribute( 'class', 'stack-column-center');
-      // td2b.width='50%';
-      // td2b.innerHTML = "<p>This is bs</p>";
-      // td2b.setAttribute( 'class', 'stack-column-center');
-      table2.setAttribute( 'role', 'presentation');
-      table2.width='100%';
-      table2.cellPadding='0';
-      table2.cellSpacing='0';
-      td3.setAttribute('dir', 'ltr'),
-      td3.align='left';
-      td3.vAlign='top';
-      img.width = Attributes.imgWidth;
-      img.height = Attributes.imgHeight;
-      img.style = Attributes.imgStyle;
-      img.src = Attributes.imgSrc;
-      img.alt = Attributes.imgAlt;
-      console.log('td1.outerHTML is: \n ' + td1.outerHTML);
-      console.log('td1 is: ' + td1);
-
-      // !VA 
-      // writeClipboard(td1.outerHTML);
-
-
-      return td1;
-
-    }
-
     function makeImgNode () {
       // console.log('makeImgNode running');
       // !VA Id is passed but not used here,  because we're only building the node.
@@ -793,7 +728,6 @@ var Whitty = (function () {
     
     function makeTdNode( id ) {
       console.log('makeTdNode running');
-      console.log('id is: ' + id);
       let Attributes;
       Attributes = getAttributes();
       let tdInner, imgNode;
@@ -858,7 +792,7 @@ var Whitty = (function () {
         tdInner.innerHTML = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${indent}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${indent}<v:textbox inset="0,0,0,0">${indent}<![endif]-->${indent}<div>${indent}<!-- Put Foreground Content Here -->${indent}</div>${indent}<!--[if gte mso 9]>${indent}</v:textbox>${indent}</v:rect><![endif]-->\n`;
         break;
       case (radioSelected === 'posswitch'):
-        console.log('radioSelected === posswitch running');
+        // console.log('radioSelected === posswitch running');
         tdInner = makePosSwitchNodes();
         // console.log(tdInner);
         
@@ -873,7 +807,6 @@ var Whitty = (function () {
 
     function makeTableNode( id ) {
       // console.log('makeTdNode running');
-      console.log('id is: ' + id);
       let Attributes;
       Attributes = getAttributes();
       let tableNode, tableInner, tableOuter, tdInner, tdOuter, trInner, trOuter;
@@ -945,8 +878,7 @@ var Whitty = (function () {
     }
 
     function makeNodeList( id ) {
-      console.log('makeNodeList running');
-      console.log('id is: ' + id);
+      // console.log('makeNodeList running');
       let container, imgNode, tdNode, tableNode, topNode;
       // !VA Create the container div - we need this to access the descendant elements as children, including the parent table of all the descendent table elements.
       container = document.createElement('div');
@@ -983,7 +915,7 @@ var Whitty = (function () {
       // writeClipboard( id, str);
 
       // doIndents( id, container );
-      doIndents( id, container );
+
     }
 
     // !VA This works for everything except embedded background image tags. This is totally hacked but it works and structurally it can be improved upon at some later date
@@ -1228,7 +1160,10 @@ var Whitty = (function () {
     }
 
     function makePosSwitchNodes() {
-      // console.log('makePosSwitchNodes running');
+      console.log('makePosSwitchNodes running');
+      console.clear();
+
+
       // !VA Declare the arrays for new element names and new element types
       let containerIds = [], containerElements = [], sibling1Ids = [], sibling1Elements = [], sibling2Ids = [], sibling2Elements = [], containerNodes = [], sibling1Nodes = [], sibling2Nodes = [];
       // !VA Declare loop iterators
@@ -1236,10 +1171,19 @@ var Whitty = (function () {
       // !VA Populate the arrays with the new element names and their corresponding types
       containerIds = [ 'container', 'td_switchcontainer', 'table_switchparent', 'tr_switchparent' ];
       containerElements = [ 'div', 'td', 'table', 'tr' ];
+      
+       
+      
       sibling1Ids = [ 'container', 'td_switchsibling1', 'table_switchchild1', 'tr_switchchild1', 'td_switchcontent1', 'img_switchcontent1' ];
       sibling1Elements = [ 'div', 'td', 'table', 'tr', 'td', 'img'];
       sibling2Ids = [ 'container', 'td_switchsibling2', 'table_switchchild2', 'tr_switchchild2', 'td_switchcontent2', 'p_switchcontent2' ];
       sibling2Elements = [ 'div', 'td', 'table', 'tr', 'td', 'p'];
+      
+      // !VA This is where we have process the Insert Anchor input. sibling1Elements and sibling1Ids have to put the anchor at the second-to-last position if the Insert Anchor box is checked. 
+      if (getCheckboxSelection(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk)) {
+        sibling1Ids.splice( sibling1Ids.length - 1, 0, 'a');
+        sibling1Elements.splice( sibling1Elements.length - 1, 0, 'a');
+      }
 
       // !VA Loop through the arrays and create the elements with name and corresponding type
       for (i = 0; i < containerIds.length; i++) {
@@ -1272,17 +1216,12 @@ var Whitty = (function () {
       containerNodes[3].appendChild(sibling2Nodes[1]);
 
       let container = (containerNodes[0]);
-      console.log('containerNodes[0] is: ' + containerNodes[0]);
-      console.log(containerNodes[0]);
 
       container = setPosSwitchNodeAttributes(container);
       var tdInner = container.childNodes[0]; 
-      console.log('makePosSwitchNodes tdInner is');
-      console.log(tdInner);
       
-      var nodeList = container.querySelectorAll( '*' );
-      console.log('makePosSwitchNodes nodeList[0] is:');
-      console.log(nodeList[0]);
+      // var nodeList = container.querySelectorAll( '*' );
+      // console.log(nodeList[0]);
       
       return tdInner;
     }
@@ -1291,14 +1230,11 @@ var Whitty = (function () {
       // console.log('setPosSwitchNodeAttributes running');
       let Attributes = getAttributes();
       
-      // console.log('container is: ' + container);
-      // console.dir(container);
       var nodeList = container.querySelectorAll( '*' );
-      console.log('setPosSwitchNodeAttributes nodeList[0] is: ');
-      console.log(nodeList[0]);
+      console.log('nodeList is:');
+      console.log(nodeList);
       
 
-      
       // !VA Parent container td
       nodeList[0].setAttribute('dir', 'rtl');
       nodeList[0].width='100%';
@@ -1347,8 +1283,6 @@ var Whitty = (function () {
       // // !VA Content para
       nodeList[12].style = 'margin: 10px';
       nodeList[12].textContent = 'On larger devices, this content will appear to the left of the image. On smaller devices, the right-column content will appear above the left-column content.';
-      console.log('setPosSwitchNodeAttributes container is:');
-      console.log(container);
       return container;
     }
 
@@ -1359,7 +1293,6 @@ var Whitty = (function () {
 
       // !VA Called from eventHandler to handle clipboard button clicks
       doClipboard: function(evt) {
-        console.log('doingClipboard');
         let id = evt.target.id;
         // !VA If the clicked element id is a Make Tag button, run makeNodeList, otherwise run makeCSSRule.
         id.includes('tag') ? makeNodeList(id) : makeCssRule(id);
@@ -1432,7 +1365,6 @@ var Whitty = (function () {
         // if (typeof(window.event) != "undefined")
         // 	oNode.attachEvent("on"+evt, oFunc);
         // else
-        // console.log('oNode.id is: ' + oNode.id);
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
       // addEventHandler(document.getElementById(toolbarElements.btnTbrIncr01),'click',doit,false);
@@ -1493,7 +1425,6 @@ var Whitty = (function () {
         var clipBut;
         if(btnCcpMakeClips.hasOwnProperty(i)){
           clipBut = document.querySelector(btnCcpMakeClips[i]);
-          // console.log('clipBut.id is: ' + clipBut.id);
           addEventHandler(clipBut,'click',CBController.doClipboard,false);
         }
       }
