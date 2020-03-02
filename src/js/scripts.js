@@ -13,12 +13,15 @@ TODO: There's an issue with what to do if the user grows the image past the view
 TODO: Add some kind of fluid option to the img options. Cerberus hard codes it into the img tag. That needs to be tested. Litmus overrides the width and height style properties in the CSS media queries. Need to test before that is implemented - but there's no reason to include a fluid option if that's settable in CSS.
 
 Status:
-TODO: Add a link wrapper to img options
 TODO: Add no-image option to td options select - think about how that will affect indents first
 TODO: Change msg-table to flex div
-TODO: Fix the Chrome display in Ubuntu
-TODO: Make Stig clearly a link
+TODO: Fix the Chrome display 
 
+
+
+
+DONE: Make Stig clearly a link
+DONE: Add a link wrapper to img options
 DONE: Figure out what to do about the px units in the height/width input fields. Only applies to td and table width and table height fields. The filter needs to be between the makeCssRule function and the clipboardStr
 DONE : Fix CSS Rule CB output
 DONE: Fix <img> options bottom is cut 
