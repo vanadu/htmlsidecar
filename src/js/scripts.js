@@ -11,8 +11,10 @@ TODO: The CSS output will need to be revisited. You'd never need to output the w
 TODO: Figure out why queryDOMElements is running mutliple times per CB build.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
 TODO: Add some kind of fluid option to the img options. Cerberus hard codes it into the img tag. That needs to be tested. Litmus overrides the width and height style properties in the CSS media queries. Need to test before that is implemented - but there's no reason to include a fluid option if that's settable in CSS.
+TODO: Now the rtl position switch doesn't do the indents right, the td after the img wrong. I need to revisit this indent thing for the millionth time.
 
 Status:
+TODO: Add image swap
 TODO: Add no-image option to td options select - think about how that will affect indents first
 TODO: Change msg-table to flex div
 TODO: Fix the Chrome display 
@@ -1038,7 +1040,6 @@ var Whitty = (function () {
           } else {
             nodeList[i].insertAdjacentHTML('beforebegin', indent);
             nodeList[i].insertAdjacentHTML('beforeend', indent);
-
           }
         }
         // !VA The number of elements below the sibling element is equal to the second sibling's index minus the first sibling's index -- that's the number of descendants separating the two siblings. Consequently, the first sibling's index is i and the second sibling's index is i + 5. So now loop through the siblings and their descendants, starting with the index of the first sibling. 
