@@ -1184,31 +1184,49 @@ var Whitty = (function () {
         sibling1Ids.splice( sibling1Ids.length - 1, 0, 'a');
         sibling1Elements.splice( sibling1Elements.length - 1, 0, 'a');
       }
+      // !VA Branch setPosSwitchNodeAttributes here
+      // !VA Now we have two branches of the node tree, each with a different number of descendants. So we have to loop through them separately to create their nodes.
+
 
       // !VA Loop through the arrays and create the elements with name and corresponding type
+      // // !VA Start with the container items that are parents of the sibling elements.
       for (i = 0; i < containerIds.length; i++) {
         containerNodes[i] = document.createElement(containerElements[i]);
         containerNodes[i].id = containerIds[i];
         // console.log('containerNodes[i].outerHTML is: ' + containerNodes[i].outerHTML);
       }
       // !VA Append each element with its respective child
-      for (j = 0; j < containerNodes.length - 1; j++) {
-        k = j + 1;
-        containerNodes[j].appendChild(containerNodes[k]);
+      for (i = 0; i < containerNodes.length - 1; i++) {
+        j = i + 1;
+        containerNodes[i].appendChild(containerNodes[j]);
       }
+
+
+      // !VA Now do the first sibling nodes
       for (i = 0; i < sibling1Ids.length; i++) {
         sibling1Nodes[i] = document.createElement(sibling1Elements[i]);
         sibling1Nodes[i].id = sibling1Ids[i];
         // console.log('sibling1Nodes[i].outerHTML is: ' + sibling1Nodes[i].outerHTML);
-        sibling2Nodes[i] = document.createElement(sibling2Elements[i]);
-        sibling2Nodes[i].id = sibling2Ids[i];
-        // console.log('sibling2Nodes[i].outerHTML is: ' + sibling2Nodes[i].outerHTML);
       }
       // !VA Append each element with its respective child
-      for (j = 0; j < sibling1Nodes.length - 1; j++) {
-        k = j + 1;
-        sibling1Nodes[j].appendChild(sibling1Nodes[k]);
-        sibling2Nodes[j].appendChild(sibling2Nodes[k]);
+      for (i = 0; i < sibling1Nodes.length - 1; i++) {
+        j = i + 1;
+        // !VA j is the element one position lower on the tree from i, i.e. the child
+        sibling1Nodes[i].appendChild(sibling1Nodes[j]);
+      }
+
+      // !VA Now do the second sibling nodes
+      // !VA Now do the first sibling nodes
+      for (i = 0; i < sibling2Ids.length; i++) {
+        sibling2Nodes[i] = document.createElement(sibling2Elements[i]);
+        sibling2Nodes[i].id = sibling2Ids[i];
+        // console.log('sibling1Nodes[i].outerHTML is: ' + sibling1Nodes[i].outerHTML);
+      }
+      // !VA Append each element with its respective child
+      for (i = 0; i < sibling2Nodes.length - 1; i++) {
+        j = i + 1;
+        // !VA j is the element one position lower on the tree from i, i.e. the child
+        sibling2Nodes[i].appendChild(sibling2Nodes[j]);
       }
 
       // !VA Append the siblings to the parent tr
@@ -1229,6 +1247,8 @@ var Whitty = (function () {
     function setPosSwitchNodeAttributes(container) {
       // console.log('setPosSwitchNodeAttributes running');
       let Attributes = getAttributes();
+
+      // !VA Branch setPosSwitchNodeAttributes here
       
       var nodeList = container.querySelectorAll( '*' );
       console.log('nodeList is:');
