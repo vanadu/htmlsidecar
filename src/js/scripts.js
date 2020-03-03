@@ -914,7 +914,7 @@ var Whitty = (function () {
       // console.log(str);
       // writeClipboard( id, str);
 
-      // doIndents( id, container );
+      doIndents( id, container );
 
     }
 
@@ -1235,11 +1235,11 @@ var Whitty = (function () {
 
       let container = (containerNodes[0]);
 
-      let testcontainer = (containerNodes[0]);
-      testTuesday(container);
+      // let testcontainer = (containerNodes[0]);
+      // testTuesday(container);
 
       // !VA These are the real things
-      // container = setPosSwitchNodeAttributes(container);
+      container = setPosSwitchNodeAttributes(container);
       // !VA These are the real things
       var tdInner = container.childNodes[0]; 
       // !VA These are the real things
@@ -1438,16 +1438,6 @@ var Whitty = (function () {
       
       // !VA The below didn't work for me
       document.querySelectorAll('[id=td_switchcontainer]').forEach( x=> x.setAttribute('width','1200'));
-
-      // !VA Trying this example from https://ultimatecourses.com/blog/ditch-the-array-foreach-call-nodelist-hack
-
-
-
-
-
-
-      
-
 
       // !VA Parent container td
       nodeList[0].setAttribute('dir', 'rtl');
