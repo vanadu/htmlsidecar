@@ -1235,14 +1235,179 @@ var Whitty = (function () {
 
       let container = (containerNodes[0]);
 
-      container = setPosSwitchNodeAttributes(container);
+      let testcontainer = (containerNodes[0]);
+      testTuesday(container);
+
+      // !VA These are the real things
+      // container = setPosSwitchNodeAttributes(container);
+      // !VA These are the real things
       var tdInner = container.childNodes[0]; 
-      
+      // !VA These are the real things
       // var nodeList = container.querySelectorAll( '*' );
       // console.log(nodeList[0]);
-      
+      // !VA test, comment out below
+
+
+
       return tdInner;
     }
+
+    function testTuesday(testcontainer) {
+      console.log('testTuesday running');
+
+      let Attributes = getAttributes();
+      var myNodeList, i;
+      let td_switchcontainerAttr, table_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr, td_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, td_switchcontent2Attr, p_switchcontent2Attr;
+
+      myNodeList = testcontainer.querySelectorAll( '*' );
+
+      td_switchcontainerAttr = {
+        dir: 'rtl',
+        width: '100%',
+        align: 'left',
+        bgcolor: '#FFFFFF'
+      };
+      table_switchparentAttr = {
+        role: 'presentation',
+        border: '0',
+        width: '100%',
+        cellPadding: '0',
+        cellSpacing: '0'
+      };
+      td_switchsibling1Attr = {
+        width: '50%',
+        class: 'stack-column-center'
+      };
+      table_switchchild1Attr = {
+        role: 'presentation',
+        border: '0',
+        width: '100%',
+        cellPadding: '0',
+        cellSpacing: '0'
+      };
+      td_switchcontent1Attr = {
+        dir: 'ltr',
+        align: 'left',
+        vAlign: 'top'
+      };
+      img_switchcontent1Attr = {
+        width: Attributes.imgWidth,
+        height: Attributes.imgHeight,
+        style: Attributes.imgStyle,
+        src: Attributes.imgSrc,
+        alt: Attributes.imgAlt
+      };
+      td_switchsibling2Attr = {
+        width: '50%',
+        class: 'stack-column-center'
+      };
+      table_switchchild2Attr = {
+        role: 'presentation',
+        border: '0',
+        width: '100%',
+        cellPadding: '0',
+        cellSpacing: '0'
+      };
+      td_switchsibling2Attr = {
+        width: '50%',
+        class: 'stack-column-center'
+      };
+      td_switchcontent2Attr = {
+        dir: 'ltr',
+        align: 'left',
+        vAlign: 'top'
+      };
+      p_switchcontent2Attr = {
+        style: 'margin: 10px',
+      };
+
+
+
+
+
+      for (i = 0; i < myNodeList.length; i++) {
+        if (myNodeList[i].id === 'td_switchcontainer') {
+          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
+          for (let entries of Object.entries(td_switchcontainerAttr)) {
+            myNodeList[i].setAttribute( entries[0], entries[1]);
+          }
+        }
+      }
+      for (i = 0; i < myNodeList.length; i++) {
+        if (myNodeList[i].id === 'table_switchparent') {
+          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
+          for (let entries of Object.entries(table_switchparentAttr)) {
+            myNodeList[i].setAttribute( entries[0], entries[1]);
+          }
+        }
+      }
+      for (i = 0; i < myNodeList.length; i++) {
+        if (myNodeList[i].id === 'td_switchsibling1') {
+          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
+          for (let entries of Object.entries(td_switchsibling1Attr)) {
+            myNodeList[i].setAttribute( entries[0], entries[1]);
+          }
+        }
+      }
+      for (i = 0; i < myNodeList.length; i++) {
+        if (myNodeList[i].id === 'table_switchchild1') {
+          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
+          for (let entries of Object.entries(table_switchchild1Attr)) {
+            myNodeList[i].setAttribute( entries[0], entries[1]);
+          }
+        }
+      }
+      for (i = 0; i < myNodeList.length; i++) {
+        if (myNodeList[i].id === 'td_switchcontent1') {
+          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
+          for (let entries of Object.entries(td_switchcontent1Attr)) {
+            myNodeList[i].setAttribute( entries[0], entries[1]);
+          }
+        }
+      }
+      for (i = 0; i < myNodeList.length; i++) {
+        if (myNodeList[i].id === 'img_switchcontent1') {
+          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
+          for (let entries of Object.entries(img_switchcontent1Attr)) {
+            myNodeList[i].setAttribute( entries[0], entries[1]);
+          }
+        }
+      }
+      for (i = 0; i < myNodeList.length; i++) {
+        if (myNodeList[i].id === 'td_switchsibling2') {
+          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
+          for (let entries of Object.entries(td_switchsibling2Attr)) {
+            myNodeList[i].setAttribute( entries[0], entries[1]);
+          }
+        }
+      }
+      for (i = 0; i < myNodeList.length; i++) {
+        if (myNodeList[i].id === 'table_switchchild2') {
+          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
+          for (let entries of Object.entries(table_switchchild2Attr)) {
+            myNodeList[i].setAttribute( entries[0], entries[1]);
+          }
+        }
+      }
+      for (i = 0; i < myNodeList.length; i++) {
+        if (myNodeList[i].id === 'td_switchcontent2') {
+          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
+          for (let entries of Object.entries(td_switchcontent2Attr)) {
+            myNodeList[i].setAttribute( entries[0], entries[1]);
+          }
+        }
+      }
+      for (i = 0; i < myNodeList.length; i++) {
+        if (myNodeList[i].id === 'p_switchcontent2') {
+          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
+          for (let entries of Object.entries(p_switchcontent2Attr)) {
+            myNodeList[i].setAttribute( entries[0], entries[1]);
+          }
+        }
+      }
+      console.log(myNodeList);
+    }
+
 
     function setPosSwitchNodeAttributes(container) {
       // console.log('setPosSwitchNodeAttributes running');
@@ -1254,6 +1419,18 @@ var Whitty = (function () {
       console.log('nodeList is:');
       console.log(nodeList);
       
+      // !VA The below didn't work for me
+      document.querySelectorAll('[id=td_switchcontainer]').forEach( x=> x.setAttribute('width','1200'));
+
+      // !VA Trying this example from https://ultimatecourses.com/blog/ditch-the-array-foreach-call-nodelist-hack
+
+
+
+
+
+
+      
+
 
       // !VA Parent container td
       nodeList[0].setAttribute('dir', 'rtl');
