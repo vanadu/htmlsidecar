@@ -1174,16 +1174,16 @@ var Whitty = (function () {
       
        
       
-      sibling1Ids = [ 'container', 'td_switchsibling1', 'table_switchchild1', 'tr_switchchild1', 'td_switchcontent1', 'img_switchcontent1' ];
-      sibling1Elements = [ 'div', 'td', 'table', 'tr', 'td', 'img'];
+      sibling1Ids = [ 'container', 'td_switchsibling1', 'table_switchchild1', 'tr_switchchild1', 'td_switchcontent1', 'a_switchcontent1','img_switchcontent1' ];
+      sibling1Elements = [ 'div', 'td', 'table', 'tr', 'td', 'a', 'img'];
       sibling2Ids = [ 'container', 'td_switchsibling2', 'table_switchchild2', 'tr_switchchild2', 'td_switchcontent2', 'p_switchcontent2' ];
       sibling2Elements = [ 'div', 'td', 'table', 'tr', 'td', 'p'];
       
       // !VA This is where we have process the Insert Anchor input. sibling1Elements and sibling1Ids have to put the anchor at the second-to-last position if the Insert Anchor box is checked. 
-      if (getCheckboxSelection(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk)) {
-        sibling1Ids.splice( sibling1Ids.length - 1, 0, 'a');
-        sibling1Elements.splice( sibling1Elements.length - 1, 0, 'a');
-      }
+      // if (getCheckboxSelection(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk)) {
+      //   sibling1Ids.splice( sibling1Ids.length - 1, 0, 'a');
+      //   sibling1Elements.splice( sibling1Elements.length - 1, 0, 'a');
+      // }
       // !VA Branch setPosSwitchNodeAttributes here
       // !VA Now we have two branches of the node tree, each with a different number of descendants. So we have to loop through them separately to create their nodes.
 
@@ -1257,9 +1257,11 @@ var Whitty = (function () {
 
       let Attributes = getAttributes();
       var myNodeList, i;
-      let td_switchcontainerAttr, table_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr, td_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, td_switchcontent2Attr, p_switchcontent2Attr;
+      // let td_switchcontainerAttr, table_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr, td_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, td_switchcontent2Attr, p_switchcontent2Attr;
+      let td_switchcontainerAttr, table_switchparentAttr, tr_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr, tr_switchchild1Attr, td_switchcontent1Attr, a_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, tr_switchchild2Attr, td_switchcontent2Attr, p_switchcontent2Attr; 
 
       myNodeList = testcontainer.querySelectorAll( '*' );
+
 
       td_switchcontainerAttr = {
         dir: 'rtl',
@@ -1274,6 +1276,9 @@ var Whitty = (function () {
         cellPadding: '0',
         cellSpacing: '0'
       };
+      tr_switchparentAttr = {
+
+      };
       td_switchsibling1Attr = {
         width: '50%',
         class: 'stack-column-center'
@@ -1285,10 +1290,17 @@ var Whitty = (function () {
         cellPadding: '0',
         cellSpacing: '0'
       };
+      tr_switchchild1Attr = {
+
+      };
       td_switchcontent1Attr = {
         dir: 'ltr',
         align: 'left',
         vAlign: 'top'
+      };
+      a_switchcontent1Attr = {
+        href: '#',
+        color: 'red'
       };
       img_switchcontent1Attr = {
         width: Attributes.imgWidth,
@@ -1308,9 +1320,8 @@ var Whitty = (function () {
         cellPadding: '0',
         cellSpacing: '0'
       };
-      td_switchsibling2Attr = {
-        width: '50%',
-        class: 'stack-column-center'
+      tr_switchchild2Attr = {
+
       };
       td_switchcontent2Attr = {
         dir: 'ltr',
@@ -1320,8 +1331,6 @@ var Whitty = (function () {
       p_switchcontent2Attr = {
         style: 'margin: 10px',
       };
-
-
 
 
 
@@ -1361,6 +1370,14 @@ var Whitty = (function () {
         if (myNodeList[i].id === 'td_switchcontent1') {
           console.log('myNodeList[i].id is: ' + myNodeList[i].id);
           for (let entries of Object.entries(td_switchcontent1Attr)) {
+            myNodeList[i].setAttribute( entries[0], entries[1]);
+          }
+        }
+      }
+      for (i = 0; i < myNodeList.length; i++) {
+        if (myNodeList[i].id === 'a_switchcontent1') {
+          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
+          for (let entries of Object.entries(a_switchcontent1Attr)) {
             myNodeList[i].setAttribute( entries[0], entries[1]);
           }
         }
