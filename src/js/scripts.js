@@ -936,7 +936,7 @@ var Whitty = (function () {
       let indentspacing, indent, i, nextSiblingIndex, previousSiblingIndex, loopCount, target, hasAnchor, output;
       // !VA Set the loop iterator to 0 and the indentspacing to two spaces
       let j;
-      i = 0, indentspacing = 'XX';
+      i = 0, indentspacing = '  ';
 
       console.clear();
       // !VA If nodeList only contains a singleton img tag, nodeList[i] will be null, so we exclude that case
@@ -946,7 +946,6 @@ var Whitty = (function () {
           if (nodeList[i].nextSibling) { nextSiblingIndex = i; }
           if (nodeList[i].previousSibling) {previousSiblingIndex = i;}
         }
-        
         // !VA If there is an element with a sibling, then increment loopCount until that element's index is reached. If there's no element with a sibling, then set loopCount to the length of nodeList and process the entire nodeList.
         nextSiblingIndex ? loopCount = nextSiblingIndex : loopCount = nodeList.length;
         // !VA If the terminating img tag has an anchor tag wrapper, we don't want the terminating img element to be indented.So we need to find out whether the anchor is present
@@ -957,14 +956,8 @@ var Whitty = (function () {
         let indentafterbegin;
         let indentafterend;
         for (i = 0; i < loopCount; i++) {
-          indentafterbegin  =  '\nAA' + indentspacing.repeat([i]);
+          indentafterbegin  =  '\n  ' + indentspacing.repeat([i]);
           indentafterend = '\n' + indentspacing.repeat([i]);
-
-
-
-
-
-
           // !VA If insert  anchor is checked
           if (hasAnchor) {
             // !VA Don't apply indents to the img element if insert anchor is checked 
@@ -989,11 +982,18 @@ var Whitty = (function () {
         var loopCount2 = nextSiblingIndex + (previousSiblingIndex - nextSiblingIndex);
         for (i = nextSiblingIndex; i < loopCount2; i++) {
           // !VA Increase the indent with each iteration. 
-          indentafterbegin  =  '\nBB' + indentspacing.repeat([i]);
+          indentafterbegin  =  '\n  ' + indentspacing.repeat([i]);
           indentafterend = '\n' + indentspacing.repeat([i]);
           indent  =  '\n' + indentspacing.repeat([i]);
           // !VA The terminating element in the tree gets no indent and no line break - the indent and line break are covered by its parent.
           if (i === nextSiblingIndex) { indent = ''; }
+          if (nodeList[i].nodeName === 'A') {
+            // !VA This gets rid of the indents on the A tag, at least for the clipboard output.
+            console.log('nodeList[i].oouterHTML is: ' + nodeList[i].outerHTML);
+            nodeList[i].outerHTML = `<a href='#' color='red'><img style='display: block; width: 625px; height: 525px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;' src='img/_625X525.png' alt='' width='625' height='525'></a>`;
+
+            console.log('nodeList[i].outerHTML is now: ' + nodeList[i].outerHTML);
+          }
           console.log('loopCount is now: ' + loopCount);
           if ( i === 7) {
             console.log('nodeList[i].id is: ' + nodeList[i].id);
@@ -1006,7 +1006,7 @@ var Whitty = (function () {
             nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
             nodeList[i].insertAdjacentHTML('beforeend', indentafterend);
             // !VA Apply the indent to the previousSibling
-            indentafterbegin  =  '\nBB' + indentspacing.repeat([i - 1]);
+            indentafterbegin  =  '\n  ' + indentspacing.repeat([i - 1]);
             indentafterend = '\n' + indentspacing.repeat([i - 1]);
             nodeList[i + 5].insertAdjacentHTML('beforebegin', indentafterbegin);
             nodeList[i + 5].insertAdjacentHTML('afterend', indentafterend);
@@ -1365,21 +1365,15 @@ var Whitty = (function () {
         }
       }
       // !VA Now we no longer need the IDs, so we can delete them.
-      // for (let i = 0; i < nodeList.length; i++) {
-      //   console.log('nodeList[i] is: ' +  nodeList[i]);
-      //   nodeList[i].removeAttribute('id');
-      // }
+      for (let i = 0; i < nodeList.length; i++) {
+        console.log('nodeList[i] is: ' +  nodeList[i]);
+        nodeList[i].removeAttribute('id');
+      }
       // !VA Return the container with the attributes to the calling function
       console.log('nodeList is now: ');
       console.log(nodeList);
       return container;
     }
-
-
-      
-
-
-    
 
     // !VA CBController public functions 
     return {
