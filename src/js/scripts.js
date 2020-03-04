@@ -91,14 +91,14 @@ DONE: Show/Hide CCP, make checkboxes functional.
 var Whitty = (function () {
 
   // !VA Run on page load
-  document.addEventListener("DOMContentLoaded", function() {
-    setTimeout(function(){ 
-      console.log('timeout'); 
-      // !VA Don't forget you can't use button aliases here..
-      document.querySelector('#btn-ccp-make-td-tag').click();
+  // document.addEventListener("DOMContentLoaded", function() {
+  //   setTimeout(function(){ 
+  //     console.log('timeout'); 
+  //     // !VA Don't forget you can't use button aliases here..
+  //     document.querySelector('#btn-ccp-make-td-tag').click();
 
-    }, 1000);
-  });
+  //   }, 1000);
+  // });
 
   // !VA DEV Test function to get the clicked element to the console
   // (function () {
@@ -769,7 +769,7 @@ var Whitty = (function () {
         fallback = '#7bceeb';
         Attributes.tdBgcolor ? bgcolor = Attributes.tdBgcolor : bgcolor = fallback;
         tdInner.bgColor = bgcolor;
-        console.log('Attributes.tableIncludeWrapper is: ' + Attributes.tableIncludeWrapper);
+        // console.log('Attributes.tableIncludeWrapper is: ' + Attributes.tableIncludeWrapper);
         // We have set the indent here because it would be much too complicated to do loop through all these nodes in doIndents. Here, all we have to do is pass in the string with pre-defined indents based on the button that was clicked to generate the HTML.
 
         switch(true) {
@@ -1161,33 +1161,28 @@ var Whitty = (function () {
 
     function makePosSwitchNodes() {
       console.log('makePosSwitchNodes running');
-      console.clear();
-
-
       // !VA Declare the arrays for new element names and new element types
       let containerIds = [], containerElements = [], sibling1Ids = [], sibling1Elements = [], sibling2Ids = [], sibling2Elements = [], containerNodes = [], sibling1Nodes = [], sibling2Nodes = [];
       // !VA Declare loop iterators
-      let i, j, k;
+      let i, j, index;
       // !VA Populate the arrays with the new element names and their corresponding types
       containerIds = [ 'container', 'td_switchcontainer', 'table_switchparent', 'tr_switchparent' ];
       containerElements = [ 'div', 'td', 'table', 'tr' ];
-      
-       
-      
-      sibling1Ids = [ 'container', 'td_switchsibling1', 'table_switchchild1', 'tr_switchchild1', 'td_switchcontent1', 'a_switchcontent1','img_switchcontent1' ];
+      // !VA We include the anchor wrapper for the img here, and remove it from the array later if the checkbox is checked.
+      sibling1Ids = [ 'container', 'td_switchsibling1', 'table_switchchild1', 'tr_switchchild1', 'td_switchcontent1', 'a_switchtcontent','img_switchcontent1' ];
       sibling1Elements = [ 'div', 'td', 'table', 'tr', 'td', 'a', 'img'];
       sibling2Ids = [ 'container', 'td_switchsibling2', 'table_switchchild2', 'tr_switchchild2', 'td_switchcontent2', 'p_switchcontent2' ];
       sibling2Elements = [ 'div', 'td', 'table', 'tr', 'td', 'p'];
-      
-      // !VA This is where we have process the Insert Anchor input. sibling1Elements and sibling1Ids have to put the anchor at the second-to-last position if the Insert Anchor box is checked. 
-      // if (getCheckboxSelection(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk)) {
-      //   sibling1Ids.splice( sibling1Ids.length - 1, 0, 'a');
-      //   sibling1Elements.splice( sibling1Elements.length - 1, 0, 'a');
-      // }
-      // !VA Branch setPosSwitchNodeAttributes here
+      // !VA We have to handle the Include anchor tag case here because once the nodeList is created, it's a hack to modify it. So we remove the a tag from the arrays before creating the nodeList and setting the node attributes. We'll have to remove the corresponding a tag index from the nodeAttributes array as well otherwise the loop assigning the attributes to the nodeList will break. Note: this is a HACK! But this whole makePosSwitchNodes thing is a hack anyway so lets' make it simple human-readable.
+      // !VA Get the checkmark target
+      var target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
+      // !VA If Include anchor is NOT checked, remove the anchor item from both sibling1 arrays and 
+      if (!getCheckboxSelection(target) ) {
+        index = 5;
+        sibling1Ids.splice(index, 1);
+        sibling1Elements.splice(index, 1);
+      }   
       // !VA Now we have two branches of the node tree, each with a different number of descendants. So we have to loop through them separately to create their nodes.
-
-
       // !VA Loop through the arrays and create the elements with name and corresponding type
       // // !VA Start with the container items that are parents of the sibling elements.
       for (i = 0; i < containerIds.length; i++) {
@@ -1200,9 +1195,7 @@ var Whitty = (function () {
         j = i + 1;
         containerNodes[i].appendChild(containerNodes[j]);
       }
-
-
-      // !VA Now do the first sibling nodes
+      // !VA Now create the first sibling's nodes
       for (i = 0; i < sibling1Ids.length; i++) {
         sibling1Nodes[i] = document.createElement(sibling1Elements[i]);
         sibling1Nodes[i].id = sibling1Ids[i];
@@ -1215,12 +1208,10 @@ var Whitty = (function () {
         sibling1Nodes[i].appendChild(sibling1Nodes[j]);
       }
 
-      // !VA Now do the second sibling nodes
-      // !VA Now do the first sibling nodes
+      // !VA Now create the second sibling's nodes
       for (i = 0; i < sibling2Ids.length; i++) {
         sibling2Nodes[i] = document.createElement(sibling2Elements[i]);
         sibling2Nodes[i].id = sibling2Ids[i];
-        // console.log('sibling1Nodes[i].outerHTML is: ' + sibling1Nodes[i].outerHTML);
       }
       // !VA Append each element with its respective child
       for (i = 0; i < sibling2Nodes.length - 1; i++) {
@@ -1228,41 +1219,30 @@ var Whitty = (function () {
         // !VA j is the element one position lower on the tree from i, i.e. the child
         sibling2Nodes[i].appendChild(sibling2Nodes[j]);
       }
-
       // !VA Append the siblings to the parent tr
       containerNodes[3].appendChild(sibling1Nodes[1]);
       containerNodes[3].appendChild(sibling2Nodes[1]);
-
+      // !VA Set the container to return to the top node of the tree
       let container = (containerNodes[0]);
-
-      // let testcontainer = (containerNodes[0]);
-      // testTuesday(container);
-
-      // !VA These are the real things
+      // !VA Call the function that sets the attributes for the nodes
       container = setPosSwitchNodeAttributes(container);
-      // !VA These are the real things
+      // !VA Copy the container to tdInner. This is for nomenclature, because all the other makeNode functions return the container under the name tdInner
       var tdInner = container.childNodes[0]; 
-      // !VA These are the real things
-      // var nodeList = container.querySelectorAll( '*' );
-      // console.log(nodeList[0]);
-      // !VA test, comment out below
-
-
-
+      // !VA Return the container to makeTdNodes
       return tdInner;
     }
 
-    function testTuesday(testcontainer) {
-      console.log('testTuesday running');
-
+    function setPosSwitchNodeAttributes(container) {
+      console.log('setPosSwitchNodeAttributes running');
+      // !VA Get the Td attributes, we need them for height and width
+      var nodeList, index;
       let Attributes = getAttributes();
-      var myNodeList, i;
-      // let td_switchcontainerAttr, table_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr, td_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, td_switchcontent2Attr, p_switchcontent2Attr;
+      let nodeAttributes = [];
+      // !VA Initialize the objects that contain the attributes for the individual nodes
       let td_switchcontainerAttr, table_switchparentAttr, tr_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr, tr_switchchild1Attr, td_switchcontent1Attr, a_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, tr_switchchild2Attr, td_switchcontent2Attr, p_switchcontent2Attr; 
-
-      myNodeList = testcontainer.querySelectorAll( '*' );
-
-
+      // !VA Make the nodeList from the container passed in from makePosSwitchNodes to apply the attributes to.
+      nodeList = container.querySelectorAll( '*' );
+      // !VA Build the objects that contain the attributes that will be set on the nodeList nodes.
       td_switchcontainerAttr = {
         dir: 'rtl',
         width: '100%',
@@ -1276,6 +1256,7 @@ var Whitty = (function () {
         cellPadding: '0',
         cellSpacing: '0'
       };
+      // !VA The TR nodes have no attributes but we need them as placeholders to keep the array length the same as the nodeList.
       tr_switchparentAttr = {
 
       };
@@ -1290,6 +1271,7 @@ var Whitty = (function () {
         cellPadding: '0',
         cellSpacing: '0'
       };
+      // !VA The TR nodes have no attributes but we need them as placeholders to keep the array length the same as the nodeList.
       tr_switchchild1Attr = {
 
       };
@@ -1320,6 +1302,7 @@ var Whitty = (function () {
         cellPadding: '0',
         cellSpacing: '0'
       };
+      // !VA The TR nodes have no attributes but we need them as placeholders to keep the array length the same as the nodeList.
       tr_switchchild2Attr = {
 
       };
@@ -1332,164 +1315,44 @@ var Whitty = (function () {
         style: 'margin: 10px',
       };
 
+      // !VA Create the array with the attribute objects. We use this array to cycle through the nodeList and apply the attributes to the individual nodes. I tried many ways to do this but was not able to assign these objects to the individual nodes any other way than to loop through them ensuring that the array and nodeList length were identical. If there is a way to assign attributes to nodes using the node ID as index, I'd like to learn that technique.
+      nodeAttributes = [ td_switchcontainerAttr, table_switchparentAttr,  tr_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr,  tr_switchchild1Attr, td_switchcontent1Attr, a_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, tr_switchchild2Attr, td_switchcontent2Attr, p_switchcontent2Attr ];
 
-
-      for (i = 0; i < myNodeList.length; i++) {
-        if (myNodeList[i].id === 'td_switchcontainer') {
-          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
-          for (let entries of Object.entries(td_switchcontainerAttr)) {
-            myNodeList[i].setAttribute( entries[0], entries[1]);
-          }
+      // !VA Remove the anchor attributes from the array if the Include anchor checkbox is checked. The a tag is at position 7 in the attributes array.
+      var target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
+      if (!getCheckboxSelection(target)) {
+        index = 7;
+        nodeAttributes.splice(index, 1);
+      } 
+      // !VA Assign the attributes to the nodes using the length of the nodeAttribute array as index.
+      for (let i = 0; i < nodeAttributes.length; i++) {
+        for (let entries of Object.entries(nodeAttributes[i])) {
+          nodeList[i].setAttribute( entries[0], entries[1]);
         }
       }
-      for (i = 0; i < myNodeList.length; i++) {
-        if (myNodeList[i].id === 'table_switchparent') {
-          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
-          for (let entries of Object.entries(table_switchparentAttr)) {
-            myNodeList[i].setAttribute( entries[0], entries[1]);
-          }
+      // !VA Last modification is to add the textContent to the p tag. We do it now because it's a node, not an attribute, so we can't do it in the set attribute loop. We don't do it earlier because it might add a node and increment the array length, thus breaking the set attribute loop.
+      // nodeList.(p_switchcontent).textContent = 'ADD YOUR TEXT CONTENT HERE';
+      for (let i = 0; i < nodeList.length; i++) {
+        if (nodeList[i].id === 'p_switchcontent2') {
+          nodeList[i].textContent = 'ADD YOUR TEXT CONTENT HERE';
         }
       }
-      for (i = 0; i < myNodeList.length; i++) {
-        if (myNodeList[i].id === 'td_switchsibling1') {
-          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
-          for (let entries of Object.entries(td_switchsibling1Attr)) {
-            myNodeList[i].setAttribute( entries[0], entries[1]);
-          }
-        }
+      // !VA Now we no longer need the IDs, so we can delete them.
+      for (let i = 0; i < nodeList.length; i++) {
+        console.log('nodeList[i] is: ' +  nodeList[i]);
+        nodeList[i].removeAttribute('id');
       }
-      for (i = 0; i < myNodeList.length; i++) {
-        if (myNodeList[i].id === 'table_switchchild1') {
-          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
-          for (let entries of Object.entries(table_switchchild1Attr)) {
-            myNodeList[i].setAttribute( entries[0], entries[1]);
-          }
-        }
-      }
-      for (i = 0; i < myNodeList.length; i++) {
-        if (myNodeList[i].id === 'td_switchcontent1') {
-          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
-          for (let entries of Object.entries(td_switchcontent1Attr)) {
-            myNodeList[i].setAttribute( entries[0], entries[1]);
-          }
-        }
-      }
-      for (i = 0; i < myNodeList.length; i++) {
-        if (myNodeList[i].id === 'a_switchcontent1') {
-          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
-          for (let entries of Object.entries(a_switchcontent1Attr)) {
-            myNodeList[i].setAttribute( entries[0], entries[1]);
-          }
-        }
-      }
-      for (i = 0; i < myNodeList.length; i++) {
-        if (myNodeList[i].id === 'img_switchcontent1') {
-          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
-          for (let entries of Object.entries(img_switchcontent1Attr)) {
-            myNodeList[i].setAttribute( entries[0], entries[1]);
-          }
-        }
-      }
-      for (i = 0; i < myNodeList.length; i++) {
-        if (myNodeList[i].id === 'td_switchsibling2') {
-          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
-          for (let entries of Object.entries(td_switchsibling2Attr)) {
-            myNodeList[i].setAttribute( entries[0], entries[1]);
-          }
-        }
-      }
-      for (i = 0; i < myNodeList.length; i++) {
-        if (myNodeList[i].id === 'table_switchchild2') {
-          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
-          for (let entries of Object.entries(table_switchchild2Attr)) {
-            myNodeList[i].setAttribute( entries[0], entries[1]);
-          }
-        }
-      }
-      for (i = 0; i < myNodeList.length; i++) {
-        if (myNodeList[i].id === 'td_switchcontent2') {
-          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
-          for (let entries of Object.entries(td_switchcontent2Attr)) {
-            myNodeList[i].setAttribute( entries[0], entries[1]);
-          }
-        }
-      }
-      for (i = 0; i < myNodeList.length; i++) {
-        if (myNodeList[i].id === 'p_switchcontent2') {
-          console.log('myNodeList[i].id is: ' + myNodeList[i].id);
-          for (let entries of Object.entries(p_switchcontent2Attr)) {
-            myNodeList[i].setAttribute( entries[0], entries[1]);
-          }
-        }
-      }
-      console.log(myNodeList);
-    }
-
-
-    function setPosSwitchNodeAttributes(container) {
-      // console.log('setPosSwitchNodeAttributes running');
-      let Attributes = getAttributes();
-
-      // !VA Branch setPosSwitchNodeAttributes here
-      
-      var nodeList = container.querySelectorAll( '*' );
-      console.log('nodeList is:');
+      // !VA Return the container with the attributes to the calling function
+      console.log('nodeList is now: ');
       console.log(nodeList);
-      
-      // !VA The below didn't work for me
-      document.querySelectorAll('[id=td_switchcontainer]').forEach( x=> x.setAttribute('width','1200'));
-
-      // !VA Parent container td
-      nodeList[0].setAttribute('dir', 'rtl');
-      nodeList[0].width='100%';
-      nodeList[0].align='left';
-      nodeList[0].bgcolor='#FFFFFF';
-      nodeList[0].valign='top';
-      // !VA Parent attributes
-      nodeList[1].setAttribute( 'role', 'presentation');
-      nodeList[1].border='0';
-      nodeList[1].width='100%';
-      nodeList[1].cellPadding='0';
-      nodeList[1].cellSpacing='0';
-      
-      // !VA Sibling 1
-      // !VA parent TD
-      nodeList[3].width='50%';
-      nodeList[3].setAttribute( 'class', 'stack-column-center');
-      // // !VA Parent Table
-      nodeList[4].width='100%';
-      nodeList[4].cellPadding='0';
-      nodeList[4].cellSpacing='0';
-      nodeList[4].border='0';
-      // !VA Content TD
-      nodeList[6].setAttribute('dir', 'ltr'),
-      nodeList[6].align='left';
-      nodeList[6].vAlign='top';
-      // !VA Content img
-      nodeList[7].width = Attributes.imgWidth;
-      nodeList[7].height = Attributes.imgHeight;
-      nodeList[7].style = Attributes.imgStyle;
-      nodeList[7].src = Attributes.imgSrc;
-      nodeList[7].alt = Attributes.imgAlt;
-    
-      // !VA Sibling 2 - text content container
-      nodeList[8].width='50%';
-      nodeList[8].setAttribute( 'class', 'stack-column-center');
-      // // !VA Parent Table
-      nodeList[9].width='100%';
-      nodeList[9].cellPadding='0';
-      nodeList[9].cellSpacing='0';
-      nodeList[9].border='0';
-      // !VA Content TD
-      nodeList[11].setAttribute('dir', 'ltr'),
-      nodeList[11].align='left';
-      nodeList[11].vAlign='top';
-      // // !VA Content para
-      nodeList[12].style = 'margin: 10px';
-      nodeList[12].textContent = 'On larger devices, this content will appear to the left of the image. On smaller devices, the right-column content will appear above the left-column content.';
       return container;
     }
 
+
+      
+
+
+    
 
     // !VA CBController public functions 
     return {
@@ -1504,7 +1367,6 @@ var Whitty = (function () {
        
       },
       runTest: function() {
-        // console.clear();
         console.log('runTest running');
         // makeNodes();
         makePosSwitchNodes();
