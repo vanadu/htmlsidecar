@@ -91,14 +91,14 @@ DONE: Show/Hide CCP, make checkboxes functional.
 var Whitty = (function () {
 
   // !VA Run on page load
-  // document.addEventListener("DOMContentLoaded", function() {
-  //   setTimeout(function(){ 
-  //     console.log('timeout'); 
-  //     // !VA Don't forget you can't use button aliases here..
-  //     document.querySelector('#btn-ccp-make-td-tag').click();
+  document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(function(){ 
+      console.log('timeout'); 
+      // !VA Don't forget you can't use button aliases here..
+      document.querySelector('#btn-ccp-make-td-tag').click();
 
-  //   }, 1000);
-  // });
+    }, 500);
+  });
 
   // !VA DEV Test function to get the clicked element to the console
   // (function () {
@@ -918,105 +918,90 @@ var Whitty = (function () {
 
     }
 
-    // !VA This works for everything except embedded background image tags. This is totally hacked but it works and structurally it can be improved upon at some later date
-
+    // !VA This works for everything except embedded background image tags. This is totally hacked but it works 100% - I don't think it can be improved on structurally.
     function doIndents(id, container) {
-      // console.clear();
+      console.clear();
       console.log('doIndents running');
       var nodeList = container.querySelectorAll( '*' );
-      // console.log('nodeList is:');
-      // console.log(nodeList);
-      // console.log('nodeList[0].innerHTML is: ' + nodeList[0].innerHTML);
-      // console.log('childNodes:');
-      // console.log(nodeList[0].childNodes);
-      // console.log('nodeList[0].childNodes.length is: ' + nodeList[0].childNodes.length);
-      // for (let i = 0; i < nodeList[0].childNodes.length; i++) {
-      //   console.log('nodeList[0].childNodes[i] is: ' +  nodeList[0].childNodes[i]);
-      // }
-      let indentspacing, indent, i, nextSiblingIndex, previousSiblingIndex, loopCount, target, hasAnchor, output;
-      // !VA Set the loop iterator to 0 and the indentspacing to two spaces
-      let j;
-      i = 0, indentspacing = '  ';
-
-      console.clear();
-      // !VA If nodeList only contains a singleton img tag, nodeList[i] will be null, so we exclude that case
-      if (nodeList.length > 0) {
-        // !VA Get the index of the sibling nodes, i.e. the td nodes containing the two-column content.  
-        for (i = 0; i < nodeList.length; i++) {
-          if (nodeList[i].nextSibling) { nextSiblingIndex = i; }
-          if (nodeList[i].previousSibling) {previousSiblingIndex = i;}
-        }
-        // !VA If there is an element with a sibling, then increment loopCount until that element's index is reached. If there's no element with a sibling, then set loopCount to the length of nodeList and process the entire nodeList.
-        nextSiblingIndex ? loopCount = nextSiblingIndex : loopCount = nodeList.length;
-        // !VA If the terminating img tag has an anchor tag wrapper, we don't want the terminating img element to be indented.So we need to find out whether the anchor is present
-        console.log('loopCount is: ' + loopCount);
-        target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
-        hasAnchor = getCheckboxSelection(target);
-        // !VA Loop through the elements and increase the indent with each iteration
-        let indentafterbegin;
-        let indentafterend;
-        for (i = 0; i < loopCount; i++) {
-          indentafterbegin  =  '\n  ' + indentspacing.repeat([i]);
-          indentafterend = '\n' + indentspacing.repeat([i]);
-          // !VA If insert  anchor is checked
-          if (hasAnchor) {
-            // !VA Don't apply indents to the img element if insert anchor is checked 
-            if (nodeList[i].nodeName === 'IMG' || nodeList[i].nodeName === 'A') {
-              // !VA This should be rewritten to deal with the empty if statement before the else
-
-            } else {
-              nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
-              nodeList[i].insertAdjacentHTML('beforeend', indentafterend);
-            }
-            // !VA Insert anchor is not checked, so apply the normal indents to all elements
-          } else {
-            nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
-            nodeList[i].insertAdjacentHTML('beforeend', indentafterend);
-          }
-        }
-
-        // !VA The number of elements below the sibling element is equal to the second sibling's index minus the first sibling's index -- that's the number of descendants separating the two siblings. Consequently, the first sibling's index is i and the second sibling's index is i + 5. So now loop through the siblings and their descendants, starting with the index of the first sibling.
-        // var loopCount2;
-        // console.log('nextSiblingIndex is: ' + nextSiblingIndex);
-        // console.log('previousSiblingIndex is: ' + previousSiblingIndex);
-        var loopCount2 = nextSiblingIndex + (previousSiblingIndex - nextSiblingIndex);
-        for (i = nextSiblingIndex; i < loopCount2; i++) {
-          // !VA Increase the indent with each iteration. 
-          indentafterbegin  =  '\n  ' + indentspacing.repeat([i]);
-          indentafterend = '\n' + indentspacing.repeat([i]);
-          indent  =  '\n' + indentspacing.repeat([i]);
-          // !VA The terminating element in the tree gets no indent and no line break - the indent and line break are covered by its parent.
-          if (i === nextSiblingIndex) { indent = ''; }
-          if (nodeList[i].nodeName === 'A') {
-            // !VA This gets rid of the indents on the A tag, at least for the clipboard output.
-            console.log('nodeList[i].oouterHTML is: ' + nodeList[i].outerHTML);
-            nodeList[i].outerHTML = `<a href='#' color='red'><img style='display: block; width: 625px; height: 525px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;' src='img/_625X525.png' alt='' width='625' height='525'></a>`;
-
-            console.log('nodeList[i].outerHTML is now: ' + nodeList[i].outerHTML);
-          }
-          console.log('loopCount is now: ' + loopCount);
-          if ( i === 7) {
-            console.log('nodeList[i].id is: ' + nodeList[i].id);
-            // !VA This should be rewritten to deal with the empty if statement before the else
-            // nodeList[i - 1].insertAdjacentHTML('afterbegin', indentafterbegin);
-            // nodeList[i - 1].insertAdjacentHTML('afterend', '\n');
-          } else {
-
-            // !VA Apply the indent to the nextSibling. 
-            nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
-            nodeList[i].insertAdjacentHTML('beforeend', indentafterend);
-            // !VA Apply the indent to the previousSibling
-            indentafterbegin  =  '\n  ' + indentspacing.repeat([i - 1]);
-            indentafterend = '\n' + indentspacing.repeat([i - 1]);
-            nodeList[i + 5].insertAdjacentHTML('beforebegin', indentafterbegin);
-            nodeList[i + 5].insertAdjacentHTML('afterend', indentafterend);
-          }
-        }
-
-
-
-
+      // !VA Variables for spacing and structure
+      let indentspacing, indentbeforebegin, indentafterbegin, indentbeforeend, indentafterend, i, target, hasAnchor, output;
+      // !VA Variables for node name positions in the nodeList
+      let imgNodeIndex, aNodeIndex, pNodeIndex, nextSiblingNodeIndex, previousSiblingNodeIndex, previousSiblingIndent;
+      // !VA Get the status of the Include anchor checkbox
+      target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
+      hasAnchor = getCheckboxSelection(target);
+      // !VA Set the default indent spacing and adjacentHTML spacing
+      indentspacing = '  ';
+      indentbeforebegin = '' + indentspacing.repeat([i]);
+      indentafterbegin  = indentafterend =  '\n';
+      indentbeforeend = '' + indentspacing.repeat([i]);
+      // !VA Loop through nodeList and get the relevant node positions
+      for (let i = 0; i < nodeList.length; i++) {
+        // !VA Get the positions of the relevant nodes for indents
+        if (nodeList[i].nodeName === 'IMG') { imgNodeIndex = i; }
+        if (nodeList[i].nodeName === 'A') { aNodeIndex = i; }
+        if (nodeList[i].nodeName === 'P') { pNodeIndex = i; }
+        if (nodeList[i].nextSibling) {nextSiblingNodeIndex = i; } 
+        if (nodeList[i].previousSibling) {previousSiblingNodeIndex = i; } 
       }
+      // !VA Set the indent for the second sibling TD. It should be equal to the indents for the first sibling, so we need to reset the repeat spacing iterator to the same value as it was for the first sibling. Since the nodeList.length varies based on if an anchor is included or if the img is excluded and if the create TD or create Table buttons were pressed, we need to base this indent on the nodeList.length and index it to the position of the first sibling. This will always give us the indent iterator used for the first sibling. 
+      previousSiblingIndent = (nodeList.length - (nextSiblingNodeIndex + 5));
+      // console.log('previousSiblingIndent is: ' + previousSiblingIndent);
+      // !VA Loop through nodeList and apply the indents to the IMG and A nodes. If the A node is present, the IMG gets no indent at all. If the A node is not present, the IMG is treated as the terminating node for indent purposes.
+      for (let i = 0; i < nodeList.length; i++) {
+        indentbeforebegin = '' + indentspacing.repeat([i]);
+        indentafterbegin  = indentafterend =  '\n';
+        indentbeforeend = '' + indentspacing.repeat([i]);
+        // !VA These are the unique cases where different indents are applied.
+        switch(true) {
+        // !VA Exclude indents for img tag if there is no anchor wrapper, otherwise treat the IMG as the terminal node in the indent tree.
+        case (i === imgNodeIndex):
+          if (hasAnchor) {
+            // !VA If Include anchor is checked, then we want the img to be enclosed in the anchor tag without any indents, so don't do anything here
+          } else {
+            // !VA If there's no anchor, then we need to indent the IMG as the terminal node in the tree
+            nodeList[i].insertAdjacentHTML('beforebegin', indentbeforebegin);
+            // nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
+            // nodeList[i].insertAdjacentHTML('beforeend', indentbeforeend);
+            nodeList[i].insertAdjacentHTML('afterend', '\n');
+          }
+
+          break;
+        case (i === aNodeIndex):
+          // !VA If the Anchor is present, treat it as the terminal node -- its child IMG gets no indent
+          nodeList[i].insertAdjacentHTML('beforebegin', indentbeforebegin);
+          // nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
+          // nodeList[i].insertAdjacentHTML('beforeend', indentbeforeend);
+          nodeList[i].insertAdjacentHTML('afterend', '\n');
+          break;
+        case (i === pNodeIndex):
+          // !VA This is the child P of the second sibling node. It could probably be processed under the next condition, but I'm going to leave it for now.
+          console.log('i is: ' + i);
+          indentbeforebegin = '' + indentspacing.repeat([i - previousSiblingIndent]);
+          indentafterbegin  = indentafterend =  '\n';
+          indentbeforeend = '' + indentspacing.repeat([i - previousSiblingIndent]);
+          nodeList[i].insertAdjacentHTML('beforebegin', indentbeforebegin);
+          nodeList[i].insertAdjacentHTML('afterend', indentafterend);
+          break;
+        case (nextSiblingNodeIndex && i >= previousSiblingNodeIndex):
+          // !VA If a sibling is present, apply the same indents to the second sibling as were applied to the first.
+          indentbeforebegin = '' + indentspacing.repeat([i - previousSiblingIndent]);
+          indentafterbegin  = indentafterend =  '\n';
+          indentbeforeend = '' + indentspacing.repeat([i - previousSiblingIndent]);
+          nodeList[i].insertAdjacentHTML('beforebegin', indentbeforebegin);
+          nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
+          nodeList[i].insertAdjacentHTML('beforeend', indentbeforeend);
+          nodeList[i].insertAdjacentHTML('afterend', indentafterend);
+          break;
+        default:
+          // !VA All the other nodes get the default indent scheme
+          nodeList[i].insertAdjacentHTML('beforebegin', indentbeforebegin);
+          nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
+          nodeList[i].insertAdjacentHTML('beforeend', indentbeforeend);
+          nodeList[i].insertAdjacentHTML('afterend', indentafterend);
+        } 
+      }
+
       output = nodeList[0].outerHTML; 
       writeClipboard( id, output);
     }
