@@ -88,7 +88,7 @@ DONE: Show/Hide CCP, make checkboxes functional.
 //PAGE SETUP START
 
 // Namespace
-var Whitty = (function () {
+var Witty = (function () {
 
   // !VA Run on page load
   document.addEventListener("DOMContentLoaded", function() {
@@ -722,28 +722,27 @@ var Whitty = (function () {
         // !VA Otherwise, set returnNode to imgNode without the anchor.
         returnNode = imgNode;
       }
-      
       return returnNode;
     }
     
     function makeTdNode( id ) {
       console.log('makeTdNode running');
+      // console.clear();
       let Attributes;
       Attributes = getAttributes();
       let tdInner, imgNode;
       tdInner = document.createElement('td');
       // !VA Add the attributes that are included in both the default and background image td
-
       if (Attributes.tdValign) { tdInner.vAlign = Attributes.tdValign; }
       // !VA bgcolor attribute. Pass the input value, don't prepend hex # character for now
       if (Attributes.tdBgcolor) { tdInner.bgColor = Attributes.tdBgcolor; }
       // !VA Now add the attributes included only with the default Td configuration
-
-
       let fallback;
       let bgcolor;
-      let indent;
-      let radioSelected;
+      let linebreak, indent, indentbeforebegin, indentafterbegin,  indentbeforeend, indentafterend;
+      let radioSelected, writeToClipboard;
+      linebreak = '\n';
+      indent = indentbeforebegin = indentafterbegin = indentbeforeend = indentafterend = 'XX';
       radioSelected = document.querySelector('input[name=tdoptions]:checked').value;
       switch(true) {
       case (radioSelected === 'basic'):
@@ -757,6 +756,7 @@ var Whitty = (function () {
         imgNode = makeImgNode();
         // !VA We need to include the imgNode here ONLY if Bgimage is unchecked
         tdInner.appendChild(imgNode);
+        writeToClipboard = false;
         break;
       case (radioSelected === 'bgimage'):
         tdInner.width = Attributes.tdAppdataWidth;
@@ -772,35 +772,37 @@ var Whitty = (function () {
         // console.log('Attributes.tableIncludeWrapper is: ' + Attributes.tableIncludeWrapper);
         // We have set the indent here because it would be much too complicated to do loop through all these nodes in doIndents. Here, all we have to do is pass in the string with pre-defined indents based on the button that was clicked to generate the HTML.
 
+        // !VA Determine which button fired this action and either return to calling makeNodeList, which then calls doIndents, or abort the return and write directly to clipboard. We need to write directly to clipboard when the indent scheme is handled here, for instance, with the bg image code. Trying to run this code with all its comment nodes through a doIndent structure would be suicide.
         switch(true) {
         case (id === 'btn-ccp-make-td-tag'):
-          // !VA If the CCP Make Td button was clicked, apply a standard 2-space indent
-          indent = '\n  ';
+          console.log('Mark1');
+          indent = '  ';
           break;
         case (id === 'btn-ccp-make-table-tag' && !Attributes.tableIncludeWrapper):
           // !VA If the CCP Make Table button was clicked and Include wrapper table is NOT checked, add 2 spaces for each table node for a total of 6 spaces
-          indent = '\n       ';
+          indent = '      ';
           break;
         case (id === 'btn-ccp-make-table-tag' && Attributes.tableIncludeWrapper):
           // !VA If the CCP Make Table button was clicked and Include wrapper table IS checked, add 2 spaces for each additional table node for a total of 9 spaces
-          indent = '\n             ';
+          indent = '            ';
           break;
         default:
           console.log('default');
         } 
+        // !VA Define the innerHTML of the bgimage code
+        tdInner.innerHTML = `${indent}<!--[if gte mso 9]>${linebreak}${indent}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${linebreak}${indent}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${linebreak}${indent}<v:textbox inset="0,0,0,0">${linebreak}${indent}<![endif]-->${linebreak}${indent}<div>${indent}<!-- Put Foreground Content Here -->${linebreak}${indent}</div>${indent}<!--[if gte mso 9]>${linebreak}${indent}</v:textbox>${linebreak}${indent}</v:rect><![endif]-->\n`;
 
-        tdInner.innerHTML = `${indent}<!--[if gte mso 9]>${indent}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${indent}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${indent}<v:textbox inset="0,0,0,0">${indent}<![endif]-->${indent}<div>${indent}<!-- Put Foreground Content Here -->${indent}</div>${indent}<!--[if gte mso 9]>${indent}</v:textbox>${indent}</v:rect><![endif]-->\n`;
         break;
       case (radioSelected === 'posswitch'):
         // console.log('radioSelected === posswitch running');
         tdInner = makePosSwitchNodes();
         // console.log(tdInner);
-        
+        writeToClipboard = false;
 
 
         break;
       default:
-        // code block
+        // default code block
       } 
       return tdInner;
     }
@@ -887,6 +889,9 @@ var Whitty = (function () {
       if (id == document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).id) {
         imgNode = makeImgNode( id );
         topNode = imgNode;
+        console.log('topNode is: ' + topNode);
+        console.log(topNode);
+        
       } 
 
 
@@ -918,11 +923,57 @@ var Whitty = (function () {
 
     }
 
+    function doAltIndents( id, container ) {
+      // console.clear();
+      console.log('Terminating...');
+      // throw new Error('Stop script');
+      console.log('id is: ' + id);
+      
+      
+
+      var nodeList = container.querySelectorAll( '*' );
+
+      
+      console.log('nodeList is:');
+      console.log(nodeList);
+      console.log('nodeList[0].outerHTML is: ' + nodeList[0].outerHTML);
+
+
+      let indentspacing, indentbeforebegin, indentafterbegin, indentbeforeend, indentafterend, i;
+      indentspacing = '  ';
+      indentbeforebegin = '' + indentspacing.repeat([i]);
+      indentafterbegin  = indentafterend =  '\n';
+      indentbeforeend = '' + indentspacing.repeat([i]);
+
+      console.log('mark1');
+      console.log('nodeList.length is: ' + nodeList.length);
+      for (let i = 0; i < nodeList.length; i++) {
+        console.log('nodeList[0].nodeType is: ' + nodeList[0].nodeType);
+        
+        // indentbeforebegin = '' + indentspacing.repeat([i]);
+        // indentafterbegin  = indentafterend =  '\n';
+        // indentbeforeend = '' + indentspacing.repeat([i]);
+
+        // nodeList[i].insertAdjacentHTML('beforebegin', indentbeforebegin);
+        // nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
+        // nodeList[i].insertAdjacentHTML('beforeend', indentbeforeend);
+        // nodeList[i].insertAdjacentHTML('afterend', indentafterend);
+
+
+      }
+
+
+
+
+      writeClipboard( id, container.outerHTML);
+    }
+
     // !VA This works for everything except embedded background image tags. This is totally hacked but it works 100% - I don't think it can be improved on structurally.
     function doIndents(id, container) {
-      console.clear();
       console.log('doIndents running');
+      // !VA Get the nodeList from the passed-in container
       var nodeList = container.querySelectorAll( '*' );
+
       // !VA Variables for spacing and structure
       let indentspacing, indentbeforebegin, indentafterbegin, indentbeforeend, indentafterend, i, target, hasAnchor, output;
       // !VA Variables for node name positions in the nodeList
@@ -965,7 +1016,6 @@ var Whitty = (function () {
             // nodeList[i].insertAdjacentHTML('beforeend', indentbeforeend);
             nodeList[i].insertAdjacentHTML('afterend', '\n');
           }
-
           break;
         case (i === aNodeIndex):
           // !VA If the Anchor is present, treat it as the terminal node -- its child IMG gets no indent
@@ -976,7 +1026,6 @@ var Whitty = (function () {
           break;
         case (i === pNodeIndex):
           // !VA This is the child P of the second sibling node. It could probably be processed under the next condition, but I'm going to leave it for now.
-          console.log('i is: ' + i);
           indentbeforebegin = '' + indentspacing.repeat([i - previousSiblingIndent]);
           indentafterbegin  = indentafterend =  '\n';
           indentbeforeend = '' + indentspacing.repeat([i - previousSiblingIndent]);
@@ -985,13 +1034,21 @@ var Whitty = (function () {
           break;
         case (nextSiblingNodeIndex && i >= previousSiblingNodeIndex):
           // !VA If a sibling is present, apply the same indents to the second sibling as were applied to the first.
-          indentbeforebegin = '' + indentspacing.repeat([i - previousSiblingIndent]);
-          indentafterbegin  = indentafterend =  '\n';
-          indentbeforeend = '' + indentspacing.repeat([i - previousSiblingIndent]);
-          nodeList[i].insertAdjacentHTML('beforebegin', indentbeforebegin);
-          nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
-          nodeList[i].insertAdjacentHTML('beforeend', indentbeforeend);
-          nodeList[i].insertAdjacentHTML('afterend', indentafterend);
+          if (nodeList[i].nodeName === 'DIV') { 
+            // !VA Hack in a fix for the bgimage div's not indenting properly. Here we just add the line break without any repeat, which allows the DIV to keep the indents defined in the makeTdNode function.
+            nodeList[i].insertAdjacentHTML('afterbegin', '\n');
+            nodeList[i].insertAdjacentHTML('afterend', '\n');
+          } 
+          else {
+            indentbeforebegin = '' + indentspacing.repeat([i - previousSiblingIndent]);
+            indentafterbegin  = indentafterend =  '\n';
+            indentbeforeend = '' + indentspacing.repeat([i - previousSiblingIndent]);
+            nodeList[i].insertAdjacentHTML('beforebegin', indentbeforebegin);
+            nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
+            nodeList[i].insertAdjacentHTML('beforeend', indentbeforeend);
+            nodeList[i].insertAdjacentHTML('afterend', indentafterend);
+          }
+
           break;
         default:
           // !VA All the other nodes get the default indent scheme
@@ -1001,7 +1058,7 @@ var Whitty = (function () {
           nodeList[i].insertAdjacentHTML('afterend', indentafterend);
         } 
       }
-
+      // !VA Output to clipboard
       output = nodeList[0].outerHTML; 
       writeClipboard( id, output);
     }
@@ -1239,7 +1296,7 @@ var Whitty = (function () {
       // !VA Call the function that sets the attributes for the nodes
       container = setPosSwitchNodeAttributes(container);
       // !VA Copy the container to tdInner. This is for nomenclature, because all the other makeNode functions return the container under the name tdInner
-      var tdInner = container.childNodes[0]; 
+      var tdInner = container.children[0]; 
       // !VA Return the container to makeTdNodes
       return tdInner;
     }
