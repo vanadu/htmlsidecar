@@ -32,6 +32,7 @@ Add image swap:
 
 Branch: addConditionalToIndents
 --We have to add alternative ident schemes after all... ugh!
+The problem is htat you can't mix NODES and NODELISTS, and the NODELIST is where you do all the indenting. Do you can't have separate functions for indenting IMGNODE, TDNODE and TABLENODE... or can you. At least my last attempt at this failed. You'd have to output the ENTIRE NODELIST every time. I was previously trying to do indents from the imgMakeNode output - that won't work. Try it again using the doIndents output...
 
 
 /* !VA  - 06.23.19
