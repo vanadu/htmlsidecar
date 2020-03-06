@@ -18,29 +18,17 @@ TODO: Add no-image option to td options select - think about how that will affec
 TODO: Change msg-table to flex div
 TODO: Fix the Chrome display 
 
+Add image swap:
+<td align="left" style="vertical-align:top;">
+  <a href="http://www.dimwhit.io">
+    <img class="hide" alt="Pay as little as a $0 co-pay for brand-name Rx and get free delivery" width="600" height="167" src="template-img/witty-template-desktop.jpg" border="0" style="width: 600px; height: 167px; margin: 0px; border: none; outline: none; text-decoration: none; display: block;" /></a>
 
-DONE: The indents work 100% even with the bgimage but it's still very hacky after two weeks!
-DONE: Just spent all morning trying to fix the ONE little quirk about the RTL Position Swith CB output -- DONE WITH THAT for now. Can't waste any more time on it!
-DONE: Make Stig clearly a link
-DONE: Add a link wrapper to img options
-DONE: Figure out what to do about the px units in the height/width input fields. Only applies to td and table width and table height fields. The filter needs to be between the makeCssRule function and the clipboardStr
-DONE : Fix CSS Rule CB output
-DONE: Fix <img> options bottom is cut 
-DONE: Add height attribute input field to CPP TD options
-DONE: Pre-select Include width and height in style attributes option
-DONE: Fix the img output to get rid of quote string
-DONE: Fix the bgimage clipboard output for parent tables
-DONE: Remove checkmark styles for bgimage
-DONE: Deal with the indents and embedded tag issue.
-DONE: It's bad that writeClipboard is called even when that clipboard isn't being output. ccpMakeTdTag calls ccpMakeImgTag which calls writeClipboard -- that makes no sense. 
-DONE: All tables must have cellspacing border and cellpadding attributes!
-DONE: Is including the id in the make element functions necessary? YES, clipboardJS requires it!
-DONE: Renaming clipboard buttons and elements...
-DONE: Fix type error in ccpMakeTdTag -- Done, ccpMakeImgTag now returns the img object but passes img.outerHTML to writeClipboard. writeClipboard doesn't parse anything now, only takes the string and outputs it.
-DONE: Make clipboard CSS bvuttons work.
-DONE: Td large phone width css is wrong. Somehow that got fixed but I don't know when.
-DONE: Toolbar small and large phones don'g retain value on tab out -- fixed.
-DONE: Fix the toolbar sm phone and lg phone buttons and set to iPhone width of 414pxl
+    <!--[if !mso]><!-->
+      <span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">
+        <a href="http://www.dimwhit.io"><img class="mobileshow" alt="Rx truths: Did you know patients can save with brand-name Rx?" width="480" height="480" src="template-img/witty-template-mobile.jpg" border="0" style="width: 480px; height: 480px; margin: 0px; border: none; outline: none; text-decoration: none; display: block;" /></a>
+      <!--</span>-->
+    <!--<![endif]-->
+</td>
 
 
 
@@ -233,6 +221,7 @@ var Witty = (function () {
       // !VA This is deprecated as of today
       // spnCcpTdBgimageCheckmrk: '#spn-ccp-td-bgimage-checkmrk',
       rdoCcpTdBasic: '#rdo-ccp-td-basic',
+      rdoCcpTdImgswap: '#rdo-ccp-td-imgswap',
       rdoCcpTdPosswitch: '#rdo-ccp-td-posswitch',
       rdoCcpTdBgimage: '#rdo-ccp-td-bgimage',
 
@@ -708,7 +697,7 @@ var Witty = (function () {
       if (Attributes.imgAlign) { imgNode.align = Attributes.imgAlign; }
       // !VA border attribute
       imgNode.border = '0';
-
+      
       // !VA If the include anchor option is checked, create the anchor element, add the attributes, append the imgNode to it, and return it.
       if(Attributes.imgIncludeAnchor === true) {
         let anchor = document.createElement('a');
@@ -743,6 +732,7 @@ var Witty = (function () {
       linebreak = '\n';
       indent = indentbeforebegin = indentafterbegin = indentbeforeend = indentafterend = 'XX';
       radioSelected = document.querySelector('input[name=tdoptions]:checked').value;
+      let str, imgSwapText, beginSpan, beginMsoConditional, endMsoConditional, beginComment, endComment, container;
       switch(true) {
       case (radioSelected === 'basic'):
         // !VA class attribute
@@ -756,6 +746,46 @@ var Witty = (function () {
         // !VA We need to include the imgNode here ONLY if Bgimage is unchecked
         tdInner.appendChild(imgNode);
         writeToClipboard = false;
+        break;
+      case (radioSelected === 'imgswap'):
+        tdInner.width = Attributes.tdAppdataWidth;
+        tdInner.height = Attributes.tdAppdataHeight;
+        // !VA valign attribute
+        tdInner.vAlign = Attributes.tdValign;
+        // !VA Set the background attribute to the current path/filename
+        tdInner.setAttribute('background', Attributes.tdBackground);
+        // !VA Include fallback color if no bgColor is selected. Use Stig's fallback: #7bceeb
+        fallback = '#7bceeb';
+        Attributes.tdBgcolor ? bgcolor = Attributes.tdBgcolor : bgcolor = fallback;
+        tdInner.bgColor = bgcolor;
+        // console.log('Attributes.tableIncludeWrapper is: ' + Attributes.tableIncludeWrapper);
+        // We have set the indent here because it would be much too complicated to do loop through all these nodes in doIndents. Here, all we have to do is pass in the string with pre-defined indents based on the button that was clicked to generate the HTML.
+
+        // !VA Determine which button fired this action and either return to calling makeNodeList, which then calls doIndents, or abort the return and write directly to clipboard. We need to write directly to clipboard when the indent scheme is handled here, for instance, with the bg image code. Trying to run this code with all its comment nodes through a doIndent structure would be suicide.
+        switch(true) {
+        case (id === 'btn-ccp-make-td-tag'):
+          console.log('Mark1');
+          indent = '  ';
+          break;
+        case (id === 'btn-ccp-make-table-tag' && !Attributes.tableIncludeWrapper):
+          // !VA If the CCP Make Table button was clicked and Include wrapper table is NOT checked, add 2 spaces for each table node for a total of 6 spaces
+          indent = '      ';
+          break;
+        case (id === 'btn-ccp-make-table-tag' && Attributes.tableIncludeWrapper):
+          // !VA If the CCP Make Table button was clicked and Include wrapper table IS checked, add 2 spaces for each additional table node for a total of 9 spaces
+          indent = '            ';
+          break;
+        default:
+          console.log('default');
+        } 
+        // !VA Define the innerHTML of the bgimage code
+        tdInner.innerHTML = `<!--[if !mso]>
+        <!-->
+            <span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">
+            <a href="http://www.dimwhit.io"><img class="mobileshow" alt="Rx truths: Did you know patients can save with brand-name Rx?" width="480" height="480" src="template-img/witty-template-mobile.jpg" border="0" style="width: 480px; height: 480px; margin: 0px; border: none; outline: none; text-decoration: none; display: block;" /></a>
+        <!--</span>-->
+        <!--<![endif]-->`;
+
         break;
       case (radioSelected === 'bgimage'):
         tdInner.width = Attributes.tdAppdataWidth;
@@ -1146,6 +1176,11 @@ var Witty = (function () {
           return ccpIfNoUserInput('height',document.querySelector(ccpUserInput.iptCcpTdHeight).value);
         })(),
         tdBasic: (function() {
+          target = ccpUserInput.rdoCcpTdBasic;
+          checked = getRadioSelection(target);
+          return checked;
+        })(),
+        tdImgswap: (function() {
           target = ccpUserInput.rdoCcpTdBasic;
           checked = getRadioSelection(target);
           return checked;

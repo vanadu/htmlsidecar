@@ -1728,13 +1728,13 @@ fieldset {
 .ccp-img-include-anchor-label {
   z-index: 111; }
 
-#ccp-td-basictd, #ccp-td-posswitch, #ccp-td-bgimage {
+#ccp-td-basictd, #ccp-td-imgswap, #ccp-td-posswitch, #ccp-td-bgimage {
   display: flex;
   justify-content: space-evenly; }
-  #ccp-td-basictd input, #ccp-td-posswitch input, #ccp-td-bgimage input {
+  #ccp-td-basictd input, #ccp-td-imgswap input, #ccp-td-posswitch input, #ccp-td-bgimage input {
     width: 5%;
     padding-top: 5px; }
-  #ccp-td-basictd label, #ccp-td-posswitch label, #ccp-td-bgimage label {
+  #ccp-td-basictd label, #ccp-td-imgswap label, #ccp-td-posswitch label, #ccp-td-bgimage label {
     text-align: left;
     width: 80%;
     line-height: 1.5rem;
