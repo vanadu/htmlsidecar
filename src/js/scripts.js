@@ -11,7 +11,6 @@ TODO: The CSS output will need to be revisited. You'd never need to output the w
 TODO: Figure out why queryDOMElements is running mutliple times per CB build.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
 TODO: Add some kind of fluid option to the img options. Cerberus hard codes it into the img tag. That needs to be tested. Litmus overrides the width and height style properties in the CSS media queries. Need to test before that is implemented - but there's no reason to include a fluid option if that's settable in CSS.
-TODO: Now the rtl position switch doesn't do the indents right, the td after the img wrong. I need to revisit this indent thing for the millionth time.
 
 Status:
 TODO: Add image swap
@@ -20,7 +19,7 @@ TODO: Change msg-table to flex div
 TODO: Fix the Chrome display 
 
 
-
+DONE: The indents work 100% even with the bgimage but it's still very hacky after two weeks!
 DONE: Just spent all morning trying to fix the ONE little quirk about the RTL Position Swith CB output -- DONE WITH THAT for now. Can't waste any more time on it!
 DONE: Make Stig clearly a link
 DONE: Add a link wrapper to img options
