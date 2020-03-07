@@ -84,7 +84,7 @@ var Witty = (function () {
     setTimeout(function(){ 
       console.log('timeout'); 
       // !VA Don't forget you can't use button aliases here..
-      document.querySelector('#btn-ccp-make-td-tag').click();
+      document.querySelector('#btn-ccp-make-img-tag').click();
 
     }, 500);
   });
@@ -716,7 +716,7 @@ var Witty = (function () {
     }
     
     function makeTdNode( id ) {
-      console.log('makeTdNode running');
+      // console.log('makeTdNode running');
       // console.clear();
       let Attributes;
       Attributes = getAttributes();
@@ -835,6 +835,19 @@ var Witty = (function () {
       return tdInner;
     }
 
+    function makeNodeTree(params) {
+
+
+
+
+
+
+      
+    }
+
+
+
+
     function makeTableNode( id ) {
       // console.log('makeTdNode running');
       let Attributes;
@@ -868,139 +881,226 @@ var Witty = (function () {
       tdInner = makeTdNode( id );
       trInner.appendChild(tdInner);
       
-      if (!Attributes.tableIncludeWrapper) {
-        // !VA If Include table wrapper is unchecked, just return this inner table
-        tableNode = tableInner;
-      } else {
-        // !VA If include table wrapper is checked, build the outer table and return it
-        // !VA table wrapper class
-        if (Attributes.tableTagWrapperAlign) { tableOuter.align = Attributes.tableTagWrapperAlign; }
-        // !VA wrapper table align attribute
-        if (Attributes.tableTagWrapperClass) { tableOuter.className = Attributes.tableTagWrapperClass; }
 
-        // !VA width attribute
-        // !VA the default is the current display size, so it gets the value from the field.
-        tableOuter.width = Attributes.tableTagWrapperWidth;
 
-        // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for nowtableTagWrapperBgcolor);
-        if (Attributes.tableTagWrapperBgcolor) { tableOuter.bgColor = Attributes.tableTagWrapperBgcolor; }
+      // !VA 03.06.20A We are ALWAYS outputting EVERYTHING this time...
+      // if (!Attributes.tableIncludeWrapper) {
+      //   // !VA If Include table wrapper is unchecked, just return this inner table
+      tableNode = tableInner;
+      // } else {
+      // !VA If include table wrapper is checked, build the outer table and return it
+      // !VA table wrapper class
+      if (Attributes.tableTagWrapperAlign) { tableOuter.align = Attributes.tableTagWrapperAlign; }
+      // !VA wrapper table align attribute
+      if (Attributes.tableTagWrapperClass) { tableOuter.className = Attributes.tableTagWrapperClass; }
 
-        // !VA Add border, cellspacing and cellpadding
-        tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
-        tableOuter.setAttribute('role', 'presentation'); 
+      // !VA width attribute
+      // !VA the default is the current display size, so it gets the value from the field.
+      tableOuter.width = Attributes.tableTagWrapperWidth;
 
-        // !VA Append the outer tr
-        tableOuter.appendChild(trOuter);
-        trOuter.appendChild(tdOuter);
-        // !VA Append the outer td
-        trOuter.appendChild(tdOuter);
-        // !VA Add the outer td attributes
-        if (Attributes.tdAlign) { tdOuter.align = Attributes.tdAlign; }
-        // !VA valign attribute
-        if (Attributes.tdValign) { tdOuter.vAlign = Attributes.tdValign; }
-        // !VA Append the inner table to the outer table's td
-        tdOuter.appendChild(tableInner);
-        // !VA Pass the outer table to the tableNode.
-        tableNode = tableOuter;
-      }
+      // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for nowtableTagWrapperBgcolor);
+      if (Attributes.tableTagWrapperBgcolor) { tableOuter.bgColor = Attributes.tableTagWrapperBgcolor; }
+
+      // !VA Add border, cellspacing and cellpadding
+      tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
+      tableOuter.setAttribute('role', 'presentation'); 
+
+      // !VA Append the outer tr
+      tableOuter.appendChild(trOuter);
+      trOuter.appendChild(tdOuter);
+      // !VA Append the outer td
+      trOuter.appendChild(tdOuter);
+      // !VA Add the outer td attributes
+      if (Attributes.tdAlign) { tdOuter.align = Attributes.tdAlign; }
+      // !VA valign attribute
+      if (Attributes.tdValign) { tdOuter.vAlign = Attributes.tdValign; }
+      // !VA Append the inner table to the outer table's td
+      tdOuter.appendChild(tableInner);
+      // !VA Pass the outer table to the tableNode.
+      tableNode = tableOuter;
+      // }
       // console.log(tableNode.outerHTML);
       return tableNode;
     }
 
     function makeNodeList( id ) {
-      // console.log('makeNodeList running');
-      let container, imgNode, tdNode, tableNode, topNode;
+      console.log('makeNodeList running');
+      console.clear();
+      let container, chkbox, imgNode, tdNode, tableNode, topNode;
+      let hasAnchor, hasWrapper, selectedRadio;
       // !VA Create the container div - we need this to access the descendant elements as children, including the parent table of all the descendent table elements.
       container = document.createElement('div');
+      // !VA Get the status of all the checkboxes and tdoptions radio buttons that affect the indents
+      chkbox = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
+      hasAnchor = getCheckboxSelection(chkbox);
+      chkbox = ccpUserInput.spnCcpTableIncludeWrapperCheckmrk;
+      hasWrapper = getCheckboxSelection(chkbox);
+      selectedRadio = document.querySelector('input[name="tdoptions"]:checked').value;
+
       // !VA make the node for the img tag
       // !VA If the CCP make img tag button was clicked, return imgNode as the nodeList and send to doIndents for code indents
-      if (id == document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).id) {
-        imgNode = makeImgNode( id );
-        topNode = imgNode;
-        console.log('topNode is: ' + topNode);
-        console.log(topNode);
-        
-      } 
-
+      // if (id == document.querySelector(btnCcpMakeClips.btnCcpMakeImgTag).id) {
+      imgNode = makeImgNode( id );
+      topNode = imgNode;
+      // } 
 
       // !VA If the CCP make td tag button was clicked, we have different cases, depending on which tdoptions radio button was selected.return tdNode as the nodeList and send to doIndents for code indents
-      if (id == document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag).id) {
-        tdNode = makeTdNode( id );
-        // console.log('tdNode is: ' + tdNode);
-        topNode = tdNode;
-        // !VA We do NOT append imgNode here...that has to be done in makeTdNode because if Bgimage is checked, no imgNode is included. If we do it here then we have to include the conditional if Bgimage = checked here too. That belongs in the makeTdNode function.
-
-      }
-
-
-
-
+      // if (id == document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag).id) {
+      tdNode = makeTdNode( id );
+      topNode = tdNode;
+      // !VA NOTE: We do NOT append imgNode here...that has to be done in makeTdNode because if Bgimage is checked, no imgNode is included. If we do it here then we have to include the conditional if Bgimage = checked here too. That belongs in the makeTdNode function.
+      // }
 
       // !VA If the CCP make table tag button was clicked, return tableNode as the nodeList and send to doIndents for code indents
-      if ( id == document.querySelector(btnCcpMakeClips.btnCcpMakeTableTag).id )  {
-        tableNode = makeTableNode( id );
-        topNode = tableNode;
-      }
+      // if ( id == document.querySelector(btnCcpMakeClips.btnCcpMakeTableTag).id )  {
+      tableNode = makeTableNode( id );
+      topNode = tableNode;
+      // }
       // !VA Put the table and its descendents into the parent container
       container.appendChild(topNode);
       // !VA Pass the clicked button id and parent container element to process the code indents
-      // console.log('container is: ' + container);
-      // console.dir(container);
+      console.log('makeNodeList container is: ' + container);
+      console.log(container);
 
-      // !VA Should I choose to use HTML Beautify, it's here
-      // const str = html_beautify(tableNode.outerHTML, { indent_size: 2});
-      // console.log('str is:');
-      // console.log(str);
-      // writeClipboard( id, str);
-
-      doIndents( id, container );
+      doIndentsNew( id, container, hasAnchor, hasWrapper, selectedRadio );
 
     }
 
-    function doAltIndents1( id, container ) {
-      console.clear();
-      console.log('doAltIndents1 running');
+    function indentLevelToIndentChars( indentLevel ) {
+      console.log('indentLevelToChars running');
+      let indentChar, indent;
+      let linebreak, indentbeforebegin, indentafterbegin,  indentbeforeend, indentafterend;
+      indentChar = 'XX';
+      indent = indentChar.repeat([indentLevel]);
+      return indent;
+    }
+
+
+    function doIndentsNew( id, container, hasAnchor, hasWrapper, selectedRadio ) {
+      // !VA PROBLEM: nodeList does not include the top level element, so we need a div container for everything. That needs to come from makeNodeList.
+      console.log('doIndentsNew');
       console.log('id is: ' + id);
-      let nodeList, hasAnchor, target;
-      let indentspacing, indentbeforebegin, indentafterbegin, indentbeforeend, indentafterend, i;
-      // !VA Find out if there's an anchor tag around the img
-      target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
-      hasAnchor = getCheckboxSelection(target);
+      console.log('container is: ');
+      console.log(container);
+      let i, clipboardStr, target, checked, nl, loopCount;
+      let indent;
+      // !VA Array of node names for console
+      let nlnodenames = [];
+      nl = container.querySelectorAll('*');
 
-      nodeList = container.querySelectorAll( '*' );
-      console.log('nodeList is:');
-      console.dir(nodeList);
-      
-      // indentspacing = '  ';
-      // indentbeforebegin = '' + indentspacing.repeat([i]);
-      // indentafterbegin  = indentafterend =  '\n';
-      // indentbeforeend = '' + indentspacing.repeat([i]);
-      // !VA Indent the TD
-      nodeList[0].insertAdjacentHTML('afterbegin', '\n');
-      nodeList[0].insertAdjacentHTML('beforebegin', '');
-      nodeList[0].insertAdjacentHTML('beforeend', '\n');
+      // !VA NL INFO
+      for (let i = 0; i < nl.length; i++) { nlnodenames.push(nl[i].nodeName); }
+      console.log('NL INFO: nl.length is: ' + nl.length + '; nlnodenames is: ' + nlnodenames);
 
-      if (hasAnchor) {
-        // !VA If Include anchor is checked, then we want the img to be enclosed in the anchor tag without any indents, so don't do anything here
-        nodeList[1].insertAdjacentHTML('beforebegin', '  ');
-        // nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
-        // nodeList[i].insertAdjacentHTML('beforeend', indentbeforeend);
-        nodeList[1].insertAdjacentHTML('afterend', '\n    ');
-      } else {
-        // !VA If there's no anchor, then we need to indent the IMG as the terminal node in the tree
-        nodeList[1].insertAdjacentHTML('beforebegin', '  ');
-        // nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
-        // nodeList[i].insertAdjacentHTML('beforeend', indentbeforeend);
-        nodeList[1].insertAdjacentHTML('afterend', '\n');
+      console.log('hasAnchor is: ' + hasAnchor + '; hasWrapper is: ' + hasWrapper + '; selectedRadio is: ' + selectedRadio);
+      console.log('btnCcpMakeClips.btnCcpMakeImgTag is: ' + btnCcpMakeClips.btnCcpMakeImgTag);
+      switch(true) {
+      // !VA Use slice to  remove the # from the alias to match it with the id string.
+      case (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)):
+        // !VA If Include anchor is checked get the anchor and descendant img, otherwise, just get the img.  Don't forget we need to get the parent of the element we want to get the nodeList from because querySelectorAll gets the descendants not including the parent. Subtract from nl.length accordingly.
+        hasAnchor ? nl  = nl[nl.length  - 3] : nl  = nl[nl.length  - 2];
+        nl = nl.querySelectorAll('*');
+        console.log('CASE 1 nl is: ');
+        console.log('nl.length is: ' + nl.length);
+        console.log(nl);
+        break;
+      case (id === btnCcpMakeClips.btnCcpMakeTdTag.slice(1)):
+        switch(true) {
+        case (selectedRadio === 'basic'):
+          hasAnchor ? nl  = nl[nl.length  - 4] : nl  = nl[nl.length  - 3];
+          nl = nl.querySelectorAll('*');
+          console.log('CASE 2 nl is: ');
+          console.log('selectedRadio is: ' + selectedRadio);
+          console.log('nl.length is: ' + nl.length);
+          break;
+
+        default:
+          console.log('default');
+        } 
+        break;
+      case (id === btnCcpMakeClips.btnCcpMakeTableTag.slice(1)):
+        switch(true) {
+        case (selectedRadio === 'basic'):
+          console.log('CASE 3 nl is: ');
+          console.log('nl is: ');
+          console.log(nl);
+          // hasAnchor ? nl  = nl[nl.length  - 7] : nl  = nl[nl.length  - 5];
+          // !VA If hasWrapper, then we need to create the nodeList from the original container, otherwise the parent table will be excluded and the nodeList will start with the child tr. Otherwise, since we don't need the parent div. NOTE: Since we're calculating the output nodes from the TOP of the tree here, hasAnchor doesn't figure into the calcualtion.
+          hasWrapper ? nl = container : nl = nl[2];
+          nl = nl.querySelectorAll('*');
+          console.log('nl.length is: ' + nl.length);
+          break;
+        default:
+          console.log('default');
+        } 
+        break;
+      default:
+        // code block
+      } 
+
+
+      // !VA 
+      loopCount = nl.length;
+
+      let imgNodeIndex, aNodeIndex;
+      // !VA Loop through nodeList and get the relevant node positions
+      for (let i = 0; i < nl.length; i++) {
+        // !VA Get the positions of the relevant nodes for indents
+        if (nl[i].nodeName === 'IMG') { imgNodeIndex = i; }
+        if (nl[i].nodeName === 'A') { aNodeIndex = i; }
+        // if (nl[i].nodeName === 'P') { pNodeIndex = i; }
+        // if (nl[i].nextSibling) {nextSiblingNodeIndex = i; } 
+        // if (nl[i].previousSibling) {previousSiblingNodeIndex = i; } 
       }
-      
 
-      
-      
-      console.log('nodeList[0].outerHTML is: \n' + nodeList[0].outerHTML);
-      writeClipboard( id, container.outerHTML);
-      return;
+      console.log('loopCount is: ' + loopCount);
+      for (i = 0; i < loopCount; i++) {
+        // console.log('i is: ' + i);
+        indent  = indentLevelToIndentChars(i);
+        // !VA Relevant exceptions here, need to move to a separate function later
+        // !VA Exclude indents for img tag if there is no anchor wrapper, otherwise treat the IMG as the terminal node in the indent tree.
+
+        switch(true) {
+        // !VA Exclude indents for img tag if there is no anchor wrapper, otherwise treat the IMG as the terminal node in the indent tree.
+        case (i === imgNodeIndex):
+          if (hasAnchor) {
+            // !VA If Include anchor is checked, then we want the img to be enclosed in the anchor tag without any indents, so don't do anything here
+          } else {
+            // !VA If there's no anchor, then we need to indent the IMG as the terminal node in the tree
+            nl[i].insertAdjacentHTML('beforebegin', indent);
+            // nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
+            // nodeList[i].insertAdjacentHTML('beforeend', indentbeforeend);
+            nl[i].insertAdjacentHTML('afterend', '\n');
+          }
+          break;
+        case (i === aNodeIndex):
+          // !VA If the Anchor is present, treat it as the terminal node -- its child IMG gets no indent
+          nl[i].insertAdjacentHTML('beforebegin', indent);
+          // nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
+          // nodeList[i].insertAdjacentHTML('beforeend', indentbeforeend);
+          nl[i].insertAdjacentHTML('afterend', '\n');
+          break;
+
+        default:
+          // !VA All the other nodes get the default indent scheme
+          nl[i].insertAdjacentHTML('beforebegin', indent);
+          nl[i].insertAdjacentHTML('afterbegin', '\n');
+          nl[i].insertAdjacentHTML('beforeend', indent);
+          nl[i].insertAdjacentHTML('afterend', '\n');
+        } 
+
+      }
+      console.log('nl[0].outerHTML is: ');
+      console.dir(nl[0].outerHTML);
+      clipboardStr = nl[0].outerHTML;
+
+      writeClipboard( id, clipboardStr);
     }
+
+
+
+
+
 
     // !VA This works for everything except embedded background image tags. This is totally hacked but it works 100% - I don't think it can be improved on structurally.
     function doIndents(id, container) {
@@ -1113,7 +1213,7 @@ var Witty = (function () {
 
     function writeClipboard(id, str) {
       console.log('writeClipboard running');
-      
+      console.log('id is: ' + id);
       var clipboardStr;
       clipboardStr = str;
       // clipboardStr = tag.outerHTML;
