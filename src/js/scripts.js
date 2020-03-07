@@ -764,22 +764,22 @@ var Witty = (function () {
         // We have set the indents and will process them in doAltIndents1. 
 
         // !VA Determine which button fired this action and either return to calling makeNodeList, which then calls doIndents, or abort the return and write directly to clipboard. We need to write directly to clipboard when the indent scheme is handled here, for instance, with the bg image code. Trying to run this code with all its comment nodes through a doIndent structure would be suicide.
-        switch(true) {
-        case (id === 'btn-ccp-make-td-tag'):
-          console.log('Mark1');
-          indent = 'XXXX';
-          break;
-        case (id === 'btn-ccp-make-table-tag' && !Attributes.tableIncludeWrapper):
-          // !VA If the CCP Make Table button was clicked and Include wrapper table is NOT checked, add 2 spaces for each table node for a total of 6 spaces
-          indent = '000000';
-          break;
-        case (id === 'btn-ccp-make-table-tag' && Attributes.tableIncludeWrapper):
-          // !VA If the CCP Make Table button was clicked and Include wrapper table IS checked, add 2 spaces for each additional table node for a total of 9 spaces
-          indent = 'GGGGGGGGG';
-          break;
-        default:
-          console.log('default');
-        } 
+        // switch(true) {
+        // case (id === 'btn-ccp-make-td-tag'):
+        //   console.log('Mark1');
+        //   indent = 'XXXX';
+        //   break;
+        // case (id === 'btn-ccp-make-table-tag' && !Attributes.tableIncludeWrapper):
+        //   // !VA If the CCP Make Table button was clicked and Include wrapper table is NOT checked, add 2 spaces for each table node for a total of 6 spaces
+        //   indent = '000000';
+        //   break;
+        // case (id === 'btn-ccp-make-table-tag' && Attributes.tableIncludeWrapper):
+        //   // !VA If the CCP Make Table button was clicked and Include wrapper table IS checked, add 2 spaces for each additional table node for a total of 9 spaces
+        //   indent = 'GGGGGGGGG';
+        //   break;
+        // default:
+        //   console.log('default');
+        // } 
 
 
         var foo = document.createComment(`[if !mso]><!-->${linebreak}${indent}<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">${linebreak}${indent}<a href="http://www.dimwhit.io"><img class="mobileshow" alt="ALT" width="480" height="480" src="template-img/witty-template-mobile.jpg" border="0" style="width: 480px; height: 480px; margin: 0px; border: none; outline: none; text-decoration: none; display: block;" /></a>${linebreak}${indent}<!--</span>-->${linebreak}${indent}<!--<![endif]`);
@@ -959,8 +959,6 @@ var Witty = (function () {
       // !VA Put the table and its descendents into the parent container
       container.appendChild(topNode);
       // !VA Pass the clicked button id and parent container element to process the code indents
-      console.log('makeNodeList container is: ' + container);
-      console.log(container);
 
       doIndentsNew( id, container, hasAnchor, hasWrapper, selectedRadio );
 
@@ -979,9 +977,9 @@ var Witty = (function () {
     function doIndentsNew( id, container, hasAnchor, hasWrapper, selectedRadio ) {
       // !VA PROBLEM: nodeList does not include the top level element, so we need a div container for everything. That needs to come from makeNodeList.
       console.log('doIndentsNew');
-      console.log('id is: ' + id);
-      console.log('container is: ');
-      console.log(container);
+      // console.log('id is: ' + id);
+      // console.log('container is: ');
+      // console.log(container);
       let i, clipboardStr, target, checked, nl, loopCount;
       let indent;
       // !VA Array of node names for console
@@ -992,26 +990,31 @@ var Witty = (function () {
       for (let i = 0; i < nl.length; i++) { nlnodenames.push(nl[i].nodeName); }
       console.log('NL INFO: nl.length is: ' + nl.length + '; nlnodenames is: ' + nlnodenames);
 
-      console.log('hasAnchor is: ' + hasAnchor + '; hasWrapper is: ' + hasWrapper + '; selectedRadio is: ' + selectedRadio);
-      console.log('btnCcpMakeClips.btnCcpMakeImgTag is: ' + btnCcpMakeClips.btnCcpMakeImgTag);
       switch(true) {
       // !VA Use slice to  remove the # from the alias to match it with the id string.
       case (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)):
         // !VA If Include anchor is checked get the anchor and descendant img, otherwise, just get the img.  Don't forget we need to get the parent of the element we want to get the nodeList from because querySelectorAll gets the descendants not including the parent. Subtract from nl.length accordingly.
         hasAnchor ? nl  = nl[nl.length  - 3] : nl  = nl[nl.length  - 2];
         nl = nl.querySelectorAll('*');
-        console.log('CASE 1 nl is: ');
-        console.log('nl.length is: ' + nl.length);
-        console.log(nl);
+        // console.log('CASE 1 nl is: ');
+        // console.log('nl.length is: ' + nl.length);
+        // console.log(nl);
         break;
       case (id === btnCcpMakeClips.btnCcpMakeTdTag.slice(1)):
         switch(true) {
         case (selectedRadio === 'basic'):
           hasAnchor ? nl  = nl[nl.length  - 4] : nl  = nl[nl.length  - 3];
           nl = nl.querySelectorAll('*');
-          console.log('CASE 2 nl is: ');
-          console.log('selectedRadio is: ' + selectedRadio);
-          console.log('nl.length is: ' + nl.length);
+          // console.log('CASE 2 nl is: ');
+          // console.log('selectedRadio is: ' + selectedRadio);
+          // console.log('nl.length is: ' + nl.length);
+          break;
+        case (selectedRadio === 'imgswap'):
+          hasAnchor ? nl  = nl[nl.length  - 4] : nl  = nl[nl.length  - 3];
+          nl = nl.querySelectorAll('*');
+          // console.log('CASE 2 nl is: ');
+          // console.log('selectedRadio is: ' + selectedRadio);
+          // console.log('nl.length is: ' + nl.length);
           break;
 
         default:
@@ -1021,14 +1024,14 @@ var Witty = (function () {
       case (id === btnCcpMakeClips.btnCcpMakeTableTag.slice(1)):
         switch(true) {
         case (selectedRadio === 'basic'):
-          console.log('CASE 3 nl is: ');
-          console.log('nl is: ');
-          console.log(nl);
+          // console.log('CASE 3 nl is: ');
+          // console.log('nl is: ');
+          // console.log(nl);
           // hasAnchor ? nl  = nl[nl.length  - 7] : nl  = nl[nl.length  - 5];
           // !VA If hasWrapper, then we need to create the nodeList from the original container, otherwise the parent table will be excluded and the nodeList will start with the child tr. Otherwise, since we don't need the parent div. NOTE: Since we're calculating the output nodes from the TOP of the tree here, hasAnchor doesn't figure into the calcualtion.
           hasWrapper ? nl = container : nl = nl[2];
           nl = nl.querySelectorAll('*');
-          console.log('nl.length is: ' + nl.length);
+          // console.log('nl.length is: ' + nl.length);
           break;
         default:
           console.log('default');
@@ -1038,8 +1041,21 @@ var Witty = (function () {
         // code block
       } 
 
+      function applyIndents(nl, i,  indentType, indent) {
+        console.log('Apply indents running');
+        if (indentType == 'terminal') {
+          nl[i].insertAdjacentHTML('beforebegin', indent);
+          nl[i].insertAdjacentHTML('afterend', '\n');
+        } 
+        else {
+          nl[i].insertAdjacentHTML('beforebegin', indent);
+          nl[i].insertAdjacentHTML('afterbegin', '\n');
+          nl[i].insertAdjacentHTML('beforeend', indent);
+          nl[i].insertAdjacentHTML('afterend', '\n');
+        }
+      }
 
-      // !VA 
+
       loopCount = nl.length;
 
       let imgNodeIndex, aNodeIndex;
@@ -1066,27 +1082,18 @@ var Witty = (function () {
           if (hasAnchor) {
             // !VA If Include anchor is checked, then we want the img to be enclosed in the anchor tag without any indents, so don't do anything here
           } else {
-            // !VA If there's no anchor, then we need to indent the IMG as the terminal node in the tree
-            nl[i].insertAdjacentHTML('beforebegin', indent);
-            // nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
-            // nodeList[i].insertAdjacentHTML('beforeend', indentbeforeend);
-            nl[i].insertAdjacentHTML('afterend', '\n');
+            // !VA Treat the img tag as the terminal node and apply indents accordingly
+            applyIndents(nl, i, 'terminal', indent);
           }
           break;
         case (i === aNodeIndex):
-          // !VA If the Anchor is present, treat it as the terminal node -- its child IMG gets no indent
-          nl[i].insertAdjacentHTML('beforebegin', indent);
-          // nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
-          // nodeList[i].insertAdjacentHTML('beforeend', indentbeforeend);
-          nl[i].insertAdjacentHTML('afterend', '\n');
+          // !VA If the Anchor is present, treat it as the TERMINAL node -- its child IMG gets no indent
+          applyIndents(nl, i, 'terminal', indent);
           break;
 
         default:
-          // !VA All the other nodes get the default indent scheme
-          nl[i].insertAdjacentHTML('beforebegin', indent);
-          nl[i].insertAdjacentHTML('afterbegin', '\n');
-          nl[i].insertAdjacentHTML('beforeend', indent);
-          nl[i].insertAdjacentHTML('afterend', '\n');
+          // !VA All the other nodes get the normal indent scheme
+          applyIndents(nl, i, 'normal', indent);
         } 
 
       }
@@ -1212,8 +1219,6 @@ var Witty = (function () {
     }
 
     function writeClipboard(id, str) {
-      console.log('writeClipboard running');
-      console.log('id is: ' + id);
       var clipboardStr;
       clipboardStr = str;
       // clipboardStr = tag.outerHTML;
