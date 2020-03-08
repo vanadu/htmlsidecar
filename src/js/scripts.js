@@ -991,7 +991,8 @@ var Witty = (function () {
       console.log('NL INFO: nl.length is: ' + nl.length + '; nlnodenames is: ' + nlnodenames);
 
       switch(true) {
-      // !VA Use slice to  remove the # from the alias to match it with the id string.
+      // !VA Use slice to  remove the # from the alias to match it with the id string. 
+      // !VA 03.08.2020 We need to add in the part from the deleted branch about adding a container node above the nodeList after extracting the sub-trees below. AND make the indices relative to the top node, not the bottom. See yesterday's saved JS file in ../witty which I saved there before deleting the branch.
       case (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)):
         // !VA If Include anchor is checked get the anchor and descendant img, otherwise, just get the img.  Don't forget we need to get the parent of the element we want to get the nodeList from because querySelectorAll gets the descendants not including the parent. Subtract from nl.length accordingly.
         hasAnchor ? nl  = nl[nl.length  - 3] : nl  = nl[nl.length  - 2];
