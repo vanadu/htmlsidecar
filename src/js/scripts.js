@@ -726,7 +726,7 @@ var Witty = (function () {
       let Attributes, Appdata;
       Attributes = getAttributes();
       Appdata = appController.initGetAppdata();
-      let tdInner, imgNode, mobileSwapStr, mobileSwapSrc;
+      let tdInner, imgNode, mobileSwapStr, mobileFilename;
       tdInner = document.createElement('td');
       // !VA Add the attributes that are included in both the default and background image td
       if (Attributes.tdValign) { tdInner.vAlign = Attributes.tdValign; }
@@ -763,24 +763,14 @@ var Witty = (function () {
         // !VA get the current img
         imgNode = makeImgNode();
         tdInner.appendChild(imgNode);
-        // mobileSwapSrc = Attributes.imgSrc + '-mob';
-        // var srcSource = Attributes.imgSrc;
-        // console.log('srcSource is: ' + srcSource);
-        // mobileSwapSrc = srcSource.replace(/(.*)/, /mob-$2/);
-        // console.log('mobileSwapSrc is: ' + mobileSwapSrc);
-
-        mobileSwapSrc = Appdata.fname;
-        console.log('mobileSwapSrc is: ' + mobileSwapSrc);
-        
-
-        // console.log(/.(jpg|png|gif|svg)/.test(foo));
-        mobileSwapSrc = mobileSwapSrc.replace(/(.jpg|.png|.gif|.svg)/g, "-mob$1");
-        console.log('mobileSwapSrc is: ' + mobileSwapSrc);
-
-        mobileSwapStr = document.createComment(`[if !mso]><!-->${linebreak}${indent}<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">${linebreak}${indent}<a href="#"><img class="mobileshow" alt=${Attributes.imgAlt} width="${Appdata.sPhonesW}" height="${Appdata.sPhonesH}" src="${mobileSwapSrc}" border="0" style="width: ${Appdata.sPhonesW}px; height: ${Appdata.sPhonesH}px; margin: 0; border: none; outline: none; text-decoration: none; display: block;" /></a>${linebreak}${indent}<!--</span>-->${linebreak}${indent}<!--<![endif]`);
-        // !VA Append the mobileSwapStr code
+        // !VA Create the mobile image filename: Get the current image file's filename and append the name with '-mob'.
+        mobileFilename = Appdata.fname;
+        // !VA The regex for appending the filename with '-mob'.
+        mobileFilename = mobileFilename.replace(/(.jpg|.png|.gif|.svg)/g, "-mob$1");
+        // !VA Create the code for the mobile swap TD as a Comment node of the parent td. 
+        mobileSwapStr = document.createComment(`[if !mso]><!-->${linebreak}${indent}<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">${linebreak}${indent}<a href="#"><img class="mobileshow" alt=${Attributes.imgAlt} width="${Appdata.sPhonesW}" height="${Appdata.sPhonesH}" src="${mobileFilename}" border="0" style="width: ${Appdata.sPhonesW}px; height: ${Appdata.sPhonesH}px; margin: 0; border: none; outline: none; text-decoration: none; display: block;" /></a>${linebreak}${indent}<!--</span>-->${linebreak}${indent}<!--<![endif]`);
+        // !VA Append the mobileSwapStr code to tdInner
         tdInner.appendChild(mobileSwapStr);
-
         break;
       case (radioSelected === 'bgimage'):
         tdInner.width = Attributes.tdAppdataWidth;
@@ -971,10 +961,7 @@ var Witty = (function () {
         for (i = 0; i < nl.length; i++) {
           // console.log('i is: ' + i);
           indent  = indentLevelToIndentChars(i);
-
           // !VA Exclude indents for img tag if there is no anchor wrapper, otherwise treat the IMG as the terminal node in the indent tree.
-          
-
           switch(true) {
           // !VA Exclude indents for img tag if there is no anchor wrapper, otherwise treat the IMG as the terminal node in the indent tree.
           case (i === imgNodeIndex):
@@ -997,7 +984,6 @@ var Witty = (function () {
           } 
         }
       }
-
       function applyIndents(nl, indentIndex,  indentType, indent) {
         console.log('applyIndents running');
         if (indentType == 'terminal') {
@@ -1012,10 +998,30 @@ var Witty = (function () {
           nl[indentIndex].insertAdjacentHTML('beforeend', indent);
           nl[indentIndex].insertAdjacentHTML('afterend', '\n');
         }
-
-
       }
+      function doImgSwapIndents(nl) {
+        console.log('doImgSwapIndents running');
+        console.log('nl is: ');
+        console.log(nl);
+        indent = indentLevelToIndentChars( 1 );
+        nl[0].insertAdjacentHTML('afterbegin', '\n');
+        nl[0].insertAdjacentHTML('beforeend', '\n');
+        nl[1].insertAdjacentHTML('beforebegin', indent);
+        // nl[1].insertAdjacentHTML('beforeend', indent);
+        nl[1].insertAdjacentHTML('afterbegin', '\n');
+        nl[1].insertAdjacentHTML('afterend', '\n' + indent);
+        nl[2].insertAdjacentHTML('beforebegin', indent);
 
+
+        
+
+        // nl[0].childNodes[3].insertAdjacentHTML('beforebegin', '\n');
+
+        var foo = nl[0].childNodes[3];
+        console.log('foo.textContent is: ');
+        console.log(foo.textContent);
+        
+      }
       // !VA NL INFO
       for (let i = 0; i < nl.length; i++) { nlnodenames.push(nl[i].nodeName); }
       console.log('NL INFO: nl.length is: ' + nl.length + '; nlnodenames is: ' + nlnodenames);
@@ -1050,11 +1056,12 @@ var Witty = (function () {
           // doIndentStructure(nl);
           break;
         case (selectedRadio === 'imgswap'):
-          hasAnchor ? nl  = nl[nl.length  - 4] : nl  = nl[nl.length  - 3];
-          nl = nl.querySelectorAll('*');
+          i = 5;
+          nl = extractNodes(nl, i);
           // console.log('CASE 2 nl is: ');
           // console.log('selectedRadio is: ' + selectedRadio);
           // console.log('nl.length is: ' + nl.length);
+          doImgSwapIndents(nl);
           break;
 
         default:
@@ -1076,6 +1083,7 @@ var Witty = (function () {
           console.log(nl);
           preprocessIndents(nl );
           break;
+
         default:
           console.log('default');
         } 
