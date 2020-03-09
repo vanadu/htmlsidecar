@@ -7,32 +7,33 @@
 =========================================================
 // !VA 02.28.20
 For later:
-TODO: The CSS output will need to be revisited. You'd never need to output the width AND height in CSS for tables and for td it probably has no effect for height. That means...ugh.
+TODO: The CSS output will need to be revisited for td and table.
 TODO: Figure out why queryDOMElements is running mutliple times per CB build.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
 TODO: Add some kind of fluid option to the img options. Cerberus hard codes it into the img tag. That needs to be tested. Litmus overrides the width and height style properties in the CSS media queries. Need to test before that is implemented - but there's no reason to include a fluid option if that's settable in CSS.
 
 Status:
-TODO: Add image swap
+TODO: Handle indents for  mobile  swap
+Branch: mobileSwapIndents
+
+
+
 TODO: Add no-image option to td options select - think about how that will affect indents first
 TODO: Change msg-table to flex div
 TODO: Fix the Chrome display 
 
 Add image swap:
 <td align="left" style="vertical-align:top;">
-  <a href="http://www.dimwhit.io">
-    <img class="hide" alt="Pay as little as a $0 co-pay for brand-name Rx and get free delivery" width="600" height="167" src="template-img/witty-template-desktop.jpg" border="0" style="width: 600px; height: 167px; margin: 0px; border: none; outline: none; text-decoration: none; display: block;" /></a>
-
-    <!--[if !mso]><!-->
-      <span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">
-        <a href="http://www.dimwhit.io"><img class="mobileshow" alt="Rx truths: Did you know patients can save with brand-name Rx?" width="480" height="480" src="template-img/witty-template-mobile.jpg" border="0" style="width: 480px; height: 480px; margin: 0px; border: none; outline: none; text-decoration: none; display: block;" /></a>
-      <!--</span>-->
-    <!--<![endif]-->
+<a href="http://www.dimwhit.io">
+<img class="hide" alt="Pay as little as a $0 co-pay for brand-name Rx and get free delivery" width="600" height="167" src="template-img/witty-template-desktop.jpg" border="0" style="width: 600px; height: 167px; margin: 0px; border: none; outline: none; text-decoration: none; display: block;" /></a>
+<!--[if !mso]><!-->
+<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">
+<a href="http://www.dimwhit.io"><img class="mobileshow" alt="Rx truths: Did you know patients can save with brand-name Rx?" width="480" height="480" src="template-img/witty-template-mobile.jpg" border="0" style="width: 480px; height: 480px; margin: 0px; border: none; outline: none; text-decoration: none; display: block;" /></a>
+<!--</span>-->
+<!--<![endif]-->
 </td>
 
-Branch: addConditionalToIndents
---We have to add alternative ident schemes after all... ugh!
-The problem is htat you can't mix NODES and NODELISTS, and the NODELIST is where you do all the indenting. Do you can't have separate functions for indenting IMGNODE, TDNODE and TABLENODE... or can you. At least my last attempt at this failed. You'd have to output the ENTIRE NODELIST every time. I was previously trying to do indents from the imgMakeNode output - that won't work. Try it again using the doIndents output...
+
 
 
 /* !VA  - 06.23.19
@@ -52,6 +53,7 @@ TODO: THe CCP should store all the currently selected options and restore them w
 TODO: Assign keyboard  shortcuts
 TODO: Assign tab order
 
+DONE: Add image swap
 DONE: Reduce timeout on clicking clipboard buttons...too slow. There has to be two implementations of messages - one for status messages that only last a half a second and use the blocker, and one for error messages that last two seconds and don't use the blocker.
 DONE: Fixed error messages - they didn't fade out. Loop that in with flashAppMessage
 DONE: Implement Td and table copy to clipboard buttons.
