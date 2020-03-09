@@ -15,6 +15,8 @@ TODO: Add some kind of fluid option to the img options. Cerberus hard codes it i
 Status:
 TODO: Handle indents for  mobile  swap
 Branch: mobileSwapIndents
+1) Make the current image the mobile output image + mob extension
+
 
 
 
@@ -721,9 +723,10 @@ var Witty = (function () {
     function makeTdNode( id ) {
       // console.log('makeTdNode running');
       // console.clear();
-      let Attributes;
+      let Attributes, Appdata;
       Attributes = getAttributes();
-      let tdInner, imgNode;
+      Appdata = appController.initGetAppdata();
+      let tdInner, imgNode, mobileSwapStr, mobileSwapSrc;
       tdInner = document.createElement('td');
       // !VA Add the attributes that are included in both the default and background image td
       if (Attributes.tdValign) { tdInner.vAlign = Attributes.tdValign; }
@@ -732,7 +735,7 @@ var Witty = (function () {
       // !VA Now add the attributes included only with the default Td configuration
       let fallback;
       let bgcolor;
-      let linebreak, indent, indentbeforebegin, indentafterbegin,  indentbeforeend, indentafterend;
+      let linebreak, indent;
       let radioSelected, writeToClipboard;
       linebreak = '\n';
       indent = indentbeforebegin = indentafterbegin = indentbeforeend = indentafterend = 'XX';
@@ -760,9 +763,23 @@ var Witty = (function () {
         // !VA get the current img
         imgNode = makeImgNode();
         tdInner.appendChild(imgNode);
+        // mobileSwapSrc = Attributes.imgSrc + '-mob';
+        // var srcSource = Attributes.imgSrc;
+        // console.log('srcSource is: ' + srcSource);
+        // mobileSwapSrc = srcSource.replace(/(.*)/, /mob-$2/);
+        // console.log('mobileSwapSrc is: ' + mobileSwapSrc);
 
-        var foo = document.createComment(`[if !mso]><!-->${linebreak}${indent}<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">${linebreak}${indent}<a href="http://www.dimwhit.io"><img class="mobileshow" alt="ALT" width="480" height="480" src="template-img/witty-template-mobile.jpg" border="0" style="width: 480px; height: 480px; margin: 0px; border: none; outline: none; text-decoration: none; display: block;" /></a>${linebreak}${indent}<!--</span>-->${linebreak}${indent}<!--<![endif]`);
-        tdInner.appendChild(foo);
+        mobileSwapSrc = Appdata.fname;
+        console.log('mobileSwapSrc is: ' + mobileSwapSrc);
+        
+
+        // console.log(/.(jpg|png|gif|svg)/.test(foo));
+        mobileSwapSrc = mobileSwapSrc.replace(/(.jpg|.png|.gif|.svg)/g, "-mob$1");
+        console.log('mobileSwapSrc is: ' + mobileSwapSrc);
+
+        mobileSwapStr = document.createComment(`[if !mso]><!-->${linebreak}${indent}<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">${linebreak}${indent}<a href="#"><img class="mobileshow" alt=${Attributes.imgAlt} width="${Appdata.sPhonesW}" height="${Appdata.sPhonesH}" src="${mobileSwapSrc}" border="0" style="width: ${Appdata.sPhonesW}px; height: ${Appdata.sPhonesH}px; margin: 0; border: none; outline: none; text-decoration: none; display: block;" /></a>${linebreak}${indent}<!--</span>-->${linebreak}${indent}<!--<![endif]`);
+        // !VA Append the mobileSwapStr code
+        tdInner.appendChild(mobileSwapStr);
 
         break;
       case (radioSelected === 'bgimage'):
@@ -943,6 +960,7 @@ var Witty = (function () {
           // !VA Get the positions of the relevant nodes for indents
           if (nl[i].nodeName === 'IMG') { imgNodeIndex = i; }
           if (nl[i].nodeName === 'A') { aNodeIndex = i; }
+
           // if (nl[i].nodeName === 'P') { pNodeIndex = i; }
           // if (nl[i].nextSibling) {nextSiblingNodeIndex = i; } 
           // if (nl[i].previousSibling) {previousSiblingNodeIndex = i; } 
