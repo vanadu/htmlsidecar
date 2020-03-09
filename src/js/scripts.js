@@ -12,17 +12,11 @@ TODO: Figure out why queryDOMElements is running mutliple times per CB build.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
 TODO: Add some kind of fluid option to the img options. Cerberus hard codes it into the img tag. That needs to be tested. Litmus overrides the width and height style properties in the CSS media queries. Need to test before that is implemented - but there's no reason to include a fluid option if that's settable in CSS.
 
-Status:
-TODO: Handle indents for  mobile  swap
-Branch: mobileSwapIndents
-1) Make the current image the mobile output image + mob extension
+Status 03.09.2020:
 
-
-
-
-TODO: Add no-image option to td options select - think about how that will affect indents first
-TODO: Change msg-table to flex div
-TODO: Fix the Chrome display 
+TODO: Handle indents for background image
+TODO: Structure the doIndents so that the selected TD options in CASE2 also apply to CASE 3 
+DONE: Handle indents for mobile swap TD
 
 Add image swap:
 <td align="left" style="vertical-align:top;">
@@ -35,8 +29,12 @@ Add image swap:
 <!--<![endif]-->
 </td>
 
+TODO: Add no-image option to td options select - think about how that will affect indents first
+TODO: Change msg-table to flex div
+TODO: Fix the Chrome display 
 
 
+DONE: Add image swap
 
 /* !VA  - 06.23.19
 =========================================================
@@ -47,7 +45,6 @@ TOD0: Think about making getAppdata only query a specific property if possible.
 TODO: Fix being able to resize viewerW smaller than imgW - current behavior is imgw resizes with viewerW. If that's the desired behavior, imgW still doesn't write the udpated width to Appdata, that needs to be fixed.
 TODO: Make mrk => box function...not sure where though or whether it's necessary since it's just a one-liner.
 TODO: Fix bug - load 400X1000, multiple click on +50, Display Size shows 450 but the img doesn't grow...
-TODO: Implement image swap 
 TODO: Parent table class att only shows in CB output if Wrapper is selected, not in just the Partent table output.
 TODO: Make bgcolor add the hash if it's not in the value
 TODO: Fix, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
@@ -55,27 +52,8 @@ TODO: THe CCP should store all the currently selected options and restore them w
 TODO: Assign keyboard  shortcuts
 TODO: Assign tab order
 
-DONE: Add image swap
-DONE: Reduce timeout on clicking clipboard buttons...too slow. There has to be two implementations of messages - one for status messages that only last a half a second and use the blocker, and one for error messages that last two seconds and don't use the blocker.
-DONE: Fixed error messages - they didn't fade out. Loop that in with flashAppMessage
-DONE: Implement Td and table copy to clipboard buttons.
-DONE: Uncheck and Hide Wrapper table options when CCP is opened.
-DONE: Fix flashAppMessage to include status messages and cleanup
-DONE: Fix showElementOnInput in CCP
-Merge Branch 0619FixPhonesInput
-DONE: fixed sPhonesw and iptTbrLPhonesW user input.
-Merge fixAppMessages
-DONE: Fixed, imgW field on tab doesn't reset to placeholders. 
-DONE: Rewrite updateAppdata to be parameters... with key/value pairs as parameter.
-DONE: Fold handleToolbarClicks into checkUserInput and rename to checkUserInput
-Branch checkUserInput
-DONE: Branch rewriteHandleUserAction061119
-DONE: Fix that iSmallPhones and iLargePhones input fields show undefined and show in Appdata as pixel values.
-DONE: Fix default value in viewerW field - Fixed, added to calcViewerSize
-DONE: resize viewerW doesn't work Fixed, reconfigured updateAppdata to include viewerW
-DONE: - imgheight and imgwidth don't work Fixed, added evalToolbarInput to follow checkUserInput
-DONE: Rename UI.
-DONE: Show/Hide CCP, make checkboxes functional.
+
+
 */
 //SCRIPT START
 //PAGE SETUP START
