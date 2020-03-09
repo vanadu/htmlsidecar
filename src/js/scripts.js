@@ -16,6 +16,7 @@ Status 03.09.2020:
 
 TODO: Handle indents for background image
 TODO: Structure the doIndents so that the selected TD options in CASE2 also apply to CASE 3 
+TODO: FIX CHROME CSS!
 DONE: Handle indents for mobile swap TD
 
 Add image swap:
@@ -713,7 +714,8 @@ var Witty = (function () {
       // !VA Now add the attributes included only with the default Td configuration
       let fallback;
       let bgcolor;
-      let linebreak, indent;
+      // !VA TODO: Get rid of linebreak and replace with hard break or function reference
+      let linebreak, indentLevel;
       let radioSelected, writeToClipboard;
       linebreak = '\n';
       indent = indentbeforebegin = indentafterbegin = indentbeforeend = indentafterend = 'XX';
@@ -745,8 +747,9 @@ var Witty = (function () {
         mobileFilename = Appdata.fname;
         // !VA The regex for appending the filename with '-mob'.
         mobileFilename = mobileFilename.replace(/(.jpg|.png|.gif|.svg)/g, "-mob$1");
+        // !VA Set the indentLevel to 1 for now
         // !VA Create the code for the mobile swap TD as a Comment node of the parent td. 
-        mobileSwapStr = document.createComment(`[if !mso]><!-->${linebreak}${indent}<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">${linebreak}${indent}<a href="#"><img class="mobileshow" alt=${Attributes.imgAlt} width="${Appdata.sPhonesW}" height="${Appdata.sPhonesH}" src="${mobileFilename}" border="0" style="width: ${Appdata.sPhonesW}px; height: ${Appdata.sPhonesH}px; margin: 0; border: none; outline: none; text-decoration: none; display: block;" /></a>${linebreak}${indent}<!--</span>-->${linebreak}${indent}<!--<![endif]`);
+        mobileSwapStr = document.createComment(`[if !mso]><!-->${linebreak}${getIndent(indentLevel)}<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">${linebreak}${getIndent(indentLevel)}<a href="#"><img class="mobileshow" alt=${Attributes.imgAlt} width="${Appdata.sPhonesW}" height="${Appdata.sPhonesH}" src="${mobileFilename}" border="0" style="width: ${Appdata.sPhonesW}px; height: ${Appdata.sPhonesH}px; margin: 0; border: none; outline: none; text-decoration: none; display: block;" /></a>${linebreak}${getIndent(indentLevel)}<!--</span>-->${linebreak}${getIndent(indentLevel)}<!--<![endif]`);
         // !VA Append the mobileSwapStr code to tdInner
         tdInner.appendChild(mobileSwapStr);
         break;
@@ -762,8 +765,10 @@ var Witty = (function () {
         Attributes.tdBgcolor ? bgcolor = Attributes.tdBgcolor : bgcolor = fallback;
         tdInner.bgColor = bgcolor;
 
+        // !VA 03.09.2020 Set the indentLevel to 1 for now
+        indentLevel = 1;
         // !VA Define the innerHTML of the bgimage code
-        tdInner.innerHTML = `${indent}<!--[if gte mso 9]>${linebreak}${indent}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${linebreak}${indent}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${linebreak}${indent}<v:textbox inset="0,0,0,0">${linebreak}${indent}<![endif]-->${linebreak}${indent}<div>${indent}<!-- Put Foreground Content Here -->${linebreak}${indent}</div>${indent}<!--[if gte mso 9]>${linebreak}${indent}</v:textbox>${linebreak}${indent}</v:rect><![endif]-->\n`;
+        tdInner.innerHTML = `<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}<div>${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div><!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}</v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect><![endif]-->`;
 
         break;
       case (radioSelected === 'posswitch'):
@@ -868,9 +873,17 @@ var Witty = (function () {
       // !VA Put the table and its descendents into the parent container
       container.appendChild(topNode);
       // !VA Pass the clicked button id and parent container element to doIndents
-
       doIndentsNew( id, container );
+    }
 
+    function getIndent(indentLevel) {
+      console.log('indentLevelToChars running');
+      console.log('indentLevel is: ' + indentLevel);
+      let indentChar, indent;
+      indentChar = 'HH';
+      indent = indentChar.repeat([indentLevel]);
+      console.log('indent is: ' + indent);
+      return indent;
     }
 
     function doIndentsNew( id, container ) {
@@ -906,16 +919,6 @@ var Witty = (function () {
         return nl;
       }
 
-      function indentLevelToIndentChars(indentLevel) {
-        console.log('indentLevelToChars running');
-        console.log('indentLevel is: ' + indentLevel);
-        let indentChar, indent;
-        indentChar = 'XX';
-        indent = indentChar.repeat([indentLevel]);
-        console.log('indent is: ' + indent);
-        return indent;
-      }
-
       // !VA Handle the exception cases, i.e. imgNode doesn't get any indent if wrapped in an anchor, and separate handling of the terminal node vs parent nodes. Don't need indentIndex or indexType parameters  - they are generated here and passed from here.
       function preprocessIndents(nl) {
         // console.log('preprocessIndents running');
@@ -938,7 +941,7 @@ var Witty = (function () {
         // !VA Loop through nodes and process exceptions
         for (i = 0; i < nl.length; i++) {
           // console.log('i is: ' + i);
-          indent  = indentLevelToIndentChars(i);
+          indent  = getIndent(i);
           // !VA Exclude indents for img tag if there is no anchor wrapper, otherwise treat the IMG as the terminal node in the indent tree.
           switch(true) {
           // !VA Exclude indents for img tag if there is no anchor wrapper, otherwise treat the IMG as the terminal node in the indent tree.
@@ -981,7 +984,7 @@ var Witty = (function () {
         console.log('doImgSwapIndents running');
         console.log('nl is: ');
         console.log(nl);
-        indent = indentLevelToIndentChars( 1 );
+        indent = getIndent( 1 );
         nl[0].insertAdjacentHTML('afterbegin', '\n');
         nl[0].insertAdjacentHTML('beforeend', '\n');
         nl[1].insertAdjacentHTML('beforebegin', indent);
@@ -989,17 +992,30 @@ var Witty = (function () {
         nl[1].insertAdjacentHTML('afterbegin', '\n');
         nl[1].insertAdjacentHTML('afterend', '\n' + indent);
         nl[2].insertAdjacentHTML('beforebegin', indent);
-
-
-        
-
-        // nl[0].childNodes[3].insertAdjacentHTML('beforebegin', '\n');
-
-        var foo = nl[0].childNodes[3];
-        console.log('foo.textContent is: ');
-        console.log(foo.textContent);
-        
       }
+      function doBgimageIndents(nl) {
+        console.log('doBgimageIndents running');
+        console.log('nl is: ');
+        console.log(nl);
+        indent = getIndent( 1 );
+        nl[0].insertAdjacentHTML('afterbegin', '\n' + indent);
+        nl[0].insertAdjacentHTML('beforeend', '\n');
+        nl[1].insertAdjacentHTML('beforebegin', indent);
+        // nl[1].insertAdjacentHTML('beforeend', indent);
+        nl[1].insertAdjacentHTML('afterbegin', '\n');
+        nl[1].insertAdjacentHTML('afterend', '\n' + indent);
+        // nl[2].insertAdjacentHTML('beforebegin', indent);
+
+        var foo = nl[0].innerHTML;
+        console.log('foo is: ');
+        console.log(foo);
+
+
+
+
+      }
+
+      
       // !VA NL INFO
       for (let i = 0; i < nl.length; i++) { nlnodenames.push(nl[i].nodeName); }
       console.log('NL INFO: nl.length is: ' + nl.length + '; nlnodenames is: ' + nlnodenames);
@@ -1013,7 +1029,7 @@ var Witty = (function () {
         // i = 6, indentLevel = nl.length - (i - 1);
         i = 6, indentLevel = 0, indentIndex = 0;
 
-        indent = indentLevelToIndentChars( indentLevel );
+        indent = getIndent( indentLevel );
         nl = extractNodes(nl, i);
         console.log('nl is: ');
         console.log(nl);
@@ -1026,7 +1042,7 @@ var Witty = (function () {
         switch(true) {
         case (selectedRadio === 'basic'):
           i = 5, indentLevel = 1, indentIndex = 0;
-          indent = indentLevelToIndentChars( indentLevel );
+          indent = getIndent( indentLevel );
           nl = extractNodes(nl, i);
           console.log('nl is: ');
           console.log(nl);
@@ -1041,7 +1057,14 @@ var Witty = (function () {
           // console.log('nl.length is: ' + nl.length);
           doImgSwapIndents(nl);
           break;
-
+        case (selectedRadio === 'bgimage'):
+          i = 5;
+          nl = extractNodes(nl, i);
+          // console.log('CASE 2 nl is: ');
+          // console.log('selectedRadio is: ' + selectedRadio);
+          // console.log('nl.length is: ' + nl.length);
+          doBgimageIndents(nl);
+          break;
         default:
           console.log('default');
         } 
@@ -1051,10 +1074,10 @@ var Witty = (function () {
         case (selectedRadio === 'basic'):
           if (hasWrapper) {
             i = 0, indentLevel = 0, indentIndex = 0;
-            indent = indentLevelToIndentChars( indentLevel );
+            indent = getIndent( indentLevel );
           } else {
             i = 3, indentLevel = 1, indentIndex = 0;
-            indent = indentLevelToIndentChars( indentLevel );
+            indent = getIndent( indentLevel );
           }
           nl = extractNodes(nl, i);
           console.log('nl is: ');
