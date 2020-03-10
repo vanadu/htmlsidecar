@@ -715,7 +715,12 @@ var Witty = (function () {
       }
       return returnNode;
     }
-    
+
+
+
+    // !VA 03.10.2020 Need to find out whether the table button was clicked and if so just add 3 or 6 to the indentLevel of the getIndent function.
+
+
     function makeTdNode( id ) {
       // console.log('makeTdNode running');
       // console.clear();
@@ -1044,7 +1049,12 @@ var Witty = (function () {
         console.log('CASE 1');
         // !VA If Include anchor is checked get the anchor and descendant img, otherwise, just get the img.  Don't forget we need to get the parent of the element we want to get the nodeList from because querySelectorAll gets the descendants not including the parent. Subtract from nl.length accordingly.
         // i = 6, indentLevel = nl.length - (i - 1);
-        i = 6, indentLevel = 0, indentIndex = 0;
+        // !VA 03.10.2020
+        console.log('nl.length is: ' + nl.length);
+        // console.log('nl.length - (nl.length - 2) is: ' + nl.length - (nl.length - 2));
+        i = nl.length - 2;
+        // i = 6;
+        indentLevel = 0, indentIndex = 0;
 
         indent = getIndent( indentLevel );
         nl = extractNodes(nl, i);
