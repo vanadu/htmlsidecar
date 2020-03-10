@@ -12,7 +12,24 @@ TODO: Figure out why queryDOMElements is running mutliple times per CB build.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
 TODO: Add some kind of fluid option to the img options. Cerberus hard codes it into the img tag. That needs to be tested. Litmus overrides the width and height style properties in the CSS media queries. Need to test before that is implemented - but there's no reason to include a fluid option if that's settable in CSS.
 
-Status 03.09.2020:
+Status 03.10.2020:
+
+TODO: Need a plan here. Woke up this morning and nothing was working. Here's where we are now:
+
+TD Options: Basic TD
+  Make Img button works, hasAnchor true and false
+  Make td button works, hasAnchor true and false
+  Both make table buttons work, hasAnchor true and false
+
+TD Options: Mobile image swap
+  Make IMg buttons work, hasAnchor true and false
+  Make td button works more or less - the working Mobile image swap routine is in \witty\scripts_03.10.20A_doIndentsNew_RTLIndentsWork.js
+
+  After that, nothing works. 
+
+  First thing I need to do is figure out how to run the indents through a function in the mso td strings. // !VA 03.10.2020 branching to indentFunction
+  
+
 
 TODO: Handle indents for background image
 TODO: Structure the doIndents so that the selected TD options in CASE2 also apply to CASE 3 
