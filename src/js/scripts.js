@@ -680,7 +680,7 @@ var Witty = (function () {
     // !VA Get the user selections that define the clipboard output configuration- the clicked Options button, the Include anchor checkbox and the Include wrapper table checkbox. The nodeList used for the indents as well as the indent implementation will depend on these options -- only the basic TD radio button option generates a simple nodeList structure whose indents can be processed with a simple for loop. The other options generate nodeLists with text nodes and comments that require a custom indent scheme.
     function getUserSelection(id) {
       console.log('getUserSelection running');
-      console.log('id is: ' + id);
+      // console.log('id is: ' + id);
       let hasAnchor, hasWrapper, selectedRadio;
       let imgNode, tdNode, tableNode;
       // !VA Get the pertinent user-selected CCP options
@@ -697,14 +697,14 @@ var Witty = (function () {
       } 
       else if ( id=== btnCcpMakeClips.btnCcpMakeTdTag.slice(1)) {
         console.log('TD button clicked');
-        console.log('selectedRadio is: ' + selectedRadio);
+        // console.log('selectedRadio is: ' + selectedRadio);
         tdNode = makeTdNode( id, selectedRadio );
         console.log('tdNode is: ');
         console.log(tdNode);
         preprocessIndents( id, tdNode );
 
       } 
-      else if ( id=== btnCcpMakeClips.btnCcpMakeTdTag.slice(1)) {
+      else if ( id=== btnCcpMakeClips.btnCcpMakeTableTag.slice(1)) {
         console.log('TABLE button clicked');
       } 
       else {
@@ -716,7 +716,8 @@ var Witty = (function () {
       // console.clear();
       console.log('PreprocessIndents running');
       
-      let nl, container, i, indent, clipboardStr, imgNodeIndex, aNodeIndex, nextSiblingNodeIndex, indentspacing, previousSiblingNodeIndex, previousSiblingIndent;
+      let nl, block, container, i, indent, clipboardStr, imgNodeIndex, aNodeIndex, pNodeIndex, nextSiblingNodeIndex, indentspacing, previousSiblingNodeIndex, previousSiblingIndent;
+      let indentLevel;
 
 
       if (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)) {
@@ -730,6 +731,7 @@ var Witty = (function () {
       if (id === btnCcpMakeClips.btnCcpMakeTdTag.slice(1)) {
         // !VA getUserSelection Rather than pass the parameter, we can just get the selectedRadio here.
         var selectedRadio = document.querySelector('input[name="tdoptions"]:checked').value;
+        console.log('selectedRadio is: ' + selectedRadio);
         switch(true) {
         case ( selectedRadio === 'basic'):
           nl = makeNodeList(id, curNode);
@@ -753,39 +755,83 @@ var Witty = (function () {
           }
           break;
         case ( selectedRadio === 'imgswap'):
-        // code block
+          // !VA Hacked indents for now.
+          block = getImgSwapBlock( 1 );
+          var com = document.createComment(block);
+          curNode.appendChild(com);
+          console.log(curNode);
+          nl = makeNodeList(id, curNode);
+          console.log('nl is: ');
+          console.log(nl);
+          nl[1].insertAdjacentHTML('afterend', '\nHH');
+          nl[0].insertAdjacentHTML('beforeend', '\n');
           break;
         case ( selectedRadio === 'posswitch'):
-        // code block
+          console.clear();
+          curNode = makePosSwitchNodes();
+          nl = makeNodeList(id, curNode);
+          for (let i = 0; i < nl.length; i++) {
+            // !VA Get the positions of the relevant nodes for indents
+            // if (nl[i].nodeName === 'IMG') { imgNodeIndex = i; }
+            // if (nl[i].nodeName === 'A') { aNodeIndex = i; }
+            if (nl[i].nodeName === 'P') { pNodeIndex = i; }
+            if (nl[i].nextSibling) {nextSiblingNodeIndex = i; } 
+            if (nl[i].previousSibling) {previousSiblingNodeIndex = i; } 
+          }
+          previousSiblingIndent = (nl.length - (nextSiblingNodeIndex + 5));
+          for (let i = 0; i < nl.length; i++) {
+            // console.log('nl[i] is: ' +  nl[i]);
+            indent  = getIndent(i);
+
+            if (nextSiblingNodeIndex && i >= previousSiblingNodeIndex) {
+              // !VA Set the sibling's indent to be the same as that of the first sibling of the parent TR
+              indent = '' + getIndent(i - previousSiblingIndent);
+              // !VA We still need to add some indicator content to the terminating TD in this nodeList -- putting it in the makePosSwitchNode function itself would make it impossible to indent properly without some creative coding that's beyond my ability. So. we'll put it here, after the indent has been shrunk to be equal to the nextSibling's indent.
+              if ( i === 12) {
+                nl[i].innerHTML = indent + '  <!-- ADD YOUR CONTENT HERE --> \n';
+              }
+              nl[i].insertAdjacentHTML('beforebegin', indent);
+              nl[i].insertAdjacentHTML('afterbegin', '\n');
+              nl[i].insertAdjacentHTML('beforeend', indent);
+              nl[i].insertAdjacentHTML('afterend', '\n');
+            } 
+            else {
+              applyIndents(id, nl, i, 'normal', indent);
+            }
+          }
           break;
         case ( selectedRadio === 'bgimage'):
-        // code block
+          // !VA Hacked indents for now.
+          block = getBgimageBlock( 1 );
+          nl = makeNodeList(id, curNode);
+          nl[0].innerHTML = block;
+          nl[0].insertAdjacentHTML('afterbegin', '\nHH');
+          nl[0].insertAdjacentHTML('beforeend', '\n');
           break;
         default:
-            // code block
         } 
       }
-      console.log('nl[0].outerHTML is: ');
-      console.log(nl[0].outerHTML);
+      // console.log('nl[0].outerHTML is: ');
+      // console.log(nl[0].outerHTML);
       clipboardStr = nl[0].outerHTML;
-      console.log('clipboardStr is: ' + clipboardStr);
+      // console.log('clipboardStr is: ' + clipboardStr);
       writeClipboard( id, clipboardStr);
     }
 
     function applyIndents(id, nl, indentIndex,  indentType, indent) {
-      console.log('applyIndents running');
-      console.log('indentType is: ' + indentType);
+      // console.log('applyIndents running');
+      // console.log('indentType is: ' + indentType);
       if (indentType == 'terminal') {
-        console.log('terminal');
+        // console.log('terminal');
         nl[indentIndex].insertAdjacentHTML('beforebegin', indent);
         nl[indentIndex].insertAdjacentHTML('afterend', '\n');
       } 
       else if (indentType == 'normal') {
-        console.log('normal');
+        // console.log('normal');
         // console.log('nl[indentIndex] is: ');
         // console.log(nl[indentIndex]);
-        console.log('nl[indentIndex] is: ');
-        console.log(nl[indentIndex]);
+        // console.log('nl[indentIndex] is: ');
+        // console.log(nl[indentIndex]);
         nl[indentIndex].insertAdjacentHTML('beforebegin', indent);
         nl[indentIndex].insertAdjacentHTML('afterbegin', '\n');
         nl[indentIndex].insertAdjacentHTML('beforeend', indent);
@@ -802,10 +848,50 @@ var Witty = (function () {
 
     // !VA START TD OPTIONS MS-CONDITIONAL CODE BLOCKS
     // !VA These are the code blocks that contain MS conditionals in comment nodes or text nodes, i.e. mobile swap and background image.
-    function getMobileSwapBlock( id, curNode ) {
-      
+    function getImgSwapBlock( indentLevel ) {
+      let Appdata, Attributes;
+      Attributes = getAttributes();
+      Appdata = appController.initGetAppdata();
+      // console.log('Attributes is:');
+      // console.dir(Attributes);
+      let linebreak;
+      linebreak = '\n';
+      let mobileFilename, mobileSwapStr;
+      // !VA Create the mobile image filename: Get the current image file's filename and append the name with '-mob'.
+      mobileFilename = Appdata.fname;
+      console.log('mobileFilename is: ' + mobileFilename);
+      // !VA The regex for appending the filename with '-mob'.
+      mobileFilename = mobileFilename.replace(/(.jpg|.png|.gif|.svg)/g, "-mob$1");
+      // !VA Set the indentLevel to 1 for now
+      // !VA Create the code for the mobile swap TD as a Comment node of the parent td. 
+      mobileSwapStr = `[if !mso]><!-->${linebreak}${getIndent(indentLevel)}<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">${linebreak}${getIndent(indentLevel)}<a href="#"><img class="mobileshow" alt=${Attributes.imgAlt} width="${Appdata.sPhonesW}" height="${Appdata.sPhonesH}" src="${mobileFilename}" border="0" style="width: ${Appdata.sPhonesW}px; height: ${Appdata.sPhonesH}px; margin: 0; border: none; outline: none; text-decoration: none; display: block;" /></a>${linebreak}${getIndent(indentLevel)}<!--</span>-->${linebreak}${getIndent(indentLevel)}<!--<![endif]`;
+      // !VA Append the mobileSwapStr code to tdInner
+      // tdInner.appendChild(mobileSwapStr);
+      return mobileSwapStr;
     }
-        // !VA END TD OPTIONS MS-CONDITIONAL CODE BLOCKS
+
+    function getBgimageBlock( indentLevel) {
+      let Attributes;
+      Attributes = getAttributes();
+      let bgimageStr, fallback, bgcolor;
+      let linebreak;
+      linebreak = '\n';
+      // !VA 03.09.2020 Set the indentLevel to 1 for now
+      fallback = '#7bceeb';
+      Attributes.tdBgcolor ? bgcolor = Attributes.tdBgcolor : bgcolor = fallback;
+      console.log('bgcolor is: ' + bgcolor);
+
+      // !VA Define the innerHTML of the bgimage code
+      bgimageStr = `[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}${getIndent(indentLevel)}<div>${linebreak}${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div><!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}</v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect><![endif]`;
+
+      return bgimageStr;
+    }
+
+    function getPosSwitchText( indentLevel ) {
+      var str = 'PUT YOUR CONTENT HERE';
+      return str;
+    }
+    // !VA END TD OPTIONS MS-CONDITIONAL CODE BLOCKS
 
 
 
@@ -863,6 +949,7 @@ var Witty = (function () {
       Attributes = getAttributes();
       Appdata = appController.initGetAppdata();
       let tdInner, imgNode, mobileSwapStr, mobileFilename;
+
       tdInner = document.createElement('td');
       // !VA Add the attributes that are included in both the default and background image td
       if (Attributes.tdValign) { tdInner.vAlign = Attributes.tdValign; }
@@ -873,6 +960,7 @@ var Witty = (function () {
       let bgcolor;
       // !VA TODO: Get rid of linebreak and replace with hard break or function reference
       let linebreak, indentLevel;
+      linebreak = '\n';
       let  str, imgSwapText, beginSpan, beginMsoConditional, endMsoConditional, beginComment, endComment, container;
       switch(true) {
       case (selectedRadio === 'basic'):
@@ -889,8 +977,7 @@ var Witty = (function () {
 
         break;
       case (selectedRadio === 'imgswap'):
-        console.log('makeTdNode: imgswap');
-        // !VA First we create the node and add the attributes and add the imgNode
+        
         tdInner.width = Attributes.tdAppdataWidth;
         tdInner.height = Attributes.tdAppdataHeight;
         // !VA valign attribute
@@ -898,22 +985,13 @@ var Witty = (function () {
         // !VA get the current img
         imgNode = makeImgNode();
         tdInner.appendChild(imgNode);
-        console.log('makeTdNode imgswap here');
-        console.log('tdInner.outerHTML is: ');
-        console.log(tdInner.outerHTML);
-        // !VA getUserSelection Now we have the tdInner outerHTML - can we return this for now and add the code block after the nodeList is created?
+        
 
 
 
-        // !VA Create the mobile image filename: Get the current image file's filename and append the name with '-mob'.
-        mobileFilename = Appdata.fname;
-        // !VA The regex for appending the filename with '-mob'.
-        mobileFilename = mobileFilename.replace(/(.jpg|.png|.gif|.svg)/g, "-mob$1");
-        // !VA Set the indentLevel to 1 for now
-        // !VA Create the code for the mobile swap TD as a Comment node of the parent td. 
-        mobileSwapStr = document.createComment(`[if !mso]><!-->${linebreak}${getIndent(indentLevel)}<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">${linebreak}${getIndent(indentLevel)}<a href="#"><img class="mobileshow" alt=${Attributes.imgAlt} width="${Appdata.sPhonesW}" height="${Appdata.sPhonesH}" src="${mobileFilename}" border="0" style="width: ${Appdata.sPhonesW}px; height: ${Appdata.sPhonesH}px; margin: 0; border: none; outline: none; text-decoration: none; display: block;" /></a>${linebreak}${getIndent(indentLevel)}<!--</span>-->${linebreak}${getIndent(indentLevel)}<!--<![endif]`);
-        // !VA Append the mobileSwapStr code to tdInner
-        tdInner.appendChild(mobileSwapStr);
+
+
+
         break;
       case (selectedRadio === 'bgimage'):
         // !VA First we create the node
@@ -924,21 +1002,14 @@ var Witty = (function () {
         // !VA Set the background attribute to the current path/filename
         tdInner.setAttribute('background', Attributes.tdBackground);
         // !VA Include fallback color if no bgColor is selected. Use Stig's fallback: #7bceeb
-        fallback = '#7bceeb';
-        Attributes.tdBgcolor ? bgcolor = Attributes.tdBgcolor : bgcolor = fallback;
-        tdInner.bgColor = bgcolor;
 
-        // !VA 03.09.2020 Set the indentLevel to 1 for now
-        indentLevel = 1;
-        // !VA Define the innerHTML of the bgimage code
-        tdInner.innerHTML = `<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}<div>${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div><!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}</v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect><![endif]-->`;
+
+
 
         break;
       case (selectedRadio === 'posswitch'):
         // console.log('radioSelected === posswitch running');
-        tdInner = makePosSwitchNodes();
-        // console.log(tdInner);
-        writeToClipboard = false;
+
         break;
       default:
         // default code block
@@ -951,8 +1022,8 @@ var Witty = (function () {
 
     function makeNodeList( id, curNode ) {
       console.log('makeNodeList running');
-      console.log('curNode is: ');
-      console.log(curNode);
+      // console.log('curNode is: ');
+      // console.log(curNode);
       // console.clear();
       let container, nl, imgNode, tdNode,tableNode, topNode;
       let indent, indentLevel;
@@ -972,12 +1043,12 @@ var Witty = (function () {
     }
 
     function getIndent(indentLevel) {
-      console.log('getIndent running');
-      console.log('indentLevel is: ' + indentLevel);
+      // console.log('getIndent running');
+      // console.log('indentLevel is: ' + indentLevel);
       let indentChar, indent;
       indentChar = 'HH';
       indent = indentChar.repeat([indentLevel]);
-      console.log('indent is: ' + indent);
+      // console.log('indent is: ' + indent);
       return indent;
     }
 
@@ -1163,8 +1234,8 @@ var Witty = (function () {
       // !VA We include the anchor wrapper for the img here, and remove it from the array later if the checkbox is checked.
       sibling1Ids = [ 'container', 'td_switchsibling1', 'table_switchchild1', 'tr_switchchild1', 'td_switchcontent1', 'a_switchtcontent','img_switchcontent1' ];
       sibling1Elements = [ 'div', 'td', 'table', 'tr', 'td', 'a', 'img'];
-      sibling2Ids = [ 'container', 'td_switchsibling2', 'table_switchchild2', 'tr_switchchild2', 'td_switchcontent2', 'p_switchcontent2' ];
-      sibling2Elements = [ 'div', 'td', 'table', 'tr', 'td', 'p'];
+      sibling2Ids = [ 'container', 'td_switchsibling2', 'table_switchchild2', 'tr_switchchild2', 'td_switchcontent2' ];
+      sibling2Elements = [ 'div', 'td', 'table', 'tr', 'td'];
       // !VA We have to handle the Include anchor tag case here because once the nodeList is created, it's a hack to modify it. So we remove the a tag from the arrays before creating the nodeList and setting the node attributes. We'll have to remove the corresponding a tag index from the nodeAttributes array as well otherwise the loop assigning the attributes to the nodeList will break. Note: this is a HACK! But this whole makePosSwitchNodes thing is a hack anyway so lets' make it simple human-readable.
       // !VA Get the checkmark target
       var target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
@@ -1231,7 +1302,7 @@ var Witty = (function () {
       let Attributes = getAttributes();
       let nodeAttributes = [];
       // !VA Initialize the objects that contain the attributes for the individual nodes
-      let td_switchcontainerAttr, table_switchparentAttr, tr_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr, tr_switchchild1Attr, td_switchcontent1Attr, a_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, tr_switchchild2Attr, td_switchcontent2Attr, p_switchcontent2Attr; 
+      let td_switchcontainerAttr, table_switchparentAttr, tr_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr, tr_switchchild1Attr, td_switchcontent1Attr, a_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, tr_switchchild2Attr, td_switchcontent2Attr; 
       // !VA Make the nodeList from the container passed in from makePosSwitchNodes to apply the attributes to.
       nodeList = container.querySelectorAll( '*' );
       // !VA Build the objects that contain the attributes that will be set on the nodeList nodes.
@@ -1303,12 +1374,12 @@ var Witty = (function () {
         align: 'left',
         vAlign: 'top'
       };
-      p_switchcontent2Attr = {
-        style: 'margin: 10px',
-      };
+      // p_switchcontent2Attr = {
+      //   style: 'margin: 10px',
+      // };
 
       // !VA Create the array with the attribute objects. We use this array to cycle through the nodeList and apply the attributes to the individual nodes. I tried many ways to do this but was not able to assign these objects to the individual nodes any other way than to loop through them ensuring that the array and nodeList length were identical. If there is a way to assign attributes to nodes using the node ID as index, I'd like to learn that technique.
-      nodeAttributes = [ td_switchcontainerAttr, table_switchparentAttr,  tr_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr,  tr_switchchild1Attr, td_switchcontent1Attr, a_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, tr_switchchild2Attr, td_switchcontent2Attr, p_switchcontent2Attr ];
+      nodeAttributes = [ td_switchcontainerAttr, table_switchparentAttr,  tr_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr,  tr_switchchild1Attr, td_switchcontent1Attr, a_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, tr_switchchild2Attr, td_switchcontent2Attr ];
 
       // !VA Remove the anchor attributes from the array if the Include anchor checkbox is checked. The a tag is at position 7 in the attributes array.
       var target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
@@ -1324,19 +1395,18 @@ var Witty = (function () {
       }
       // !VA Last modification is to add the textContent to the p tag. We do it now because it's a node, not an attribute, so we can't do it in the set attribute loop. We don't do it earlier because it might add a node and increment the array length, thus breaking the set attribute loop.
       // nodeList.(p_switchcontent).textContent = 'ADD YOUR TEXT CONTENT HERE';
-      for (let i = 0; i < nodeList.length; i++) {
-        if (nodeList[i].id === 'p_switchcontent2') {
-          nodeList[i].textContent = 'ADD YOUR TEXT CONTENT HERE';
-        }
-      }
+      // for (let i = 0; i < nodeList.length; i++) {
+      //   if (nodeList[i].id === 'td_switchcontent2') {
+      //     com = document.createComment('ADD YOUR CONTENT HERE');
+      //     nodeList[i].appendChild(com);
+      //   }
+      // }
       // !VA Now we no longer need the IDs, so we can delete them.
       for (let i = 0; i < nodeList.length; i++) {
-        console.log('nodeList[i] is: ' +  nodeList[i]);
+        // console.log('nodeList[i] is: ' +  nodeList[i]);
         nodeList[i].removeAttribute('id');
       }
       // !VA Return the container with the attributes to the calling function
-      console.log('nodeList is now: ');
-      console.log(nodeList);
       return container;
     }
 
