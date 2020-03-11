@@ -676,7 +676,117 @@ var Witty = (function () {
       return str;
     }
 
-    function makeImgNode () {
+    function getUserSelection(id) {
+      console.log('getUserSelection running');
+      console.log('id is: ' + id);
+      let hasAnchor, hasWrapper, selectedRadio;
+      let butClicked, imgNode, tdNode, tableNode;
+      // !VA Get the pertinent user-selected CCP options
+      hasAnchor = getCheckboxSelection(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk);
+      hasWrapper = getCheckboxSelection(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk);
+      selectedRadio = document.querySelector('input[name="tdoptions"]:checked').value;
+      console.log('hasAnchor is: ' + hasAnchor  + '; hasWrapper is: ' + hasWrapper + '; selectedRadio is: ' + selectedRadio);
+      // !VA getUserSelection We could abbreviate all this id stuff...think about it.
+      if (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)) {
+        console.log('IMG button clicked');
+        imgNode = makeImgNode( id, hasAnchor );
+        makeNodeList( id, imgNode );
+        return;
+      } 
+      else if ( id=== btnCcpMakeClips.btnCcpMakeTdTag.slice(1)) {
+        console.log('TD button clicked');
+        console.log('selectedRadio is: ' + selectedRadio);
+        tdNode = makeTdNode( id, selectedRadio );
+        console.log('tdNode is: ');
+        console.log(tdNode);
+        makeNodeList( id, tdNode );
+
+      } 
+      else if ( id=== btnCcpMakeClips.btnCcpMakeTdTag.slice(1)) {
+        console.log('TABLE button clicked');
+      } 
+      else {
+        console.log('Some error occurred...');
+      }
+    }
+
+    // !VA Handle the exception cases, i.e. imgNode doesn't get any indent if wrapped in an anchor, and separate handling of the terminal node vs parent nodes. Don't need indentIndex or indexType parameters  - they are generated here and passed from here.
+    function preprocessIndents( id, curNode ) {
+      console.clear();
+      console.log('PreprocessINdents running');
+
+      let nl, container, i, indent, clipboardStr, imgNodeIndex, aNodeIndex, nextSiblingNodeIndex, indentspacing, previousSiblingNodeIndex, previousSiblingIndent;
+
+      container = document.createElement('div');
+      container.appendChild(curNode);
+      nl = container.querySelectorAll('*');
+      if (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)) {
+        // !VA getUserSelection Don't apply ANY indents at ALL!
+      } 
+      if (id === btnCcpMakeClips.btnCcpMakeTdTag.slice(1)) {
+        // !VA getUserSelection Rather than pass the parameter, we can just get the selectedRadio here.
+        var selectedRadio = document.querySelector('input[name="tdoptions"]:checked').value;
+        switch(true) {
+        case ( selectedRadio === 'basic'):
+          console.log('nl is: ');
+          console.log(nl);
+
+          // console.log('indent is: ' + indent);
+          for (i = 0; i < nl.length; i++) {
+            console.log('nl[i] is: ' +  nl[i]);
+            indent = getIndent(i);
+            applyIndents(id, nl, i, 'normal', indent);
+            // !VA getUserSelection Stopped here 03.10.20
+          }
+
+          break;
+        case ( selectedRadio === 'imgswap'):
+        // code block
+          break;
+        case ( selectedRadio === 'posswitch'):
+        // code block
+          break;
+        case ( selectedRadio === 'bgimage'):
+        // code block
+          break;
+        default:
+            // code block
+        } 
+      }
+      console.log('nl[0].outerHTML is: ');
+      console.log(nl[0].outerHTML);
+      clipboardStr = nl[0].outerHTML;
+      console.log('clipboardStr is: ' + clipboardStr);
+      writeClipboard( id, clipboardStr);
+    }
+
+
+
+
+
+    function applyIndents(id, nl, indentIndex,  indentType, indent) {
+      console.log('applyIndents running');
+      if (indentType == 'terminal') {
+        console.log('terminal');
+        nl[indentIndex].insertAdjacentHTML('beforebegin', indent);
+        nl[indentIndex].insertAdjacentHTML('afterend', '\n');
+      } 
+      else {
+        console.log('normal');
+        // console.log('nl[indentIndex] is: ');
+        // console.log(nl[indentIndex]);
+        console.log('nl[indentIndex] is: ');
+        console.log(nl[indentIndex]);
+        nl[indentIndex].insertAdjacentHTML('beforebegin', indent);
+        nl[indentIndex].insertAdjacentHTML('afterbegin', '\n');
+        nl[indentIndex].insertAdjacentHTML('beforeend', indent);
+        nl[indentIndex].insertAdjacentHTML('afterend', '\n');
+      }
+    }
+
+
+
+    function makeImgNode ( id ) {
       // console.log('makeImgNode running');
       // !VA Id is passed but not used here,  because we're only building the node.
       let Attributes;
@@ -713,6 +823,8 @@ var Witty = (function () {
         // !VA Otherwise, set returnNode to imgNode without the anchor.
         returnNode = imgNode;
       }
+
+
       return returnNode;
     }
 
@@ -721,7 +833,7 @@ var Witty = (function () {
     // !VA 03.10.2020 Need to find out whether the table button was clicked and if so just add 3 or 6 to the indentLevel of the getIndent function.
 
 
-    function makeTdNode( id ) {
+    function makeTdNode( id, selectedRadio ) {
       // console.log('makeTdNode running');
       // console.clear();
       let Attributes, Appdata;
@@ -738,13 +850,9 @@ var Witty = (function () {
       let bgcolor;
       // !VA TODO: Get rid of linebreak and replace with hard break or function reference
       let linebreak, indentLevel;
-      let radioSelected, writeToClipboard;
-      linebreak = '\n';
-      indent = indentbeforebegin = indentafterbegin = indentbeforeend = indentafterend = 'XX';
-      radioSelected = document.querySelector('input[name=tdoptions]:checked').value;
       let  str, imgSwapText, beginSpan, beginMsoConditional, endMsoConditional, beginComment, endComment, container;
       switch(true) {
-      case (radioSelected === 'basic'):
+      case (selectedRadio === 'basic'):
         // !VA class attribute
         if (Attributes.tdClass) { tdInner.className = Attributes.tdClass; }
         // !VA valign attribute
@@ -755,9 +863,9 @@ var Witty = (function () {
         imgNode = makeImgNode();
         // !VA We need to include the imgNode here ONLY if Bgimage is unchecked
         tdInner.appendChild(imgNode);
-        writeToClipboard = false;
+
         break;
-      case (radioSelected === 'imgswap'):
+      case (selectedRadio === 'imgswap'):
         tdInner.width = Attributes.tdAppdataWidth;
         tdInner.height = Attributes.tdAppdataHeight;
         // !VA valign attribute
@@ -775,7 +883,7 @@ var Witty = (function () {
         // !VA Append the mobileSwapStr code to tdInner
         tdInner.appendChild(mobileSwapStr);
         break;
-      case (radioSelected === 'bgimage'):
+      case (selectedRadio === 'bgimage'):
         tdInner.width = Attributes.tdAppdataWidth;
         tdInner.height = Attributes.tdAppdataHeight;
         // !VA valign attribute
@@ -793,7 +901,7 @@ var Witty = (function () {
         tdInner.innerHTML = `<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}<div>${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div><!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}</v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect><![endif]-->`;
 
         break;
-      case (radioSelected === 'posswitch'):
+      case (selectedRadio === 'posswitch'):
         // console.log('radioSelected === posswitch running');
         tdInner = makePosSwitchNodes();
         // console.log(tdInner);
@@ -806,100 +914,54 @@ var Witty = (function () {
     }
 
 
-    function makeTableNode( id ) {
-      // console.log('makeTdNode running');
-      let Attributes;
-      Attributes = getAttributes();
-      let tableNode, tableInner, tableOuter, tdInner, tdOuter, trInner, trOuter;
-      tableOuter = document.createElement('table');
-      tableInner = document.createElement('table');
-      tdInner = document.createElement('td');
-      tdOuter = document.createElement('td');
-      trInner = document.createElement('tr');
-      trOuter = document.createElement('tr');
 
-      // !VA Make the inner table. If Include wrapper table is unchecked, we return just the inner table. If it's checked, we return the inner table and the outer table 
-      // !VA Add inner table attributes
-      // !VA table class attribute
-      if (Attributes.tableClass) { tableInner.className = Attributes.tableClass; }
-      // table.className = Attributes.tableClass;
-      // !VA table align attribute
-      if (Attributes.tableAlign) { tableInner.align = Attributes.tableAlign; }
-      // !VA width attribute -- the default is the current display size, so it gets the value from the toolbar viewerW input field.
-      tableInner.width = Attributes.tableWidth;
-      // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for now
-      if (Attributes.tableBgcolor) { tableInner.bgColor = Attributes.tableBgcolor; }
-      // !VA Add border, cellspacing and cellpadding
-      tableInner.border = '0', tableInner.cellSpacing = '0', tableInner.cellPadding = '0';
-      tableInner.setAttribute('role', 'presentation'); 
-      
-      // !VA Build the inner tr
-      tableInner.appendChild(trInner);
-      // !VA Get the inner TD and append it - id is not for the inner TD but that's not relevent here.
-      tdInner = makeTdNode( id );
-      trInner.appendChild(tdInner);
-      
-
-
-      // !VA 03.06.20A We are ALWAYS outputting EVERYTHING this time...
-      // if (!Attributes.tableIncludeWrapper) {
-      //   // !VA If Include table wrapper is unchecked, just return this inner table
-      tableNode = tableInner;
-      // } else {
-      // !VA If include table wrapper is checked, build the outer table and return it
-      // !VA table wrapper class
-      if (Attributes.tableTagWrapperAlign) { tableOuter.align = Attributes.tableTagWrapperAlign; }
-      // !VA wrapper table align attribute
-      if (Attributes.tableTagWrapperClass) { tableOuter.className = Attributes.tableTagWrapperClass; }
-
-      // !VA width attribute
-      // !VA the default is the current display size, so it gets the value from the field.
-      tableOuter.width = Attributes.tableTagWrapperWidth;
-
-      // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for nowtableTagWrapperBgcolor);
-      if (Attributes.tableTagWrapperBgcolor) { tableOuter.bgColor = Attributes.tableTagWrapperBgcolor; }
-
-      // !VA Add border, cellspacing and cellpadding
-      tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
-      tableOuter.setAttribute('role', 'presentation'); 
-
-      // !VA Append the outer tr
-      tableOuter.appendChild(trOuter);
-      trOuter.appendChild(tdOuter);
-      // !VA Append the outer td
-      trOuter.appendChild(tdOuter);
-      // !VA Add the outer td attributes
-      if (Attributes.tdAlign) { tdOuter.align = Attributes.tdAlign; }
-      // !VA valign attribute
-      if (Attributes.tdValign) { tdOuter.vAlign = Attributes.tdValign; }
-      // !VA Append the inner table to the outer table's td
-      tdOuter.appendChild(tableInner);
-      // !VA Pass the outer table to the tableNode.
-      tableNode = tableOuter;
-      // }
-      // console.log(tableNode.outerHTML);
-      return tableNode;
-    }
-
-    function makeNodeList( id ) {
+    function makeNodeList( id, curNode ) {
       console.log('makeNodeList running');
-      console.clear();
-      let container, tableNode, topNode;
+      // console.clear();
+      let container, imgNode, tdNode,tableNode, topNode;
+      let indent, indentLevel;
 
-      container = document.createElement('div');
+      // !VA getUserSelection Doing this in preprocessINdents now
+      // container = document.createElement('div');
       // !VA Get the status of all the checkboxes and tdoptions radio buttons that affect the indents
 
+      if (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)) {
+        // !VA getUserSelection Here nl[i] is ALWAYS going to be 0 because the IMG button was clicked. Now we still have a DOM object - let's try to convert it to a nodeList in preprocessINdents 
+        console.log('IMG button clicked');
+        imgNode = curNode;
+        console.log('imgNode is: ');
+        console.log(imgNode);
+        indentLevel = 0;
+        // indent = getIndent( indentLevel);
+        preprocessIndents(id, imgNode );
+      } 
+      if (id === btnCcpMakeClips.btnCcpMakeTdTag.slice(1)) {
+        // !VA getUserSelection Here nl[i] is ALWAYS going to be 0 because the IMG button was clicked. Now we still have a DOM object - let's try to convert it to a nodeList in preprocessINdents 
+        console.log('TD button clicked');
+        tdNode = curNode;
+        console.log('imgNode is: ');
+        console.log(imgNode);
+        indentLevel = 0;
+        // indent = getIndent( indentLevel);
+        preprocessIndents(id, tdNode );
+   
+      } 
+
+
+
+
+
       // !VA Get the tableNode. This includes all the descendant nodes we need for the template nodeList we'll be using in doIndents
-      tableNode = makeTableNode( id );
-      topNode = tableNode;
+      // tableNode = makeTableNode( id );
+      // topNode = tableNode;
       // !VA Put the table and its descendents into the parent container
-      container.appendChild(topNode);
+      // container.appendChild(topNode);
       // !VA Pass the clicked button id and parent container element to doIndents
-      doIndentsNew( id, container );
+      // doIndentsNew( id, container );
     }
 
     function getIndent(indentLevel) {
-      console.log('indentLevelToChars running');
+      console.log('getIndent running');
       console.log('indentLevel is: ' + indentLevel);
       let indentChar, indent;
       indentChar = 'HH';
@@ -908,337 +970,7 @@ var Witty = (function () {
       return indent;
     }
 
-    function doIndentsNew( id, container ) {
-      // !VA PROBLEM: nodeList does not include the top level element, so we need a div container for everything. That needs to come from makeNodeList.
-      console.log('doIndentsNew');
-      // console.log('id is: ' + id);
-      // console.log('container is: ');
-      // console.log(container);
-      let i, clipboardStr, indent, indentLevel, indentIndex, nl, loopCount;
-      let chkbox, hasAnchor, hasWrapper, selectedRadio;
-      // !VA Create the container div - we need this to access the descendant elements as children, including the parent table of all the descendent table elements.
-      let parent; // new top-level div container node appended after the original container node is removed from the nodeList by the second querySelectorAll.
-      let nlnodenames = []; // nodeNames array - for console only
-      // !VA Get the pertinent user-selected CCP options
-      hasAnchor = getCheckboxSelection(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk);
-      hasWrapper = getCheckboxSelection(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk);
-      selectedRadio = document.querySelector('input[name="tdoptions"]:checked').value;
-      console.log('hasAnchor is: ' + hasAnchor  + '; hasWrapper is: ' + hasWrapper + '; selectedRadio is: ' + selectedRadio);
-      nl = container.querySelectorAll('*');
 
-      // !VA Extract nodes for indenting based on the CCP selections from the switch/case  statement
-      function extractNodes(nodeList, nodeIndex) {
-        // console.log('extractNodes running');
-        // console.log('nodeIndex is: ' + nodeIndex);
-        // console.log('nl is: ');
-        // console.log(nl);
-        nodeList = nodeList[nodeIndex];
-        // console.log('nodeList is: ');
-        // console.log(nodeList);
-        parent = document.createElement('div');
-        parent.appendChild(nodeList);
-        nl = parent.querySelectorAll('*');
-        return nl;
-      }
-
-      // !VA Handle the exception cases, i.e. imgNode doesn't get any indent if wrapped in an anchor, and separate handling of the terminal node vs parent nodes. Don't need indentIndex or indexType parameters  - they are generated here and passed from here.
-      function preprocessIndents(nl) {
-        // console.log('preprocessIndents running');
-        // console.log('indentIndex is: ' + indentIndex);
-        // console.log('nl is: ');
-        // console.log(nl);
-        // console.log('nl[indentIndex] is: ' + nl[indentIndex]);
-        let imgNodeIndex, aNodeIndex;
-        for (let i = 0; i < nl.length; i++) {
-          // !VA Get the positions of the relevant nodes for indents
-          if (nl[i].nodeName === 'IMG') { imgNodeIndex = i; }
-          if (nl[i].nodeName === 'A') { aNodeIndex = i; }
-
-          // if (nl[i].nodeName === 'P') { pNodeIndex = i; }
-          // if (nl[i].nextSibling) {nextSiblingNodeIndex = i; } 
-          // if (nl[i].previousSibling) {previousSiblingNodeIndex = i; } 
-        }
-        // console.log('imgNodeIndex is: ' + imgNodeIndex);
-        // console.log('aNodeIndex is: ' + aNodeIndex);
-        // !VA Loop through nodes and process exceptions
-        for (i = 0; i < nl.length; i++) {
-          // console.log('i is: ' + i);
-          indent  = getIndent(i);
-          // !VA Exclude indents for img tag if there is no anchor wrapper, otherwise treat the IMG as the terminal node in the indent tree.
-          switch(true) {
-          // !VA Exclude indents for img tag if there is no anchor wrapper, otherwise treat the IMG as the terminal node in the indent tree.
-          case (i === imgNodeIndex):
-            console.log('Case: imgNodeIndex');
-            if (hasAnchor) {
-              // !VA If Include anchor is checked, then we want the img to be enclosed in the anchor tag without any indents, so don't do anything here
-            } else {
-              // !VA Treat the img tag as the terminal node and apply indents accordingly
-              applyIndents(nl, i, 'terminal', indent);
-            }
-            break;
-          case (i === aNodeIndex):
-            // !VA If the Anchor is present, treat it as the TERMINAL node -- its child IMG gets no indent
-            applyIndents(nl, i, 'terminal', indent);
-            break;
-
-          default:
-            // !VA All the other nodes get the normal indent scheme
-            applyIndents(nl, i, 'normal', indent);
-          } 
-        }
-      }
-      function applyIndents(nl, indentIndex,  indentType, indent) {
-        console.log('applyIndents running');
-        if (indentType == 'terminal') {
-          console.log('terminal');
-          nl[indentIndex].insertAdjacentHTML('beforebegin', indent);
-          nl[indentIndex].insertAdjacentHTML('afterend', '\n');
-        } 
-        else {
-          console.log('normal');
-          nl[indentIndex].insertAdjacentHTML('beforebegin', indent);
-          nl[indentIndex].insertAdjacentHTML('afterbegin', '\n');
-          nl[indentIndex].insertAdjacentHTML('beforeend', indent);
-          nl[indentIndex].insertAdjacentHTML('afterend', '\n');
-        }
-      }
-      function doImgSwapIndents(nl) {
-        console.log('doImgSwapIndents running');
-        console.log('nl is: ');
-        console.log(nl);
-        indent = getIndent( 1 );
-        nl[0].insertAdjacentHTML('afterbegin', '\n');
-        nl[0].insertAdjacentHTML('beforeend', '\n');
-        nl[1].insertAdjacentHTML('beforebegin', indent);
-        // nl[1].insertAdjacentHTML('beforeend', indent);
-        nl[1].insertAdjacentHTML('afterbegin', '\n');
-        nl[1].insertAdjacentHTML('afterend', '\n' + indent);
-        nl[2].insertAdjacentHTML('beforebegin', indent);
-      }
-      function doBgimageIndents(nl) {
-        console.log('doBgimageIndents running');
-        console.log('nl is: ');
-        console.log(nl);
-        indent = getIndent( 1 );
-        nl[0].insertAdjacentHTML('afterbegin', '\n' + indent);
-        nl[0].insertAdjacentHTML('beforeend', '\n');
-        nl[1].insertAdjacentHTML('beforebegin', indent);
-        // nl[1].insertAdjacentHTML('beforeend', indent);
-        nl[1].insertAdjacentHTML('afterbegin', '\n');
-        nl[1].insertAdjacentHTML('afterend', '\n' + indent);
-        // nl[2].insertAdjacentHTML('beforebegin', indent);
-
-        var foo = nl[0].innerHTML;
-        console.log('foo is: ');
-        console.log(foo);
-
-
-
-
-      }
-
-      
-      // !VA NL INFO
-      for (let i = 0; i < nl.length; i++) { nlnodenames.push(nl[i].nodeName); }
-      console.log('NL INFO: nl.length is: ' + nl.length + '; nlnodenames is: ' + nlnodenames);
-
-      switch(true) {
-      // !VA Use slice to  remove the # from the alias to match it with the id string. 
-      // !VA 03.08.2020 We need to add in the part from the deleted branch about adding a container node above the nodeList after extracting the sub-trees below. AND make the indices relative to the top node, not the bottom. See yesterday's saved JS file in ../witty which I saved there before deleting the branch.
-      case (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)):
-        console.log('CASE 1');
-        // !VA If Include anchor is checked get the anchor and descendant img, otherwise, just get the img.  Don't forget we need to get the parent of the element we want to get the nodeList from because querySelectorAll gets the descendants not including the parent. Subtract from nl.length accordingly.
-        // i = 6, indentLevel = nl.length - (i - 1);
-        // !VA 03.10.2020
-        console.log('nl.length is: ' + nl.length);
-        // console.log('nl.length - (nl.length - 2) is: ' + nl.length - (nl.length - 2));
-        i = nl.length - 2;
-        // i = 6;
-        indentLevel = 0, indentIndex = 0;
-
-        indent = getIndent( indentLevel );
-        nl = extractNodes(nl, i);
-        console.log('nl is: ');
-        console.log(nl);
-        // doIndentStructure(nl);
-        preprocessIndents(nl );
-
-        break;
-      case (id === btnCcpMakeClips.btnCcpMakeTdTag.slice(1)):
-        console.log('CASE 2');
-        switch(true) {
-        case (selectedRadio === 'basic'):
-          i = 5, indentLevel = 1, indentIndex = 0;
-          indent = getIndent( indentLevel );
-          nl = extractNodes(nl, i);
-          console.log('nl is: ');
-          console.log(nl);
-          preprocessIndents(nl );
-          // doIndentStructure(nl);
-          break;
-        case (selectedRadio === 'imgswap'):
-          i = 5;
-          nl = extractNodes(nl, i);
-          // console.log('CASE 2 nl is: ');
-          // console.log('selectedRadio is: ' + selectedRadio);
-          // console.log('nl.length is: ' + nl.length);
-          doImgSwapIndents(nl);
-          break;
-        case (selectedRadio === 'bgimage'):
-          i = 5;
-          nl = extractNodes(nl, i);
-          // console.log('CASE 2 nl is: ');
-          // console.log('selectedRadio is: ' + selectedRadio);
-          // console.log('nl.length is: ' + nl.length);
-          doBgimageIndents(nl);
-          break;
-        default:
-          console.log('default');
-        } 
-        break;
-      case (id === btnCcpMakeClips.btnCcpMakeTableTag.slice(1)):
-        switch(true) {
-        case (selectedRadio === 'basic'):
-          if (hasWrapper) {
-            i = 0, indentLevel = 0, indentIndex = 0;
-            indent = getIndent( indentLevel );
-          } else {
-            i = 3, indentLevel = 1, indentIndex = 0;
-            indent = getIndent( indentLevel );
-          }
-          nl = extractNodes(nl, i);
-          console.log('nl is: ');
-          console.log(nl);
-          preprocessIndents(nl );
-          break;
-
-        default:
-          console.log('default');
-        } 
-        break;
-      default:
-        // code block
-      } 
-      console.log('nl[0].outerHTML is: ');
-      console.dir(nl[0].outerHTML);
-      clipboardStr = nl[0].outerHTML;
-
-      writeClipboard( id, clipboardStr);
-    }
-
-
-
-
-
-
-    // !VA This works for everything except embedded background image tags. This is totally hacked but it works 100% - I don't think it can be improved on structurally.
-    function doIndents(id, container) {
-      console.log('doIndents running');
-      // !VA Get the nodeList from the passed-in container
-      var nodeList = container.querySelectorAll( '*' );
-
-      // !VA Variables for spacing and structure
-      let indentspacing, indentbeforebegin, indentafterbegin, indentbeforeend, indentafterend, i, target, hasAnchor, output;
-      // !VA Variables for node name positions in the nodeList
-      let imgNodeIndex, aNodeIndex, pNodeIndex, nextSiblingNodeIndex, previousSiblingNodeIndex, previousSiblingIndent;
-      // !VA Get the status of the Include anchor checkbox
-      target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
-      hasAnchor = getCheckboxSelection(target);
-
-      // !VA branch: addConditionalToIndents
-      // !VA Let's just get the selected radio button here for now
-      var selectedRadio = document.querySelector('input[name="tdoptions"]:checked').value;
-      // !VA If the container contains the image swap code, run doAltIndents to handle indenting.
-      if (selectedRadio === 'imgswap') {
-        doAltIndents1( id, container );
-        // return;
-      // We will add the alternative indents for the bgimage code later, but for now they work do we don't need to touch them. So, if it's not imgswap, do all the other casesl
-      } else  {
-
-        console.log('Everything but imgswap');
-        // !VA Set the default indent spacing and adjacentHTML spacing
-        indentspacing = '  ';
-        indentbeforebegin = '' + indentspacing.repeat([i]);
-        indentafterbegin  = indentafterend =  '\n';
-        indentbeforeend = '' + indentspacing.repeat([i]);
-        // !VA Loop through nodeList and get the relevant node positions
-        for (let i = 0; i < nodeList.length; i++) {
-          // !VA Get the positions of the relevant nodes for indents
-          if (nodeList[i].nodeName === 'IMG') { imgNodeIndex = i; }
-          if (nodeList[i].nodeName === 'A') { aNodeIndex = i; }
-          if (nodeList[i].nodeName === 'P') { pNodeIndex = i; }
-          if (nodeList[i].nextSibling) {nextSiblingNodeIndex = i; } 
-          if (nodeList[i].previousSibling) {previousSiblingNodeIndex = i; } 
-        }
-        // !VA Set the indent for the second sibling TD. It should be equal to the indents for the first sibling, so we need to reset the repeat spacing iterator to the same value as it was for the first sibling. Since the nodeList.length varies based on if an anchor is included or if the img is excluded and if the create TD or create Table buttons were pressed, we need to base this indent on the nodeList.length and index it to the position of the first sibling. This will always give us the indent iterator used for the first sibling. 
-        previousSiblingIndent = (nodeList.length - (nextSiblingNodeIndex + 5));
-        // console.log('previousSiblingIndent is: ' + previousSiblingIndent);
-        // !VA Loop through nodeList and apply the indents to the IMG and A nodes. If the A node is present, the IMG gets no indent at all. If the A node is not present, the IMG is treated as the terminating node for indent purposes.
-        for (let i = 0; i < nodeList.length; i++) {
-          indentbeforebegin = '' + indentspacing.repeat([i]);
-          indentafterbegin  = indentafterend =  '\n';
-          indentbeforeend = '' + indentspacing.repeat([i]);
-          // !VA These are the unique cases where different indents are applied.
-          switch(true) {
-          // !VA Exclude indents for img tag if there is no anchor wrapper, otherwise treat the IMG as the terminal node in the indent tree.
-          case (i === imgNodeIndex):
-            if (hasAnchor) {
-              // !VA If Include anchor is checked, then we want the img to be enclosed in the anchor tag without any indents, so don't do anything here
-            } else {
-              // !VA If there's no anchor, then we need to indent the IMG as the terminal node in the tree
-              nodeList[i].insertAdjacentHTML('beforebegin', indentbeforebegin);
-              // nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
-              // nodeList[i].insertAdjacentHTML('beforeend', indentbeforeend);
-              nodeList[i].insertAdjacentHTML('afterend', '\n');
-            }
-            break;
-          case (i === aNodeIndex):
-            // !VA If the Anchor is present, treat it as the terminal node -- its child IMG gets no indent
-            nodeList[i].insertAdjacentHTML('beforebegin', indentbeforebegin);
-            // nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
-            // nodeList[i].insertAdjacentHTML('beforeend', indentbeforeend);
-            nodeList[i].insertAdjacentHTML('afterend', '\n');
-            break;
-          case (i === pNodeIndex):
-            // !VA This is the child P of the second sibling node. It could probably be processed under the next condition, but I'm going to leave it for now.
-            indentbeforebegin = '' + indentspacing.repeat([i - previousSiblingIndent]);
-            indentafterbegin  = indentafterend =  '\n';
-            indentbeforeend = '' + indentspacing.repeat([i - previousSiblingIndent]);
-            nodeList[i].insertAdjacentHTML('beforebegin', indentbeforebegin);
-            nodeList[i].insertAdjacentHTML('afterend', indentafterend);
-            break;
-          case (nextSiblingNodeIndex && i >= previousSiblingNodeIndex):
-            // !VA If a sibling is present, apply the same indents to the second sibling as were applied to the first.
-            if (nodeList[i].nodeName === 'DIV') { 
-              // !VA Hack in a fix for the bgimage div's not indenting properly. Here we just add the line break without any repeat, which allows the DIV to keep the indents defined in the makeTdNode function.
-              nodeList[i].insertAdjacentHTML('afterbegin', '\n');
-              nodeList[i].insertAdjacentHTML('afterend', '\n');
-            } 
-            else {
-              indentbeforebegin = '' + indentspacing.repeat([i - previousSiblingIndent]);
-              indentafterbegin  = indentafterend =  '\n';
-              indentbeforeend = '' + indentspacing.repeat([i - previousSiblingIndent]);
-              nodeList[i].insertAdjacentHTML('beforebegin', indentbeforebegin);
-              nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
-              nodeList[i].insertAdjacentHTML('beforeend', indentbeforeend);
-              nodeList[i].insertAdjacentHTML('afterend', indentafterend);
-            }
-
-            break;
-          default:
-            // !VA All the other nodes get the default indent scheme
-            nodeList[i].insertAdjacentHTML('beforebegin', indentbeforebegin);
-            nodeList[i].insertAdjacentHTML('afterbegin', indentafterbegin);
-            nodeList[i].insertAdjacentHTML('beforeend', indentbeforeend);
-            nodeList[i].insertAdjacentHTML('afterend', indentafterend);
-          } 
-        } 
-
-      }
-      // !VA Output to clipboard
-      output = nodeList[0].outerHTML; 
-      writeClipboard( id, output);
-    }
 
     function writeClipboard(id, str) {
       var clipboardStr;
@@ -1605,8 +1337,11 @@ var Witty = (function () {
       doClipboard: function(evt) {
         let id = evt.target.id;
         // !VA If the clicked element id is a Make Tag button, run makeNodeList, otherwise run makeCSSRule.
-        id.includes('tag') ? makeNodeList(id) : makeCssRule(id);
-        
+        // !VA getUserSelection
+        // id.includes('tag') ? makeNodeList(id) : makeCssRule(id);
+        // id.includes('tag') ? makeNodeList(id) : makeCssRule(id);
+        id.includes('tag') ? getUserSelection(id) : makeCssRule(id);
+
        
       },
       runTest: function() {
