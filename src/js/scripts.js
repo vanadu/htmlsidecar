@@ -173,7 +173,6 @@ var Witty = (function () {
       btnTbrIncr10: '#btn-tbr-incr10',
       btnTbrIncr01: '#btn-tbr-incr01',
       iptTbrImgWidth: '#ipt-tbr-imgwidth',
-      toggleImgSize: '#toggle-image-size',
       iptTbrImgHeight: '#ipt-tbr-imgheight',
       btnTbrDecr01:'#btn-tbr-decr01',
       btnTbrDecr10: '#btn-tbr-decr10',
@@ -338,10 +337,7 @@ var Witty = (function () {
       getCcpUserInputIDs: function() {
         return ccpUserInput;
       },
-      getCcpBuildTagIDs: function() {
-        return ccpMakeClip;
-      },
-      getCcpMakeClipButIDs: function() {
+      getBtnCcpMakeClips: function() {
         return btnCcpMakeClips;
       },
 
@@ -399,11 +395,11 @@ var Witty = (function () {
         document.querySelector(staticRegions.tbrContainer).style.display = 'none';
         document.querySelector(iInspectors.btnToggleCcp).style.display = 'none';
 
-        const dimarray = Object.values(iInspectors);
-        console.log('dimarray is: ' + dimarray);
-        for ( let i = 0; i < dimarray.length; i++ ) {
-          if ( dimarray[i] !== '#btn-toggle-ccp' &&  dimarray[i] !== '#i-filename' ) {
-            document.querySelector(dimarray[i]).innerHTML = '<span class="pop-font">&nbsp;&nbsp;No Image</span>';
+        const iArray = Object.values(iInspectors);
+        console.log('iArray is: ' + iArray);
+        for ( let i = 0; i < iArray.length; i++ ) {
+          if ( iArray[i] !== '#btn-toggle-ccp' &&  iArray[i] !== '#i-filename' ) {
+            document.querySelector(iArray[i]).innerHTML = '<span class="pop-font">&nbsp;&nbsp;No Image</span>';
           } 
         } 
       },
@@ -504,12 +500,10 @@ var Witty = (function () {
 
     // !VA CBController private functions
     // !VA If we want to access any of the DOM IDs we have to call them from UIController where they're defined.
-    var dynamicRegions = UIController.getDynamicRegionIDs();
-    var staticRegions = UIController.getStaticRegionIDs();
-    var toolbarElements = UIController.getToolButtonIDs();
+
     var iInspectors = UIController.getInspectorIDs();
     var ccpUserInput = UIController.getCcpUserInputIDs();
-    var btnCcpMakeClips = UIController.getCcpMakeClipButIDs();
+    var btnCcpMakeClips = UIController.getBtnCcpMakeClips();
 
 
     function getKeyByValue(object, value) {
@@ -558,7 +552,6 @@ var Witty = (function () {
       default:
         // code block
       } 
-
       // !VA If the input includes a percent char, remove the hard-coded trailing px on the value and just output the value with the user-entered percent char.
       clipboardStr.includes('%')  ? clipboardStr = clipboardStr.replace('%px', '%') : clipboardStr;
 
@@ -676,9 +669,25 @@ var Witty = (function () {
       return str;
     }
 
+
+    function getUserSelections( id ) {
+      console.log('getCcpSelections running');
+      let uSels = {};
+      uSels = {
+        buttonClicked: id,
+        hasAnchor: getCheckboxSelection(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk),
+        hasWrapper: getCheckboxSelection(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk),
+        selectedRadio: document.querySelector('input[name="tdoptions"]:checked').value
+      };
+      console.log('buttonClicked is: ' + uSels.buttonClicked + '; hasAnchor is: ' + uSels.hasAnchor + '; selectedRadio is: ' + uSels.selectedRadio);
+    }
+
+    
+
     // !VA INDENT FUNCTIONS
     // !VA Get the user selections that define the clipboard output configuration- the clicked Options button, the Include anchor checkbox and the Include wrapper table checkbox. The nodeList used for the indents as well as the indent implementation will depend on these options -- only the basic TD radio button option generates a simple nodeList structure whose indents can be processed with a simple for loop. The other options generate nodeLists with text nodes and comments that require a custom indent scheme.
     function getUserSelection(id) {
+      getUserSelections(id);
       console.log('getUserSelection running');
       // console.log('id is: ' + id);
       let hasAnchor, hasWrapper, selectedRadio;
@@ -715,34 +724,24 @@ var Witty = (function () {
     function preprocessIndents( id, curNode ) {
       // console.clear();
       console.log('PreprocessIndents running');
-      
-      let nl, block, container, i, indent, clipboardStr, imgNodeIndex, aNodeIndex, pNodeIndex, nextSiblingNodeIndex, indentspacing, previousSiblingNodeIndex, previousSiblingIndent;
-      let indentLevel;
-
-
+      let nl, block, i, indent, clipboardStr, nextSiblingNodeIndex,  previousSiblingNodeIndex, previousSiblingIndent;
+      // !VA If the makeImg button was clicked, just get the nodeList of the imgNode
       if (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)) {
         // !VA getUserSelection Don't apply ANY indents at ALL!
-        console.log('curNode is: ');
-        console.log(curNode);
         nl = makeNodeList( id, curNode);
-        console.log('nl is: ');
-        console.log(nl);
       } 
+      // !VA If the makeTd button was clicked find out which tdoptions was selected
       if (id === btnCcpMakeClips.btnCcpMakeTdTag.slice(1)) {
         // !VA getUserSelection Rather than pass the parameter, we can just get the selectedRadio here.
         var selectedRadio = document.querySelector('input[name="tdoptions"]:checked').value;
-        console.log('selectedRadio is: ' + selectedRadio);
         switch(true) {
+        // !VA If td with options was selected 
         case ( selectedRadio === 'basic'):
+          // !VA Get the nodeList for tdNode
           nl = makeNodeList(id, curNode);
-          console.log('nl is: ');
-          console.log(nl);
-          // console.log('indent is: ' + indent);
+          // !VA Determine whether an anchor exists and if so apply the appropriate indents. The img tag never gets indents.
           for (i = 0; i < nl.length; i++) {
-            console.log('nl[i].nodeName is: ' +  nl[i].nodeName);
-            console.log('i is: ' + i);
             indent = getIndent(i);
-            
             if ( i === 1 && nl[i].nodeName === 'A') {
               // !VA If nodeList item 1 is the anchor, then Include anchor is checked. Apply the 'terminal' indent scheme and don't apply any indent to the img element.
               applyIndents(id, nl, i, 'terminal', indent);
@@ -757,34 +756,32 @@ var Witty = (function () {
         case ( selectedRadio === 'imgswap'):
           // !VA Hacked indents for now.
           block = getImgSwapBlock( 1 );
+          // !VA Create a comment node
           var com = document.createComment(block);
+          // !VA Append comment node to parent node
           curNode.appendChild(com);
-          console.log(curNode);
+          // !VA Make the nodeList
           nl = makeNodeList(id, curNode);
-          console.log('imgswap: nl.length = ' + nl.length);
-          console.log('nl is: ');
-          console.log(nl);
+          // !VA Hack in these indents to the child of the parent td - I haven't been able to figure out how to use insertAdjacentHTML with text or comment nodes.
           nl[1].insertAdjacentHTML('afterend', '\nHH');
           nl[0].insertAdjacentHTML('beforeend', '\n');
           break;
         case ( selectedRadio === 'posswitch'):
-          console.clear();
+          // !VA Get the PosSwitch node
           curNode = makePosSwitchNodes();
+          // !VA Make the nodeList of the posSwitch node
           nl = makeNodeList(id, curNode);
-          console.log('posswitch: nl.length = ' + nl.length);
           for (let i = 0; i < nl.length; i++) {
-            // !VA Get the positions of the relevant nodes for indents
-            // if (nl[i].nodeName === 'IMG') { imgNodeIndex = i; }
-            // if (nl[i].nodeName === 'A') { aNodeIndex = i; }
-            if (nl[i].nodeName === 'P') { pNodeIndex = i; }
+            // !VA Get the positions of the relevant child nodes for indents
             if (nl[i].nextSibling) {nextSiblingNodeIndex = i; } 
             if (nl[i].previousSibling) {previousSiblingNodeIndex = i; } 
           }
+          // !VA The indent index of the second child is the second child's node index plus 5 -- that gives us the indent index of the first child node 
           previousSiblingIndent = (nl.length - (nextSiblingNodeIndex + 5));
           for (let i = 0; i < nl.length; i++) {
-            // console.log('nl[i] is: ' +  nl[i]);
+            // !VA Get the indent based on the loop count
             indent  = getIndent(i);
-
+            // !VA If there's a next sibling, then there are child nodes to the parent node, so we do the IF clause. AND if so, then if the loop counter is greater than the node index of the second child, run the if clause.
             if (nextSiblingNodeIndex && i >= previousSiblingNodeIndex) {
               // !VA Set the sibling's indent to be the same as that of the first sibling of the parent TR
               indent = '' + getIndent(i - previousSiblingIndent);
@@ -797,11 +794,13 @@ var Witty = (function () {
               nl[i].insertAdjacentHTML('beforeend', indent);
               nl[i].insertAdjacentHTML('afterend', '\n');
             } 
+            // !VA Otherwise, there is either no sibling or the sibling is the first child element and so gets the normal indent scheme.
             else {
               applyIndents(id, nl, i, 'normal', indent);
             }
           }
           break;
+        // !VA Get the bgimage code block and apply indent hacks to the parent td.
         case ( selectedRadio === 'bgimage'):
           // !VA Hacked indents for now.
           block = getBgimageBlock( 1 );
@@ -813,10 +812,9 @@ var Witty = (function () {
         default:
         } 
       }
-      // console.log('nl[0].outerHTML is: ');
-      // console.log(nl[0].outerHTML);
+      // !VA Make the clipboard string
       clipboardStr = nl[0].outerHTML;
-      // console.log('clipboardStr is: ' + clipboardStr);
+      // !VA And write to clipboard
       writeClipboard( id, clipboardStr);
     }
 
@@ -881,23 +879,13 @@ var Witty = (function () {
       // !VA 03.09.2020 Set the indentLevel to 1 for now
       fallback = '#7bceeb';
       Attributes.tdBgcolor ? bgcolor = Attributes.tdBgcolor : bgcolor = fallback;
-      console.log('bgcolor is: ' + bgcolor);
 
       // !VA Define the innerHTML of the bgimage code
       bgimageStr = `[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}${getIndent(indentLevel)}<div>${linebreak}${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div><!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}</v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect><![endif]`;
 
       return bgimageStr;
     }
-
-    function getPosSwitchText( indentLevel ) {
-      var str = 'PUT YOUR CONTENT HERE';
-      return str;
-    }
     // !VA END TD OPTIONS MS-CONDITIONAL CODE BLOCKS
-
-
-
-
 
     function makeImgNode ( id ) {
       // console.log('makeImgNode running');
@@ -942,28 +930,17 @@ var Witty = (function () {
 
 
     // !VA 03.10.2020 Need to find out whether the table button was clicked and if so just add 3 or 6 to the indentLevel of the getIndent function.
-
-
     function makeTdNode( id, selectedRadio ) {
       // console.log('makeTdNode running');
-      // console.clear();
-      let Attributes, Appdata;
+      let Attributes;
       Attributes = getAttributes();
-      Appdata = appController.initGetAppdata();
-      let tdInner, imgNode, mobileSwapStr, mobileFilename;
-
+      let tdInner, imgNode;
       tdInner = document.createElement('td');
       // !VA Add the attributes that are included in both the default and background image td
       if (Attributes.tdValign) { tdInner.vAlign = Attributes.tdValign; }
       // !VA bgcolor attribute. Pass the input value, don't prepend hex # character for now
       if (Attributes.tdBgcolor) { tdInner.bgColor = Attributes.tdBgcolor; }
       // !VA Now add the attributes included only with the default Td configuration
-      let fallback;
-      let bgcolor;
-      // !VA TODO: Get rid of linebreak and replace with hard break or function reference
-      let linebreak, indentLevel;
-      linebreak = '\n';
-      let  str, imgSwapText, beginSpan, beginMsoConditional, endMsoConditional, beginComment, endComment, container;
       switch(true) {
       case (selectedRadio === 'basic'):
         // !VA class attribute
@@ -976,10 +953,8 @@ var Witty = (function () {
         imgNode = makeImgNode();
         // !VA We need to include the imgNode here ONLY if Bgimage is unchecked
         tdInner.appendChild(imgNode);
-
         break;
       case (selectedRadio === 'imgswap'):
-        
         tdInner.width = Attributes.tdAppdataWidth;
         tdInner.height = Attributes.tdAppdataHeight;
         // !VA valign attribute
@@ -987,13 +962,6 @@ var Witty = (function () {
         // !VA get the current img
         imgNode = makeImgNode();
         tdInner.appendChild(imgNode);
-        
-
-
-
-
-
-
         break;
       case (selectedRadio === 'bgimage'):
         // !VA First we create the node
@@ -1004,19 +972,12 @@ var Witty = (function () {
         // !VA Set the background attribute to the current path/filename
         tdInner.setAttribute('background', Attributes.tdBackground);
         // !VA Include fallback color if no bgColor is selected. Use Stig's fallback: #7bceeb
-
-
-
-
         break;
       case (selectedRadio === 'posswitch'):
-        // console.log('radioSelected === posswitch running');
 
         break;
       default:
-        // default code block
       } 
-      // !VA getUserSelection working
       return tdInner;
     }
 
@@ -1033,15 +994,6 @@ var Witty = (function () {
       container.appendChild(curNode);
       nl = container.querySelectorAll('*');
       return nl;
-
-
-      // !VA Get the tableNode. This includes all the descendant nodes we need for the template nodeList we'll be using in doIndents
-      // tableNode = makeTableNode( id );
-      // topNode = tableNode;
-      // !VA Put the table and its descendents into the parent container
-      // container.appendChild(topNode);
-      // !VA Pass the clicked button id and parent container element to doIndents
-      // doIndentsNew( id, container );
     }
 
     function getIndent(indentLevel) {
@@ -1053,8 +1005,6 @@ var Witty = (function () {
       // console.log('indent is: ' + indent);
       return indent;
     }
-
-
 
     function writeClipboard(id, str) {
       var clipboardStr;
@@ -1218,9 +1168,7 @@ var Witty = (function () {
         tableTagWrapperBgcolor: (function() {
           return ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.iptCcpTableWrapperBgColor).value);
         })(),
-
       };
-
       return Attributes;
     }
 
@@ -1395,14 +1343,6 @@ var Witty = (function () {
           nodeList[i].setAttribute( entries[0], entries[1]);
         }
       }
-      // !VA Last modification is to add the textContent to the p tag. We do it now because it's a node, not an attribute, so we can't do it in the set attribute loop. We don't do it earlier because it might add a node and increment the array length, thus breaking the set attribute loop.
-      // nodeList.(p_switchcontent).textContent = 'ADD YOUR TEXT CONTENT HERE';
-      // for (let i = 0; i < nodeList.length; i++) {
-      //   if (nodeList[i].id === 'td_switchcontent2') {
-      //     com = document.createComment('ADD YOUR CONTENT HERE');
-      //     nodeList[i].appendChild(com);
-      //   }
-      // }
       // !VA Now we no longer need the IDs, so we can delete them.
       for (let i = 0; i < nodeList.length; i++) {
         // console.log('nodeList[i] is: ' +  nodeList[i]);
@@ -1451,7 +1391,7 @@ var Witty = (function () {
     var staticRegions = UICtrl.getStaticRegionIDs();
     var toolbarElements = UICtrl.getToolButtonIDs();
     var ccpUserInput = UICtrl.getCcpUserInputIDs();
-    var btnCcpMakeClips =  UICtrl.getCcpMakeClipButIDs();
+    var btnCcpMakeClips =  UICtrl.getBtnCcpMakeClips();
     
 
     // !VA appController private setupEventListeners
@@ -2343,7 +2283,7 @@ var Witty = (function () {
       // !VA Call appMessages to get the message for the messCode provided, returned as array with a bool and a string.
       retArray = appMessages(isErr, messCode);
       UIController.flashAppMessage(retArray);
-    };
+    }
 
     // !VA Might be good to fold this into error handling
     // appController private validateInteger
@@ -2461,18 +2401,13 @@ var Witty = (function () {
         // !VA First, set it to the opposite of how you want to start it.
         document.querySelector(staticRegions.ccpContainer).classList.remove('active');
         // !VA Then run initCCP to initialize
-  
         initCCP();
       }, delayInMilliseconds);
-
-
-     
     };
 
 
     function getAppdata() {
       // console.log('getAppdata running');
-      var arr = [];
       var Appdata = {};
       Appdata = UIController.queryDOMElements();
 
