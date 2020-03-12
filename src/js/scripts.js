@@ -761,6 +761,7 @@ var Witty = (function () {
           curNode.appendChild(com);
           console.log(curNode);
           nl = makeNodeList(id, curNode);
+          console.log('imgswap: nl.length = ' + nl.length);
           console.log('nl is: ');
           console.log(nl);
           nl[1].insertAdjacentHTML('afterend', '\nHH');
@@ -770,6 +771,7 @@ var Witty = (function () {
           console.clear();
           curNode = makePosSwitchNodes();
           nl = makeNodeList(id, curNode);
+          console.log('posswitch: nl.length = ' + nl.length);
           for (let i = 0; i < nl.length; i++) {
             // !VA Get the positions of the relevant nodes for indents
             // if (nl[i].nodeName === 'IMG') { imgNodeIndex = i; }
