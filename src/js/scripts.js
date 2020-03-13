@@ -777,18 +777,34 @@ var Witty = (function () {
       console.log(container.outerHTML);
 
       for (i = index; i < nl.length; i++) {
+        console.log('i is: ' + i);
         console.log('nl[i] is: ' +  nl[i]);
         counter = counter + 1;
         indent = getIndent(counter);
         console.log('indent is: ' + indent);
+        if ( i === 6 && nl[i].nodeName === 'A') {
+          console.log('terminal');
+          // !VA If nodeList item 1 is the anchor, then Include anchor is checked. Apply the 'terminal' indent scheme and don't apply any indent to the img element.
+          applyIndents2(nl[i], indent, 'terminal');
+        } else {
+          console.log('normal');
+          applyIndents2( nl[i], indent, 'normal');
+        }
 
-        nl[i].insertAdjacentHTML('beforebegin', indent);
-        nl[i].insertAdjacentHTML('afterbegin', '\n');
-        nl[i].insertAdjacentHTML('beforeend', indent);
-        nl[i].insertAdjacentHTML('afterend', '\n');
+
+
 
       }
+
+      var faa =  uSels.buttonClicked;
+      console.log('faa is: ' + faa);
+      var foo = aliasToId(uSels.buttonClicked);
+      console.log('foo is: ' + foo);
+      var clipboardStr = container.outerHTML;
       console.log('container.outerHTML is: \n' + container.outerHTML);
+      writeClipboard( aliasToId(uSels.buttonClicked), clipboardStr);
+
+
 
     }
     
@@ -926,6 +942,35 @@ var Witty = (function () {
       // !VA And write to clipboard
       writeClipboard( id, clipboardStr);
     }
+
+    function applyIndents2(node, indent, indentType ) {
+
+      if (node.nodeName === 'IMG') {
+        // !VA Do nothing
+      }
+      else if (indentType == 'terminal') {
+        // console.log('terminal');
+        node.insertAdjacentHTML('beforebegin', indent);
+        node.insertAdjacentHTML('afterend', '\n');
+      } 
+      
+      else if (indentType === 'normal') {
+        node.insertAdjacentHTML('beforebegin', indent);
+        node.insertAdjacentHTML('afterbegin', '\n');
+        node.insertAdjacentHTML('beforeend', indent);
+        node.insertAdjacentHTML('afterend', '\n');
+      }
+    }
+
+    function aliasToId( alias ) {
+      console.log('aliasToId running');
+      let id;
+      if (alias === 'imgbut') {id = btnCcpMakeClips.btnCcpMakeImgTag.slice(1); }
+      if (alias === 'tdbut') {id = btnCcpMakeClips.btnCcpMakeTdTag.slice(1); }
+      if (alias === 'tablebut') {id = btnCcpMakeClips.btnCcpMakeTableTag.slice(1); }
+      return id;
+    }
+
 
     function applyIndents(id, nl, indentIndex,  indentType, indent) {
       // console.log('applyIndents running');
