@@ -671,17 +671,61 @@ var Witty = (function () {
 
 
     function getUserSelections( id ) {
-      console.log('getCcpSelections running');
-      let uSels = {};
+      let uSels = {}, indentLevel;
       uSels = {
-        buttonClicked: id,
+        buttonClicked: '',
         hasAnchor: getCheckboxSelection(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk),
         hasWrapper: getCheckboxSelection(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk),
         selectedRadio: document.querySelector('input[name="tdoptions"]:checked').value
       };
-      console.log('buttonClicked is: ' + uSels.buttonClicked + '; hasAnchor is: ' + uSels.hasAnchor + '; selectedRadio is: ' + uSels.selectedRadio);
+      if (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)) { 
+        uSels.buttonClicked = 'imgbut';
+      } else if (id === btnCcpMakeClips.btnCcpMakeTdTag.slice(1)) { 
+        uSels.buttonClicked = 'tdbut';
+      } else {
+        uSels.buttonClicked = 'tablebut';
+      }
+      indentLevel = parseUserSelections( id, uSels);
+      console.log('indentLevel is: ' + indentLevel);
     }
 
+    function parseUserSelections(id, uSels) {
+      // console.log('parseUserSelections running');
+      // console.log('uSels is: ');
+      // console.log(uSels);
+      let indentLevel;
+      if (uSels.selectedRadio === 'basic') {
+        switch (true) {
+        case (uSels.buttonClicked === 'imgbut' && uSels.hasAnchor === false):
+          console.log('img, no anchor');
+          indentLevel = 1;
+          break;
+        case (uSels.buttonClicked === 'imgbut' && uSels.hasAnchor === true):
+          console.log('img, anchor');
+          indentLevel = 2;
+          break;
+        case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor === false):
+          console.log('td, no anchor');
+          indentLevel = 2;
+          break;
+        case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor === true):
+          console.log('td, anchor');
+          indentLevel = 3;
+          break;
+        case (uSels.buttonClicked === 'tablebut' && uSels.hasAnchor === false):
+          console.log('tablebut, no anchor');
+          indentLevel = 7;
+          break;
+        case (uSels.buttonClicked === 'tablebut' && uSels.hasAnchor === true):
+          console.log('tablebut, anchor');
+          indentLevel = 8;
+          break;
+        default:
+          // code block
+        } 
+      }
+      return indentLevel;
+    }
     
 
     // !VA INDENT FUNCTIONS
