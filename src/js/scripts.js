@@ -780,7 +780,7 @@ var Witty = (function () {
       console.log('parseTopNode');
       // !VA curpos
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
-      let i, index, nl, tableNodeFragment, indent;
+      let i, index, counter, nl, tableNodeFragment, indent;
       let foo, faa;
       tableNodeFragment = makeTableNode( uSels );
       nl = tableNodeFragment.querySelectorAll('*');
@@ -788,16 +788,11 @@ var Witty = (function () {
       console.log('nl is: ');
       console.log(nl);
       console.log('nl.length is: ' + nl.length);
-      // var foo = nl.length - (indentLevel);
-      // var fug = nl.length - (nl.length - indentLevel);
-      // console.log('foo is: ' + foo);
       // !VA Find out which index position in the nodeList corresponds to the user CCP selection  based on the conditions defined in parseUserSelections. For instance, if the IMG button is clicked with Include anchor checked, i will start incrementing at 6, the position of the anchor tag in the list.
       // !VA The counter determines the indentLevel. It initializes at -1 so it starts incrementing at 0, giving the top node in the list no indent. Subsequent nodes get an indent level of 1 and so on.
-      var counter = -1;
+      counter = -1;
       // !VA Start incrementing at the number of nodes minus the indentLevel passed in from parseUserSelections. This will be different for all flavors of indenting, so put it at the top of each flavor
-      var index = (nl.length - indentLevel);
-      console.log('index is: ' + index);
-      console.log('indentLevel is: ' + indentLevel);
+      index = (nl.length - indentLevel);
       // !VA Create the container that contains the nodes to be output to the clipboard. But we continue to process the and assign indents based on the original nodeList -- those changes stay live in the outputted nodes.
       var container = document.createElement('div');
       container = nl[index];
@@ -834,6 +829,7 @@ var Witty = (function () {
         // !VA Handle the node for the imgswap code block. First, save the indent level of the lowest TD in the tree to a variable. We need that when we apply the indents for the imgswap and bgimage code blocks which we will append to the lowest td in the tree. We loop here separately because trying to process the code block indents in the same loop as the node indents throws a NoModificationsToDocument error, probably because adding the comment node changes the index and screws up where insertAdjacentHTML puts the indent characters. 
         // !VA Get the indent level of the lowest TD in the tree
         counter = -1;
+        index = (nl.length - indentLevel);
         let imgSwapBlockIndent;
         for (i = index; i < nl.length; i++) {
           console.log('i is: ' + i);
@@ -842,11 +838,26 @@ var Witty = (function () {
           indent = getIndent(counter);
           console.log('indent is: ' + indent);
           if ( i > 3 &&  nl[i].nodeName === 'TD') {
-            console.log('run getImgSwapBlock now');
             imgSwapBlockIndent = ( counter + 1 );
-            console.log('imgSwapBlockIndent is: ' + imgSwapBlockIndent);
+          } 
+          // else if  (nl[i].nodeName === 'IMG') {
+          //   applyIndents2( nl[i], indent, 'ignore');
+          // }
+          else if (( uSels.hasAnchor && nl[i].nodeName === 'A') ||  (!uSels.hasAnchor && nl[i].nodeName === 'IMG')) {
+            console.log('boogers');
+            console.log('index is: ' + index);
+            console.log('nl.length is: ' + nl.length);
+            // !VA Hacks, but they work. Ideally I'd unwrap the img inside the anchor, but...maybe later.
+            // !VA If the table button with or without wrapper was clicked...
+            if (index === 0 || index === 3) {
+              // !VA Add an extra indent before the comment node
+              nl[i].insertAdjacentHTML('afterend', getIndent(1));
+            } else {
+              // !VA Otherwise, add a complete indent cycle before the comment node.
+              nl[i].insertAdjacentHTML('afterend', getIndent(imgSwapBlockIndent));
+            }
           }
-          // applyIndents2( nl[i], indent, 'normal');
+          applyIndents2( nl[i], indent, 'normal');
         }
         // !VA Create the comment node for appending to the TD. It doesn't work with innerHTML or textContent because those methods convert characters to HTML entities. NOTE: These indents work with td button but not yet for Table button.
         var com = document.createComment;
@@ -862,7 +873,7 @@ var Witty = (function () {
           }
           // !VA If Include anchor is checked, apply the indent to the A, otherwise apply it to the IMG.
           if (( uSels.hasAnchor && nl[i].nodeName === 'A') ||  (!uSels.hasAnchor && nl[i].nodeName === 'IMG')) {
-            nl[i].insertAdjacentHTML('afterend', '\n' + getIndent(imgSwapBlockIndent));
+            // nl[i].insertAdjacentHTML('afterend',   getIndent(imgSwapBlockIndent - 1));
           }
 
         }
