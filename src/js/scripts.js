@@ -733,6 +733,46 @@ var Witty = (function () {
           // code block
         } 
       }
+      else if (uSels.selectedRadio === 'imgswap') {
+        console.log('imgswap...');
+        switch(true) {
+        case (uSels.buttonClicked === 'imgbut' && !uSels.hasAnchor ):
+          console.log('img, no anchor');
+          indentLevel = 1;
+          break;
+        case (uSels.buttonClicked === 'imgbut' && uSels.hasAnchor):
+          console.log('img, anchor');
+          indentLevel = 2;
+          break;
+        case (uSels.buttonClicked === 'tdbut' && !uSels.hasAnchor):
+          console.log('td, no anchor');
+          indentLevel = 2;
+          break;
+        case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor):
+          console.log('td, anchor');
+          indentLevel = 3;
+          break;
+        case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && !uSels.hasAnchor):
+          console.log('tablebut, no wrapper, no anchor');
+          indentLevel = 4;
+          break;
+        case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && uSels.hasAnchor):
+          console.log('tablebut, no wrapper, anchor');
+          indentLevel = 5;
+          break;
+        case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && !uSels.hasAnchor ):
+          console.log('tablebut, no anchor');
+          indentLevel = 7;
+          break;
+        case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && uSels.hasAnchor):
+          console.log('tablebut, anchor');
+          indentLevel = 8;
+          break;
+        default:
+          // code block
+        } 
+      }
+
       parseTopNode(uSels, indentLevel);
     }
 
@@ -741,31 +781,20 @@ var Witty = (function () {
       // !VA curpos
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
       let i, nl, tableNodeFragment, indent;
+      let foo, faa;
       tableNodeFragment = makeTableNode( uSels );
       nl = tableNodeFragment.querySelectorAll('*');
+      console.clear();
       console.log('nl is: ');
       console.log(nl);
-
+      console.log('nl.length is: ' + nl.length);
       // var foo = nl.length - (indentLevel);
       // var fug = nl.length - (nl.length - indentLevel);
       // console.log('foo is: ' + foo);
       // !VA Find out which index position in the nodeList corresponds to the user CCP selection  based on the conditions defined in parseUserSelections. For instance, if the IMG button is clicked with Include anchor checked, i will start incrementing at 6, the position of the anchor tag in the list.
-      console.clear();
       // !VA The counter determines the indentLevel. It initializes at -1 so it starts incrementing at 0, giving the top node in the list no indent. Subsequent nodes get an indent level of 1 and so on.
       var counter = -1;
       // !VA Start incrementing at the number of nodes minus the indentLevel passed in from parseUserSelections + 1... can't explain the +1 though yet but it works.
-      // for (let i = (nl.length - indentLevel + 1); i < nl.length; i++) {
-      //   // !VA Set the number of indent repeats to be returned from getIndent
-      //   counter = counter + 1;
-      //   indent = getIndent(counter);
-      //   // !VA Print the current node list items corresponding to the user selections to the console.
-      //   console.log('i is: ' + i);
-      //   // console.log('nodeList[i] is: ');
-      //   console.log(nl[i]);
-      //   // console.log('indent is is: ' + indent);
-      // }
-
-      // !VA But all we really need is the index and the indentLevel...
       var index = (nl.length - indentLevel);
       console.log('index is: ' + index);
       console.log('indentLevel is: ' + indentLevel);
@@ -776,23 +805,53 @@ var Witty = (function () {
       console.log('container.outerHTML is: ');
       console.log(container.outerHTML);
 
+
+      let imgSwapBlockIndent;
       for (i = index; i < nl.length; i++) {
         console.log('i is: ' + i);
         console.log('nl[i] is: ' +  nl[i]);
         counter = counter + 1;
         indent = getIndent(counter);
         console.log('indent is: ' + indent);
+        if ( i > 3 &&  nl[i].nodeName === 'TD') {
+          if (uSels.selectedRadio === 'imgswap') {
+            console.log('run getImgSwapBlock now');
+            imgSwapBlockIndent = ( counter + 1 );
+            console.log('imgSwapBlockIndent is: ' + imgSwapBlockIndent);
+          }
+          else if (uSels.selectedRadio === 'bgimage') {
+            console.log('run getTdimageBlock now');
+          }
+        }
         if (i === 7 && nl[i].nodeName === 'IMG') {
-          console.log('ignore');
+          // console.log('ignore');
           applyIndents2(nl[i], indent, 'ignore');
         }
         else if ( i === 6 && nl[i].nodeName === 'A') {
-          console.log('terminal');
+          // console.log('terminal');
           // !VA If nodeList item 1 is the anchor, then Include anchor is checked. Apply the 'terminal' indent scheme and don't apply any indent to the img element.
           applyIndents2(nl[i], indent, 'terminal');
         } else {
-          console.log('normal');
+          // console.log('normal');
           applyIndents2( nl[i], indent, 'normal');
+        }
+      }
+
+
+      var com = document.createComment;
+      for (i = index; i < nl.length; i++) {
+
+        if ( i > 3 &&  nl[i].nodeName === 'TD') {
+          if (uSels.selectedRadio === 'imgswap') {
+            console.log('run getImgSwapBlock now');
+            foo = getImgSwapBlock( imgSwapBlockIndent );
+            com = document.createComment(foo);
+            console.log('foo is: ' + foo);
+            nl[i].appendChild(com);
+          }
+          else if (uSels.selectedRadio === 'bgimage') {
+            console.log('run getTdimageBlock now');
+          }
         }
       }
 
@@ -944,10 +1003,11 @@ var Witty = (function () {
 
       if (indentType === 'ignore') {
         // !VA Do nothing
-        console.log('Do nothing: img');
+        // console.log('Do nothing: img');
       }
       else if (indentType == 'terminal') {
         // console.log('terminal');
+        console.log('node problem is: ' + node);
         node.insertAdjacentHTML('beforebegin', indent);
         node.insertAdjacentHTML('afterend', '\n');
       } 
@@ -1125,6 +1185,7 @@ var Witty = (function () {
         // !VA Branch: 031320A
       // case (selectedRadio === 'imgswap'):
       case (uSels.selectedRadio === 'imgswap'):
+        console.log('tdNode: imgswap');
         tdInner.width = Attributes.tdAppdataWidth;
         tdInner.height = Attributes.tdAppdataHeight;
         // !VA valign attribute
