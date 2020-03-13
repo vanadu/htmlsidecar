@@ -731,16 +731,31 @@ var Witty = (function () {
     function parseTopNode( uSels, indentLevel ) {
       console.log('parseTopNode');
       // !VA curpos
-      // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection.
-      let nl, tableNodeFragment;
+      // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
+      let nl, tableNodeFragment, indent;
       tableNodeFragment = makeTableNode( uSels );
       nl = tableNodeFragment.querySelectorAll('*');
       console.log('nl is: ');
       console.log(nl);
 
-
-
-
+      // var foo = nl.length - (indentLevel);
+      // var fug = nl.length - (nl.length - indentLevel);
+      // console.log('foo is: ' + foo);
+      // !VA Find out which index position in the nodeList corresponds to the user CCP selection  based on the conditions defined in parseUserSelections. For instance, if the IMG button is clicked with Include anchor checked, i will start incrementing at 6, the position of the anchor tag in the list.
+      console.clear();
+      // !VA The counter determines the indentLevel. It initializes at -1 so it starts incrementing at 0, giving the top node in the list no indent. Subsequent nodes get an indent level of 1 and so on.
+      var counter = -1;
+      // !VA Start incrementing at the number of nodes minus the indentLevel passed in from parseUserSelections
+      for (let i = (nl.length - indentLevel); i < nl.length; i++) {
+        // !VA Set the number of indent repeats to be returned from getIndent
+        counter = counter + 1;
+        indent = getIndent(counter);
+        // !VA Print the current node list items corresponding to the user selections to the console.
+        console.log('nodeList[i] is: ');
+        console.log(nl[i]);
+        console.log('indent is is: ' + indent);
+        
+      }
     }
     
 
