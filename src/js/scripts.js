@@ -713,11 +713,19 @@ var Witty = (function () {
           console.log('td, anchor');
           indentLevel = 3;
           break;
-        case (uSels.buttonClicked === 'tablebut' && uSels.hasAnchor === false):
+        case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper === false && uSels.hasAnchor === false):
+          console.log('tablebut, no wrapper, no anchor');
+          indentLevel = 4;
+          break;
+        case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper === false && uSels.hasAnchor === true):
+          console.log('tablebut, no wrapper, anchor');
+          indentLevel = 5;
+          break;
+        case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper === true && uSels.hasAnchor === false):
           console.log('tablebut, no anchor');
           indentLevel = 7;
           break;
-        case (uSels.buttonClicked === 'tablebut' && uSels.hasAnchor === true):
+        case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper === true && uSels.hasAnchor === true):
           console.log('tablebut, anchor');
           indentLevel = 8;
           break;
@@ -732,7 +740,7 @@ var Witty = (function () {
       console.log('parseTopNode');
       // !VA curpos
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
-      let nl, tableNodeFragment, indent;
+      let i, nl, tableNodeFragment, indent;
       tableNodeFragment = makeTableNode( uSels );
       nl = tableNodeFragment.querySelectorAll('*');
       console.log('nl is: ');
@@ -745,17 +753,43 @@ var Witty = (function () {
       console.clear();
       // !VA The counter determines the indentLevel. It initializes at -1 so it starts incrementing at 0, giving the top node in the list no indent. Subsequent nodes get an indent level of 1 and so on.
       var counter = -1;
-      // !VA Start incrementing at the number of nodes minus the indentLevel passed in from parseUserSelections
-      for (let i = (nl.length - indentLevel); i < nl.length; i++) {
-        // !VA Set the number of indent repeats to be returned from getIndent
+      // !VA Start incrementing at the number of nodes minus the indentLevel passed in from parseUserSelections + 1... can't explain the +1 though yet but it works.
+      // for (let i = (nl.length - indentLevel + 1); i < nl.length; i++) {
+      //   // !VA Set the number of indent repeats to be returned from getIndent
+      //   counter = counter + 1;
+      //   indent = getIndent(counter);
+      //   // !VA Print the current node list items corresponding to the user selections to the console.
+      //   console.log('i is: ' + i);
+      //   // console.log('nodeList[i] is: ');
+      //   console.log(nl[i]);
+      //   // console.log('indent is is: ' + indent);
+      // }
+
+      // !VA But all we really need is the index and the indentLevel...
+      var index = (nl.length - indentLevel);
+      console.log('index is: ' + index);
+      console.log('indentLevel is: ' + indentLevel);
+      var container = document.createElement('div');
+      container = nl[index];
+      console.log('container is: ');
+      console.log(container);
+      console.log('container.outerHTML is: ');
+      console.log(container.outerHTML);
+
+      for (i = index; i < nl.length; i++) {
+        console.log('nl[i] is: ' +  nl[i]);
         counter = counter + 1;
         indent = getIndent(counter);
-        // !VA Print the current node list items corresponding to the user selections to the console.
-        console.log('nodeList[i] is: ');
-        console.log(nl[i]);
-        console.log('indent is is: ' + indent);
-        
+        console.log('indent is: ' + indent);
+
+        nl[i].insertAdjacentHTML('beforebegin', indent);
+        nl[i].insertAdjacentHTML('afterbegin', '\n');
+        nl[i].insertAdjacentHTML('beforeend', indent);
+        nl[i].insertAdjacentHTML('afterend', '\n');
+
       }
+      console.log('container.outerHTML is: \n' + container.outerHTML);
+
     }
     
 
