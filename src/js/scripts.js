@@ -697,35 +697,35 @@ var Witty = (function () {
       // !VA If the tdoptions radio button selection is Basic td with options, determine the indent level of the possible node output configurations.
       if (uSels.selectedRadio === 'basic') {
         switch (true) {
-        case (uSels.buttonClicked === 'imgbut' && uSels.hasAnchor === false):
+        case (uSels.buttonClicked === 'imgbut' && !uSels.hasAnchor ):
           console.log('img, no anchor');
           indentLevel = 1;
           break;
-        case (uSels.buttonClicked === 'imgbut' && uSels.hasAnchor === true):
+        case (uSels.buttonClicked === 'imgbut' && uSels.hasAnchor):
           console.log('img, anchor');
           indentLevel = 2;
           break;
-        case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor === false):
+        case (uSels.buttonClicked === 'tdbut' && !uSels.hasAnchor):
           console.log('td, no anchor');
           indentLevel = 2;
           break;
-        case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor === true):
+        case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor):
           console.log('td, anchor');
           indentLevel = 3;
           break;
-        case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper === false && uSels.hasAnchor === false):
+        case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && !uSels.hasAnchor):
           console.log('tablebut, no wrapper, no anchor');
           indentLevel = 4;
           break;
-        case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper === false && uSels.hasAnchor === true):
+        case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && uSels.hasAnchor):
           console.log('tablebut, no wrapper, anchor');
           indentLevel = 5;
           break;
-        case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper === true && uSels.hasAnchor === false):
+        case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && !uSels.hasAnchor ):
           console.log('tablebut, no anchor');
           indentLevel = 7;
           break;
-        case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper === true && uSels.hasAnchor === true):
+        case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && uSels.hasAnchor):
           console.log('tablebut, anchor');
           indentLevel = 8;
           break;
@@ -782,7 +782,11 @@ var Witty = (function () {
         counter = counter + 1;
         indent = getIndent(counter);
         console.log('indent is: ' + indent);
-        if ( i === 6 && nl[i].nodeName === 'A') {
+        if (i === 7 && nl[i].nodeName === 'IMG') {
+          console.log('ignore');
+          applyIndents2(nl[i], indent, 'ignore');
+        }
+        else if ( i === 6 && nl[i].nodeName === 'A') {
           console.log('terminal');
           // !VA If nodeList item 1 is the anchor, then Include anchor is checked. Apply the 'terminal' indent scheme and don't apply any indent to the img element.
           applyIndents2(nl[i], indent, 'terminal');
@@ -790,16 +794,9 @@ var Witty = (function () {
           console.log('normal');
           applyIndents2( nl[i], indent, 'normal');
         }
-
-
-
-
       }
 
-      var faa =  uSels.buttonClicked;
-      console.log('faa is: ' + faa);
-      var foo = aliasToId(uSels.buttonClicked);
-      console.log('foo is: ' + foo);
+
       var clipboardStr = container.outerHTML;
       console.log('container.outerHTML is: \n' + container.outerHTML);
       writeClipboard( aliasToId(uSels.buttonClicked), clipboardStr);
@@ -945,8 +942,9 @@ var Witty = (function () {
 
     function applyIndents2(node, indent, indentType ) {
 
-      if (node.nodeName === 'IMG') {
+      if (indentType === 'ignore') {
         // !VA Do nothing
+        console.log('Do nothing: img');
       }
       else if (indentType == 'terminal') {
         // console.log('terminal');
