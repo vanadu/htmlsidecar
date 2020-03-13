@@ -671,7 +671,9 @@ var Witty = (function () {
 
 
     function getUserSelections( id ) {
-      let uSels = {}, indentLevel;
+      // console.log('getUserSelections running');
+      // !VA Initialize the clipboard-building process by getting those user selections in the CCP that determine the structure of the clipboard output and put those selections into the uSels object.
+      let uSels = {};
       uSels = {
         buttonClicked: '',
         hasAnchor: getCheckboxSelection(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk),
@@ -685,15 +687,14 @@ var Witty = (function () {
       } else {
         uSels.buttonClicked = 'tablebut';
       }
-      indentLevel = parseUserSelections( id, uSels);
-      console.log('indentLevel is: ' + indentLevel);
+      parseUserSelections( uSels );
     }
 
-    function parseUserSelections(id, uSels) {
+    function parseUserSelections(uSels) {
       // console.log('parseUserSelections running');
-      // console.log('uSels is: ');
-      // console.log(uSels);
+      // !VA Here we determine the indent level for node indices based on the user selection configuration in uSels
       let indentLevel;
+      // !VA If the tdoptions radio button selection is Basic td with options, determine the indent level of the possible node output configurations.
       if (uSels.selectedRadio === 'basic') {
         switch (true) {
         case (uSels.buttonClicked === 'imgbut' && uSels.hasAnchor === false):
@@ -724,14 +725,29 @@ var Witty = (function () {
           // code block
         } 
       }
-      return indentLevel;
+      parseTopNode(uSels, indentLevel);
+    }
+
+    function parseTopNode( uSels, indentLevel ) {
+      console.log('parseTopNode');
+      // !VA curpos
+      // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection.
+      let nl, tableNodeFragment;
+      tableNodeFragment = makeTableNode( uSels );
+      nl = tableNodeFragment.querySelectorAll('*');
+      console.log('nl is: ');
+      console.log(nl);
+
+
+
+
     }
     
 
     // !VA INDENT FUNCTIONS
     // !VA Get the user selections that define the clipboard output configuration- the clicked Options button, the Include anchor checkbox and the Include wrapper table checkbox. The nodeList used for the indents as well as the indent implementation will depend on these options -- only the basic TD radio button option generates a simple nodeList structure whose indents can be processed with a simple for loop. The other options generate nodeLists with text nodes and comments that require a custom indent scheme.
     function getUserSelection(id) {
-      getUserSelections(id);
+      // getUserSelections(id);
       console.log('getUserSelection running');
       // console.log('id is: ' + id);
       let hasAnchor, hasWrapper, selectedRadio;
@@ -930,14 +946,19 @@ var Witty = (function () {
       return bgimageStr;
     }
     // !VA END TD OPTIONS MS-CONDITIONAL CODE BLOCKS
-
-    function makeImgNode ( id ) {
+    // !VA Branch: 031320A
+    // function makeImgNode ( id ) {
+    function makeImgNode ( ) {
       // console.log('makeImgNode running');
       // !VA Id is passed but not used here,  because we're only building the node.
       let Attributes;
       Attributes = getAttributes();
       let imgNode, returnNode;
+      // !VA Branch: 031320A Let's try to use fragments again for this.
+      let returnNodeFragment;
       imgNode = document.createElement('img');
+      returnNodeFragment = document.createDocumentFragment();
+
       // !VA class attribute
       if (Attributes.imgClass) { imgNode.className = Attributes.imgClass; }
       // !VA alt attribute
@@ -963,30 +984,41 @@ var Witty = (function () {
         // console.log(anchor.outerHTML);
         anchor.appendChild(imgNode);
         // console.log(anchor.outerHTML);
-        returnNode = anchor;
+        returnNodeFragment.appendChild(anchor);
       } else {
         // !VA Otherwise, set returnNode to imgNode without the anchor.
-        returnNode = imgNode;
+        // returnNode = imgNode;
+        // !VA Branch: 031320A
+        returnNodeFragment.appendChild(imgNode);
       }
-      return returnNode;
+      // !VA Branch: 031320A
+      // return returnNode;
+      return returnNodeFragment;
     }
 
 
 
     // !VA 03.10.2020 Need to find out whether the table button was clicked and if so just add 3 or 6 to the indentLevel of the getIndent function.
-    function makeTdNode( id, selectedRadio ) {
+    // !VA Branch: 031320A
+    // function makeTdNode( id, selectedRadio ) {
+    function makeTdNode( uSels ) {
       // console.log('makeTdNode running');
       let Attributes;
       Attributes = getAttributes();
       let tdInner, imgNode;
       tdInner = document.createElement('td');
+      // !VA Branch: 031320A
+      let tdNodeFragment;
+      tdNodeFragment = document.createDocumentFragment();
       // !VA Add the attributes that are included in both the default and background image td
       if (Attributes.tdValign) { tdInner.vAlign = Attributes.tdValign; }
       // !VA bgcolor attribute. Pass the input value, don't prepend hex # character for now
       if (Attributes.tdBgcolor) { tdInner.bgColor = Attributes.tdBgcolor; }
       // !VA Now add the attributes included only with the default Td configuration
       switch(true) {
-      case (selectedRadio === 'basic'):
+      // !VA Branch: 031320A
+      // case (selectedRadio === 'basic'):
+      case (uSels.selectedRadio === 'basic'):
         // !VA class attribute
         if (Attributes.tdClass) { tdInner.className = Attributes.tdClass; }
         // !VA valign attribute
@@ -998,7 +1030,9 @@ var Witty = (function () {
         // !VA We need to include the imgNode here ONLY if Bgimage is unchecked
         tdInner.appendChild(imgNode);
         break;
-      case (selectedRadio === 'imgswap'):
+        // !VA Branch: 031320A
+      // case (selectedRadio === 'imgswap'):
+      case (uSels.selectedRadio === 'imgswap'):
         tdInner.width = Attributes.tdAppdataWidth;
         tdInner.height = Attributes.tdAppdataHeight;
         // !VA valign attribute
@@ -1007,7 +1041,9 @@ var Witty = (function () {
         imgNode = makeImgNode();
         tdInner.appendChild(imgNode);
         break;
-      case (selectedRadio === 'bgimage'):
+      // !VA Branch: 031320A
+      // case (selectedRadio === 'bgimage'):
+      case (uSels.selectedRadio === 'bgimage'):
         // !VA First we create the node
         tdInner.width = Attributes.tdAppdataWidth;
         tdInner.height = Attributes.tdAppdataHeight;
@@ -1017,12 +1053,102 @@ var Witty = (function () {
         tdInner.setAttribute('background', Attributes.tdBackground);
         // !VA Include fallback color if no bgColor is selected. Use Stig's fallback: #7bceeb
         break;
-      case (selectedRadio === 'posswitch'):
+        // !VA Branch: 031320A
+      // case (selectedRadio === 'posswitch'):
+      case (uSels.selectedRadio === 'posswitch'):
 
         break;
       default:
       } 
-      return tdInner;
+      // !VA Branch: 031320A
+      // return tdInner;
+      tdNodeFragment.appendChild(tdInner);
+      return tdNodeFragment;
+
+    }
+
+    // !VA Branch: 031320A
+    // function makeTableNode( id ) {
+    function makeTableNode( uSels) {
+      // console.log('makeTdNode running');
+      let Attributes;
+      Attributes = getAttributes();
+      let tableNode, tableInner, tableOuter, tdInner, tdOuter, trInner, trOuter;
+      tableOuter = document.createElement('table');
+      tableInner = document.createElement('table');
+      tdInner = document.createElement('td');
+      tdOuter = document.createElement('td');
+      trInner = document.createElement('tr');
+      trOuter = document.createElement('tr');
+
+      // !VA Make the inner table. If Include wrapper table is unchecked, we return just the inner table. If it's checked, we return the inner table and the outer table 
+      // !VA Add inner table attributes
+      // !VA table class attribute
+      if (Attributes.tableClass) { tableInner.className = Attributes.tableClass; }
+      // table.className = Attributes.tableClass;
+      // !VA table align attribute
+      if (Attributes.tableAlign) { tableInner.align = Attributes.tableAlign; }
+      // !VA width attribute -- the default is the current display size, so it gets the value from the toolbar viewerW input field.
+      tableInner.width = Attributes.tableWidth;
+      // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for now
+      if (Attributes.tableBgcolor) { tableInner.bgColor = Attributes.tableBgcolor; }
+      // !VA Add border, cellspacing and cellpadding
+      tableInner.border = '0', tableInner.cellSpacing = '0', tableInner.cellPadding = '0';
+      tableInner.setAttribute('role', 'presentation'); 
+      
+      // !VA Build the inner tr
+      tableInner.appendChild(trInner);
+      // !VA Get the inner TD and append it - id is not for the inner TD but that's not relevent here.
+      // !VA Branch: 031320A
+      // tdInner = makeTdNode( id );
+      // trInner.appendChild(tdInner);
+      let tdNodeFragment = makeTdNode( uSels );
+      trInner.appendChild(tdNodeFragment);
+      
+      // !VA 03.06.20A We are ALWAYS outputting EVERYTHING this time...
+      // if (!Attributes.tableIncludeWrapper) {
+      //   // !VA If Include table wrapper is unchecked, just return this inner table
+      tableNode = tableInner;
+      // } else {
+      // !VA If include table wrapper is checked, build the outer table and return it
+      // !VA table wrapper class
+      if (Attributes.tableTagWrapperAlign) { tableOuter.align = Attributes.tableTagWrapperAlign; }
+      // !VA wrapper table align attribute
+      if (Attributes.tableTagWrapperClass) { tableOuter.className = Attributes.tableTagWrapperClass; }
+
+      // !VA width attribute
+      // !VA the default is the current display size, so it gets the value from the field.
+      tableOuter.width = Attributes.tableTagWrapperWidth;
+
+      // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for nowtableTagWrapperBgcolor);
+      if (Attributes.tableTagWrapperBgcolor) { tableOuter.bgColor = Attributes.tableTagWrapperBgcolor; }
+
+      // !VA Add border, cellspacing and cellpadding
+      tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
+      tableOuter.setAttribute('role', 'presentation'); 
+
+      // !VA Append the outer tr
+      tableOuter.appendChild(trOuter);
+      trOuter.appendChild(tdOuter);
+      // !VA Append the outer td
+      trOuter.appendChild(tdOuter);
+      // !VA Add the outer td attributes
+      if (Attributes.tdAlign) { tdOuter.align = Attributes.tdAlign; }
+      // !VA valign attribute
+      if (Attributes.tdValign) { tdOuter.vAlign = Attributes.tdValign; }
+      // !VA Append the inner table to the outer table's td
+      tdOuter.appendChild(tableInner);
+      // !VA Pass the outer table to the tableNode.
+      // !VA Branch: 031320A
+      // tableNode = tableOuter;
+      let tableNodeFragment;
+      tableNodeFragment = document.createDocumentFragment();
+      tableNodeFragment.appendChild(tableOuter);
+      // }
+      // console.log(tableNode.outerHTML);
+      // !VA Branch: 031320A
+      // return tableNode;
+      return tableNodeFragment;
     }
 
 
@@ -1407,7 +1533,8 @@ var Witty = (function () {
         // !VA getUserSelection
         // id.includes('tag') ? makeNodeList(id) : makeCssRule(id);
         // id.includes('tag') ? makeNodeList(id) : makeCssRule(id);
-        id.includes('tag') ? getUserSelection(id) : makeCssRule(id);
+        // !VA 03.13.2020 Initiating script at getUserSelections for branch 031320A instead of getUserSelection
+        id.includes('tag') ? getUserSelections(id) : makeCssRule(id);
 
        
       },
