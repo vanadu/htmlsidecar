@@ -772,6 +772,26 @@ var Witty = (function () {
           // code block
         } 
       }
+      else if (uSels.selectedRadio === 'bgimage') {
+        console.log('bgimage...');
+        // !VA There is no A or IMG in the nodeList for this option.
+        switch(true) {
+        case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor):
+          console.log('td');
+          indentLevel = 1;
+          break;
+        case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && uSels.hasAnchor):
+          console.log('tablebut, no wrapper, anchor');
+          indentLevel = 3;
+          break;
+        case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && uSels.hasAnchor):
+          console.log('tablebut, anchor');
+          indentLevel = 6;
+          break;
+        default:
+          // code block
+        } 
+      }
       parseTopNode(uSels, indentLevel);
     }
 
@@ -780,6 +800,7 @@ var Witty = (function () {
       // !VA curpos
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
       let i, index, counter, nl, tableNodeFragment, indent;
+      let imgSwapBlockIndent, commentNode;
       let foo, faa;
       tableNodeFragment = makeTableNode( uSels );
       nl = tableNodeFragment.querySelectorAll('*');
@@ -790,6 +811,10 @@ var Witty = (function () {
       // !VA Start incrementing at the number of nodes minus the indentLevel passed in from parseUserSelections. This will be different for all flavors of indenting, so put it at the top of each flavor
       index = (nl.length - indentLevel);
       // !VA Create the container that contains the nodes to be output to the clipboard. But we continue to process the and assign indents based on the original nodeList -- those changes stay live in the outputted nodes.
+
+      // !VA 03.14.2020 We need to pass: nl, index, counter
+
+
       var container = document.createElement('div');
       container = nl[index];
       // !VA Loop through the nodes and apply the indents to the nodes without MS conditionals.
@@ -818,11 +843,10 @@ var Witty = (function () {
         // !VA Get the indent level of the lowest TD in the tree
         counter = -1;
         index = (nl.length - indentLevel);
-        let imgSwapBlockIndent;
         for (i = index; i < nl.length; i++) {
           counter = counter + 1;
           indent = getIndent(counter);
-          // !VA ???
+          // !VA If the TD is the lowermost TD in the tree, then it has a nodeList index of less than 3, so set the indent for the imgswapblock section to the counter + 1 to define the indent of the comment block
           if ( i > 3 &&  nl[i].nodeName === 'TD') {
             imgSwapBlockIndent = ( counter + 1 );
           } 
@@ -840,27 +864,85 @@ var Witty = (function () {
           applyIndents2( nl[i], indent, 'normal');
         }
         // !VA Create the comment node for appending to the TD. It doesn't work with innerHTML or textContent because those methods convert characters to HTML entities. NOTE: These indents work with td button but not yet for Table button. This has to come after the node indent handler above. 
-        var com = document.createComment;
+        commentNode = document.createComment;
         for (i = index; i < nl.length; i++) {
           // !VA If the child of the TD isn't a table, then the TD is the lowest descendant in the tree, so append the comment node to it.
           if ( nl[i].nodeName === 'TD' && nl[i+1].nodeName !== 'TABLE') {
             // !VA MAGIC HAPPENS: Get the indent using the saved indentLevel from the above function and apply it everywhere the getIndent function appears in the code block.
-            com = document.createComment(getImgSwapBlock( imgSwapBlockIndent ));
+            commentNode = document.createComment(getImgSwapBlock( imgSwapBlockIndent ));
             // !VA Append the comment to the TD
-            nl[i].appendChild(com);
+            nl[i].appendChild(commentNode);
             // !VA Add the indent before the closing tag
             nl[i].insertAdjacentHTML('beforeend', '\n' + getIndent(imgSwapBlockIndent - 1));
           }
           // !VA If Include anchor is checked, apply the indent to the A, otherwise apply it to the IMG.
           if (( uSels.hasAnchor && nl[i].nodeName === 'A') ||  (!uSels.hasAnchor && nl[i].nodeName === 'IMG')) {
+            // !VA This was supposed to ignore the A and IMG indenting but it does nothing, so delete it or make it an else if of the above clause.
             // nl[i].insertAdjacentHTML('afterend',   getIndent(imgSwapBlockIndent - 1));
           }
         }
       } // End img swap section
 
+      // !VA Start bgimage section
+      // !VA We only have 6 nodes in the nodeList because the A and IMG aren't included as nodes, but rather are only referenced as attributes of the TD node passed in from makeTdNode.
+      if ( uSels.selectedRadio === 'bgimage') {
+        if ( uSels.buttonClicked === 'imgbut') {
+          console.log('img but clicked');
+          // !VA 03.14.2020 Have to deal with the imgbut click in this case 
+        } else {
+          
+          console.log('bgimage running');
+          counter = -1;
+          index = (nl.length - indentLevel);
+          console.log('index is: ' + index);
+          console.log('nl is: ');
+          console.log(nl);
+
+
+          for (i = index; i < nl.length; i++) {
+            counter = counter + 1;
+            indent = getIndent(counter);
 
 
 
+
+            // !VA If i = 5, then this is the lowermost descendant TD in the tree, so we set the indent level of the comment block to 1. We get the comment block in the next function.
+            imgSwapBlockIndent = ( counter + 1 );
+            if ( index === 5) {
+              nl[i].insertAdjacentHTML('afterbegin', getIndent(imgSwapBlockIndent));
+              console.log('tdbutton clicked');
+            } 
+            else {
+              if ( i === 5) {
+                // !VA If the table button is clicked, add an extra indent before the comment node -- applyIndents2 leaves that out.
+                nl[i].insertAdjacentHTML('afterbegin', 'ZZ');
+              }
+            }
+            applyIndents2( nl[i], indent, 'normal');
+          }
+          // !VA Create the comment node for appending to the TD. It doesn't work with innerHTML or textContent because those methods convert characters to HTML entities. NOTE: These indents work with td button but not yet for Table button. This has to come after the node indent handler above. 
+          commentNode = document.createComment;
+          for (i = index; i < nl.length; i++) {
+            console.log('i is: ' + i);
+            // !VA If the current TD has no child, then it's the lowest descendant in the tree, so append the comment node to it.
+            if ( nl[i].nodeName === 'TD' && !nl[i+1]) {
+              // !VA MAGIC HAPPENS: Get the indent using the saved indentLevel from the above function and apply it everywhere the getIndent function appears in the code block.
+              commentNode = document.createComment(getBgimageBlock( imgSwapBlockIndent ));
+              // !VA Append the comment to the TD
+              nl[i].appendChild(commentNode);
+              // !VA Add the indent before the closing tag
+              nl[i].insertAdjacentHTML('beforeend', '\n' + getIndent(imgSwapBlockIndent - 1));
+            }
+            // !VA If Include anchor is checked, apply the indent to the A, otherwise apply it to the IMG.
+            if (( uSels.hasAnchor && nl[i].nodeName === 'A') ||  (!uSels.hasAnchor && nl[i].nodeName === 'IMG')) {
+              // nl[i].insertAdjacentHTML('afterend',   getIndent(imgSwapBlockIndent - 1));
+            }
+          }
+
+        }
+
+
+      }
 
 
       var clipboardStr = container.outerHTML;
