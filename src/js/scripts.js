@@ -5,8 +5,9 @@
 // !VA GENERAL NOTES
 /* !VA  - February Reboot Notes
 =========================================================
-// !VA 02.28.20
+// !VA 03.15.2020
 For later:
+TODO: Implement posswitch
 TODO: The CSS output will need to be revisited for td and table.
 TODO: Figure out why queryDOMElements is running mutliple times per CB build.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
@@ -54,7 +55,7 @@ var Witty = (function () {
     setTimeout(function(){ 
       console.log('timeout'); 
       // !VA Don't forget you can't use button aliases here..
-      document.querySelector('#btn-ccp-make-img-tag').click();
+      document.querySelector('#btn-ccp-make-td-tag').click();
 
     }, 500);
   });
@@ -749,6 +750,48 @@ var Witty = (function () {
           // code block
         } 
       }
+      else if (uSels.selectedRadio === 'posswitch') {
+        console.log('posswitch');
+        switch(true) {
+        // !VA Not accessed, overridden in getUserSelections
+        case (uSels.buttonClicked === 'imgbut' && !uSels.hasAnchor ):
+          console.log('img, no anchor');
+          indentLevel = 12;
+          break;
+          // !VA Not accessed, overridden in getUserSelections
+        case (uSels.buttonClicked === 'imgbut' && uSels.hasAnchor):
+          console.log('img, anchor');
+          indentLevel = 13;
+          break;
+        case (uSels.buttonClicked === 'tdbut' && !uSels.hasAnchor):
+          console.log('td, no anchor');
+          indentLevel = 6;
+          break;
+        case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor):
+          console.log('td, anchor');
+          indentLevel = 6;
+          break;
+        case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && !uSels.hasAnchor):
+          console.log('tablebut, no wrapper, no anchor');
+          indentLevel = 4;
+          break;
+        case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && uSels.hasAnchor):
+          console.log('tablebut, no wrapper, anchor');
+          indentLevel = 5;
+          break;
+        case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && !uSels.hasAnchor ):
+          console.log('tablebut, no anchor');
+          indentLevel = 7;
+          break;
+        case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && uSels.hasAnchor):
+          console.log('tablebut, anchor');
+          indentLevel = 8;
+          break;
+        default:
+          // code block
+        } 
+        
+      }
       else if (uSels.selectedRadio === 'bgimage') {
         console.log('bgimage...');
         // !VA There is no A or IMG in the nodeList for this option.
@@ -773,12 +816,16 @@ var Witty = (function () {
     }
 
     function parseTopNode( uSels, indentLevel ) {
+      console.clear();
       console.log('parseTopNode');
+      console.log('indentLevel 820 is: ' + indentLevel);
       // !VA curpos
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
       let index, counter, nl, tableNodeFragment;
       let foo, faa;
+      
       tableNodeFragment = makeTableNode( uSels );
+      
       nl = tableNodeFragment.querySelectorAll('*');
       // !VA Find out which index position in the nodeList corresponds to the user CCP selection  based on the conditions defined in parseUserSelections. For instance, if the IMG button is clicked with Include anchor checked, i will start incrementing at 6, the position of the anchor tag in the list.
       // !VA The counter determines the indentLevel. It initializes at -1 so it starts incrementing at 0, giving the top node in the list no indent. Subsequent nodes get an indent level of 1 and so on.
@@ -816,7 +863,16 @@ var Witty = (function () {
 
       // !VA Start posswitch section
       if (uSels.selectedRadio === 'posswitch') {
-        console.log('Not yet implemented');
+        console.log('Mark1:');
+        console.log('869');
+        console.log('uSels is: ');
+        console.log(uSels);
+        console.log('nl is: ');
+        console.log(nl);
+        console.log('index is: ' + index);
+        console.log('counter is: ' + counter);
+
+        configNodeIndents( uSels, nl, index, counter);
       }
       var clipboardStr = container.outerHTML;
       console.log('container.outerHTML is: \n' + container.outerHTML);
@@ -827,13 +883,34 @@ var Witty = (function () {
     function configNodeIndents(uSels, nl, index, counter) {
       console.log('configNodeIndents running');
       let i, indent, container;
+      // !VA Vars for the sibling nodes of RTL switch position
+      let imgNodeIndex, aNodeIndex, nextSiblingNodeIndex, indentspacing, previousSiblingNodeIndex, previousSiblingIndent;
+      for (let i = 0; i < nl.length; i++) {
+        // !VA Get the positions of the sibling nodes if present
+        if (nl[i].nextSibling) {nextSiblingNodeIndex = i; } 
+        if (nl[i].previousSibling) {previousSiblingNodeIndex = i; } 
+      }
+      // !VA Set the indent for the second sibling TD. It should be equal to the indents for the first sibling, so we need to reset the repeat spacing iterator to the same value as it was for the first sibling. Since the nodeList.length varies based on if an anchor is included or if the img is excluded and if the create TD or create Table buttons were pressed, we need to base this indent on the nodeList.length and index it to the position of the first sibling. This will always give us the indent iterator used for the first sibling. 
+      previousSiblingIndent = (nl.length - (nextSiblingNodeIndex + 5));
+      // console.log('imgNodeIndex is: ' + imgNodeIndex);
+      // console.log('aNodeIndex is: ' + aNodeIndex);
+      // !VA Loop through nodes and process exceptions
       // !VA Create the container that receives the active nodes, i.e. the nodes that correspond to the clicked CCP button
       container = document.createElement('div');
       container = nl[index];
       // !VA Counter initializes at -1 to begin loop at 0. 
+      // console.log('nl at 900 is: ');
+      // console.log(nl);
+      // console.log('index at 902 is: ' + index);
+      // console.log('nl.length at 903 is: ' + nl.length);
+
       for (i = index; i < nl.length; i++) {
+        // console.log('nl[i] is: ');
+        // console.log(nl[i]);
         counter = counter + 1;
         indent = getIndent(counter);
+
+        // !VA 03.15.2020 This is the problem. The 
         // !VA Ignore any indents for the IMG tag - it should be nested within the anchor on the same line. This is actually superfluous since no action is executed, it's only included for clarity.
         if (i === 7 && nl[i].nodeName === 'IMG') {
           applyIndents2(nl[i], indent, 'ignore');
@@ -841,11 +918,18 @@ var Witty = (function () {
         else if ( i === 6 && nl[i].nodeName === 'A') {
           // !VA If nodeList item 1 is the anchor, then Include anchor is checked. Apply the 'terminal' indent scheme and don't apply any indent to the img element.
           applyIndents2(nl[i], indent, 'terminal');
-        } else {
+        } 
+
+        else {
           // Otherwise, apply the normal indent scheme.
+          // !VA 03.15.2020 
+          // i = 0; this doesnt work
+          console.log('i at 923 is: ' + i);
           applyIndents2( nl[i], indent, 'normal');
         }
       }
+      // console.log('container.outerHTML is: ');
+      // console.log(container.outerHTML);
       return container.outerHTML;
     }
 
@@ -942,7 +1026,13 @@ var Witty = (function () {
     }
     
     function applyIndents2(node, indent, indentType ) {
+      console.log('applyIndents2 running');
       // !VA Apply indents to nodes. Changes apply to the live DOM nodes, so no return is required.
+      let imgNodeIndex, aNodeIndex, nextSiblingNodeIndex, indentspacing, previousSiblingNodeIndex, previousSiblingIndent;
+      // console.log('node is: ');
+      // console.log(node);
+
+
       if (indentType === 'ignore') {
         // !VA Do nothing
         // console.log('Do nothing: img');
@@ -953,10 +1043,14 @@ var Witty = (function () {
       } 
       
       else if (indentType === 'normal') {
+        console.log('at 1037: normal');
+        // !VA 03.15.2020 the passed-in node from 
         node.insertAdjacentHTML('beforebegin', indent);
         node.insertAdjacentHTML('afterbegin', '\n');
         node.insertAdjacentHTML('beforeend', indent);
         node.insertAdjacentHTML('afterend', '\n');
+        console.log('node.outerHTML is: ');
+        console.log(node.outerHTML);
       }
     }
 
@@ -1122,7 +1216,7 @@ var Witty = (function () {
         // !VA Branch: 031320A
       // case (selectedRadio === 'posswitch'):
       case (uSels.selectedRadio === 'posswitch'):
-
+        tdInner  = makePosSwitchNodes();
         break;
       default:
       } 
