@@ -748,7 +748,7 @@ var Witty = (function () {
 
         case (uSels.buttonClicked === 'tdbut' && !uSels.hasAnchor):
           console.log('parseUserSelections posswitch: td, no anchor');
-          indentStartPosition = 6;
+          indentStartPosition = 5;
           break;
         case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor):
           console.log('parseUserSelections posswitch: td, anchor');
@@ -870,12 +870,16 @@ var Witty = (function () {
         // !VA The counter determines the indentLevel. It initializes at -1 so it starts incrementing at 0, giving the top node in the list no indent. Subsequent nodes get an indent level of 1 and so on.
         // !VA Branch: fixPosSwitch: to clarify the above...
         // !VA activeNodeStartIndex is the position in the nodeList that defines the start of the ACTIVE nodes, i.e. the nodes in the node tree that are to receive indents based on the user CCP selection. activeNodeStartIndex equals the nodeList count of the complete node tree, minus the indentStartPosition passed in from parseUserSelections, so it will be different for all flavors of indenting. IT NEEDS TO BE SET AT THE TOP OF EACH FLAVOR.
-        // !VA IMPORTANT: Note the difference between activeNodeStartIndex and indentStartPosition. 
-        // !VA Branch: fixPosSwitch
-        // index = (nl.length - indentLevel);
-        console.log('activeNodeStartIndex = (nl.length - indentStartPosition');
-        console.log(activeNodeStartIndex + ' = (' + nl.length + ' - ' + indentStartPosition + ')');
-        activeNodeStartIndex = (nl.length - indentStartPosition);
+        // !VA IMPORTANT: Note the difference between activeNodeStartIndex and indentStartPosition, and note that we have to subtract a value from this for posswitch because it has extra sibling nodes and seven extra nodes between parent td of the anchor/image and the top TD returned by makePosSwitchNodes. Very complicated, but suffice it to say that the magic number is 7, see below.
+        /* !VA Branch: fixPosSwitch: But there's still a problem because 
+          1)a node is getting left out in the clipboard output and the indents start at the wrong place
+          2) The indents start at the wrong place
+        
+
+
+        */
+
+        activeNodeStartIndex = (nl.length - indentStartPosition - 7);
         console.log('activeNodeStartIndex is: ' + activeNodeStartIndex);
         // !VA Configure the posswitch indenting 'flavor'
         // !VA Counter needs to start incrementing at 0 so we initialize it at -1. It needs to be reset at the top of each indenting 'flavor'.
@@ -887,6 +891,7 @@ var Witty = (function () {
         // !VA Branch: fixPosSwitch: AND THE PROBLEM IS...That activeNodeStartIndex is 12 rather than 5, because the nodeList count (nl.length) includes 5 nodes that come AFTER the initial TD that is defined in makePosSwitchNodes. So let's try to hack this...
         // !VA Branch: fixPosSwitch: We are building the container, but not passing it here? What's the point in building it here then if it's gong to be built again in configNodeINdents? And why is the clipboard being written to now?
         // container = nl[activeNodeStartIndex];
+        // !VA Branch: fixPosSwitch PROBLEM: If we delete the below container assignment, which we actually shouldn't need, then the container output div has no children. Also, it appears that bgimage and imgswap now have no output to the container div.
         container = nl[5];
         // !VA Branch: fixPosSwitch: THere we go! But now we're not getting indents starting at position 5, but rather at position
         console.log('posswitch container is: ');
@@ -901,9 +906,12 @@ var Witty = (function () {
     // !VA Configure the node-level indents for basic and RTL position switch options. Options that include comment nodes have to be configured separately prior to applying the indents to the entire node tree
     function configNodeIndents(uSels, nl, activeNodeStartIndex, counter) {
       console.log('configNodeIndents running');
-
-
-
+      console.log('uSels is: ');
+      console.log(uSels);
+      console.log('nl is: ');
+      console.log(nl);
+      console.log('activeNodeStartIndex is: ' + activeNodeStartIndex);
+      console.log('counter is: ' + counter);
 
 
 
@@ -935,16 +943,17 @@ var Witty = (function () {
       // !VA Loop through nodes and process exceptions
       // !VA Create the container that receives the active nodes, i.e. the nodes that correspond to the clicked CCP button. Reminder: index = (nl.length - indentStartPosition), where indentStartPosition is the position in the complete-tree nodeList at which the indenting should start based on the user's CCP selections. 
       // !VA Branch: fixPosSwitch: This has to be the problem with posswitch...what is 
+      console.log('945 nl is: ');
+      console.log(nl);
       container = document.createElement('div');
       console.log('940 activeNodeStartIndex is: ' + activeNodeStartIndex);
       // !VA Branch: fixPosSwitch: Here the container is WRONG! So let's hack in the right activeNodeStartIndex
-      activeNodeStartIndex = 5;
       // !VA Branch: fixPosSwitch: Perfect!
       container = nl[activeNodeStartIndex];
       console.log('container 940 is: ');
       console.log(container);
-      console.log('nl is: ');
-      console.log(nl);
+      // console.log('nl is: ');
+      // console.log(nl);
       // !VA Counter initializes at -1 to begin loop at 0. 
       // !VA Start the indent loop beginning at the nodeList position corresponding to user's CCP selections.
       for (i = activeNodeStartIndex; i < nl.length; i++) {
@@ -972,6 +981,8 @@ var Witty = (function () {
           applyIndents2( nl[i], indent, 'normal');
         }
       }
+      console.log('container.outerHTML 983 is: ');
+      console.log(container.outerHTML);
       return container.outerHTML;
     }
 
