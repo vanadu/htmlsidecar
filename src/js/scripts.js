@@ -53,7 +53,6 @@ var Witty = (function () {
   // !VA Run on page load
   document.addEventListener("DOMContentLoaded", function() {
     setTimeout(function(){ 
-      console.log('timeout'); 
       // !VA Don't forget you can't use button aliases here..
       document.querySelector('#btn-ccp-make-td-tag').click();
 
@@ -73,22 +72,18 @@ var Witty = (function () {
 
   // !VA Click on Witty logo to run test function
   // var testbut = document.querySelector('#testme');
-  // console.log('testbut is: ' + testbut);
   // testbut.addEventListener('click', runMe, false);
   // // testBut.addEventListener('click', runMe, false);
 
   // function runMe(evt) {
-  //   console.log('evt.target.id is: ' + evt.target.id);
 
   //   var str = 'btn-ccp-make-table-dsktp-css-rule'
   //   var str1 = str.slice(-4);
-  //   console.log('str1 is: ' + str1);
 
   
 
 
 
-  //   console.log('running me');
   //   let output;
   //   let classname = 'alsdfadf';
   //   let val = 848;
@@ -254,17 +249,12 @@ var Witty = (function () {
     // !VA UIController private evalInspectorAlerts
     // !VA Reboot: passing in Appdata...it was iInspectors, but writeInspectors doesn't pass iInspectors. So let's see if there's a difference between the passed Appdata and the queried Appdata. Not relevant at this point since Appdata has no data...
     function evalInspectorAlerts(passedAppdata) {
-      // console.log('Appdata passed from WriteInspectors is:');
-      // console.dir(passedAppdata);
       var allInspectors;
       allInspectors = UIController.getInspectorIDs();
       // !VA Query Appdata
       var Appdata = {};
       Appdata = appController.initGetAppdata(false);
       // console.dir(Appdata);
-      // console.log('Appdata queried here is:');
-      // console.log('iInspectors is: ' + iInspectors);
-      // console.dir(iInspectors);
       // !VA Size On Disk is NOT 2X the Display Size: flag Size on Disk and Retina
       var curInspector = [];
       if (Appdata.imgNW <= (Appdata.imgW * 2) ) {
@@ -316,7 +306,6 @@ var Witty = (function () {
       // !VA Moving getAppdata from appController to UIController because Appdata is derived from the DOM elements and data properties that reside in the DOM. 
 
       queryDOMElements: function() {
-        // console.log('queryDOMElements running...');
         // !VA NEW This needs to ONLY return the non-calculated DOM elements and data properties: curImg.imgW, curImg.imgW, curImg.imgNW, curImg.NH and viewerW. Aspect is calculated so we don't need to get that here, leave that to appController.
         // !VA NEW We will get the individual properties and return them as an ES6 array.
         // !VA Declare the local vars
@@ -352,14 +341,11 @@ var Witty = (function () {
 
       // !VA UIController public initUI
       initUI: function() {
-        console.log('initUI');
         // !VA  Initialize the ImgViewer to accomodate the dragArea. This should be the same as the CSS definition: currently 650x450
         // !VA DEV Write the computed styles to console to make sure they are as expected: 650x450
         // var cStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
         // viewerW = cStyles.getPropertyValue('width');
         // viewerH = cStyles.getPropertyValue('height');
-        // console.log('viewerW is: ' + viewerW); 
-        // console.log('viewerH is: ' + viewerH); 
 
         // !VA Make sure the tbrContainer is off and the dropArea is on.
         document.querySelector(staticRegions.dropArea).style.display = 'flex';
@@ -367,7 +353,6 @@ var Witty = (function () {
         document.querySelector(iInspectors.btnToggleCcp).style.display = 'none';
 
         const iArray = Object.values(iInspectors);
-        console.log('iArray is: ' + iArray);
         for ( let i = 0; i < iArray.length; i++ ) {
           if ( iArray[i] !== '#btn-toggle-ccp' &&  iArray[i] !== '#i-filename' ) {
             document.querySelector(iArray[i]).innerHTML = '<span class="pop-font">&nbsp;&nbsp;No Image</span>';
@@ -487,10 +472,8 @@ var Witty = (function () {
     function  makeCssRule( id, classname, wval, hval ) {
       let Attributes = [];
       Attributes = getAttributes();
-      console.log(Attributes);
       let Appdata = [];
       Appdata = appController.initGetAppdata();
-      console.log(Appdata);
       let clipboardStr;
       let args = [];
       switch(true) {
@@ -663,8 +646,6 @@ var Witty = (function () {
       } else {
         uSels.buttonClicked = 'tablebut';
       }
-      console.log('getUserSelections uSels is: ');
-      console.log(uSels);
       parseUserSelections( uSels );
     }
 
@@ -676,35 +657,35 @@ var Witty = (function () {
       if (uSels.selectedRadio === 'basic') {
         switch (true) {
         case (uSels.buttonClicked === 'imgbut' && !uSels.hasAnchor ):
-          console.log('img, no anchor');
+          console.log('parseUserSelections basic: img, no anchor');
           indentLevel = 1;
           break;
         case (uSels.buttonClicked === 'imgbut' && uSels.hasAnchor):
-          console.log('img, anchor');
+          console.log('parseUserSelections basic: img, anchor');
           indentLevel = 2;
           break;
         case (uSels.buttonClicked === 'tdbut' && !uSels.hasAnchor):
-          console.log('td, no anchor');
+          console.log('parseUserSelections basic: td, no anchor');
           indentLevel = 2;
           break;
         case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor):
-          console.log('td, anchor');
+          console.log('parseUserSelections basic: td, anchor');
           indentLevel = 3;
           break;
         case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && !uSels.hasAnchor):
-          console.log('tablebut, no wrapper, no anchor');
+          console.log('parseUserSelections basic: tablebut, no wrapper, no anchor');
           indentLevel = 4;
           break;
         case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && uSels.hasAnchor):
-          console.log('tablebut, no wrapper, anchor');
+          console.log('parseUserSelections basic: tablebut, no wrapper, anchor');
           indentLevel = 5;
           break;
         case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && !uSels.hasAnchor ):
-          console.log('tablebut, no anchor');
+          console.log('parseUserSelections basic: tablebut, no anchor');
           indentLevel = 7;
           break;
         case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && uSels.hasAnchor):
-          console.log('tablebut, anchor');
+          console.log('parseUserSelections basic: tablebut, anchor');
           indentLevel = 8;
           break;
         default:
@@ -712,38 +693,37 @@ var Witty = (function () {
         } 
       }
       else if (uSels.selectedRadio === 'imgswap') {
-        console.log('imgswap...');
         switch(true) {
         case (uSels.buttonClicked === 'imgbut' && !uSels.hasAnchor ):
-          console.log('img, no anchor');
+          console.log('parseUserSelections imgswap: img, no anchor');
           indentLevel = 1;
           break;
         case (uSels.buttonClicked === 'imgbut' && uSels.hasAnchor):
-          console.log('img, anchor');
+          console.log('parseUserSelections imgswap: img, anchor');
           indentLevel = 2;
           break;
         case (uSels.buttonClicked === 'tdbut' && !uSels.hasAnchor):
-          console.log('td, no anchor');
+          console.log('parseUserSelections imgswap: td, no anchor');
           indentLevel = 2;
           break;
         case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor):
-          console.log('td, anchor');
+          console.log('parseUserSelections imgswap: td, anchor');
           indentLevel = 3;
           break;
         case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && !uSels.hasAnchor):
-          console.log('tablebut, no wrapper, no anchor');
+          console.log('parseUserSelections imgswap: tablebut, no wrapper, no anchor');
           indentLevel = 4;
           break;
         case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && uSels.hasAnchor):
-          console.log('tablebut, no wrapper, anchor');
+          console.log('parseUserSelections imgswap: tablebut, no wrapper, anchor');
           indentLevel = 5;
           break;
         case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && !uSels.hasAnchor ):
-          console.log('tablebut, no anchor');
+          console.log('parseUserSelections imgswap: tablebut, no anchor');
           indentLevel = 7;
           break;
         case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && uSels.hasAnchor):
-          console.log('tablebut, anchor');
+          console.log('parseUserSelections imgswap: tablebut, anchor');
           indentLevel = 8;
           break;
         default:
@@ -755,36 +735,36 @@ var Witty = (function () {
         switch(true) {
         // !VA Not accessed, overridden in getUserSelections
         case (uSels.buttonClicked === 'imgbut' && !uSels.hasAnchor ):
-          console.log('img, no anchor');
+          console.log('parseUserSelections posswitch: img, no anchor');
           indentLevel = 12;
           break;
           // !VA Not accessed, overridden in getUserSelections
         case (uSels.buttonClicked === 'imgbut' && uSels.hasAnchor):
-          console.log('img, anchor');
+          console.log('parseUserSelections posswitch: img, anchor');
           indentLevel = 13;
           break;
         case (uSels.buttonClicked === 'tdbut' && !uSels.hasAnchor):
-          console.log('td, no anchor');
+          console.log('parseUserSelections posswitch: td, no anchor');
           indentLevel = 6;
           break;
         case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor):
-          console.log('td, anchor');
+          console.log('parseUserSelections posswitch: td, anchor');
           indentLevel = 6;
           break;
         case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && !uSels.hasAnchor):
-          console.log('tablebut, no wrapper, no anchor');
+          console.log('parseUserSelections posswitch: tablebut, no wrapper, no anchor');
           indentLevel = 4;
           break;
         case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && uSels.hasAnchor):
-          console.log('tablebut, no wrapper, anchor');
+          console.log('parseUserSelections posswitch: tablebut, no wrapper, anchor');
           indentLevel = 5;
           break;
         case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && !uSels.hasAnchor ):
-          console.log('tablebut, no anchor');
+          console.log('parseUserSelections posswitch: tablebut, no anchor');
           indentLevel = 7;
           break;
         case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && uSels.hasAnchor):
-          console.log('tablebut, anchor');
+          console.log('parseUserSelections posswitch: tablebut, anchor');
           indentLevel = 8;
           break;
         default:
@@ -797,15 +777,15 @@ var Witty = (function () {
         // !VA There is no A or IMG in the nodeList for this option.
         switch(true) {
         case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor):
-          console.log('td');
+          console.log('parseUserSelections bgimage: tdbut');
           indentLevel = 1;
           break;
         case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && uSels.hasAnchor):
-          console.log('tablebut, no wrapper, anchor');
+          console.log('parseUserSelections bgimage: tablebut, no wrapper, anchor');
           indentLevel = 3;
           break;
         case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && uSels.hasAnchor):
-          console.log('tablebut, anchor');
+          console.log('parseUserSelections bgimage: tablebut, anchor');
           indentLevel = 6;
           break;
         default:
@@ -818,7 +798,6 @@ var Witty = (function () {
     function parseTopNode( uSels, indentLevel ) {
       console.clear();
       console.log('parseTopNode');
-      console.log('indentLevel 820 is: ' + indentLevel);
       // !VA curpos
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
       let index, counter, nl, tableNodeFragment;
@@ -855,7 +834,6 @@ var Witty = (function () {
       // !VA Start bgimage section
       if ( uSels.selectedRadio === 'bgimage') {
         // !VA Handle the img button click before calling the configBgimageIndents function - the bgimage code block doesn't reference the IMG tag so we need to call the IMG code...
-        console.log('bgimage radio selected');
         // !VA No need to return anything since the container node updates live to the DOM which is accessible via container.outerHTML.
         configBgimageIndents( uSels, nl, index, counter, indentLevel);
 
@@ -863,19 +841,11 @@ var Witty = (function () {
 
       // !VA Start posswitch section
       if (uSels.selectedRadio === 'posswitch') {
-        console.log('Mark1:');
-        console.log('869');
-        console.log('uSels is: ');
-        console.log(uSels);
-        console.log('nl is: ');
-        console.log(nl);
-        console.log('index is: ' + index);
-        console.log('counter is: ' + counter);
+
 
         configNodeIndents( uSels, nl, index, counter);
       }
       var clipboardStr = container.outerHTML;
-      console.log('container.outerHTML is: \n' + container.outerHTML);
       writeClipboard( aliasToId(uSels.buttonClicked), clipboardStr);
     }
     
@@ -892,21 +862,13 @@ var Witty = (function () {
       }
       // !VA Set the indent for the second sibling TD. It should be equal to the indents for the first sibling, so we need to reset the repeat spacing iterator to the same value as it was for the first sibling. Since the nodeList.length varies based on if an anchor is included or if the img is excluded and if the create TD or create Table buttons were pressed, we need to base this indent on the nodeList.length and index it to the position of the first sibling. This will always give us the indent iterator used for the first sibling. 
       previousSiblingIndent = (nl.length - (nextSiblingNodeIndex + 5));
-      // console.log('imgNodeIndex is: ' + imgNodeIndex);
-      // console.log('aNodeIndex is: ' + aNodeIndex);
       // !VA Loop through nodes and process exceptions
       // !VA Create the container that receives the active nodes, i.e. the nodes that correspond to the clicked CCP button
       container = document.createElement('div');
       container = nl[index];
       // !VA Counter initializes at -1 to begin loop at 0. 
-      // console.log('nl at 900 is: ');
-      // console.log(nl);
-      // console.log('index at 902 is: ' + index);
-      // console.log('nl.length at 903 is: ' + nl.length);
 
       for (i = index; i < nl.length; i++) {
-        // console.log('nl[i] is: ');
-        // console.log(nl[i]);
         counter = counter + 1;
         indent = getIndent(counter);
 
@@ -924,12 +886,9 @@ var Witty = (function () {
           // Otherwise, apply the normal indent scheme.
           // !VA 03.15.2020 
           // i = 0; this doesnt work
-          console.log('i at 923 is: ' + i);
           applyIndents2( nl[i], indent, 'normal');
         }
       }
-      // console.log('container.outerHTML is: ');
-      // console.log(container.outerHTML);
       return container.outerHTML;
     }
 
@@ -981,10 +940,7 @@ var Witty = (function () {
 
     function configBgimageIndents(uSels, nl, index, counter, indentLevel) {
       // !VA We only have 6 nodes in the nodeList because the A and IMG aren't included as nodes, but rather are only referenced as attributes of the TD node passed in from makeTdNode. That's why we need to handle the IMG button here - if the bgimage radio button is selected, references to IMG will return undefined.
-      console.log('uSels is: ');
-      console.log(uSels);
       let commentNode, indent, i, bgimageBlockIndent; 
-      console.log('bgimage running');
       counter = -1;
       index = (nl.length - indentLevel);
       for (i = index; i < nl.length; i++) {
@@ -994,7 +950,6 @@ var Witty = (function () {
         bgimageBlockIndent = ( counter + 1 );
         if ( index === 5) {
           nl[i].insertAdjacentHTML('afterbegin', getIndent(bgimageBlockIndent));
-          console.log('tdbutton clicked');
         } 
         else {
           if ( i === 5) {
@@ -1007,7 +962,6 @@ var Witty = (function () {
       // !VA Create the comment node for appending to the TD. This doesn't work with innerHTML or textContent because those methods convert characters to HTML entities. 
       commentNode = document.createComment;
       for (i = index; i < nl.length; i++) {
-        console.log('i is: ' + i);
         // !VA If the current TD has no child, then it's the lowest descendant in the tree, so append the comment node to it.
         if ( nl[i].nodeName === 'TD' && !nl[i+1]) {
           // !VA MAGIC HAPPENS: Get the indent using the saved indentLevel from the above function and apply it everywhere the getIndent function appears in the code block.
@@ -1029,13 +983,8 @@ var Witty = (function () {
       console.log('applyIndents2 running');
       // !VA Apply indents to nodes. Changes apply to the live DOM nodes, so no return is required.
       let imgNodeIndex, aNodeIndex, nextSiblingNodeIndex, indentspacing, previousSiblingNodeIndex, previousSiblingIndent;
-      // console.log('node is: ');
-      // console.log(node);
-
-
       if (indentType === 'ignore') {
         // !VA Do nothing
-        // console.log('Do nothing: img');
       }
       else if (indentType == 'terminal') {
         node.insertAdjacentHTML('beforebegin', indent);
@@ -1043,14 +992,11 @@ var Witty = (function () {
       } 
       
       else if (indentType === 'normal') {
-        console.log('at 1037: normal');
         // !VA 03.15.2020 the passed-in node from 
         node.insertAdjacentHTML('beforebegin', indent);
         node.insertAdjacentHTML('afterbegin', '\n');
         node.insertAdjacentHTML('beforeend', indent);
         node.insertAdjacentHTML('afterend', '\n');
-        console.log('node.outerHTML is: ');
-        console.log(node.outerHTML);
       }
     }
 
@@ -1068,17 +1014,13 @@ var Witty = (function () {
     // !VA START TD OPTIONS MS-CONDITIONAL CODE BLOCKS
     // !VA These are the code blocks that contain MS conditionals in comment nodes or text nodes, i.e. mobile swap and background image.
     function getImgSwapBlock( indentLevel ) {
-      let Appdata, Attributes;
+      let Appdata, Attributes, linebreak;
       Attributes = getAttributes();
       Appdata = appController.initGetAppdata();
-      // console.log('Attributes is:');
-      // console.dir(Attributes);
-      let linebreak;
       linebreak = '\n';
       let mobileFilename, mobileSwapStr;
       // !VA Create the mobile image filename: Get the current image file's filename and append the name with '-mob'.
       mobileFilename = Appdata.fname;
-      console.log('mobileFilename is: ' + mobileFilename);
       // !VA The regex for appending the filename with '-mob'.
       mobileFilename = mobileFilename.replace(/(.jpg|.png|.gif|.svg)/g, "-mob$1");
       // !VA Set the indentLevel to 1 for now
@@ -1108,7 +1050,6 @@ var Witty = (function () {
     // !VA Branch: 031320A
     // function makeImgNode ( id ) {
     function makeImgNode ( ) {
-      // console.log('makeImgNode running');
       // !VA Id is passed but not used here,  because we're only building the node.
       let Attributes;
       Attributes = getAttributes();
@@ -1140,13 +1081,10 @@ var Witty = (function () {
         let anchor = document.createElement('a');
         anchor.href = '#';
         anchor.setAttribute('style', 'color: #FF0000');
-        // console.log(anchor.outerHTML);
         anchor.appendChild(imgNode);
-        // console.log(anchor.outerHTML);
         returnNodeFragment.appendChild(anchor);
       } else {
         // !VA Otherwise, set returnNode to imgNode without the anchor.
-        // returnNode = imgNode;
         // !VA Branch: 031320A
         returnNodeFragment.appendChild(imgNode);
       }
@@ -1161,7 +1099,6 @@ var Witty = (function () {
     // !VA Branch: 031320A
     // function makeTdNode( id, selectedRadio ) {
     function makeTdNode( uSels ) {
-      // console.log('makeTdNode running');
       let Attributes;
       Attributes = getAttributes();
       let tdInner, imgNode;
@@ -1192,7 +1129,6 @@ var Witty = (function () {
         // !VA Branch: 031320A
       // case (selectedRadio === 'imgswap'):
       case (uSels.selectedRadio === 'imgswap'):
-        console.log('tdNode: imgswap');
         tdInner.width = Attributes.tdAppdataWidth;
         tdInner.height = Attributes.tdAppdataHeight;
         // !VA valign attribute
@@ -1230,7 +1166,6 @@ var Witty = (function () {
     // !VA Branch: 031320A
     // function makeTableNode( id ) {
     function makeTableNode( uSels) {
-      // console.log('makeTdNode running');
       let Attributes;
       Attributes = getAttributes();
       let tableNode, tableInner, tableOuter, tdInner, tdOuter, trInner, trOuter;
@@ -1305,7 +1240,6 @@ var Witty = (function () {
       tableNodeFragment = document.createDocumentFragment();
       tableNodeFragment.appendChild(tableOuter);
       // }
-      // console.log(tableNode.outerHTML);
       // !VA Branch: 031320A
       // return tableNode;
       return tableNodeFragment;
@@ -1315,9 +1249,6 @@ var Witty = (function () {
 
     function makeNodeList( id, curNode ) {
       console.log('makeNodeList running');
-      // console.log('curNode is: ');
-      // console.log(curNode);
-      // console.clear();
       let container, nl, imgNode, tdNode,tableNode, topNode;
       let indent, indentLevel;
       container = document.createElement('div');
@@ -1327,12 +1258,9 @@ var Witty = (function () {
     }
 
     function getIndent(indentLevel) {
-      // console.log('getIndent running');
-      // console.log('indentLevel is: ' + indentLevel);
       let indentChar, indent;
       indentChar = 'HH';
       indent = indentChar.repeat([indentLevel]);
-      // console.log('indent is: ' + indent);
       return indent;
     }
 
@@ -1503,7 +1431,6 @@ var Witty = (function () {
     }
 
     function makePosSwitchNodes() {
-      console.log('makePosSwitchNodes running');
       // !VA Declare the arrays for new element names and new element types
       let containerIds = [], containerElements = [], sibling1Ids = [], sibling1Elements = [], sibling2Ids = [], sibling2Elements = [], containerNodes = [], sibling1Nodes = [], sibling2Nodes = [];
       // !VA Declare loop iterators
@@ -1531,7 +1458,6 @@ var Witty = (function () {
       for (i = 0; i < containerIds.length; i++) {
         containerNodes[i] = document.createElement(containerElements[i]);
         containerNodes[i].id = containerIds[i];
-        // console.log('containerNodes[i].outerHTML is: ' + containerNodes[i].outerHTML);
       }
       // !VA Append each element with its respective child
       for (i = 0; i < containerNodes.length - 1; i++) {
@@ -1542,7 +1468,6 @@ var Witty = (function () {
       for (i = 0; i < sibling1Ids.length; i++) {
         sibling1Nodes[i] = document.createElement(sibling1Elements[i]);
         sibling1Nodes[i].id = sibling1Ids[i];
-        // console.log('sibling1Nodes[i].outerHTML is: ' + sibling1Nodes[i].outerHTML);
       }
       // !VA Append each element with its respective child
       for (i = 0; i < sibling1Nodes.length - 1; i++) {
@@ -1576,7 +1501,6 @@ var Witty = (function () {
     }
 
     function setPosSwitchNodeAttributes(container) {
-      console.log('setPosSwitchNodeAttributes running');
       // !VA Get the Td attributes, we need them for height and width
       var nodeList, index;
       let Attributes = getAttributes();
@@ -1675,7 +1599,6 @@ var Witty = (function () {
       }
       // !VA Now we no longer need the IDs, so we can delete them.
       for (let i = 0; i < nodeList.length; i++) {
-        // console.log('nodeList[i] is: ' +  nodeList[i]);
         nodeList[i].removeAttribute('id');
       }
       // !VA Return the container with the attributes to the calling function
@@ -1728,18 +1651,6 @@ var Witty = (function () {
     // !VA appController private setupEventListeners
     var setupEventListeners = function() {
 
-
-
-      // document.addEventListener('click', function(e) {
-      //   e = e || window.event;
-      //   var target = e.target || e.srcElement,
-      //     text = target.textContent || target.innerText;  
-      //     console.log('target is: ' + target);
-      //   console.log('text is: ' + text); 
-      // }, false);
-
-
-
       //DRAG AND DROP PROCESSING START
 
 
@@ -1771,8 +1682,6 @@ var Witty = (function () {
       var tbClickables = [ toolbarElements.btnTbrIncr50, toolbarElements.btnTbrIncr10, toolbarElements.btnTbrIncr01, toolbarElements.btnTbrDecr50, toolbarElements.btnTbrDecr10, toolbarElements.btnTbrDecr01  ];
       for (let i = 0; i < tbClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
-        // console.log('i is: ' + i);
-        // console.log('tbClickables[i] is: ' + tbClickables[i]);
         tbClickables[i] = document.querySelector(tbClickables[i]);
         addEventHandler(tbClickables[i],'click',handleMouseEvents,false);
 
@@ -1783,8 +1692,6 @@ var Witty = (function () {
       for (let i = 0; i < tbKeypresses.length; i++) {
         // !VA convert the ID string to the object inside the loop
         tbKeypresses[i] = document.querySelector(tbKeypresses[i]);
-        // console.log('i is: ' + i);
-        // console.log('tbKeypresses[i].id is: ' + tbKeypresses[i].id);
         // !VA Handles all key events except TAB, which require keyDown to get the value of the current input rather than the input being tabbed to.
         addEventHandler((tbKeypresses[i]),'keydown',handleKeydown,false);
         addEventHandler((tbKeypresses[i]),'keyup',handleKeyup,false);
@@ -1801,8 +1708,6 @@ var Witty = (function () {
       // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. Currently only the img class input does that.
       var ccpKeypresses = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass ];
       for (let i = 0; i < ccpKeypresses.length; i++) {
-        // console.log('i is: ' + i);
-        // console.log('ccpKeypresses[i] is: ' + ccpKeypresses[i]);
         // !VA convert the ID string to the object inside the loop
         ccpKeypresses[i] = document.querySelector(ccpKeypresses[i]);
         addEventHandler((ccpKeypresses[i]),'input',showElementOnInput,false);
@@ -1867,7 +1772,6 @@ var Witty = (function () {
     // appController private: hfs - FILEREADER OBJECT PROCESSING
     //Get the user-selected image file object 
     function handleFileSelect(evt) {
-      console.log('hFS running');
       // If a file is already being displayed, i.e. Appdata.fname is true, then remove that image to make room for the next image being dropped
       // !VA Remove the current #cur-img from the DOM. This has to be done in a separate function call, I'm not sure why handleFileSelect doesn't see #cur-img even though it is in the DOM at this point
       // !VA Remove the current image if one exists so the user can drop another one over it and reboot the process rather than having to refresh the browser and drop another image. This way, all the current settings are maintained. If they want new settings they can refresh the browser.
@@ -1948,8 +1852,6 @@ var Witty = (function () {
 
                 // !VA Initialize the value in the toolbar viewerW input field to its initial CSS value.
                 // !VA Commenting this out since I changed it to hard-coded in the HTML file along with iptTbrSmallPhonesW and sPhonesH.
-                // console.log('document.querySelector(dynamicRegions.imgViewer) is: ' + document.querySelector(dynamicRegions.imgViewer));
-                // console.dir(document.querySelector(dynamicRegions.imgViewer));
                 // document.querySelector(toolbarElements.viewerW).value = document.querySelector(dynamicRegions.imgViewer).style.width;
                 
                 // !VA Set the data attribute for small phone and large phone width. We need this because there is not actual HTML element that corresponds to these properties, and thus no way to persist them globally. So the data attribute sphonew and sphoneh will be written to the toolbar input field as surrogate for an actual DOM element that Appdata can query.
@@ -2040,7 +1942,6 @@ var Witty = (function () {
     // !VA Branch rewriteHandleUserAction061119 
     // !VA appController private handleMouseEvents. Preprocess mouse events and route them to respective eval handler.
     function handleMouseEvents(evt) {
-      console.log('handleMouseEvents');
       // !VA Carryover from earlier handleUserAction
       // !VA Get the target element of the click
       var el = document.getElementById(this.id);
@@ -2071,7 +1972,6 @@ var Witty = (function () {
           isErr = checkUserInput(args);
           if (isErr) {
             // !VA If it returns an error, select the input and show the error message so the user can correct it or ESC out of the field.
-            console.log('handleMouseEvents: ERROR MESSAGE SHOULD BE SHOWN NOW!');
             // !VA Post-error button handling?
           } else {
             // !VA If no error, pass the Appdata property name and the entered value for further processing.
@@ -2138,7 +2038,6 @@ var Witty = (function () {
               if (isEnter) {
                 this.select();
               } else {
-                console.log('tab pressed');
                 this.value = '';
                 this.blur();
               }
@@ -2294,8 +2193,6 @@ var Witty = (function () {
       
       // !VA Call updateAppdata to resize the DOM elements and data properties that correspond to the Appdata properties above.
       // !VA IMPORTANT -- these args aren't used...???
-      console.log('args is:');
-      console.dir(args);
       updateAppdata( arg1, arg2 );
       // !VA Once those DOM properties and data properties have been updated, recalculate the image's containers.
       calcViewerSize();
@@ -2304,13 +2201,10 @@ var Witty = (function () {
 
     function updateAppdata( ...params ) {
       let prop, val;
-      console.log('updateAppData running...');
       // !VA Each param pair is a property name prop and a value val. evalToolbarInput passes in one or more such pairs whose corresponding Appdata DOM element/data attribute has to be updated. So, loop through the argument arrays and update the corresponding DOM elements
       for (let i = 0; i < params.length; i++) {
         prop = params[i][0];
         val = params[i][1];
-        console.log('params[i][0] is: ' + params[i][0]);
-        console.log('params[i][1] is: ' + params[i][1]);
         switch(true) {
         case (!prop) :
           console.log('no prop');
@@ -2544,10 +2438,6 @@ var Witty = (function () {
       elems[6] = document.querySelector(btnCcpMakeClips.btnCcpMakeTableDsktpCssRule);
       elems[7] = document.querySelector(btnCcpMakeClips.btnCcpMakeTableSmphnCssRule);
       elems[8] = document.querySelector(btnCcpMakeClips.btnCcpMakeTableLgphnCssRule);
-
-
-      console.log('event is: ' + event.target.id);
-
       // !VA We only want to show the buttons in each respective fieldset
       // !VA If the input is in the img fieldset, only show the first three buttons in the array. Add the hash # to the target ID to find the match with the ID in ccpUserInput
       if (('#' + event.target.id) == ccpUserInput.iptCcpImgClass) {
@@ -2712,8 +2602,6 @@ var Witty = (function () {
   
         // !VA Initialize the value in the toolbar viewerW input field to its initial CSS value.
         // !VA Commenting this out since I changed it to hard-coded in the HTML file along with iptTbrSmallPhonesW and sPhonesH.
-        // console.log('document.querySelector(dynamicRegions.imgViewer) is: ' + document.querySelector(dynamicRegions.imgViewer));
-        // console.dir(document.querySelector(dynamicRegions.imgViewer));
         // document.querySelector(toolbarElements.viewerW).value = document.querySelector(dynamicRegions.imgViewer).style.width;
         
         // !VA THis is duplicated in handleFileSelect, only included here to initialize dev mode.
@@ -2725,7 +2613,6 @@ var Witty = (function () {
         lphonesw.setAttribute('data-lphonesw', '414');
         sphonesw.value = sphonesw.getAttribute('data-sphonesw');
         lphonesw.value = lphonesw.getAttribute('data-lphonesw');
-        console.log('initDev');
   
         calcViewerSize();
         // !VA Open the CCP by default in dev mode
@@ -2738,7 +2625,6 @@ var Witty = (function () {
 
 
     function getAppdata() {
-      // console.log('getAppdata running');
       var Appdata = {};
       Appdata = UIController.queryDOMElements();
 
