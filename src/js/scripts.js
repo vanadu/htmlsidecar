@@ -5,8 +5,21 @@
 // !VA GENERAL NOTES
 /* !VA  - February Reboot Notes
 =========================================================
-// !VA 03.15.2020
-For later:
+// !VA 03.21.2020
+Status:
+WORKS:
+IMG: hasAnchor, !hasAnchor
+TD: Basic, hasAnchor, !hasAnchor, TABLE hasWrapper, !hasWrapper
+    bgimage: outputs only container div
+    posswitch: outputs indents, but sibling is over-indented
+    imgswap: outputs only container div.
+
+I will determine what the problem is and how to fix it then merge to master and branch again for the fix. Need to get this stuff all on the remote repo, been running this branch for too long.
+The problem is that since the getBgimageBlock is called from configBgimageIndents, it is never passed to makeTdNode and thus is never included in the tdNodeFragment that's called from makeTableNode, which is what parseTopNode uses to build the container that is output to the clipboard.
+
+
+
+
 TODO: Implement posswitch
 TODO: The CSS output will need to be revisited for td and table.
 TODO: Figure out why queryDOMElements is running mutliple times per CB build.
@@ -1033,6 +1046,7 @@ var Witty = (function () {
     }
 
     function configBgimageIndents(uSels, nl, activeNodeStartIndex, counter, indentLevel) {
+      console.log('configBgimageIndents running');
       // !VA We only have 6 nodes in the nodeList because the A and IMG aren't included as nodes, but rather are only referenced as attributes of the TD node passed in from makeTdNode. That's why we need to handle the IMG button here - if the bgimage radio button is selected, references to IMG will return undefined.
       let commentNode, indent, i, bgimageBlockIndent; 
       counter = -1;
@@ -1125,6 +1139,7 @@ var Witty = (function () {
     }
 
     function getBgimageBlock( indentLevel) {
+      console.log('getBgiamgeBlock running');
       let Attributes;
       Attributes = getAttributes();
       let bgimageStr, fallback, bgcolor;
@@ -1136,7 +1151,8 @@ var Witty = (function () {
 
       // !VA Define the innerHTML of the bgimage code
       bgimageStr = `[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}${getIndent(indentLevel)}<div>${linebreak}${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div><!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}</v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect><![endif]`;
-
+      console.log('bgimageStr is: ');
+      console.log(bgimageStr);
       return bgimageStr;
     }
     // !VA END TD OPTIONS MS-CONDITIONAL CODE BLOCKS
@@ -1233,6 +1249,7 @@ var Witty = (function () {
       // !VA Branch: 031320A
       // case (selectedRadio === 'bgimage'):
       case (uSels.selectedRadio === 'bgimage'):
+        console.log('makeTdNode bgimage');
         // !VA First we create the node
         tdInner.width = Attributes.tdAppdataWidth;
         tdInner.height = Attributes.tdAppdataHeight;
