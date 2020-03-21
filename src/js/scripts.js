@@ -790,10 +790,14 @@ var Witty = (function () {
       }
       else if (uSels.selectedRadio === 'bgimage') {
         console.log('bgimage...');
-        // !VA There is no A or IMG in the nodeList for this option.
+        // !VA There is no A or IMG in the nodeList for this option, so set indentStartPosition to 1 for both options otherwise indentStartPosition will be undefined and no commentNode will be built.
         switch(true) {
+        case (uSels.buttonClicked === 'tdbut' && !uSels.hasAnchor):
+          console.log('parseUserSelections bgimage: tdbut, no anchor');
+          indentStartPosition = 1;
+          break;
         case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor):
-          console.log('parseUserSelections bgimage: tdbut');
+          console.log('parseUserSelections bgimage: tdbut, anchor');
           indentStartPosition = 1;
           break;
         case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && uSels.hasAnchor):
@@ -821,6 +825,7 @@ var Witty = (function () {
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
       let container, activeNodeStartIndex, counter, nl, tableNodeFragment;
       let foo, faa;
+      let commentNode;
       
       tableNodeFragment = makeTableNode( uSels );
       console.log('tableNodeFragment is: ');
@@ -858,19 +863,36 @@ var Witty = (function () {
 
       // !VA Start imgswap section
       if ( uSels.selectedRadio === 'imgswap') {
-        // !VA No need to return anything since the container node updates live to the DOM which is accessible via container.outerHTML.
+        
+        // configBgimageIndents( uSels, nl, index, counter, indentLevel);
+        activeNodeStartIndex = (nl.length - indentStartPosition);
+        // !VA 03.21.2020 We really don't have to pass activeNodeIndex or counter or indentStartPosition, do we?
+        // !VA Get the comment node that includes the MS conditional comments
         // configImgSwapIndents(uSels, nl, index, counter, indentLevel);
-        configImgSwapIndents(uSels, nl, activeNodeStartIndex, counter, indentStartPosition);
+        commentNode = configImgSwapIndents(uSels, nl, activeNodeStartIndex, counter, indentStartPosition);
+        // !VA 'Extract' the active nodes, i.e. the nodes that correspond to the user's CCP selection, in the container.
+        container = nl[activeNodeStartIndex];
+        // !VA Append the commentNode to the container.
+        container.appendChild(commentNode);
+
+
+
+
       } // End img swap section
 
       // !VA Start bgimage section
       if ( uSels.selectedRadio === 'bgimage') {
-        // !VA Handle the img button click before calling the configBgimageIndents function - the bgimage code block doesn't reference the IMG tag so we need to call the IMG code...
-        // !VA No need to return anything since the container node updates live to the DOM which is accessible via container.outerHTML.
-        // !VA Branch: fixPosSwitch
-        // configBgimageIndents( uSels, nl, index, counter, indentLevel);
-        configBgimageIndents( uSels, nl, activeNodeStartIndex, counter, indentStartPosition);
+        // !VA 03.21.2020 This works for TD button, but not TABLE button.
 
+        // configBgimageIndents( uSels, nl, index, counter, indentLevel);
+        activeNodeStartIndex = (nl.length - indentStartPosition);
+        // !VA 03.21.2020 We really don't have to pass activeNodeIndex or counter or indentStartPosition, do we?
+        // !VA Get the comment node that includes the MS conditional comments
+        commentNode = configBgimageIndents( uSels, nl, activeNodeStartIndex, counter, indentStartPosition);
+        // !VA 'Extract' the active nodes, i.e. the nodes that correspond to the user's CCP selection, in the container.
+        container = nl[activeNodeStartIndex];
+        // !VA Append the commentNode to the container.
+        container.appendChild(commentNode);
       }
 
 
@@ -1045,12 +1067,27 @@ var Witty = (function () {
       }
     }
 
-    function configBgimageIndents(uSels, nl, activeNodeStartIndex, counter, indentLevel) {
+    function configBgimageIndents(uSels, nl, activeNodeStartIndex, counter, indentStartPosition) {
       console.log('configBgimageIndents running');
       // !VA We only have 6 nodes in the nodeList because the A and IMG aren't included as nodes, but rather are only referenced as attributes of the TD node passed in from makeTdNode. That's why we need to handle the IMG button here - if the bgimage radio button is selected, references to IMG will return undefined.
+      console.clear();
+      console.log('uSels is: ');
+      console.log(uSels);
+      console.log('nl is: ');
+      console.log(nl);
+      console.log('activeNodeStartIndex is: ' + activeNodeStartIndex);
+      console.log('counter is: ' + counter);
+      console.log('indentStartPosition is: ' + indentStartPosition);
+
+
       let commentNode, indent, i, bgimageBlockIndent; 
       counter = -1;
-      activeNodeStartIndex = (nl.length - indentLevel);
+      activeNodeStartIndex = (nl.length - indentStartPosition);
+      console.log('nl.length is: ' + nl.length);
+
+
+
+
       for (i = activeNodeStartIndex; i < nl.length; i++) {
         counter = counter + 1;
         indent = getIndent(counter);
@@ -1074,6 +1111,7 @@ var Witty = (function () {
         if ( nl[i].nodeName === 'TD' && !nl[i+1]) {
           // !VA MAGIC HAPPENS: Get the indent using the saved indentLevel from the above function and apply it everywhere the getIndent function appears in the code block.
           commentNode = document.createComment(getBgimageBlock( bgimageBlockIndent ));
+
           // !VA Append the comment to the TD
           nl[i].appendChild(commentNode);
           // !VA Add the indent before the closing tag
@@ -1085,6 +1123,7 @@ var Witty = (function () {
           // nl[i].insertAdjacentHTML('afterend',   getIndent(imgSwapBlockIndent - 1));
         }
       }
+      return commentNode;
     }
     
     function applyIndents2(node, indent, indentType ) {
@@ -1151,8 +1190,8 @@ var Witty = (function () {
 
       // !VA Define the innerHTML of the bgimage code
       bgimageStr = `[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}${getIndent(indentLevel)}<div>${linebreak}${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div><!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}</v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect><![endif]`;
-      console.log('bgimageStr is: ');
-      console.log(bgimageStr);
+      // console.log('bgimageStr is: ');
+      // console.log(bgimageStr);
       return bgimageStr;
     }
     // !VA END TD OPTIONS MS-CONDITIONAL CODE BLOCKS
@@ -1268,11 +1307,11 @@ var Witty = (function () {
       } 
       // !VA Branch: 031320A
       // return tdInner;
-      console.log('tdInner is: ');
-      console.log(tdInner);
+      // console.log('tdInner is: ');
+      // console.log(tdInner);
       tdNodeFragment.appendChild(tdInner);
-      console.log('tdNodeFragment is: ');
-      console.log(tdNodeFragment);
+      // console.log('tdNodeFragment is: ');
+      // console.log(tdNodeFragment);
       return tdNodeFragment;
 
     }
