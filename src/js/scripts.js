@@ -5,20 +5,9 @@
 // !VA GENERAL NOTES
 /* !VA  - February Reboot Notes
 =========================================================
-// !VA 03.21.2020
+// !VA 03.23.2020
 Status:
-WORKS:
-IMG: hasAnchor, !hasAnchor
-TD: Basic, hasAnchor, !hasAnchor, TABLE hasWrapper, !hasWrapper
-    bgimage: outputs only container div
-    posswitch: outputs indents, but sibling is over-indented
-    imgswap: outputs only container div.
-
-I will determine what the problem is and how to fix it then merge to master and branch again for the fix. Need to get this stuff all on the remote repo, been running this branch for too long.
-The problem is that since the getBgimageBlock is called from configBgimageIndents, it is never passed to makeTdNode and thus is never included in the tdNodeFragment that's called from makeTableNode, which is what parseTopNode uses to build the container that is output to the clipboard.
-
-
-
+Everything works, but small issues with MS conditional indents. Merging to master.
 
 TODO: Implement posswitch
 TODO: The CSS output will need to be revisited for td and table.
@@ -707,9 +696,6 @@ var Witty = (function () {
       }
       else if (uSels.selectedRadio === 'imgswap') {
         switch(true) {
-
-
-
           
         case (uSels.buttonClicked === 'imgbut' && !uSels.hasAnchor ):
           console.log('parseUserSelections imgswap: img, no anchor');
