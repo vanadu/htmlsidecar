@@ -707,6 +707,10 @@ var Witty = (function () {
       }
       else if (uSels.selectedRadio === 'imgswap') {
         switch(true) {
+
+
+
+          
         case (uSels.buttonClicked === 'imgbut' && !uSels.hasAnchor ):
           console.log('parseUserSelections imgswap: img, no anchor');
           indentStartPosition = 1;
@@ -867,32 +871,39 @@ var Witty = (function () {
         // configBgimageIndents( uSels, nl, index, counter, indentLevel);
         activeNodeStartIndex = (nl.length - indentStartPosition);
         // !VA 03.21.2020 We really don't have to pass activeNodeIndex or counter or indentStartPosition, do we?
+        console.log('874');
+        console.log('nl is: ');
+        console.log(nl);
+
+
+
         // !VA Get the comment node that includes the MS conditional comments
         // configImgSwapIndents(uSels, nl, index, counter, indentLevel);
         commentNode = configImgSwapIndents(uSels, nl, activeNodeStartIndex, counter, indentStartPosition);
+        // !VA Append the commentNode to the lowest descendent in the node tree.
+        // nl[5].appendChild(commentNode);
         // !VA 'Extract' the active nodes, i.e. the nodes that correspond to the user's CCP selection, in the container.
         container = nl[activeNodeStartIndex];
-        // !VA Append the commentNode to the container.
-        container.appendChild(commentNode);
-
-
-
-
       } // End img swap section
+
+
+
+
 
       // !VA Start bgimage section
       if ( uSels.selectedRadio === 'bgimage') {
         // !VA 03.21.2020 This works for TD button, but not TABLE button.
 
-        // configBgimageIndents( uSels, nl, index, counter, indentLevel);
         activeNodeStartIndex = (nl.length - indentStartPosition);
+        
+        
         // !VA 03.21.2020 We really don't have to pass activeNodeIndex or counter or indentStartPosition, do we?
         // !VA Get the comment node that includes the MS conditional comments
         commentNode = configBgimageIndents( uSels, nl, activeNodeStartIndex, counter, indentStartPosition);
+        // !VA Append the commentNode to the lowest descendent in the node tree.
+        nl[5].appendChild(commentNode);
         // !VA 'Extract' the active nodes, i.e. the nodes that correspond to the user's CCP selection, in the container.
         container = nl[activeNodeStartIndex];
-        // !VA Append the commentNode to the container.
-        container.appendChild(commentNode);
       }
 
 
