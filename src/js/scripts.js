@@ -5,9 +5,11 @@
 // !VA GENERAL NOTES
 /* !VA  - February Reboot Notes
 =========================================================
-// !VA 03.23.2020
+// !VA 03.26.20
 Status:
-Everything works, but small issues with MS conditional indents. Merging to master.
+Everything works, except posSwitch indents not implemented. Created branch fixPosSwitchIndents to fix them. Also small adjustments to MS Conditional indents required.
+
+
 
 TODO: Implement posswitch
 TODO: The CSS output will need to be revisited for td and table.
@@ -16,6 +18,7 @@ TODO: There's an issue with what to do if the user grows the image past the view
 TODO: Add some kind of fluid option to the img options. Cerberus hard codes it into the img tag. That needs to be tested. Litmus overrides the width and height style properties in the CSS media queries. Need to test before that is implemented - but there's no reason to include a fluid option if that's settable in CSS.
 
 Status 03.14.2020:
+
 
 
 DONE: Separate indent config functions out from parseUserSelections
