@@ -7,7 +7,8 @@
 =========================================================
 // !VA 03.26.20
 Status:
-Everything works, except posSwitch indents not implemented. Created branch fixPosSwitchIndents to fix them. Also small adjustments to MS Conditional indents required.
+There are a lot of bad things going on here. First, get the console logs in order, they are chaotic. 
+THen focus on getting posswitch indents to work.
 
 
 
@@ -631,7 +632,6 @@ var Witty = (function () {
     // !VA INDENT FUNCTIONS
     // !VA Get the user selections that define the clipboard output configuration- the clicked Options button, the Include anchor checkbox and the Include wrapper table checkbox. The nodeList used for the indents as well as the indent implementation will depend on these options -- only the basic TD radio button option generates a simple nodeList structure whose indents can be processed with a simple for loop. The other options generate nodeLists with text nodes and comments that require a custom indent scheme.
     function getUserSelections( id ) {
-      console.log('getUserSelections running');
       // !VA Initialize the clipboard-building process by getting those user selections in the CCP that determine the structure of the clipboard output and put those selections into the uSels object.
       let uSels = {};
       uSels = {
@@ -655,42 +655,33 @@ var Witty = (function () {
     }
 
     function parseUserSelections(uSels) {
-      console.log('parseUserSelections running');
       // !VA Here we determine the indentStartPosition for node indices based on the user selection configuration in uSels
       let indentStartPosition;
       // !VA If the tdoptions radio button selection is Basic td with options, determine the indent level of the possible node output configurations.
       if (uSels.selectedRadio === 'basic') {
         switch (true) {
         case (uSels.buttonClicked === 'imgbut' && !uSels.hasAnchor ):
-          console.log('parseUserSelections basic: img, no anchor');
           indentStartPosition = 1;
           break;
         case (uSels.buttonClicked === 'imgbut' && uSels.hasAnchor):
-          console.log('parseUserSelections basic: img, anchor');
           indentStartPosition = 2;
           break;
         case (uSels.buttonClicked === 'tdbut' && !uSels.hasAnchor):
-          console.log('parseUserSelections basic: td, no anchor');
           indentStartPosition = 2;
           break;
         case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor):
-          console.log('parseUserSelections basic: td, anchor');
           indentStartPosition = 3;
           break;
         case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && !uSels.hasAnchor):
-          console.log('parseUserSelections basic: tablebut, no wrapper, no anchor');
           indentStartPosition = 4;
           break;
         case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && uSels.hasAnchor):
-          console.log('parseUserSelections basic: tablebut, no wrapper, anchor');
           indentStartPosition = 5;
           break;
         case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && !uSels.hasAnchor ):
-          console.log('parseUserSelections basic: tablebut, no anchor');
           indentStartPosition = 7;
           break;
         case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && uSels.hasAnchor):
-          console.log('parseUserSelections basic: tablebut, anchor');
           indentStartPosition = 8;
           break;
         default:
@@ -701,35 +692,27 @@ var Witty = (function () {
         switch(true) {
           
         case (uSels.buttonClicked === 'imgbut' && !uSels.hasAnchor ):
-          console.log('parseUserSelections imgswap: img, no anchor');
           indentStartPosition = 1;
           break;
         case (uSels.buttonClicked === 'imgbut' && uSels.hasAnchor):
-          console.log('parseUserSelections imgswap: img, anchor');
           indentStartPosition = 2;
           break;
         case (uSels.buttonClicked === 'tdbut' && !uSels.hasAnchor):
-          console.log('parseUserSelections imgswap: td, no anchor');
           indentStartPosition = 2;
           break;
         case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor):
-          console.log('parseUserSelections imgswap: td, anchor');
           indentStartPosition = 3;
           break;
         case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && !uSels.hasAnchor):
-          console.log('parseUserSelections imgswap: tablebut, no wrapper, no anchor');
           indentStartPosition = 4;
           break;
         case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && uSels.hasAnchor):
-          console.log('parseUserSelections imgswap: tablebut, no wrapper, anchor');
           indentStartPosition = 5;
           break;
         case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && !uSels.hasAnchor ):
-          console.log('parseUserSelections imgswap: tablebut, no anchor');
           indentStartPosition = 7;
           break;
         case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && uSels.hasAnchor):
-          console.log('parseUserSelections imgswap: tablebut, anchor');
           indentStartPosition = 8;
           break;
         default:
@@ -737,43 +720,34 @@ var Witty = (function () {
         } 
       }
       else if (uSels.selectedRadio === 'posswitch') {
-        console.log('posswitch');
         switch(true) {
         // !VA Not accessed, overridden in getUserSelections
         case (uSels.buttonClicked === 'imgbut' && !uSels.hasAnchor ):
-          console.log('parseUserSelections posswitch: img, no anchor');
           indentStartPosition = 12;
           break;
           // !VA Not accessed, overridden in getUserSelections
         case (uSels.buttonClicked === 'imgbut' && uSels.hasAnchor):
-          console.log('parseUserSelections posswitch: img, anchor');
           indentStartPosition = 13;
           break;
 
 
 
         case (uSels.buttonClicked === 'tdbut' && !uSels.hasAnchor):
-          console.log('parseUserSelections posswitch: td, no anchor');
           indentStartPosition = 5;
           break;
         case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor):
-          console.log('parseUserSelections posswitch: td, anchor');
           indentStartPosition = 6;
           break;
         case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && !uSels.hasAnchor):
-          console.log('parseUserSelections posswitch: tablebut, no wrapper, no anchor');
           indentStartPosition = 4;
           break;
         case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && uSels.hasAnchor):
-          console.log('parseUserSelections posswitch: tablebut, no wrapper, anchor');
           indentStartPosition = 5;
           break;
         case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && !uSels.hasAnchor ):
-          console.log('parseUserSelections posswitch: tablebut, no anchor');
           indentStartPosition = 7;
           break;
         case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && uSels.hasAnchor):
-          console.log('parseUserSelections posswitch: tablebut, anchor');
           indentStartPosition = 8;
           break;
         default:
@@ -786,25 +760,22 @@ var Witty = (function () {
         // !VA There is no A or IMG in the nodeList for this option, so set indentStartPosition to 1 for both options otherwise indentStartPosition will be undefined and no commentNode will be built.
         switch(true) {
         case (uSels.buttonClicked === 'tdbut' && !uSels.hasAnchor):
-          console.log('parseUserSelections bgimage: tdbut, no anchor');
           indentStartPosition = 1;
           break;
         case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor):
-          console.log('parseUserSelections bgimage: tdbut, anchor');
           indentStartPosition = 1;
           break;
         case (uSels.buttonClicked === 'tablebut' && !uSels.hasWrapper && uSels.hasAnchor):
-          console.log('parseUserSelections bgimage: tablebut, no wrapper, anchor');
           indentStartPosition = 3;
           break;
         case (uSels.buttonClicked === 'tablebut' && uSels.hasWrapper && uSels.hasAnchor):
-          console.log('parseUserSelections bgimage: tablebut, anchor');
           indentStartPosition = 6;
           break;
         default:
           // code block
         } 
       }
+      console.log('parseUserSelections: uSels.selectedRadio: ' +  uSels.selectedRadio + '; uSels.buttonClicked: ' + uSels.buttonClicked + '; hasAnchor: ' + uSels.hasAnchor + '; hasWrapper: '  + uSels.hasWrapper + '; indentStartPosition: ' + indentStartPosition);
       parseTopNode(uSels, indentStartPosition);
     }
     // !VA parseTopNode gets the tableNodeFragment from makeTableNode and runs the indent configuration routine based on the selected tdoptions radio button, after which applyIndents2 is run to loop through the nodes and apply indents to the non-comment nodes. IMPORTANT: Indents are NOT applied to the entire node tree, but rather ONLY to those nodes that correspond to the clipboard button click. Example: if the MakeIMG button is clicked and basic TD is selected, no indent is applied (indentStartPosition = 1) and only positions 12 and 13 for the A and IMG tag get a line break, the positions above that in the node tree are ignored. If makeTD button is clicked and basic TD is selected, then only positions 12 or 13 for IMG or A respectively get an indent (indentStartPosition = 2) and all the parental nodes in the tree are ignored. If the makeTable button is clicked, then all the descendants of that table node get indents starting at position 4 or 5 (hasWrapper or !hasWrapper). 
@@ -812,18 +783,18 @@ var Witty = (function () {
     // !VA Branch: fixPosSwitch
     // function parseTopNode( uSels, indentLevel ) {
     function parseTopNode( uSels, indentStartPosition ) {
-      console.clear();
       console.log('parseTopNode running');
       // !VA curpos
-      // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
       let container, activeNodeStartIndex, counter, nl, tableNodeFragment;
-      let foo, faa;
       let commentNode;
       
+      // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
       tableNodeFragment = makeTableNode( uSels );
-      console.log('tableNodeFragment is: ');
+      console.log('parseTopNode - tableNodeFragment: ');
       console.log(tableNodeFragment);
       nl = tableNodeFragment.querySelectorAll('*');
+      console.log('parseTopNode - nl: ');
+      console.log(nl);
       
       // !VA Create the container for the nodes to be output to the clipboard. The original node tree fragment returned from makeTableNodes is still the primary storehouse for the DOM changes even after the container with the active nodes is created.
       container = document.createElement('div');
@@ -848,6 +819,7 @@ var Witty = (function () {
         counter = -1;
 
         // !VA Here we 'extract' those nodes from the full nodeList correspond to the user CCP selections. IMPORTANT: this container has to be rebuilt for all 'flavors' of indenting, i.e. basic and posswitch. It does NOT apply to bgimage and imgswap since these are built directly from code blocks embedded in comment nodes.
+        // !VA Branch: fixPosSwitchIndents - IMPORTANT! The CONTAINER is the subset of nodes to which indents will be applied. It is NOT the full nodeList of the complete node tree. What we pass is the full nodeList the complete node tree and we apply the indents to the nodes in the complete tree. The extracted nodes that live in the CONTAINER are updated live in the DOM. Finally, the outer HTML of the nodes in the CONTAINER (i.e. the extracted nodes) is passed to the Clipboard object for output.   
         container = nl[activeNodeStartIndex];
         console.log('basic container is: ');
         configNodeIndents(uSels, nl, activeNodeStartIndex, counter);
@@ -860,11 +832,6 @@ var Witty = (function () {
         // configBgimageIndents( uSels, nl, index, counter, indentLevel);
         activeNodeStartIndex = (nl.length - indentStartPosition);
         // !VA 03.21.2020 We really don't have to pass activeNodeIndex or counter or indentStartPosition, do we?
-        console.log('874');
-        console.log('nl is: ');
-        console.log(nl);
-
-
 
         // !VA Get the comment node that includes the MS conditional comments
         // configImgSwapIndents(uSels, nl, index, counter, indentLevel);
@@ -898,7 +865,6 @@ var Witty = (function () {
 
       // !VA Start posswitch section
       if (uSels.selectedRadio === 'posswitch') {
-        console.log('posswitch section');
 
 
         // !VA Find out which index position in the nodeList corresponds to the user CCP selection  based on the conditions defined in parseUserSelections. For instance, if the IMG button is clicked with Include anchor checked, i will start incrementing at 6, the position of the anchor tag in the list.
@@ -929,8 +895,7 @@ var Witty = (function () {
         // !VA Branch: fixPosSwitch PROBLEM: If we delete the below container assignment, which we actually shouldn't need, then the container output div has no children. Also, it appears that bgimage and imgswap now have no output to the container div.
         container = nl[5];
         // !VA Branch: fixPosSwitch: THere we go! But now we're not getting indents starting at position 5, but rather at position
-        console.log('posswitch container is: ');
-        console.log(container);
+
 
         configNodeIndents( uSels, nl, activeNodeStartIndex, counter);
       }
@@ -940,13 +905,7 @@ var Witty = (function () {
     
     // !VA Configure the node-level indents for basic and RTL position switch options. Options that include comment nodes have to be configured separately prior to applying the indents to the entire node tree
     function configNodeIndents(uSels, nl, activeNodeStartIndex, counter) {
-      console.log('configNodeIndents running');
-      console.log('uSels is: ');
-      console.log(uSels);
-      console.log('nl is: ');
-      console.log(nl);
-      console.log('activeNodeStartIndex is: ' + activeNodeStartIndex);
-      console.log('counter is: ' + counter);
+      console.log('configNodeIndents - activeNodeStartIndex: ' + activeNodeStartIndex + '; counter: ' + counter);
 
 
 
@@ -978,17 +937,12 @@ var Witty = (function () {
       // !VA Loop through nodes and process exceptions
       // !VA Create the container that receives the active nodes, i.e. the nodes that correspond to the clicked CCP button. Reminder: index = (nl.length - indentStartPosition), where indentStartPosition is the position in the complete-tree nodeList at which the indenting should start based on the user's CCP selections. 
       // !VA Branch: fixPosSwitch: This has to be the problem with posswitch...what is 
-      console.log('945 nl is: ');
-      console.log(nl);
       container = document.createElement('div');
-      console.log('940 activeNodeStartIndex is: ' + activeNodeStartIndex);
+      
       // !VA Branch: fixPosSwitch: Here the container is WRONG! So let's hack in the right activeNodeStartIndex
       // !VA Branch: fixPosSwitch: Perfect!
       container = nl[activeNodeStartIndex];
-      console.log('container 940 is: ');
-      console.log(container);
-      // console.log('nl is: ');
-      // console.log(nl);
+      
       // !VA Counter initializes at -1 to begin loop at 0. 
       // !VA Start the indent loop beginning at the nodeList position corresponding to user's CCP selections.
       for (i = activeNodeStartIndex; i < nl.length; i++) {
