@@ -801,6 +801,7 @@ var Witty = (function () {
       
 
       // !VA Loop through the nodes and apply the indents to the nodes without MS conditionals.
+      // !VA BASIC 
       if ( uSels.selectedRadio === 'basic') {
         // !VA No need to return anything since the container node updates live to the DOM which is accessible via container.outerHTML.
         // !VA Find out which index position in the nodeList corresponds to the user CCP selection  based on the conditions defined in parseUserSelections. For instance, if the IMG button is clicked with Include anchor checked, i will start incrementing at 6, the position of the anchor tag in the list.
@@ -823,16 +824,14 @@ var Witty = (function () {
         container = nl[activeNodeStartIndex];
         console.log('basic container is: ');
         configNodeIndents(uSels, nl, activeNodeStartIndex, counter);
-
       }
+      // !VA BASIC End
 
-      // !VA Start imgswap section
+      // !VA IMGSWAP Start
       if ( uSels.selectedRadio === 'imgswap') {
-        
         // configBgimageIndents( uSels, nl, index, counter, indentLevel);
         activeNodeStartIndex = (nl.length - indentStartPosition);
         // !VA 03.21.2020 We really don't have to pass activeNodeIndex or counter or indentStartPosition, do we?
-
         // !VA Get the comment node that includes the MS conditional comments
         // configImgSwapIndents(uSels, nl, index, counter, indentLevel);
         commentNode = configImgSwapIndents(uSels, nl, activeNodeStartIndex, counter, indentStartPosition);
@@ -840,19 +839,12 @@ var Witty = (function () {
         // nl[5].appendChild(commentNode);
         // !VA 'Extract' the active nodes, i.e. the nodes that correspond to the user's CCP selection, in the container.
         container = nl[activeNodeStartIndex];
-      } // End img swap section
+      } // IMGSWAP End
 
-
-
-
-
-      // !VA Start bgimage section
+      // !VA BGIMAGE Start
       if ( uSels.selectedRadio === 'bgimage') {
         // !VA 03.21.2020 This works for TD button, but not TABLE button.
-
         activeNodeStartIndex = (nl.length - indentStartPosition);
-        
-        
         // !VA 03.21.2020 We really don't have to pass activeNodeIndex or counter or indentStartPosition, do we?
         // !VA Get the comment node that includes the MS conditional comments
         commentNode = configBgimageIndents( uSels, nl, activeNodeStartIndex, counter, indentStartPosition);
@@ -861,24 +853,16 @@ var Witty = (function () {
         // !VA 'Extract' the active nodes, i.e. the nodes that correspond to the user's CCP selection, in the container.
         container = nl[activeNodeStartIndex];
       }
+      // !VA BGIMAGE End
 
 
-      // !VA Start posswitch section
+      // !VA POSSWITCH Start
       if (uSels.selectedRadio === 'posswitch') {
-
-
         // !VA Find out which index position in the nodeList corresponds to the user CCP selection  based on the conditions defined in parseUserSelections. For instance, if the IMG button is clicked with Include anchor checked, i will start incrementing at 6, the position of the anchor tag in the list.
         // !VA The counter determines the indentLevel. It initializes at -1 so it starts incrementing at 0, giving the top node in the list no indent. Subsequent nodes get an indent level of 1 and so on.
         // !VA Branch: fixPosSwitch: to clarify the above...
         // !VA activeNodeStartIndex is the position in the nodeList that defines the start of the ACTIVE nodes, i.e. the nodes in the node tree that are to receive indents based on the user CCP selection. activeNodeStartIndex equals the nodeList count of the complete node tree, minus the indentStartPosition passed in from parseUserSelections, so it will be different for all flavors of indenting. IT NEEDS TO BE SET AT THE TOP OF EACH FLAVOR.
         // !VA IMPORTANT: Note the difference between activeNodeStartIndex and indentStartPosition, and note that we have to subtract a value from this for posswitch because it has extra sibling nodes and seven extra nodes between parent td of the anchor/image and the top TD returned by makePosSwitchNodes. Very complicated, but suffice it to say that the magic number is 7, see below.
-        /* !VA Branch: fixPosSwitch: But there's still a problem because 
-          1)a node is getting left out in the clipboard output and the indents start at the wrong place
-          2) The indents start at the wrong place
-        
-
-
-        */
 
         activeNodeStartIndex = (nl.length - indentStartPosition - 7);
         console.log('activeNodeStartIndex is: ' + activeNodeStartIndex);
@@ -895,8 +879,6 @@ var Witty = (function () {
         // !VA Branch: fixPosSwitch PROBLEM: If we delete the below container assignment, which we actually shouldn't need, then the container output div has no children. Also, it appears that bgimage and imgswap now have no output to the container div.
         container = nl[5];
         // !VA Branch: fixPosSwitch: THere we go! But now we're not getting indents starting at position 5, but rather at position
-
-
         configNodeIndents( uSels, nl, activeNodeStartIndex, counter);
       }
       var clipboardStr = container.outerHTML;
@@ -907,32 +889,9 @@ var Witty = (function () {
     function configNodeIndents(uSels, nl, activeNodeStartIndex, counter) {
       console.log('configNodeIndents - activeNodeStartIndex: ' + activeNodeStartIndex + '; counter: ' + counter);
 
-
-
-
       let i, indent, container;
       // !VA Vars for the sibling nodes of RTL switch position
       let imgNodeIndex, aNodeIndex, nextSiblingNodeIndex, indentspacing, previousSiblingNodeIndex, previousSiblingIndent;
-
-      // !VA Branch: fixPosSwitch: Leave out all posswitch code until we get basic working with current mods.
-      // !VA Get the positions of the IMG and A tag, and of the siblings. UPDATE: We probably don't need the A and IMG positions anymore.
-      // let imgNodePosition, aNodePosition;
-      // for (let i = 0; i < nl.length; i++) {
-      //   // !VA Get the positions of the sibling nodes if present
-      //   if (nl[i].nodeName === 'IMG') {(imgNodePosition = i);}
-      //   if (nl[i].nodeName === 'A') {(aNodePosition = i);}
-      //   if (nl[i].nextSibling) {nextSiblingNodeIndex = i; } 
-      //   if (nl[i].previousSibling) {previousSiblingNodeIndex = i; } 
-      // }
-      // console.log('imgNodePosition is: ' + imgNodePosition);
-      // console.log('aNodePosition is: ' + aNodePosition);
-
-
-      // !VA Set the indent for the second sibling TD. It should be equal to the indents for the first sibling, so we need to reset the repeat spacing iterator to the same value as it was for the first sibling. Since the nodeList.length varies based on if an anchor is included or if the img is excluded and if the create TD or create Table buttons were pressed, we need to base this indent on the nodeList.length and index it to the position of the first sibling. This will always give us the indent iterator used for the first sibling. 
-
-      // !VA Branch: fixPosSwitch: Leave out all posswitch code until we get basic working with current mods.
-      // previousSiblingIndent = (nl.length - (nextSiblingNodeIndex + 5));
-
 
       // !VA Loop through nodes and process exceptions
       // !VA Create the container that receives the active nodes, i.e. the nodes that correspond to the clicked CCP button. Reminder: index = (nl.length - indentStartPosition), where indentStartPosition is the position in the complete-tree nodeList at which the indenting should start based on the user's CCP selections. 
@@ -964,10 +923,49 @@ var Witty = (function () {
         } 
 
         else {
-          // Otherwise, apply the normal indent scheme.
-          // !VA 03.15.2020 
-          // i = 0; this doesnt work
-          applyIndents2( nl[i], indent, 'normal');
+
+          // !VA Get the positions of the relevant child nodes for indents
+          for (let i = 0; i < nl.length; i++) {
+            // !VA Get the positions of the relevant child nodes for indents
+            if (nl[i].nextSibling) {nextSiblingNodeIndex = i; } 
+            if (nl[i].previousSibling) {previousSiblingNodeIndex = i; } 
+          }
+
+          
+
+          // !VA If there's a next sibling, then there are child nodes to the parent node, so we do the IF clause. AND if so, then if the loop counter is greater than the node index of the second child, run the if clause.
+          // !VA Branch: fixPosSwitchIndents: If !hasAnchor, then nl.length is one less. Indent level of the second sibling also decreases by one.
+          // !VA Branch: fixPosSwitchIndents This sucks because the DOM is updated with the new indent each time the loop runs. SUCKS!
+
+          console.log('nextSiblingNodeIndex is: ' + nextSiblingNodeIndex);
+          console.log('previousSiblingNodeIndex is: ' + previousSiblingNodeIndex);
+          console.log('i is: ' + i);
+          console.log('nl.length is: ' + nl.length);
+          
+          
+          if (nextSiblingNodeIndex && i >= previousSiblingNodeIndex) {
+            // !VA Set the sibling's indent to be the same as that of the first sibling of the parent TR
+            indent = '' + getIndent(i - 11);
+            // !VA We still need to add some indicator content to the terminating TD in this nodeList -- putting it in the makePosSwitchNode function itself would make it impossible to indent properly without some creative coding that's beyond my ability. So. we'll put it here, after the indent has been shrunk to be equal to the nextSibling's indent.
+            if ( i === 12) {
+              nl[i].innerHTML = indent + '  <!-- ADD YOUR CONTENT HERE --> \n';
+            }
+            nl[i].insertAdjacentHTML('beforebegin', indent);
+            nl[i].insertAdjacentHTML('afterbegin', '\n');
+            nl[i].insertAdjacentHTML('beforeend', indent);
+            nl[i].insertAdjacentHTML('afterend', '\n');
+          } else {
+            // Otherwise, apply the normal indent scheme.
+            // !VA 03.15.2020 
+            // i = 0; this doesnt work
+            applyIndents2( nl[i], indent, 'normal');
+
+          }
+
+
+
+
+
         }
       }
       console.log('container.outerHTML 983 is: ');
