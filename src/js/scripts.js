@@ -888,32 +888,26 @@ var Witty = (function () {
     // !VA Configure the node-level indents for basic and RTL position switch options. Options that include comment nodes have to be configured separately prior to applying the indents to the entire node tree
     function configNodeIndents(uSels, nl, activeNodeStartIndex, counter) {
       console.log('configNodeIndents - activeNodeStartIndex: ' + activeNodeStartIndex + '; counter: ' + counter);
-
       let i, indent, container;
       // !VA Vars for the sibling nodes of RTL switch position
-      let imgNodeIndex, aNodeIndex, nextSiblingNodeIndex, indentspacing, previousSiblingNodeIndex, previousSiblingIndent;
-
+      let nextSiblingNodeIndex, previousSiblingNodeIndex, previousSiblingPosition;
       // !VA Loop through nodes and process exceptions
       // !VA Create the container that receives the active nodes, i.e. the nodes that correspond to the clicked CCP button. Reminder: index = (nl.length - indentStartPosition), where indentStartPosition is the position in the complete-tree nodeList at which the indenting should start based on the user's CCP selections. 
-      // !VA Branch: fixPosSwitch: This has to be the problem with posswitch...what is 
       container = document.createElement('div');
-      
-      // !VA Branch: fixPosSwitch: Here the container is WRONG! So let's hack in the right activeNodeStartIndex
-      // !VA Branch: fixPosSwitch: Perfect!
+      // !VA Extract the 'active' nodes to container
       container = nl[activeNodeStartIndex];
-      
-      // !VA Counter initializes at -1 to begin loop at 0. 
-      // !VA Start the indent loop beginning at the nodeList position corresponding to user's CCP selections.
+      // !VA Get the positions of the relevant child nodes for indents. nextSiblingIndex should always be 8. If Include anchor is checked (usSels.hasAnchor) previousSiblingIndex should be 14. If !uSels.hasAnchor, previous SiblingIndex should be 13. 
+      for (let i = 0; i < nl.length; i++) {
+        // !VA Get the positions of the relevant child nodes for indents
+        if (nl[i].nextSibling) {nextSiblingNodeIndex = i; } 
+        if (nl[i].previousSibling) {previousSiblingNodeIndex = i; } 
+      }
+      // !VA 
+      // !VA Start the indent loop beginning at the nodeList position corresponding to user's CCP selections. Counter initializes at -1 to begin loop at 0. 
       for (i = activeNodeStartIndex; i < nl.length; i++) {
         counter = counter + 1;
         indent = getIndent(counter);
-
-        // !VA 03.15.2020 This is the problem. The 
-        // !VA Ignore any indents for the IMG tag - it should be nested within the anchor on the same line. This is actually superfluous since no action is executed, it's only included for clarity.
-
-
-        // !VA Branch: fixPosSwitch: This is problematic because it names a specific index position. It will be different for posswitch and any other mods to follow. But it doesn't work unless you can specify a position for IMG. It would be so much easier if we'd just applied classes when creating these elments... but then we'd have the issue of what to do with user-applied classes...ugh. In basic option, the A/IMG positions are 7 and 8. In posswitch they're 12 and 13. The only difference between them is that their parent td has the dir attribute. Maybe we should be looking for IMG's parent and if it's an A...That works for basic. OK so, now we've removed the nodeList position for IMG and A. Don't know if it works for posswitch because we're still only getting A and  IMG output. That has to be because of the output of active nodes in configNodeIndents, I think.
-        // console.log('i is: ' + i);
+        // !VA Ignore any indents for the IMG tag if its parent node is the A tag. The IMG tag should be nested within the anchor on the same line. 
         if (nl[i].nodeName === 'IMG' && nl[i].parentNode.nodeName === 'A') {
           applyIndents2(nl[i], indent, 'ignore');
         }
@@ -921,54 +915,30 @@ var Witty = (function () {
           // !VA If nodeList item 1 is the anchor, then Include anchor is checked. Apply the 'terminal' indent scheme and don't apply any indent to the img element.
           applyIndents2(nl[i], indent, 'terminal');
         } 
-
         else {
-
-          // !VA Get the positions of the relevant child nodes for indents
-          for (let i = 0; i < nl.length; i++) {
-            // !VA Get the positions of the relevant child nodes for indents
-            if (nl[i].nextSibling) {nextSiblingNodeIndex = i; } 
-            if (nl[i].previousSibling) {previousSiblingNodeIndex = i; } 
-          }
-
-          
-
+          // !VA Else, handle all the other indents. That includes standard indents without exceptions AND the indent of sibling nodes for the posswitch option.
           // !VA If there's a next sibling, then there are child nodes to the parent node, so we do the IF clause. AND if so, then if the loop counter is greater than the node index of the second child, run the if clause.
-          // !VA Branch: fixPosSwitchIndents: If !hasAnchor, then nl.length is one less. Indent level of the second sibling also decreases by one.
-          // !VA Branch: fixPosSwitchIndents This sucks because the DOM is updated with the new indent each time the loop runs. SUCKS!
-
-          console.log('nextSiblingNodeIndex is: ' + nextSiblingNodeIndex);
-          console.log('previousSiblingNodeIndex is: ' + previousSiblingNodeIndex);
-          console.log('i is: ' + i);
-          console.log('nl.length is: ' + nl.length);
-          
-          
           if (nextSiblingNodeIndex && i >= previousSiblingNodeIndex) {
-            // !VA Set the sibling's indent to be the same as that of the first sibling of the parent TR
-            indent = '' + getIndent(i - 11);
-            // !VA We still need to add some indicator content to the terminating TD in this nodeList -- putting it in the makePosSwitchNode function itself would make it impossible to indent properly without some creative coding that's beyond my ability. So. we'll put it here, after the indent has been shrunk to be equal to the nextSibling's indent.
-            if ( i === 12) {
+            // !VA Set the sibling's indent to be the same as that of the first sibling of the parent TR. The indent level passed to getIndent is the counter value minus the number of nodes between the top node and the previousSibling. If Include anchor (uSels.hasAnchor) is checked, that number is 11. If !usels.hasAnchor, that number is 10.
+            uSels.hasAnchor ? previousSiblingPosition = 11 : previousSiblingPosition = 10;
+            // !VA Get the indent string for the current node
+            indent = '' + getIndent(i - previousSiblingPosition);
+            // !VA We still need to add some indicator content to the terminating TD in this nodeList -- putting it in the makePosSwitchNode function itself would make it impossible to indent properly without some creative coding that's beyond my ability. So. we'll put it here, after the indent has been shrunk to be equal to the nextSibling's indent. It will always be added to the last node in the tree, i.e. the nodeList length - 1.
+            if ( i === nl.length - 1) {
               nl[i].innerHTML = indent + '  <!-- ADD YOUR CONTENT HERE --> \n';
             }
+            // !VA Insert the indent strings to the node
             nl[i].insertAdjacentHTML('beforebegin', indent);
             nl[i].insertAdjacentHTML('afterbegin', '\n');
             nl[i].insertAdjacentHTML('beforeend', indent);
             nl[i].insertAdjacentHTML('afterend', '\n');
           } else {
             // Otherwise, apply the normal indent scheme.
-            // !VA 03.15.2020 
-            // i = 0; this doesnt work
             applyIndents2( nl[i], indent, 'normal');
-
           }
-
-
-
-
-
         }
       }
-      console.log('container.outerHTML 983 is: ');
+      console.log('container.outerHTML 941 is: ');
       console.log(container.outerHTML);
       return container.outerHTML;
     }
