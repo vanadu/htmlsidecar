@@ -5,10 +5,9 @@
 // !VA GENERAL NOTES
 /* !VA  - February Reboot Notes
 =========================================================
-// !VA 03.26.20
+// !VA 03.29.20
 Status:
-There are a lot of bad things going on here. First, get the console logs in order, they are chaotic. 
-THen focus on getting posswitch indents to work.
+All posswitch works, except TABLE indents are off.
 
 
 
@@ -733,7 +732,7 @@ var Witty = (function () {
 
 
         case (uSels.buttonClicked === 'tdbut' && !uSels.hasAnchor):
-          indentDepth = 7;
+          indentDepth = 5;
           break;
         case (uSels.buttonClicked === 'tdbut' && uSels.hasAnchor):
           indentDepth = 6;
@@ -881,7 +880,7 @@ var Witty = (function () {
         // !VA Branch: fixPosSwitch PROBLEM: If we delete the below container assignment, which we actually shouldn't need, then the container output div has no children. Also, it appears that bgimage and imgswap now have no output to the container div.
 
         // !VA Branch: fixPosSwitchIndents: The number 5 below is a hack I put in here just to get the TD button to work. Now I have to get the correct nodelist to be extracted when the table button configurations are selected. 
-        container = nl[5];
+        // container = nl[5];
         // container = nl[activeNodeStartIndex];
 
         // !VA Branch: fixPosSwitch: THere we go! But now we're not getting indents starting at position 5, but rather at position
@@ -899,6 +898,7 @@ var Witty = (function () {
 
     function configNodeIndents(uSels, nl, activeNodeStartIndex, counter) {
       console.log('configNodeIndents - activeNodeStartIndex: ' + activeNodeStartIndex + '; counter: ' + counter);
+      
       let i, indent, container;
       // !VA Vars for the sibling nodes of RTL switch position
       let nextSiblingNodeIndex, previousSiblingNodeIndex, previousSiblingPosition;
@@ -907,6 +907,13 @@ var Witty = (function () {
       container = document.createElement('div');
       // !VA Extract the 'active' nodes to container
       container = nl[activeNodeStartIndex];
+
+      console.log('911 container is: ');
+      console.log(container);
+
+
+
+
       // !VA Get the positions of the relevant child nodes for indents. nextSiblingIndex should always be 8. If Include anchor is checked (usSels.hasAnchor) previousSiblingIndex should be 14. If !uSels.hasAnchor, previous SiblingIndex should be 13. 
       for (let i = 0; i < nl.length; i++) {
         // !VA Get the positions of the relevant child nodes for indents
@@ -931,7 +938,9 @@ var Witty = (function () {
           // !VA If there's a next sibling, then there are child nodes to the parent node, so we do the IF clause. AND if so, then if the loop counter is greater than the node index of the second child, run the if clause.
           if (nextSiblingNodeIndex && i >= previousSiblingNodeIndex) {
             // !VA Set the sibling's indent to be the same as that of the first sibling of the parent TR. The indent level passed to getIndent is the counter value minus the number of nodes between the top node and the previousSibling. If Include anchor (uSels.hasAnchor) is checked, that number is 11. If !usels.hasAnchor, that number is 10.
-            // !VA Branch: fixPosSwitchIndents: The above is only true if TD button is clicked. previousSiblingPosition can't be hard-coded, it has to be derived from indentDepth.
+
+            // !VA Branch: fixPosSwitchIndents
+            // !VA Branch: fixPosSwitchIndents: The above is only true if TD button is clicked. previousSiblingPosition can't be hard-coded, it has to be derived from indentDepth or activeNodeStartIndex
 
             uSels.hasAnchor ? previousSiblingPosition = 11 : previousSiblingPosition = 10;
             // !VA Get the indent string for the current node
