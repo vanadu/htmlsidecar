@@ -880,8 +880,9 @@ var Witty = (function () {
         // !VA Branch: fixPosSwitch PROBLEM: If we delete the below container assignment, which we actually shouldn't need, then the container output div has no children. Also, it appears that bgimage and imgswap now have no output to the container div.
 
         // !VA Branch: fixPosSwitchIndents: The number 5 below is a hack I put in here just to get the TD button to work. Now I have to get the correct nodelist to be extracted when the table button configurations are selected. 
+        // !VA Branch: fixPosSwitchIndents Don't forget - THIS is what gets sent to the clipboard object.
         // container = nl[5];
-        // container = nl[activeNodeStartIndex];
+        container = nl[activeNodeStartIndex];
 
         // !VA Branch: fixPosSwitch: THere we go! But now we're not getting indents starting at position 5, but rather at position
         configNodeIndents( uSels, nl, activeNodeStartIndex, counter);
@@ -940,11 +941,18 @@ var Witty = (function () {
             // !VA Set the sibling's indent to be the same as that of the first sibling of the parent TR. The indent level passed to getIndent is the counter value minus the number of nodes between the top node and the previousSibling. If Include anchor (uSels.hasAnchor) is checked, that number is 11. If !usels.hasAnchor, that number is 10.
 
             // !VA Branch: fixPosSwitchIndents
-            // !VA Branch: fixPosSwitchIndents: The above is only true if TD button is clicked. previousSiblingPosition can't be hard-coded, it has to be derived from indentDepth or activeNodeStartIndex
-
+            // !VA Branch: fixPosSwitchIndents: The above is only true if TD button is clicked. previousSiblingPosition can't be hard-coded, it has to be derived from indentDepth or activeNodeStartIndex. No, previousSiblingPosition is always either 11 or 10. 
+            console.log('activeNodeStartIndex is: ' + activeNodeStartIndex);
+            console.log('previousSiblingPosition is: ' + previousSiblingPosition);
             uSels.hasAnchor ? previousSiblingPosition = 11 : previousSiblingPosition = 10;
+            var indentLevel;
+            indentLevel = activeNodeStartIndex;
+
             // !VA Get the indent string for the current node
-            indent = '' + getIndent(i - previousSiblingPosition);
+            console.log('i is: ' + i);
+            console.log('i - previousSiblingPosition + 0 is: ' + (i - previousSiblingPosition + 0));
+            console.log('i - previousSiblingPosition + activeNodeStartIndex =: ' + (i - previousSiblingPosition + activeNodeStartIndex));
+            indent = '' + getIndent(i - previousSiblingPosition + 0);
             // !VA We still need to add some indicator content to the terminating TD in this nodeList -- putting it in the makePosSwitchNode function itself would make it impossible to indent properly without some creative coding that's beyond my ability. So. we'll put it here, after the indent has been shrunk to be equal to the nextSibling's indent. It will always be added to the last node in the tree, i.e. the nodeList length - 1.
             if ( i === nl.length - 1) {
               nl[i].innerHTML = indent + '  <!-- ADD YOUR CONTENT HERE --> \n';
