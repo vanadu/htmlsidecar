@@ -5,8 +5,13 @@
 // !VA GENERAL NOTES
 /* !VA  - February Reboot Notes
 =========================================================
-// !VA 03.29.20
+// !VA 04.11.20
 Status:
+* Unchecking Include anchor doesn't remove anchor in mobile swap
+* Minor indent issue with bgimage
+* Indents still off with TABLE posswitch
+
+
 All posswitch works, except TABLE indents are off.
 
 
@@ -789,11 +794,12 @@ var Witty = (function () {
       
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
       tableNodeFragment = makeTableNode( uSels );
-      console.log('parseTopNode - tableNodeFragment: ');
-      console.log(tableNodeFragment);
+      // console.log('parseTopNode tableNodeFragment: ');
+      // console.log(tableNodeFragment);
       nl = tableNodeFragment.querySelectorAll('*');
-      console.log('parseTopNode - nl: ');
+      console.log('parseTopNode nl: ');
       console.log(nl);
+      console.log('parseTopNode indentDepth is: ' + indentDepth);
       
       // !VA Create the container for the nodes to be output to the clipboard. The original node tree fragment returned from makeTableNodes is still the primary storehouse for the DOM changes even after the container with the active nodes is created.
       container = document.createElement('div');
