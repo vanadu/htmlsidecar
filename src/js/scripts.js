@@ -863,6 +863,7 @@ var Witty = (function () {
 
       // !VA POSSWITCH Start
       if (uSels.selectedRadio === 'posswitch') {
+        console.clear();
         // !VA Find out which index position in the nodeList corresponds to the user CCP selection  based on the conditions defined in parseUserSelections. For instance, if the IMG button is clicked with Include anchor checked, i will start incrementing at 6, the position of the anchor tag in the list.
         // !VA The counter determines the indentLevel. It initializes at -1 so it starts incrementing at 0, giving the top node in the list no indent. Subsequent nodes get an indent level of 1 and so on.
         // !VA Branch: fixPosSwitch: to clarify the above...
