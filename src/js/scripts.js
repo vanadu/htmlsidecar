@@ -61,13 +61,13 @@ TODO: Assign tab order
 var Witty = (function () {
 
   // !VA Run on page load
-  document.addEventListener("DOMContentLoaded", function() {
-    setTimeout(function(){ 
-      // !VA Don't forget you can't use button aliases here..
-      document.querySelector('#btn-ccp-make-td-tag').click();
+  // document.addEventListener("DOMContentLoaded", function() {
+  //   setTimeout(function(){ 
+  //     // !VA Don't forget you can't use button aliases here..
+  //     document.querySelector('#btn-ccp-make-td-tag').click();
 
-    }, 500);
-  });
+  //   }, 500);
+  // });
 
   // !VA DEV Test function to get the clicked element to the console
   // (function () {
@@ -863,7 +863,7 @@ var Witty = (function () {
 
       // !VA POSSWITCH Start
       if (uSels.selectedRadio === 'posswitch') {
-        console.clear();
+        // console.clear();
         // !VA Find out which index position in the nodeList corresponds to the user CCP selection  based on the conditions defined in parseUserSelections. For instance, if the IMG button is clicked with Include anchor checked, i will start incrementing at 6, the position of the anchor tag in the list.
         // !VA The counter determines the indentLevel. It initializes at -1 so it starts incrementing at 0, giving the top node in the list no indent. Subsequent nodes get an indent level of 1 and so on.
         // !VA Branch: fixPosSwitch: to clarify the above...
@@ -1058,7 +1058,7 @@ var Witty = (function () {
         else {
           if ( i === 5) {
             // !VA If the table button is clicked, add an extra indent before the comment node -- applyIndents2 doesn't handle that properly.
-            nl[i].insertAdjacentHTML('afterbegin', '  ');
+            nl[i].insertAdjacentHTML('afterbegin', 'ZZ');
           }
         }
         applyIndents2( nl[i], indent, 'normal');
@@ -1370,7 +1370,7 @@ var Witty = (function () {
 
     function getIndent(indentLevel) {
       let indentChar, indent;
-      indentChar = '  ';
+      indentChar = 'HH';
       indent = indentChar.repeat([indentLevel]);
       return indent;
     }
