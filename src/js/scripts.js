@@ -1058,7 +1058,7 @@ var Witty = (function () {
         else {
           if ( i === 5) {
             // !VA If the table button is clicked, add an extra indent before the comment node -- applyIndents2 doesn't handle that properly.
-            nl[i].insertAdjacentHTML('afterbegin', 'ZZ');
+            nl[i].insertAdjacentHTML('afterbegin', '  ');
           }
         }
         applyIndents2( nl[i], indent, 'normal');
@@ -1370,7 +1370,7 @@ var Witty = (function () {
 
     function getIndent(indentLevel) {
       let indentChar, indent;
-      indentChar = 'HH';
+      indentChar = '  ';
       indent = indentChar.repeat([indentLevel]);
       return indent;
     }
