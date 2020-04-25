@@ -663,7 +663,7 @@ var Witty = (function () {
       console.log('getSubFragmentIndex running');
       console.log('uSels is: /n');
       console.log(uSels);
-      let tableNodeFragment, nl, frag, fragNL;
+      let tableNodeFragment, nl, frag, outputNL;
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
       tableNodeFragment = makeTableNode( uSels );
       nl = tableNodeFragment.querySelectorAll('*');
@@ -697,26 +697,70 @@ var Witty = (function () {
           console.log('makeTable frag: ');
           console.log(frag);
         }
-
-
-        
-
-
         break;
       default:
         // code block
       } 
 
-      // !VA Build the container for the nodeList and append the fragment to it.
+      // !VA Build the container for the nodeList and append the fragment to it. We will call the container 'outputNL' because it contains the nodeList that will be passed to the clipboard object for output.
       var container = document.createElement('div');
-
-
       container.appendChild(frag);
-      nl = container.querySelectorAll('*');
-      console.log('container: ');
-      console.log(container);
+      outputNL = container.querySelectorAll('*');
+      console.log('outputNL: ');
+      console.log(outputNL);
+
+      // !VA  Now we need to start applying indents:
+      /* !VA  If tablebut is clicked with hasWrapper...
+      if (uSels.buttonClicked === 'tablebut && uSels.hasWrapper) {
+        outputNL[0].indentLevel === 0; outputNL[1].indentLevel === 1; outputNL[2].indentLevel === 2;
+      }
+      */
+      /* !VA  If tablebut is clicked without hasWrapper 
+      if (uSels.buttonClicked === 'tablebut && uSels.hasWrapper) {
+        outputNL[0].indentLevel === 0; outputNL[1].indentLevel === 1; outputNL[2].indentLevel === 2;
+        outputNL[3].indentLevel === [3]; outputNL[4].indentLevel === [4]; outputNL[5].indentLevel === [5]; 
+      }
+
+      See a pattern here? indentLevel is always going to equal outputNL.index. So you can loop through the nodeList and run getIndent at each iteration. But that would require that the nodeList be updated at each iteration. Wouldn't it be better to put the indent in an object beforehand and then just access the object to get the indent at each iteration, rather than making an external function call each time you need an indent? 
+      */
 
 
+      function getIndent(indentLevel) {
+        let indentChar, indent;
+        indentChar = 'HH';
+        indent = indentChar.repeat([indentLevel]);
+        return indent;
+      }
+
+      // var Indents = { };
+      // Indents.indent = getIndent(5);
+      // console.log('Indents.indent is: ' + Indents.indent);
+      var indents = [];
+      var foo;
+      for (let i = 0; i < outputNL.length; i++) {
+        console.log('outputNL[i] is: ');
+        console.log(outputNL[i]);
+        foo = getIndent(i);
+        console.log('foo is: ' + foo);
+        indents.push(foo);
+      }
+      console.dir(indents);
+
+      for (let i = 0; i < outputNL.length; i++) {
+        console.log('indents[i] is: ' + indents[i]);
+        console.log(outputNL[i]);
+        
+        outputNL[i].insertAdjacentHTML('beforebegin', indents[i]);
+        outputNL[i].insertAdjacentHTML('afterbegin', '\n');
+        outputNL[i].insertAdjacentHTML('beforeend', indents[i]);
+        outputNL[i].insertAdjacentHTML('afterend', '\n');
+      }
+      console.log(outputNL);
+      console.log(outputNL[0].outerHTML);
+      
+      var clipboardStr = outputNL[0].outerHTML;
+      writeClipboard( aliasToId(uSels.buttonClicked), clipboardStr);
+      
     }
 
 
