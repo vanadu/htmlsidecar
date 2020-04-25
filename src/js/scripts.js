@@ -720,8 +720,6 @@ var Witty = (function () {
         outputNL[0].indentLevel === 0; outputNL[1].indentLevel === 1; outputNL[2].indentLevel === 2;
         outputNL[3].indentLevel === [3]; outputNL[4].indentLevel === [4]; outputNL[5].indentLevel === [5]; 
       }
-
-      See a pattern here? indentLevel is always going to equal outputNL.index. So you can loop through the nodeList and run getIndent at each iteration. But that would require that the nodeList be updated at each iteration. Wouldn't it be better to put the indent in an object beforehand and then just access the object to get the indent at each iteration, rather than making an external function call each time you need an indent? 
       */
 
 
@@ -732,32 +730,23 @@ var Witty = (function () {
         return indent;
       }
 
-      // var Indents = { };
-      // Indents.indent = getIndent(5);
-      // console.log('Indents.indent is: ' + Indents.indent);
+      // !VA Create array to store indent strings
       var indents = [];
-      var foo;
       for (let i = 0; i < outputNL.length; i++) {
-        console.log('outputNL[i] is: ');
-        console.log(outputNL[i]);
-        foo = getIndent(i);
-        console.log('foo is: ' + foo);
-        indents.push(foo);
+        // !VA Get the indent strings into the indents array
+        indents.push(getIndent(i));
       }
-      console.dir(indents);
-
+      // !VA Loop through the outputNL nodeList, get the corresponding indent string from the indents array, and insert into the current outputNL node
       for (let i = 0; i < outputNL.length; i++) {
-        console.log('indents[i] is: ' + indents[i]);
-        console.log(outputNL[i]);
-        
         outputNL[i].insertAdjacentHTML('beforebegin', indents[i]);
         outputNL[i].insertAdjacentHTML('afterbegin', '\n');
         outputNL[i].insertAdjacentHTML('beforeend', indents[i]);
         outputNL[i].insertAdjacentHTML('afterend', '\n');
       }
-      console.log(outputNL);
+      console.log('outputNL[0].outerHTML: ');
       console.log(outputNL[0].outerHTML);
       
+      // !VA Write the outerHTML of the top node in the nodeList to the clipboard
       var clipboardStr = outputNL[0].outerHTML;
       writeClipboard( aliasToId(uSels.buttonClicked), clipboardStr);
       
