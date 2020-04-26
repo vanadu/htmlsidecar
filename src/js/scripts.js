@@ -752,10 +752,6 @@ var Witty = (function () {
       
     }
 
-
-
-
-
     function aliasToId( alias ) {
       // !VA Convert uSels.buttonClicked back to an id before passing to Clipboard object.
       let id;
