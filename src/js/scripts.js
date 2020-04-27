@@ -730,26 +730,65 @@ var Witty = (function () {
         return indent;
       }
 
-      // !VA Create array to store indent strings
-      var indents = [];
-      for (let i = 0; i < outputNL.length; i++) {
-        // !VA Get the indent strings into the indents array
-        indents.push(getIndent(i));
+      function applyIndents( outputNL ) {
+        console.log('applyIndents running');
+        // !VA Create array to store indent strings
+        var indents = [];
+        for (let i = 0; i < outputNL.length; i++) {
+          // !VA Get the indent strings into the indents array
+          indents.push(getIndent(i));
+        }
+        for (let i = 0; i < outputNL.length; i++) {
+          console.log('outputNL[i].nodeName is: ' + outputNL[i].nodeName);
+          console.log('outputNL[i].parentNode.nodeName is: ' + outputNL[i].parentNode.nodeName);
+          if (outputNL[i].nodeName === 'IMG' && outputNL[i].parentNode.nodeName === 'A') {
+            console.log('Case 1: do nothing');
+            // do nothing
+          }
+          else if ( outputNL[i].nodeName === 'A') {
+            console.log('Case 2');
+            // !VA If nodeList item 1 is the anchor, then Include anchor is checked. Apply the 'terminal' indent scheme and don't apply any indent to the img element.
+            outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
+            outputNL[i].insertAdjacentHTML('afterend', '\n');
+          } 
+          else {
+            console.log('Case 3');
+            outputNL[i].insertAdjacentHTML('afterend', '\n');
+            outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
+            outputNL[i].insertAdjacentHTML('afterbegin', '\n');
+            outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
+          }
+        }
+        // !VA Apply indents to nodes. Changes apply to the live DOM nodes, so no return is required.
+
       }
-      // !VA Loop through the outputNL nodeList, get the corresponding indent string from the indents array, and insert into the current outputNL node
-      for (let i = 0; i < outputNL.length; i++) {
-        outputNL[i].insertAdjacentHTML('beforebegin', indents[i]);
-        outputNL[i].insertAdjacentHTML('afterbegin', '\n');
-        outputNL[i].insertAdjacentHTML('beforeend', indents[i]);
-        outputNL[i].insertAdjacentHTML('afterend', '\n');
-      }
+      // for (let i = 0; i < nl.length; i++) {
+      //   if (outputNL[i].nodeName === 'IMG' && outputNL[i].parentNode.nodeName === 'A') {
+      //     applyIndents(nl[i], 'ignore');
+      //   }
+      //   else if ( nl[i].nodeName === 'A') {
+      //     // !VA If nodeList item 1 is the anchor, then Include anchor is checked. Apply the 'terminal' indent scheme and don't apply any indent to the img element.
+      //     applyIndents(nl[i], 'terminal');
+      //   } 
+      // }
+
+
+      applyIndents(outputNL);
+
+
+
       console.log('outputNL[0].outerHTML: ');
       console.log(outputNL[0].outerHTML);
+
+      let arr = Array.from(outputNL);
+      console.log('arr 750: ');
+      console.dir(arr);
+      console.log('arr[0]:');
+      console.log(arr[0]);
       
       // !VA Write the outerHTML of the top node in the nodeList to the clipboard
       var clipboardStr = outputNL[0].outerHTML;
       writeClipboard( aliasToId(uSels.buttonClicked), clipboardStr);
-      
     }
 
     function aliasToId( alias ) {
