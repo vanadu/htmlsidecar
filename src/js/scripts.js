@@ -5,33 +5,24 @@
 // !VA GENERAL NOTES
 /* !VA  - February Reboot Notes
 =========================================================
-// !VA 04.11.20
+// !VA 04.27.20
 Status:
-* Unchecking Include anchor doesn't remove anchor in mobile swap
-* Minor indent issue with bgimage
-* Indents still off with TABLE posswitch
+Rewrote the basic indent routine. It works now for basic TD options and should be relatively easy to modify for a no-img TD option by tweaking the output of makeTdNode to not append imgNode if selected.
+
+TODO: Implement imgswap
 
 
 All posswitch works, except TABLE indents are off.
 
 
 
-TODO: Implement posswitch
+
 TODO: The CSS output will need to be revisited for td and table.
 TODO: Figure out why queryDOMElements is running mutliple times per CB build.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
 TODO: Add some kind of fluid option to the img options. Cerberus hard codes it into the img tag. That needs to be tested. Litmus overrides the width and height style properties in the CSS media queries. Need to test before that is implemented - but there's no reason to include a fluid option if that's settable in CSS.
 
-Status 03.14.2020:
 
-
-
-DONE: Separate indent config functions out from parseUserSelections
-DONE: Handle indents for background image
-DONE: Structure the doIndents so that the selected TD options in CASE2 also apply to CASE 3 
-DONE: Handle indents for mobile swap TD
-
-TODO: Add no-image option to td options select - think about how that will affect indents first
 TODO: Change msg-table to flex div
 TODO: FIX CHROME CSS!
 
