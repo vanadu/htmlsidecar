@@ -9,7 +9,7 @@
 Status:
 Rewrote the basic indent routine. It works now for basic TD options and should be relatively easy to modify for a no-img TD option by tweaking the output of makeTdNode to not append imgNode if selected.
 
-TODO: Implement imgswap
+TODO: Implement imgswap. Having trouble...line 721. imgSwapBlock isn't a commentNode, it's just a string so can't be an argument of appendChild
 
 
 All posswitch works, except TABLE indents are off.
@@ -650,8 +650,8 @@ var Witty = (function () {
     }
 
     // !VA Build the nodeList that will be populated with indents. Don't forget that the actual nodeList can't be a fragment because fragments don't support insertAdjacentHMTL). So it has to be a container div with the HTML nodes as children.
-    function buildNodeList( uSels) {
-      console.log('getSubFragmentIndex running');
+    function buildNodeList( uSels ) {
+      console.log('buildNodeList running');
       console.log('uSels is: /n');
       console.log(uSels);
       let tableNodeFragment, nl, frag, outputNL;
@@ -661,37 +661,56 @@ var Witty = (function () {
       console.log('nl: ');
       console.dir(nl);
       
-      switch(true) {
-      case (uSels.buttonClicked === 'imgbut'):
-        uSels.hasAnchor ? frag = nl[nl.length - 2] : frag = nl[nl.length - 1]; 
-        console.log('makeImg frag: ');
-        console.log(frag);
-
-
-
-        break;
-      case (uSels.buttonClicked === 'tdbut'):
-
-        uSels.hasAnchor ? frag = nl[nl.length - 3] : frag = nl[nl.length - 2]; 
-        console.log('makeTd frag: ');  
-        console.log(frag);
-        console.log('nl.length is: ' + nl.length);     
-
-        break;
-      case (uSels.buttonClicked === 'tablebut'):
-        if (uSels.hasWrapper) {
-          uSels.hasAnchor ? frag = nl[nl.length - 8] : frag = nl[nl.length - 7]; 
-          console.log('makeTable frag: ');
-          console.log(frag);
-        } else {
-          uSels.hasAnchor ? frag = nl[nl.length - 5] : frag = nl[nl.length - 4]; 
-          console.log('makeTable frag: ');
-          console.log(frag);
+      if (uSels.selctedRadio === 'basic') {
+        // !VA Basic TD Options
+        switch(true) {
+        case (uSels.buttonClicked === 'imgbut'):
+          uSels.hasAnchor ? frag = nl[nl.length - 2] : frag = nl[nl.length - 1]; 
+          break;
+        case (uSels.buttonClicked === 'tdbut'):
+          uSels.hasAnchor ? frag = nl[nl.length - 3] : frag = nl[nl.length - 2]; 
+          break;
+        case (uSels.buttonClicked === 'tablebut'):
+          if (uSels.hasWrapper) {
+            uSels.hasAnchor ? frag = nl[nl.length - 8] : frag = nl[nl.length - 7]; 
+          } else {
+            uSels.hasAnchor ? frag = nl[nl.length - 5] : frag = nl[nl.length - 4]; 
+          }
+          break;
+        default:
+          // code block
         }
-        break;
-      default:
-        // code block
-      } 
+      } else if (uSels.selectedRadio === 'imgswap') {
+
+        console.log('Mark1');
+        switch(true) {
+        case (uSels.buttonClicked === 'tdbut'):
+          frag = nl[nl.length  - 1];
+          console.log('frag: ');
+          console.log(frag);
+          
+          // uSels.hasAnchor ? frag = nl[nl.length - 1] : frag = nl[nl.length - 2]; 
+          break;
+        case (uSels.buttonClicked === 'tablebut'):
+          if (uSels.hasWrapper) {
+            frag = nl[nl.length  - 6];
+            // uSels.hasAnchor ? frag = nl[nl.length - 8] : frag = nl[nl.length - 7]; 
+          } else {
+            frag = nl[nl.length  - 4];
+            // uSels.hasAnchor ? frag = nl[nl.length - 6] : frag = nl[nl.length - 3]; 
+          }
+          break;
+        default:
+          // code block
+
+        
+        }
+        
+        var imgSwapBlock = getImgSwapBlock( 2 );
+        console.log('imgSwapBlock:');
+        console.log(imgSwapBlock);
+
+      }
 
       // !VA Build the container for the nodeList and append the fragment to it. We will call the container 'outputNL' because it contains the nodeList that will be passed to the clipboard object for output.
       var container = document.createElement('div');
@@ -699,72 +718,9 @@ var Witty = (function () {
       outputNL = container.querySelectorAll('*');
       console.log('outputNL: ');
       console.log(outputNL);
-
-      // !VA  Now we need to start applying indents:
-      /* !VA  If tablebut is clicked with hasWrapper...
-      if (uSels.buttonClicked === 'tablebut && uSels.hasWrapper) {
-        outputNL[0].indentLevel === 0; outputNL[1].indentLevel === 1; outputNL[2].indentLevel === 2;
-      }
-      */
-      /* !VA  If tablebut is clicked without hasWrapper 
-      if (uSels.buttonClicked === 'tablebut && uSels.hasWrapper) {
-        outputNL[0].indentLevel === 0; outputNL[1].indentLevel === 1; outputNL[2].indentLevel === 2;
-        outputNL[3].indentLevel === [3]; outputNL[4].indentLevel === [4]; outputNL[5].indentLevel === [5]; 
-      }
-      */
-
-
-      function getIndent(indentLevel) {
-        let indentChar, indent;
-        indentChar = 'HH';
-        indent = indentChar.repeat([indentLevel]);
-        return indent;
-      }
-
-      function applyIndents( outputNL ) {
-        console.log('applyIndents running');
-        // !VA Create array to store indent strings
-        var indents = [];
-        for (let i = 0; i < outputNL.length; i++) {
-          // !VA Get the indent strings into the indents array
-          indents.push(getIndent(i));
-        }
-        for (let i = 0; i < outputNL.length; i++) {
-          console.log('outputNL[i].nodeName is: ' + outputNL[i].nodeName);
-          console.log('outputNL[i].parentNode.nodeName is: ' + outputNL[i].parentNode.nodeName);
-          if (outputNL[i].nodeName === 'IMG' && outputNL[i].parentNode.nodeName === 'A') {
-            console.log('Case 1: do nothing');
-            // do nothing
-          }
-          else if ( outputNL[i].nodeName === 'A') {
-            console.log('Case 2');
-            // !VA If nodeList item 1 is the anchor, then Include anchor is checked. Apply the 'terminal' indent scheme and don't apply any indent to the img element.
-            outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
-            outputNL[i].insertAdjacentHTML('afterend', '\n');
-          } 
-          else {
-            console.log('Case 3');
-            outputNL[i].insertAdjacentHTML('afterend', '\n');
-            outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
-            outputNL[i].insertAdjacentHTML('afterbegin', '\n');
-            outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
-          }
-        }
-        // !VA Apply indents to nodes. Changes apply to the live DOM nodes, so no return is required.
-
-      }
-      // for (let i = 0; i < nl.length; i++) {
-      //   if (outputNL[i].nodeName === 'IMG' && outputNL[i].parentNode.nodeName === 'A') {
-      //     applyIndents(nl[i], 'ignore');
-      //   }
-      //   else if ( nl[i].nodeName === 'A') {
-      //     // !VA If nodeList item 1 is the anchor, then Include anchor is checked. Apply the 'terminal' indent scheme and don't apply any indent to the img element.
-      //     applyIndents(nl[i], 'terminal');
-      //   } 
-      // }
-
-
-      applyIndents(outputNL);
+      outputNL[0].appendChild(imgSwapBlock);
+      
+      outputNL = applyIndents(outputNL);
 
 
 
@@ -795,6 +751,9 @@ var Witty = (function () {
 
     // !VA START TD OPTIONS MS-CONDITIONAL CODE BLOCKS
     // !VA These are the code blocks that contain MS conditionals in comment nodes or text nodes, i.e. mobile swap and background image.
+    // !VA Branch: implementImgSwap (042720)    
+    // function getImgSwapBlock( indentLevel ) {
+
     function getImgSwapBlock( indentLevel ) {
       let Appdata, Attributes, linebreak;
       Attributes = getAttributes();
@@ -882,6 +841,9 @@ var Witty = (function () {
     // !VA Branch: 031320A
     // function makeTdNode( id, selectedRadio ) {
     function makeTdNode( uSels ) {
+      console.log('makeTdNode running');
+      console.log('makeTdNode uSels is: ');
+      console.dir(uSels);
       let Attributes;
       Attributes = getAttributes();
       let tdInner, imgNode;
@@ -898,6 +860,7 @@ var Witty = (function () {
       // !VA Branch: 031320A
       // case (selectedRadio === 'basic'):
       case (uSels.selectedRadio === 'basic'):
+        console.log('makeTdNode basic');
         // !VA class attribute
         if (Attributes.tdClass) { tdInner.className = Attributes.tdClass; }
         // !VA valign attribute
@@ -912,13 +875,15 @@ var Witty = (function () {
         // !VA Branch: 031320A
       // case (selectedRadio === 'imgswap'):
       case (uSels.selectedRadio === 'imgswap'):
+        console.log('makeTdNode imgswap');
         tdInner.width = Attributes.tdAppdataWidth;
         tdInner.height = Attributes.tdAppdataHeight;
         // !VA valign attribute
         tdInner.align = Attributes.tdAlign;
         // !VA get the current img
-        imgNode = makeImgNode();
-        tdInner.appendChild(imgNode);
+        // !VA Branch: implementImgSwap (042720) Don't include the imgNode
+        // imgNode = makeImgNode();
+        // tdInner.appendChild(imgNode);
         break;
       // !VA Branch: 031320A
       // case (selectedRadio === 'bgimage'):
@@ -1033,16 +998,40 @@ var Witty = (function () {
       return tableNodeFragment;
     }
 
-
-
-    function makeNodeList( id, curNode ) {
-      let container, nl, imgNode, tdNode,tableNode, topNode;
-      let indent, indentLevel;
-      container = document.createElement('div');
-      container.appendChild(curNode);
-      nl = container.querySelectorAll('*');
-      return nl;
+    function applyIndents( outputNL ) {
+      console.log('applyIndents running');
+      // !VA Create array to store indent strings
+      var indents = [];
+      for (let i = 0; i < outputNL.length; i++) {
+        // !VA Get the indent strings into the indents array
+        indents.push(getIndent(i));
+      }
+      for (let i = 0; i < outputNL.length; i++) {
+        console.log('outputNL[i].nodeName is: ' + outputNL[i].nodeName);
+        console.log('outputNL[i].parentNode.nodeName is: ' + outputNL[i].parentNode.nodeName);
+        if (outputNL[i].nodeName === 'IMG' && outputNL[i].parentNode.nodeName === 'A') {
+          console.log('Case 1: do nothing');
+          // do nothing
+        }
+        else if ( outputNL[i].nodeName === 'A') {
+          console.log('Case 2');
+          // !VA If nodeList item 1 is the anchor, then Include anchor is checked. Apply the 'terminal' indent scheme and don't apply any indent to the img element.
+          outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
+          outputNL[i].insertAdjacentHTML('afterend', '\n');
+        } 
+        else {
+          console.log('Case 3');
+          outputNL[i].insertAdjacentHTML('afterend', '\n');
+          outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
+          outputNL[i].insertAdjacentHTML('afterbegin', '\n');
+          outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
+        }
+      }
+      return outputNL;
+      // !VA Apply indents to nodes. Changes apply to the live DOM nodes, so no return is required.
     }
+
+
 
     function getIndent(indentLevel) {
       let indentChar, indent;
