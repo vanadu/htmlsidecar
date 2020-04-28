@@ -696,8 +696,8 @@ var Witty = (function () {
         // !VA Create the outputNL nodeList to pass to the Clipboard object
         outputNL = container.querySelectorAll('*');
 
-      // !VA imgSwap option
-      } else if (uSels.selectedRadio === 'imgswap') {
+      // !VA imgSwap and bgimage option - nodeList includes comment node with MS conditional code
+      } else if (uSels.selectedRadio === 'imgswap' || uSels.selectedRadio  === 'bgimage') {
         // !VA We start with the tdbut makeNode button because the img makeNode button isn't referenced in the imgswap option. The A/IMG tags are hard-coded into the MS Conditional code in getImgSwapBlock. Also, there's a switch to include/exclude the A/IMG node in makeTdNode.
         switch(true) {
         case (uSels.buttonClicked === 'tdbut'):
@@ -720,48 +720,20 @@ var Witty = (function () {
         // !VA Create the nodeList to pass to the Clipboard object. 
         outputNL = container.querySelectorAll('*');
         // !VA Create the comment node and populate it with the imgSwapBlock MS Conditional code
-        commentNode = document.createComment(getImgSwapBlock( outputNL.length ));
-
-        // !VA Append the comment node to the appropriate position in the outputNL nodeList at the appropriate index based on the nodeList fragment length
-        outputNL[outputNL.length - 1].appendChild(commentNode);
-        console.log('outputNL: 724');
-        console.log(outputNL);
-      } else if (uSels.selectedRadio === 'bgimage') {
-
-        switch(true) {
-        case (uSels.buttonClicked === 'tdbut'):
-          // !VA Extract the parent TD to which the comment node containing the MS Conditional code will be appended.
-          frag = nl[nl.length  - 1];
-          break;
-        case (uSels.buttonClicked === 'tablebut'):
-          if (uSels.hasWrapper) {
-            // !VA Take the entire nodeList starting with the wrapper table
-            frag = nl[nl.length  - 6];
-          } else {
-            // !VA Take the parent table of the TD to which the MS Conditional code will be appended.
-            frag = nl[nl.length  - 3];
-          }
-          break;
-        default:
+        if (uSels.selectedRadio === 'imgswap') {
+          // !VA Get the MS conditional code for imgswap
+          commentNode = document.createComment(getImgSwapBlock( outputNL.length ));
+        } else if ( uSels.selectedRadio === 'bgimage') {
+          // !VA Get the MS conditional code for bgimage
+          commentNode = document.createComment(getBgimageBlock( outputNL.length ));
         }
-        // !VA Append the nodeList fragment to the container div
-        container.appendChild(frag);
-        // !VA Create the nodeList to pass to the Clipboard object. 
-        outputNL = container.querySelectorAll('*');
-        // !VA Create the comment node and populate it with the imgSwapBlock MS Conditional code
-        commentNode = document.createComment(getBgimageBlock( outputNL.length ));
-        console.log('commentNode');
-        console.log(commentNode);
-        
 
         // !VA Append the comment node to the appropriate position in the outputNL nodeList at the appropriate index based on the nodeList fragment length
         outputNL[outputNL.length - 1].appendChild(commentNode);
         console.log('outputNL: 724');
         console.log(outputNL);
+      } 
 
-
-
-      }
       // !VA Apply the indents and return the indented outputNL
       // outputNL = applyIndents(outputNL);
       
