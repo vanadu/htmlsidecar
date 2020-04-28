@@ -10,7 +10,8 @@ Status:
 Rewrote the basic indent routine. It works now for basic TD options and should be relatively easy to modify for a no-img TD option by tweaking the output of makeTdNode to not append imgNode if selected.
 
 DONE: Implement imgSwap - done, minor indent issues remaining
-TODO: Implement bgimage: branch ImplementBgimage042820
+DONE: Implement bgimage: branch ImplementBgimage042820 - same remaining indent issue as imgSwap
+TODO: 
 
 
 
@@ -725,6 +726,41 @@ var Witty = (function () {
         outputNL[outputNL.length - 1].appendChild(commentNode);
         console.log('outputNL: 724');
         console.log(outputNL);
+      } else if (uSels.selectedRadio === 'bgimage') {
+
+        switch(true) {
+        case (uSels.buttonClicked === 'tdbut'):
+          // !VA Extract the parent TD to which the comment node containing the MS Conditional code will be appended.
+          frag = nl[nl.length  - 1];
+          break;
+        case (uSels.buttonClicked === 'tablebut'):
+          if (uSels.hasWrapper) {
+            // !VA Take the entire nodeList starting with the wrapper table
+            frag = nl[nl.length  - 6];
+          } else {
+            // !VA Take the parent table of the TD to which the MS Conditional code will be appended.
+            frag = nl[nl.length  - 3];
+          }
+          break;
+        default:
+        }
+        // !VA Append the nodeList fragment to the container div
+        container.appendChild(frag);
+        // !VA Create the nodeList to pass to the Clipboard object. 
+        outputNL = container.querySelectorAll('*');
+        // !VA Create the comment node and populate it with the imgSwapBlock MS Conditional code
+        commentNode = document.createComment(getBgimageBlock( outputNL.length ));
+        console.log('commentNode');
+        console.log(commentNode);
+        
+
+        // !VA Append the comment node to the appropriate position in the outputNL nodeList at the appropriate index based on the nodeList fragment length
+        outputNL[outputNL.length - 1].appendChild(commentNode);
+        console.log('outputNL: 724');
+        console.log(outputNL);
+
+
+
       }
       // !VA Apply the indents and return the indented outputNL
       // outputNL = applyIndents(outputNL);
