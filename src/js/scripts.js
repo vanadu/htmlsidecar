@@ -9,7 +9,9 @@
 Status:
 Rewrote the basic indent routine. It works now for basic TD options and should be relatively easy to modify for a no-img TD option by tweaking the output of makeTdNode to not append imgNode if selected.
 
-TODO: Implement imgswap. Having trouble...line 721. imgSwapBlock isn't a commentNode, it's just a string so can't be an argument of appendChild
+DONE: Implement imgSwap - done, minor indent issues remaining
+TODO: Implement bgimage: branch ImplementBgimage042820
+
 
 
 All posswitch works, except TABLE indents are off.
