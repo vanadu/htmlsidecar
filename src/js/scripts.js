@@ -723,13 +723,22 @@ var Witty = (function () {
         outputNL[outputNL.length - 1].appendChild(commentNode);
         console.log('outputNL: 724');
         console.log(outputNL);
-        
-
-
       }
       // !VA Apply the indents and return the indented outputNL
-      outputNL = applyIndents(outputNL);
+      // outputNL = applyIndents(outputNL);
       
+      // !VA Apply imgSwap-specific indents
+      if (outputNL.length === 1 ) {
+        outputNL[0].insertAdjacentHTML( 'afterbegin', '\n' + getIndent(outputNL.length ));
+      } else {
+        // outputNL.insertAdjacentHTML( 'afterbegin', '\n' + getIndent(outputNL.length ));
+        console.log('outputNL[3]');
+        console.log(outputNL[3]);
+        
+        applyIndents(outputNL);
+      }
+
+
       // !VA Write the outerHTML of the top node in the nodeList to the clipboard
       console.log('outputNL[0].outerHTML: ');
       console.log(outputNL[0].outerHTML);
