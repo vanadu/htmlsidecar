@@ -654,86 +654,85 @@ var Witty = (function () {
       console.log('buildNodeList running');
       console.log('uSels is: /n');
       console.log(uSels);
-      let tableNodeFragment, nl, frag, outputNL;
+      let tableNodeFragment, nl, frag, outputNL, commentNode;
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
       tableNodeFragment = makeTableNode( uSels );
       nl = tableNodeFragment.querySelectorAll('*');
       console.log('nl: ');
       console.dir(nl);
-      
-      if (uSels.selctedRadio === 'basic') {
-        // !VA Basic TD Options
+      // !VA Create the div container to which the extracted nodeList fragment will be appended
+      var container = document.createElement('div');
+
+      // !VA Basic TD Options
+      if (uSels.selectedRadio === 'basic') {
+        // !VA Deterimine which makeNode button was clicked and extract a nodeList fragment with only those nodes that correspond to the clicked button. The index position of the extracted fragments is determined by the length of the tableNodeFragment nodeList minus an integer to compensate for the 0-based nodeList indices.
         switch(true) {
         case (uSels.buttonClicked === 'imgbut'):
+          // !VA If there's an anchor, take the last two nodes, otherwise just take the last node.
           uSels.hasAnchor ? frag = nl[nl.length - 2] : frag = nl[nl.length - 1]; 
           break;
         case (uSels.buttonClicked === 'tdbut'):
+          // !VA Start extracting at the parent TD of the A/IMG node.
           uSels.hasAnchor ? frag = nl[nl.length - 3] : frag = nl[nl.length - 2]; 
           break;
         case (uSels.buttonClicked === 'tablebut'):
+
           if (uSels.hasWrapper) {
+            // !VA Start extracting at the wrapper table, i.e. the complete nodeList.
             uSels.hasAnchor ? frag = nl[nl.length - 8] : frag = nl[nl.length - 7]; 
           } else {
+            // !VA Start extracting at the parent TABLE of parent TD of the A/IMG node.
             uSels.hasAnchor ? frag = nl[nl.length - 5] : frag = nl[nl.length - 4]; 
           }
           break;
         default:
           // code block
         }
-      } else if (uSels.selectedRadio === 'imgswap') {
+        // !VA Append the fragment to the container
+        container.appendChild(frag);
+        // !VA Create the outputNL nodeList to pass to the Clipboard object
+        outputNL = container.querySelectorAll('*');
 
-        console.log('Mark1');
+      // !VA imgSwap option
+      } else if (uSels.selectedRadio === 'imgswap') {
+        // !VA We start with the tdbut makeNode button because the img makeNode button isn't referenced in the imgswap option. The A/IMG tags are hard-coded into the MS Conditional code in getImgSwapBlock. Also, there's a switch to include/exclude the A/IMG node in makeTdNode.
         switch(true) {
         case (uSels.buttonClicked === 'tdbut'):
+          // !VA Extract the parent TD to which the comment node containing the MS Conditional code will be appended.
           frag = nl[nl.length  - 1];
-          console.log('frag: ');
-          console.log(frag);
-          
-          // uSels.hasAnchor ? frag = nl[nl.length - 1] : frag = nl[nl.length - 2]; 
           break;
         case (uSels.buttonClicked === 'tablebut'):
           if (uSels.hasWrapper) {
+            // !VA Take the entire nodeList starting with the wrapper table
             frag = nl[nl.length  - 6];
-            // uSels.hasAnchor ? frag = nl[nl.length - 8] : frag = nl[nl.length - 7]; 
           } else {
-            frag = nl[nl.length  - 4];
-            // uSels.hasAnchor ? frag = nl[nl.length - 6] : frag = nl[nl.length - 3]; 
+            // !VA Take the parent table of the TD to which the MS Conditional code will be appended.
+            frag = nl[nl.length  - 3];
           }
           break;
         default:
-          // code block
-
-        
         }
+        // !VA Append the nodeList fragment to the container div
+        container.appendChild(frag);
+        // !VA Create the nodeList to pass to the Clipboard object. 
+        outputNL = container.querySelectorAll('*');
+        // !VA Create the comment node and populate it with the imgSwapBlock MS Conditional code
+        commentNode = document.createComment(getImgSwapBlock( outputNL.length ));
+
+        // !VA Append the comment node to the appropriate position in the outputNL nodeList at the appropriate index based on the nodeList fragment length
+        outputNL[outputNL.length - 1].appendChild(commentNode);
+        console.log('outputNL: 724');
+        console.log(outputNL);
         
-        var imgSwapBlock = getImgSwapBlock( 2 );
-        console.log('imgSwapBlock:');
-        console.log(imgSwapBlock);
+
 
       }
-
-      // !VA Build the container for the nodeList and append the fragment to it. We will call the container 'outputNL' because it contains the nodeList that will be passed to the clipboard object for output.
-      var container = document.createElement('div');
-      container.appendChild(frag);
-      outputNL = container.querySelectorAll('*');
-      console.log('outputNL: ');
-      console.log(outputNL);
-      outputNL[0].appendChild(imgSwapBlock);
-      
+      // !VA Apply the indents and return the indented outputNL
       outputNL = applyIndents(outputNL);
-
-
-
-      console.log('outputNL[0].outerHTML: ');
-      console.log(outputNL[0].outerHTML);
-
-      let arr = Array.from(outputNL);
-      console.log('arr 750: ');
-      console.dir(arr);
-      console.log('arr[0]:');
-      console.log(arr[0]);
       
       // !VA Write the outerHTML of the top node in the nodeList to the clipboard
+      console.log('outputNL[0].outerHTML: ');
+      console.log(outputNL[0].outerHTML);
       var clipboardStr = outputNL[0].outerHTML;
       writeClipboard( aliasToId(uSels.buttonClicked), clipboardStr);
     }
