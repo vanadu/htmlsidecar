@@ -11,7 +11,8 @@ Rewrote the basic indent routine. It works now for basic TD options and should b
 
 DONE: Implement imgSwap - done, minor indent issues remaining
 DONE: Implement bgimage: branch ImplementBgimage042820 - same remaining indent issue as imgSwap
-TODO: 
+
+TODO: Implement posswitch 
 
 
 
@@ -55,13 +56,13 @@ TODO: Assign tab order
 var Witty = (function () {
 
   // !VA Run on page load
-  // document.addEventListener("DOMContentLoaded", function() {
-  //   setTimeout(function(){ 
-  //     // !VA Don't forget you can't use button aliases here..
-  //     document.querySelector('#btn-ccp-make-td-tag').click();
+  document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(function(){ 
+      // !VA Don't forget you can't use button aliases here..
+      document.querySelector('#btn-ccp-make-td-tag').click();
 
-  //   }, 500);
-  // });
+    }, 500);
+  });
 
   // !VA DEV Test function to get the clicked element to the console
   // (function () {
@@ -661,6 +662,7 @@ var Witty = (function () {
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
       tableNodeFragment = makeTableNode( uSels );
       nl = tableNodeFragment.querySelectorAll('*');
+      console.clear();
       console.log('nl: ');
       console.dir(nl);
       // !VA Create the div container to which the extracted nodeList fragment will be appended
@@ -695,6 +697,7 @@ var Witty = (function () {
         container.appendChild(frag);
         // !VA Create the outputNL nodeList to pass to the Clipboard object
         outputNL = container.querySelectorAll('*');
+        applyIndents(outputNL);
 
       // !VA imgSwap and bgimage option - nodeList includes comment node with MS conditional code
       } else if (uSels.selectedRadio === 'imgswap' || uSels.selectedRadio  === 'bgimage') {
@@ -727,26 +730,148 @@ var Witty = (function () {
           // !VA Get the MS conditional code for bgimage
           commentNode = document.createComment(getBgimageBlock( outputNL.length ));
         }
-
+        
         // !VA Append the comment node to the appropriate position in the outputNL nodeList at the appropriate index based on the nodeList fragment length
         outputNL[outputNL.length - 1].appendChild(commentNode);
         console.log('outputNL: 724');
         console.log(outputNL);
+
+        // !VA Apply imgSwap-specific indents
+        if (outputNL.length === 1 ) {
+          outputNL[0].insertAdjacentHTML( 'afterbegin', '\n' + getIndent(outputNL.length ));
+        } else {
+          // outputNL.insertAdjacentHTML( 'afterbegin', '\n' + getIndent(outputNL.length ));
+          console.log('outputNL[3]');
+          console.log(outputNL[3]);
+          applyIndents(outputNL);
+
+        }
+      // !VA posswitch option
+      } else  {
+
+        // !VA Deterimine which makeNode button was clicked and extract a nodeList fragment with only those nodes that correspond to the clicked button. The index position of the extracted fragments is determined by the length of the tableNodeFragment nodeList minus an integer to compensate for the 0-based nodeList indices.
+        switch(true) {
+        case (uSels.buttonClicked === 'imgbut'):
+          // !VA If there's an anchor, take the last two nodes, otherwise just take the last node.
+          uSels.hasAnchor ? frag = nl[nl.length - 2] : frag = nl[nl.length - 1]; 
+          break;
+        case (uSels.buttonClicked === 'tdbut'):
+          // console.clear();
+          console.log('posswitch running');
+          // !VA Start extracting at the parent TD of the A/IMG node.
+          uSels.hasAnchor ? frag = nl[nl.length - 13] : frag = nl[nl.length - 12]; 
+          break;
+        case (uSels.buttonClicked === 'tablebut'):
+
+          if (uSels.hasWrapper) {
+            // !VA Start extracting at the wrapper table, i.e. the complete nodeList.
+            uSels.hasAnchor ? frag = nl[nl.length - 8] : frag = nl[nl.length - 7]; 
+          } else {
+            // !VA Start extracting at the parent TABLE of parent TD of the A/IMG node.
+            uSels.hasAnchor ? frag = nl[nl.length - 5] : frag = nl[nl.length - 4]; 
+          }
+          break;
+        default:
+          // code block
+        }
+        // !VA Need to get the 
+
+
+        container.appendChild(frag);
+        // !VA Create the outputNL nodeList to pass to the Clipboard object
+
+
+        outputNL = container.querySelectorAll('*');
+        // applyIndents(outputNL);
+        console.log('outputNL');
+        console.log(outputNL);
+        console.log('posswitch running');
+        // !VA Create array to store indent strings
+        var indents = [];
+        for (let i = 0; i < outputNL.length; i++) {
+          // !VA Get the indent strings into the indents array
+          indents.push(getIndent(i));
+        }
+        for (let i = 0; i < outputNL.length; i++) {
+          console.log('outputNL[i].nodeName is: ' + outputNL[i].nodeName);
+  
+          console.log('outputNL[i].parentNode.nodeName is: ' + outputNL[i].parentNode.nodeName);
+          // if (outputNL[i].nodeName === 'IMG' && outputNL[i].parentNode.nodeName === 'A') {
+          //   console.log('Case 1: do nothing');
+          //   // do nothing
+          // }
+          // else if ( outputNL[i].nodeName === 'A') {
+          //   console.log('Case 2');
+          //   // !VA If nodeList item 1 is the anchor, then Include anchor is checked. Apply the 'terminal' indent scheme and don't apply any indent to the img element.
+          //   outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
+          //   outputNL[i].insertAdjacentHTML('afterend', '\n');
+          // } 
+          // else {
+            if (uSels.selectedRadio !== 'posswitch') {
+              console.log('Case 3: not posswitch');
+              outputNL[i].insertAdjacentHTML('afterend', '\n');
+              outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
+              outputNL[i].insertAdjacentHTML('afterbegin', '\n');
+              outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
+            } else {
+              console.log('Case 3: posswitch');
+              console.log('indents');
+              console.log(indents);
+              if (uSels.hasAnchor ) {
+                if (i <= 6) {
+                  outputNL[i].insertAdjacentHTML('afterend', '\n');
+                  outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
+                  outputNL[i].insertAdjacentHTML('afterbegin', '\n');
+                  outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
+                } else {
+                  outputNL[i].insertAdjacentHTML('afterend', '\n');
+                  outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i - 6));
+                  outputNL[i].insertAdjacentHTML('afterbegin', '\n');
+                  outputNL[i].insertAdjacentHTML('beforeend', getIndent(i - 6));
+                }
+              } else {
+                if (i <= 6) {
+                  outputNL[i].insertAdjacentHTML('afterend', '\n');
+                  outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
+                  outputNL[i].insertAdjacentHTML('afterbegin', '\n');
+                  outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
+                } else {
+                  outputNL[i].insertAdjacentHTML('afterend', '\n');
+                  outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i - 5));
+                  outputNL[i].insertAdjacentHTML('afterbegin', '\n');
+                  outputNL[i].insertAdjacentHTML('beforeend', getIndent(i - 5));
+                }
+              }
+
+              
+              
+            }
+          // }
+        }
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
       } 
+      
 
       // !VA Apply the indents and return the indented outputNL
       // outputNL = applyIndents(outputNL);
-      
-      // !VA Apply imgSwap-specific indents
-      if (outputNL.length === 1 ) {
-        outputNL[0].insertAdjacentHTML( 'afterbegin', '\n' + getIndent(outputNL.length ));
-      } else {
-        // outputNL.insertAdjacentHTML( 'afterbegin', '\n' + getIndent(outputNL.length ));
-        console.log('outputNL[3]');
-        console.log(outputNL[3]);
-        
-        applyIndents(outputNL);
-      }
+
+
+
+
 
 
       // !VA Write the outerHTML of the top node in the nodeList to the clipboard
@@ -1026,6 +1151,7 @@ var Witty = (function () {
       }
       for (let i = 0; i < outputNL.length; i++) {
         console.log('outputNL[i].nodeName is: ' + outputNL[i].nodeName);
+
         console.log('outputNL[i].parentNode.nodeName is: ' + outputNL[i].parentNode.nodeName);
         if (outputNL[i].nodeName === 'IMG' && outputNL[i].parentNode.nodeName === 'A') {
           console.log('Case 1: do nothing');
