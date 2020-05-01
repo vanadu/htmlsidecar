@@ -23,6 +23,18 @@ TODO: Fix irregularities in MS conditional indents - branch fixCommentNodeIndent
 /* !VA  
 - Accessing textContent through outputNL.childNodes[i] doesn't work because the textContent doesn't include the comment characters <!--, which is what we want to replace.
 - Accessing the comment characters through outputNL.innerHMTL doesn't appear to work because you can't replace innerHTML in a nodeList, I don't think. Actually, it does work, but didn't work here but didn't work when I tried it in applyIndents.
+- Accessing the nodeValue of the individual childNode that contains the ms conditional flag doesn't work because as soon as you do that, JS adds the missing closing span tag, which 1) adds a node and causes the indent character to go before the new closing span instead of the closing TD like it should.
+CONCLUSION: The only place to do add indents before the comment character is AFTER outputNL has been converted to string via outerHTML. 
+
+NEW PLAN: Clean up the comments as best as possible and then move to adding the indent after the outputNL is converted to string. Probably best to do a separate function for that.
+--------------------------------------------------------------------------------------------
+Comment Block Issues -- these problems are universal to all tdbut and tablebut flavors of both imgswap and bgimage:
+DONE: Needs linebreak before the closing td and before the indent chars - this can be handled in applyIndents. See the commentNodeIndex routine in applyIndents
+
+
+
+
+needs indentchars before the ms conditional flag - this has to be handled in the clipboardStr
 
 
 
@@ -667,7 +679,7 @@ var Witty = (function () {
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
     function buildOutputNodeList( uSels ) {
       console.log('buildOutputNodeList running');
-      let tableNodeFragment, nl, frag, outputNL, commentNode;
+      let tableNodeFragment, nl, frag, outputNL, commentNode, clipboardStr;
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
       tableNodeFragment = makeTableNode( uSels );
       nl = tableNodeFragment.querySelectorAll('*');
@@ -777,16 +789,31 @@ var Witty = (function () {
         //   // console.log(outputNL[3]);
         applyIndents(outputNL);
         // }
-
-
-
-
-
       } 
+      clipboardStr = outputNL[0].outerHTML;
+      if (uSels.selectedRadio === 'imgswap' || uSels.selectedRadio === 'bgimage') {
+        fixCommentNodes(uSels, clipboardStr);
+      } else {
+
+      }
       // !VA Write the outerHTML of the top node in the nodeList to the clipboard
-      var clipboardStr = outputNL[0].outerHTML;
+
+
+    }
+
+    function fixCommentNodes(uSels, clipboardStr) {
+      // !VA Here we hack in some indents before the MS conditional flags
+      console.log('fixCommentNodes running');
+      console.log('clipboardStr:');
+      console.log(clipboardStr);
+      
+
+
+
       writeClipboard( aliasToId(uSels.buttonClicked), clipboardStr);
     }
+
+
 
     function aliasToId( alias ) {
       // !VA Convert uSels.buttonClicked back to an id before passing to Clipboard object.
@@ -834,7 +861,7 @@ var Witty = (function () {
       Attributes.tdBgcolor ? bgcolor = Attributes.tdBgcolor : bgcolor = fallback;
 
       // !VA Define the innerHTML of the bgimage code
-      bgimageStr = `[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}${getIndent(indentLevel)}<div>${linebreak}${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div><!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}</v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect><![endif]`;
+      bgimageStr = `[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}${getIndent(indentLevel)}<div>${linebreak}${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div>${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}  </v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect>${linebreak}${getIndent(indentLevel)}<![endif]`;
       // console.log('bgimageStr is: ');
       // console.log(bgimageStr);
       return bgimageStr;
@@ -1057,7 +1084,9 @@ var Witty = (function () {
       let stackColumnPos = [];
       // !VA Variable to hold the indentLevel of the second posswitch column that the first posswitch column will stack over.
       let stackColumnIndentLevel;
-      // !VA Loop through outputNL and push the indent strings per index into the indents array, and push the positions of the stackable posswitch columns onto the stackColumnPos array 
+      // !VA Variable to hold the index of the node that contains the comment node
+      let commentNodeIndex;
+      // !VA Loop through outputNL and push the indent strings per index into the indents array, push the positions of the stackable posswitch columns onto the stackColumnPos array, and get the index of the node that contains the comments
       for (let i = 0; i < outputNL.length; i++) {
         // !VA Get the indent strings into the indents array
         indents.push(getIndent(i));
@@ -1065,6 +1094,16 @@ var Witty = (function () {
         if ( outputNL[i].className === 'stack-column-center') {
           stackColumnPos.push(i);
         }
+
+        for (let j = 0; j < outputNL[i].childNodes.length; j++) {
+          if (outputNL[i].childNodes[j].nodeValue) {
+            if (outputNL[i].childNodes[j].nodeValue.includes('!mso') || outputNL[i].childNodes[j].nodeValue.includes('gte mso 9')) {
+              commentNodeIndex = i;
+            }
+          }
+        }
+
+
       }
       // !VA Apply exception indents to the A and IMG nodes.
       for (let i = 0; i < outputNL.length; i++) {
@@ -1085,9 +1124,6 @@ var Witty = (function () {
             outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
             outputNL[i].insertAdjacentHTML('afterbegin', '\n');
             outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
-
-
-
           } else {
             // !VA If the node index is less than the index of the first stacking column
             if ( i < stackColumnPos[1] ) {
@@ -1111,36 +1147,12 @@ var Witty = (function () {
           }
         }
       }
-
-      // !VA Branch: fixCommentNodeIndents050220 (050220) - Now we have to fix the commment node indents
-
-      // !VA Hack for imgswap indents
-      // !VA Loop through outputNL
-      for (let i = 0; i < outputNL.length; i++) {
-        // !VA Loop through the childNodes of each node. We need to locate the MS conditional flag in the nodeValue of one of the childNodes of the current node -- if we look for it in the node's innerHTML, it will be present in every node. But it's only present in the nodeValue of a childNode of the node we want to apply the indent to. So, we're targeting the ms conditional in the specific node that should get the indent.
-        for (let j = 0; j < outputNL[i].childNodes.length; j++) {
-          // !VA If there's a nodeValue in the childNode, then look for the ms conditional. We need this because not all childNodes have a nodeValue - and a falsy nodeValue throws an error.  
-          if (outputNL[i].childNodes[j].nodeValue) {
-            // !VA If the nodeValue of the childNode contains the MS conditional flag, then add the indent before the comment character.
-            if (outputNL[i].childNodes[j].nodeValue.includes('[if !mso]')) {
-              outputNL[i].innerHTML = outputNL[i].innerHTML.replace('<!--[if !mso]>', getIndent(i + 1) + '<!--[if !mso]>');
-            }
-          }
-        }
+      // !VA Add a line break and indents before the closing tag of the TD whose child node is the comment node, i.e. either imgswap or bgimage. NOTE: This does the job, but adds a string of spaces after the closing MS conditional -- I can live with that for now, but the RIGHT way to do this is to trap imgswap and bgimage earlier and have a separate indent routine for them.
+      // !VA If commentNodeIndex is not undefined, then we have a commentNode
+      if (typeof commentNodeIndex !== 'undefined') {
+        // !VA Add a linebreak and an indent before the closing tag of the node whose child node is the comment node
+        outputNL[commentNodeIndex].insertAdjacentHTML('beforeend', '\n' + getIndent(commentNodeIndex));
       }
-
-
-
-
-
-      // }
-      // var foo;
-      // foo = outputNL[0].innerHTML;
-      // console.log('foo is: ' + foo);
-      // foo = foo.replace('<!--[if !mso]>', 'XX<!--[if !mso]>');
-      // outputNL[0].innerHTML = foo;
-      
-
 
       return outputNL;
       // !VA Apply indents to nodes. Changes apply to the live DOM nodes, so no return is required.
