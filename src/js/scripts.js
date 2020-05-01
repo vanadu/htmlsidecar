@@ -242,8 +242,8 @@ var Witty = (function () {
     // !VA Run test function on page load
     // document.addEventListener('DOMContentLoaded', function() {
     //   setTimeout(function(){ 
-    //     var foo = document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag);
-    //     foo.click();
+    //     var fug = document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag);
+    //     fug.click();
 
     //   }, 500);
     // });
@@ -669,35 +669,81 @@ var Witty = (function () {
       var container = document.createElement('div');
 
       // !VA Basic TD Options
-      if (uSels.selectedRadio === 'basic') {
+      if (uSels.selectedRadio === 'basic' || uSels.selectedRadio === 'posswitch') {
         // !VA Deterimine which makeNode button was clicked and extract a nodeList fragment with only those nodes that correspond to the clicked button. The index position of the extracted fragments is determined by the length of the tableNodeFragment nodeList minus an integer to compensate for the 0-based nodeList indices.
+        let rtlNodePos, ltrNodePos, extractPos;
+        /* !VA  
+        getAttribute = 'rtl' = extractPos == this is OK
+        extractPos + 3 = posSwitchCol1IndentIndex
+        if class='stack-column-center' and i > 5 getIndent
+        
+        */
+       // !VA Loop through and get the 
+        for (let i = 0; i < nl.length; i++) {
+          // console.log('nl[i] is: ' +  nl[i]);
+          if (nl[i].getAttribute('dir')  === 'rtl') {
+            rtlNodePos = i;
+          }
+        }
+
+
         switch(true) {
         case (uSels.buttonClicked === 'imgbut'):
           // !VA If there's an anchor, take the last two nodes, otherwise just take the last node.
           uSels.hasAnchor ? frag = nl[nl.length - 2] : frag = nl[nl.length - 1]; 
           break;
         case (uSels.buttonClicked === 'tdbut'):
-          // !VA Start extracting at the parent TD of the A/IMG node.
-          uSels.hasAnchor ? frag = nl[nl.length - 3] : frag = nl[nl.length - 2]; 
+          console.log('tdbut');
+          console.log('nl.length is: ' + nl.length);
+          if ( uSels.selectedRadio === 'basic') { 
+            uSels.hasAnchor ? extractPos = nl.length - 3 : extractPos = nl.length - 2;
+            console.log('extractPos basic is: ' + extractPos);
+            frag = nl[extractPos];
+          } else {
+            extractPos = rtlNodePos;
+            frag = nl[extractPos];
+          }
           break;
         case (uSels.buttonClicked === 'tablebut'):
+          // !VA 
+          if (uSels.selectedRadio === 'basic') {
+            if (uSels.hasWrapper) {
+              uSels.hasAnchor ? extractPos = nl.length - 8 : extractPos = nl.length - 7;
+              frag = nl[extractPos];
+            } else {
+              uSels.hasAnchor ? extractPos = nl.length - 5 : extractPos = nl.length - 4; 
+              frag = nl[extractPos];
+            }
 
-          if (uSels.hasWrapper) {
-            // !VA Start extracting at the wrapper table, i.e. the complete nodeList.
-            uSels.hasAnchor ? frag = nl[nl.length - 8] : frag = nl[nl.length - 7]; 
+          // !VA 'posswitch' option
           } else {
-            // !VA Start extracting at the parent TABLE of parent TD of the A/IMG node.
-            uSels.hasAnchor ? frag = nl[nl.length - 5] : frag = nl[nl.length - 4]; 
+            console.log('posswitch option');
+            if (uSels.hasWrapper) {
+              // !VA Start extracting at the wrapper table, i.e. the complete nodeList.
+              console.log('hasWrapper');
+              extractPos = 0;
+              console.log('extractPos is: ' + extractPos);
+            } else {
+              extractPos = 3;
+              console.log('extractPos is: ' + extractPos);
+              // !VA Start extracting at the parent TABLE of parent TD of the A/IMG node.
+            }
+            frag = nl[extractPos];
           }
+          
+          
+
           break;
         default:
           // code block
         }
+
+
         // !VA Append the fragment to the container
         container.appendChild(frag);
         // !VA Create the outputNL nodeList to pass to the Clipboard object
         outputNL = container.querySelectorAll('*');
-        applyIndents(outputNL);
+        applyIndents(outputNL, rtlNodePos, ltrNodePos);
 
       // !VA imgSwap and bgimage option - nodeList includes comment node with MS conditional code
       } else if (uSels.selectedRadio === 'imgswap' || uSels.selectedRadio  === 'bgimage') {
@@ -747,131 +793,7 @@ var Witty = (function () {
 
         }
       // !VA posswitch option
-      } else  {
-
-        // !VA Deterimine which makeNode button was clicked and extract a nodeList fragment with only those nodes that correspond to the clicked button. The index position of the extracted fragments is determined by the length of the tableNodeFragment nodeList minus an integer to compensate for the 0-based nodeList indices.
-        switch(true) {
-        case (uSels.buttonClicked === 'imgbut'):
-          // !VA If there's an anchor, take the last two nodes, otherwise just take the last node.
-          uSels.hasAnchor ? frag = nl[nl.length - 2] : frag = nl[nl.length - 1]; 
-          break;
-        case (uSels.buttonClicked === 'tdbut'):
-          // console.clear();
-          console.log('posswitch running');
-          // !VA Start extracting at the parent TD of the A/IMG node.
-          uSels.hasAnchor ? frag = nl[nl.length - 13] : frag = nl[nl.length - 12]; 
-          break;
-        case (uSels.buttonClicked === 'tablebut'):
-
-          if (uSels.hasWrapper) {
-            // !VA Start extracting at the wrapper table, i.e. the complete nodeList.
-            uSels.hasAnchor ? frag = nl[nl.length - 8] : frag = nl[nl.length - 7]; 
-          } else {
-            // !VA Start extracting at the parent TABLE of parent TD of the A/IMG node.
-            uSels.hasAnchor ? frag = nl[nl.length - 5] : frag = nl[nl.length - 4]; 
-          }
-          break;
-        default:
-          // code block
-        }
-        // !VA Need to get the 
-
-
-        container.appendChild(frag);
-        // !VA Create the outputNL nodeList to pass to the Clipboard object
-
-
-        outputNL = container.querySelectorAll('*');
-        // applyIndents(outputNL);
-        console.log('outputNL');
-        console.log(outputNL);
-        console.log('posswitch running');
-        // !VA Create array to store indent strings
-        var indents = [];
-        for (let i = 0; i < outputNL.length; i++) {
-          // !VA Get the indent strings into the indents array
-          indents.push(getIndent(i));
-        }
-        for (let i = 0; i < outputNL.length; i++) {
-          console.log('outputNL[i].nodeName is: ' + outputNL[i].nodeName);
-  
-          console.log('outputNL[i].parentNode.nodeName is: ' + outputNL[i].parentNode.nodeName);
-          // if (outputNL[i].nodeName === 'IMG' && outputNL[i].parentNode.nodeName === 'A') {
-          //   console.log('Case 1: do nothing');
-          //   // do nothing
-          // }
-          // else if ( outputNL[i].nodeName === 'A') {
-          //   console.log('Case 2');
-          //   // !VA If nodeList item 1 is the anchor, then Include anchor is checked. Apply the 'terminal' indent scheme and don't apply any indent to the img element.
-          //   outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
-          //   outputNL[i].insertAdjacentHTML('afterend', '\n');
-          // } 
-          // else {
-            if (uSels.selectedRadio !== 'posswitch') {
-              console.log('Case 3: not posswitch');
-              outputNL[i].insertAdjacentHTML('afterend', '\n');
-              outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
-              outputNL[i].insertAdjacentHTML('afterbegin', '\n');
-              outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
-            } else {
-              console.log('Case 3: posswitch');
-              console.log('indents');
-              console.log(indents);
-              if (uSels.hasAnchor ) {
-                if (i <= 6) {
-                  outputNL[i].insertAdjacentHTML('afterend', '\n');
-                  outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
-                  outputNL[i].insertAdjacentHTML('afterbegin', '\n');
-                  outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
-                } else {
-                  outputNL[i].insertAdjacentHTML('afterend', '\n');
-                  outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i - 6));
-                  outputNL[i].insertAdjacentHTML('afterbegin', '\n');
-                  outputNL[i].insertAdjacentHTML('beforeend', getIndent(i - 6));
-                }
-              } else {
-                if (i <= 6) {
-                  outputNL[i].insertAdjacentHTML('afterend', '\n');
-                  outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
-                  outputNL[i].insertAdjacentHTML('afterbegin', '\n');
-                  outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
-                } else {
-                  outputNL[i].insertAdjacentHTML('afterend', '\n');
-                  outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i - 5));
-                  outputNL[i].insertAdjacentHTML('afterbegin', '\n');
-                  outputNL[i].insertAdjacentHTML('beforeend', getIndent(i - 5));
-                }
-              }
-
-              
-              
-            }
-          // }
-        }
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-
       } 
-      
-
-      // !VA Apply the indents and return the indented outputNL
-      // outputNL = applyIndents(outputNL);
-
-
-
-
 
 
       // !VA Write the outerHTML of the top node in the nodeList to the clipboard
@@ -1145,14 +1067,23 @@ var Witty = (function () {
       console.log('applyIndents running');
       // !VA Create array to store indent strings
       var indents = [];
+      var stackColumnPos = [];
+      console.log('outputNL');
+      console.log(outputNL);
+      
       for (let i = 0; i < outputNL.length; i++) {
         // !VA Get the indent strings into the indents array
         indents.push(getIndent(i));
+        if ( outputNL[i].className === 'stack-column-center') {
+          stackColumnPos.push(i);
+        }
       }
+      console.log('stackColumnPos:');
+      console.log(stackColumnPos);
+      
       for (let i = 0; i < outputNL.length; i++) {
-        console.log('outputNL[i].nodeName is: ' + outputNL[i].nodeName);
-
-        console.log('outputNL[i].parentNode.nodeName is: ' + outputNL[i].parentNode.nodeName);
+        // console.log('outputNL[i].nodeName is: ' + outputNL[i].nodeName);
+        // console.log('outputNL[i].parentNode.nodeName is: ' + outputNL[i].parentNode.nodeName);
         if (outputNL[i].nodeName === 'IMG' && outputNL[i].parentNode.nodeName === 'A') {
           console.log('Case 1: do nothing');
           // do nothing
@@ -1165,10 +1096,29 @@ var Witty = (function () {
         } 
         else {
           console.log('Case 3');
-          outputNL[i].insertAdjacentHTML('afterend', '\n');
-          outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
-          outputNL[i].insertAdjacentHTML('afterbegin', '\n');
-          outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
+          console.log();
+          
+          if (stackColumnPos.length === 0) {
+            outputNL[i].insertAdjacentHTML('afterend', '\n');
+            outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
+            outputNL[i].insertAdjacentHTML('afterbegin', '\n');
+            outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
+          } else {
+            console.log('indenting posswitch');
+            if ( i < stackColumnPos[1] ) {
+              outputNL[i].insertAdjacentHTML('afterend', '\n');
+              outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
+              outputNL[i].insertAdjacentHTML('afterbegin', '\n');
+              outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
+            } else {
+              var foo = i - (stackColumnPos[1] - stackColumnPos[0]);
+              console.log('foo is: ' + foo);
+              outputNL[i].insertAdjacentHTML('afterend', '\n');
+              outputNL[i].insertAdjacentHTML('beforebegin', getIndent(foo));
+              outputNL[i].insertAdjacentHTML('afterbegin', '\n');
+              outputNL[i].insertAdjacentHTML('beforeend', getIndent(foo));
+            }
+          }
         }
       }
       return outputNL;
