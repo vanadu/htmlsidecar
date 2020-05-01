@@ -13,7 +13,7 @@ DONE: Implement imgSwap - done, minor indent issues remaining
 DONE: Implement bgimage: branch ImplementBgimage042820 - same remaining indent issue as imgSwap
 DONE: Implement posswitch complete 
 DONE: buildOutputNL and applyIndents commented
-
+DONE: Add content placeholder to posswitch
 TODO: Fix irregularities in MS conditional indents
 
 
@@ -24,6 +24,7 @@ TODO: The CSS output will need to be revisited for td and table.
 TODO: Figure out why queryDOMElements is running mutliple times per CB build.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
 TODO: Add some kind of fluid option to the img options. Cerberus hard codes it into the img tag. That needs to be tested. Litmus overrides the width and height style properties in the CSS media queries. Need to test before that is implemented - but there's no reason to include a fluid option if that's settable in CSS.
+
 
 
 TODO: Change msg-table to flex div
@@ -1067,7 +1068,7 @@ var Witty = (function () {
             outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
             outputNL[i].insertAdjacentHTML('afterbegin', '\n');
             outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
-          // !VA 
+          // !VA Here we apply indents to the 'posswitch' option
           } else {
             // !VA If the node index is less than the index of the first stacking column
             if ( i < stackColumnPos[1] ) {
@@ -1084,6 +1085,19 @@ var Witty = (function () {
               outputNL[i].insertAdjacentHTML('afterbegin', '\n');
               outputNL[i].insertAdjacentHTML('beforeend', getIndent(stackColumnIndentLevel));
             }
+            // !VA We still need to add some indicator content to the terminating TD in this nodeList -- putting it in the makePosSwitchNode function itself would make it impossible to indent properly without some creative coding that's beyond my ability. So. we'll put it here, after the indent has been shrunk to be equal to the nextSibling's indent. It will always be added to the last node in the tree, i.e. the nodeList length - 1.
+            if ( i === outputNL.length - 1) {
+              outputNL[i].innerHTML = '\n' + getIndent(stackColumnIndentLevel) + '  <!-- ADD YOUR CONTENT HERE --> \n' + getIndent(stackColumnIndentLevel);
+            }
+            // !VA Insert the indent strings to the node
+            // outputNL[i].insertAdjacentHTML('beforebegin', getIndent(stackColumnIndentLevel));
+            // outputNL[i].insertAdjacentHTML('afterbegin', '\n');
+            // outputNL[i].insertAdjacentHTML('beforeend', getIndent(stackColumnIndentLevel));
+            // outputNL[i].insertAdjacentHTML('afterend', '\n');
+
+
+
+
           }
         }
       }
