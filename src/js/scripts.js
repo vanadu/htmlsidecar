@@ -3,20 +3,19 @@
 // See C:\Users\VANA\OneDrive\WhittyReview_12.30.19.docx
 
 // !VA GENERAL NOTES
-/* !VA  - February Reboot Notes
+/* !VA  - April Reboot Notes
 =========================================================
-// !VA 04.27.20
+// !VA 04.30.20
 Status:
 Rewrote the basic indent routine. It works now for basic TD options and should be relatively easy to modify for a no-img TD option by tweaking the output of makeTdNode to not append imgNode if selected.
 
 DONE: Implement imgSwap - done, minor indent issues remaining
 DONE: Implement bgimage: branch ImplementBgimage042820 - same remaining indent issue as imgSwap
+DONE: Implement posswitch complete 
+DONE: buildOutputNL and applyIndents commented
 
-TODO: Implement posswitch 
+TODO: Fix irregularities in MS conditional indents
 
-
-
-All posswitch works, except TABLE indents are off.
 
 
 
@@ -650,102 +649,75 @@ var Witty = (function () {
       } else {
         uSels.buttonClicked = 'tablebut';
       }
-      buildNodeList( uSels );
+      buildOutputNodeList( uSels );
     }
 
-    // !VA Build the nodeList that will be populated with indents. Don't forget that the actual nodeList can't be a fragment because fragments don't support insertAdjacentHMTL). So it has to be a container div with the HTML nodes as children.
-    function buildNodeList( uSels ) {
-      console.log('buildNodeList running');
-      console.log('uSels is: /n');
-      console.log(uSels);
+    // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
+    function buildOutputNodeList( uSels ) {
+      console.log('buildOutputNodeList running');
       let tableNodeFragment, nl, frag, outputNL, commentNode;
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
       tableNodeFragment = makeTableNode( uSels );
       nl = tableNodeFragment.querySelectorAll('*');
-      console.clear();
-      console.log('nl: ');
-      console.dir(nl);
       // !VA Create the div container to which the extracted nodeList fragment will be appended
       var container = document.createElement('div');
 
-      // !VA Basic TD Options
+      // !VA Basic TD Options - This should be extracted to a separate function
       if (uSels.selectedRadio === 'basic' || uSels.selectedRadio === 'posswitch') {
         // !VA Deterimine which makeNode button was clicked and extract a nodeList fragment with only those nodes that correspond to the clicked button. The index position of the extracted fragments is determined by the length of the tableNodeFragment nodeList minus an integer to compensate for the 0-based nodeList indices.
         let rtlNodePos, ltrNodePos, extractPos;
-        /* !VA  
-        getAttribute = 'rtl' = extractPos == this is OK
-        extractPos + 3 = posSwitchCol1IndentIndex
-        if class='stack-column-center' and i > 5 getIndent
-        
-        */
-       // !VA Loop through and get the 
+        // !VA For the posswitch option: Get the position of the RTL node, if it exists. 
         for (let i = 0; i < nl.length; i++) {
           // console.log('nl[i] is: ' +  nl[i]);
           if (nl[i].getAttribute('dir')  === 'rtl') {
             rtlNodePos = i;
           }
         }
-
-
+        // !VA Process the makeNode button clicks
         switch(true) {
+        // !VA imgbut is clicked. We can hardcode the index where the extraction begins because the imgNode is created in makeTdNode and the imgbut button click overrides any other makeNode button actions. 
         case (uSels.buttonClicked === 'imgbut'):
           // !VA If there's an anchor, take the last two nodes, otherwise just take the last node.
           uSels.hasAnchor ? frag = nl[nl.length - 2] : frag = nl[nl.length - 1]; 
           break;
+        // !VA tdbut is clicked. Here we handle the 'basic' and 'posswitch' options because they process indents with no modifications. 'imgswap' and 'bgimage' options are handled separately because they import comment nodes with MS conditional code
         case (uSels.buttonClicked === 'tdbut'):
           console.log('tdbut');
-          console.log('nl.length is: ' + nl.length);
+          // !VA basic option is selected 
           if ( uSels.selectedRadio === 'basic') { 
+            // !VA We can hardcode this for now, but that will be a problem if any other options with other nodes are added.
             uSels.hasAnchor ? extractPos = nl.length - 3 : extractPos = nl.length - 2;
-            console.log('extractPos basic is: ' + extractPos);
-            frag = nl[extractPos];
+            // frag = nl[extractPos];
+          // !VA posswitch option is selected
           } else {
+            // !VA The fragment is extracted starting at the position of the RTL node
             extractPos = rtlNodePos;
-            frag = nl[extractPos];
           }
+          frag = nl[extractPos];
           break;
         case (uSels.buttonClicked === 'tablebut'):
-          // !VA 
-          if (uSels.selectedRadio === 'basic') {
-            if (uSels.hasWrapper) {
-              uSels.hasAnchor ? extractPos = nl.length - 8 : extractPos = nl.length - 7;
-              frag = nl[extractPos];
-            } else {
-              uSels.hasAnchor ? extractPos = nl.length - 5 : extractPos = nl.length - 4; 
-              frag = nl[extractPos];
-            }
-
-          // !VA 'posswitch' option
+          // !VA basic option is selected 
+          // !VA We can hardcode the 'basic' and 'posswitch' positions for now, but these will have to be revisited if any new options are added that change the outputNL indices. 
+          if (uSels.hasWrapper) {
+            // !VA The Include wrapper table option is selected, so the entire nodeList is extracted
+            extractPos = 0;
+            // frag = nl[extractPos];
           } else {
-            console.log('posswitch option');
-            if (uSels.hasWrapper) {
-              // !VA Start extracting at the wrapper table, i.e. the complete nodeList.
-              console.log('hasWrapper');
-              extractPos = 0;
-              console.log('extractPos is: ' + extractPos);
-            } else {
-              extractPos = 3;
-              console.log('extractPos is: ' + extractPos);
-              // !VA Start extracting at the parent TABLE of parent TD of the A/IMG node.
-            }
-            frag = nl[extractPos];
+            // !VA The Include wrapper table option is not selected, so all nodes starting at index 3 are extracted
+            extractPos = 3;
           }
-          
-          
-
+          frag = nl[extractPos];
           break;
         default:
-          // code block
+          // Default code block, this should be an error code
         }
-
-
         // !VA Append the fragment to the container
         container.appendChild(frag);
         // !VA Create the outputNL nodeList to pass to the Clipboard object
         outputNL = container.querySelectorAll('*');
         applyIndents(outputNL, rtlNodePos, ltrNodePos);
 
-      // !VA imgSwap and bgimage option - nodeList includes comment node with MS conditional code
+      // !VA imgSwap and bgimage option - nodeList includes comment node with MS conditional code. This should be extracted to a separate function
       } else if (uSels.selectedRadio === 'imgswap' || uSels.selectedRadio  === 'bgimage') {
         // !VA We start with the tdbut makeNode button because the img makeNode button isn't referenced in the imgswap option. The A/IMG tags are hard-coded into the MS Conditional code in getImgSwapBlock. Also, there's a switch to include/exclude the A/IMG node in makeTdNode.
         switch(true) {
@@ -763,6 +735,7 @@ var Witty = (function () {
           }
           break;
         default:
+          // Default code block, this should be an error code
         }
         // !VA Append the nodeList fragment to the container div
         container.appendChild(frag);
@@ -790,12 +763,8 @@ var Witty = (function () {
           console.log('outputNL[3]');
           console.log(outputNL[3]);
           applyIndents(outputNL);
-
         }
-      // !VA posswitch option
       } 
-
-
       // !VA Write the outerHTML of the top node in the nodeList to the clipboard
       console.log('outputNL[0].outerHTML: ');
       console.log(outputNL[0].outerHTML);
@@ -1066,11 +1035,12 @@ var Witty = (function () {
     function applyIndents( outputNL ) {
       console.log('applyIndents running');
       // !VA Create array to store indent strings
-      var indents = [];
-      var stackColumnPos = [];
-      console.log('outputNL');
-      console.log(outputNL);
-      
+      let indents = [];
+      // !VA Create array to store the positions of the stackable columns in the posswitch option.
+      let stackColumnPos = [];
+      // !VA Variable to hold the indentLevel of the second posswitch column that the first posswitch column will stack over.
+      let stackColumnIndentLevel;
+      // !VA Loop through outputNL and push the indent strings per index into the indents array, and push the positions of the stackable posswitch columns onto the stackColumnPos array 
       for (let i = 0; i < outputNL.length; i++) {
         // !VA Get the indent strings into the indents array
         indents.push(getIndent(i));
@@ -1078,45 +1048,41 @@ var Witty = (function () {
           stackColumnPos.push(i);
         }
       }
-      console.log('stackColumnPos:');
-      console.log(stackColumnPos);
-      
+      // !VA Apply exception indents to the A and IMG nodes.
       for (let i = 0; i < outputNL.length; i++) {
-        // console.log('outputNL[i].nodeName is: ' + outputNL[i].nodeName);
-        // console.log('outputNL[i].parentNode.nodeName is: ' + outputNL[i].parentNode.nodeName);
+        // !VA If parent of the IMG node is a A, then don't apply indents because we want the IMG tag to be nested within the A with no indents
         if (outputNL[i].nodeName === 'IMG' && outputNL[i].parentNode.nodeName === 'A') {
-          console.log('Case 1: do nothing');
-          // do nothing
+          // Apply no indent to the IMG tag if the Include anchor option is checked
         }
         else if ( outputNL[i].nodeName === 'A') {
-          console.log('Case 2');
-          // !VA If nodeList item 1 is the anchor, then Include anchor is checked. Apply the 'terminal' indent scheme and don't apply any indent to the img element.
+          // !VA If nodeList item 1 is the anchor, then Include anchor is checked. Apply the indent to the A but don't apply any afterbegin or beforeend indent, because that would affect the child img element.
           outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
           outputNL[i].insertAdjacentHTML('afterend', '\n');
         } 
         else {
-          console.log('Case 3');
-          console.log();
-          
+          // !VA Here we apply the 'regular' indents.
+          // !VA If stackColumnPos is empty, then the 'basic' td option is selected. Apply regular indents to all nodes.
           if (stackColumnPos.length === 0) {
             outputNL[i].insertAdjacentHTML('afterend', '\n');
             outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
             outputNL[i].insertAdjacentHTML('afterbegin', '\n');
             outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
+          // !VA 
           } else {
-            console.log('indenting posswitch');
+            // !VA If the node index is less than the index of the first stacking column
             if ( i < stackColumnPos[1] ) {
+              // !VA Apply the 'regular' indent scheme to all nodes up to the second stacking column
               outputNL[i].insertAdjacentHTML('afterend', '\n');
               outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
               outputNL[i].insertAdjacentHTML('afterbegin', '\n');
               outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
             } else {
-              var foo = i - (stackColumnPos[1] - stackColumnPos[0]);
-              console.log('foo is: ' + foo);
+              // !VA The indent level of the second stacking column should be the same as the first stacking column, which is equal to the iterator minus the index of the second stacking column minus the index of the first stacking column. So, for the makeTd button,  i = 10, stackColumnPos[1] = 10, stackColumnPos[0] = 6, so the stackColumnIndentLevel is 4.
+              stackColumnIndentLevel = (i - (stackColumnPos[1] - stackColumnPos[0]));
               outputNL[i].insertAdjacentHTML('afterend', '\n');
-              outputNL[i].insertAdjacentHTML('beforebegin', getIndent(foo));
+              outputNL[i].insertAdjacentHTML('beforebegin', getIndent(stackColumnIndentLevel));
               outputNL[i].insertAdjacentHTML('afterbegin', '\n');
-              outputNL[i].insertAdjacentHTML('beforeend', getIndent(foo));
+              outputNL[i].insertAdjacentHTML('beforeend', getIndent(stackColumnIndentLevel));
             }
           }
         }
@@ -1126,10 +1092,11 @@ var Witty = (function () {
     }
 
 
-
+    // !VA Return the indent string based on the indent level passed in
     function getIndent(indentLevel) {
       let indentChar, indent;
-      indentChar = 'HH';
+      indentChar = '  ';
+      // !VA Repeat the indent character indentLevel number of times
       indent = indentChar.repeat([indentLevel]);
       return indent;
     }
