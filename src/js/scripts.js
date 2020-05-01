@@ -14,7 +14,19 @@ DONE: Implement bgimage: branch ImplementBgimage042820 - same remaining indent i
 DONE: Implement posswitch complete 
 DONE: buildOutputNL and applyIndents commented
 DONE: Add content placeholder to posswitch
-TODO: Fix irregularities in MS conditional indents
+TODO: Fix irregularities in MS conditional indents - branch fixCommentNodeIndents050220
+
+/* !VA  
+// !VA Apply imgSwap-specific indents
+// !VA If outputNL.length is 1, then there's only one node ergo the td button was clicked. So apply a line break and an indent after the parent TD node -- 
+// !VA Branch: fixCommentNodeIndents050220 (050220): this only works for TD. Need a solution for TABLE clicks
+/* !VA  
+- Accessing textContent through outputNL.childNodes[i] doesn't work because the textContent doesn't include the comment characters <!--, which is what we want to replace.
+- Accessing the comment characters through outputNL.innerHMTL doesn't appear to work because you can't replace innerHTML in a nodeList, I don't think. Actually, it does work, but didn't work here but didn't work when I tried it in applyIndents.
+
+
+
+
 
 
 
@@ -56,13 +68,13 @@ TODO: Assign tab order
 var Witty = (function () {
 
   // !VA Run on page load
-  document.addEventListener("DOMContentLoaded", function() {
-    setTimeout(function(){ 
-      // !VA Don't forget you can't use button aliases here..
-      document.querySelector('#btn-ccp-make-td-tag').click();
+  // document.addEventListener("DOMContentLoaded", function() {
+  //   setTimeout(function(){ 
+  //     // !VA Don't forget you can't use button aliases here..
+  //     document.querySelector('#btn-ccp-make-td-tag').click();
 
-    }, 500);
-  });
+  //   }, 500);
+  // });
 
   // !VA DEV Test function to get the clicked element to the console
   // (function () {
@@ -632,7 +644,6 @@ var Witty = (function () {
     // !VA Get the user selections that define the clipboard output configuration- the clicked Options button, the Include anchor checkbox and the Include wrapper table checkbox. The nodeList used for the indents as well as the indent implementation will depend on these options -- only the basic TD radio button option generates a simple nodeList structure whose indents can be processed with a simple for loop. The other options generate nodeLists with text nodes and comments that require a custom indent scheme.
     function getUserSelections( id ) {
       // !VA Initialize the clipboard-building process by getting those user selections in the CCP that determine the structure of the clipboard output and put those selections into the uSels object.
-      console.clear();
       let uSels = {};
       uSels = {
         buttonClicked: '',
@@ -753,22 +764,26 @@ var Witty = (function () {
         
         // !VA Append the comment node to the appropriate position in the outputNL nodeList at the appropriate index based on the nodeList fragment length
         outputNL[outputNL.length - 1].appendChild(commentNode);
-        console.log('outputNL: 724');
-        console.log(outputNL);
+
 
         // !VA Apply imgSwap-specific indents
-        if (outputNL.length === 1 ) {
-          outputNL[0].insertAdjacentHTML( 'afterbegin', '\n' + getIndent(outputNL.length ));
-        } else {
-          // outputNL.insertAdjacentHTML( 'afterbegin', '\n' + getIndent(outputNL.length ));
-          console.log('outputNL[3]');
-          console.log(outputNL[3]);
-          applyIndents(outputNL);
-        }
+        // !VA If outputNL.length is 1, then there's only one node ergo the td button was clicked. So apply a line break and an indent after the parent TD node -- 
+        // !VA Branch: fixCommentNodeIndents050220 (050220): this only works for TD. Need a solution for TABLE clicks, so commenting this out for now.
+        // if (outputNL.length === 1 ) {
+        //   outputNL[0].insertAdjacentHTML( 'afterbegin', '\n' + getIndent(outputNL.length ));
+        // } else {
+        //   // outputNL.insertAdjacentHTML( 'afterbegin', '\n' + getIndent(outputNL.length ));
+        //   // console.log('outputNL[3]');
+        //   // console.log(outputNL[3]);
+        applyIndents(outputNL);
+        // }
+
+
+
+
+
       } 
       // !VA Write the outerHTML of the top node in the nodeList to the clipboard
-      console.log('outputNL[0].outerHTML: ');
-      console.log(outputNL[0].outerHTML);
       var clipboardStr = outputNL[0].outerHTML;
       writeClipboard( aliasToId(uSels.buttonClicked), clipboardStr);
     }
@@ -1034,6 +1049,7 @@ var Witty = (function () {
     }
 
     function applyIndents( outputNL ) {
+      console.clear();
       console.log('applyIndents running');
       // !VA Create array to store indent strings
       let indents = [];
@@ -1045,6 +1061,7 @@ var Witty = (function () {
       for (let i = 0; i < outputNL.length; i++) {
         // !VA Get the indent strings into the indents array
         indents.push(getIndent(i));
+        // !VA Push the positions of the stackable posswitch columns onto the stackColumnPos array 
         if ( outputNL[i].className === 'stack-column-center') {
           stackColumnPos.push(i);
         }
@@ -1068,7 +1085,9 @@ var Witty = (function () {
             outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
             outputNL[i].insertAdjacentHTML('afterbegin', '\n');
             outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
-          // !VA Here we apply indents to the 'posswitch' option
+
+
+
           } else {
             // !VA If the node index is less than the index of the first stacking column
             if ( i < stackColumnPos[1] ) {
@@ -1089,18 +1108,40 @@ var Witty = (function () {
             if ( i === outputNL.length - 1) {
               outputNL[i].innerHTML = '\n' + getIndent(stackColumnIndentLevel) + '  <!-- ADD YOUR CONTENT HERE --> \n' + getIndent(stackColumnIndentLevel);
             }
-            // !VA Insert the indent strings to the node
-            // outputNL[i].insertAdjacentHTML('beforebegin', getIndent(stackColumnIndentLevel));
-            // outputNL[i].insertAdjacentHTML('afterbegin', '\n');
-            // outputNL[i].insertAdjacentHTML('beforeend', getIndent(stackColumnIndentLevel));
-            // outputNL[i].insertAdjacentHTML('afterend', '\n');
-
-
-
-
           }
         }
       }
+
+      // !VA Branch: fixCommentNodeIndents050220 (050220) - Now we have to fix the commment node indents
+
+      // !VA Hack for imgswap indents
+      // !VA Loop through outputNL
+      for (let i = 0; i < outputNL.length; i++) {
+        // !VA Loop through the childNodes of each node. We need to locate the MS conditional flag in the nodeValue of one of the childNodes of the current node -- if we look for it in the node's innerHTML, it will be present in every node. But it's only present in the nodeValue of a childNode of the node we want to apply the indent to. So, we're targeting the ms conditional in the specific node that should get the indent.
+        for (let j = 0; j < outputNL[i].childNodes.length; j++) {
+          // !VA If there's a nodeValue in the childNode, then look for the ms conditional. We need this because not all childNodes have a nodeValue - and a falsy nodeValue throws an error.  
+          if (outputNL[i].childNodes[j].nodeValue) {
+            // !VA If the nodeValue of the childNode contains the MS conditional flag, then add the indent before the comment character.
+            if (outputNL[i].childNodes[j].nodeValue.includes('[if !mso]')) {
+              outputNL[i].innerHTML = outputNL[i].innerHTML.replace('<!--[if !mso]>', getIndent(i + 1) + '<!--[if !mso]>');
+            }
+          }
+        }
+      }
+
+
+
+
+
+      // }
+      // var foo;
+      // foo = outputNL[0].innerHTML;
+      // console.log('foo is: ' + foo);
+      // foo = foo.replace('<!--[if !mso]>', 'XX<!--[if !mso]>');
+      // outputNL[0].innerHTML = foo;
+      
+
+
       return outputNL;
       // !VA Apply indents to nodes. Changes apply to the live DOM nodes, so no return is required.
     }
@@ -1109,7 +1150,7 @@ var Witty = (function () {
     // !VA Return the indent string based on the indent level passed in
     function getIndent(indentLevel) {
       let indentChar, indent;
-      indentChar = '  ';
+      indentChar = 'HH';
       // !VA Repeat the indent character indentLevel number of times
       indent = indentChar.repeat([indentLevel]);
       return indent;
