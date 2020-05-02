@@ -16,6 +16,19 @@ DONE: buildOutputNL and applyIndents commented
 DONE: Add content placeholder to posswitch
 TODO: Fix irregularities in MS conditional indents - branch fixCommentNodeIndents050220
 
+05.02.20
+--------
+I've been dinking with these indents for 3 months now, and I have to face the fact that there's no way to do this using the DOM. The comment nodes are too irregular, and Javascript keeps 'correcting' them thus rendering them 'incorrect'. I'm going to try one last approach, which is to add the indents to the comment nodes as strings after outputNL[x].outerHTML.
+
+
+
+
+
+
+
+
+
+
 /* !VA  
 // !VA Apply imgSwap-specific indents
 // !VA If outputNL.length is 1, then there's only one node ergo the td button was clicked. So apply a line break and an indent after the parent TD node -- 
@@ -739,7 +752,7 @@ var Witty = (function () {
         container.appendChild(frag);
         // !VA Create the outputNL nodeList to pass to the Clipboard object
         outputNL = container.querySelectorAll('*');
-        applyIndents(outputNL, rtlNodePos, ltrNodePos);
+        applyIndents( outputNL );
 
       // !VA imgSwap and bgimage option - nodeList includes comment node with MS conditional code. This should be extracted to a separate function
       } else if (uSels.selectedRadio === 'imgswap' || uSels.selectedRadio  === 'bgimage') {
@@ -790,26 +803,11 @@ var Witty = (function () {
         applyIndents(outputNL);
         // }
       } 
-      clipboardStr = outputNL[0].outerHTML;
-      if (uSels.selectedRadio === 'imgswap' || uSels.selectedRadio === 'bgimage') {
-        fixCommentNodes(uSels, clipboardStr);
-      } else {
 
-      }
-      // !VA Write the outerHTML of the top node in the nodeList to the clipboard
-
-
-    }
-
-    function fixCommentNodes(uSels, clipboardStr) {
-      // !VA Here we hack in some indents before the MS conditional flags
-      console.log('fixCommentNodes running');
-      console.log('clipboardStr:');
-      console.log(clipboardStr);
       
-
-
-
+      
+      
+      clipboardStr = outputNL[0].outerHTML;
       writeClipboard( aliasToId(uSels.buttonClicked), clipboardStr);
     }
 
