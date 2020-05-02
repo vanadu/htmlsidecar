@@ -757,38 +757,79 @@ var Witty = (function () {
       // !VA imgSwap and bgimage option - nodeList includes comment node with MS conditional code. This should be extracted to a separate function
       } else if (uSels.selectedRadio === 'imgswap' || uSels.selectedRadio  === 'bgimage') {
         // !VA We start with the tdbut makeNode button because the img makeNode button isn't referenced in the imgswap option. The A/IMG tags are hard-coded into the MS Conditional code in getImgSwapBlock. Also, there's a switch to include/exclude the A/IMG node in makeTdNode.
-        switch(true) {
-        case (uSels.buttonClicked === 'tdbut'):
-          // !VA Extract the parent TD to which the comment node containing the MS Conditional code will be appended.
-          frag = nl[nl.length  - 1];
-          break;
-        case (uSels.buttonClicked === 'tablebut'):
+        // !VA Branch: tryTextStringIndents (050220)
+        /* !VA  
+        Trying to do indents using the text string in getImgSwapBlock and getBgimageBlock.
+
+        1) DONE: Modify getImgSwapBlock and getBgimageBlock to include the MS conditional opening and closing flag. 
+        2) Get the parent nodes and apply the indents using applyIndent, since the parent nodes have the regular indent scheme.
+        3) Calculate the indent level of the comments. It will be the node index of lastChild in the nodeList plus 1.
+        4) Apply the indents in the MS code block.
+        5) Convert outputNL to text.
+        6) Replace the td string corresponding to the outputNL's lastChild to the td string plus the MS code block.  
+        NOTE: THis isn't going to work without more mods. The parent TD of the MS comments doesn't have any unique string that could be used to place the inserted MS comment block. Have to add/remove a class.
+        
+        */
+        console.clear();
+        console.log('nl.length is: ' + nl.length);
+        console.log('Mark1');
+        var extractNodeIndex;
+        if ( uSels.buttonClicked === 'tdbut') {
+          console.log('tdbut');
+          extractNodeIndex = nl.length - 1;
+        } else {
           if (uSels.hasWrapper) {
-            // !VA Take the entire nodeList starting with the wrapper table
-            frag = nl[nl.length  - 6];
+            console.log('tablebut hasWrapper');
+            extractNodeIndex = 0;
           } else {
-            // !VA Take the parent table of the TD to which the MS Conditional code will be appended.
-            frag = nl[nl.length  - 3];
+            console.log('tablebut !hasWrapper');
+            extractNodeIndex = nl.length - 3;
           }
-          break;
-        default:
-          // Default code block, this should be an error code
         }
+        frag = nl[extractNodeIndex];
+        console.log('frag');
+        console.log(frag);
+        
+
+        // switch(true) {
+        // case (uSels.buttonClicked === 'tdbut'):
+        //   // !VA Extract the parent TD to which the comment node containing the MS Conditional code will be appended.
+        //   frag = nl[nl.length  - 1];
+        //   break;
+        // case (uSels.buttonClicked === 'tablebut'):
+        //   if (uSels.hasWrapper) {
+        //     // !VA Take the entire nodeList starting with the wrapper table
+        //     frag = nl[nl.length  - 6];
+        //   } else {
+        //     // !VA Take the parent table of the TD to which the MS Conditional code will be appended.
+        //     frag = nl[nl.length  - 3];
+        //   }
+        //   break;
+        // default:
+        // Default code block, this should be an error code
+        // }
         // !VA Append the nodeList fragment to the container div
         container.appendChild(frag);
         // !VA Create the nodeList to pass to the Clipboard object. 
         outputNL = container.querySelectorAll('*');
-        // !VA Create the comment node and populate it with the imgSwapBlock MS Conditional code
-        if (uSels.selectedRadio === 'imgswap') {
-          // !VA Get the MS conditional code for imgswap
-          commentNode = document.createComment(getImgSwapBlock( outputNL.length ));
-        } else if ( uSels.selectedRadio === 'bgimage') {
-          // !VA Get the MS conditional code for bgimage
-          commentNode = document.createComment(getBgimageBlock( outputNL.length ));
-        }
+        applyIndents(outputNL);
+        console.log('outputNL after parent indents');
+        console.log(outputNL);
         
+        var tmp;
+        tmp = outputNL[0].outerHTML;
+        console.log('tmp:');
+        console.log(tmp);
+
+
+
+        
+        clipboardStr = tmp;
+
+
+
         // !VA Append the comment node to the appropriate position in the outputNL nodeList at the appropriate index based on the nodeList fragment length
-        outputNL[outputNL.length - 1].appendChild(commentNode);
+        // outputNL[outputNL.length - 1].appendChild(commentNode);
 
 
         // !VA Apply imgSwap-specific indents
@@ -800,15 +841,15 @@ var Witty = (function () {
         //   // outputNL.insertAdjacentHTML( 'afterbegin', '\n' + getIndent(outputNL.length ));
         //   // console.log('outputNL[3]');
         //   // console.log(outputNL[3]);
-        applyIndents(outputNL);
+
         // }
       } 
 
       
+
       
-      
-      clipboardStr = outputNL[0].outerHTML;
       writeClipboard( aliasToId(uSels.buttonClicked), clipboardStr);
+
     }
 
 
@@ -841,7 +882,7 @@ var Witty = (function () {
       mobileFilename = mobileFilename.replace(/(.jpg|.png|.gif|.svg)/g, "-mob$1");
       // !VA Set the indentLevel to 1 for now
       // !VA Create the code for the mobile swap TD as a Comment node of the parent td. 
-      mobileSwapStr = `[if !mso]><!-->${linebreak}${getIndent(indentLevel)}<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">${linebreak}${getIndent(indentLevel)}<a href="#"><img class="mobileshow" alt=${Attributes.imgAlt} width="${Appdata.sPhonesW}" height="${Appdata.sPhonesH}" src="${mobileFilename}" border="0" style="width: ${Appdata.sPhonesW}px; height: ${Appdata.sPhonesH}px; margin: 0; border: none; outline: none; text-decoration: none; display: block;" /></a>${linebreak}${getIndent(indentLevel)}<!--</span>-->${linebreak}${getIndent(indentLevel)}<!--<![endif]`;
+      mobileSwapStr = `<!--[if !mso]><!-->${linebreak}${getIndent(indentLevel)}<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">${linebreak}${getIndent(indentLevel)}<a href="#"><img class="mobileshow" alt=${Attributes.imgAlt} width="${Appdata.sPhonesW}" height="${Appdata.sPhonesH}" src="${mobileFilename}" border="0" style="width: ${Appdata.sPhonesW}px; height: ${Appdata.sPhonesH}px; margin: 0; border: none; outline: none; text-decoration: none; display: block;" /></a>${linebreak}${getIndent(indentLevel)}<!--</span>-->${linebreak}${getIndent(indentLevel)}<!--<![endif]-->`;
       // !VA Append the mobileSwapStr code to tdInner
       // tdInner.appendChild(mobileSwapStr);
       return mobileSwapStr;
@@ -859,7 +900,7 @@ var Witty = (function () {
       Attributes.tdBgcolor ? bgcolor = Attributes.tdBgcolor : bgcolor = fallback;
 
       // !VA Define the innerHTML of the bgimage code
-      bgimageStr = `[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}${getIndent(indentLevel)}<div>${linebreak}${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div>${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}  </v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect>${linebreak}${getIndent(indentLevel)}<![endif]`;
+      bgimageStr = `<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}${getIndent(indentLevel)}<div>${linebreak}${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div>${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}  </v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect>${linebreak}${getIndent(indentLevel)}<![endif]-->`;
       // console.log('bgimageStr is: ');
       // console.log(bgimageStr);
       return bgimageStr;
@@ -1074,7 +1115,7 @@ var Witty = (function () {
     }
 
     function applyIndents( outputNL ) {
-      console.clear();
+      // console.clear();
       console.log('applyIndents running');
       // !VA Create array to store indent strings
       let indents = [];
