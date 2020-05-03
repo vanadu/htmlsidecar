@@ -755,26 +755,10 @@ var Witty = (function () {
         applyIndents( uSels, outputNL );
         clipboardStr = outputNL[0].outerHTML;
 
-      // !VA imgSwap and bgimage option - nodeList includes comment node with MS conditional code. This should be extracted to a separate function
+      // !VA imgSwap and bgimage option - includes MS conditional code retrieved by getImgSwapBlock and getBgimageBlock which includes getIndent functions. First, run applyIndents on outputNL. applyIndents also inserts tokens at the position where the codeBlock is to be inserted. The parent nodelist is converted to a string, the code blocks are retrieved, indents are inserted, and finally the codeblocks are inserted into the string between the tags of the last node in the outputNL.outerHTML string. 
       } else if (uSels.selectedRadio === 'imgswap' || uSels.selectedRadio  === 'bgimage') {
         // !VA We start with the tdbut makeNode button because the img makeNode button isn't referenced in the imgswap option. The A/IMG tags are hard-coded into the MS Conditional code in getImgSwapBlock. Also, there's a switch to include/exclude the A/IMG node in makeTdNode.
-        // !VA Branch: tryTextStringIndents (050220)
-        /* !VA  
-        Trying to do indents using the text string in getImgSwapBlock and getBgimageBlock.
 
-        1) DONE: Modify getImgSwapBlock and getBgimageBlock to include the MS conditional opening and closing flag. 
-        2) Get the parent nodes and apply the indents using applyIndent, since the parent nodes have the regular indent scheme.
-        3) Calculate the indent level of the comments. It will be the node index of lastChild in the nodeList plus 1.
-        4) Apply the indents in the MS code block.
-        5) Convert outputNL to text.
-        6) Replace the td string corresponding to the outputNL's lastChild to the td string plus the MS code block.  
-        PROBLEM: THis isn't going to work without more mods. The parent TD of the MS comments doesn't have any unique string that could be used to place the inserted MS comment block. Have to add/remove a class. 
-        SOLUTION: Add a step after 3) to use insertAdjacentHTML afterbegin and beforeend to add tokens to mark the beginning and end of the replace operation for inserting the MS conditional comments. 
-        PROBLEM: Indents inserted between tokens by applyIndents. 
-        SOLUTION: Skip processing indents for the last index of the outputNL if imgswap or bgimage, or put a separate indent routine here.
-        // !VA THIS WORKS -- finally, I hope.
-        
-        */
         // !VA extractNodeIndex is the nl index position at which the nodes are extracted to build outputNL. It equals the nodeList length minus the indentLevel.
         let extractNodeIndex;
         // !VA indentLevel is the number of indents passed to getIndent.
@@ -1155,7 +1139,6 @@ var Witty = (function () {
           }
         }
       }
-      // !VA Branch: tryTextStringIndents (050220) This whole comment node routine removed. It was used to identify code comments and add indents.
       
       return outputNL;
     }
