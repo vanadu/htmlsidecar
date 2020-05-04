@@ -648,7 +648,6 @@ var Witty = (function () {
         uSels.buttonClicked = 'imgbut';
         // !VA Override the selectedRadio value for the IMG button - the IMG button will ALWAYS output img/anchor tags to the clipboard no matter which tdoptions radio button is selected.
         uSels.selectedRadio = 'basic';
-
       } else if (id === btnCcpMakeClips.btnCcpMakeTdTag.slice(1)) { 
         uSels.buttonClicked = 'tdbut';
       } else {
@@ -693,6 +692,11 @@ var Witty = (function () {
             // !VA We can hardcode this for now, but that will be a problem if any other options with other nodes are added.
             uSels.hasAnchor ? extractPos = nl.length - 3 : extractPos = nl.length - 2;
             // frag = nl[extractPos];
+          } else if ( uSels.selectedRadio === 'excludeimg') {
+          
+            console.log('noimg selected');
+
+
           // !VA posswitch option is selected
           } else {
             // !VA The fragment is extracted starting at the position of the RTL node
