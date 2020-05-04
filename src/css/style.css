@@ -1557,6 +1557,8 @@ fieldset {
   display: block;
   position: relative;
   width: 100%;
+  margin: 0;
+  padding: 0 0 0 10px;
   margin-bottom: 5px;
   border: 1px solid #959595;
   border-radius: 5px; }
@@ -1579,9 +1581,9 @@ fieldset {
       height: 162px; }
 
 .ccp-options-container {
-  position: absolute;
-  top: 3px;
   display: flex;
+  position: relative;
+  align-content: flex-start;
   justify-content: space-evenly; }
 
 .ccp-options-col-1, .ccp-options-col-2, .ccp-options-col-3, .ccp-options-col-4 {

@@ -19,21 +19,21 @@ I've been dinking with these indents for 3 months now, and I have to face the fa
 CONCLUSION: The only place to do add indents before the comment character is AFTER outputNL has been converted to string via outerHTML. 
 
 05.04.20
-TODO: Move the CCP interface around to make more room for td and table options.
-TODO: Add the Exclude <img> checkbox under Basic <td> with options
-TODO: Add Exclude <img> functionality
-TODO: Fix the Chrome CCP layout issues.
+DONE: Move the CCP interface around to make more room for td and table options.
+DONE: Add the Exclude <img> checkbox under Basic <td> with options
+DONE: Add Exclude <img> functionality
+DONE: FIX CHROME CSS! - see comments at custom.scss .ccp-options-container. For some reason the top: 3px instruction was breaking webkit display. Apparently Firefox handles position: absolute incorrectly, see https://brianscodingexamples.wordpress.com/2013/06/20/absolute-position-elements-in-firefox-vs-chrome/
+TODO: Fix table align, doesn't work, shows 'left' when 'center' is seleced. AND 'center' should be preselected. Issue: takes the value from the TD, not the TABLE align option. Plus, the TD Valign option is also taking that value.
 
 
 TODO: The CSS output will need to be revisited for td and table.
 TODO: Figure out why queryDOMElements is running mutliple times per CB build.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
 TODO: Add some kind of fluid option to the img options. Cerberus hard codes it into the img tag. That needs to be tested. Litmus overrides the width and height style properties in the CSS media queries. Need to test before that is implemented - but there's no reason to include a fluid option if that's settable in CSS.
-
-
+TODO: Fix table width: doesn't reflect what's in toolbar viewer width field.
 
 TODO: Change msg-table to flex div
-TODO: FIX CHROME CSS!
+
 
 /* !VA  - 06.23.19
 =========================================================
@@ -1130,7 +1130,7 @@ var Witty = (function () {
     // !VA Return the indent string based on the indent level passed in
     function getIndent(indentLevel) {
       let indentChar, indent;
-      indentChar = 'HH';
+      indentChar = '  ';
       // !VA Repeat the indent character indentLevel number of times
       indent = indentChar.repeat([indentLevel]);
       return indent;
