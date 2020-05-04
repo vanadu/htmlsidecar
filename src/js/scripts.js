@@ -41,6 +41,7 @@ TODO: FIX CHROME CSS!
 TODO: Fix Include wrapper table options don't appear if the CCP is closed and re-opened 
 TODO: rewrite getAppdata to only query specific items in the array, or at least use destructuring to only make a const out of which ever Appdata property is needed in the respective function.
 TOD0: Think about making getAppdata only query a specific property if possible.
+TODO: CCP numeric input fiels need an input validator
 TODO: Fix being able to resize viewerW smaller than imgW - current behavior is imgw resizes with viewerW. If that's the desired behavior, imgW still doesn't write the udpated width to Appdata, that needs to be fixed.
 TODO: Make mrk => box function...not sure where though or whether it's necessary since it's just a one-liner.
 TODO: Fix bug - load 400X1000, multiple click on +50, Display Size shows 450 but the img doesn't grow...
@@ -50,6 +51,7 @@ TODO: Fix, when imgNW is greater than imgW the imgNW size flashes before resizin
 TODO: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- I think. Not sure if this is the right behavior...think bout it. Probably not.YOUTBV
 TODO: Assign keyboard  shortcuts
 TODO: Assign tab order
+
 
 
 
@@ -193,6 +195,7 @@ var Witty = (function () {
       selCcpTdAlign: '#sel-ccp-td-align',
       selCcpTdValign: '#sel-ccp-td-valign',
       iptCcpTdHeight: '#ipt-ccp-td-height',
+      iptCcpTdWidth: '#ipt-ccp-td-width',
       iptCcpTdBgColor: '#ipt-ccp-td-bgcolor',
       // !VA spn-ccp-td-bgimage-checkmrk
       // !VA This is deprecated as of today
@@ -658,18 +661,22 @@ var Witty = (function () {
 
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
     function buildOutputNodeList( uSels ) {
+      console.clear();
       console.log('buildOutputNodeList running');
-      let tableNodeFragment, nl, frag, outputNL, commentNode, clipboardStr;
+      let tableNodeFragment, nl, frag, outputNL, clipboardStr;
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
       tableNodeFragment = makeTableNode( uSels );
       nl = tableNodeFragment.querySelectorAll('*');
+      console.log('nl 667:');
+      console.log(nl);
+      
       // !VA Create the div container to which the extracted nodeList fragment will be appended
       var container = document.createElement('div');
 
       // !VA Basic TD Options - This should be extracted to a separate function
-      if (uSels.selectedRadio === 'basic' || uSels.selectedRadio === 'posswitch') {
+      if (uSels.selectedRadio === 'basic' || uSels.selectedRadio === 'excludeimg' || uSels.selectedRadio === 'posswitch') {
         // !VA Deterimine which makeNode button was clicked and extract a nodeList fragment with only those nodes that correspond to the clicked button. The index position of the extracted fragments is determined by the length of the tableNodeFragment nodeList minus an integer to compensate for the 0-based nodeList indices.
-        let rtlNodePos, ltrNodePos, extractPos;
+        let rtlNodePos, extractPos;
         // !VA For the posswitch option: Get the position of the RTL node, if it exists. 
         for (let i = 0; i < nl.length; i++) {
           // console.log('nl[i] is: ' +  nl[i]);
@@ -694,7 +701,7 @@ var Witty = (function () {
             // frag = nl[extractPos];
           } else if ( uSels.selectedRadio === 'excludeimg') {
           
-            console.log('noimg selected');
+            extractPos = 5;
 
 
           // !VA posswitch option is selected
@@ -897,20 +904,26 @@ var Witty = (function () {
       if (Attributes.tdBgcolor) { tdInner.bgColor = Attributes.tdBgcolor; }
       // !VA Now add the attributes included only with the default Td configuration
       switch(true) {
-      // !VA Branch: 031320A
+      
+
+      
       // case (selectedRadio === 'basic'):
-      case (uSels.selectedRadio === 'basic'):
-        console.log('makeTdNode basic');
+      case (uSels.selectedRadio === 'basic' || uSels.selectedRadio === 'excludeimg'):
+        console.log('makeTdNode basic OR excludeimg');
         // !VA class attribute
         if (Attributes.tdClass) { tdInner.className = Attributes.tdClass; }
         // !VA valign attribute
         if (Attributes.tdAlign) { tdInner.align = Attributes.tdAlign; }
         // !VA height attribute
         if (Attributes.tdHeight) { tdInner.height = Attributes.tdHeight; }
-        // !VA The id is wrong here -- we're passing the td's id but that shouldn't matter
-        imgNode = makeImgNode();
-        // !VA We need to include the imgNode here ONLY if Bgimage is unchecked
-        tdInner.appendChild(imgNode);
+        if (Attributes.tdWidth) { tdInner.width = Attributes.tdWidth; }
+        // !VA Branch: implementExcludeImg (050420)
+        // !VA If 'basic' is checked, create imgNode and append it, otherwise exclude the imgNode.
+        if (uSels.selectedRadio === 'basic') {
+          imgNode = makeImgNode();
+          // !VA We need to include the imgNode here ONLY if Bgimage is unchecked
+          tdInner.appendChild(imgNode);
+        }
         break;
         // !VA Branch: 031320A
       // case (selectedRadio === 'imgswap'):
@@ -950,8 +963,6 @@ var Witty = (function () {
       // console.log('tdInner is: ');
       // console.log(tdInner);
       tdNodeFragment.appendChild(tdInner);
-      // console.log('tdNodeFragment is: ');
-      // console.log(tdNodeFragment);
       return tdNodeFragment;
 
     }
@@ -1033,8 +1044,9 @@ var Witty = (function () {
       tableNodeFragment = document.createDocumentFragment();
       tableNodeFragment.appendChild(tableOuter);
       // }
-      // !VA Branch: 031320A
-      // return tableNode;
+      console.log('tableNodeFragment:');
+      console.log(tableNodeFragment);
+      
       return tableNodeFragment;
     }
 
@@ -1204,6 +1216,9 @@ var Witty = (function () {
         })(),
         tdHeight: (function() {
           return ccpIfNoUserInput('height',document.querySelector(ccpUserInput.iptCcpTdHeight).value);
+        })(),
+        tdWidth: (function() {
+          return ccpIfNoUserInput('width',document.querySelector(ccpUserInput.iptCcpTdWidth).value);
         })(),
         tdBasic: (function() {
           target = ccpUserInput.rdoCcpTdBasic;
