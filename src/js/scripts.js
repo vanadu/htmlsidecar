@@ -25,42 +25,6 @@ TODO: Add Exclude <img> functionality
 TODO: Fix the Chrome CCP layout issues.
 
 
-
-
-
-
-
-
-
-
-/* !VA  
-// !VA Apply imgSwap-specific indents
-// !VA If outputNL.length is 1, then there's only one node ergo the td button was clicked. So apply a line break and an indent after the parent TD node -- 
-// !VA Branch: fixCommentNodeIndents050220 (050220): this only works for TD. Need a solution for TABLE clicks
-/* !VA  
-- Accessing textContent through outputNL.childNodes[i] doesn't work because the textContent doesn't include the comment characters <!--, which is what we want to replace.
-- Accessing the comment characters through outputNL.innerHMTL doesn't appear to work because you can't replace innerHTML in a nodeList, I don't think. Actually, it does work, but didn't work here but didn't work when I tried it in applyIndents.
-- Accessing the nodeValue of the individual childNode that contains the ms conditional flag doesn't work because as soon as you do that, JS adds the missing closing span tag, which 1) adds a node and causes the indent character to go before the new closing span instead of the closing TD like it should.
-CONCLUSION: The only place to do add indents before the comment character is AFTER outputNL has been converted to string via outerHTML. 
-
-NEW PLAN: Clean up the comments as best as possible and then move to adding the indent after the outputNL is converted to string. Probably best to do a separate function for that.
---------------------------------------------------------------------------------------------
-Comment Block Issues -- these problems are universal to all tdbut and tablebut flavors of both imgswap and bgimage:
-DONE: Needs linebreak before the closing td and before the indent chars - this can be handled in applyIndents. See the commentNodeIndex routine in applyIndents
-
-
-
-
-needs indentchars before the ms conditional flag - this has to be handled in the clipboardStr
-
-
-
-
-
-
-
-
-
 TODO: The CSS output will need to be revisited for td and table.
 TODO: Figure out why queryDOMElements is running mutliple times per CB build.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
@@ -74,7 +38,7 @@ TODO: FIX CHROME CSS!
 /* !VA  - 06.23.19
 =========================================================
 
-
+TODO: Fix Include wrapper table options don't appear if the CCP is closed and re-opened 
 TODO: rewrite getAppdata to only query specific items in the array, or at least use destructuring to only make a const out of which ever Appdata property is needed in the respective function.
 TOD0: Think about making getAppdata only query a specific property if possible.
 TODO: Fix being able to resize viewerW smaller than imgW - current behavior is imgw resizes with viewerW. If that's the desired behavior, imgW still doesn't write the udpated width to Appdata, that needs to be fixed.

@@ -184,10 +184,7 @@
                     <label class="col-2-label" for="ipt-ccp-img-class-input">class=</label> 
                     <input id="ipt-ccp-img-class" value="" placeholder="none" />  
                   </div> 
-                  <div id="ccp-img-alt"> 
-                    <label class="col-2-label" for="ipt-ccp-img-alt">alt=</label> 
-                    <input id="ipt-ccp-img-alt" value="" placeholder="none" /> 
-                  </div> 
+
                   <div id="ccp-img-relpath"> 
                     <label id="ipt-ccp-img-relpath-label" class="col-2-label" for="ipt-ccp-img-relpath">path=</label> 
                     <input id="ipt-ccp-img-relpath" value="img" placeholder="none" />
@@ -214,6 +211,10 @@
 
                 </div> 
                 <div class="ccp-options-col-3"> 
+                  <div id="ccp-img-alt"> 
+                    <label class="col-2-label" for="ipt-ccp-img-alt">alt=</label> 
+                    <input id="ipt-ccp-img-alt" value="" placeholder="none" /> 
+                  </div> 
                   <div id="ccp-img-include-width-height" > 
                     <!-- VA! Reboot: This is the label that goes with the fake checkbox hack -->
                     <label class="ccp-img-include-width-height-container mock-checkbox-container" id="ccp-img-include-width-height-container" for="img-include-width-height">
@@ -310,10 +311,29 @@
                 <div class="ccp-options-col-3">
 
                   <div id="ccp-td-basictd" > 
-                    <!-- The default checkbox is hidden -->
                     <input name="tdoptions"  type="radio" id="rdo-ccp-td-basic"  value="basic">
                     <label class="rdo-ccp-td-basic-label" id="rdo-ccp-td-basic-label" for="rdo-ccp-td-basic">
                       Basic &lt;td&gt; with options
+                  </div> 
+
+                  <div id="ccp-td-exclude-img" > 
+                    <!-- VA! Reboot: This is the label that goes with the fake checkbox hack -->
+                    <label class="ccp-td-exclude-img-container mock-checkbox-container" id="ccp-td-exclude-img-container" for="td-exclude-img">
+                      <!-- VA! Reboot: This is the label I added to allow positioning of the text label  -->
+                      <label class="ccp-td-exclude-img-label mock-checkbox" id="ccp-td-exclude-img-label" for="chk-ccp-td-exclude-img-checkbox">
+                      
+                      Exclude &lt;img&gt;</label>
+                    <!-- The default checkbox is hidden -->
+                    <input type="checkbox" checked id="chk-ccp-img-include-anchor-checkbox">
+                    <span id="spn-ccp-img-include-anchor-checkmrk"></span>
+                    <!-- VA! These options are set in handleTableWidth -->
+                  </label> 
+                  </div> 
+
+                  <div id="ccp-td-posswitch" > 
+                    <input name="tdoptions" type="radio" id="rdo-ccp-td-posswitch" value="posswitch">
+                    <label class="rdo-ccp-td-posswitch-label" id="rdo-ccp-td-posswitch-label" for="rdo-ccp-td-posswitch-radio">
+                      RTL Position Switch
                   </div> 
 
                   <div id="ccp-td-imgswap" > 
@@ -321,13 +341,6 @@
                     <input name="tdoptions" checked type="radio" id="rdo-ccp-td-imgswap" value="imgswap">
                     <label class="rdo-ccp-td-imgswap-label" id="rdo-ccp-td-imgswap-label" for="rdo-ccp-td-imgswap">
                       Mobile image swap
-                  </div> 
-
-                  <div id="ccp-td-posswitch" > 
-                    <!-- The default checkbox is hidden -->
-                    <input name="tdoptions" type="radio" id="rdo-ccp-td-posswitch" value="posswitch">
-                    <label class="rdo-ccp-td-posswitch-label" id="rdo-ccp-td-posswitch-label" for="rdo-ccp-td-posswitch-radio">
-                      RTL Position Switch
                   </div> 
 
                   <div id="ccp-td-bgimage" > 

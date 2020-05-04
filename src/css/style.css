@@ -1553,9 +1553,6 @@ output {
     color: #FFFFFF;
     width: 150px; }
 
-fieldset#ccp-img-options, fieldset#ccp-td-options, fieldset#ccp-table-options {
-  height: 162px; }
-
 fieldset {
   display: block;
   position: relative;
@@ -1572,6 +1569,14 @@ fieldset {
     color: #959595;
     font-size: 16px;
     font-weight: 400; }
+  fieldset#ccp-img-options {
+    height: 120px; }
+    fieldset#ccp-img-options .ccp-options-container {
+      height: 92px; }
+  fieldset#ccp-td-options, fieldset#ccp-table-options {
+    height: 200px; }
+    fieldset#ccp-td-options .ccp-options-container, fieldset#ccp-table-options .ccp-options-container {
+      height: 162px; }
 
 .ccp-options-container {
   position: absolute;
@@ -1587,7 +1592,7 @@ fieldset {
 .ccp-options-col-1 {
   left: 0;
   width: 92px;
-  height: 120px;
+  height: 91px;
   margin: 0 7px; }
   .ccp-options-col-1 .ccp-but {
     width: 90px;
@@ -1607,6 +1612,13 @@ fieldset {
   left: 350px;
   width: 300px;
   margin-left: 10px; }
+  .ccp-options-col-3 #ccp-img-alt {
+    padding: 0; }
+    .ccp-options-col-3 #ccp-img-alt label {
+      width: 25px;
+      text-align: left; }
+    .ccp-options-col-3 #ccp-img-alt input {
+      width: 250px; }
 
 .ccp-options-col-4 {
   left: 680px;
@@ -1730,15 +1742,16 @@ fieldset {
 
 #ccp-td-basictd, #ccp-td-imgswap, #ccp-td-posswitch, #ccp-td-bgimage {
   display: flex;
-  justify-content: space-evenly; }
+  justify-content: flex-start; }
   #ccp-td-basictd input, #ccp-td-imgswap input, #ccp-td-posswitch input, #ccp-td-bgimage input {
-    width: 5%;
+    width: 15px;
+    margin-right: 10px;
     padding-top: 5px; }
   #ccp-td-basictd label, #ccp-td-imgswap label, #ccp-td-posswitch label, #ccp-td-bgimage label {
-    text-align: left;
     width: 80%;
+    margin: 0;
     line-height: 1.5rem;
-    margin: 0; }
+    text-align: left; }
 
 #ccp-table-include-wrapper-label {
   margin: 0;
