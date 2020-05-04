@@ -5,20 +5,24 @@
 // !VA GENERAL NOTES
 /* !VA  - April Reboot Notes
 =========================================================
-// !VA 04.30.20
+// !VA 05.04.20
 Status:
 Rewrote the basic indent routine. It works now for basic TD options and should be relatively easy to modify for a no-img TD option by tweaking the output of makeTdNode to not append imgNode if selected.
-
-DONE: Implement imgSwap - done, minor indent issues remaining
-DONE: Implement bgimage: branch ImplementBgimage042820 - same remaining indent issue as imgSwap
-DONE: Implement posswitch complete 
-DONE: buildOutputNL and applyIndents commented
-DONE: Add content placeholder to posswitch
-TODO: Fix irregularities in MS conditional indents - branch fixCommentNodeIndents050220
+DONE: Reconfigured imgswap and bgimage code blocks to insert as text after clipboardStr is created from outputNL. This avoids all the issues with JS 'fixing' irregularities in MS conditional comments when we don't want them to be fixed, as was happening when trying to process the comments as document comment nodes.
 
 05.02.20
 --------
-I've been dinking with these indents for 3 months now, and I have to face the fact that there's no way to do this using the DOM. The comment nodes are too irregular, and Javascript keeps 'correcting' them thus rendering them 'incorrect'. I'm going to try one last approach, which is to add the indents to the comment nodes as strings after outputNL[x].outerHTML.
+I've been dinking with these indents for 3 months now, and I have to face the fact that there's no way to do this using the DOM. The comment nodes are too irregular, and Javascript keeps 'correcting' them thus rendering them 'incorrect'. I'm going to try one last approach, which is to add the indents to the comment nodes as strings after outputNL[x].outerHTML. Here are some of the takeaways from the odyssey of creating regular indents with irregular HTML:
+- Accessing textContent through outputNL.childNodes[i] doesn't work because the textContent doesn't include the comment characters <!--, which is what we want to replace.
+- Accessing the comment characters through outputNL.innerHMTL doesn't appear to work because once you update the DOM by replacing any content in innerHTML, the browser parses the code and tries to 'fix' it.
+- Accessing the nodeValue of the individual childNode that contains the ms conditional flag doesn't work because as soon as you do that, JS adds the missing closing span tag, which 1) adds a node and causes the indent character to go before the new closing span instead of the closing TD like it should.
+CONCLUSION: The only place to do add indents before the comment character is AFTER outputNL has been converted to string via outerHTML. 
+
+05.04.20
+TODO: Move the CCP interface around to make more room for td and table options.
+TODO: Add the Exclude <img> checkbox under Basic <td> with options
+TODO: Add Exclude <img> functionality
+TODO: Fix the Chrome CCP layout issues.
 
 
 
