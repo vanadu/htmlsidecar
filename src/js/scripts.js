@@ -175,7 +175,8 @@ var Witty = (function () {
       ccpContainer: '#ccp',
       msgContainer: '#msg-container',
       msgDisplay: '#msg-content',
-      ccpBlocker: '#ccp-blocker'
+      ccpBlocker: '#ccp-blocker',
+      hdrIsolateApp: '.header-isolate-app'
     };
 
     // !VA  UIController: ccpUserInput ID Strings
@@ -255,8 +256,6 @@ var Witty = (function () {
 
     //   }, 500);
     // });
-
-
 
 
     // !VA UIController private evalInspectorAlerts
@@ -1532,6 +1531,14 @@ var Witty = (function () {
     var btnCcpMakeClips =  UICtrl.getBtnCcpMakeClips();
     
 
+    function isolateApp() {
+      console.log('isolateApp running');
+      var foo = document.querySelector(staticRegions.headerIsolateApp);
+      console.log('foo is: ' + foo);
+
+
+    }
+
     // !VA appController private setupEventListeners
     var setupEventListeners = function() {
 
@@ -1548,6 +1555,31 @@ var Witty = (function () {
       // dropArea.addEventListener('drop', startNewDrop, false);
       // Drag and Drop Listener 
       //DRAG AND DROP PROCESSING END
+
+      var isolateAppBlob = document.querySelector(staticRegions.hdrIsolateApp);
+      console.log('isolateAppBlob is: ' + isolateAppBlob);
+      isolateAppBlob.addEventListener('click', isolateApp, false);
+
+      function isolateApp() {
+        console.log('isolateApp running');
+        var curURL = window.location.href;
+        var win;
+        win = window.open(curURL,'targetWindow',  
+          `toolbar=no,
+          location=yes,
+          status=no,
+          menubar=no,
+          scrollbars=yes,
+          resizable=yes,
+          width=930,
+          height=780`);
+        win.onload = function() {
+          var winHeaderIsolateApp = win.document.querySelector('.header-isolate-app');
+          var winHeaderContainer = win.document.querySelector('.header-container');
+          winHeaderIsolateApp.style.display = 'none';
+          winHeaderContainer.style.display = 'none';
+        }
+      }
 
       // !VA This was in the old version but it doesn't look necessary
       // function initializeHandlers() {
@@ -1650,8 +1682,6 @@ var Witty = (function () {
 
     // !VA appController private functions
     //  ==============================
-
-
 
     // appController private: hfs - FILEREADER OBJECT PROCESSING
     //Get the user-selected image file object 

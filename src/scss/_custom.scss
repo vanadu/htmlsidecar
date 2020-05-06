@@ -102,6 +102,7 @@ button:disabled  {
 
 // HERO/HEADER
 .header-container {
+  display: block;
   position: relative;
   width: 100%;
   height: 125px;
@@ -110,14 +111,36 @@ button:disabled  {
   padding-bottom: 5px;
 }
 
+.header-isolate-app {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  // border: 5px solid #959595;
+  // border-radius: 10px;
+  padding: 5px 5px 0 10px;
+  z-index: 100;
+  &:hover {
+    cursor: nw-resize;
+  }
+  img {
+    width: 30px;
+    height: auto;
+
+  }
+
+}
+
 .header-content {
   display: flex;
   position: relative;
-  flex-direction: column;
-  align-content: center;
+  justify-content: flex-start;
   width: 100%;
   height: 80px;
-  padding-left: 120px;
+  padding-left: 60px;
+}
+
+.header-text {
+  width: 600px;
 }
 
 .header-headline {
@@ -128,7 +151,7 @@ button:disabled  {
 }
 
 .header-image {
-  position: absolute;
+  position: relative;
   // top: 0;
   width: 113px;
   height: 113px;
