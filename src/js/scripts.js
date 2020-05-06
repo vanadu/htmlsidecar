@@ -23,8 +23,8 @@ DONE: Move the CCP interface around to make more room for td and table options.
 DONE: Add the Exclude <img> checkbox under Basic <td> with options
 DONE: Add Exclude <img> functionality
 DONE: FIX CHROME CSS! - see comments at custom.scss .ccp-options-container. For some reason the top: 3px instruction was breaking webkit display. Apparently Firefox handles position: absolute incorrectly, see https://brianscodingexamples.wordpress.com/2013/06/20/absolute-position-elements-in-firefox-vs-chrome/
-TODO: Fix table align, doesn't work, shows 'left' when 'center' is seleced. AND 'center' should be preselected. Issue: takes the value from the TD, not the TABLE align option. Plus, the TD Valign option is also taking that value.
-
+DONE: Fix table align, doesn't work, shows 'left' when 'center' is seleced. AND 'center' should be preselected. Issue: takes the value from the TD, not the TABLE align option. Plus, the TD Valign option is also taking that value.
+TODO: Redude size of MakeCSS buttons 
 
 TODO: The CSS output will need to be revisited for td and table.
 TODO: Figure out why queryDOMElements is running mutliple times per CB build.
@@ -558,7 +558,6 @@ var Witty = (function () {
 
     function getAlignAttribute(selectid, options) {
       var str, selInd;
-      selectid = ccpUserInput.selCcpTdAlign;
       selInd = document.querySelector(selectid).selectedIndex;
       switch (true) {
       case (selInd === 0):
@@ -661,7 +660,6 @@ var Witty = (function () {
 
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
     function buildOutputNodeList( uSels ) {
-      console.clear();
       console.log('buildOutputNodeList running');
       let tableNodeFragment, nl, frag, outputNL, clipboardStr;
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
@@ -1137,7 +1135,12 @@ var Witty = (function () {
     }
 
     function writeClipboard(id, str) {
+      console.log('writeClipboard running');
+      console.log('str: ');
+      console.log(str);
+      
       var clipboardStr;
+      
       clipboardStr = str;
       // clipboardStr = tag.outerHTML;
       var currentCB = new ClipboardJS('#' + id, {
@@ -1275,8 +1278,14 @@ var Witty = (function () {
         tableAlign: (function() {
           let str = '', options = [], selectid = '';
           selectid = ccpUserInput.selCcpTableAlign;
+          console.log('selectid send:');
+          console.log(selectid);
+          
           options = [ '', 'left', 'center', 'right'];
           str = getAlignAttribute( selectid, options );
+          console.log('str:');
+          console.log(str);
+          
           return str;
         })(),
         tableIncludeWrapper: (function() {

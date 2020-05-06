@@ -1545,7 +1545,7 @@ output {
     font-size: 14px;
     font-weight: 300; }
   #ccp-content select {
-    width: 90px;
+    width: 60px;
     font-size: 14px; }
   #ccp-content input {
     border: 1px solid #616161;
@@ -1558,8 +1558,8 @@ fieldset {
   position: relative;
   width: 100%;
   margin: 0;
-  padding: 0 0 0 10px;
-  margin-bottom: 5px;
+  padding: 0;
+  margin-bottom: 3px;
   border: 1px solid #959595;
   border-radius: 5px; }
   fieldset legend {
@@ -1572,13 +1572,17 @@ fieldset {
     font-size: 16px;
     font-weight: 400; }
   fieldset#ccp-img-options {
-    height: 120px; }
+    height: 140px; }
     fieldset#ccp-img-options .ccp-options-container {
-      height: 92px; }
-  fieldset#ccp-td-options, fieldset#ccp-table-options {
-    height: 200px; }
-    fieldset#ccp-td-options .ccp-options-container, fieldset#ccp-table-options .ccp-options-container {
-      height: 162px; }
+      height: 119px; }
+  fieldset#ccp-td-options {
+    height: 190px; }
+    fieldset#ccp-td-options .ccp-options-container {
+      height: 169px; }
+  fieldset#ccp-table-options {
+    height: 160px; }
+    fieldset#ccp-table-options .ccp-options-container {
+      height: 139px; }
 
 .ccp-options-container {
   display: flex;
@@ -1593,18 +1597,22 @@ fieldset {
 
 .ccp-options-col-1 {
   left: 0;
-  width: 92px;
-  height: 91px;
-  margin: 0 7px; }
+  width: 120px;
+  margin: 5px 0;
+  padding: 0;
+  padding-bottom: 3px; }
   .ccp-options-col-1 .ccp-but {
     width: 90px;
-    height: 90px;
+    height: 46px;
     padding-right: 7px;
-    float: left;
+    padding: 0;
+    margin: 10px auto 20px;
     display: block;
     border: none;
     background-color: transparent;
     background-size: 90px 46px !important; }
+  .ccp-options-col-1 label {
+    width: 50px; }
 
 .ccp-options-col-2 {
   left: 120px;
@@ -1627,13 +1635,13 @@ fieldset {
   width: 70px; }
   .ccp-options-col-4 .ccp-but {
     display: block;
-    width: 60px;
-    height: 35px;
-    margin-bottom: 9px;
+    width: 52px;
+    height: 30px;
+    margin-bottom: 8px;
     background-color: transparent;
     cursor: default;
     border: none;
-    background-size: 60px 35px !important; }
+    background-size: 52px 30px !important; }
     .ccp-options-col-4 .ccp-but.active {
       display: block;
       cursor: pointer; }

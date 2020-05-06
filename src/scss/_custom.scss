@@ -757,7 +757,7 @@ output {
     font-weight: 300;
   }
   select {
-    width: 90px;
+    width: 60px;
     font-size: 14px;
   }
   // CCP input element styles
@@ -781,8 +781,8 @@ fieldset {
   // VA! Below overrides the fieldset margin in normalize.less
   margin: 0;
   // VA! Below overrides the fieldset padding in normalize.less
-  padding: 0 0 0 10px;
-  margin-bottom: 5px;
+  padding: 0;
+  margin-bottom: 3px;
   border: 1px solid $fieldset-border-color;
   border-radius: 5px;
   legend {
@@ -796,15 +796,21 @@ fieldset {
     font-weight: 400;
   }
   &#ccp-img-options {
-    height: 120px;
+    height: 140px;
     .ccp-options-container {
-      height: 92px;
+      height: 119px;
     }
   }
-  &#ccp-td-options, &#ccp-table-options {
-    height: 200px;
+  &#ccp-td-options {
+    height: 190px;
     .ccp-options-container {
-      height: 162px;
+      height: 169px;
+    }
+  }
+  &#ccp-table-options {
+    height: 160px;
+    .ccp-options-container {
+      height: 139px;
     }
   }
 }
@@ -834,20 +840,26 @@ fieldset {
 
 
 .ccp-options-col-1 {
-  // !VA Width is actually irrelevant here since these elements are absolutely positioned
+  // !VA Height is irrelevant here since these elements get their height from the parent
   left: 0;
-  width: 92px;
-  height: 91px;
-  margin: 0 7px;
+  width: 120px;
+  margin: 5px 0;
+  padding: 0;
+  padding-bottom: 3px;
   .ccp-but {
     width: 90px;
-    height: 90px; 
+    height: 46px; 
     padding-right: 7px;
-    float: left;
+    padding: 0;
+    margin: 10px auto 20px;
+    
     display: block;
     border: none;
     background-color: transparent;
     background-size: 90px 46px !important;
+  }
+  label {
+    width: 50px;
   }
 }
 .ccp-options-col-2 {
@@ -876,14 +888,14 @@ fieldset {
   width: 70px;
   .ccp-but {
     display: block;
-    width: 60px;
-    height: 35px;
-    margin-bottom: 9px;
+    width: 52px;
+    height: 30px;
+    margin-bottom: 8px;
     // border: 1px solid transparent;
     background-color:  transparent;
     cursor: default;
     border: none;
-    background-size:  60px 35px !important;
+    background-size:  52px 30px !important;
     &.active {
       display: block;
       cursor: pointer;

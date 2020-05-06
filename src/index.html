@@ -178,6 +178,15 @@
                 <div class="ccp-options-col-1"> 
                     <!-- VA! Reboot: why no parent div here?-->
                     <button id="btn-ccp-make-img-tag" class="ccp-but"></button> 
+                    <div id="ccp-img-align"> 
+                      <label id="sel-ccp-img-align-label" class="col-2-label" for="sel-ccp-img-align">align=</label> 
+                      <select id="sel-ccp-img-align"> 
+                        <option selected="selected">none</option> 
+                        <option>left</option> 
+                        <option>middle</option> 
+                        <option>right</option> 
+                      </select> 
+                    </div> 
                 </div> 
                 <div class="ccp-options-col-2"> 
                   <div id="ccp-img-class"> 
@@ -190,15 +199,7 @@
                     <input id="ipt-ccp-img-relpath" value="img" placeholder="none" />
                     <!-- <span class="slash">&nbsp;/</span>  -->
                   </div> 
-                  <div id="ccp-img-align"> 
-                    <label id="sel-ccp-img-align-label" class="col-2-label" for="sel-ccp-img-align">align=</label> 
-                    <select id="sel-ccp-img-align"> 
-                      <option selected="selected">none</option> 
-                      <option>left</option> 
-                      <option>middle</option> 
-                      <option>right</option> 
-                    </select> 
-                  </div> 
+
 
                   <!-- VA! V2 Leaving this out for now... -->
                   <!-- <div id="img-width">
@@ -274,6 +275,24 @@
                 <div class="ccp-options-col-1"> 
                   <!-- VA! Reboot: why no parent div here? -->
                     <button id="btn-ccp-make-td-tag" class="ccp-but"></button> 
+                    <div id="ccp-td-align"> 
+                      <label id="sel-ccp-td-align-label" class="col-2-label" for="sel-ccp-td-align">align=</label> 
+                      <select id="sel-ccp-td-align">
+                        <option>none</option> 
+                        <option selected="selected">left</option> 
+                        <option>center</option> 
+                        <option>right</option> 
+                      </select>  
+                    </div> 
+                    <div id="ccp-td-valign"> 
+                      <label id="sel-ccp-td-valign-label" class="col-2-label" for="sel-ccp-td-valign">valign=</label>
+                      <select id="sel-ccp-td-valign"> 
+                        <option>none</option> 
+                        <option selected="selected">top</option> 
+                        <option>middle</option> 
+                        <option>bottom</option> 
+                      </select> 
+                    </div>
                 </div> 
       
                 <div class="ccp-options-col-2"> 
@@ -281,24 +300,7 @@
                     <label class="col-2-label" for="ipt-ccp-td-class">class=</label> 
                     <input id="ipt-ccp-td-class" value="" placeholder="none" />  
                   </div> 
-                  <div id="ccp-td-align"> 
-                    <label id="sel-ccp-td-align-label" class="col-2-label" for="sel-ccp-td-align">align=</label> 
-                    <select id="sel-ccp-td-align">
-                      <option>none</option> 
-                      <option selected="selected">left</option> 
-                      <option>center</option> 
-                      <option>right</option> 
-                    </select>  
-                  </div> 
-                  <div id="ccp-td-valign"> 
-                    <label id="sel-ccp-td-valign-label" class="col-2-label" for="sel-ccp-td-valign">valign=</label>
-                    <select id="sel-ccp-td-valign"> 
-                      <option>none</option> 
-                      <option selected="selected">top</option> 
-                      <option>middle</option> 
-                      <option>bottom</option> 
-                    </select> 
-                  </div>
+
                   <div id="ccp-td-height">
                     <label for="ipt-ccp-td-height" class="col-2-label" id="ipt-ccp-td-height-label">height=</label>
                     <input type="text" id="ipt-ccp-td-height" placeholder="none" value="" />
@@ -370,6 +372,10 @@
                     <label class="col-2-label"for="ipt-ccp-table-class">class=</label>
                     <input id="ipt-ccp-table-class" placeholder="none" />  
                   </div> 
+                  <div id="ccp-table-width">
+                      <label id="ipt-ccp-table-width-label" class="col-2-label" for="ipt-ccp-table-width">width=</label> 
+                      <input id="ipt-ccp-table-width" value="" placeholder="" />
+                  </div>
                   <div id="ccp-table-align"> 
                     <label class="col-2-label" id="ccp-table-align-label" for="sel-ccp-table-align">align=</label> 
                     <!-- We can hard code these because there isn't any dynamic data -->
@@ -379,10 +385,6 @@
                       <option selected="selected">center</option> 
                       <option>right</option> 
                     </select>
-                  </div>
-                  <div id="ccp-table-width">
-                      <label id="ipt-ccp-table-width-label" class="col-2-label" for="ipt-ccp-table-width">width=</label> 
-                      <input id="ipt-ccp-table-width" value="" placeholder="" />
                   </div>
                   <div id="ccp-table-bgcolor">
                       <label class="col-2-label" for="ipt-ccp-table-bgcolor" id="ipt-ccp-table-bgcolor-label">bgcolor=</label>
