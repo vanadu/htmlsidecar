@@ -1585,16 +1585,8 @@ var Witty = (function () {
           menubar=no,
           scrollbars=no,
           resizable=no,
-          width=930,
-          height=780`);
-        win.onload = function() {
-          // !VA Below works
-          // win.opener.document.write('<p>This is the source window!</p>'); 
-          // !VA Below doesn't work because myVariable is an object, and isn't defined - it still doesn't work.
-          // let passedVariable = window.opener.myObject;
-          // console.log('passedVariable:');
-          // console.log(passedVariable);
-        };
+          width=870,
+          height=775`);
       }
 
       // !VA This was in the old version but it doesn't look necessary

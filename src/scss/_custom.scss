@@ -58,7 +58,6 @@ body {
   min-height: 100% !important; 
   font-family: $primary-font-family;
   font-size: 1rem;
-  
 }
 
 // VA! Reboot: only for content, probably can delete
@@ -105,8 +104,8 @@ button:disabled  {
   display: block;
   position: relative;
   width: 100%;
-  height: 125px;
-  margin: 0 auto;
+  height: 93px;
+  margin: 0 auto 40px;
   padding-top: 10px;
   padding-bottom: 5px;
 }
@@ -126,7 +125,6 @@ button:disabled  {
   img {
     width: 30px;
     height: auto;
-
   }
 
 }
@@ -155,7 +153,7 @@ button:disabled  {
   position: relative;
   // top: 0;
   width: 113px;
-  height: 113px;
+  height: 90px;
   margin-top: -8px;
   margin-left: -8px;
   float: left;
@@ -231,9 +229,9 @@ button:disabled  {
   display: block;
   position: relative;
   // VA! This yields a viewport width of 802, which allows a user-entered width of 800 max
-  width: 850px;
-  min-height: 679px;
-  margin: 30px auto 100px;
+  width: 860px;
+  min-height: 725px;
+  margin: 45px auto 0;
 }
 
 // TOOLS
@@ -413,7 +411,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   position: absolute;
   top: 50px;
   justify-content: space-evenly;
-  width: 100%;
+  width: 850px;
   height:  95px;
   margin: 0;
   padding: 0;
@@ -524,11 +522,11 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 #msg-container {
   display: block;
   position: relative;
-  top: -65px;
+  top: -40px;
   // top: 0px;
   left: 0;
   width: 100%;
-  height: 65px;
+  height: 35px;
   opacity: 1;
   &.show-err {
     opacity: 1;
@@ -565,29 +563,21 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
     // -webkit-transform: scaleX(0);
     // -webkit-transition: -webkit-transform 500ms;
   }
-  // dim-errors
-  table {
-    display: block;
-    position: relative;
-    width: 650px;
-    height: 100%;
-    margin: 0 auto;
-    // msg-content
-    td {
-      width: 650px;
-      height: 65px;
-      font-size: 17px;
-      line-height: 18px;
-      font-style: italic;
-      font-weight: normal;
-      text-align: center;
-      text-transform: none;
-      vertical-align: middle;
-      // overflow: hidden;
-    }
-  }
 }
 
+// VA! Message content
+h4#msg-content {
+  width: 100%;
+  height: 1.75rem;
+  // margin-top: 1rem;
+  margin: 0;
+  padding: 0;
+  font-size: 1.125rem;
+  font-style: italic;
+  font-weight: normal;
+  line-height: 1.75rem;
+  text-align: center;
+}
 
 // MAIN IMAGE VIEWER
 #main-image-viewer {
