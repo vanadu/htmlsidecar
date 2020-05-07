@@ -89,19 +89,11 @@ var Witty = (function () {
   // });
 
   // !VA Run on page load
-  document.addEventListener("DOMContentLoaded", function() {
-    console.log('DOMContentLoaded');
-    var headerContainer = document.querySelector('.header-container');
-    // headerContainer.style.display = 'block';
-    console.log('headerContainer is: ' + headerContainer);
-    console.log('headerContainer.style.display:');
-    console.log(headerContainer.style.display);
-    console.log('getComputedStyle(headerContainer, null).display');
-    console.log(getComputedStyle(headerContainer, null).display);
-    
+  // document.addEventListener("DOMContentLoaded", function() {
+    // console.log('DOMContentLoaded');
 
 
-  });
+  // });
 
   // !VA DEV Test function to get the clicked element to the console
   // (function () {
@@ -242,6 +234,7 @@ var Witty = (function () {
       rdoCcpTdImgswap: '#rdo-ccp-td-imgswap',
       rdoCcpTdPosswitch: '#rdo-ccp-td-posswitch',
       rdoCcpTdBgimage: '#rdo-ccp-td-bgimage',
+      rdoCcpTdVmlButton: '#rdo-ccp-td-vmlbutton',
 
 
       iptCcpTableClass: '#ipt-ccp-table-class',
@@ -769,7 +762,7 @@ var Witty = (function () {
         clipboardStr = outputNL[0].outerHTML;
 
       // !VA imgSwap and bgimage option - includes MS conditional code retrieved by getImgSwapBlock and getBgimageBlock which includes getIndent functions. First, run applyIndents on outputNL. applyIndents also inserts tokens at the position where the codeBlock is to be inserted. The parent nodelist is converted to a string, the code blocks are retrieved, indents are inserted, and finally the codeblocks are inserted into the string between the tags of the last node in the outputNL.outerHTML string. 
-      } else if (uSels.selectedRadio === 'imgswap' || uSels.selectedRadio  === 'bgimage') {
+      } else if (uSels.selectedRadio === 'imgswap' || uSels.selectedRadio  === 'bgimage' || uSels.selectedRadio === 'vmlbutton') {
         // !VA We start with the tdbut makeNode button because the img makeNode button isn't referenced in the imgswap option. The A/IMG tags are hard-coded into the MS Conditional code in getImgSwapBlock. Also, there's a switch to include/exclude the A/IMG node in makeTdNode.
 
         // !VA extractNodeIndex is the nl index position at which the nodes are extracted to build outputNL. It equals the nodeList length minus the indentLevel.
@@ -804,14 +797,25 @@ var Witty = (function () {
         applyIndents(uSels, outputNL);
         // !VA Convert outputNL to a string (including tokens for inserting MS conditional code) for output to Clipboard object.
         clipboardStr = outputNL[0].outerHTML;
+        console.log(outputNL[0]);
+        
+        console.log('mark 1 clipboardStr:');
+        console.log(clipboardStr);
         // !VA Get the codeBlock corresponding to the selected TD option
         if ( uSels.selectedRadio === 'imgswap') {
           codeBlock = getImgSwapBlock(indentLevel);
         } else if (  uSels.selectedRadio === 'bgimage' ) {
           codeBlock = getBgimageBlock(indentLevel);
+        } else if (uSels.selectedRadio === 'vmlbutton') {
+          console.log('mark1');
+          codeBlock = getVmlButtonBlock(indentLevel);
+          console.log('codeBlock is: ' + codeBlock);
         }
         // !VA Replace the tokens in clipboardStr with the codeBlock
         clipboardStr = clipboardStr.replace('/replacestart//replaceend/', codeBlock + '\n');
+        console.log('mark 2 clipboardStr:');
+        console.log(clipboardStr);
+        
       } 
       // !VA Convert the alias of the clicked button to an ID the Clipboard object recognizes and write clipboardStr to the clipboard.
       writeClipboard( aliasToId(uSels.buttonClicked), clipboardStr);
@@ -869,6 +873,19 @@ var Witty = (function () {
       // console.log('bgimageStr is: ');
       // console.log(bgimageStr);
       return bgimageStr;
+    }
+
+    function getVmlButtonBlock (indentLevel) {
+      // console.clear();
+      let Attributes;
+      Attributes = getAttributes();
+      console.dir(Attributes);
+      let vmlButtonStr;
+      let linebreak;
+      linebreak = '\n';
+      vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:40px;v-text-anchor:middle;width:200px;" arcsize="10%" strokecolor="#1e3650" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="https://i.imgur.com/0xPEf.gif" color="#556270" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Show me the button!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="#"
+style="background-color:#556270;background-image:url(https://i.imgur.com/0xPEf.gif);border:1px solid #1e3650;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:40px;text-align:center;text-decoration:none;width:200px;-webkit-text-size-adjust:none;mso-hide:all;">Show me the button!</a></div>`;
+      return vmlButtonStr;
     }
     // !VA END TD OPTIONS MS-CONDITIONAL CODE BLOCKS
     // function makeImgNode ( id ) {
@@ -1094,7 +1111,7 @@ var Witty = (function () {
       let stackColumnIndentLevel;
 
       let hasMSConditional;
-      if ( uSels.selectedRadio === 'imgswap' || uSels.selectedRadio === 'bgimage') {
+      if ( uSels.selectedRadio === 'imgswap' || uSels.selectedRadio === 'bgimage' || uSels.selectedRadio === 'vmlbutton') {
         hasMSConditional = true;
       }
       for (let i = 0; i < outputNL.length; i++) {
@@ -1586,7 +1603,6 @@ var Witty = (function () {
       //DRAG AND DROP PROCESSING END
 
       var isolateAppBlob = document.querySelector(staticRegions.hdrIsolateApp);
-      console.log('isolateAppBlob is: ' + isolateAppBlob);
       isolateAppBlob.addEventListener('click', isolateApp, false);
 
       function isolateApp() {
