@@ -8,10 +8,15 @@
 // !VA 05.07.20
 Status:
 Rewrote the basic indent routine. It works now for basic TD options and should be relatively easy to modify for a no-img TD option by tweaking the output of makeTdNode to not append imgNode if selected.
+DONE: Add bulletproof button td option
+
 TODO: Add tag name to CSS selector output
 TODO: Include JSON file settings for content width, small phone width and large phone width
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
-TODO: Add bulletproof button td option
+
+
+
+
 
 
 NOTES from first tutorial attempts:
