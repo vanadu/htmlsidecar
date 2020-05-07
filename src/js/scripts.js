@@ -883,8 +883,25 @@ var Witty = (function () {
       let vmlButtonStr;
       let linebreak;
       linebreak = '\n';
-      vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:40px;v-text-anchor:middle;width:200px;" arcsize="10%" strokecolor="#1e3650" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="https://i.imgur.com/0xPEf.gif" color="#556270" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Show me the button!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="#"
-style="background-color:#556270;background-image:url(https://i.imgur.com/0xPEf.gif);border:1px solid #1e3650;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:40px;text-align:center;text-decoration:none;width:200px;-webkit-text-size-adjust:none;mso-hide:all;">Show me the button!</a></div>`;
+      // !VA Branch: implementVMLButton (050720)
+      /* !VA  
+      Should be:  width = tdoptions.height.input.value
+                  height = tdoptions.height.input.value
+                  if either of the above's value is falsy, trigger an error
+
+
+      
+      
+      */
+      var tdHeight, tdWidth;
+      console.clear();
+      tdHeight = document.querySelector(ccpUserInput.iptCcpTdHeight).value;
+      tdWidth = document.querySelector(ccpUserInput.iptCcpTdWidth).value;
+
+
+
+      vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:${tdHeight}px;v-text-anchor:middle;width:${tdWidth}px;" arcsize="10%" strokecolor="#1e3650" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc}" color="#556270" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Show me the button!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="#"
+style="background-color:#556270;background-image:url(${Attributes.imgSrc});border:1px solid #1e3650;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:${tdHeight}px;text-align:center;text-decoration:none;width:${tdWidth}px;-webkit-text-size-adjust:none;mso-hide:all;">Show me the button!</a></div>`;
       return vmlButtonStr;
     }
     // !VA END TD OPTIONS MS-CONDITIONAL CODE BLOCKS
@@ -966,6 +983,18 @@ style="background-color:#556270;background-image:url(https://i.imgur.com/0xPEf.g
         // !VA valign attribute
         if (Attributes.tdAlign) { tdInner.align = Attributes.tdAlign; }
         // !VA height attribute
+        // !VA Branch: implementVMLButton (050720) The below is wrong. 
+        /* !VA  Problems:
+        1) ClipClip isnt' working as it should - it repopulates the list after you delete it.
+        2) If you add height and width to TD options, it stays in there even if you delete it from the input fields.
+        
+        
+        
+        
+        */
+
+
+
         if (Attributes.tdHeight) { tdInner.height = Attributes.tdHeight; }
         if (Attributes.tdWidth) { tdInner.width = Attributes.tdWidth; }
         // !VA Branch: implementExcludeImg (050420)
