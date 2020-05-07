@@ -71,6 +71,21 @@ var Witty = (function () {
   //   }, 500);
   // });
 
+  // !VA Run on page load
+  document.addEventListener("DOMContentLoaded", function() {
+    console.log('DOMContentLoaded');
+    var headerContainer = document.querySelector('.header-container');
+    // headerContainer.style.display = 'block';
+    console.log('headerContainer is: ' + headerContainer);
+    console.log('headerContainer.style.display:');
+    console.log(headerContainer.style.display);
+    console.log('getComputedStyle(headerContainer, null).display');
+    console.log(getComputedStyle(headerContainer, null).display);
+    
+
+
+  });
+
   // !VA DEV Test function to get the clicked element to the console
   // (function () {
   //   document.addEventListener('click', function(e) {
@@ -123,7 +138,12 @@ var Witty = (function () {
   // }
 
 
+  // !VA GLOBAL
+  let myObject = {};
+  myObject.variable = 'This is a string';
 
+
+  
 
 
 
@@ -1531,14 +1551,6 @@ var Witty = (function () {
     var btnCcpMakeClips =  UICtrl.getBtnCcpMakeClips();
     
 
-    function isolateApp() {
-      console.log('isolateApp running');
-      var foo = document.querySelector(staticRegions.headerIsolateApp);
-      console.log('foo is: ' + foo);
-
-
-    }
-
     // !VA appController private setupEventListeners
     var setupEventListeners = function() {
 
@@ -1562,7 +1574,8 @@ var Witty = (function () {
 
       function isolateApp() {
         console.log('isolateApp running');
-        var curURL = window.location.href;
+        // !VA Put a query string in the URL to indicate that the child window is isolated
+        var curURL = window.location.href + '?isolate=' + true;
         var win;
         win = window.open(curURL,'targetWindow',  
           `toolbar=no,
@@ -1574,11 +1587,13 @@ var Witty = (function () {
           width=930,
           height=780`);
         win.onload = function() {
-          var winHeaderIsolateApp = win.document.querySelector('.header-isolate-app');
-          var winHeaderContainer = win.document.querySelector('.header-container');
-          winHeaderIsolateApp.style.display = 'none';
-          winHeaderContainer.style.display = 'none';
-        }
+          // !VA Below works
+          // win.opener.document.write('<p>This is the source window!</p>'); 
+          // !VA Below doesn't work because myVariable is an object, and isn't defined - it still doesn't work.
+          // let passedVariable = window.opener.myObject;
+          // console.log('passedVariable:');
+          // console.log(passedVariable);
+        };
       }
 
       // !VA This was in the old version but it doesn't look necessary
@@ -2566,6 +2581,20 @@ var Witty = (function () {
       init: function(){
         console.log('App initialized.');
         // !VA  Make sure the CCP is off
+
+
+        // !VA Determine if the window is an isolate window, i.e. should be displayed with just the Witty app in window with fixed dimensions without header or tutorial content.
+        let curUrl;
+        // !VA If the value of the query string is true, then remove the header-container, isolate button and content from the DOM
+        curUrl = window.location.href;
+        if (curUrl.substring(curUrl.length - 4))  {
+          console.log('is isolate');
+          document.querySelector('.header-container').style.display = 'none';
+          document.querySelector('.header-isolate-app').style.display = 'none';
+          document.querySelector('.content-section').style.display = 'none';
+        }
+
+        // !VA Hide the CCP
         document.querySelector(staticRegions.ccpContainer).classList.remove('active');
         setupEventListeners();
         // !VA  Test if there is currently #cur-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
