@@ -1577,13 +1577,14 @@ var Witty = (function () {
         // !VA Put a query string in the URL to indicate that the child window is isolated
         var curURL = window.location.href + '?isolate=' + true;
         var win;
+        // !VA Open a new fixed-size window with no browser elements except the URL bar
         win = window.open(curURL,'targetWindow',  
           `toolbar=no,
           location=yes,
           status=no,
           menubar=no,
-          scrollbars=yes,
-          resizable=yes,
+          scrollbars=no,
+          resizable=no,
           width=930,
           height=780`);
         win.onload = function() {
@@ -2587,12 +2588,12 @@ var Witty = (function () {
         let curUrl;
         // !VA If the value of the query string is true, then remove the header-container, isolate button and content from the DOM
         curUrl = window.location.href;
-        if (curUrl.substring(curUrl.length - 4))  {
-          console.log('is isolate');
+
+        if (curUrl.substring(curUrl.length - 4) === 'true')  {
           document.querySelector('.header-container').style.display = 'none';
           document.querySelector('.header-isolate-app').style.display = 'none';
           document.querySelector('.content-section').style.display = 'none';
-        }
+        } 
 
         // !VA Hide the CCP
         document.querySelector(staticRegions.ccpContainer).classList.remove('active');
