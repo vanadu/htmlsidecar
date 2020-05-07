@@ -10,13 +10,17 @@ Status:
 Rewrote the basic indent routine. It works now for basic TD options and should be relatively easy to modify for a no-img TD option by tweaking the output of makeTdNode to not append imgNode if selected.
 DONE: Add bulletproof button td option
 
+TODO: Show and hide TD inputs based on option
 TODO: Add tag name to CSS selector output
 TODO: Include JSON file settings for content width, small phone width and large phone width
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
+TODO: Fix imgswap codeBlock output: alt tag has quotes following, alt doesn't work.
 
 
-
-
+Errors Handling
+--------------
+vmlbutton: TD width and height MUST BE entered, otherwise the button has no dimensions
+vmlbutton: TD Height has to equal the Display Height, otherwise, the graphic will not fit the button
 
 
 NOTES from first tutorial attempts:
@@ -847,16 +851,27 @@ var Witty = (function () {
     function getImgSwapBlock( indentLevel ) {
       let Appdata, Attributes, linebreak;
       Attributes = getAttributes();
+      console.log('Attributes');
+      console.dir(Attributes);
       Appdata = appController.initGetAppdata();
+      console.log('Appdata');
+      console.dir();
       linebreak = '\n';
       let mobileFilename, mobileSwapStr;
       // !VA Create the mobile image filename: Get the current image file's filename and append the name with '-mob'.
-      mobileFilename = Appdata.fname;
+      mobileFilename = Attributes.imgSrc;
       // !VA The regex for appending the filename with '-mob'.
-      mobileFilename = mobileFilename.replace(/(.jpg|.png|.gif|.svg)/g, "-mob$1");
-      // !VA Set the indentLevel to 1 for now
+      mobileFilename = mobileFilename.replace(/(.jpg|.png|.gif|.svg)/g, "_mob$1");
       // !VA Create the code for the mobile swap TD as a Comment node of the parent td. 
-      mobileSwapStr = `${linebreak}${getIndent(indentLevel)}<!--[if !mso]><!-->${linebreak}${getIndent(indentLevel)}<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">${linebreak}${getIndent(indentLevel)}<a href="#"><img class="mobileshow" alt=${Attributes.imgAlt} width="${Appdata.sPhonesW}" height="${Appdata.sPhonesH}" src="${mobileFilename}" border="0" style="width: ${Appdata.sPhonesW}px; height: ${Appdata.sPhonesH}px; margin: 0; border: none; outline: none; text-decoration: none; display: block;" /></a>${linebreak}${getIndent(indentLevel)}<!--</span>-->${linebreak}${getIndent(indentLevel)}<!--<![endif]-->`;
+      // !VA Issues 05.07.20 //
+
+      // !VA  The parent TD is different, it should have no width, no valign and no height. Tt should be align='left', style="vertical-align:top" 
+      // !VA  The img is missing here completely. It should ge the img and anchor. I think this is probably a result of getting rid of the img for the excludeimg option  -->
+
+
+
+
+      mobileSwapStr = `${linebreak}${getIndent(indentLevel)}<a href="#"><img class="hide" alt="${Attributes.imgAlt}" width="${Attributes.imgWidth}" height="${Attributes.imgHeight}" src="${Attributes.imgSrc}" border="0" style="width: ${Attributes.imgWidth}px; height: ${Attributes.imgHeight}px; margin: 0; border: none; outline: none; text-decoration: none; display: block; "></a>${linebreak}${getIndent(indentLevel)}<!--[if !mso]><!-->${linebreak}${getIndent(indentLevel)}<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">${linebreak}${getIndent(indentLevel)}<a href="#"><img class="mobileshow" alt="${Attributes.imgAlt}" width="${Appdata.sPhonesW}" height="${Appdata.sPhonesH}" src="${mobileFilename}" border="0" style="width: ${Appdata.sPhonesW}px; height: ${Appdata.sPhonesH}px; margin: 0; border: none; outline: none; text-decoration: none; display: block;" /></a>${linebreak}${getIndent(indentLevel)}<!--</span>-->${linebreak}${getIndent(indentLevel)}<!--<![endif]-->`;
       // !VA Append the mobileSwapStr code to tdInner
       // tdInner.appendChild(mobileSwapStr);
       return mobileSwapStr;
@@ -872,6 +887,11 @@ var Witty = (function () {
       // !VA 03.09.2020 Set the indentLevel to 1 for now
       fallback = '#7bceeb';
       Attributes.tdBgcolor ? bgcolor = Attributes.tdBgcolor : bgcolor = fallback;
+
+
+      // !VA This is wrong: the td should have bgcolor. Besides that looks OK
+      
+      
 
       // !VA Define the innerHTML of the bgimage code
       bgimageStr = `${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}${getIndent(indentLevel)}<div>${linebreak}${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div>${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}  </v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect>${linebreak}${getIndent(indentLevel)}<![endif]-->`;
@@ -1018,10 +1038,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         tdInner.height = Attributes.tdAppdataHeight;
         // !VA valign attribute
         tdInner.align = Attributes.tdAlign;
-        // !VA get the current img
-        // !VA Branch: implementImgSwap (042720) Don't include the imgNode
-        // imgNode = makeImgNode();
-        // tdInner.appendChild(imgNode);
+
         break;
       // !VA Branch: 031320A
       // case (selectedRadio === 'bgimage'):
@@ -1045,9 +1062,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       } 
       // !VA Branch: 031320A
       // return tdInner;
-      // console.log('tdInner is: ');
-      // console.log(tdInner);
+      console.log('1074 tdInner is: ');
+      console.log(tdInner);
       tdNodeFragment.appendChild(tdInner);
+      console.log('1077 tdNodeFragment');
+      console.log(tdNodeFragment);
+      
       return tdNodeFragment;
 
     }
