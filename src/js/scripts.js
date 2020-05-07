@@ -5,10 +5,23 @@
 // !VA GENERAL NOTES
 /* !VA  - April Reboot Notes
 =========================================================
-// !VA 05.04.20
+// !VA 05.07.20
 Status:
 Rewrote the basic indent routine. It works now for basic TD options and should be relatively easy to modify for a no-img TD option by tweaking the output of makeTdNode to not append imgNode if selected.
-DONE: Reconfigured imgswap and bgimage code blocks to insert as text after clipboardStr is created from outputNL. This avoids all the issues with JS 'fixing' irregularities in MS conditional comments when we don't want them to be fixed, as was happening when trying to process the comments as document comment nodes.
+TODO: Add tag name to CSS selector output
+TODO: Include JSON file settings for content width, small phone width and large phone width
+TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
+TODO: Add bulletproof button td option
+
+
+NOTES from first tutorial attempts:
+	Why is Wrapper table and parent table being output as two clips in ClipClip?
+	Why is CSS table buttons outputting duplicate clips in ClipClip?
+	Why is td css button not including the element name in the selector? This is now a TODO.
+	Wh are  table css buttons not showing when class is entered? Sometimes they don't...
+	When wrapper table is selected and a class is entered in both, which one use output with the CSS buttons?
+
+
 
 05.02.20
 --------
@@ -18,13 +31,17 @@ I've been dinking with these indents for 3 months now, and I have to face the fa
 - Accessing the nodeValue of the individual childNode that contains the ms conditional flag doesn't work because as soon as you do that, JS adds the missing closing span tag, which 1) adds a node and causes the indent character to go before the new closing span instead of the closing TD like it should.
 CONCLUSION: The only place to do add indents before the comment character is AFTER outputNL has been converted to string via outerHTML. 
 
-05.04.20
+05.07.20
+-----------
+DONE: Include routine to isolate and open Witty app in a new browser window.
+DONE: Reconfigure and repositon msg-container
+DONE: Put align options under MakeHTML buttons for IMG and TD options
 DONE: Move the CCP interface around to make more room for td and table options.
 DONE: Add the Exclude <img> checkbox under Basic <td> with options
 DONE: Add Exclude <img> functionality
 DONE: FIX CHROME CSS! - see comments at custom.scss .ccp-options-container. For some reason the top: 3px instruction was breaking webkit display. Apparently Firefox handles position: absolute incorrectly, see https://brianscodingexamples.wordpress.com/2013/06/20/absolute-position-elements-in-firefox-vs-chrome/
 DONE: Fix table align, doesn't work, shows 'left' when 'center' is seleced. AND 'center' should be preselected. Issue: takes the value from the TD, not the TABLE align option. Plus, the TD Valign option is also taking that value.
-TODO: Redude size of MakeCSS buttons 
+TODO: Resize MakeCSS buttons 
 
 TODO: The CSS output will need to be revisited for td and table.
 TODO: Figure out why queryDOMElements is running mutliple times per CB build.
