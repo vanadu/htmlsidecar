@@ -531,29 +531,29 @@ var Witty = (function () {
       switch(true) {
       case (id.includes('img-dsktp')):
         // args[0] = Attributes.imgClass, args[1] = Attributes.imgWidth, args[2] = Attributes.imgHeight;
-        clipboardStr = `.${Attributes.imgClass} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important; }`;
+        clipboardStr = `img.${Attributes.imgClass} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important; }`;
         break;
       case (id.includes('img-smphn')):
-        clipboardStr = `.${Attributes.imgClass} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important; }`;
+        clipboardStr = `img.${Attributes.imgClass} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important; }`;
         break;
       case (id.includes('img-lgphn')):
-        clipboardStr = `.${Attributes.imgClass} { width: ${Appdata.lPhonesW}px !important; height: ${Appdata.lPhonesH}px !important; }`;
+        clipboardStr = `img.${Attributes.imgClass} { width: ${Appdata.lPhonesW}px !important; height: ${Appdata.lPhonesH}px !important; }`;
         break;
       case (id.includes('td-dsktp') || id.includes('td-smphn') || id.includes('td-lgphn')) :
         if ( Attributes.tdHeight) {
-          clipboardStr = `.${Attributes.tdClass} { height: ${Attributes.tdHeight}px !important; }`;
+          clipboardStr = `td.${Attributes.tdClass} { height: ${Attributes.tdHeight}px !important; }`;
         } else {
-          clipboardStr = `.${Attributes.tdClass} {  }`;
+          clipboardStr = `td.${Attributes.tdClass} {  }`;
         }
         break;
       case (id.includes('table-dsktp')):
-        clipboardStr = `.${Attributes.tableClass} { width: ${Attributes.tableWidth}px !important; align: ${Attributes.tableAlign} !important; }`;
+        clipboardStr = `table.${Attributes.tableClass} { width: ${Attributes.tableWidth}px !important; align: ${Attributes.tableAlign} !important; }`;
         break;
       case (id.includes('table-smphn')):
-        clipboardStr = `.${Attributes.tableClass} { width: ${Appdata.sPhonesW}px !important; align: ${Attributes.tableAlign} !important; }`;
+        clipboardStr = `table.${Attributes.tableClass} { width: ${Appdata.sPhonesW}px !important; align: ${Attributes.tableAlign} !important; }`;
         break;
       case (id.includes('table-lgphn')):
-        clipboardStr = `.${Attributes.tableClass} { width: ${Appdata.lPhonesW}px !important; align: ${Attributes.tableAlign} !important; }`;
+        clipboardStr = `table.${Attributes.tableClass} { width: ${Appdata.lPhonesW}px !important; align: ${Attributes.tableAlign} !important; }`;
         break;
       default:
         // code block
@@ -858,7 +858,7 @@ var Witty = (function () {
       linebreak = '\n';
       let mobileFilename, mobileSwapStr;
       // !VA Create the mobile image filename: Get the current image file's filename and append the name with '-mob'.
-      mobileFilename = Attributes;
+      mobileFilename = Attributes.imgSrc;
       // !VA The regex for appending the filename with '-mob'.
       mobileFilename = mobileFilename.replace(/(.jpg|.png|.gif|.svg)/g, "_mob$1");
       // !VA Create the code for the mobile swap TD as a Comment node of the parent td. 
@@ -1027,8 +1027,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // case (selectedRadio === 'imgswap'):
       case (uSels.selectedRadio === 'imgswap'):
         console.log('makeTdNode imgswap');
-        tdInner.width = Attributes.tdAppdataWidth;
-        tdInner.height = Attributes.tdAppdataHeight;
+        // tdInner.width = Attributes.tdAppdataWidth;
+        // tdInner.height = Attributes.tdAppdataHeight;
         // !VA valign attribute
         tdInner.align = Attributes.tdAlign;
 
