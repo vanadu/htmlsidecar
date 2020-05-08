@@ -392,6 +392,7 @@ var Witty = (function () {
 
       // !VA UIController public initUI
       initUI: function() {
+
         // !VA  Initialize the ImgViewer to accomodate the dragArea. This should be the same as the CSS definition: currently 650x450
         // !VA DEV Write the computed styles to console to make sure they are as expected: 650x450
         // var cStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
@@ -845,8 +846,6 @@ var Witty = (function () {
 
     // !VA START TD OPTIONS MS-CONDITIONAL CODE BLOCKS
     // !VA These are the code blocks that contain MS conditionals in comment nodes or text nodes, i.e. mobile swap and background image.
-    // !VA Branch: implementImgSwap (042720)    
-    // function getImgSwapBlock( indentLevel ) {
 
     function getImgSwapBlock( indentLevel ) {
       let Appdata, Attributes, linebreak;
@@ -859,7 +858,7 @@ var Witty = (function () {
       linebreak = '\n';
       let mobileFilename, mobileSwapStr;
       // !VA Create the mobile image filename: Get the current image file's filename and append the name with '-mob'.
-      mobileFilename = Attributes.imgSrc;
+      mobileFilename = Attributes;
       // !VA The regex for appending the filename with '-mob'.
       mobileFilename = mobileFilename.replace(/(.jpg|.png|.gif|.svg)/g, "_mob$1");
       // !VA Create the code for the mobile swap TD as a Comment node of the parent td. 
@@ -936,7 +935,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       let Attributes;
       Attributes = getAttributes();
       let imgNode, returnNode;
-      // !VA Branch: 031320A Let's try to use fragments again for this.
       let returnNodeFragment;
       imgNode = document.createElement('img');
       returnNodeFragment = document.createDocumentFragment();
@@ -967,10 +965,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         returnNodeFragment.appendChild(anchor);
       } else {
         // !VA Otherwise, set returnNode to imgNode without the anchor.
-        // !VA Branch: 031320A
         returnNodeFragment.appendChild(imgNode);
       }
-      // !VA Branch: 031320A
       // return returnNode;
       return returnNodeFragment;
     }
@@ -978,7 +974,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
 
     // !VA 03.10.2020 Need to find out whether the table button was clicked and if so just add 3 or 6 to the indentLevel of the getIndent function.
-    // !VA Branch: 031320A
     // function makeTdNode( id, selectedRadio ) {
     function makeTdNode( uSels ) {
       console.log('makeTdNode running');
@@ -988,7 +983,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       Attributes = getAttributes();
       let tdInner, imgNode;
       tdInner = document.createElement('td');
-      // !VA Branch: 031320A
       let tdNodeFragment;
       tdNodeFragment = document.createDocumentFragment();
       // !VA Add the attributes that are included in both the default and background image td
@@ -1030,7 +1024,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           tdInner.appendChild(imgNode);
         }
         break;
-        // !VA Branch: 031320A
       // case (selectedRadio === 'imgswap'):
       case (uSels.selectedRadio === 'imgswap'):
         console.log('makeTdNode imgswap');
@@ -1040,7 +1033,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         tdInner.align = Attributes.tdAlign;
 
         break;
-      // !VA Branch: 031320A
       // case (selectedRadio === 'bgimage'):
       case (uSels.selectedRadio === 'bgimage'):
         console.log('makeTdNode bgimage');
@@ -1053,14 +1045,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         tdInner.setAttribute('background', Attributes.tdBackground);
         // !VA Include fallback color if no bgColor is selected. Use Stig's fallback: #7bceeb
         break;
-        // !VA Branch: 031320A
       // case (selectedRadio === 'posswitch'):
       case (uSels.selectedRadio === 'posswitch'):
         tdInner  = makePosSwitchNodes();
         break;
       default:
       } 
-      // !VA Branch: 031320A
       // return tdInner;
       console.log('1074 tdInner is: ');
       console.log(tdInner);
@@ -1072,7 +1062,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
     }
 
-    // !VA Branch: 031320A
     // function makeTableNode( id ) {
     function makeTableNode( uSels) {
       let Attributes;
@@ -1103,7 +1092,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA Build the inner tr
       tableInner.appendChild(trInner);
       // !VA Get the inner TD and append it - id is not for the inner TD but that's not relevent here.
-      // !VA Branch: 031320A
       // tdInner = makeTdNode( id );
       // trInner.appendChild(tdInner);
       let tdNodeFragment = makeTdNode( uSels );
@@ -1143,7 +1131,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA Append the inner table to the outer table's td
       tdOuter.appendChild(tableInner);
       // !VA Pass the outer table to the tableNode.
-      // !VA Branch: 031320A
       // tableNode = tableOuter;
       let tableNodeFragment;
       tableNodeFragment = document.createDocumentFragment();
@@ -1607,7 +1594,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // !VA getUserSelection
         // id.includes('tag') ? makeNodeList(id) : makeCssRule(id);
         // id.includes('tag') ? makeNodeList(id) : makeCssRule(id);
-        // !VA 03.13.2020 Initiating script at getUserSelections for branch 031320A instead of getUserSelection
         id.includes('tag') ? getUserSelections(id) : makeCssRule(id);
 
        
@@ -1860,6 +1846,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
                 // !VA Now that we have a current image in the DOM, Get Appdata so we can store the iFilename in it.
 
                 // !VA Initialize the value in the toolbar viewerW input field to its initial CSS value.
+                // !VA Branch: tryLocalStorage (050820)
+                // !VA Setting viewerW to the CSS value is stupid.
+
+
+
                 // !VA Commenting this out since I changed it to hard-coded in the HTML file along with iptTbrSmallPhonesW and sPhonesH.
                 // document.querySelector(toolbarElements.viewerW).value = document.querySelector(dynamicRegions.imgViewer).style.width;
                 
@@ -1948,7 +1939,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       }
     }
 
-    // !VA Branch rewriteHandleUserAction061119 
     // !VA appController private handleMouseEvents. Preprocess mouse events and route them to respective eval handler.
     function handleMouseEvents(evt) {
       // !VA Carryover from earlier handleUserAction
@@ -2217,7 +2207,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           console.log('no prop');
           break;
         case prop === 'viewerW' :
-          document.querySelector(dynamicRegions.imgViewer).style.width = val + 'px';  
+          document.querySelector(dynamicRegions.imgViewer).style.width = val + 'px'; 
+          // !VA Write the imgViewer value to localStorage. 
+          localStorage.setItem('viewerW', val);
           break;
         case prop === 'imgW' :
           document.querySelector(dynamicRegions.curImg).style.width = val + 'px';
@@ -2240,18 +2232,31 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA  appController private calcViewerSize
     // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH
     function calcViewerSize() {
-      var Appdata = {};
+      let Appdata = {};
+      let viewerW, viewerH, compStyles; 
+      let localViewerW;
       Appdata = appController.initGetAppdata(false);
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
-      // !VA  Get the actual viewerW from getComputedStyle
-      var viewerW;
-      var viewerH;
-      var compStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
-      viewerW = parseInt(compStyles.getPropertyValue('width'), 10);
+      // !VA  Get the actual viewerW and viewerH CSS values from getComputedStyle
+      compStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
+
+      // !VA Branch: tryLocalStorage (050820)
+      // !VA This is where the initial viewerW value comes from. If the user has set this value in the toolbar before, then queried from localStorage. That value persists between sessions. If this is the initial use of the app, then viewerW is queried from the CSS value. 
+
+      // !VA Get the viewerW value from localStorage, if it's been set
+      localViewerW = appController.doLocalStorage();
+      if (localViewerW) {
+        // !VA Set imgViewer and viewerW to the localStorage value
+        viewerW = localViewerW;
+        document.querySelector(dynamicRegions.imgViewer).style.width = localViewerW + 'px';
+      } else {
+        // !VA If no localStorage is set, use the CSS value.
+        viewerW = parseInt(compStyles.getPropertyValue('width'), 10);
+      }
+      // !VA In either case, use the CSS value for height, unless the height of the loaded image is greater than the CSS value.
       viewerH = parseInt(compStyles.getPropertyValue('height'), 10);
       // !VA Write the viewerW to the toolbar input field
       document.querySelector(toolbarElements.iptTbrViewerW).value = viewerW;
-
       // !VA If we're initializing a new image, use the naturalWidth and naturalHeight. If we're updating via user input, we need to use the display image and height, imgW and imgH. If we're initializing, then Appdata.imgW and Appdata.imgH will be 0 or falsy because it hasn't been resized yet. So we need to make the following decision based on the _actual_ image width and height, which will be different based on whether we're initializing or updating.
       // !VA I thought I fixed this...it appears to only apply to dev mode.
       var actualW, actualH
@@ -2658,9 +2663,35 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         return Appdata;
       },
 
+      doLocalStorage: function() {
+        // console.log('doLocalStorage running');
+        // !VA Get localStorage for viewerW here. localStorage is set in updateAppdata after the user input has been parsed for errors. 
+        // !VA TODO: smallPhones/largePhones width to be added later
+        let localViewerW;
+        // !VA Clear localStorage for testing only.
+        // localStorage.clear();
+        // !VA If localStorage is set for viewerW, return the value
+        if (localStorage.getItem('viewerW')) {
+          localViewerW = localStorage.getItem('viewerW');
+          console.log('doLocalStorage: ' + localViewerW);
+        } else {
+          console.log('doLocalStorage: localStorage viewerW not set');
+        }
+        return localViewerW;
+      },
+
       init: function(){
         console.log('App initialized.');
-        // !VA  Make sure the CCP is off
+
+
+      
+
+
+        // console.log('localStorage viewerW is:');
+        // console.log(localStorage.getItem('viewerW'));
+
+
+
 
 
         // !VA Determine if the window is an isolate window, i.e. should be displayed with just the Witty app in window with fixed dimensions without header or tutorial content.

@@ -581,11 +581,11 @@ h4#msg-content {
 
 // MAIN IMAGE VIEWER
 #main-image-viewer {
-  width: 650px;
-  height: 450px;
   position: absolute;
   top: 50%;
   left: 50%;
+  width: 650px;
+  height: 450px;
   // !VA Width and height should only be set programmatically
   transform:  translateY(-50%) translateX(-50%);
   background: #e1e1e1 url('../img/html-email-icon-white.png') repeat;

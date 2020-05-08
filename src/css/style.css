@@ -1413,11 +1413,11 @@ h4#msg-content {
   text-align: center; }
 
 #main-image-viewer {
-  width: 650px;
-  height: 450px;
   position: absolute;
   top: 50%;
   left: 50%;
+  width: 650px;
+  height: 450px;
   transform: translateY(-50%) translateX(-50%);
   background: #e1e1e1 url("../img/html-email-icon-white.png") repeat; }
 
