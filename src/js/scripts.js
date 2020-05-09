@@ -354,6 +354,13 @@ var Witty = (function () {
         return btnCcpMakeClips;
       },
 
+      initToolbarInputs: function() {
+        // !VA This is called from init (? ) and initializes the values of the toolbar viewerW, sPhonesW and lPhonesW values from either a default value or the localStorage values. Check if there are localStorage values, if not, initialize viewerW = 650, sPhonesW = 320, lPhonesW = 414 and write those to the toolbarUI. 
+        console.log('initToolbarInputs running');
+
+
+      },
+
       // !VA UIController public getAppdata
       // !VA Moving getAppdata from appController to UIController because Appdata is derived from the DOM elements and data properties that reside in the DOM. 
 
@@ -379,8 +386,12 @@ var Witty = (function () {
         els.imgH = curImg.height;
         els.imgNW = curImg.naturalWidth;
         els.imgNH = curImg.naturalHeight;
+
+        
         // !VA Get the data properties for iptTbrSmallPhonesW and sPhonesH
         // !VA This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
+        // !VA Branch: implementPhonesLocalStorage (050920)
+
         els.sPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).getAttribute('data-sphonesw'), 10);
         els.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
         els.iptTbrSPhonesWidth ? els.iptTbrSPhonesWidth : Appdata.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
@@ -1818,7 +1829,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
                 // !VA Initialize the value in the toolbar viewerW input field to its initial CSS value.
                 // !VA Branch: tryLocalStorage (050820)
-                // !VA Setting viewerW to the CSS value is stupid.
 
 
 
@@ -1826,15 +1836,18 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
                 // document.querySelector(toolbarElements.viewerW).value = document.querySelector(dynamicRegions.imgViewer).style.width;
                 
                 // !VA Set the data attribute for small phone and large phone width. We need this because there is not actual HTML element that corresponds to these properties, and thus no way to persist them globally. So the data attribute sphonew and sphoneh will be written to the toolbar input field as surrogate for an actual DOM element that Appdata can query.
-                var sphonesw, lphonesw;
-                sphonesw = document.querySelector(toolbarElements.iptTbrSPhonesWidth);
-                lphonesw = document.querySelector(toolbarElements.iptTbrLPhonesWidth);              
-                sphonesw.setAttribute('data-sphonesw', '320');
-                lphonesw.setAttribute('data-lphonesw', '414');
-                sphonesw.value = sphonesw.getAttribute('data-sphonesw');
-                lphonesw.value = lphonesw.getAttribute('data-lphonesw');
 
-                calcViewerSize(false);
+                // !VA Branch: implementPhonesLocalStorage (050920)
+                // var sphonesw, lphonesw;
+                // sphonesw = document.querySelector(toolbarElements.iptTbrSPhonesWidth);
+                // lphonesw = document.querySelector(toolbarElements.iptTbrLPhonesWidth);              
+                // sphonesw.setAttribute('data-sphonesw', '320');
+                // lphonesw.setAttribute('data-lphonesw', '414');
+                // sphonesw.value = sphonesw.getAttribute('data-sphonesw');
+                // lphonesw.value = lphonesw.getAttribute('data-lphonesw');
+
+                
+                (false);
               })();
               
               // !VA Timeout of 250 ms while the blob loads.
@@ -2206,10 +2219,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
     // !VA  appController private calcViewerSize
     // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH
+    // !VA Branch: implementPhonesLocalStorage (050920) 
+    /* !VA  Need to determine where to write localStorage values to UI and whether to continue using data properties to store the sPhonesW and lPhonesW values if we can just write them to localStorage. I don't want to be calling localStorage all the time, it's not module-internal. It should only be called once and that value should be written to the data property. Currently the data properties are defined twice, once in handleFileSelect production mode and once in initDev for dev mode. That's no good. Probably the best place is public UIController, since the values are first written when the UI is initialized. */
+    
+
+
+
     function calcViewerSize() {
       let Appdata = {};
       let viewerW, viewerH, compStyles; 
-      let localViewerW;
+      let localViewerW, curLocalStorage;
       Appdata = appController.initGetAppdata(false);
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
       // !VA  Get the actual viewerW and viewerH CSS values from getComputedStyle
@@ -2219,17 +2238,22 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA This is where the initial viewerW value comes from. If the user has set this value in the toolbar before, then queried from localStorage. That value persists between sessions. If this is the initial use of the app, then viewerW is queried from the CSS value. 
 
       // !VA Get the viewerW value from localStorage, if it's been set
-      localViewerW = appController.doLocalStorage();
-      if (localViewerW) {
+      curLocalStorage = appController.getLocalStorage();
+      console.log('curLocalStorage 2222');
+      console.dir(curLocalStorage);
+      localViewerW = curLocalStorage[0];
+      if (curLocalStorage[0]) {
         // !VA Set imgViewer and viewerW to the localStorage value
-        viewerW = localViewerW;
-        document.querySelector(dynamicRegions.imgViewer).style.width = localViewerW + 'px';
+        viewerW = curLocalStorage[0];
+        document.querySelector(dynamicRegions.imgViewer).style.width = curLocalStorage[0] + 'px';
       } else {
         // !VA If no localStorage is set, use the CSS value.
         viewerW = parseInt(compStyles.getPropertyValue('width'), 10);
       }
       // !VA In either case, use the CSS value for height, unless the height of the loaded image is greater than the CSS value.
       viewerH = parseInt(compStyles.getPropertyValue('height'), 10);
+      // !VA Branch: implementPhonesLocalStorage (050920) Don't even know if I have to do this here
+      UIController.initToolbarInputs();
       // !VA Write the viewerW to the toolbar input field
       document.querySelector(toolbarElements.iptTbrViewerW).value = viewerW;
       // !VA If we're initializing a new image, use the naturalWidth and naturalHeight. If we're updating via user input, we need to use the display image and height, imgW and imgH. If we're initializing, then Appdata.imgW and Appdata.imgH will be 0 or falsy because it hasn't been resized yet. So we need to make the following decision based on the _actual_ image width and height, which will be different based on whether we're initializing or updating.
@@ -2593,13 +2617,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         
         // !VA THis is duplicated in handleFileSelect, only included here to initialize dev mode.
         // !VA Set the data attribute for small phone and large phone width. We need this because there is not actual HTML element that corresponds to these properties, and thus no way to persist them globally. So the data attribute sphonew and lphonew will be written to the toolbar input field as surrogate for an actual DOM element that Appdata can query.
-        var sphonesw, lphonesw;
-        sphonesw = document.querySelector(toolbarElements.iptTbrSPhonesWidth);
-        lphonesw = document.querySelector(toolbarElements.iptTbrLPhonesWidth);              
-        sphonesw.setAttribute('data-sphonesw', '320');
-        lphonesw.setAttribute('data-lphonesw', '414');
-        sphonesw.value = sphonesw.getAttribute('data-sphonesw');
-        lphonesw.value = lphonesw.getAttribute('data-lphonesw');
+        // var sphonesw, lphonesw;
+        // sphonesw = document.querySelector(toolbarElements.iptTbrSPhonesWidth);
+        // lphonesw = document.querySelector(toolbarElements.iptTbrLPhonesWidth);              
+        // sphonesw.setAttribute('data-sphonesw', '320');
+        // lphonesw.setAttribute('data-lphonesw', '414');
+        // sphonesw.value = sphonesw.getAttribute('data-sphonesw');
+        // lphonesw.value = lphonesw.getAttribute('data-lphonesw');
   
         calcViewerSize();
         // !VA Open the CCP by default in dev mode
@@ -2638,36 +2662,30 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         return Appdata;
       },
 
-      doLocalStorage: function() {
-        // console.log('doLocalStorage running');
+      getLocalStorage: function() {
+        // console.log('getLocalStorage running');
         // !VA Get localStorage for viewerW here. localStorage is set in updateAppdata after the user input has been parsed for errors. 
         // !VA TODO: smallPhones/largePhones width to be added later
-        let localViewerW;
+        let arr = [], curLocalStorage = [];
+
         // !VA Clear localStorage for testing only.
         // localStorage.clear();
-        // !VA If localStorage is set for viewerW, return the value
-        if (localStorage.getItem('viewerW')) {
-          localViewerW = localStorage.getItem('viewerW');
-          console.log('doLocalStorage: ' + localViewerW);
-        } else {
-          console.log('doLocalStorage: localStorage viewerW not set');
+        // !VA If localStorage is set for viewerW, sPhonesW or lgPhones, add the localStorage value to curLocalStorage and return it
+        arr = [ 'viewerW', 'sPhonesW', 'lPhonesW' ];
+        for (let i = 0; i < arr.length; i++) {
+          localStorage.getItem(arr[i]) ? curLocalStorage.push(localStorage.getItem(arr[i])) : localStorage.getItem(arr[i]).push(false);
         }
-        return localViewerW;
+        console.log('curLocalStorage:');
+        console.dir(curLocalStorage);
+
+        // localStorage.getItem('viewerW') ? curLocalStorage.push(localStorage.getItem('viewerW')) : curLocalStorage.push(false);
+        // localStorage.getItem('sPhonesW') ? curLocalStorage.push(localStorage.getItem('sPhonesW')) : curLocalStorage.push(false);
+        // localStorage.getItem('lPhonesW') ? curLocalStorage.push(localStorage.getItem('lPhonesW')) : curLocalStorage.push(false);
+        return curLocalStorage;
       },
 
       init: function(){
         console.log('App initialized.');
-
-
-      
-
-
-        // console.log('localStorage viewerW is:');
-        // console.log(localStorage.getItem('viewerW'));
-
-
-
-
 
         // !VA Determine if the window is an isolate window, i.e. should be displayed with just the Witty app in window with fixed dimensions without header or tutorial content.
         let curUrl;
