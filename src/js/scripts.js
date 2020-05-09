@@ -9,15 +9,16 @@
 Status:
 Rewrote the basic indent routine. It works now for basic TD options and should be relatively easy to modify for a no-img TD option by tweaking the output of makeTdNode to not append imgNode if selected.
 DONE: Add bulletproof button td option
+DONE: Add tag name to CSS selector output
+DONE: Save viewerW to localStorage
 
 TODO: Show and hide TD inputs based on option
-TODO: Add tag name to CSS selector output
-TODO: Include JSON file settings for content width, small phone width and large phone width
+TODO: Save sPhonesW and lPhonesW to localStorage
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
 TODO: Fix imgswap codeBlock output: alt tag has quotes following, alt doesn't work.
 
 
-Errors Handling
+Error Handling
 --------------
 vmlbutton: TD width and height MUST BE entered, otherwise the button has no dimensions
 vmlbutton: TD Height has to equal the Display Height, otherwise, the graphic will not fit the button
@@ -704,8 +705,6 @@ var Witty = (function () {
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
       tableNodeFragment = makeTableNode( uSels );
       nl = tableNodeFragment.querySelectorAll('*');
-      console.log('nl 667:');
-      console.log(nl);
       
       // !VA Create the div container to which the extracted nodeList fragment will be appended
       var container = document.createElement('div');
@@ -783,7 +782,6 @@ var Witty = (function () {
         let codeBlock;
         // !VA If the makeTD button is clicked, then only the last node in nl is extracted and the MS conditional comments get one indent level
         if ( uSels.buttonClicked === 'tdbut') {
-          console.log('tdbut');
           indentLevel = 1;
           extractNodeIndex = nl.length - indentLevel;
         } else {
@@ -807,24 +805,17 @@ var Witty = (function () {
         applyIndents(uSels, outputNL);
         // !VA Convert outputNL to a string (including tokens for inserting MS conditional code) for output to Clipboard object.
         clipboardStr = outputNL[0].outerHTML;
-        console.log(outputNL[0]);
         
-        console.log('mark 1 clipboardStr:');
-        console.log(clipboardStr);
         // !VA Get the codeBlock corresponding to the selected TD option
         if ( uSels.selectedRadio === 'imgswap') {
           codeBlock = getImgSwapBlock(indentLevel);
         } else if (  uSels.selectedRadio === 'bgimage' ) {
           codeBlock = getBgimageBlock(indentLevel);
         } else if (uSels.selectedRadio === 'vmlbutton') {
-          console.log('mark1');
           codeBlock = getVmlButtonBlock(indentLevel);
-          console.log('codeBlock is: ' + codeBlock);
         }
         // !VA Replace the tokens in clipboardStr with the codeBlock
         clipboardStr = clipboardStr.replace('/replacestart//replaceend/', codeBlock + '\n');
-        console.log('mark 2 clipboardStr:');
-        console.log(clipboardStr);
         
       } 
       // !VA Convert the alias of the clicked button to an ID the Clipboard object recognizes and write clipboardStr to the clipboard.
@@ -850,24 +841,21 @@ var Witty = (function () {
     function getImgSwapBlock( indentLevel ) {
       let Appdata, Attributes, linebreak;
       Attributes = getAttributes();
-      console.log('Attributes');
-      console.dir(Attributes);
       Appdata = appController.initGetAppdata();
-      console.log('Appdata');
-      console.dir();
       linebreak = '\n';
       let mobileFilename, mobileSwapStr;
       // !VA Create the mobile image filename: Get the current image file's filename and append the name with '-mob'.
       mobileFilename = Attributes.imgSrc;
       // !VA The regex for appending the filename with '-mob'.
-      mobileFilename = mobileFilename.replace(/(.jpg|.png|.gif|.svg)/g, "_mob$1");
+      mobileFilename = mobileFilename.replace(/(.jpg|.png|.gif|.svg)/g, '_mob$1');
       // !VA Create the code for the mobile swap TD as a Comment node of the parent td. 
       // !VA Issues 05.07.20 //
 
       // !VA  The parent TD is different, it should have no width, no valign and no height. Tt should be align='left', style="vertical-align:top" 
       // !VA  The img is missing here completely. It should ge the img and anchor. I think this is probably a result of getting rid of the img for the excludeimg option  -->
 
-
+      console.dir(Attributes);
+      console.log('Attributes.imgAlt is: ' + Attributes.imgAlt);
 
 
       mobileSwapStr = `${linebreak}${getIndent(indentLevel)}<a href="#"><img class="hide" alt="${Attributes.imgAlt}" width="${Attributes.imgWidth}" height="${Attributes.imgHeight}" src="${Attributes.imgSrc}" border="0" style="width: ${Attributes.imgWidth}px; height: ${Attributes.imgHeight}px; margin: 0; border: none; outline: none; text-decoration: none; display: block; "></a>${linebreak}${getIndent(indentLevel)}<!--[if !mso]><!-->${linebreak}${getIndent(indentLevel)}<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">${linebreak}${getIndent(indentLevel)}<a href="#"><img class="mobileshow" alt="${Attributes.imgAlt}" width="${Appdata.sPhonesW}" height="${Appdata.sPhonesH}" src="${mobileFilename}" border="0" style="width: ${Appdata.sPhonesW}px; height: ${Appdata.sPhonesH}px; margin: 0; border: none; outline: none; text-decoration: none; display: block;" /></a>${linebreak}${getIndent(indentLevel)}<!--</span>-->${linebreak}${getIndent(indentLevel)}<!--<![endif]-->`;
@@ -976,9 +964,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA 03.10.2020 Need to find out whether the table button was clicked and if so just add 3 or 6 to the indentLevel of the getIndent function.
     // function makeTdNode( id, selectedRadio ) {
     function makeTdNode( uSels ) {
-      console.log('makeTdNode running');
-      console.log('makeTdNode uSels is: ');
-      console.dir(uSels);
       let Attributes;
       Attributes = getAttributes();
       let tdInner, imgNode;
@@ -1026,7 +1011,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         break;
       // case (selectedRadio === 'imgswap'):
       case (uSels.selectedRadio === 'imgswap'):
-        console.log('makeTdNode imgswap');
         // tdInner.width = Attributes.tdAppdataWidth;
         // tdInner.height = Attributes.tdAppdataHeight;
         // !VA valign attribute
@@ -1052,12 +1036,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       default:
       } 
       // return tdInner;
-      console.log('1074 tdInner is: ');
-      console.log(tdInner);
       tdNodeFragment.appendChild(tdInner);
-      console.log('1077 tdNodeFragment');
-      console.log(tdNodeFragment);
-      
       return tdNodeFragment;
 
     }
@@ -1135,10 +1114,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       let tableNodeFragment;
       tableNodeFragment = document.createDocumentFragment();
       tableNodeFragment.appendChild(tableOuter);
-      // }
-      console.log('tableNodeFragment:');
-      console.log(tableNodeFragment);
-      
       return tableNodeFragment;
     }
 
@@ -1372,13 +1347,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         tableAlign: (function() {
           let str = '', options = [], selectid = '';
           selectid = ccpUserInput.selCcpTableAlign;
-          console.log('selectid send:');
-          console.log(selectid);
           
           options = [ '', 'left', 'center', 'right'];
           str = getAlignAttribute( selectid, options );
-          console.log('str:');
-          console.log(str);
           
           return str;
         })(),
