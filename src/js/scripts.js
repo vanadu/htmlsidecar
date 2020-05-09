@@ -2190,9 +2190,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           break;
         case prop === 'sPhonesW' :
           document.querySelector(toolbarElements.iptTbrSPhonesWidth).setAttribute('data-sphonesw', val);
+          // !VA Write the sPhonesW value to localStorage. 
+          localStorage.setItem('sPhonesW', val);
           break;
         case prop === 'lPhonesW' :
           document.querySelector(toolbarElements.iptTbrLPhonesWidth).setAttribute('data-lphonesw', val);
+          // !VA Write the lPhonesW value to localStorage. 
+          localStorage.setItem('lPhonesW', val);
           break;
         }
       }
