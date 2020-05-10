@@ -16,6 +16,7 @@ TODO: Show and hide TD inputs based on option
 TODO: Save sPhonesW and lPhonesW to localStorage
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
 TODO: Fix imgswap codeBlock output: alt tag has quotes following, alt doesn't work.
+TODO: curImg doesn't resize back if you change viewerW to smaller than curImg and then change it back. It should follow the size of viewerW shouldn't it? Maybe not...
 
 
 Error Handling
@@ -431,7 +432,7 @@ var Witty = (function () {
         // !VA The rest of the routine applies to DEV and PROD modes
         // !VA Initialize the input fields for the pertinent device widths: viewerW, sPhonesW and lPhonesW. Also initialize the data attributes for sphonesw and lphonesw - we only want to access the localStorage once and the rest we do using data-attributes
         let arr = [], curDeviceWidths = [];
-        localStorage.clear();
+        // localStorage.clear();
         // !VA Clear localStorage for testing only.
         // localStorage.clear();
         // !VA If localStorage is set for viewerW, sPhonesW or lgPhones, add the localStorage value to curDeviceWidths, otherwise set the defaults used when the app is used for the first time or no user-values are entered.
@@ -957,7 +958,6 @@ var Witty = (function () {
       
       */
       var tdHeight, tdWidth;
-      console.clear();
       tdHeight = document.querySelector(ccpUserInput.iptCcpTdHeight).value;
       tdWidth = document.querySelector(ccpUserInput.iptCcpTdWidth).value;
 
@@ -1015,12 +1015,17 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA 03.10.2020 Need to find out whether the table button was clicked and if so just add 3 or 6 to the indentLevel of the getIndent function.
     // function makeTdNode( id, selectedRadio ) {
     function makeTdNode( uSels ) {
+      // !VA Set defaults for vmlbutton option
+      let vmlDefaultWidth, vmlDefaultHeight;
       let Attributes;
       Attributes = getAttributes();
       let tdInner, imgNode;
       tdInner = document.createElement('td');
       let tdNodeFragment;
       tdNodeFragment = document.createDocumentFragment();
+      // !VA Branch: tryShowHideTDOptions (050920)
+
+      // !VA Branch: tryShowHideTDOptions (050920) THis doesn't belong here, there are no attributes that are available in ALL the parent nodes.
       // !VA Add the attributes that are included in both the default and background image td
       if (Attributes.tdValign) { tdInner.vAlign = Attributes.tdValign; }
       // !VA bgcolor attribute. Pass the input value, don't prepend hex # character for now
@@ -1037,19 +1042,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         if (Attributes.tdClass) { tdInner.className = Attributes.tdClass; }
         // !VA valign attribute
         if (Attributes.tdAlign) { tdInner.align = Attributes.tdAlign; }
-        // !VA height attribute
-        // !VA Branch: implementVMLButton (050720) The below is wrong. 
-        /* !VA  Problems:
-        1) ClipClip isnt' working as it should - it repopulates the list after you delete it.
-        2) If you add height and width to TD options, it stays in there even if you delete it from the input fields.
-        
-        
-        
-        
-        */
-
-
-
         if (Attributes.tdHeight) { tdInner.height = Attributes.tdHeight; }
         if (Attributes.tdWidth) { tdInner.width = Attributes.tdWidth; }
         // !VA Branch: implementExcludeImg (050420)
@@ -1066,24 +1058,57 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // tdInner.height = Attributes.tdAppdataHeight;
         // !VA valign attribute
         tdInner.align = Attributes.tdAlign;
-
         break;
       // case (selectedRadio === 'bgimage'):
       case (uSels.selectedRadio === 'bgimage'):
         console.log('makeTdNode bgimage');
-        // !VA First we create the node
+        // !VA Create the parent node to which the bgimage code block will be appended after outputNL is converted to text in buildNodeList.
+        // !VA Include width, height and valign as per Stig's version
         tdInner.width = Attributes.tdAppdataWidth;
         tdInner.height = Attributes.tdAppdataHeight;
-        // !VA valign attribute
         tdInner.vAlign = Attributes.tdValign;
         // !VA Set the background attribute to the current path/filename
         tdInner.setAttribute('background', Attributes.tdBackground);
         // !VA Include fallback color if no bgColor is selected. Use Stig's fallback: #7bceeb
+        Attributes.tdBgcolor ? tdInner.bgColor = Attributes.tdBgcolor : tdInner.bgColor = '#7bceeb';
         break;
       // case (selectedRadio === 'posswitch'):
       case (uSels.selectedRadio === 'posswitch'):
         tdInner  = makePosSwitchNodes();
         break;
+      
+      // !VA Branch: tryShowHideTDOptions (050920) VML button:
+      /* !VA  
+        Challenge: Get VML height and width to default to 200/40 
+
+
+        parent td MUST include:
+        align attribute
+        height and width
+        And if they're not present, ERROR!
+
+        parent td default should be align: center, valign: top
+
+        text content MUST include
+        arcsize, which is 10 percent of the HEIGHT
+        border radius with is a VALUE
+        bgcolor
+        border/stroke color
+        font color
+      */
+      case (uSels.selectedRadio === 'vmlbutton'):
+        // !VA Set defaults
+        // document.querySelector(ccpUserInput.iptCcpTdWidth).value = '200';
+        // document.querySelector(ccpUserInput.iptCcpTdHeight).value = '40';
+        // vmlDefaultWidth = 200;
+        // vmlDefaultHeight = 40;
+        console.log('Attributes.tdWidth is: ' + Attributes.tdWidth);
+        Attributes.tdWidth ? tdInner.width = Attributes.tdWidth : tdInner.width = '200';
+        Attributes.tdHeight ? tdInner.height = Attributes.tdHeight : tdInner.height = '40';
+        tdInner.width  = Attributes.tdWidth;
+        tdInner.height = Attributes.tdHeight;
+        break;
+      
       default:
       } 
       // return tdInner;
@@ -1505,6 +1530,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       var nodeList, index;
       let Attributes = getAttributes();
       let nodeAttributes = [];
+      // !VA Branch: tryShowHideTDOptions (050920)
+      // !VA Remove the inapplicable CCP elements from the td options
+
+
+
+
+
+
       // !VA Initialize the objects that contain the attributes for the individual nodes
       let td_switchcontainerAttr, table_switchparentAttr, tr_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr, tr_switchchild1Attr, td_switchcontent1Attr, a_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, tr_switchchild2Attr, td_switchcontent2Attr; 
       // !VA Make the nodeList from the container passed in from makePosSwitchNodes to apply the attributes to.
@@ -1512,9 +1545,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA Build the objects that contain the attributes that will be set on the nodeList nodes.
       td_switchcontainerAttr = {
         dir: 'rtl',
+        class: Attributes.tdClass,
         width: '100%',
-        align: 'left',
-        bgcolor: '#FFFFFF'
+        align: Attributes.tdAlign,
+        valign: Attributes.tdValign,
+        bgcolor: Attributes.tdBgcolor
       };
       table_switchparentAttr = {
         role: 'presentation',
@@ -2268,24 +2303,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     function calcViewerSize() {
       let Appdata = {};
       let viewerW, viewerH, compStyles; 
-      let localViewerW, curLocalStorage;
+      let curLocalStorage;
       Appdata = appController.initGetAppdata(false);
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
       // !VA  Get the actual viewerW and viewerH CSS values from getComputedStyle
       compStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
 
-      // !VA Branch: tryLocalStorage (050820)
-      // !VA This is where the initial viewerW value comes from. If the user has set this value in the toolbar before, then queried from localStorage. That value persists between sessions. If this is the initial use of the app, then viewerW is queried from the CSS value. 
-
-      // !VA Get the viewerW value from localStorage, if it's been set
-
-
-
+      // !VA Set the viewerW value based on localStorage  If the user has set this value in the toolbar before, then queried from localStorage. That value persists between sessions. If this is the initial use of the app, then viewerW is queried from the CSS value. 
       curLocalStorage = appController.getLocalStorage();
-      
-      console.log('curLocalStorage 2222');
-      console.dir(curLocalStorage);
-      localViewerW = curLocalStorage[0];
       if (curLocalStorage[0]) {
         // !VA Set imgViewer and viewerW to the localStorage value
         viewerW = curLocalStorage[0];
