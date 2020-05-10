@@ -13,6 +13,7 @@ DONE: Add tag name to CSS selector output
 DONE: Save viewerW to localStorage
 
 TODO: Show and hide TD inputs based on option
+TODO: rtl class attribute shows when nothing is entered: it should be hidden
 TODO: Save sPhonesW and lPhonesW to localStorage
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
 TODO: Fix imgswap codeBlock output: alt tag has quotes following, alt doesn't work.
@@ -242,10 +243,11 @@ var Witty = (function () {
       // !VA This is deprecated as of today
       // spnCcpTdBgimageCheckmrk: '#spn-ccp-td-bgimage-checkmrk',
       rdoCcpTdBasic: '#rdo-ccp-td-basic',
+      rdoCcpTdExcludeimg: '#rdo-ccp-td-excludeimg',
       rdoCcpTdImgswap: '#rdo-ccp-td-imgswap',
       rdoCcpTdPosswitch: '#rdo-ccp-td-posswitch',
       rdoCcpTdBgimage: '#rdo-ccp-td-bgimage',
-      rdoCcpTdVmlButton: '#rdo-ccp-td-vmlbutton',
+      rdoCcpTdVmlbutton: '#rdo-ccp-td-vmlbutton',
 
 
       iptCcpTableClass: '#ipt-ccp-table-class',
@@ -502,6 +504,87 @@ var Witty = (function () {
         for (let i = 0; i < curInspectors.length; i++) {
           document.querySelector(curInspectors[i]).style.color = att;
         }
+      },
+
+      displayTdOptions: function(evt) {
+        console.log('displayTdOptions running');
+        console.log('evt:');
+        console.log(evt);
+        console.log('evt.target.id is: ' + evt.target.id);
+        // !VA Array including all the defined options for each tdoption radio
+
+
+
+
+        let allTdOptions = [];
+        let optionsToShow = [];
+        let target = evt.target;
+        // !VA Id of the parent div of the td option to be displayed/hidden. We need the parent div because it contains label and input of the element, not just the input field or dropdown list itself.
+        let parentDivId;
+        // !VA Populate allTdOptions with all the defined Td options
+        allTdOptions = [ ccpUserInput.iptCcpTdClass,  ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor ];
+        // !VA Cycle through all the TD options and remove the active class to hide them;
+        for (let i = 0; i < allTdOptions.length; i++) {
+
+
+          parentDivId = getParentDiv(allTdOptions[i]);
+          // console.log('allTdOptions[i] is: ' +  allTdOptions[i]);
+          console.log('document.querySelector(allTdOptions[i]):');
+          document.querySelector(parentDivId);
+          document.querySelector(parentDivId).classList.remove('active');
+        }
+
+
+        // !VA Get the parent div of the td option element to be displayed/hidden
+        function getParentDiv(parentDivId) {
+          parentDivId = '#' + parentDivId.substring( 5 );
+          return parentDivId;
+        }
+
+        function showOptions(optionsToShow) {
+          console.log('showOptions running');
+          for (let i = 0; i < optionsToShow.length; i++) {
+            parentDivId = getParentDiv(optionsToShow[i]);
+            console.log('parentDivId is: ' + parentDivId);
+            document.querySelector(parentDivId).classList.add('active');
+          }
+        }
+        // !VA Determine which tdoptions radio button is selected based on the click event and run showOptions for the selected TD radio option.
+        switch(true) {
+        case target.id === ccpUserInput.rdoCcpTdBasic.slice(1) || target.id === ccpUserInput.rdoCcpTdExcludeimg.slice(1):
+          optionsToShow = [ ccpUserInput.iptCcpTdClass,  ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor ];
+          // !VA Run showOptions to get the parent div of the options to show for these tdoption radio selections and apply the active class to display them.
+          showOptions(optionsToShow);
+          break;
+        case target.id === ccpUserInput.rdoCcpTdPosswitch.slice(1):
+          // !VA TODO: Cerebrus has NO td options except width: 100% - let's add 'class' andleave it like that for the time being and see if there's a case where any other options are useful. 
+          optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign ];
+          showOptions(optionsToShow);
+          console.log('displayTdOptions posswitch');
+          break;
+        case target.id === ccpUserInput.rdoCcpTdImgswap.slice(1):
+          optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign ];
+          showOptions(optionsToShow);
+          console.log('displayTdOptions imgswap');
+          break;
+        case target.id === ccpUserInput.rdoCcpTdBgimage.slice(1):
+          // !VA bgcolor, width, height, valign
+          optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor ];
+          showOptions(optionsToShow);
+          console.log('displayTdOptions bgimage');
+          break;
+        case target.id === ccpUserInput.rdoCcpTdVmlbutton.slice(1):
+          optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor ];
+          showOptions(optionsToShow);
+          console.log('displayTdOptions vmlbutton');
+          break;
+        default:
+          // code block
+        } 
+
+        // console.log('optionsToShow:');
+        // console.dir(optionsToShow);
+
       },
 
       // UIController: Flash a status message in the app message area
@@ -1777,14 +1860,35 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
 
       // !VA We need eventListeners for ALL the clipboard buttons so make an eventListener for each value in the btnCcpMakeClips object. We need a for in loop for objects
-      for(var i in btnCcpMakeClips) {
+      for(let i in btnCcpMakeClips) {
         // !VA loop through the object that contain the id and func properties.
-        var clipBut;
+        let clipBut;
         if(btnCcpMakeClips.hasOwnProperty(i)){
           clipBut = document.querySelector(btnCcpMakeClips[i]);
           addEventHandler(clipBut,'click',CBController.doClipboard,false);
         }
       }
+
+      // !VA Branch: tryShowHideTDOptions (050920)
+      // !VA eventListeners for the tdOptions radio buttons for showing/hiding options based on selectedRadio
+      for(let i in ccpUserInput) {
+        // !VA loop through the object that contain the id and func properties.
+        let selectedRadio;
+        // console.log('ccpUserInput[i].substring(0, 4)) is: ' + ccpUserInput[i].substring(0, 4));
+        if (ccpUserInput[i].substring(0, 4) === '#rdo') {
+          // console.log('ccpUserInput[i] is: ' + ccpUserInput[i]);
+
+          selectedRadio = document.querySelector(ccpUserInput[i]);
+          console.log('selectedRadio.id is: ' + selectedRadio.id);
+
+          
+          addEventHandler(selectedRadio,'click',UIController.displayTdOptions,false);
+        }
+        // if(ccpUserInput.hasOwnProperty(i)){
+        //   clipBut = document.querySelector(btnCcpMakeClips[i]);
+        // }
+      }
+
 
 
 
@@ -2426,6 +2530,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     function initCCP() {
       // !VA Get Appdata
       var Appdata = appController.initGetAppdata();
+      let ccpCheckmarks, ccpCheckboxes, wrapperItemsToHide, selectedRadio;
       // !VA The app initializes with the CCP closed, so toggle it on and off here.
       document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
       // !VA If the CCP is open:
@@ -2436,14 +2541,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
 
         // !VA CCP Checkboxes - these are mock checkboxes with custom styling, so the ID names have to be converted to checkbox names in order to select or deselect them. We attach the event handler to the checkmark, not the checkbox. The checkmark is converted to checkbox for handling in toggleCheckbox.
-        var ccpCheckmarks = [ ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk, ccpUserInput.spnCcpImgIncludeAnchorCheckmrk, ccpUserInput.spnCcpTableIncludeWrapperCheckmrk ];
-        var ccpCheckboxes = [];
+        ccpCheckmarks = [ ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk, ccpUserInput.spnCcpImgIncludeAnchorCheckmrk, ccpUserInput.spnCcpTableIncludeWrapperCheckmrk ];
+        ccpCheckboxes = [];
         for (let i = 0; i < ccpCheckmarks.length; i++) {
           document.querySelector(ccpCheckmarks[i]).addEventListener('click', handleCCPInput, false);
         }
 
         // !VA Initialize with all the 'Wrapper table' options undisplayed - uncomment this for DEV
-        var wrapperItemsToHide = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
+        let wrapperItemsToHide = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
         for (let i = 0; i < wrapperItemsToHide.length; i++) {
           document.querySelector(wrapperItemsToHide[i]).style.display = 'none'; 
         }
@@ -2452,6 +2557,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // !VA Reboot: Commenting out for now
         // var includeWrapperTable = document.querySelector((ccpUserInput.spnCcpTableIncludeWrapperCheckmrk.replace('mrk', 'box')));
         // includeWrapperTable.checked = true;
+
+        // !VA Find out which tdoption is selected and display the appropriate option elements
+        var foo;
+        foo = document.querySelector('input[name="tdoptions"]:checked').value;
+        console.log('foo is: ' + foo);
+        selectedRadio = document.querySelector('input[name="tdoptions"]:checked');
+        console.log('selectedRadio is: ' + selectedRadio);
+        selectedRadio.click();
+        // UIController.displayTdOptions(selectedRadio);
 
 
         // !VA Default for table width
