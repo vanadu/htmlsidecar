@@ -13,6 +13,7 @@ DONE: vmlbutton - add default 40/200 width and height as per Stig and add error 
 TODO: The default bgcolor also has to be written to the input fields in vmlbutton
 TODO: Add error handling and the isErr argument to makeTdNode and makeTableNode so that the Clipboard object can discern between success messages and 'alert' messages, i.e. when the Clipboard output should be reviewed by the user for some reason, i.e. when vmlbutton height doesn't match the height of the loaded image.
 
+TODO: Fix viewer doesn't resize horizontally any more in PROD mode or show the Inspectors - but works in DEV mode.
 TODO: rtl class attribute shows when nothing is entered: it should be hidden
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
 TODO: curImg doesn't resize back if you change viewerW to smaller than curImg and then change it back. It should follow the size of viewerW shouldn't it? Maybe not...
@@ -387,6 +388,7 @@ var Witty = (function () {
       // !VA UIController public initUI
       initUI: function(initMode) {
         const delayInMilliseconds = 10;
+        console.log('initMode is: ' + initMode);
         // !VA Here we initialze DEV mode, i.e. reading a hardcoded image from the HTML file instead of loading one manually in production mode
         if (initMode === 'devmode') {
           console.log('initUI devmode');
@@ -2015,7 +2017,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
                 // lphonesw.value = lphonesw.getAttribute('data-lphonesw');
 
                 
-                (false);
+                calcViewerSize(false);
               })();
               
               // !VA Timeout of 250 ms while the blob loads.
@@ -2838,6 +2840,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         setupEventListeners();
         // !VA  Test if there is currently #cur-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
         var curImgExists = document.querySelector(dynamicRegions.curImg);
+        console.log('curImgExists is: ' + curImgExists);
+        
         if (curImgExists) {
           initMode = 'devmode';
           UICtrl.initUI();
