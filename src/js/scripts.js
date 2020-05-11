@@ -7,13 +7,8 @@
 =========================================================
 // !VA 05.07.20
 Status:
-Rewrote the basic indent routine. It works now for basic TD options and should be relatively easy to modify for a no-img TD option by tweaking the output of makeTdNode to not append imgNode if selected.
-DONE: Show and hide TD inputs based on option
-DONE: Add bulletproof button td option
-DONE: Add tag name to CSS selector output
-DONE: Save viewerW to localStorage
 
-TODOP: Add vml options to CCP and implement them in getVmlButtonBlock
+TODO: Add vml options to CCP and implement them in getVmlButtonBlock. Height and width of the vmlbutton td has to come from the loaded image but can be overwritten manually in case the user doesn't want to include a background image fro some reason - though what would be the point in that? The default bgcolor also has to be written to the input fields.
 
 TODO: rtl class attribute shows when nothing is entered: it should be hidden
 TODO: Save sPhonesW and lPhonesW to localStorage
@@ -35,41 +30,17 @@ NOTES from first tutorial attempts:
 	Wh are  table css buttons not showing when class is entered? Sometimes they don't...
 	When wrapper table is selected and a class is entered in both, which one use output with the CSS buttons?
 
-
-
-05.02.20
---------
-I've been dinking with these indents for 3 months now, and I have to face the fact that there's no way to do this using the DOM. The comment nodes are too irregular, and Javascript keeps 'correcting' them thus rendering them 'incorrect'. I'm going to try one last approach, which is to add the indents to the comment nodes as strings after outputNL[x].outerHTML. Here are some of the takeaways from the odyssey of creating regular indents with irregular HTML:
-- Accessing textContent through outputNL.childNodes[i] doesn't work because the textContent doesn't include the comment characters <!--, which is what we want to replace.
-- Accessing the comment characters through outputNL.innerHMTL doesn't appear to work because once you update the DOM by replacing any content in innerHTML, the browser parses the code and tries to 'fix' it.
-- Accessing the nodeValue of the individual childNode that contains the ms conditional flag doesn't work because as soon as you do that, JS adds the missing closing span tag, which 1) adds a node and causes the indent character to go before the new closing span instead of the closing TD like it should.
-CONCLUSION: The only place to do add indents before the comment character is AFTER outputNL has been converted to string via outerHTML. 
-
-05.07.20
------------
-DONE: Include routine to isolate and open Witty app in a new browser window.
-DONE: Reconfigure and repositon msg-container
-DONE: Put align options under MakeHTML buttons for IMG and TD options
-DONE: Move the CCP interface around to make more room for td and table options.
-DONE: Add the Exclude <img> checkbox under Basic <td> with options
-DONE: Add Exclude <img> functionality
-DONE: FIX CHROME CSS! - see comments at custom.scss .ccp-options-container. For some reason the top: 3px instruction was breaking webkit display. Apparently Firefox handles position: absolute incorrectly, see https://brianscodingexamples.wordpress.com/2013/06/20/absolute-position-elements-in-firefox-vs-chrome/
-DONE: Fix table align, doesn't work, shows 'left' when 'center' is seleced. AND 'center' should be preselected. Issue: takes the value from the TD, not the TABLE align option. Plus, the TD Valign option is also taking that value.
-TODO: Resize MakeCSS buttons 
-
 TODO: The CSS output will need to be revisited for td and table.
 TODO: Figure out why queryDOMElements is running mutliple times per CB build.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
 TODO: Add some kind of fluid option to the img options. Cerberus hard codes it into the img tag. That needs to be tested. Litmus overrides the width and height style properties in the CSS media queries. Need to test before that is implemented - but there's no reason to include a fluid option if that's settable in CSS.
 TODO: Fix table width: doesn't reflect what's in toolbar viewer width field.
-
-TODO: Change msg-table to flex div
+TODO: Fix Include wrapper table options don't appear if the CCP is closed and re-opened 
 
 
 /* !VA  - 06.23.19
 =========================================================
 
-TODO: Fix Include wrapper table options don't appear if the CCP is closed and re-opened 
 TODO: rewrite getAppdata to only query specific items in the array, or at least use destructuring to only make a const out of which ever Appdata property is needed in the respective function.
 TOD0: Think about making getAppdata only query a specific property if possible.
 TODO: CCP numeric input fiels need an input validator
@@ -1077,7 +1048,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // function makeTdNode( id, selectedRadio ) {
     function makeTdNode( uSels ) {
       // !VA Set defaults for vmlbutton option
-      let vmlDefaultWidth, vmlDefaultHeight;
       let Attributes;
       Attributes = getAttributes();
       let tdInner, imgNode;
@@ -1103,8 +1073,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         if (Attributes.tdClass) { tdInner.className = Attributes.tdClass; }
         // !VA valign attribute
         if (Attributes.tdAlign) { tdInner.align = Attributes.tdAlign; }
-        if (Attributes.tdHeight) { tdInner.height = Attributes.tdHeight; }
-        if (Attributes.tdWidth) { tdInner.width = Attributes.tdWidth; }
+        // if (Attributes.tdHeight) { tdInner.height = Attributes.tdHeight; }
+        // if (Attributes.tdWidth) { tdInner.width = Attributes.tdWidth; }
+        if (Attributes.tdHeight) { tdInner.height = Attributes.imgWidth; }
+        if (Attributes.tdWidth) { tdInner.width = Attributes.imgHeight; }
         // !VA Branch: implementExcludeImg (050420)
         // !VA If 'basic' is checked, create imgNode and append it, otherwise exclude the imgNode.
         if (uSels.selectedRadio === 'basic') {
