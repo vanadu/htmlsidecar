@@ -9,12 +9,12 @@
 Status:
 DONE: Fix imgswap codeBlock output: alt tag has quotes following, alt doesn't work. THis was fixed in an earlier commit.
 DONE: vmlbutton - add default 40/200 width and height as per Stig and add error handling if one of the values is omitted.
+DONE: Populate inputs with defaults in vmlbutton and 
+DONE: Fix viewer doesn't resize horizontally any more in PROD mode or show the Inspectors - but works in DEV mode.
+DONE: rtl class attribute shows when nothing is entered: it should be hidden. FIXED in setPosSwitchNodeAttributes
 
-TODO: The default bgcolor also has to be written to the input fields in vmlbutton
+
 TODO: Add error handling and the isErr argument to makeTdNode and makeTableNode so that the Clipboard object can discern between success messages and 'alert' messages, i.e. when the Clipboard output should be reviewed by the user for some reason, i.e. when vmlbutton height doesn't match the height of the loaded image.
-
-TODO: Fix viewer doesn't resize horizontally any more in PROD mode or show the Inspectors - but works in DEV mode.
-TODO: rtl class attribute shows when nothing is entered: it should be hidden
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
 TODO: curImg doesn't resize back if you change viewerW to smaller than curImg and then change it back. It should follow the size of viewerW shouldn't it? Maybe not...
 TODO: Notate all functions with module and private/public
@@ -151,7 +151,7 @@ var Witty = (function () {
     var Appdata = {};
 
     // !VA UIController: Inspector ID strings
-    var iInspectors = {
+    const iInspectors = {
       iFilename: '#i-filename',
       iDisplay: '#i-display-size',
       iDisksize: '#i-disk-size',
@@ -163,7 +163,7 @@ var Witty = (function () {
     };
 
     // !VA UIController: toolButton ID Strings
-    var toolbarElements = {
+    const toolbarElements = {
       iptTbrViewerW: '#ipt-tbr-viewerw',
       btnTbrIncr50: '#btn-tbr-incr50',
       btnTbrIncr10: '#btn-tbr-incr10',
@@ -179,7 +179,7 @@ var Witty = (function () {
 
     //!VA If we separate this out into UI objects that correspond to the objects we want to create, then we can just loop through them rather than define each property separately. So, dynamicElements are those that resize based on the current image... but I haven't figured out how to loop through them yet.
     // !VA UIController: dynamicRegions
-    var dynamicRegions = {
+    const dynamicRegions = {
       curImg: '#cur-img',
       imgViewer: '#main-image-viewer',
       imgViewport: '#image-viewport',
@@ -187,7 +187,7 @@ var Witty = (function () {
     };
 
     // !VA UIController: staticRegions
-    var staticRegions = {
+    const staticRegions = {
       dropArea: '#drop-area',
       tbrContainer: '#toolbar-container',
       ccpContainer: '#ccp',
@@ -199,7 +199,7 @@ var Witty = (function () {
 
     // !VA  UIController: ccpUserInput ID Strings
     // !VA imgAnchor is just a flag for the status of the checkbox. The actual propStrings have to have an Open and Close property.
-    var ccpUserInput = {
+    const ccpUserInput = {
       iptCcpImgClass: '#ipt-ccp-img-class',
       // imgAnchor: '#chk-ccp-img-anchor',
       // !VA iptCcpImgAlt
@@ -248,7 +248,7 @@ var Witty = (function () {
     //iInspectors.btnToggleCcp
     //iInspectors.btnToggleCcp for assembling the clipboard create tag buttons. We also store the functions that are run in the CBController module to build the clipboard snippets when each of these elements is clicked so that we can just loop through the properties, get the current event target and run the associated function without an extra switch statement or other conditional at that stage.
 
-    var btnCcpMakeClips = {
+    const btnCcpMakeClips = {
       // !VA Build HTML Clipboard Buttons
       // !VA NEW
       btnCcpMakeImgTag: '#btn-ccp-make-img-tag',
@@ -281,7 +281,7 @@ var Witty = (function () {
     // });
 
 
-    // !VA UIController private evalInspectorAlerts
+    // !VA UIController private
     // !VA Reboot: passing in Appdata...it was iInspectors, but writeInspectors doesn't pass iInspectors. So let's see if there's a difference between the passed Appdata and the queried Appdata. Not relevant at this point since Appdata has no data...
     function evalInspectorAlerts(passedAppdata) {
       var allInspectors;
@@ -337,16 +337,16 @@ var Witty = (function () {
         return btnCcpMakeClips;
       },
 
+      // !VA UIController public
       initToolbarInputs: function() {
         // !VA This is called from init (? ) and initializes the values of the toolbar viewerW, sPhonesW and lPhonesW values from either a default value or the localStorage values. Check if there are localStorage values, if not, initialize viewerW = 650, sPhonesW = 320, lPhonesW = 414 and write those to the toolbarUI. 
         console.log('initToolbarInputs running');
-
-
       },
 
       // !VA UIController public getAppdata
-      // !VA Moving getAppdata from appController to UIController because Appdata is derived from the DOM elements and data properties that reside in the DOM. 
+      // !VA Moved getAppdata from appController to UIController because Appdata is derived from the DOM elements and data properties that reside in the DOM. 
 
+      // !VA UIController public
       queryDOMElements: function() {
         // !VA NEW This needs to ONLY return the non-calculated DOM elements and data properties: curImg.imgW, curImg.imgW, curImg.imgNW, curImg.NH and viewerW. Aspect is calculated so we don't need to get that here, leave that to appController.
         // !VA NEW We will get the individual properties and return them as an ES6 array.
@@ -383,9 +383,7 @@ var Witty = (function () {
         return els;
       },
 
-
-
-      // !VA UIController public initUI
+      // !VA UIController public
       initUI: function(initMode) {
         const delayInMilliseconds = 10;
         console.log('initMode is: ' + initMode);
@@ -448,7 +446,7 @@ var Witty = (function () {
         } 
       },
 
-      // !VA UIController public writeInspectors
+      // !VA UIController public
       writeInspectors: function() {
         // !VA We need the current value in iInspectors.iSmallPhones and iInspectors.iLargePhones to display all the iInspectors. So, if it's not explicitly user-defined, then use the default placeholder value from the HTML, then get the height from getAspectRatio
         var Appdata = {};
@@ -471,8 +469,7 @@ var Witty = (function () {
         evalInspectorAlerts(Appdata);
       },
 
-      // !VA  I had this as private but moved to public, not sure why.
-      //UIController public writeInspectorAlerts
+      //UIController public
       writeInspectorAlerts: function(curInspectors, bool) {
         // !VA if evalInspectorAlerts returns true, then the Inspector should be displayed in red. To reset the dim alert, set to style color to 'auto'.
         var att = bool;
@@ -487,17 +484,13 @@ var Witty = (function () {
         }
       },
 
+      // !VA UIController public
       displayTdOptions: function(evt) {
         console.log('displayTdOptions running');
         // !VA Array including all the defined options for each tdoption radio
         let allTdOptions = [], optionsToShow = [], targetid, parentDivId;
-        let Attributes;
-        // Attributes = appController.getAttributes();
         let Appdata;
         Appdata = appController.initGetAppdata();
-        console.log('Appdata:');
-        console.dir(Appdata);
-
         // !VA Set the target id of the click event
         targetid = evt.target.id;
         // !VA Populate allTdOptions with all the defined Td options
@@ -533,7 +526,7 @@ var Witty = (function () {
           break;
         case targetid === ccpUserInput.rdoCcpTdPosswitch.slice(1):
           // !VA TODO: Cerebrus has NO td options except width: 100% - let's add 'class' andleave it like that for the time being and see if there's a case where any other options are useful. 
-          optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign ];
+          optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTdBgColor ];
           showOptions(optionsToShow);
           break;
         case targetid === ccpUserInput.rdoCcpTdImgswap.slice(1):
@@ -561,7 +554,6 @@ var Witty = (function () {
           document.querySelector(ccpUserInput.iptCcpTdFontColor).value = '#FFFFFF';
           document.querySelector(ccpUserInput.iptCcpTdBorderColor).value = '#1e3650';
           document.querySelector(ccpUserInput.iptCcpTdBorderRadius).value = '4';
-          
           break;
         default:
           console.log('ERROR: UIController.displayTdOptions public');
@@ -569,14 +561,14 @@ var Witty = (function () {
       },
 
       // UIController: Flash a status message in the app message area
-      // !VA  - review this. We could probably fold this into the error handler but that's going to be complicated enough as it is and this is just for status messages
+      // !VA TODO: Review this. We could probably fold this into the error handler but that's going to be complicated enough as it is and this is just for status messages
+      // !VA UIController public
       flashAppMessage: function(messArray) {
         // !VA Receives an array of a boolean error flag and the message to be displayed.
         // !VA Init error flag, message string and timeout delay
         let isErr, mess, del;
         isErr = messArray[0];
         mess = messArray[1];
-        
 
         // !VA Get the message container and display text into variables
         let msgContainer = document.querySelector(staticRegions.msgContainer);
@@ -597,8 +589,6 @@ var Witty = (function () {
         // !VA If it's an error, let it display for 2.5 seconds. If it's a status, just flash it because while it's onscreen the CCP blocker is active and we want that to be short.
         isErr ? del = 2500 : del = 500;
 
-
-
         // !VA Show the message for two seconds
         window.setTimeout(function() {
         // !VA After two seconds, hide the message and remove the blocker
@@ -615,785 +605,24 @@ var Witty = (function () {
         del);
       },
     };
-
-    
   })();
 
 
   var CBController = (function() {
 
-
     // !VA CBController private functions
-    // !VA If we want to access any of the DOM IDs we have to call them from UIController where they're defined.
-
+    // !VA NOTE: If we want to access any of the DOM IDs we have to call them from UIController where they're defined.
     var iInspectors = UIController.getInspectorIDs();
     var ccpUserInput = UIController.getCcpUserInputIDs();
     var btnCcpMakeClips = UIController.getBtnCcpMakeClips();
 
-
+    // !VA TODO: Appears to be deprecated, remove
+    // !VA CBController private
     function getKeyByValue(object, value) {
       return Object.keys(object).find(key => object[key] === value);
     }
 
-
-
-    // !VA New CSS RUle output functionality 02.20.20
-    function  makeCssRule( id, classname, wval, hval ) {
-      let Attributes = [];
-      Attributes = getAttributes();
-      let Appdata = [];
-      Appdata = appController.initGetAppdata();
-      let clipboardStr, isErr;
-      let args = [];
-      // !VA isErr is passed to Clipboard object to indicate whether to flash the success message or an alert message
-      isErr = false;
-      switch(true) {
-      case (id.includes('img-dsktp')):
-        // args[0] = Attributes.imgClass, args[1] = Attributes.imgWidth, args[2] = Attributes.imgHeight;
-        clipboardStr = `img.${Attributes.imgClass} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important; }`;
-        break;
-      case (id.includes('img-smphn')):
-        clipboardStr = `img.${Attributes.imgClass} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important; }`;
-        break;
-      case (id.includes('img-lgphn')):
-        clipboardStr = `img.${Attributes.imgClass} { width: ${Appdata.lPhonesW}px !important; height: ${Appdata.lPhonesH}px !important; }`;
-        break;
-      case (id.includes('td-dsktp') || id.includes('td-smphn') || id.includes('td-lgphn')) :
-        if ( Attributes.tdHeight) {
-          clipboardStr = `td.${Attributes.tdClass} { height: ${Attributes.tdHeight}px !important; }`;
-        } else {
-          clipboardStr = `td.${Attributes.tdClass} {  }`;
-        }
-        break;
-      case (id.includes('table-dsktp')):
-        clipboardStr = `table.${Attributes.tableClass} { width: ${Attributes.tableWidth}px !important; align: ${Attributes.tableAlign} !important; }`;
-        break;
-      case (id.includes('table-smphn')):
-        clipboardStr = `table.${Attributes.tableClass} { width: ${Appdata.sPhonesW}px !important; align: ${Attributes.tableAlign} !important; }`;
-        break;
-      case (id.includes('table-lgphn')):
-        clipboardStr = `table.${Attributes.tableClass} { width: ${Appdata.lPhonesW}px !important; align: ${Attributes.tableAlign} !important; }`;
-        break;
-      default:
-        // code block
-      } 
-      // !VA If the input includes a percent char, remove the hard-coded trailing px on the value and just output the value with the user-entered percent char.
-      clipboardStr.includes('%')  ? clipboardStr = clipboardStr.replace('%px', '%') : clipboardStr;
-
-      writeClipboard(id, clipboardStr);
-
-    }
-
-
-    // !VA 02.17.20 This is the same as ccpIfNoUserInput except it returns ONLY the value, not the attribute name -- but we don't need this now, because if it has not value, then, well it has no value.
-    function ccpGetAttValue(att, value) {
-      // !VA We need get the iFilename from Appdata in case the user leaves 'path' empty
-      var Appdata = appController.initGetAppdata();
-      var str;
-      // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
-      if (value && att) {
-        // !VA I might want to change this to include the # in the string itself.
-        if (value === '#') {
-          str = '';
-        } else {
-          // !VA Include the space here to ensure no duplicate spaces slip in when the clip is built
-          str = value;
-        }
-
-      } else {
-        // !VA If the path field is empty, we need to return the iFilename without the path.
-        if (att === 'src' && value === '' ) {
-          str = `${att}="${Appdata.fname}" `;
-        } else if ( att === '#' || att === '') {
-          str = '';
-        } else {
-          // !VA If there is no input, exclude the attribute entry.
-          str = '';
-        }
-      }
-      return str;
-    }
-
-    function getAlignAttribute(selectid, options) {
-      var str, selInd;
-      selInd = document.querySelector(selectid).selectedIndex;
-      switch (true) {
-      case (selInd === 0):
-        str = '';
-        break;
-      case (selInd === 1):
-        str = options[1];
-        break;
-      case (selInd === 2):
-        str = options[2];
-        break;
-      case (selInd === 3):
-        str = options[3];
-        break;
-      }
-      return str;
-    }
-
-    function getCheckboxSelection(target) {
-      // console.clear();
-      let chkboxid, checked;
-      chkboxid = document.querySelector(target).id;
-      chkboxid = chkboxid.replace('mrk', 'box');
-      chkboxid = chkboxid.replace('spn', 'chk');
-      if (document.querySelector('#' + chkboxid).checked === false) {
-        // !VA WRAPPER TABLE NOT CHECKED
-        checked = false;
-      } else {
-      // !VA WRAPPER TABLE IS CHECKED
-        checked = true;
-      }
-      return checked;
-    }
-
-    function getRadioSelection(target) {
-      let radioid, checked;
-      radioid = document.querySelector(target).id; 
-      if (document.querySelector('#' + radioid).checked === false) {
-        // !VA Radio button is NOT CHECKED
-        checked = false;
-      } else {
-      // !VA Radio button IS CHECKED
-        checked = true;
-      }
-      return checked;
-    }
-
-    // clipboardController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
-    // !VA TODO: THis should be in handleUserInput
-    function ccpIfNoUserInput(att, value) {
-      // !VA We need get the iFilename from Appdata in case the user leaves 'path' empty
-      var Appdata = appController.initGetAppdata();
-      var str;
-      // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
-      if (value && att) {
-        // !VA I might want to change this to include the # in the string itself.
-        if (value === '#') {
-          str = '';
-        } else {
-          // !VA Include the space here to ensure no duplicate spaces slip in when the clip is built
-          str = value;
-        }
-
-      } else {
-        // !VA If the path field is empty, we need to return the iFilename without the path.
-        if (att === 'src' && value === '' ) {
-          str = `${att}="${Appdata.fname}" `;
-        } else if ( att === '#' || att === '') {
-          str = '';
-        } else {
-          // !VA If there is no input, exclude the attribute entry.
-          str = '';
-        }
-      }
-      return str;
-    }
-
-    // !VA INDENT FUNCTIONS
-    // !VA Get the user selections that define the clipboard output configuration- the clicked Options button, the Include anchor checkbox and the Include wrapper table checkbox. The nodeList used for the indents as well as the indent implementation will depend on these options -- only the basic TD radio button option generates a simple nodeList structure whose indents can be processed with a simple for loop. The other options generate nodeLists with text nodes and comments that require a custom indent scheme.
-    function getUserSelections( id ) {
-      // !VA Initialize the clipboard-building process by getting those user selections in the CCP that determine the structure of the clipboard output and put those selections into the uSels object.
-      let uSels = {};
-      uSels = {
-        buttonClicked: '',
-        hasAnchor: getCheckboxSelection(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk),
-        hasWrapper: getCheckboxSelection(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk),
-        selectedRadio: document.querySelector('input[name="tdoptions"]:checked').value
-      };
-      if (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)) { 
-        uSels.buttonClicked = 'imgbut';
-        // !VA Override the selectedRadio value for the IMG button - the IMG button will ALWAYS output img/anchor tags to the clipboard no matter which tdoptions radio button is selected.
-        uSels.selectedRadio = 'basic';
-      } else if (id === btnCcpMakeClips.btnCcpMakeTdTag.slice(1)) { 
-        uSels.buttonClicked = 'tdbut';
-      } else {
-        uSels.buttonClicked = 'tablebut';
-      }
-      buildOutputNodeList( uSels );
-    }
-
-    // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
-    function buildOutputNodeList( uSels ) {
-      let tableNodeFragment, nl, frag, outputNL, clipboardStr;
-      // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
-      tableNodeFragment = makeTableNode( uSels );
-      // !VA Create the full nodeList from the tableNodeFragment. If tableNodeFragment is null, return to abort without creating Clipboard object.
-      try {
-        nl = tableNodeFragment.querySelectorAll('*');
-      } catch (e) {
-        console.log('Error in buildOutputNodeList: tableNodeFragment is null. Aborting...');
-        return;
-      }
-      // !VA Create the div container to which the extracted nodeList fragment will be appended
-      var container = document.createElement('div');
-
-      // !VA Basic TD Options - This should be extracted to a separate function
-      if (uSels.selectedRadio === 'basic' || uSels.selectedRadio === 'excludeimg' || uSels.selectedRadio === 'posswitch') {
-        // !VA Deterimine which makeNode button was clicked and extract a nodeList fragment with only those nodes that correspond to the clicked button. The index position of the extracted fragments is determined by the length of the tableNodeFragment nodeList minus an integer to compensate for the 0-based nodeList indices.
-        let rtlNodePos, extractPos;
-        // !VA For the posswitch option: Get the position of the RTL node, if it exists. 
-        for (let i = 0; i < nl.length; i++) {
-          // console.log('nl[i] is: ' +  nl[i]);
-          if (nl[i].getAttribute('dir')  === 'rtl') {
-            rtlNodePos = i;
-          }
-        }
-        // !VA Process the makeNode button clicks
-        switch(true) {
-        // !VA imgbut is clicked. We can hardcode the index where the extraction begins because the imgNode is created in makeTdNode and the imgbut button click overrides any other makeNode button actions. 
-        case (uSels.buttonClicked === 'imgbut'):
-          // !VA If there's an anchor, take the last two nodes, otherwise just take the last node.
-          uSels.hasAnchor ? frag = nl[nl.length - 2] : frag = nl[nl.length - 1]; 
-          break;
-        // !VA tdbut is clicked. Here we handle the 'basic' and 'posswitch' options because they process indents with no modifications. 'imgswap' and 'bgimage' options are handled separately because they import comment nodes with MS conditional code
-        case (uSels.buttonClicked === 'tdbut'):
-          console.log('tdbut');
-          // !VA basic option is selected 
-          if ( uSels.selectedRadio === 'basic') { 
-            // !VA We can hardcode this for now, but that will be a problem if any other options with other nodes are added.
-            uSels.hasAnchor ? extractPos = nl.length - 3 : extractPos = nl.length - 2;
-            // frag = nl[extractPos];
-          } else if ( uSels.selectedRadio === 'excludeimg') {
-          
-            extractPos = 5;
-
-
-          // !VA posswitch option is selected
-          } else {
-            // !VA The fragment is extracted starting at the position of the RTL node
-            extractPos = rtlNodePos;
-          }
-          frag = nl[extractPos];
-          break;
-        case (uSels.buttonClicked === 'tablebut'):
-          // !VA basic option is selected 
-          // !VA We can hardcode the 'basic' and 'posswitch' positions for now, but these will have to be revisited if any new options are added that change the outputNL indices. 
-          if (uSels.hasWrapper) {
-            // !VA The Include wrapper table option is selected, so the entire nodeList is extracted
-            extractPos = 0;
-            // frag = nl[extractPos];
-          } else {
-            // !VA The Include wrapper table option is not selected, so all nodes starting at index 3 are extracted
-            extractPos = 3;
-          }
-          frag = nl[extractPos];
-          break;
-        default:
-          // Default code block, this should be an error code
-        }
-        // !VA Append the fragment to the container
-        container.appendChild(frag);
-        // !VA Create the outputNL nodeList to pass to the Clipboard object
-        outputNL = container.querySelectorAll('*');
-        applyIndents( uSels, outputNL );
-        clipboardStr = outputNL[0].outerHTML;
-
-      // !VA imgSwap and bgimage option - includes MS conditional code retrieved by getImgSwapBlock and getBgimageBlock which includes getIndent functions. First, run applyIndents on outputNL. applyIndents also inserts tokens at the position where the codeBlock is to be inserted. The parent nodelist is converted to a string, the code blocks are retrieved, indents are inserted, and finally the codeblocks are inserted into the string between the tags of the last node in the outputNL.outerHTML string. 
-      } else if (uSels.selectedRadio === 'imgswap' || uSels.selectedRadio  === 'bgimage' || uSels.selectedRadio === 'vmlbutton') {
-        // !VA We start with the tdbut makeNode button because the img makeNode button isn't referenced in the imgswap option. The A/IMG tags are hard-coded into the MS Conditional code in getImgSwapBlock. Also, there's a switch to include/exclude the A/IMG node in makeTdNode.
-
-        // !VA extractNodeIndex is the nl index position at which the nodes are extracted to build outputNL. It equals the nodeList length minus the indentLevel.
-        let extractNodeIndex;
-        // !VA indentLevel is the number of indents passed to getIndent.
-        let indentLevel;
-        // !VA codeBlock is the MS conditional code block returned as string
-        let codeBlock;
-        // !VA If the makeTD button is clicked, then only the last node in nl is extracted and the MS conditional comments get one indent level
-        if ( uSels.buttonClicked === 'tdbut') {
-          indentLevel = 1;
-          extractNodeIndex = nl.length - indentLevel;
-        } else {
-          if (uSels.hasWrapper) {
-            // !VA If the makeTable button is clicked and hasWrapper is checked, then all nl nodes are extracted and the MS conditional comments get 6 indents
-            indentLevel = 6;
-            extractNodeIndex = nl.length - indentLevel;
-          } else {
-            // !VA If the makeTable button is clicked and hasWrapper is unchecked, then nl nodes are extracted at position 3 and the MS conditional comments get 3 indents
-            indentLevel = 3;
-            extractNodeIndex = nl.length - indentLevel;
-          }
-        }
-        // !VA Extract the fragment to convert to outputNL
-        frag = nl[extractNodeIndex];
-        // !VA Append the nodeList fragment to the container div
-        container.appendChild(frag);
-        // !VA Create the nodeList to pass to the Clipboard object. 
-        outputNL = container.querySelectorAll('*');
-        // !VA Apply the indents and insert the tokens marking the position for inserting the MS conditional code.
-        applyIndents(uSels, outputNL);
-        // !VA Convert outputNL to a string (including tokens for inserting MS conditional code) for output to Clipboard object.
-        clipboardStr = outputNL[0].outerHTML;
-        
-        // !VA Get the codeBlock corresponding to the selected TD option
-        if ( uSels.selectedRadio === 'imgswap') {
-          codeBlock = getImgSwapBlock(indentLevel);
-        } else if (  uSels.selectedRadio === 'bgimage' ) {
-          codeBlock = getBgimageBlock(indentLevel);
-        } else if (uSels.selectedRadio === 'vmlbutton') {
-          codeBlock = getVmlButtonBlock(indentLevel);
-        }
-        // !VA Replace the tokens in clipboardStr with the codeBlock
-        clipboardStr = clipboardStr.replace('/replacestart//replaceend/', codeBlock + '\n');
-        
-      } 
-      // !VA Convert the alias of the clicked button to an ID the Clipboard object recognizes and write clipboardStr to the clipboard.
-      writeClipboard( aliasToId(uSels.buttonClicked), clipboardStr );
-    }
-
-
-
-    function aliasToId( alias ) {
-      // !VA Convert uSels.buttonClicked back to an id before passing to Clipboard object.
-      let id;
-      if (alias === 'imgbut') {id = btnCcpMakeClips.btnCcpMakeImgTag.slice(1); }
-      if (alias === 'tdbut') {id = btnCcpMakeClips.btnCcpMakeTdTag.slice(1); }
-      if (alias === 'tablebut') {id = btnCcpMakeClips.btnCcpMakeTableTag.slice(1); }
-      return id;
-    }
-
-    // !VA END INDENT FUNCTIONS
-
-    // !VA START TD OPTIONS MS-CONDITIONAL CODE BLOCKS
-    // !VA These are the code blocks that contain MS conditionals in comment nodes or text nodes, i.e. mobile swap and background image.
-
-    function getImgSwapBlock( indentLevel ) {
-      let Appdata, Attributes, linebreak;
-      Attributes = getAttributes();
-      Appdata = appController.initGetAppdata();
-      linebreak = '\n';
-      let mobileFilename, mobileSwapStr;
-      // !VA Create the mobile image filename: Get the current image file's filename and append the name with '-mob'.
-      mobileFilename = Attributes.imgSrc;
-      // !VA The regex for appending the filename with '-mob'.
-      mobileFilename = mobileFilename.replace(/(.jpg|.png|.gif|.svg)/g, '_mob$1');
-      // !VA Create the code for the mobile swap TD as a Comment node of the parent td. 
-      // !VA Issues 05.07.20 //
-
-      // !VA  The parent TD is different, it should have no width, no valign and no height. Tt should be align='left', style="vertical-align:top" 
-      // !VA  The img is missing here completely. It should ge the img and anchor. I think this is probably a result of getting rid of the img for the excludeimg option  -->
-
-      console.dir(Attributes);
-      console.log('Attributes.imgAlt is: ' + Attributes.imgAlt);
-
-
-      mobileSwapStr = `${linebreak}${getIndent(indentLevel)}<a href="#"><img class="hide" alt="${Attributes.imgAlt}" width="${Attributes.imgWidth}" height="${Attributes.imgHeight}" src="${Attributes.imgSrc}" border="0" style="width: ${Attributes.imgWidth}px; height: ${Attributes.imgHeight}px; margin: 0; border: none; outline: none; text-decoration: none; display: block; "></a>${linebreak}${getIndent(indentLevel)}<!--[if !mso]><!-->${linebreak}${getIndent(indentLevel)}<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">${linebreak}${getIndent(indentLevel)}<a href="#"><img class="mobileshow" alt="${Attributes.imgAlt}" width="${Appdata.sPhonesW}" height="${Appdata.sPhonesH}" src="${mobileFilename}" border="0" style="width: ${Appdata.sPhonesW}px; height: ${Appdata.sPhonesH}px; margin: 0; border: none; outline: none; text-decoration: none; display: block;" /></a>${linebreak}${getIndent(indentLevel)}<!--</span>-->${linebreak}${getIndent(indentLevel)}<!--<![endif]-->`;
-      // !VA Append the mobileSwapStr code to tdInner
-      // tdInner.appendChild(mobileSwapStr);
-      return mobileSwapStr;
-    }
-
-    function getBgimageBlock( indentLevel) {
-      console.log('getBgiamgeBlock running');
-      let Attributes;
-      Attributes = getAttributes();
-      let bgimageStr, fallback, bgcolor;
-      let linebreak;
-      linebreak = '\n';
-      // !VA 03.09.2020 Set the indentLevel to 1 for now
-      fallback = '#7bceeb';
-      Attributes.tdBgcolor ? bgcolor = Attributes.tdBgcolor : bgcolor = fallback;
-
-
-      // !VA This is wrong: the td should have bgcolor. Besides that looks OK
-      
-      
-
-      // !VA Define the innerHTML of the bgimage code
-      bgimageStr = `${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}${getIndent(indentLevel)}<div>${linebreak}${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div>${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}  </v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect>${linebreak}${getIndent(indentLevel)}<![endif]-->`;
-      // console.log('bgimageStr is: ');
-      // console.log(bgimageStr);
-      return bgimageStr;
-    }
-
-    function getVmlButtonBlock (indentLevel) {
-      // console.clear();
-      let Attributes;
-      Attributes = getAttributes();
-      // console.dir(Attributes);
-      let vmlButtonStr;
-      let linebreak;
-      linebreak = '\n';
-      // !VA Branch: implementVMLButton (050720)
-      /* !VA  
-      Should be:  width = tdoptions.height.input.value
-                  height = tdoptions.height.input.value
-                  if either of the above's value is falsy, trigger an error
-
-
-      
-      
-      */
-      var tdHeight, tdWidth;
-      tdHeight = document.querySelector(ccpUserInput.iptCcpTdHeight).value;
-      tdWidth = document.querySelector(ccpUserInput.iptCcpTdWidth).value;
-
-
-
-      vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:${tdHeight}px;v-text-anchor:middle;width:${tdWidth}px;" arcsize="10%" strokecolor="#1e3650" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc}" color="#556270" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Show me the button!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="#"
-style="background-color:#556270;background-image:url(${Attributes.imgSrc});border:1px solid #1e3650;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:${tdHeight}px;text-align:center;text-decoration:none;width:${tdWidth}px;-webkit-text-size-adjust:none;mso-hide:all;">Show me the button!</a></div>`;
-      return vmlButtonStr;
-    }
-    // !VA END TD OPTIONS MS-CONDITIONAL CODE BLOCKS
-    // function makeImgNode ( id ) {
-    function makeImgNode ( ) {
-      // !VA Id is passed but not used here,  because we're only building the node.
-      let Attributes;
-      Attributes = getAttributes();
-      let imgNode, returnNode;
-      let returnNodeFragment;
-      imgNode = document.createElement('img');
-      returnNodeFragment = document.createDocumentFragment();
-
-      // !VA class attribute
-      if (Attributes.imgClass) { imgNode.className = Attributes.imgClass; }
-      // !VA alt attribute
-      if (Attributes.imgAlt) { imgNode.alt = Attributes.imgAlt; }
-      // src attribute;
-      imgNode.src = Attributes.imgSrc;
-      // !VA width attribute
-      imgNode.width = Attributes.imgWidth;
-      // !VA height attribute
-      imgNode.height = Attributes.imgHeight;
-      // !VA style attribute
-      imgNode.setAttribute('style', Attributes.imgStyle);
-      // !VA align attribute is deprecated in html5, so we need this hack if we want to include it, which we don't for now.
-      if (Attributes.imgAlign) { imgNode.align = Attributes.imgAlign; }
-      // !VA border attribute
-      imgNode.border = '0';
-      
-      // !VA If the include anchor option is checked, create the anchor element, add the attributes, append the imgNode to it, and return it.
-      if(Attributes.imgIncludeAnchor === true) {
-        let anchor = document.createElement('a');
-        anchor.href = '#';
-        anchor.setAttribute('style', 'color: #FF0000');
-        anchor.appendChild(imgNode);
-        returnNodeFragment.appendChild(anchor);
-      } else {
-        // !VA Otherwise, set returnNode to imgNode without the anchor.
-        returnNodeFragment.appendChild(imgNode);
-      }
-      // return returnNode;
-      return returnNodeFragment;
-    }
-
-
-
-    // !VA 03.10.2020 Need to find out whether the table button was clicked and if so just add 3 or 6 to the indentLevel of the getIndent function.
-    // function makeTdNode( id, selectedRadio ) {
-    function makeTdNode( uSels ) {
-      // !VA Variables for error handling
-      let isErr, errCode;
-      // !VA Set defaults for vmlbutton option
-      let Attributes;
-      Attributes = getAttributes();
-      let tdInner, imgNode;
-      tdInner = document.createElement('td');
-      let tdNodeFragment;
-      tdNodeFragment = document.createDocumentFragment();
-      // !VA Branch: tryShowHideTDOptions (050920)
-
-      // !VA Branch: tryShowHideTDOptions (050920) THis doesn't belong here, there are no attributes that are available in ALL the parent nodes.
-      // !VA TODO: There are NO attributes that are included in ALL the tdoptions, but it's very repetitive to include these options individually. Think about how this can be made DRYer 
-      // !VA bgcolor attribute. Pass the input value, don't prepend hex # character for now
-      if (Attributes.tdBgcolor) { tdInner.bgColor = Attributes.tdBgcolor; }
-      // !VA Now add the attributes included only with the default Td configuration
-      switch(true) {
-      // case (selectedRadio === 'basic'):
-      case (uSels.selectedRadio === 'basic' || uSels.selectedRadio === 'excludeimg'):
-        console.log('makeTdNode basic OR excludeimg');
-        // !VA class attribute
-        if (Attributes.tdClass) { tdInner.className = Attributes.tdClass; }
-        // !VA valign attribute
-        if (Attributes.tdAlign) { tdInner.align = Attributes.tdAlign; }
-        if (Attributes.tdValign) { tdInner.vAlign = Attributes.tdValign; }
-        if (Attributes.tdHeight) { tdInner.height = Attributes.imgWidth; }
-        if (Attributes.tdWidth) { tdInner.width = Attributes.imgHeight; }
-        // !VA Branch: implementExcludeImg (050420)
-        // !VA If 'basic' is checked, create imgNode and append it, otherwise exclude the imgNode.
-        if (uSels.selectedRadio === 'basic') {
-          imgNode = makeImgNode();
-          // !VA We need to include the imgNode here ONLY if Bgimage is unchecked
-          tdInner.appendChild(imgNode);
-        }
-        break;
-      // case (selectedRadio === 'imgswap'):
-      case (uSels.selectedRadio === 'imgswap'):
-        if (Attributes.tdClass) { tdInner.className = Attributes.tdClass; }
-        if (Attributes.tdValign) { tdInner.vAlign = Attributes.tdValign; }
-        if (Attributes.tdAlign) { tdInner.align = Attributes.tdAlign; }
-        break;
-      // case (selectedRadio === 'bgimage'):
-      case (uSels.selectedRadio === 'bgimage'):
-        console.log('makeTdNode bgimage');
-        // !VA Create the parent node to which the bgimage code block will be appended after outputNL is converted to text in buildNodeList.
-        // !VA Include width, height and valign as per Stig's version
-        tdInner.width = Attributes.tdAppdataWidth;
-        tdInner.height = Attributes.tdAppdataHeight;
-        tdInner.vAlign = Attributes.tdValign;
-        // !VA Set the background attribute to the current path/filename
-        tdInner.setAttribute('background', Attributes.tdBackground);
-        // !VA Fallback bgcolor now set in UIController.displayTdOptions
-        // !VA Include fallback color from the default set in displayTdOptions
-        // Attributes.tdBgcolor ? tdInner.bgColor = Attributes.tdBgcolor : tdInner.bgColor = '#7bceeb';
-        break;
-      // case (selectedRadio === 'posswitch'):
-      case (uSels.selectedRadio === 'posswitch'):
-        tdInner  = makePosSwitchNodes();
-        break;
-      
-      // !VA Branch: tryShowHideTDOptions (050920) VML button:
-      /* !VA  
-        Challenge: Get VML height and width to default to 200/40 
-
-
-        parent td MUST include:
-        align attribute
-        height and width
-        And if they're not present, ERROR!
-
-        parent td default should be align: center, valign: top
-
-        text content MUST include
-        arcsize, which is 10 percent of the HEIGHT
-        border radius with is a VALUE
-        bgcolor
-        border/stroke color
-        font color
-      */
-      case (uSels.selectedRadio === 'vmlbutton'):
-        // !VA Branch: finishVmlButton (051020) height and width fields have to be entered, otherwise the button can't be built. Button width and height are set here in makeTdNode, the rest of the options are set in getVmlCodeBlock in buildNodeList. The defaults of 40/200 as per Stig are set in UIController.displayTdOptions. So if there's no value for td height and width, then the user has deleted the default and not replaced it with a valid entry. In this case, throw an ERROR and abort before it gets to the clipboard.
-
-        // !VA Button width and height are set here in makeTdNode, the rest of the options are set in getVmlCodeBlock in buildNodeList. The defaults of 40/200 as per Stig are set in UIController.displayTdOptions. So if there's no value for td height and width, then the user has deleted the default and not replaced it with a valid entry. In this case, throw an ERROR and abort before it gets to the clipboard.
-        if (!document.querySelector(ccpUserInput.iptCcpTdHeight).value || !document.querySelector(ccpUserInput.iptCcpTdWidth).value) {
-          // console.log('ERROR: no value for either height or width');
-          isErr = true;
-        } else {
-          console.log('Both height and width provided');
-          tdInner.width = Attributes.tdWidth;
-          tdInner.height = Attributes.tdHeight;
-        }
-        // !VA TODO: If the height entered doesn't match the height of the loaded image, then the user probably has forgotten to load the image used for the button background, so the code output will probably not be what the user expects. Output the code, but show an alert in the message bar. This is going to require making a different clipboard message for alerts. It will also require somehow informing the Clipboard object that two different messages can be displayed onsuccess - one success message and one alert message. That will require passing an error status along with tdNodeFragment and tableNodeFragment, which will require returning an array rather than just the node fragment. 
-        if (document.querySelector(ccpUserInput.iptCcpTdHeight).value !== Attributes.imgHeight) {
-          appController.initMessage(true, 'vmlbutton_height_mismatch');
-          console.log('ALERT vmlbutton: height value doesn\'t match height of loaded image');
-        } 
-        break;
-      default:
-        console.log('Some error has occurred in makeTdNode');
-      } 
-      // return tdInner;
-      tdNodeFragment.appendChild(tdInner);
-      // console.log('isErr is: ' + isErr);
-      if (isErr) { 
-        appController.initMessage(true, 'vmlbutton_no_value');
-        console.log('returning...');
-        return;
-      } else {
-        return tdNodeFragment;
-      }
-
-    }
-
-    // function makeTableNode( id ) {
-    function makeTableNode( uSels ) {
-      let Attributes;
-      Attributes = getAttributes();
-      let tableInner, tableOuter, tdInner, tdOuter, trInner, trOuter;
-      tableOuter = document.createElement('table');
-      tableInner = document.createElement('table');
-      // tdInner = document.createElement('td');
-      tdOuter = document.createElement('td');
-      trInner = document.createElement('tr');
-      trOuter = document.createElement('tr');
-
-      // !VA Make the inner table. If Include wrapper table is unchecked, we return just the inner table. If it's checked, we return the inner table and the outer table 
-      // !VA Add inner table attributes
-      // !VA table class attribute
-      if (Attributes.tableClass) { tableInner.className = Attributes.tableClass; }
-      // table.className = Attributes.tableClass;
-      // !VA table align attribute
-      if (Attributes.tableAlign) { tableInner.align = Attributes.tableAlign; }
-      // !VA width attribute -- the default is the current display size, so it gets the value from the toolbar viewerW input field.
-      tableInner.width = Attributes.tableWidth;
-      // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for now
-      if (Attributes.tableBgcolor) { tableInner.bgColor = Attributes.tableBgcolor; }
-      // !VA Add border, cellspacing and cellpadding
-      tableInner.border = '0', tableInner.cellSpacing = '0', tableInner.cellPadding = '0';
-      tableInner.setAttribute('role', 'presentation'); 
-      
-      // !VA Build the inner tr
-      tableInner.appendChild(trInner);
-      // !VA Get the inner TD and append it - id is not for the inner TD but that's not relevent here.
-      // tdInner = makeTdNode( id );
-      // trInner.appendChild(tdInner);
-      let tdNodeFragment = makeTdNode( uSels );
-      // !VA Append trInner to the tdNodeFragment. If tdNodeFragment is null, console the error and return to buildOutputNodeList to abort.
-      try {
-        trInner.appendChild(tdNodeFragment);
-      } catch (e) {
-        console.log('Error in makeTableNode: tdNodeFragment is null');
-        return;
-      }
-      // !VA 03.06.20A We are ALWAYS outputting EVERYTHING this time...
-      // if (!Attributes.tableIncludeWrapper) {
-      //   // !VA If Include table wrapper is unchecked, just return this inner table
-      // tableNode = tableInner;
-      // } else {
-      // !VA If include table wrapper is checked, build the outer table and return it
-      // !VA table wrapper class
-      if (Attributes.tableTagWrapperAlign) { tableOuter.align = Attributes.tableTagWrapperAlign; }
-      // !VA wrapper table align attribute
-      if (Attributes.tableTagWrapperClass) { tableOuter.className = Attributes.tableTagWrapperClass; }
-
-      // !VA width attribute
-      // !VA the default is the current display size, so it gets the value from the field.
-      tableOuter.width = Attributes.tableTagWrapperWidth;
-
-      // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for nowtableTagWrapperBgcolor);
-      if (Attributes.tableTagWrapperBgcolor) { tableOuter.bgColor = Attributes.tableTagWrapperBgcolor; }
-
-      // !VA Add border, cellspacing and cellpadding
-      tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
-      tableOuter.setAttribute('role', 'presentation'); 
-
-      // !VA Append the outer tr
-      tableOuter.appendChild(trOuter);
-      trOuter.appendChild(tdOuter);
-      // !VA Append the outer td
-      trOuter.appendChild(tdOuter);
-      // !VA Add the outer td attributes
-      if (Attributes.tdAlign) { tdOuter.align = Attributes.tdAlign; }
-      // !VA valign attribute
-      if (Attributes.tdValign) { tdOuter.vAlign = Attributes.tdValign; }
-      // !VA Append the inner table to the outer table's td
-      tdOuter.appendChild(tableInner);
-      // !VA Pass the outer table to the tableNode.
-      // tableNode = tableOuter;
-      let tableNodeFragment;
-      tableNodeFragment = document.createDocumentFragment();
-      tableNodeFragment.appendChild(tableOuter);
-      return tableNodeFragment;
-    }
-
-    function applyIndents( uSels, outputNL ) {
-      // console.log('applyIndents running');
-      // !VA Create array to store indent strings
-      let indents = [];
-      // !VA Create array to store the positions of the stackable columns in the posswitch option.
-      let stackColumnPos = [];
-      // !VA Variable to hold the indentLevel of the second posswitch column that the first posswitch column will stack over.
-      let stackColumnIndentLevel;
-
-      let hasMSConditional;
-      if ( uSels.selectedRadio === 'imgswap' || uSels.selectedRadio === 'bgimage' || uSels.selectedRadio === 'vmlbutton') {
-        hasMSConditional = true;
-      }
-      for (let i = 0; i < outputNL.length; i++) {
-        // !VA Get the indent strings into the indents array
-        indents.push(getIndent(i));
-        // !VA Push the positions of the stackable posswitch columns onto the stackColumnPos array 
-        if ( outputNL[i].className === 'stack-column-center') {
-          stackColumnPos.push(i);
-        }
-      }
-      // !VA Apply exception indents to the A and IMG nodes.
-      for (let i = 0; i < outputNL.length; i++) {
-        // !VA If parent of the IMG node is a A, then don't apply indents because we want the IMG tag to be nested within the A with no indents
-        if (outputNL[i].nodeName === 'IMG' && outputNL[i].parentNode.nodeName === 'A') {
-          // Apply no indent to the IMG tag if the Include anchor option is checked
-        }
-        else if ( outputNL[i].nodeName === 'A') {
-          // !VA If nodeList item 1 is the anchor, then Include anchor is checked. Apply the indent to the A but don't apply any afterbegin or beforeend indent, because that would affect the child img element.
-          outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
-          outputNL[i].insertAdjacentHTML('afterend', '\n');
-        } 
-        else {
-          // !VA Here we apply the 'regular' indents.
-          // !VA If stackColumnPos is empty, then the 'basic' td option is selected. Apply regular indents to all nodes.
-          if (stackColumnPos.length === 0) {
-            // !VA If the node is the last index in outputNL AND the option 'imgswap' or 'bgimage' is selected, then modify the indent to include the token for inserting the MS conditional code after outputNL is converted to text.
-            if ( i === outputNL.length - 1 && hasMSConditional === true) {
-              outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
-              outputNL[i].insertAdjacentHTML('afterbegin', '/replacestart/'); 
-              outputNL[i].insertAdjacentHTML('beforeend', '/replaceend/' + getIndent(i));
-              outputNL[i].insertAdjacentHTML('afterend', '\n');
-            } else {
-              // !VA Otherwise, apply the 'normal' indents
-              outputNL[i].insertAdjacentHTML('afterend', '\n');
-              outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
-              outputNL[i].insertAdjacentHTML('afterbegin', '\n');
-              outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
-            }
-
-          } else {
-            // !VA If the node index is less than the index of the first stacking column
-            if ( i < stackColumnPos[1] ) {
-              // !VA Apply the 'regular' indent scheme to all nodes up to the second stacking column
-              outputNL[i].insertAdjacentHTML('afterend', '\n');
-              outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
-              outputNL[i].insertAdjacentHTML('afterbegin', '\n');
-              outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
-            } else {
-              // !VA The indent level of the second stacking column should be the same as the first stacking column, which is equal to the iterator minus the index of the second stacking column minus the index of the first stacking column. So, for the makeTd button,  i = 10, stackColumnPos[1] = 10, stackColumnPos[0] = 6, so the stackColumnIndentLevel is 4.
-              stackColumnIndentLevel = (i - (stackColumnPos[1] - stackColumnPos[0]));
-              outputNL[i].insertAdjacentHTML('afterend', '\n');
-              outputNL[i].insertAdjacentHTML('beforebegin', getIndent(stackColumnIndentLevel));
-              outputNL[i].insertAdjacentHTML('afterbegin', '\n');
-              outputNL[i].insertAdjacentHTML('beforeend', getIndent(stackColumnIndentLevel));
-            }
-            // !VA We still need to add some indicator content to the terminating TD in this nodeList -- putting it in the makePosSwitchNode function itself would make it impossible to indent properly without some creative coding that's beyond my ability. So. we'll put it here, after the indent has been shrunk to be equal to the nextSibling's indent. It will always be added to the last node in the tree, i.e. the nodeList length - 1.
-            if ( i === outputNL.length - 1) {
-              outputNL[i].innerHTML = '\n' + getIndent(stackColumnIndentLevel) + '  <!-- ADD YOUR CONTENT HERE --> \n' + getIndent(stackColumnIndentLevel);
-            }
-          }
-        }
-      }
-      
-      return outputNL;
-    }
-
-    // !VA Return the indent string based on the indent level passed in
-    function getIndent(indentLevel) {
-      let indentChar, indent;
-      indentChar = '  ';
-      // !VA Repeat the indent character indentLevel number of times
-      indent = indentChar.repeat([indentLevel]);
-      return indent;
-    }
-
-    function writeClipboard(id, str) {
-      console.log('writeClipboard running');
-      console.log('str: ');
-      console.log(str);
-      
-      var clipboardStr;
-      
-      clipboardStr = str;
-      // clipboardStr = tag.outerHTML;
-      var currentCB = new ClipboardJS('#' + id, {
-        text: function(trigger) {
-
-          // var clipboardStr = ccpImgBuildHtmlClip();
-          // !VA Write success message to app message area on success
-          currentCB.on('success', function(event) {
-            appController.initMessage(false, 'copied_2_CB');
-            // debugger;
-          });
-  
-          currentCB.on('error', function(e) {
-            console.error('Action:', e.action);
-            console.error('Trigger:', e.trigger);
-          });
-          // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
-          return clipboardStr;
-        }
-      });
-    }
-
+    // !VA ATTRIBUTE FUNCTIONS
     function getAttributes() {
       var Appdata = appController.initGetAppdata();
       let target, checked, str, options, selectid;
@@ -1541,6 +770,282 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       return Attributes;
     }
 
+    // !VA 02.17.20 This is the same as ccpIfNoUserInput except it returns ONLY the value, not the attribute name -- but we don't need this now, because if it has not value, then, well it has no value.
+    // !VA CBController private
+    function ccpGetAttValue(att, value) {
+      // !VA We need get the iFilename from Appdata in case the user leaves 'path' empty
+      var Appdata = appController.initGetAppdata();
+      var str;
+      // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
+      if (value && att) {
+        // !VA I might want to change this to include the # in the string itself.
+        if (value === '#') {
+          str = '';
+        } else {
+          // !VA Include the space here to ensure no duplicate spaces slip in when the clip is built
+          str = value;
+        }
+
+      } else {
+        // !VA If the path field is empty, we need to return the iFilename without the path.
+        if (att === 'src' && value === '' ) {
+          str = `${att}="${Appdata.fname}" `;
+        } else if ( att === '#' || att === '') {
+          str = '';
+        } else {
+          // !VA If there is no input, exclude the attribute entry.
+          str = '';
+        }
+      }
+      return str;
+    }
+
+    // !VA CBController private
+    function getAlignAttribute(selectid, options) {
+      var str, selInd;
+      selInd = document.querySelector(selectid).selectedIndex;
+      switch (true) {
+      case (selInd === 0):
+        str = '';
+        break;
+      case (selInd === 1):
+        str = options[1];
+        break;
+      case (selInd === 2):
+        str = options[2];
+        break;
+      case (selInd === 3):
+        str = options[3];
+        break;
+      }
+      return str;
+    }
+
+    // !VA CBController private
+    function getCheckboxSelection(target) {
+      // console.clear();
+      let chkboxid, checked;
+      chkboxid = document.querySelector(target).id;
+      chkboxid = chkboxid.replace('mrk', 'box');
+      chkboxid = chkboxid.replace('spn', 'chk');
+      if (document.querySelector('#' + chkboxid).checked === false) {
+        // !VA WRAPPER TABLE NOT CHECKED
+        checked = false;
+      } else {
+      // !VA WRAPPER TABLE IS CHECKED
+        checked = true;
+      }
+      return checked;
+    }
+
+    // !VA CBController private
+    function getRadioSelection(target) {
+      let radioid, checked;
+      radioid = document.querySelector(target).id; 
+      if (document.querySelector('#' + radioid).checked === false) {
+        // !VA Radio button is NOT CHECKED
+        checked = false;
+      } else {
+      // !VA Radio button IS CHECKED
+        checked = true;
+      }
+      return checked;
+    }
+
+    // clipboardController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
+    // !VA TODO: This should be in handleUserInput
+    // !VA CBController private
+    function ccpIfNoUserInput(att, value) {
+      // !VA We need get the iFilename from Appdata in case the user leaves 'path' empty
+      var Appdata = appController.initGetAppdata();
+      var str;
+      // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
+      if (value && att) {
+        // !VA I might want to change this to include the # in the string itself.
+        if (value === '#') {
+          str = '';
+        } else {
+          // !VA Include the space here to ensure no duplicate spaces slip in when the clip is built
+          str = value;
+        }
+
+      } else {
+        // !VA If the path field is empty, we need to return the iFilename without the path.
+        if (att === 'src' && value === '' ) {
+          str = `${att}="${Appdata.fname}" `;
+        } else if ( att === '#' || att === '') {
+          str = '';
+        } else {
+          // !VA If there is no input, exclude the attribute entry.
+          str = '';
+        }
+      }
+      return str;
+    }
+    // !VA END ATTRIBUTE FUNCTIONS
+
+    // !VA NODE FUNCTIONS
+    // !VA Get the user selections that define the clipboard output configuration- the clicked Options button, the Include anchor checkbox and the Include wrapper table checkbox. The nodeList used for the indents as well as the indent implementation will depend on these options -- only the basic TD radio button option generates a simple nodeList structure whose indents can be processed with a simple for loop. The other options generate nodeLists with text nodes and comments that require a custom indent scheme.
+    // !VA CBController private
+    function getUserSelections( id ) {
+      // !VA Initialize the clipboard-building process by getting those user selections in the CCP that determine the structure of the clipboard output and put those selections into the uSels object.
+      let uSels = {};
+      uSels = {
+        buttonClicked: '',
+        hasAnchor: getCheckboxSelection(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk),
+        hasWrapper: getCheckboxSelection(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk),
+        selectedRadio: document.querySelector('input[name="tdoptions"]:checked').value
+      };
+      if (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)) { 
+        uSels.buttonClicked = 'imgbut';
+        // !VA Override the selectedRadio value for the IMG button - the IMG button will ALWAYS output img/anchor tags to the clipboard no matter which tdoptions radio button is selected.
+        uSels.selectedRadio = 'basic';
+      } else if (id === btnCcpMakeClips.btnCcpMakeTdTag.slice(1)) { 
+        uSels.buttonClicked = 'tdbut';
+      } else {
+        uSels.buttonClicked = 'tablebut';
+      }
+      buildOutputNodeList( uSels );
+    }
+
+    // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
+    // !VA CBController private
+    function buildOutputNodeList( uSels ) {
+      let tableNodeFragment, nl, frag, outputNL, clipboardStr;
+      // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
+      tableNodeFragment = makeTableNode( uSels );
+      // !VA Create the full nodeList from the tableNodeFragment. If tableNodeFragment is null, return to abort without creating Clipboard object.
+      try {
+        nl = tableNodeFragment.querySelectorAll('*');
+      } catch (e) {
+        console.log('Error in buildOutputNodeList: tableNodeFragment is null. Aborting...');
+        return;
+      }
+      // !VA Create the div container to which the extracted nodeList fragment will be appended
+      var container = document.createElement('div');
+
+      // !VA Basic TD Options - This should be extracted to a separate function
+      if (uSels.selectedRadio === 'basic' || uSels.selectedRadio === 'excludeimg' || uSels.selectedRadio === 'posswitch') {
+        // !VA Deterimine which makeNode button was clicked and extract a nodeList fragment with only those nodes that correspond to the clicked button. The index position of the extracted fragments is determined by the length of the tableNodeFragment nodeList minus an integer to compensate for the 0-based nodeList indices.
+        let rtlNodePos, extractPos;
+        // !VA For the posswitch option: Get the position of the RTL node, if it exists. 
+        for (let i = 0; i < nl.length; i++) {
+          // console.log('nl[i] is: ' +  nl[i]);
+          if (nl[i].getAttribute('dir')  === 'rtl') {
+            rtlNodePos = i;
+          }
+        }
+        // !VA Process the makeNode button clicks
+        switch(true) {
+        // !VA imgbut is clicked. We can hardcode the index where the extraction begins because the imgNode is created in makeTdNode and the imgbut button click overrides any other makeNode button actions. 
+        case (uSels.buttonClicked === 'imgbut'):
+          // !VA If there's an anchor, take the last two nodes, otherwise just take the last node.
+          uSels.hasAnchor ? frag = nl[nl.length - 2] : frag = nl[nl.length - 1]; 
+          break;
+        // !VA tdbut is clicked. Here we handle the 'basic', 'excludeimg' and 'posswitch' options because they process indents with no modifications. 'imgswap', 'bgimage' and 'vmlbutton' options are handled separately because they import comment nodes with MS conditional code
+        case (uSels.buttonClicked === 'tdbut'):
+          console.log('tdbut');
+          // !VA basic option is selected 
+          if ( uSels.selectedRadio === 'basic') { 
+            // !VA We can hardcode this for now, but that will be a problem if any other options with other nodes are added.
+            uSels.hasAnchor ? extractPos = nl.length - 3 : extractPos = nl.length - 2;
+            // frag = nl[extractPos];
+          } else if ( uSels.selectedRadio === 'excludeimg') {
+            extractPos = 5;
+            // !VA posswitch option is selected
+          } else {
+            // !VA The fragment is extracted starting at the position of the RTL node
+            extractPos = rtlNodePos;
+          }
+          frag = nl[extractPos];
+          break;
+        case (uSels.buttonClicked === 'tablebut'):
+          // !VA basic or excludeimg option is selected 
+          // !VA We can hardcode the 'basic' and 'posswitch' positions for now, but these will have to be revisited if any new options are added that change the outputNL indices. 
+          if (uSels.hasWrapper) {
+            // !VA The Include wrapper table option is selected, so the entire nodeList is extracted
+            extractPos = 0;
+          } else {
+            // !VA The Include wrapper table option is not selected, so all nodes starting at index 3 are extracted
+            extractPos = 3;
+          }
+          frag = nl[extractPos];
+          break;
+        default:
+          console.log('Error in buildOutputNodeList: case not defined');
+          // Default code block, this should be an error code
+        }
+        // !VA Append the fragment to the container
+        container.appendChild(frag);
+        // !VA Create the outputNL nodeList to pass to the Clipboard object
+        outputNL = container.querySelectorAll('*');
+        applyIndents( uSels, outputNL );
+        clipboardStr = outputNL[0].outerHTML;
+
+      // !VA imgSwap and bgimage option - includes MS conditional code retrieved by getImgSwapBlock, getBgimageBlock, getVMLBlock which includes getIndent functions. First, run applyIndents on outputNL. applyIndents also inserts tokens at the position where the codeBlock is to be inserted. The parent nodelist is converted to a string, the code blocks are retrieved, indents are inserted, and finally the codeblocks are inserted into the string between the tags of the last node in the outputNL.outerHTML string. 
+      } else if (uSels.selectedRadio === 'imgswap' || uSels.selectedRadio  === 'bgimage' || uSels.selectedRadio === 'vmlbutton') {
+        // !VA Start with the tdbut makeNode button because the img makeNode button isn't referenced in the imgswap option. The A/IMG tags are hard-coded into the MS Conditional code in getImgSwapBlock. Also, there's a switch to include/exclude the A/IMG node in makeTdNode.
+        // !VA extractNodeIndex is the nl index position at which the nodes are extracted to build outputNL. It equals the nodeList length minus the indentLevel.
+        let extractNodeIndex;
+        // !VA indentLevel is the number of indents passed to getIndent.
+        let indentLevel;
+        // !VA codeBlock is the MS conditional code block returned as string
+        let codeBlock;
+        // !VA If the makeTD button is clicked, then only the last node in nl is extracted and the MS conditional comments get one indent level
+        // !VA NOTE: This code is repeated above in the if clause and again here in the else
+        if ( uSels.buttonClicked === 'tdbut') {
+          indentLevel = 1;
+          extractNodeIndex = nl.length - indentLevel;
+        } else {
+          if (uSels.hasWrapper) {
+            // !VA If the makeTable button is clicked and hasWrapper is checked, then all nl nodes are extracted and the MS conditional comments get 6 indents
+            indentLevel = 6;
+            extractNodeIndex = nl.length - indentLevel;
+          } else {
+            // !VA If the makeTable button is clicked and hasWrapper is unchecked, then nl nodes are extracted at position 3 and the MS conditional comments get 3 indents
+            indentLevel = 3;
+            extractNodeIndex = nl.length - indentLevel;
+          }
+        }
+        // !VA Extract the fragment to convert to outputNL
+        // !VA NOTE: Is this not the same as frag = nl[extractPos] in the if clause above
+        frag = nl[extractNodeIndex];
+        // !VA Append the nodeList fragment to the container div
+        container.appendChild(frag);
+        // !VA Create the nodeList to pass to the Clipboard object. 
+        outputNL = container.querySelectorAll('*');
+        // !VA Apply the indents and insert the tokens marking the position for inserting the MS conditional code.
+        applyIndents(uSels, outputNL);
+        // !VA Convert outputNL to a string (including tokens for inserting MS conditional code) for output to Clipboard object.
+        clipboardStr = outputNL[0].outerHTML;
+        
+        // !VA Get the codeBlock corresponding to the selected TD option
+        if ( uSels.selectedRadio === 'imgswap') {
+          codeBlock = getImgSwapBlock(indentLevel);
+        } else if (  uSels.selectedRadio === 'bgimage' ) {
+          codeBlock = getBgimageBlock(indentLevel);
+        } else if (uSels.selectedRadio === 'vmlbutton') {
+          codeBlock = getVmlButtonBlock(indentLevel);
+        }
+        // !VA Replace the tokens in clipboardStr that were added in applyIndents with the respective codeBlock
+        clipboardStr = clipboardStr.replace('/replacestart//replaceend/', codeBlock + '\n');
+      } 
+      // !VA Convert the alias of the clicked button to an ID the Clipboard object recognizes and write clipboardStr to the clipboard.
+      writeClipboard( aliasToId(uSels.buttonClicked), clipboardStr );
+    }
+
+    // !VA CBController private
+    // !VA Convert uSels.buttonClicked in buildOutputNodeList back to an id before passing to Clipboard object.
+    function aliasToId( alias ) {
+      let id;
+      if (alias === 'imgbut') {id = btnCcpMakeClips.btnCcpMakeImgTag.slice(1); }
+      if (alias === 'tdbut') {id = btnCcpMakeClips.btnCcpMakeTdTag.slice(1); }
+      if (alias === 'tablebut') {id = btnCcpMakeClips.btnCcpMakeTableTag.slice(1); }
+      return id;
+    }
+
+    // !VA Make the nodes for the 'posswitch option' using the DIR attribute
+    // !VA CBController private
     function makePosSwitchNodes() {
       // !VA Declare the arrays for new element names and new element types
       let containerIds = [], containerElements = [], sibling1Ids = [], sibling1Elements = [], sibling2Ids = [], sibling2Elements = [], containerNodes = [], sibling1Nodes = [], sibling2Nodes = [];
@@ -1611,31 +1116,30 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       return tdInner;
     }
 
+    // !VA Set the attributes for the nodes in the 'posswitch' option using the DIR attribute
     function setPosSwitchNodeAttributes(container) {
       // !VA Get the Td attributes, we need them for height and width
       var nodeList, index;
       let Attributes = getAttributes();
       let nodeAttributes = [];
-      // !VA Branch: tryShowHideTDOptions (050920)
-      // !VA Remove the inapplicable CCP elements from the td options
-
-
-
-
-
 
       // !VA Initialize the objects that contain the attributes for the individual nodes
       let td_switchcontainerAttr, table_switchparentAttr, tr_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr, tr_switchchild1Attr, td_switchcontent1Attr, a_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, tr_switchchild2Attr, td_switchcontent2Attr; 
       // !VA Make the nodeList from the container passed in from makePosSwitchNodes to apply the attributes to.
       nodeList = container.querySelectorAll( '*' );
       // !VA Build the objects that contain the attributes that will be set on the nodeList nodes.
+      // !VA If the class input element under td options is empty, do nothing, otherwise add the class to the container TD and set the class attribute
+      !Attributes.tdClass ? !Attributes.tdClass : nodeList[0].setAttribute('class', Attributes.tdClass);
+      // !VA If the bkgrnd color input element under td options is empty, do nothing, otherwise add the bkgrnd color to the container TD and set the bgcolor attribute
+      !Attributes.tdBgcolor ? !Attributes.tdBgcolor : nodeList[0].setAttribute('bgcolor', Attributes.tdBgcolor);
+      // !VA Add the rest of the attributes to the nodes
       td_switchcontainerAttr = {
         dir: 'rtl',
-        class: Attributes.tdClass,
+        // !VA class: see above
+        // !VA bgcolor: see above
         width: '100%',
         align: Attributes.tdAlign,
         valign: Attributes.tdValign,
-        bgcolor: Attributes.tdBgcolor
       };
       table_switchparentAttr = {
         role: 'presentation',
@@ -1646,7 +1150,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       };
       // !VA The TR nodes have no attributes but we need them as placeholders to keep the array length the same as the nodeList.
       tr_switchparentAttr = {
-
+        // !VA Placeholder node
       };
       td_switchsibling1Attr = {
         width: '50%',
@@ -1661,7 +1165,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       };
       // !VA The TR nodes have no attributes but we need them as placeholders to keep the array length the same as the nodeList.
       tr_switchchild1Attr = {
-
+        // !VA Placeholder node
       };
       td_switchcontent1Attr = {
         dir: 'ltr',
@@ -1692,17 +1196,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       };
       // !VA The TR nodes have no attributes but we need them as placeholders to keep the array length the same as the nodeList.
       tr_switchchild2Attr = {
-
+        // !VA Placeholder node
       };
       td_switchcontent2Attr = {
         dir: 'ltr',
         align: 'left',
         vAlign: 'top'
       };
-      // p_switchcontent2Attr = {
-      //   style: 'margin: 10px',
-      // };
-
       // !VA Create the array with the attribute objects. We use this array to cycle through the nodeList and apply the attributes to the individual nodes. I tried many ways to do this but was not able to assign these objects to the individual nodes any other way than to loop through them ensuring that the array and nodeList length were identical. If there is a way to assign attributes to nodes using the node ID as index, I'd like to learn that technique.
       nodeAttributes = [ td_switchcontainerAttr, table_switchparentAttr,  tr_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr,  tr_switchchild1Attr, td_switchcontent1Attr, a_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, tr_switchchild2Attr, td_switchcontent2Attr ];
 
@@ -1726,54 +1226,477 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       return container;
     }
 
+    // !VA Make the img node, including anchor if it is checked
+    // !VA CBController private
+    function makeImgNode ( ) {
+      // !VA Id is passed but not used here,  because we're only building the node.
+      let Attributes;
+      Attributes = getAttributes();
+      let imgNode, returnNodeFragment;
+      // !VA Create the image node
+      imgNode = document.createElement('img');
+      // !VA Create the node fragment that will contain the IMG or A/IMG tags
+      returnNodeFragment = document.createDocumentFragment();
+      // !VA Set the img attributes. 
+      // !VA Class attribute - Add to the node only if the attribute is set, i.e. the input has an entry
+      // !VA Add to the node only if the attribute is set, i.e. the input has an entry
+      if (Attributes.imgClass) { imgNode.className = Attributes.imgClass; }
+      // !VA alt attribute - Add to the node only if the attribute is set, i.e. the input has an entry
+      if (Attributes.imgAlt) { imgNode.alt = Attributes.imgAlt; }
+      // !VA src attribute;
+      imgNode.src = Attributes.imgSrc;
+      // !VA width attribute
+      imgNode.width = Attributes.imgWidth;
+      // !VA height attribute
+      imgNode.height = Attributes.imgHeight;
+      // !VA style attribute
+      imgNode.setAttribute('style', Attributes.imgStyle);
+      // !VA NOTE: align attribute is deprecated in html5 so is it needed?
+      // !VA alt attribute - Add to the node only if the attribute is set, i.e. the selected option isn't 'none'. i.e. falsy
+      if (Attributes.imgAlign) { imgNode.align = Attributes.imgAlign; }
+      // !VA border attribute
+      imgNode.border = '0';
+      
+      // !VA If the include anchor option is checked, create the anchor element, add the attributes, append the imgNode to the nodeFragment, and return it.
+      if(Attributes.imgIncludeAnchor === true) {
+        let anchor = document.createElement('a');
+        anchor.href = '#';
+        anchor.setAttribute('style', 'color: #FF0000');
+        anchor.appendChild(imgNode);
+        returnNodeFragment.appendChild(anchor);
+      } else {
+        // !VA Otherwise, set returnNodeFragment to imgNode without the anchor.
+        returnNodeFragment.appendChild(imgNode);
+      }
+      // return the imgNode as node fragment;
+      return returnNodeFragment;
+    }
+
+    // !VA Make the TD node
+    // !VA CBController private
+    function makeTdNode( uSels ) {
+      // !VA Variables for error handling - need to include this in the return value so the Clipboard object can differentiate between alert and success messages. 
+      let isErr;
+      // !VA NOTE: No trapped errors here yet that would pass a code, but that will probably come.
+      let errCode;
+      // !VA Get the node attributes
+      let Attributes;
+      Attributes = getAttributes();
+      let tdInner, imgNode;
+      // !VA Create the TD node for the parent TD
+      tdInner = document.createElement('td');
+      // !VA Create the TD node fragment that will contain the parent TD without the code block for imgswap, bgimage or vmlbutton
+      let tdNodeFragment;
+      tdNodeFragment = document.createDocumentFragment();
+      // !VA TODO: There are NO attributes that are included in ALL the tdoptions, but it's very repetitive to include these options individually. Think about how this can be made DRYer, like it was done in makePosSwitchNodes and setPosSwitchNodeAttributes
+      // !VA bgcolor attribute. Pass the input value, don't prepend hex # character for now
+      if (Attributes.tdBgcolor) { tdInner.bgColor = Attributes.tdBgcolor; }
+      // !VA Now add the attributes included only with the default Td configuration
+      switch(true) {
+      // case (selectedRadio === 'basic'):
+      case (uSels.selectedRadio === 'basic' || uSels.selectedRadio === 'excludeimg'):
+        console.log('makeTdNode basic OR excludeimg');
+        // !VA class attribute
+        if (Attributes.tdClass) { tdInner.className = Attributes.tdClass; }
+        // !VA valign attribute
+        if (Attributes.tdAlign) { tdInner.align = Attributes.tdAlign; }
+        if (Attributes.tdValign) { tdInner.vAlign = Attributes.tdValign; }
+        if (Attributes.tdHeight) { tdInner.height = Attributes.imgWidth; }
+        if (Attributes.tdWidth) { tdInner.width = Attributes.imgHeight; }
+        // !VA Branch: implementExcludeImg (050420)
+        // !VA If 'basic' is checked, create imgNode and append it, otherwise exclude the imgNode.
+        if (uSels.selectedRadio === 'basic') {
+          imgNode = makeImgNode();
+          // !VA We need to include the imgNode here ONLY if Bgimage is unchecked
+          tdInner.appendChild(imgNode);
+        }
+        break;
+      // case (selectedRadio === 'imgswap'):
+      case (uSels.selectedRadio === 'imgswap'):
+        if (Attributes.tdClass) { tdInner.className = Attributes.tdClass; }
+        if (Attributes.tdValign) { tdInner.vAlign = Attributes.tdValign; }
+        if (Attributes.tdAlign) { tdInner.align = Attributes.tdAlign; }
+        break;
+      // case (selectedRadio === 'bgimage'):
+      case (uSels.selectedRadio === 'bgimage'):
+        console.log('makeTdNode bgimage');
+        // !VA Create the parent node to which the bgimage code block will be appended after outputNL is converted to text in buildOutputNodeList.
+        // !VA Include width, height and valign as per Stig's version
+        tdInner.width = Attributes.tdAppdataWidth;
+        tdInner.height = Attributes.tdAppdataHeight;
+        tdInner.vAlign = Attributes.tdValign;
+        // !VA Set the background attribute to the current path/filename
+        tdInner.setAttribute('background', Attributes.tdBackground);
+        // !VA Fallback bgcolor now set in UIController.displayTdOptions
+        // !VA Include fallback color from the default set in displayTdOptions
+        // Attributes.tdBgcolor ? tdInner.bgColor = Attributes.tdBgcolor : tdInner.bgColor = '#7bceeb';
+        break;
+      // case (selectedRadio === 'posswitch'):
+      case (uSels.selectedRadio === 'posswitch'):
+        tdInner  = makePosSwitchNodes();
+        break;
+      // case (selectedRadio === 'vmlbutton'):
+      case (uSels.selectedRadio === 'vmlbutton'):
+        // !VA Height and width fields have to be entered, otherwise the button can't be built. Button width and height are set here in makeTdNode, the rest of the options are set in getVmlCodeBlock in buildOutputNodeList. The defaults of 40/200 as per Stig are set in UIController.displayTdOptions. So if there's no value for td height and width, then the user has deleted the default and not replaced it with a valid entry. In this case, throw an ERROR and abort before it gets to the clipboard.
+        if (!document.querySelector(ccpUserInput.iptCcpTdHeight).value || !document.querySelector(ccpUserInput.iptCcpTdWidth).value) {
+          console.log('ERROR in makeTdNode vmlbutton: no value for either height or width');
+          isErr = true;
+        } else {
+          // !VA Set the width and height in the TD node, not in the code block
+          tdInner.width = Attributes.tdWidth;
+          tdInner.height = Attributes.tdHeight;
+        }
+        // !VA TODO: If the height entered doesn't match the height of the loaded image, then the user probably has forgotten to load the image used for the button background, so the code output will probably not be what the user expects. Output the code, but show an alert in the message bar. This is going to require making a different clipboard message for alerts. It will also require somehow informing the Clipboard object that two different messages can be displayed onsuccess - one success message and one alert message. That will require passing an error status along with tdNodeFragment and tableNodeFragment, which will require returning an array rather than just the node fragment. 
+        if (document.querySelector(ccpUserInput.iptCcpTdHeight).value !== Attributes.imgHeight) {
+          appController.initMessage(true, 'vmlbutton_height_mismatch');
+          console.log('ALERT vmlbutton: height value doesn\'t match height of loaded image');
+        } 
+        break;
+      default:
+        console.log('Some error has occurred in makeTdNode');
+      } 
+      // // !VA Set the node fragment to the TD node
+      tdNodeFragment.appendChild(tdInner);
+      // !VA TODO: This error handling is poor because it only allows for one possible error. But, it does return nothing, which is then passed on to the calling function and terminates in buildOutputNodeList
+      if (isErr) { 
+        appController.initMessage(true, 'vmlbutton_no_value');
+        console.log('returning...');
+        return;
+      } else {
+        return tdNodeFragment;
+      }
+    }
+
+    // !VA Make the table node, including parent and wrapper table if selected
+    // !VA CBController private
+    function makeTableNode( uSels ) {
+      let Attributes;
+      Attributes = getAttributes();
+      // !VA This isn't defined because there's not identified error condition as yet. See the return statement of makeTdNode for handling method.
+      let isErr;
+      // !VA Variables for parent and wrapper table, parent and wrapper tr, and wrapper td. Parent td is called from makeTdNode and is appended to tdNodeFragment. tableNodeFragment is the node that contains the entire nodelist which is returned to buildOutputNodeList
+      let tableOuter, trOuter, tdOuter, tableInner, trInner, tdNodeFragment, tableNodeFragment;
+      tableNodeFragment = document.createDocumentFragment();
+      tableOuter = document.createElement('table');
+      trOuter = document.createElement('tr');
+      tdOuter = document.createElement('td');
+      tableInner = document.createElement('table');
+      trInner = document.createElement('tr');
+
+      // !VA Make the inner table. If Include wrapper table is unchecked, we return just the inner table. If it's checked, we return the inner table and the outer table 
+      // !VA Add inner table attributes
+      // !VA table class attribute
+      if (Attributes.tableClass) { tableInner.className = Attributes.tableClass; }
+      // table.className = Attributes.tableClass;
+      // !VA table align attribute
+      if (Attributes.tableAlign) { tableInner.align = Attributes.tableAlign; }
+      // !VA width attribute -- the default is the current display size, so it gets the value from the toolbar viewerW input field.
+      tableInner.width = Attributes.tableWidth;
+      // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for now
+      if (Attributes.tableBgcolor) { tableInner.bgColor = Attributes.tableBgcolor; }
+      // !VA Add border, cellspacing and cellpadding
+      tableInner.border = '0', tableInner.cellSpacing = '0', tableInner.cellPadding = '0';
+      tableInner.setAttribute('role', 'presentation'); 
+      
+      // !VA Build the inner tr
+      tableInner.appendChild(trInner);
+      // !VA Get the inner TD from makeTdNode and append it to the nodeFragment
+      tdNodeFragment = makeTdNode( uSels );
+      // !VA If tdNodeFragment is null, then there was an error in makeTdNode, so console the error and return null to buildOutputNodeList to abort.
+      try {
+        trInner.appendChild(tdNodeFragment);
+      } catch (e) {
+        console.log('Error in makeTableNode: tdNodeFragment is null');
+        return;
+      }
+      // !VA If include table wrapper is checked, build the outer table and return it
+      // !VA table wrapper class
+      if (Attributes.tableTagWrapperAlign) { tableOuter.align = Attributes.tableTagWrapperAlign; }
+      // !VA wrapper table align attribute
+      if (Attributes.tableTagWrapperClass) { tableOuter.className = Attributes.tableTagWrapperClass; }
+      // !VA the default wrapper table width is the current display size - so it gets the value from the toolbar's Content Width field.
+      tableOuter.width = Attributes.tableTagWrapperWidth;
+      // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for now. 
+      if (Attributes.tableTagWrapperBgcolor) { tableOuter.bgColor = Attributes.tableTagWrapperBgcolor; }
+      // !VA Add default border, cellspacing, cellpadding and role for accessiblity
+      tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
+      tableOuter.setAttribute('role', 'presentation'); 
+      // !VA Append the outer tr to the wrapper
+      tableOuter.appendChild(trOuter);
+      // !VA Append the outer td to the outer tr
+      trOuter.appendChild(tdOuter);
+      // !VA Add the outer td attributes
+      if (Attributes.tdAlign) { tdOuter.align = Attributes.tdAlign; }
+      // !VA valign attribute
+      if (Attributes.tdValign) { tdOuter.vAlign = Attributes.tdValign; }
+      // !VA Append the inner table to the outer table's td
+      tdOuter.appendChild(tableInner);
+      // !VA Pass the outer table to the tableNodeFragment.
+      // tableNode = tableOuter;
+      // !VA Append the wrapper table to the node fragment and return it
+      tableNodeFragment.appendChild(tableOuter);
+      return tableNodeFragment;
+    }
+    // !VA  END NODE FUNCTIONS
+
+    // !VA START TD OPTIONS MS-CONDITIONAL CODE BLOCKS
+    // !VA These are the code blocks that contain MS conditionals in comment nodes or text nodes, i.e. mobile swap, background image, and vmlbutton
+    // !VA UIController private
+    function getImgSwapBlock( indentLevel ) {
+      let Appdata, Attributes, linebreak;
+      Attributes = getAttributes();
+      Appdata = appController.initGetAppdata();
+      linebreak = '\n';
+      let mobileFilename, mobileSwapStr;
+      // !VA Create the mobile image filename: Get the current image file's filename and append the name with '-mob'.
+      mobileFilename = Attributes.imgSrc;
+      // !VA The regex for appending the filename with '-mob'.
+      mobileFilename = mobileFilename.replace(/(.jpg|.png|.gif|.svg)/g, '_mob$1');
+      // !VA Create the code for the mobile swap TD as a Comment node of the parent td. 
+      mobileSwapStr = `${linebreak}${getIndent(indentLevel)}<a href="#"><img class="hide" alt="${Attributes.imgAlt}" width="${Attributes.imgWidth}" height="${Attributes.imgHeight}" src="${Attributes.imgSrc}" border="0" style="width: ${Attributes.imgWidth}px; height: ${Attributes.imgHeight}px; margin: 0; border: none; outline: none; text-decoration: none; display: block; "></a>${linebreak}${getIndent(indentLevel)}<!--[if !mso]><!-->${linebreak}${getIndent(indentLevel)}<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">${linebreak}${getIndent(indentLevel)}<a href="#"><img class="mobileshow" alt="${Attributes.imgAlt}" width="${Appdata.sPhonesW}" height="${Appdata.sPhonesH}" src="${mobileFilename}" border="0" style="width: ${Appdata.sPhonesW}px; height: ${Appdata.sPhonesH}px; margin: 0; border: none; outline: none; text-decoration: none; display: block;" /></a>${linebreak}${getIndent(indentLevel)}<!--</span>-->${linebreak}${getIndent(indentLevel)}<!--<![endif]-->`;
+      // !VA Return the code block with indents and linebreaks
+      return mobileSwapStr;
+    }
+
+    // !VA UIController private
+    function getBgimageBlock( indentLevel) {
+      console.log('getBgiamgeBlock running');
+      let Attributes;
+      Attributes = getAttributes();
+      let bgimageStr, fallback, bgcolor;
+      let linebreak;
+      linebreak = '\n';
+      // !VA 03.09.2020 Set the indentLevel to 1 for now
+      fallback = '#7bceeb';
+      // !VA The fallback color is written to the bgcolor input in displayTdOptions, so get it from there
+      Attributes.tdBgcolor ? bgcolor = Attributes.tdBgcolor : bgcolor = document.querySelector(ccpUserInput.iptCcpTdBgColor).value;
+
+      // !VA Define the innerHTML of the bgimage code
+      bgimageStr = `${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth}px;height:${Attributes.imgHeight}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.tdBackground}" color="${bgcolor}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}${getIndent(indentLevel)}<div>${linebreak}${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div>${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}  </v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect>${linebreak}${getIndent(indentLevel)}<![endif]-->`;
+      // !VA Return the code block with line breaks and indents
+      return bgimageStr;
+    }
+
+    // !VA CBController private
+    function getVmlButtonBlock (indentLevel) {
+      let Attributes;
+      Attributes = getAttributes();
+      // console.dir(Attributes);
+      let vmlButtonStr, linebreak, tdHeight, tdWidth;
+      linebreak = '\n';
+      // !VA Defaults for height and width are set in displayTdOptions, so get the values from the inputs
+      tdHeight = document.querySelector(ccpUserInput.iptCcpTdHeight).value;
+      tdWidth = document.querySelector(ccpUserInput.iptCcpTdWidth).value;
+      // !VA Define the innerHTML of the vmlbutton code
+      vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:${tdHeight}px;v-text-anchor:middle;width:${tdWidth}px;" arcsize="10%" strokecolor="#1e3650" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc}" color="#556270" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Show me the button!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="#"
+style="background-color:#556270;background-image:url(${Attributes.imgSrc});border:1px solid #1e3650;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:${tdHeight}px;text-align:center;text-decoration:none;width:${tdWidth}px;-webkit-text-size-adjust:none;mso-hide:all;">Show me the button!</a></div>`;
+      return vmlButtonStr;
+    }
+    // !VA END TD OPTIONS MS-CONDITIONAL CODE BLOCKS
+
+    // !VA INDENT FUNCTIONS
+    // !VA CBController private
+    // !VA NOTE: This routine identifies if the nodes 1) contain the id 'stack-column-center' 2) contain MS conditional code and 2) contain an A tag. It applies indents accordingly to the nodes using insertAdjacentHTML. 1) Is problematic because if that class name is not present in the HTML file, the indent will break. I couldn't figure out a way to do this without the id by looking for sibling nodes, so trying to create options for three or even two column tables will be ridiculous time-consuming - not an option for now.
+    function applyIndents( uSels, outputNL ) {
+      // console.log('applyIndents running');
+      // !VA Create array to store indent strings
+      let indents = [];
+      // !VA Create array to store the positions of the stackable columns in the posswitch option.
+      let stackColumnPos = [];
+      // !VA Variable to hold the indentLevel of the second posswitch column that the first posswitch column will stack over.
+      let stackColumnIndentLevel;
+      // !VA Flag for whether to insert the tokens used to insert the MS conditional code blocks after converting the output node list to text.
+      let hasMSConditional;
+      if ( uSels.selectedRadio === 'imgswap' || uSels.selectedRadio === 'bgimage' || uSels.selectedRadio === 'vmlbutton') {
+        hasMSConditional = true;
+      }
+      for (let i = 0; i < outputNL.length; i++) {
+        // !VA Get the indent strings into the indents array
+        indents.push(getIndent(i));
+        // !VA Push the positions of the stackable posswitch columns onto the stackColumnPos array 
+        if ( outputNL[i].className === 'stack-column-center') {
+          stackColumnPos.push(i);
+        }
+      }
+      // !VA Apply exception indents to the A and IMG nodes.
+      for (let i = 0; i < outputNL.length; i++) {
+        // !VA If parent of the IMG node is a A, then don't apply indents because we want the IMG tag to be nested within the A with no indents
+        if (outputNL[i].nodeName === 'IMG' && outputNL[i].parentNode.nodeName === 'A') {
+          // Apply no indent to the IMG tag if the Include anchor option is checked
+        }
+        else if ( outputNL[i].nodeName === 'A') {
+          // !VA If nodeList item 1 is the anchor, then Include anchor is checked. Apply the indent to the A but don't apply any afterbegin or beforeend indent, because that would affect the child img element.
+          outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
+          outputNL[i].insertAdjacentHTML('afterend', '\n');
+        } 
+        else {
+          // !VA Here we apply the 'regular' indents.
+          // !VA If stackColumnPos is empty, then the 'basic' or 'excludetd' td option is selected. Apply regular indents to all nodes.
+          if (stackColumnPos.length === 0) {
+            // !VA If the node is the last index in outputNL AND the option 'imgswap', 'bgimage' or 'vmlbutton' is selected, then modify the indent to include the token for inserting the MS conditional code after outputNL is converted to text.
+            if ( i === outputNL.length - 1 && hasMSConditional === true) {
+              outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
+              outputNL[i].insertAdjacentHTML('afterbegin', '/replacestart/'); 
+              outputNL[i].insertAdjacentHTML('beforeend', '/replaceend/' + getIndent(i));
+              outputNL[i].insertAdjacentHTML('afterend', '\n');
+            } else {
+              // !VA Otherwise, apply the 'normal' indents
+              outputNL[i].insertAdjacentHTML('afterend', '\n');
+              outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
+              outputNL[i].insertAdjacentHTML('afterbegin', '\n');
+              outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
+            }
+
+          } else {
+            // !VA If the node index is less than the index of the first stacking column
+            if ( i < stackColumnPos[1] ) {
+              // !VA Apply the 'regular' indent scheme to all nodes up to the second stacking column
+              outputNL[i].insertAdjacentHTML('afterend', '\n');
+              outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
+              outputNL[i].insertAdjacentHTML('afterbegin', '\n');
+              outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
+            } else {
+              // !VA The indent level of the second stacking column should be the same as the first stacking column, which is equal to the iterator minus the index of the second stacking column minus the index of the first stacking column. So, for the makeTd button,  i = 10, stackColumnPos[1] = 10, stackColumnPos[0] = 6, so the stackColumnIndentLevel is 4.
+              stackColumnIndentLevel = (i - (stackColumnPos[1] - stackColumnPos[0]));
+              outputNL[i].insertAdjacentHTML('afterend', '\n');
+              outputNL[i].insertAdjacentHTML('beforebegin', getIndent(stackColumnIndentLevel));
+              outputNL[i].insertAdjacentHTML('afterbegin', '\n');
+              outputNL[i].insertAdjacentHTML('beforeend', getIndent(stackColumnIndentLevel));
+            }
+            // !VA We still need to add some indicator content to the terminating TD in this nodeList -- putting it in the makePosSwitchNode function itself would make it impossible to indent properly without some creative coding that's beyond my ability. So. we'll put it here, after the indent has been shrunk to be equal to the nextSibling's indent. It will always be added to the last node in the tree, i.e. the nodeList length - 1.
+            if ( i === outputNL.length - 1) {
+              outputNL[i].innerHTML = '\n' + getIndent(stackColumnIndentLevel) + '  <!-- ADD YOUR CONTENT HERE --> \n' + getIndent(stackColumnIndentLevel);
+            }
+          }
+        }
+      }
+      return outputNL;
+    }
+
+    // !VA CBController private
+    // !VA Return the indent string based on the indent level passed in
+    function getIndent(indentLevel) {
+      let indentChar, indent;
+      indentChar = '  ';
+      // !VA Repeat the indent character indentLevel number of times
+      indent = indentChar.repeat([indentLevel]);
+      return indent;
+    }
+    // !VA END INDENT FUNCTTIONS
+
+
+    // !VA CLIPBOARD FUNCTIONS
+    function writeClipboard(id, str) {
+      console.log('writeClipboard running');
+      console.log('str: ');
+      console.log(str);
+      let clipboardStr;
+      // !VA clipboardStr is returned to clipboard.js
+      clipboardStr = str;
+      // clipboardStr = tag.outerHTML;
+      var currentCB = new ClipboardJS('#' + id, {
+        text: function(trigger) {
+          // !VA Write success message to app message area on success
+          // !VA TODO: Need to differentiate between success messages and alert messages displayed in the message bar. 
+          currentCB.on('success', function(event) {
+            appController.initMessage(false, 'copied_2_CB');
+            // debugger;
+          });
+  
+          currentCB.on('error', function(e) {
+            console.error('Action:', e.action);
+            console.error('Trigger:', e.trigger);
+            // !VA TODO: Need to output an error message to message bar if the clipboard operation fails here.
+          });
+          // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
+          return clipboardStr;
+        }
+      });
+    }
+
+    // !VA New CSS RUle output functionality 02.20.20
+    // !VA CBController private
+    function  makeCssRule( id, classname, wval, hval ) {
+      let Attributes = [];
+      Attributes = getAttributes();
+      let Appdata = [];
+      Appdata = appController.initGetAppdata();
+      let clipboardStr;
+      // !VA TODO: isErr is passed to Clipboard object to indicate whether to flash the success message or an alert message
+      // let isErr;
+      // isErr = false;
+      switch(true) {
+      case (id.includes('img-dsktp')):
+        // args[0] = Attributes.imgClass, args[1] = Attributes.imgWidth, args[2] = Attributes.imgHeight;
+        clipboardStr = `img.${Attributes.imgClass} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important; }`;
+        break;
+      case (id.includes('img-smphn')):
+        clipboardStr = `img.${Attributes.imgClass} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important; }`;
+        break;
+      case (id.includes('img-lgphn')):
+        clipboardStr = `img.${Attributes.imgClass} { width: ${Appdata.lPhonesW}px !important; height: ${Appdata.lPhonesH}px !important; }`;
+        break;
+      case (id.includes('td-dsktp') || id.includes('td-smphn') || id.includes('td-lgphn')) :
+        if ( Attributes.tdHeight) {
+          clipboardStr = `td.${Attributes.tdClass} { height: ${Attributes.tdHeight}px !important; }`;
+        } else {
+          clipboardStr = `td.${Attributes.tdClass} {  }`;
+        }
+        break;
+      case (id.includes('table-dsktp')):
+        clipboardStr = `table.${Attributes.tableClass} { width: ${Attributes.tableWidth}px !important; align: ${Attributes.tableAlign} !important; }`;
+        break;
+      case (id.includes('table-smphn')):
+        clipboardStr = `table.${Attributes.tableClass} { width: ${Appdata.sPhonesW}px !important; align: ${Attributes.tableAlign} !important; }`;
+        break;
+      case (id.includes('table-lgphn')):
+        clipboardStr = `table.${Attributes.tableClass} { width: ${Appdata.lPhonesW}px !important; align: ${Attributes.tableAlign} !important; }`;
+        break;
+      default:
+        console.log('ERROR in makeCssRule: case not');
+      } 
+      // !VA If the input includes a percent char, remove the hard-coded trailing px on the value and just output the value with the user-entered percent char.
+      clipboardStr.includes('%')  ? clipboardStr = clipboardStr.replace('%px', '%') : clipboardStr;
+      // !VA Write CSS code to clipboard
+      writeClipboard(id, clipboardStr);
+    }
+    // !VA END CLIPBOARD FUNCTIONS
+
     // !VA CBController public functions 
     return {
 
 
-      // !VA Called from eventHandler to handle clipboard button clicks
+      // !VA Called from eventHandler to initialize clipboard functionality
       doClipboard: function(evt) {
         let id = evt.target.id;
         // !VA If the clicked element id is a Make Tag button, run makeNodeList, otherwise run makeCSSRule.
-        // !VA getUserSelection
-        // id.includes('tag') ? makeNodeList(id) : makeCssRule(id);
-        // id.includes('tag') ? makeNodeList(id) : makeCssRule(id);
         id.includes('tag') ? getUserSelections(id) : makeCssRule(id);
-
-       
       },
+
+      // !VA Test function
       runTest: function() {
         console.log('runTest running');
-        // makeNodes();
-        makePosSwitchNodes();
+
       }
-    
-      // !VA queryAllCcpOptions was a test function, deleted 02.20.20
     };
-
   })();
-
-
-
 
   // GLOBAL APP MODULE
   var appController = (function(CBCtrl, UICtrl) {
 
-    
     // !VA Getting DOM ID strings from UIController
-    var iInspectors = UICtrl.getInspectorIDs();
-    var dynamicRegions = UICtrl.getDynamicRegionIDs();
-    var staticRegions = UICtrl.getStaticRegionIDs();
-    var toolbarElements = UICtrl.getToolButtonIDs();
-    var ccpUserInput = UICtrl.getCcpUserInputIDs();
-    var btnCcpMakeClips =  UICtrl.getBtnCcpMakeClips();
+    const iInspectors = UICtrl.getInspectorIDs();
+    const dynamicRegions = UICtrl.getDynamicRegionIDs();
+    const staticRegions = UICtrl.getStaticRegionIDs();
+    const toolbarElements = UICtrl.getToolButtonIDs();
+    const ccpUserInput = UICtrl.getCcpUserInputIDs();
+    const btnCcpMakeClips =  UICtrl.getBtnCcpMakeClips();
     
-
-    // !VA appController private setupEventListeners
+    //EVENT HANDLING START 
+    // !VA appController private
     var setupEventListeners = function() {
 
       //DRAG AND DROP PROCESSING START
-
-
       // Event Listeners for Drag and Drop
       // !VA dropArea is the screen region that will accept the drop event 
       var dropArea = document.querySelector(dynamicRegions.appContainer);
@@ -1781,19 +1704,22 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     
       // !VA Initiates the FileReader function to get the dropped image data
       dropArea.addEventListener('drop', handleFileSelect, false);
-      // dropArea.addEventListener('drop', startNewDrop, false);
       // Drag and Drop Listener 
       //DRAG AND DROP PROCESSING END
 
-      var isolateAppBlob = document.querySelector(staticRegions.hdrIsolateApp);
-      isolateAppBlob.addEventListener('click', isolateApp, false);
+      // !VA Add the click event listener for creating the isolate popup
+      var runIsolateApp = document.querySelector(staticRegions.hdrIsolateApp);
+      runIsolateApp.addEventListener('click', isolateApp, false);
 
+      // !VA Create the isolate popup with no frills and a fixed window sized to the Witty app dimensions
       function isolateApp() {
         console.log('isolateApp running');
         // !VA Put a query string in the URL to indicate that the child window is isolated
-        var curURL = window.location.href + '?isolate=' + true;
-        var win;
+        let curURL = window.location.href + '?isolate=' + true;
+        // !VA Not 
+        let win;
         // !VA Open a new fixed-size window with no browser elements except the URL bar
+        // !VA Not currently using the window object that the open method creates, but leave it for reference
         win = window.open(curURL,'targetWindow',  
           `toolbar=no,
           location=yes,
@@ -1805,10 +1731,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           height=775`);
       }
 
-      // !VA This was in the old version but it doesn't look necessary
-      // function initializeHandlers() {
-
-      //EVENT HANDLING START 
+      // !VA Event handler for initializing event listeners 
       function addEventHandler(oNode, evt, oFunc, bCaptures) {
         //Removing this -- apparently IE 9 and 10 support addEventListener
         // if (typeof(window.event) != "undefined")
@@ -1816,19 +1739,17 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // else
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
-      // addEventHandler(document.getElementById(toolbarElements.btnTbrIncr01),'click',doit,false);
-      
+
       // !VA Add click and blur event handlers for clickable toolbarElements: 
-      var tbClickables = [ toolbarElements.btnTbrIncr50, toolbarElements.btnTbrIncr10, toolbarElements.btnTbrIncr01, toolbarElements.btnTbrDecr50, toolbarElements.btnTbrDecr10, toolbarElements.btnTbrDecr01  ];
+      const tbClickables = [ toolbarElements.btnTbrIncr50, toolbarElements.btnTbrIncr10, toolbarElements.btnTbrIncr01, toolbarElements.btnTbrDecr50, toolbarElements.btnTbrDecr10, toolbarElements.btnTbrDecr01  ];
       for (let i = 0; i < tbClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         tbClickables[i] = document.querySelector(tbClickables[i]);
         addEventHandler(tbClickables[i],'click',handleMouseEvents,false);
-
       }
       
       // !VA Add event handlers for input toolbarElements
-      var tbKeypresses = [ toolbarElements.iptTbrViewerW, toolbarElements.iptTbrImgWidth, toolbarElements.iptTbrImgHeight, toolbarElements.iptTbrSPhonesWidth, toolbarElements.iptTbrLPhonesWidth ];
+      const tbKeypresses = [ toolbarElements.iptTbrViewerW, toolbarElements.iptTbrImgWidth, toolbarElements.iptTbrImgHeight, toolbarElements.iptTbrSPhonesWidth, toolbarElements.iptTbrLPhonesWidth ];
       for (let i = 0; i < tbKeypresses.length; i++) {
         // !VA convert the ID string to the object inside the loop
         tbKeypresses[i] = document.querySelector(tbKeypresses[i]);
@@ -1837,16 +1758,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         addEventHandler((tbKeypresses[i]),'keyup',handleKeyup,false);
         addEventHandler((tbKeypresses[i]),'focus',handleFocus,false);
         addEventHandler((tbKeypresses[i]),'blur',handleBlur,false);
-        // !VA Deprecated
-        // addEventHandler(tbKeypresses[i],'blur',handleUserAction,false);
-        // !VA TODO
-        // addEventHandler(tbKeypresses[i],'dragover',handleUserAction,false);
-        // addEventHandler(tbKeypresses[i],'drop',handleUserAction,false);
       }
 
-
       // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. Currently only the img class input does that.
-      var ccpKeypresses = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass ];
+      const ccpKeypresses = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass ];
       for (let i = 0; i < ccpKeypresses.length; i++) {
         // !VA convert the ID string to the object inside the loop
         ccpKeypresses[i] = document.querySelector(ccpKeypresses[i]);
@@ -1860,7 +1775,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         dvClickables[i] = document.querySelector(dvClickables[i]);
         addEventHandler((dvClickables[i]),'click',initCCP,false);
       }
-
 
       // !VA We need eventListeners for ALL the clipboard buttons so make an eventListener for each value in the btnCcpMakeClips object. We need a for in loop for objects
       for(let i in btnCcpMakeClips) {
@@ -1883,7 +1797,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         }
       }
 
-      // Click handlers - Misc
+      // !VA Misc Unused Handlers for review
       // =============================
       // !VA This was moved to initCCP I think
       // addEventHandler(iInspectors.btnToggleCcp,'click',toggleCCP,false);
@@ -1911,11 +1825,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // }
       // addEventHandler(window, 'load', function(evt) {initializeHandlers(); } );
     };
+    // !VA EVENT HANDLING END
 
-
-    // !VA appController private functions
-    //  ==============================
-
+    // !VA FILEREADER OBJECT PROCESSING
     // appController private: hfs - FILEREADER OBJECT PROCESSING
     //Get the user-selected image file object 
     function handleFileSelect(evt) {
@@ -1988,35 +1900,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
                 // !VA Display the current image
                 curImg.style.display = 'block';
-                // !VA NOW the image is in the DOM and we can call functions to get its properties.
-                // !VA Pass Appdata on to evalViewerSizes in order to resize the image containers dynamically based on the dimensions of the image.
-                // !VA Create and array of the Appdata properties to update
-                // !VA Instead of managing Appdata based on some huge object with four HTML elements and all those unneeded properties thereof, we will just update Appdata by creating a local copy with just the properties we want to add.
-                // !VA Review this - it might be an older comment 
-                // !VA The problem is that Appdata is a global object in the public functions, as it is now in master. I don't want to put all that stuff in the appController's public functions, so I have to either leave it in UIController or pass it between private functions, which will get very complicated.   I think it will be much cleaner if I only use updateAppData to loop through the items to update and don't use the klunky getAppData. Also, the refreshAppUI function refreshes all the values when it's called - it should only refresh the changed values.
-                // !VA  Now that the blob image has been displayed and has DOM properties that can be queried, query them and write them to Appdata.
-                // !VA Now that we have a current image in the DOM, Get Appdata so we can store the iFilename in it.
 
-                // !VA Initialize the value in the toolbar viewerW input field to its initial CSS value.
-                // !VA Branch: tryLocalStorage (050820)
-
-
-
-                // !VA Commenting this out since I changed it to hard-coded in the HTML file along with iptTbrSmallPhonesW and sPhonesH.
-                // document.querySelector(toolbarElements.viewerW).value = document.querySelector(dynamicRegions.imgViewer).style.width;
-                
-                // !VA Set the data attribute for small phone and large phone width. We need this because there is not actual HTML element that corresponds to these properties, and thus no way to persist them globally. So the data attribute sphonew and sphoneh will be written to the toolbar input field as surrogate for an actual DOM element that Appdata can query.
-
-                // !VA Branch: implementPhonesLocalStorage (050920)
-                // var sphonesw, lphonesw;
-                // sphonesw = document.querySelector(toolbarElements.iptTbrSPhonesWidth);
-                // lphonesw = document.querySelector(toolbarElements.iptTbrLPhonesWidth);              
-                // sphonesw.setAttribute('data-sphonesw', '320');
-                // lphonesw.setAttribute('data-lphonesw', '414');
-                // sphonesw.value = sphonesw.getAttribute('data-sphonesw');
-                // lphonesw.value = lphonesw.getAttribute('data-lphonesw');
-
-                
+                // !VA Calculate the viewer size based on the loaded image
                 calcViewerSize(false);
               })();
               
@@ -2067,9 +1952,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
     }
 
-
-    // !VA appController private function
+    // !VA appController private
     // !VA Handle behavior when an element gets the focus. Pertains only to keyboard input, actually, I'm not sure whether buttons or CCP elements need special handling.
+    // !VA TODO: Why is the argument  unused, why are there unused elements and what is actually happening here?
     function handleFocus(evt) {
       // !VA Get the target element of the click
       el = document.getElementById(this.id);
@@ -2077,7 +1962,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       this.select();
     }
 
-    // !VA appController private function
+    // !VA TODO: Why is the argument  unused, why are there unused elements and what is actually happening here?
+    // !VA appController private
     function handleBlur(evt) {
       // !VA Handle blur
       var Appdata = {};
@@ -2093,14 +1979,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       }
     }
 
-    // !VA appController private handleMouseEvents. Preprocess mouse events and route them to respective eval handler.
+    // !VA appController private 
+    // !VA Preprocess mouse events and route them to respective eval handler.
     function handleMouseEvents(evt) {
       // !VA Carryover from earlier handleUserAction
       // !VA Get the target element of the click
       var el = document.getElementById(this.id);
       var args = { };
       args.target = el.id;
-      
       
       // !VA Handle the increment toolbuttons
       if (event.type === 'click') {
@@ -2150,6 +2036,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       --Default Tab behavior, i.e. cycling through the tab order, has to be maintained under consideration of the above 2 points.
     */
     // !VA Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
+    // !VA TODO: Why are there unused elements and what is actually happening here?
     function handleKeydown(evt) {
       // !VA Get the keypress
       keydown = evt.which || evt.keyCode || evt.key;
@@ -2202,7 +2089,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       }
     }
 
-    // !VA appController private handleKeyup
+    // !VA appController private
+    // !VA TODO: Why are there unused elements and what is actually happening here?
     // !VA keyPress handler for the ESC key.  This has to be handled on keyup, so we need a separate handler for it.
     function handleKeyup(evt) {
       var el, prop;
@@ -2230,6 +2118,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
     // !VA  Parsing keyboard input based on Appdata property passed in from handleKeyup.
     // !VA TODO: rename to checkUserInput and include parsing of the toolbutton mouseclicks from handleToolbarClicks.
+    // !VA TODO: Why are there unused variables and what is actually happening here?
+    // !VA appController private
     function checkUserInput(args) {
       // !VA Destructure args
       console.dir(args);
@@ -2299,10 +2189,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         isErr = false;
       }
       return isErr;
-
     }
 
-    // !VA appController private evalToolbarInput
+    // !VA appController private
+    // !VA TODO: Why are there unused variables and what is actually happening here?
     // !VA args is the target, prop and val passed in from handleKeyUp and handleMouseEvents. 
     function evalToolbarInput(args) {
       // !VA Here we get the toolbar input from handleKeyDown, determine which input field it was entered in, and pass the value to the updateAppdata. Note that until updateAppdata is called, Appdata still retains the values prior to the user input in the fields that initiated this action.
@@ -2349,7 +2239,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       calcViewerSize();
     }
 
-    // !VA appController private updateAppdata
+    // !VA appController private
     function updateAppdata( ...params ) {
       let prop, val;
       // !VA Each param pair is a property name prop and a value val. evalToolbarInput passes in one or more such pairs whose corresponding Appdata DOM element/data attribute has to be updated. So, loop through the argument arrays and update the corresponding DOM elements
@@ -2387,14 +2277,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // console.dir(Appdata);
     }
 
-    // !VA  appController private calcViewerSize
-    // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH
-    // !VA Branch: implementPhonesLocalStorage (050920) 
-    /* !VA  Need to determine where to write localStorage values to UI and whether to continue using data properties to store the sPhonesW and lPhonesW values if we can just write them to localStorage. I don't want to be calling localStorage all the time, it's not module-internal. It should only be called once and that value should be written to the data property. Currently the data properties are defined twice, once in handleFileSelect production mode and once in initDev for dev mode. That's no good. Probably the best place is public UIController, since the values are first written when the UI is initialized. */
-    
-
-
-
+    // !VA  appController private 
+    // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH. I'm not sure what that means anymore 05.11.20
     function calcViewerSize() {
       let Appdata = {};
       let viewerW, viewerH, compStyles; 
@@ -2420,7 +2304,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
       // !VA If we're initializing a new image, use the naturalWidth and naturalHeight. If we're updating via user input, we need to use the display image and height, imgW and imgH. If we're initializing, then Appdata.imgW and Appdata.imgH will be 0 or falsy because it hasn't been resized yet. So we need to make the following decision based on the _actual_ image width and height, which will be different based on whether we're initializing or updating.
       // !VA I thought I fixed this...it appears to only apply to dev mode.
-      var actualW, actualH
+      var actualW, actualH;
       if (Appdata.imgW === 0) {
         actualW = Appdata.imgNW;
         actualH = Appdata.imgNH;
@@ -2484,7 +2368,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       resizeContainers(viewerH, Appdata.imgW, Appdata.imgH );
     }
 
-    // !VA appController private doContainerHeights
+    // !VA appController private
     function resizeContainers(viewerH, imgW, imgH)  {
       // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values which are passed in from resizeContainers.
       // !VA Initial height is 450, as it is defined in the CSS. TOo much hassle to try and get the value as defined in the CSS programmatically.
@@ -2513,11 +2397,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       UICtrl.writeInspectors();
     }
 
-    // !VA So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. Here, there are 5 mutable elements and 5 properties. Only one of the properties has changed. So we loop through them all, find the match for the prop argument, then update only the element/data property that matches. This is a mickey-mouse solution but it works for now. Ideally we will pass in a key/value pair including the property name and the ID alias so we can use properties... in case there are more than one.
+    // !VA NOTE:  So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. Here, there are 5 mutable elements and 5 properties. Only one of the properties has changed. So we loop through them all, find the match for the prop argument, then update only the element/data property that matches. This is a mickey-mouse solution but it works for now. Ideally we will pass in a key/value pair including the property name and the ID alias so we can use properties... in case there are more than one. 
+    // !VA That concept is bad because it requires constant DOM access 05.11.20
 
 
-    // !VA CCP Functions
-    // !VA appController private initCCP
+    // !VA CCP FUNCTIONS
+    // !VA appController private 
     function initCCP() {
       // !VA Get Appdata
       var Appdata = appController.initGetAppdata();
@@ -2527,9 +2412,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA If the CCP is open:
       if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
         // !VA We have to initialize CCP DOM elements here because they don't exist until the CCP is displayed.
-
-
-
 
         // !VA CCP Checkboxes - these are mock checkboxes with custom styling, so the ID names have to be converted to checkbox names in order to select or deselect them. We attach the event handler to the checkmark, not the checkbox. The checkmark is converted to checkbox for handling in toggleCheckbox.
         ccpCheckmarks = [ ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk, ccpUserInput.spnCcpImgIncludeAnchorCheckmrk, ccpUserInput.spnCcpTableIncludeWrapperCheckmrk ];
@@ -2544,11 +2426,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           document.querySelector(wrapperItemsToHide[i]).style.display = 'none'; 
         }
 
-        // !VA Initialize with 'include wrapper table' unchecked, or true for DEV
-        // !VA Reboot: Commenting out for now
-        // var includeWrapperTable = document.querySelector((ccpUserInput.spnCcpTableIncludeWrapperCheckmrk.replace('mrk', 'box')));
-        // includeWrapperTable.checked = true;
-
         // !VA Find out which tdoption is selected and send a click to that option to run displayTdOptions and display the appropriate attributes for that option
         selectedRadio = document.querySelector('input[name="tdoptions"]:checked');
         selectedRadio.click();
@@ -2562,13 +2439,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       }
     }
       
-    // !VA  appController: Toggle checkboxes and run any associated actions
+    // !VA  appController private
+    // !VA Toggle checkboxes and run any associated actions
+    // !VA TODO: This function is misnamed, it only pertains to mock checkbox processing
     function handleCCPInput(event) {
       // !VA Get the Appdata for the input default value
       var data = appController.initGetAppdata();
       var chkId, checkbox;
       // !VA Toggle CCP checkboxes and run associated operations. The CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
-
       // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
       var wrapperItemsToShow = [];
 
@@ -2602,7 +2480,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     }
 
 
-    // UIController Show element when input in another element is made 
+    // !VA Show element when input in another element is made 
+    // !VA appController private
     function showElementOnInput(event) {
       // !VA Here we catch the event handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
       var elems = [];
@@ -2636,6 +2515,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
     //  !VA ERROR HANDLING
     // ==============================
+    // !VA appController private
     // !VA Stores for all app error and status messages
     function appMessages(isErr, messCode) {
       let Appdata = appController.initGetAppdata();
@@ -2678,7 +2558,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       return [isErr, mess];
     }
 
-    // !VA appController private function
+    // !VA appController private
     function messageHandler(isErr, messCode) {
       // !VA This doesn't really do anything but pass the code to appMessages, return the message and convert the isErr/message pair to an array so it can be passed as array to flashAppMessage which then breaks it down again into strings...pretty useless. 
       var retArray = [];
@@ -2687,8 +2567,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       UIController.flashAppMessage(retArray);
     }
 
-    // !VA Might be good to fold this into error handling
-    // appController private validateInteger
+    // appController private 
     function validateInteger(inputVal) {
       // !VA Since integer validation is used for all height/width input fields, including those not yet implemented
       let isErr;
@@ -2703,11 +2582,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA Just returning true here, the error code is sent by the calling function in handleUserAction
       return isErr;
     }
+    //  !VA END ERROR HANDLING
 
-    // !VA Misc Functions
-    // !VA ================================================================
+
+    // !VA MISC FUNCTIONS
+    // !VA appController private
     // !VA Need to get the Appdata property that corresponds to the ID of the DOM input element that sets it. It's easier to just create a list of these correspondences than to rename the whole UI elements and Appdata properties so they correspond, or to create functions that use string methods to extract them from each other.
-    //  clipboardController: GET APPDATA PROPERTY NAME FROM AN HTML ELEMENT ID
     function elementIdToAppdataProp(str) {
       var IDtoProp = {
         viewerW:  'ipt-tbr-viewerw',
@@ -2723,7 +2603,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       return ret;
     }
 
-    // !VAS appController private function getAspectRatio
+    // !VA appController private
     function getAspectRatio (var1, var2) {
       var aspectReal = (var1 / var2);
       var aspectInt = function() {
@@ -2750,21 +2630,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       return [aspectReal, aspectInt];  
     }
 
-    // !VA  appController private
-    var initDev = function() {
-      // !VA This is where we initialize Dev mode, which is where we can start the app with a hard-coded img element in the HTML file. THis is very useful, otherwise we'd have to drop files to initialize or dink with the FileReader object to hard-code a test file.
-      // !VA Get Appdata so we can store the iFilename
-      // var Appdata = appController.initGetAppdata();
-      // !VA Get the current (devimg) image dimensions and write the Inspectors
-      // !VA Turn on the toolbars
-      // !VA Reboot 
-
-      // !VA Putting the init in a setTimeout otherwise the script will run before the image loads if using browsersync
-      var delayInMilliseconds = 10; //1 second
-
-    };
-
-
+    // !VA appController private
     function getAppdata() {
       var Appdata = {};
       Appdata = UIController.queryDOMElements();
@@ -2776,35 +2642,36 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       return Appdata;
     }
 
-    // !VA appController public
+    // !VA appController public functions
     return {
       // !VA Dev Mode pass-thru public functions to expose calcViewerSize and initCCP to UIController.initUI
+      // !VA appController public
       initCalcViewerSize: function() {
         calcViewerSize();
       },
+      // !VA appController public
       initInitCCP: function() {
         initCCP();
       },
 
       // !VA Were putting this here so it can be accessed from either other module -- all it does it get the code and pass it on to the private appController function that finds the error code from the string and passes that on to UIController for display.
+      // !VA appController public
       initMessage: function(isErr, errCode) {
         messageHandler(isErr, errCode);
       },
 
+      // !VA This is a pass-thru to access queryDOMElements (public UIController)  to get the current dimensions of the dynamic DOM elements and data attributes, and getAppdata (private appController) to calculate the non-DOM Appdata properties. We do this here because Appdata has to be queried in all three modules, so it has to be accessible in all of them, and because getAppdata needs getAspectRatio which belongs in appController.
+      // !VA appController public
       initGetAppdata: function() {
-        // !VA This is a pass-thru to access queryDOMElements (public UIController)  to get the current dimensions of the dynamic DOM elements and data attributes, and getAppdata (private appController) to calculate the non-DOM Appdata properties. We do this here because Appdata has to be queried in all three modules, so it has to be accessible in all of them, and because getAppdata needs getAspectRatio which belongs in appController.
         var Appdata = getAppdata();
         return Appdata;
       },
 
-
-
+      // !VA Query whether localStorage is currently set for viewerW, sPhonesW and lPhonesW
+      // !VA appController public
       getLocalStorage: function() {
-        // console.log('getLocalStorage running');
         // !VA Get localStorage for viewerW here. localStorage is set in updateAppdata after the user input has been parsed for errors. 
-        // !VA TODO: smallPhones/largePhones width to be added later
         let arr = [], curLocalStorage = [];
-
         // !VA Clear localStorage for testing only.
         // localStorage.clear();
         // !VA If localStorage is set for viewerW, sPhonesW or lgPhones, add the localStorage value to curLocalStorage and return it
@@ -2814,13 +2681,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         }
         console.log('curLocalStorage:');
         console.dir(curLocalStorage);
-
-        // localStorage.getItem('viewerW') ? curLocalStorage.push(localStorage.getItem('viewerW')) : curLocalStorage.push(false);
-        // localStorage.getItem('sPhonesW') ? curLocalStorage.push(localStorage.getItem('sPhonesW')) : curLocalStorage.push(false);
-        // localStorage.getItem('lPhonesW') ? curLocalStorage.push(localStorage.getItem('lPhonesW')) : curLocalStorage.push(false);
         return curLocalStorage;
       },
 
+      // !VA appController public
       init: function(){
         console.log('App initialized.');
 
