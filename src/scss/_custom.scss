@@ -774,12 +774,11 @@ output {
     width: 60px;
     font-size: 14px;
   }
-  // CCP input element styles
   input {
+    width: 150px;
     border: 1px solid #616161;
     background: #000000;
     color: #FFFFFF;
-    width: 150px;
   }
 
 }
@@ -856,29 +855,41 @@ fieldset {
 .ccp-options-col-1 {
   // !VA Height is irrelevant here since these elements get their height from the parent
   left: 0;
-  width: 120px;
+  width: 150px;
   margin: 5px 0;
   padding: 0;
   padding-bottom: 3px;
   .ccp-but {
+    display: block;
     width: 90px;
     height: 46px; 
-    padding-right: 7px;
-    padding: 0;
     margin: 10px auto 20px;
-    
-    display: block;
+    padding: 0 7px 0 0;
     border: none;
     background-color: transparent;
     background-size: 90px 46px !important;
   }
   label {
     width: 50px;
+    text-align: right;
+  }
+  #ipt-ccp-td-borderradius-label {
+    width: 95px;
+    margin-left: 5px !important;
+  }
+  #ipt-ccp-td-borderradius {
+    width: 40px !important;
   }
 }
 .ccp-options-col-2 {
   left: 120px;
-  width: 230px;
+  width: 210px;
+  label {
+    width: 95px;
+  }
+  input {
+    width: 110px !important;
+  }
 }
 .ccp-options-col-3 {
   left: 350px;
@@ -928,11 +939,15 @@ fieldset {
 }
 
 // VA! Reboot: need separate classes for the col 2 and col 3 labels that are NOT mock checkbox labels so we can set the width separately
+
 .col-2-label, .col-3-label {
-  width: 60px;
+
   margin-bottom: 5px;
   padding-right: 2px;
   text-align: right;
+} 
+.col-2-label {
+
 }
 
 // VA! Custom, i.e Mock checkbox
@@ -1071,7 +1086,7 @@ fieldset {
 }
 
 // VA! TD options to show an hide based on selected radio
-#ccp-td-align, #ccp-td-valign, #ccp-td-class, #ccp-td-height, #ccp-td-width, #ccp-td-bgcolor {
+#ccp-td-align, #ccp-td-valign, #ccp-td-class, #ccp-td-height, #ccp-td-width, #ccp-td-bgcolor, #ccp-td-fontcolor, #ccp-td-bordercolor, #ccp-td-borderradius {
   display: none;
   &.active {
     display: block;

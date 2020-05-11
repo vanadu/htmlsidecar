@@ -276,7 +276,7 @@
                   <!-- VA! Reboot: why no parent div here? -->
                     <button id="btn-ccp-make-td-tag" class="ccp-but"></button> 
                     <div id="ccp-td-align"> 
-                      <label id="sel-ccp-td-align-label" class="col-2-label" for="sel-ccp-td-align">align=</label> 
+                      <label id="sel-ccp-td-align-label" class="col-1-label" for="sel-ccp-td-align">align=</label> 
                       <select id="sel-ccp-td-align">
                         <option>none</option> 
                         <option selected="selected">left</option> 
@@ -285,7 +285,7 @@
                       </select>  
                     </div> 
                     <div id="ccp-td-valign"> 
-                      <label id="sel-ccp-td-valign-label" class="col-2-label" for="sel-ccp-td-valign">valign=</label>
+                      <label id="sel-ccp-td-valign-label" class="col-1-label" for="sel-ccp-td-valign">valign=</label>
                       <select id="sel-ccp-td-valign"> 
                         <option>none</option> 
                         <option selected="selected">top</option> 
@@ -293,6 +293,12 @@
                         <option>bottom</option> 
                       </select> 
                     </div>
+
+                    <div id="ccp-td-borderradius">
+                      <label for="ipt-ccp-td-borderradius" class="col-1-label" id="ipt-ccp-td-borderradius-label">border radius=</label>
+                      <input type="text" id="ipt-ccp-td-borderradius" placeholder="none" value="" />
+                    </div>
+                    
                 </div> 
       
                 <div class="ccp-options-col-2"> 
@@ -310,8 +316,16 @@
                     <input type="text" id="ipt-ccp-td-width" placeholder="none" value="" />
                   </div>
                   <div id="ccp-td-bgcolor">
-                    <label for="ipt-ccp-td-bgcolor" class="col-2-label" id="ipt-ccp-td-bgcolor-label">bgcolor=</label>
+                    <label for="ipt-ccp-td-bgcolor" class="col-2-label" id="ipt-ccp-td-bgcolor-label">bkgrnd  color=</label>
                     <input type="text" id="ipt-ccp-td-bgcolor" placeholder="none" value="" />
+                  </div>
+                  <div id="ccp-td-fontcolor">
+                    <label for="ipt-ccp-td-fontcolor" class="col-2-label" id="ipt-ccp-td-fontcolor-label">font color=</label>
+                    <input type="text" id="ipt-ccp-td-fontcolor" placeholder="none" value="" />
+                  </div>
+                  <div id="ccp-td-bordercolor">
+                    <label for="ipt-ccp-td-bordercolor" class="col-2-label" id="ipt-ccp-td-bordercolor-label">border color=</label>
+                    <input type="text" id="ipt-ccp-td-bordercolor" placeholder="none" value="" />
                   </div>
                 </div> 
                 <div class="ccp-options-col-3">
@@ -394,7 +408,7 @@
                     </select>
                   </div>
                   <div id="ccp-table-bgcolor">
-                      <label class="col-2-label" for="ipt-ccp-table-bgcolor" id="ipt-ccp-table-bgcolor-label">bgcolor=</label>
+                      <label class="col-2-label" for="ipt-ccp-table-bgcolor" id="ipt-ccp-table-bgcolor-label">bkgrnd  color=</label>
                       <input type="text" id="ipt-ccp-table-bgcolor" placeholder="none" value="" />
                   </div> 
                 </div>
@@ -432,7 +446,7 @@
                     </select>
                   </div> 
                   <div id="ccp-table-wrapper-bgcolor"> 
-                      <label id="ipt-ccp-table-wrapper-bgcolor-label" class="col-3-label" for="ipt-ccp-input-table-wrapper-bgcolor">bgcolor=</label>
+                      <label id="ipt-ccp-table-wrapper-bgcolor-label" class="col-3-label" for="ipt-ccp-input-table-wrapper-bgcolor">bkgrnd color=</label>
                       <input id="ipt-ccp-table-wrapper-bgcolor" placeholder="none" />  
                   </div> 
                 </div>

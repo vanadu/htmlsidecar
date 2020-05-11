@@ -7,15 +7,17 @@
 =========================================================
 // !VA 05.07.20
 Status:
+DONE: Fix imgswap codeBlock output: alt tag has quotes following, alt doesn't work. THis was fixed in an earlier commit.
+DONE: vmlbutton - add default 40/200 width and height as per Stig and add error handling if one of the values is omitted.
 
-TODO: Add vml options to CCP and implement them in getVmlButtonBlock. Height and width of the vmlbutton td has to come from the loaded image but can be overwritten manually in case the user doesn't want to include a background image fro some reason - though what would be the point in that? The default bgcolor also has to be written to the input fields.
+TODO: The default bgcolor also has to be written to the input fields in vmlbutton
+TODO: Add error handling and the isErr argument to makeTdNode and makeTableNode so that the Clipboard object can discern between success messages and 'alert' messages, i.e. when the Clipboard output should be reviewed by the user for some reason, i.e. when vmlbutton height doesn't match the height of the loaded image.
 
 TODO: rtl class attribute shows when nothing is entered: it should be hidden
-TODO: Save sPhonesW and lPhonesW to localStorage
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
-TODO: Fix imgswap codeBlock output: alt tag has quotes following, alt doesn't work.
 TODO: curImg doesn't resize back if you change viewerW to smaller than curImg and then change it back. It should follow the size of viewerW shouldn't it? Maybe not...
 TODO: Notate all functions with module and private/public
+TODO: CCP input fields should select all when clicked in like they do in the toolbar
 
 
 Error Handling
@@ -213,6 +215,9 @@ var Witty = (function () {
       iptCcpTdHeight: '#ipt-ccp-td-height',
       iptCcpTdWidth: '#ipt-ccp-td-width',
       iptCcpTdBgColor: '#ipt-ccp-td-bgcolor',
+      iptCcpTdFontColor: '#ipt-ccp-td-fontcolor',
+      iptCcpTdBorderColor: '#ipt-ccp-td-bordercolor',
+      iptCcpTdBorderRadius: '#ipt-ccp-td-borderradius',
       // !VA spn-ccp-td-bgimage-checkmrk
       // !VA This is deprecated as of today
       // spnCcpTdBgimageCheckmrk: '#spn-ccp-td-bgimage-checkmrk',
@@ -494,7 +499,7 @@ var Witty = (function () {
         // !VA Set the target id of the click event
         targetid = evt.target.id;
         // !VA Populate allTdOptions with all the defined Td options
-        allTdOptions = [ ccpUserInput.iptCcpTdClass,  ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor ];
+        allTdOptions = [ ccpUserInput.iptCcpTdClass,  ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor, ccpUserInput.iptCcpTdFontColor, ccpUserInput.iptCcpTdBorderColor, ccpUserInput.iptCcpTdBorderRadius  ];
         // !VA This function gets the id of the parent div of the td option to be displayed/hidden. We need the parent div because it contains label and input of the element, not just the input field or dropdown list itself.
         function getParentDiv(parentDivId) {
           parentDivId = '#' + parentDivId.substring( 5 );
@@ -513,6 +518,10 @@ var Witty = (function () {
           parentDivId = getParentDiv(allTdOptions[i]);
           document.querySelector(parentDivId).classList.remove('active');
         }
+        // !VA Reset the height, width and bgcolor fields to '', otherwise the vmlbutton defaults will persist if the user selects the vmlbutton radio button.
+        document.querySelector(ccpUserInput.iptCcpTdHeight).value = '';
+        document.querySelector(ccpUserInput.iptCcpTdWidth).value = '';
+        document.querySelector(ccpUserInput.iptCcpTdBgColor).value = '';
         // !VA Determine which tdoptions radio button is selected based on the click event and run showOptions for the selected TD radio option.
         switch(true) {
         case targetid === ccpUserInput.rdoCcpTdBasic.slice(1) || targetid === ccpUserInput.rdoCcpTdExcludeimg.slice(1):
@@ -533,15 +542,24 @@ var Witty = (function () {
           // !VA bgcolor, width, height, valign
           optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor ];
           showOptions(optionsToShow);
+          // !VA Get the default height and width from Appdata 
+          document.querySelector(ccpUserInput.iptCcpTdHeight).value = Appdata.imgH;
+          document.querySelector(ccpUserInput.iptCcpTdWidth).value = Appdata.imgW;
+          // !VA Include the default bgcolor as per Stig
+          document.querySelector(ccpUserInput.iptCcpTdBgColor).value = '#7bceeb';
           break;
         case targetid === ccpUserInput.rdoCcpTdVmlbutton.slice(1):
-          optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor ];
+          optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor, ccpUserInput.iptCcpTdFontColor, ccpUserInput.iptCcpTdBorderColor, ccpUserInput.iptCcpTdBorderRadius ];
           showOptions(optionsToShow);
-          // !VA Branch: finishVmlButton (051020)
-          // !VA Need to get imgHeight and imgWidth here
-          // !VA NO -- need to enter a value and show an error if none entered! The img height and width are inserted in the vml code block. The TD height and width have NOTHING to do with that!
-          // document.querySelector(ccpUserInput.iptCcpTdHeight).value = Appdata.imgH;
-          // document.querySelector(ccpUserInput.iptCcpTdWidth).value = Appdata.imgW;
+          // !VA The height and width field require an entry otherwise the button can't be built, that's why Stig has default values of 40/200 in his code. So we include the defaults here when the inputs are displayed and include error handling if the user omits one
+          document.querySelector(ccpUserInput.iptCcpTdHeight).value = '40';
+          document.querySelector(ccpUserInput.iptCcpTdWidth).value = '200';
+          // !VA Include the default bgcolor as per Stig
+          document.querySelector(ccpUserInput.iptCcpTdBgColor).value = '#556270';
+          document.querySelector(ccpUserInput.iptCcpTdFontColor).value = '#FFFFFF';
+          document.querySelector(ccpUserInput.iptCcpTdBorderColor).value = '#1e3650';
+          document.querySelector(ccpUserInput.iptCcpTdBorderRadius).value = '4';
+          
           break;
         default:
           console.log('ERROR: UIController.displayTdOptions public');
@@ -553,16 +571,16 @@ var Witty = (function () {
       flashAppMessage: function(messArray) {
         // !VA Receives an array of a boolean error flag and the message to be displayed.
         // !VA Init error flag, message string and timeout delay
-        var isErr, mess, del;
+        let isErr, mess, del;
         isErr = messArray[0];
         mess = messArray[1];
-        var del;
+        
 
         // !VA Get the message container and display text into variables
-        var msgContainer = document.querySelector(staticRegions.msgContainer);
-        var msgDisplay = document.querySelector(staticRegions.msgDisplay);
-        var ccpBlocker = document.querySelector(staticRegions.ccpBlocker);
-        var messType;
+        let msgContainer = document.querySelector(staticRegions.msgContainer);
+        let msgDisplay = document.querySelector(staticRegions.msgDisplay);
+        let ccpBlocker = document.querySelector(staticRegions.ccpBlocker);
+        let messType;
         // !VA If it's an error, show class show-err, otherwise it's a status message so show-mess
         isErr ? messType = 'show-err' : messType = 'show-mess';
 
@@ -623,8 +641,10 @@ var Witty = (function () {
       Attributes = getAttributes();
       let Appdata = [];
       Appdata = appController.initGetAppdata();
-      let clipboardStr;
+      let clipboardStr, isErr;
       let args = [];
+      // !VA isErr is passed to Clipboard object to indicate whether to flash the success message or an alert message
+      isErr = false;
       switch(true) {
       case (id.includes('img-dsktp')):
         // args[0] = Attributes.imgClass, args[1] = Attributes.imgWidth, args[2] = Attributes.imgHeight;
@@ -919,7 +939,7 @@ var Witty = (function () {
         
       } 
       // !VA Convert the alias of the clicked button to an ID the Clipboard object recognizes and write clipboardStr to the clipboard.
-      writeClipboard( aliasToId(uSels.buttonClicked), clipboardStr);
+      writeClipboard( aliasToId(uSels.buttonClicked), clipboardStr );
     }
 
 
@@ -1075,8 +1095,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA Branch: tryShowHideTDOptions (050920)
 
       // !VA Branch: tryShowHideTDOptions (050920) THis doesn't belong here, there are no attributes that are available in ALL the parent nodes.
-      // !VA Add the attributes that are included in both the default and background image td
-      if (Attributes.tdValign) { tdInner.vAlign = Attributes.tdValign; }
+      // !VA TODO: There are NO attributes that are included in ALL the tdoptions, but it's very repetitive to include these options individually. Think about how this can be made DRYer 
       // !VA bgcolor attribute. Pass the input value, don't prepend hex # character for now
       if (Attributes.tdBgcolor) { tdInner.bgColor = Attributes.tdBgcolor; }
       // !VA Now add the attributes included only with the default Td configuration
@@ -1088,8 +1107,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         if (Attributes.tdClass) { tdInner.className = Attributes.tdClass; }
         // !VA valign attribute
         if (Attributes.tdAlign) { tdInner.align = Attributes.tdAlign; }
-        // if (Attributes.tdHeight) { tdInner.height = Attributes.tdHeight; }
-        // if (Attributes.tdWidth) { tdInner.width = Attributes.tdWidth; }
+        if (Attributes.tdValign) { tdInner.vAlign = Attributes.tdValign; }
         if (Attributes.tdHeight) { tdInner.height = Attributes.imgWidth; }
         if (Attributes.tdWidth) { tdInner.width = Attributes.imgHeight; }
         // !VA Branch: implementExcludeImg (050420)
@@ -1102,10 +1120,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         break;
       // case (selectedRadio === 'imgswap'):
       case (uSels.selectedRadio === 'imgswap'):
-        // tdInner.width = Attributes.tdAppdataWidth;
-        // tdInner.height = Attributes.tdAppdataHeight;
-        // !VA valign attribute
-        tdInner.align = Attributes.tdAlign;
+        if (Attributes.tdClass) { tdInner.className = Attributes.tdClass; }
+        if (Attributes.tdValign) { tdInner.vAlign = Attributes.tdValign; }
+        if (Attributes.tdAlign) { tdInner.align = Attributes.tdAlign; }
         break;
       // case (selectedRadio === 'bgimage'):
       case (uSels.selectedRadio === 'bgimage'):
@@ -1117,8 +1134,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         tdInner.vAlign = Attributes.tdValign;
         // !VA Set the background attribute to the current path/filename
         tdInner.setAttribute('background', Attributes.tdBackground);
-        // !VA Include fallback color if no bgColor is selected. Use Stig's fallback: #7bceeb
-        Attributes.tdBgcolor ? tdInner.bgColor = Attributes.tdBgcolor : tdInner.bgColor = '#7bceeb';
+        // !VA Fallback bgcolor now set in UIController.displayTdOptions
+        // !VA Include fallback color from the default set in displayTdOptions
+        // Attributes.tdBgcolor ? tdInner.bgColor = Attributes.tdBgcolor : tdInner.bgColor = '#7bceeb';
         break;
       // case (selectedRadio === 'posswitch'):
       case (uSels.selectedRadio === 'posswitch'):
@@ -1145,16 +1163,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         font color
       */
       case (uSels.selectedRadio === 'vmlbutton'):
-        // !VA Set defaults
-        // document.querySelector(ccpUserInput.iptCcpTdWidth).value = '200';
-        // document.querySelector(ccpUserInput.iptCcpTdHeight).value = '40';
-        // vmlDefaultWidth = 200;
-        // vmlDefaultHeight = 40;
+        // !VA Branch: finishVmlButton (051020) height and width fields have to be entered, otherwise the button can't be built. Button width and height are set here in makeTdNode, the rest of the options are set in getVmlCodeBlock in buildNodeList. The defaults of 40/200 as per Stig are set in UIController.displayTdOptions. So if there's no value for td height and width, then the user has deleted the default and not replaced it with a valid entry. In this case, throw an ERROR and abort before it gets to the clipboard.
 
-
-        // !VA Branch: finishVmlButton (051020) height and width fields have to be entered, otherwise the button can't be built. The button has the TD width and height, the code block has all the other options. So if there's no value for td height and width, then that has to throw an ERROR and the process aborts before it gets to the clipboard.
-        console.log('Attributes.imgHeight is: ' + Attributes.imgHeight);
-        // !VA If there's no value for td height and width, the button can't be built, so throw and ERROR and abort without writing to the Clipboard.
+        // !VA Button width and height are set here in makeTdNode, the rest of the options are set in getVmlCodeBlock in buildNodeList. The defaults of 40/200 as per Stig are set in UIController.displayTdOptions. So if there's no value for td height and width, then the user has deleted the default and not replaced it with a valid entry. In this case, throw an ERROR and abort before it gets to the clipboard.
         if (!document.querySelector(ccpUserInput.iptCcpTdHeight).value || !document.querySelector(ccpUserInput.iptCcpTdWidth).value) {
           // console.log('ERROR: no value for either height or width');
           isErr = true;
@@ -1163,20 +1174,18 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           tdInner.width = Attributes.tdWidth;
           tdInner.height = Attributes.tdHeight;
         }
-
-        
-        // console.log('Attributes.tdWidth is: ' + Attributes.tdWidth);
-        // Attributes.tdWidth ? tdInner.width = Attributes.tdWidth : tdInner.width = '200';
-        // Attributes.tdHeight ? tdInner.height = Attributes.tdHeight : tdInner.height = '40';
-        // tdInner.width  = Attributes.tdWidth;
-        // tdInner.height = Attributes.tdHeight;
+        // !VA TODO: If the height entered doesn't match the height of the loaded image, then the user probably has forgotten to load the image used for the button background, so the code output will probably not be what the user expects. Output the code, but show an alert in the message bar. This is going to require making a different clipboard message for alerts. It will also require somehow informing the Clipboard object that two different messages can be displayed onsuccess - one success message and one alert message. That will require passing an error status along with tdNodeFragment and tableNodeFragment, which will require returning an array rather than just the node fragment. 
+        if (document.querySelector(ccpUserInput.iptCcpTdHeight).value !== Attributes.imgHeight) {
+          appController.initMessage(true, 'vmlbutton_height_mismatch');
+          console.log('ALERT vmlbutton: height value doesn\'t match height of loaded image');
+        } 
         break;
-      
       default:
+        console.log('Some error has occurred in makeTdNode');
       } 
       // return tdInner;
       tdNodeFragment.appendChild(tdInner);
-      console.log('isErr is: ' + isErr);
+      // console.log('isErr is: ' + isErr);
       if (isErr) { 
         appController.initMessage(true, 'vmlbutton_no_value');
         console.log('returning...');
@@ -1188,13 +1197,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     }
 
     // function makeTableNode( id ) {
-    function makeTableNode( uSels) {
+    function makeTableNode( uSels ) {
       let Attributes;
       Attributes = getAttributes();
-      let tableNode, tableInner, tableOuter, tdInner, tdOuter, trInner, trOuter;
+      let tableInner, tableOuter, tdInner, tdOuter, trInner, trOuter;
       tableOuter = document.createElement('table');
       tableInner = document.createElement('table');
-      tdInner = document.createElement('td');
+      // tdInner = document.createElement('td');
       tdOuter = document.createElement('td');
       trInner = document.createElement('tr');
       trOuter = document.createElement('tr');
@@ -1230,7 +1239,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA 03.06.20A We are ALWAYS outputting EVERYTHING this time...
       // if (!Attributes.tableIncludeWrapper) {
       //   // !VA If Include table wrapper is unchecked, just return this inner table
-      tableNode = tableInner;
+      // tableNode = tableInner;
       // } else {
       // !VA If include table wrapper is checked, build the outer table and return it
       // !VA table wrapper class
@@ -2639,6 +2648,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         viewerW_GT_maxViewerWidth: `The container table width can't be greater than the width of the app itself &mdash; 800px.`,
         not_an_integer: 'Not an integer: please enter a positive whole number for width.',
         vmlbutton_no_value: 'Height and width must be entered to create a VML button.',
+        vmlbutton_height_mismatch: 'Is the correct image loaded? Img height should match entry. Check the code output. ',
+        
 
         // !VA Status messages
         copied_2_CB: 'Code snippet copied to Clipboard!',

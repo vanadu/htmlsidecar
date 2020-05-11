@@ -1559,10 +1559,10 @@ output {
     width: 60px;
     font-size: 14px; }
   #ccp-content input {
+    width: 150px;
     border: 1px solid #616161;
     background: #000000;
-    color: #FFFFFF;
-    width: 150px; }
+    color: #FFFFFF; }
 
 fieldset {
   display: block;
@@ -1608,26 +1608,35 @@ fieldset {
 
 .ccp-options-col-1 {
   left: 0;
-  width: 120px;
+  width: 150px;
   margin: 5px 0;
   padding: 0;
   padding-bottom: 3px; }
   .ccp-options-col-1 .ccp-but {
+    display: block;
     width: 90px;
     height: 46px;
-    padding-right: 7px;
-    padding: 0;
     margin: 10px auto 20px;
-    display: block;
+    padding: 0 7px 0 0;
     border: none;
     background-color: transparent;
     background-size: 90px 46px !important; }
   .ccp-options-col-1 label {
-    width: 50px; }
+    width: 50px;
+    text-align: right; }
+  .ccp-options-col-1 #ipt-ccp-td-borderradius-label {
+    width: 95px;
+    margin-left: 5px !important; }
+  .ccp-options-col-1 #ipt-ccp-td-borderradius {
+    width: 40px !important; }
 
 .ccp-options-col-2 {
   left: 120px;
-  width: 230px; }
+  width: 210px; }
+  .ccp-options-col-2 label {
+    width: 95px; }
+  .ccp-options-col-2 input {
+    width: 110px !important; }
 
 .ccp-options-col-3 {
   left: 350px;
@@ -1667,7 +1676,6 @@ fieldset {
   color: #FFFFFF; }
 
 .col-2-label, .col-3-label {
-  width: 60px;
   margin-bottom: 5px;
   padding-right: 2px;
   text-align: right; }
@@ -1774,9 +1782,9 @@ fieldset {
     line-height: 1.5rem;
     text-align: left; }
 
-#ccp-td-align, #ccp-td-valign, #ccp-td-class, #ccp-td-height, #ccp-td-width, #ccp-td-bgcolor {
+#ccp-td-align, #ccp-td-valign, #ccp-td-class, #ccp-td-height, #ccp-td-width, #ccp-td-bgcolor, #ccp-td-fontcolor, #ccp-td-bordercolor, #ccp-td-borderradius {
   display: none; }
-  #ccp-td-align.active, #ccp-td-valign.active, #ccp-td-class.active, #ccp-td-height.active, #ccp-td-width.active, #ccp-td-bgcolor.active {
+  #ccp-td-align.active, #ccp-td-valign.active, #ccp-td-class.active, #ccp-td-height.active, #ccp-td-width.active, #ccp-td-bgcolor.active, #ccp-td-fontcolor.active, #ccp-td-bordercolor.active, #ccp-td-borderradius.active {
     display: block; }
 
 #ccp-table-include-wrapper-label {
