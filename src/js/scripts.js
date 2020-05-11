@@ -15,6 +15,7 @@ TODO: Save sPhonesW and lPhonesW to localStorage
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
 TODO: Fix imgswap codeBlock output: alt tag has quotes following, alt doesn't work.
 TODO: curImg doesn't resize back if you change viewerW to smaller than curImg and then change it back. It should follow the size of viewerW shouldn't it? Maybe not...
+TODO: Notate all functions with module and private/public
 
 
 Error Handling
@@ -483,6 +484,13 @@ var Witty = (function () {
         console.log('displayTdOptions running');
         // !VA Array including all the defined options for each tdoption radio
         let allTdOptions = [], optionsToShow = [], targetid, parentDivId;
+        let Attributes;
+        // Attributes = appController.getAttributes();
+        let Appdata;
+        Appdata = appController.initGetAppdata();
+        console.log('Appdata:');
+        console.dir(Appdata);
+
         // !VA Set the target id of the click event
         targetid = evt.target.id;
         // !VA Populate allTdOptions with all the defined Td options
@@ -494,7 +502,6 @@ var Witty = (function () {
         }
         // !VA Function to show the specific options available for the selected TD options radio
         function showOptions(optionsToShow) {
-          console.log('showOptions running');
           for (let i = 0; i < optionsToShow.length; i++) {
             parentDivId = getParentDiv(optionsToShow[i]);
             document.querySelector(parentDivId).classList.add('active');
@@ -530,6 +537,11 @@ var Witty = (function () {
         case targetid === ccpUserInput.rdoCcpTdVmlbutton.slice(1):
           optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor ];
           showOptions(optionsToShow);
+          // !VA Branch: finishVmlButton (051020)
+          // !VA Need to get imgHeight and imgWidth here
+          // !VA NO -- need to enter a value and show an error if none entered! The img height and width are inserted in the vml code block. The TD height and width have NOTHING to do with that!
+          // document.querySelector(ccpUserInput.iptCcpTdHeight).value = Appdata.imgH;
+          // document.querySelector(ccpUserInput.iptCcpTdWidth).value = Appdata.imgW;
           break;
         default:
           console.log('ERROR: UIController.displayTdOptions public');
@@ -784,12 +796,16 @@ var Witty = (function () {
 
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
     function buildOutputNodeList( uSels ) {
-      console.log('buildOutputNodeList running');
       let tableNodeFragment, nl, frag, outputNL, clipboardStr;
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
       tableNodeFragment = makeTableNode( uSels );
-      nl = tableNodeFragment.querySelectorAll('*');
-      
+      // !VA Create the full nodeList from the tableNodeFragment. If tableNodeFragment is null, return to abort without creating Clipboard object.
+      try {
+        nl = tableNodeFragment.querySelectorAll('*');
+      } catch (e) {
+        console.log('Error in buildOutputNodeList: tableNodeFragment is null. Aborting...');
+        return;
+      }
       // !VA Create the div container to which the extracted nodeList fragment will be appended
       var container = document.createElement('div');
 
@@ -975,7 +991,7 @@ var Witty = (function () {
       // console.clear();
       let Attributes;
       Attributes = getAttributes();
-      console.dir(Attributes);
+      // console.dir(Attributes);
       let vmlButtonStr;
       let linebreak;
       linebreak = '\n';
@@ -1047,6 +1063,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA 03.10.2020 Need to find out whether the table button was clicked and if so just add 3 or 6 to the indentLevel of the getIndent function.
     // function makeTdNode( id, selectedRadio ) {
     function makeTdNode( uSels ) {
+      // !VA Variables for error handling
+      let isErr, errCode;
       // !VA Set defaults for vmlbutton option
       let Attributes;
       Attributes = getAttributes();
@@ -1063,9 +1081,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       if (Attributes.tdBgcolor) { tdInner.bgColor = Attributes.tdBgcolor; }
       // !VA Now add the attributes included only with the default Td configuration
       switch(true) {
-      
-
-      
       // case (selectedRadio === 'basic'):
       case (uSels.selectedRadio === 'basic' || uSels.selectedRadio === 'excludeimg'):
         console.log('makeTdNode basic OR excludeimg');
@@ -1135,18 +1150,40 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // document.querySelector(ccpUserInput.iptCcpTdHeight).value = '40';
         // vmlDefaultWidth = 200;
         // vmlDefaultHeight = 40;
-        console.log('Attributes.tdWidth is: ' + Attributes.tdWidth);
-        Attributes.tdWidth ? tdInner.width = Attributes.tdWidth : tdInner.width = '200';
-        Attributes.tdHeight ? tdInner.height = Attributes.tdHeight : tdInner.height = '40';
-        tdInner.width  = Attributes.tdWidth;
-        tdInner.height = Attributes.tdHeight;
+
+
+        // !VA Branch: finishVmlButton (051020) height and width fields have to be entered, otherwise the button can't be built. The button has the TD width and height, the code block has all the other options. So if there's no value for td height and width, then that has to throw an ERROR and the process aborts before it gets to the clipboard.
+        console.log('Attributes.imgHeight is: ' + Attributes.imgHeight);
+        // !VA If there's no value for td height and width, the button can't be built, so throw and ERROR and abort without writing to the Clipboard.
+        if (!document.querySelector(ccpUserInput.iptCcpTdHeight).value || !document.querySelector(ccpUserInput.iptCcpTdWidth).value) {
+          // console.log('ERROR: no value for either height or width');
+          isErr = true;
+        } else {
+          console.log('Both height and width provided');
+          tdInner.width = Attributes.tdWidth;
+          tdInner.height = Attributes.tdHeight;
+        }
+
+        
+        // console.log('Attributes.tdWidth is: ' + Attributes.tdWidth);
+        // Attributes.tdWidth ? tdInner.width = Attributes.tdWidth : tdInner.width = '200';
+        // Attributes.tdHeight ? tdInner.height = Attributes.tdHeight : tdInner.height = '40';
+        // tdInner.width  = Attributes.tdWidth;
+        // tdInner.height = Attributes.tdHeight;
         break;
       
       default:
       } 
       // return tdInner;
       tdNodeFragment.appendChild(tdInner);
-      return tdNodeFragment;
+      console.log('isErr is: ' + isErr);
+      if (isErr) { 
+        appController.initMessage(true, 'vmlbutton_no_value');
+        console.log('returning...');
+        return;
+      } else {
+        return tdNodeFragment;
+      }
 
     }
 
@@ -1183,8 +1220,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // tdInner = makeTdNode( id );
       // trInner.appendChild(tdInner);
       let tdNodeFragment = makeTdNode( uSels );
-      trInner.appendChild(tdNodeFragment);
-      
+      // !VA Append trInner to the tdNodeFragment. If tdNodeFragment is null, console the error and return to buildOutputNodeList to abort.
+      try {
+        trInner.appendChild(tdNodeFragment);
+      } catch (e) {
+        console.log('Error in makeTableNode: tdNodeFragment is null');
+        return;
+      }
       // !VA 03.06.20A We are ALWAYS outputting EVERYTHING this time...
       // if (!Attributes.tableIncludeWrapper) {
       //   // !VA If Include table wrapper is unchecked, just return this inner table
@@ -1227,7 +1269,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     }
 
     function applyIndents( uSels, outputNL ) {
-      console.log('applyIndents running');
+      // console.log('applyIndents running');
       // !VA Create array to store indent strings
       let indents = [];
       // !VA Create array to store the positions of the stackable columns in the posswitch option.
@@ -1825,7 +1867,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // !VA Target only those ccpUserInput elements whose first 4 characters are #rdo. This identifies them as the radio button options.
         if (ccpUserInput[i].substring(0, 4) === '#rdo') {
           selectedRadio = document.querySelector(ccpUserInput[i]);
-          console.log('selectedRadio.id is: ' + selectedRadio.id);
           // !VA Add an event handler to trap clicks to the tdoptions radio button
           addEventHandler(selectedRadio,'click',UIController.displayTdOptions,false);
         }
@@ -2586,8 +2627,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // ==============================
     // !VA Stores for all app error and status messages
     function appMessages(isErr, messCode) {
-      var Appdata = appController.initGetAppdata();
-      var messages = {
+      let Appdata = appController.initGetAppdata();
+      let mess;
+      let messages = {
         // !VA Error messages
         not_Integer: 'This value has to be a positive whole number - try again or press ESC.',
         imgW_GT_viewerW: `The image width has to be less than the width of its container table, which is now&nbsp;set&nbsp;to&nbsp;${Appdata.viewerW}px.`,
@@ -2596,6 +2638,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // !VA maxViewerWidth issue here, see message below;
         viewerW_GT_maxViewerWidth: `The container table width can't be greater than the width of the app itself &mdash; 800px.`,
         not_an_integer: 'Not an integer: please enter a positive whole number for width.',
+        vmlbutton_no_value: 'Height and width must be entered to create a VML button.',
 
         // !VA Status messages
         copied_2_CB: 'Code snippet copied to Clipboard!',
