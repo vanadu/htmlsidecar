@@ -15,7 +15,9 @@ DONE: rtl class attribute shows when nothing is entered: it should be hidden. FI
 DONE: Notate all functions with module and private/public
 
 
-TODO: run queryDOMElements only on enter, not on every keypress
+TODO: run queryDOMElements only on enter, not on every keypress - in order to do this, need to get the previous value of the input so the user can ESC out of the field without implementing changed value. Right  now we are getting this value from Appdata. 
+
+
 TODO: Add error handling and the isErr argument to makeTdNode and makeTableNode so that the Clipboard object can discern between success messages and 'alert' messages, i.e. when the Clipboard output should be reviewed by the user for some reason, i.e. when vmlbutton height doesn't match the height of the loaded image.
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
 TODO: curImg doesn't resize back if you change viewerW to smaller than curImg and then change it back. It should follow the size of viewerW shouldn't it? Maybe not...
@@ -349,7 +351,7 @@ var Witty = (function () {
 
       // !VA UIController public
       queryDOMElements: function() {
-        console.log('queryDOMElements running');
+        // console.log('queryDOMElements running');
         // !VA NEW This needs to ONLY return the non-calculated DOM elements and data properties: curImg.imgW, curImg.imgW, curImg.imgNW, curImg.NH and viewerW. Aspect is calculated so we don't need to get that here, leave that to appController.
         // !VA NEW We will get the individual properties and return them as an ES6 array.
         // !VA Declare the local vars
@@ -415,23 +417,24 @@ var Witty = (function () {
         // !VA The rest of the routine applies to DEV and PROD modes
         // !VA Initialize the input fields for the pertinent device widths: viewerW, sPhonesW and lPhonesW. Also initialize the data attributes for sphonesw and lphonesw - we only want to access the localStorage once and the rest we do using data-attributes
         let arr = [], curDeviceWidths = [];
-        // localStorage.clear();
         // !VA Clear localStorage for testing only.
         // localStorage.clear();
         // !VA If localStorage is set for viewerW, sPhonesW or lgPhones, add the localStorage value to curDeviceWidths, otherwise set the defaults used when the app is used for the first time or no user-values are entered.
+        
         arr = [ 'viewerW', 'sPhonesW', 'lPhonesW' ];
-        // !VA If there's localStorage, push it to the curDeviceWidths array. Ottherwise, push false.
+        // !VA If there's localStorage, push it to the curDeviceWidths array. Otherwise, push false.
         for (let i = 0; i < arr.length; i++) {
           localStorage.getItem(arr[i]) ? curDeviceWidths.push(localStorage.getItem(arr[i])) : curDeviceWidths.push(false);
         }
-        // !VA If there's a localStorage for viewerW, put that value into the viewerW field of the toolbar, otherwise use the default of 650. NOTE: The default is set HERE and only HERE!!!!!
-        curDeviceWidths[0] ?  document.querySelector(toolbarElements.iptTbrViewerW).value = curDeviceWidths[0] : document.querySelector(toolbarElements.iptTbrViewerW).value = '650';
-        // !VA If there's a localStorage for sPhonesW, get it, otherwise set the default to 320. Then set the toolbar input field AND the sphonesw data attribute to this value. NOTE: The default is set HERE and only HERE!!!!!
-        curDeviceWidths[1] ? curDeviceWidths[1] : curDeviceWidths[1] = '320';
+        console.log('curDeviceWidths is: ' + curDeviceWidths);
+        // !VA If there's a localStorage for viewerW, put that value into the viewerW field of the toolbar, otherwise use the default. NOTE: The default is set ONLY in the HTML element's placeholder. The advantage of this is that we can get it anytime without having to set a global variable or localStorage for the default.
+        curDeviceWidths[0] ?  document.querySelector(toolbarElements.iptTbrViewerW).value = curDeviceWidths[0] : document.querySelector(toolbarElements.iptTbrViewerW).value = document.querySelector(toolbarElements.iptTbrViewerW).placeholder;
+        // !VA If there's a localStorage for sPhonesW, get it, otherwise set the default to the placeholder in the HTML element on index.html. Then set the toolbar input field AND the sphonesw data attribute to this value. NOTE: The default is set ONLY in the HTML element's placeholder!
+        curDeviceWidths[1] ? curDeviceWidths[1] : curDeviceWidths[1] = document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder;
         document.querySelector(toolbarElements.iptTbrSPhonesWidth).value = curDeviceWidths[1];
         document.querySelector(toolbarElements.iptTbrSPhonesWidth).setAttribute('data-sphonesw', curDeviceWidths[1]);
-        // !VA If there's a localStorage for lPhonesW, get it, otherwise set the default to 414. Then set the toolbar input field AND the lphonesw data attribute to this value. NOTE: The default is set HERE and only HERE!!!!!
-        curDeviceWidths[2] ? curDeviceWidths[2] : curDeviceWidths[2] = '414';
+        // !VA If there's a localStorage for lPhonesW, get it, otherwise set the default to the placeholdere in the HTML element in index.html. Then set the toolbar input field AND the lphonesw data attribute to this value. NOTE: The default is set ONLY in the HTML element's placeholder!
+        curDeviceWidths[2] ? curDeviceWidths[2] : curDeviceWidths[2] = document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder;
         document.querySelector(toolbarElements.iptTbrLPhonesWidth).value = curDeviceWidths[2];
         document.querySelector(toolbarElements.iptTbrLPhonesWidth).setAttribute('data-lphonesw', curDeviceWidths[2]);
 
@@ -1693,6 +1696,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     const toolbarElements = UICtrl.getToolButtonIDs();
     const ccpUserInput = UICtrl.getCcpUserInputIDs();
     const btnCcpMakeClips =  UICtrl.getBtnCcpMakeClips();
+
     
     //EVENT HANDLING START 
     // !VA appController private
@@ -1742,12 +1746,20 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
 
-      // !VA Add click and blur event handlers for clickable toolbarElements: 
+      // !VA Add click and blur event handlers for clickable toolbarElements 
       const tbClickables = [ toolbarElements.btnTbrIncr50, toolbarElements.btnTbrIncr10, toolbarElements.btnTbrIncr01, toolbarElements.btnTbrDecr50, toolbarElements.btnTbrDecr10, toolbarElements.btnTbrDecr01  ];
       for (let i = 0; i < tbClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         tbClickables[i] = document.querySelector(tbClickables[i]);
         addEventHandler(tbClickables[i],'click',handleMouseEvents,false);
+      }
+
+      // !VA Add onfocus event handlers globally for input elements 
+      const tbFocusInputs = [ toolbarElements.iptTbrViewerW, toolbarElements.iptTbrSPhonesWidth, toolbarElements.iptTbrLPhonesWidth  ];
+      for (let i = 0; i < tbFocusInputs.length; i++) {
+        // !VA convert the ID string to the object inside the loop
+        tbFocusInputs[i] = document.querySelector(tbFocusInputs[i]);
+        addEventHandler(tbFocusInputs[i],'click',handleOnfocus,false);
       }
       
       // !VA Add event handlers for input toolbarElements
@@ -1981,6 +1993,18 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       }
     }
 
+    function handleOnfocus(evt) {
+      console.log('handleOnfocus running');
+      console.log('evt.target is: ' + evt.target);
+      let targ = evt.target;
+      console.log('targ.id is: ' + targ.id);
+      let val = targ.value;
+      console.log('val is: ' + val);
+      
+    
+    }
+
+
     // !VA appController private 
     // !VA Preprocess mouse events and route them to respective eval handler.
     function handleMouseEvents(evt) {
@@ -2041,7 +2065,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
     // !VA TODO: Why are there unused elements and what is actually happening here?
     function handleKeydown(evt) {
-      console.log('handleKeydown running');
+      // console.log('handleKeydown running');
 
       // !VA Get the keypress
       keydown = evt.which || evt.keyCode || evt.key;
@@ -2063,7 +2087,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         (keydown == 9) ? isTab = true : isTab = false;
         // !VA If Tab was pressed and this.value is either empty or equals the Appdata value, then there's been no change to the field, so let Tab just cycle through the fields as per its default.
         if ((isTab) && ((this.value === '' || this.value == Appdata[args.prop]))) {
-          console.log('isTab  ');
           // !VA Only if imgW or imgH, delete the existing value to display the placeholders. Otherwise, tab through and leave the existing value from Appdata
           if (args.prop === 'imgW' || args.prop === 'imgH') {
             this.onblur = function() {
@@ -2099,28 +2122,33 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA TODO: Why are there unused elements and what is actually happening here?
     // !VA keyPress handler for the ESC key.  This has to be handled on keyup, so we need a separate handler for it.
     function handleKeyup(evt) {
-      var el, prop;
-      // !VA Get the target input element
-      el = document.getElementById(this.id);
-      console.log('el is: ' + el);
-      // !VA We only need the property here, so no need to create an args object. We could actually just use the target but since we're standardizing on property names, let's stick with that.
+      console.log('handleKeyUp running');
+      let prop, curLocalStorage;
+      // !VA We only need the property here, so no need to create an args object. We could actually just use the target but since we're standardizing on property names, let's stick with that. Get the property name from the id of this, i.e. the event target
       prop = elementIdToAppdataProp(this.id);
       // !VA Find out which key was struck
       keyup = evt.which || evt.keyCode || evt.key;
-      // !VA Get the current Appdata object because we need the previous Appdata value to restore when the ESC key is pressed
-      // !VA NOW: This is where Appdata is being called on every keypress...nuts!
-      var Appdata = appController.initGetAppdata();
-      console.log('HERE is where keyUP is handled and getAppdata is called!');
-      // !VA  On ESC, we want imgW and imgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the iInspectors and there's no need to recalc the W and H each time the user makes and entry - that would just be confusing. 
+      // var Appdata = appController.initGetAppdata();
+      // !VA  On ESC, we want imgW and imgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the iInspectors and there's no need to recalc the W and H each time the user makes and entry - that would just be confusing. For viewerW, sSphonesW and lPhonesW, revert to the previously displayed value if the user escapes out of the input field. The previously displayed value will be either 1) the default in the HTML placeholder attribute or 2) the localStorage value. So, the localStorage value is false, get the placeholder, otherwise get the localStorage value.
+      // !VA Esc key
       if (keyup == 27 ) {
-        // !VA If the value was entered into the W or H field, escape out of the field and reset the values to the placeholders
+        // !VA If the event target is the imgW or imgH input fields, on ESC exit the field and restore the placeholder set in the HTML file.
         if (prop === 'imgW' || prop === 'imgH') {
           this.value = ('');
           this.blur();
-        // !VA For viewerW, iptTbrSmallPhonesW and iptTbrLargePhonesW we want to exit the field and restore the preexisting value from Appdata.
+        // !VA If the event target is viewerW, iptTbrSmallPhonesW and iptTbrLargePhonesW, on ESC exit the field and restore the preexisting value localStorage if it exists, if not, restore the default stored in the HTML placeholder.
         } else {
-          this.value = Appdata[prop];
-          this.blur();
+          curLocalStorage = appController.getLocalStorage();
+          if (prop === 'viewerW') {
+            curLocalStorage[0] ? this.value = curLocalStorage[0] : this.value = document.querySelector(toolbarElements.iptTbrViewerW).placeholder;
+            // console.log('document.querySelector(\'#\' + prop).placeholder is: ' + document.querySelector(toolbarElements.iptTbrViewerW).placeholder);
+          } else if (prop === 'sPhonesW') {
+            curLocalStorage[1] ? this.value = curLocalStorage[1] : this.value = document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder;
+          } else if (prop === 'lPhonesW') {
+            curLocalStorage[2] ? this.value = curLocalStorage[2] : this.value = document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder;
+          } else {
+            console.log('ERROR in handleKeyup: localStorage value does not exist');
+          }
         }
       }
     }
@@ -2131,7 +2159,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA appController private
     function checkUserInput(args) {
       // !VA Destructure args
-      console.dir(args);
       const { target, prop, val } = args;
       var errCode;
       var isErr;
@@ -2250,6 +2277,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
     // !VA appController private
     function updateAppdata( ...params ) {
+      console.log('updateAppdata running');
       let prop, val;
       // !VA Each param pair is a property name prop and a value val. evalToolbarInput passes in one or more such pairs whose corresponding Appdata DOM element/data attribute has to be updated. So, loop through the argument arrays and update the corresponding DOM elements
       for (let i = 0; i < params.length; i++) {
@@ -2262,7 +2290,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         case prop === 'viewerW' :
           document.querySelector(dynamicRegions.imgViewer).style.width = val + 'px'; 
           // !VA Write the imgViewer value to localStorage. 
+          console.log('writing LS');
           localStorage.setItem('viewerW', val);
+          console.log('Setting localStorage viewerW');
+          var foo = appController.getLocalStorage();
+          console.log('foo is: ' + foo);
           break;
         case prop === 'imgW' :
           document.querySelector(dynamicRegions.curImg).style.width = val + 'px';
@@ -2689,8 +2721,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         for (let i = 0; i < arr.length; i++) {
           localStorage.getItem(arr[i]) ? curLocalStorage.push(localStorage.getItem(arr[i])) : curLocalStorage.push(false);
         }
-        console.log('curLocalStorage:');
-        console.dir(curLocalStorage);
+        // console.log('curLocalStorage:');
+        // console.dir(curLocalStorage);
         return curLocalStorage;
       },
 
@@ -2714,7 +2746,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         setupEventListeners();
         // !VA  Test if there is currently #cur-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
         var curImgExists = document.querySelector(dynamicRegions.curImg);
-        console.log('curImgExists is: ' + curImgExists);
         
         if (curImgExists) {
           initMode = 'devmode';

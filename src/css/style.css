@@ -1017,8 +1017,16 @@ html {
 
 body {
   min-height: 100% !important;
+  color: #333;
   font-family: "Open Sans", Arial, Helvetica, sans-serif;
-  font-size: 1rem; }
+  font-size: 1rem;
+  line-height: 1.42857143; }
+
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+  color: inherit;
+  font-family: inherit;
+  font-weight: 500;
+  line-height: 1.1; }
 
 span.code {
   font-family: 'Courier New', monospace; }
@@ -1029,6 +1037,36 @@ button:disabled {
 
 .output {
   border: 1px solid magenta; }
+
+.btn {
+  display: inline-block;
+  padding: 6px 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
+  border-top-color: transparent;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+  border-radius: 4px; }
+
+.btn-default {
+  color: #333;
+  background-color: #fff;
+  border-color: #ccc; }
 
 .navbar-container {
   position: relative;
@@ -1552,6 +1590,8 @@ output {
   height: 500px;
   padding: 0 10px; }
   #ccp-content input, #ccp-content label {
+    display: inline-block;
+    max-width: 100%;
     color: #FFFFFF;
     font-size: 14px;
     font-weight: 300; }

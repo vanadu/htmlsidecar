@@ -24,7 +24,7 @@
   <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,400italic,600,800|Source+Code+Pro" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Ubuntu&display=swap" rel="stylesheet">
   <link rel="icon" href="/favicon_16x16.ico?v=2" type="image/x-icon"/>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"> -->
   <link rel="stylesheet" media="all" href="css/style.css">
 
   <!--[if lt IE 9]>
@@ -130,7 +130,7 @@
         <!-- #toolbar-buttons -->
         <ul class="toolbar-buttons btn-group" role="group" aria-label="...">
             <!-- VA! viewerW value is set from localStorage or CSS in calcViewerSize -->
-            <li><div class="ttip"><input id="ipt-tbr-viewerw" class="toolbar-input btn btn-default" type="text" value="" tabindex="1"><span class="ttiptext">Enter container width as positive integer</span></div></li>
+            <li><div class="ttip"><input id="ipt-tbr-viewerw" class="toolbar-input btn btn-default" type="text" value="" placeholder="650" tabindex="1"><span class="ttiptext">Enter container width as positive integer</span></div></li>
             <!-- TODO: Replace this image with a SVG or HTML entity -->
             <li role="separator"><img class="divider" src="img/divider.png" alt="witty.JS"></li>
             <li><div class="ttip"><button id="btn-tbr-incr50" type="button" class="toolbar-but btn btn-default"  tabindex="7"></button><span class="ttiptext">Grow image 50px</span></div></li>
@@ -149,8 +149,8 @@
           <li role="separator"><img class="divider" src="img/divider.png" alt="witty.JS"></li>
           <!-- VA! 900 is a dummy value that should be overwritten programmatically by the setAttribute property -->
           <!-- VA! 050920 Changed the values for value, data-sphonesw and data-lphonesw to empty because the dummy value I had in there before was just confusing me  -->
-          <li><div class="ttip"><input id="ipt-tbr-sphones-width" class="toolbar-input btn btn-default" data-sphonesw="" value="" type="text" tabindex="4"><span class="ttiptext">Enter small phone width as positive integer</span></div></li>
-          <li><div class="ttip"><input id="ipt-tbr-lphones-width" class="toolbar-input btn btn-default" data-lphonesw="" value="" type="text" tabindex="5"><span class="ttiptext">Enter large phone width as positive integer</span></div></li>
+          <li><div class="ttip"><input id="ipt-tbr-sphones-width" class="toolbar-input btn btn-default" data-sphonesw="" value="" placeholder="320" type="text" tabindex="4"><span class="ttiptext">Enter small phone width as positive integer</span></div></li>
+          <li><div class="ttip"><input id="ipt-tbr-lphones-width" class="toolbar-input btn btn-default" data-lphonesw="" value="" placeholder="414" type="text" tabindex="5"><span class="ttiptext">Enter large phone width as positive integer</span></div></li>
 
           <!-- !VA toggle image size is deprecated -->
           <!-- <li><div class="ttip"><button id="toggle-image-size" type="button" class="btn btn-default" tabindex="6"></button><span class="ttiptext">Toggle display size/size on disk</span></div></li> -->
