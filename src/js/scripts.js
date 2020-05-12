@@ -12,12 +12,13 @@ DONE: vmlbutton - add default 40/200 width and height as per Stig and add error 
 DONE: Populate inputs with defaults in vmlbutton and 
 DONE: Fix viewer doesn't resize horizontally any more in PROD mode or show the Inspectors - but works in DEV mode.
 DONE: rtl class attribute shows when nothing is entered: it should be hidden. FIXED in setPosSwitchNodeAttributes
+DONE: Notate all functions with module and private/public
 
 
+TODO: run queryDOMElements only on enter, not on every keypress
 TODO: Add error handling and the isErr argument to makeTdNode and makeTableNode so that the Clipboard object can discern between success messages and 'alert' messages, i.e. when the Clipboard output should be reviewed by the user for some reason, i.e. when vmlbutton height doesn't match the height of the loaded image.
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
 TODO: curImg doesn't resize back if you change viewerW to smaller than curImg and then change it back. It should follow the size of viewerW shouldn't it? Maybe not...
-TODO: Notate all functions with module and private/public
 TODO: CCP input fields should select all when clicked in like they do in the toolbar
 
 
@@ -348,6 +349,7 @@ var Witty = (function () {
 
       // !VA UIController public
       queryDOMElements: function() {
+        console.log('queryDOMElements running');
         // !VA NEW This needs to ONLY return the non-calculated DOM elements and data properties: curImg.imgW, curImg.imgW, curImg.imgNW, curImg.NH and viewerW. Aspect is calculated so we don't need to get that here, leave that to appController.
         // !VA NEW We will get the individual properties and return them as an ES6 array.
         // !VA Declare the local vars
@@ -1982,6 +1984,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA appController private 
     // !VA Preprocess mouse events and route them to respective eval handler.
     function handleMouseEvents(evt) {
+      console.log('handleMouseEvents running');
       // !VA Carryover from earlier handleUserAction
       // !VA Get the target element of the click
       var el = document.getElementById(this.id);
@@ -2038,6 +2041,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
     // !VA TODO: Why are there unused elements and what is actually happening here?
     function handleKeydown(evt) {
+      console.log('handleKeydown running');
+
       // !VA Get the keypress
       keydown = evt.which || evt.keyCode || evt.key;
       // !VA Only set vars and get values if Tab and Enter keys were pressed
@@ -2058,6 +2063,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         (keydown == 9) ? isTab = true : isTab = false;
         // !VA If Tab was pressed and this.value is either empty or equals the Appdata value, then there's been no change to the field, so let Tab just cycle through the fields as per its default.
         if ((isTab) && ((this.value === '' || this.value == Appdata[args.prop]))) {
+          console.log('isTab  ');
           // !VA Only if imgW or imgH, delete the existing value to display the placeholders. Otherwise, tab through and leave the existing value from Appdata
           if (args.prop === 'imgW' || args.prop === 'imgH') {
             this.onblur = function() {
@@ -2096,12 +2102,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       var el, prop;
       // !VA Get the target input element
       el = document.getElementById(this.id);
+      console.log('el is: ' + el);
       // !VA We only need the property here, so no need to create an args object. We could actually just use the target but since we're standardizing on property names, let's stick with that.
       prop = elementIdToAppdataProp(this.id);
       // !VA Find out which key was struck
       keyup = evt.which || evt.keyCode || evt.key;
       // !VA Get the current Appdata object because we need the previous Appdata value to restore when the ESC key is pressed
+      // !VA NOW: This is where Appdata is being called on every keypress...nuts!
       var Appdata = appController.initGetAppdata();
+      console.log('HERE is where keyUP is handled and getAppdata is called!');
       // !VA  On ESC, we want imgW and imgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the iInspectors and there's no need to recalc the W and H each time the user makes and entry - that would just be confusing. 
       if (keyup == 27 ) {
         // !VA If the value was entered into the W or H field, escape out of the field and reset the values to the placeholders
@@ -2632,6 +2641,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
     // !VA appController private
     function getAppdata() {
+      // console.log('getAppdata running');
       var Appdata = {};
       Appdata = UIController.queryDOMElements();
 
