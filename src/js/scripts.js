@@ -73,7 +73,7 @@ var Witty = (function () {
 
   // !VA Run on page load
   // document.addEventListener("DOMContentLoaded", function() {
-    // console.log('DOMContentLoaded');
+  // console.log('DOMContentLoaded');
 
 
   // });
@@ -145,15 +145,22 @@ var Witty = (function () {
     var Appdata = {};
 
     // !VA UIController: Inspector ID strings
-    const iInspectors = {
-      iFilename: '#i-filename',
-      iDisplay: '#i-display-size',
-      iDisksize: '#i-disk-size',
-      iAspect: '#i-aspect',
-      iSmallPhones: '#i-small-phones',
-      iLargePhones: '#i-large-phones',
-      iRetina: '#i-retina',
-      btnToggleCcp: '#btn-toggle-ccp'
+    const inspectorElements = {
+      insFilename: '#ins-filename',
+      insDisplay: '#ins-display-size',
+      insDisksize: '#ins-disk-size',
+      insAspect: '#ins-aspect',
+      insSmallPhones: '#ins-small-phones',
+      insLargePhones: '#ins-large-phones',
+      insRetina: '#ins-retina',
+      btnToggleCcp: '#btn-toggle-ccp',
+      // !VA Branch: inspectorClipboardOutput (051320)
+      spnDisplaySizeHeight: '#spn-display-size-height',
+      spnDisplaySizeWidth: '#spn-display-size-width',
+      spnSmallPhonesHeight: '#spn-small-phones-height',
+      spnSmallPhonesWidth: '#spn-small-phones-width',
+      spnLargePhonesHeight: '#spn-large-phones-height',
+      spnLargePhonesWidth: '#spn-large-phones-width',
     };
 
     // !VA UIController: toolButton ID Strings
@@ -239,8 +246,8 @@ var Witty = (function () {
       iptCcpTableWrapperBgColor: '#ipt-ccp-table-wrapper-bgcolor',
     };
 
-    //iInspectors.btnToggleCcp
-    //iInspectors.btnToggleCcp for assembling the clipboard create tag buttons. We also store the functions that are run in the CBController module to build the clipboard snippets when each of these elements is clicked so that we can just loop through the properties, get the current event target and run the associated function without an extra switch statement or other conditional at that stage.
+    //inspectorElements.btnToggleCcp
+    //inspectorElements.btnToggleCcp for assembling the clipboard create tag buttons. We also store the functions that are run in the CBController module to build the clipboard snippets when each of these elements is clicked so that we can just loop through the properties, get the current event target and run the associated function without an extra switch statement or other conditional at that stage.
 
     const btnCcpMakeClips = {
       // !VA Build HTML Clipboard Buttons
@@ -276,7 +283,7 @@ var Witty = (function () {
 
 
     // !VA UIController private
-    // !VA Reboot: passing in Appdata...it was iInspectors, but writeInspectors doesn't pass iInspectors. So let's see if there's a difference between the passed Appdata and the queried Appdata. Not relevant at this point since Appdata has no data...
+    // !VA Reboot: passing in Appdata...it was inspectorElements, but writeInspectors doesn't pass inspectorElements. So let's see if there's a difference between the passed Appdata and the queried Appdata. Not relevant at this point since Appdata has no data...
     function evalInspectorAlerts(passedAppdata) {
       var allInspectors;
       allInspectors = UIController.getInspectorIDs();
@@ -287,19 +294,19 @@ var Witty = (function () {
       // !VA Size On Disk is NOT 2X the Display Size: flag Size on Disk and Retina
       var curInspector = [];
       if (Appdata.imgNW <= (Appdata.imgW * 2) ) {
-        curInspector.push(allInspectors.iDisksize);
+        curInspector.push(allInspectors.insDisksize);
       } 
       // !VA Small phones isn't at least 2X size on Disk and Retina
       if (Appdata.imgNW < (Appdata.sPhonesW * 2) ) {
-        curInspector.push(allInspectors.iSmallPhones);
+        curInspector.push(allInspectors.insSmallPhones);
       } 
       // !VA Large phones isn't at least 2X Size on Disk and Retina
       if (Appdata.imgNW < (Appdata.lPhonesW * 2) ) {
-        curInspector.push(allInspectors.iLargePhones);
+        curInspector.push(allInspectors.insLargePhones);
       } 
 
       // !VA Reset all the dim viewer alerts by passing in the entire Inspector array
-      UIController.writeInspectorAlerts(iInspectors, false);
+      UIController.writeInspectorAlerts(inspectorElements, false);
       // !VA Now set the individual dim viewer alerts for the current image.
       UIController.writeInspectorAlerts(curInspector, true);
     }
@@ -309,7 +316,7 @@ var Witty = (function () {
     return {
       // !VA V2 Return all the strings for the UI element's IDs
       getInspectorIDs: function() {
-        return iInspectors;
+        return inspectorElements;
       },
       // !VA Reboot: This is wrong now after renaming
       getToolButtonIDs: function() {
@@ -346,12 +353,12 @@ var Witty = (function () {
         // !VA NEW This needs to ONLY return the non-calculated DOM elements and data properties: curImg.imgW, curImg.imgW, curImg.imgNW, curImg.NH and viewerW. Aspect is calculated so we don't need to get that here, leave that to appController.
         // !VA NEW We will get the individual properties and return them as an ES6 array.
         // !VA Declare the local vars
-        // !VA Reboot - should these vars be renamed according to the new scheme? I am going to use the convention fname - iFilename when used in variable name.
+        // !VA Reboot - should these vars be renamed according to the new scheme? I am going to use the convention fname - insFilename when used in variable name.
         var fname, viewerW, viewerH, imgW, imgH, imgNW, imgNH, sPhonesW, lPhonesW;
         var els = {fname, viewerW, viewerH, imgW, imgH, imgNW, imgNH, sPhonesW, lPhonesW};
 
-        // !VA Get the iFilename from the Inspector
-        els.fname = document.querySelector(iInspectors.iFilename).textContent;
+        // !VA Get the insFilename from the Inspector
+        els.fname = document.querySelector(inspectorElements.insFilename).textContent;
         // !VA Get the curImg and imgViewer
         var curImg = document.querySelector(dynamicRegions.curImg);
         var imgViewer = document.querySelector(dynamicRegions.imgViewer);
@@ -390,12 +397,12 @@ var Witty = (function () {
             // !VA Show the toolbar and curImg region
             document.querySelector(staticRegions.tbrContainer).style.display = 'block';
             document.querySelector(dynamicRegions.curImg).style.display = 'block';
-            // !VA  Get the iFilename of the devImg in the HTML. This is the only time we'll have an actual source file -- in user mode all the images are blobs -- so we can do this as a one-off.
+            // !VA  Get the insFilename of the devImg in the HTML. This is the only time we'll have an actual source file -- in user mode all the images are blobs -- so we can do this as a one-off.
             var fname = document.querySelector(dynamicRegions.curImg).src;
             fname = fname.split('/');
             fname = fname[fname.length - 1];
-            // !VA Write the iFilename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
-            document.querySelector(iInspectors.iFilename).textContent = fname;
+            // !VA Write the insFilename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
+            document.querySelector(inspectorElements.insFilename).textContent = fname;
             // !VA Initialze calcViewerSize to size the image to the app container areas
             appController.initCalcViewerSize();
             // !VA Open the CCP by default in dev mode
@@ -432,11 +439,13 @@ var Witty = (function () {
         // !VA Make sure the tbrContainer is off and the dropArea is on.
         document.querySelector(staticRegions.dropArea).style.display = 'flex';
         document.querySelector(staticRegions.tbrContainer).style.display = 'none';
-        document.querySelector(iInspectors.btnToggleCcp).style.display = 'none';
+        document.querySelector(inspectorElements.btnToggleCcp).style.display = 'none';
 
-        const iArray = Object.values(iInspectors);
-        for ( let i = 0; i < iArray.length; i++ ) {
-          if ( iArray[i] !== '#btn-toggle-ccp' &&  iArray[i] !== '#i-filename' ) {
+        const iArray = Object.values(inspectorElements);
+        // !VA Branch: inspectorClipboardOutput (051320)
+        // !VA Loop through all but the last six items in inspectorElements - those are the display size values.
+        for ( let i = 0; i < iArray.length - 6; i++ ) {
+          if ( iArray[i] !== '#btn-toggle-ccp' &&  iArray[i] !== '#ins-filename' ) {
             document.querySelector(iArray[i]).innerHTML = '<span class="pop-font">&nbsp;&nbsp;No Image</span>';
           } 
         } 
@@ -444,22 +453,22 @@ var Witty = (function () {
 
       // !VA UIController public
       writeInspectors: function() {
-        // !VA We need the current value in iInspectors.iSmallPhones and iInspectors.iLargePhones to display all the iInspectors. So, if it's not explicitly user-defined, then use the default placeholder value from the HTML, then get the height from getAspectRatio
+        // !VA We need the current value in inspectorElements.insSmallPhones and inspectorElements.insLargePhones to display all the inspectorElements. So, if it's not explicitly user-defined, then use the default placeholder value from the HTML, then get the height from getAspectRatio
         var Appdata = {};
         // !VA Get the current Appdata
         Appdata = appController.initGetAppdata();
         // !VA Hide the dropArea
         document.querySelector(staticRegions.dropArea).style.display = 'none';
-        // Write the iInspectors
-        document.querySelector(iInspectors.iFilename).innerHTML = `<span class='pop-font'>${Appdata.fname}</span>`;
-        document.querySelector(iInspectors.iDisplay).innerHTML = `<span class='pop-font'><span id="display-size-width">${Appdata.imgW}</span> X <span id="display-size-height">${Appdata.imgH}</span></span>`;
-        document.querySelector(iInspectors.iDisksize).innerHTML = `<span class='pop-font'>${Appdata.imgNW} X ${Appdata.imgNH}</span>`;
-        document.querySelector(iInspectors.iAspect).innerHTML = `<span class='pop-font'>${Appdata.aspect[1]}</span>` ;
-        document.querySelector(iInspectors.iSmallPhones).innerHTML = `<span class='pop-font'><span id='small-phones-width'>${Appdata.sPhonesW}</span> X <span id='small-phones-height'>${Appdata.sPhonesH}</span></span>` ;
-        document.querySelector(iInspectors.iLargePhones).innerHTML = `<span class='pop-font'><span id='large-phones-width'>${Appdata.lPhonesW}</span> X <span id='large-phones-height'>${Appdata.lPhonesH}</span></span>` ;
-        document.querySelector(iInspectors.iRetina).innerHTML = `<span class='pop-font'>${2 * Appdata.imgW}</span> X <span class='pop-font'>${2 * Appdata.imgH}`;
+        // Write the inspectorElements
+        document.querySelector(inspectorElements.insFilename).innerHTML = `<span class='pop-font'>${Appdata.fname}</span>`;
+        document.querySelector(inspectorElements.insDisplay).innerHTML = `<span class='pop-font'><span id="spn-display-size-width">${Appdata.imgW}</span> X <span id="spn-display-size-height">${Appdata.imgH}</span></span>`;
+        document.querySelector(inspectorElements.insDisksize).innerHTML = `<span class='pop-font'>${Appdata.imgNW} X ${Appdata.imgNH}</span>`;
+        document.querySelector(inspectorElements.insAspect).innerHTML = `<span class='pop-font'>${Appdata.aspect[1]}</span>` ;
+        document.querySelector(inspectorElements.insSmallPhones).innerHTML = `<span class='pop-font'><span id='spn-small-phones-width'>${Appdata.sPhonesW}</span> X <span id='spn-small-phones-height'>${Appdata.sPhonesH}</span></span>` ;
+        document.querySelector(inspectorElements.insLargePhones).innerHTML = `<span class='pop-font'><span id='spn-large-phones-width'>${Appdata.lPhonesW}</span> X <span id='spn-large-phones-height'>${Appdata.lPhonesH}</span></span>` ;
+        document.querySelector(inspectorElements.insRetina).innerHTML = `<span class='pop-font'>${2 * Appdata.imgW}</span> X <span class='pop-font'>${2 * Appdata.imgH}`;
         // !VA  Display the clipboard button
-        document.querySelector(iInspectors.btnToggleCcp).style.display = 'block';
+        document.querySelector(inspectorElements.btnToggleCcp).style.display = 'block';
         // !VA Call evalInspectorAlerts to calculate which Inspector values don't meet HTML email specs.
         // !VA Reboot: nothing is passed here, although evalInspectorAlerts expects an argument. So lets' try to pass Appdata
         evalInspectorAlerts(Appdata);
@@ -608,7 +617,7 @@ var Witty = (function () {
 
     // !VA CBController private functions
     // !VA NOTE: If we want to access any of the DOM IDs we have to call them from UIController where they're defined.
-    var iInspectors = UIController.getInspectorIDs();
+    var inspectorElements = UIController.getInspectorIDs();
     var ccpUserInput = UIController.getCcpUserInputIDs();
     var btnCcpMakeClips = UIController.getBtnCcpMakeClips();
 
@@ -638,7 +647,7 @@ var Witty = (function () {
         })(),
         imgSrc: (function() {
           if (document.querySelector(ccpUserInput.iptCcpImgRelPath).value) {
-            return document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + document.querySelector(iInspectors.iFilename).textContent;
+            return document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + document.querySelector(inspectorElements.insFilename).textContent;
           }
         })(),
         imgStyle: (function() {
@@ -769,7 +778,7 @@ var Witty = (function () {
     // !VA 02.17.20 This is the same as ccpIfNoUserInput except it returns ONLY the value, not the attribute name -- but we don't need this now, because if it has not value, then, well it has no value.
     // !VA CBController private
     function ccpGetAttValue(att, value) {
-      // !VA We need get the iFilename from Appdata in case the user leaves 'path' empty
+      // !VA We need get the insFilename from Appdata in case the user leaves 'path' empty
       var Appdata = appController.initGetAppdata();
       var str;
       // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
@@ -783,7 +792,7 @@ var Witty = (function () {
         }
 
       } else {
-        // !VA If the path field is empty, we need to return the iFilename without the path.
+        // !VA If the path field is empty, we need to return the insFilename without the path.
         if (att === 'src' && value === '' ) {
           str = `${att}="${Appdata.fname}" `;
         } else if ( att === '#' || att === '') {
@@ -852,7 +861,7 @@ var Witty = (function () {
     // !VA TODO: This should be in handleUserInput
     // !VA CBController private
     function ccpIfNoUserInput(att, value) {
-      // !VA We need get the iFilename from Appdata in case the user leaves 'path' empty
+      // !VA We need get the insFilename from Appdata in case the user leaves 'path' empty
       var Appdata = appController.initGetAppdata();
       var str;
       // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
@@ -866,7 +875,7 @@ var Witty = (function () {
         }
 
       } else {
-        // !VA If the path field is empty, we need to return the iFilename without the path.
+        // !VA If the path field is empty, we need to return the insFilename without the path.
         if (att === 'src' && value === '' ) {
           str = `${att}="${Appdata.fname}" `;
         } else if ( att === '#' || att === '') {
@@ -1681,7 +1690,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
   var appController = (function(CBCtrl, UICtrl) {
 
     // !VA Getting DOM ID strings from UIController
-    const iInspectors = UICtrl.getInspectorIDs();
+    const inspectorElements = UICtrl.getInspectorIDs();
     const dynamicRegions = UICtrl.getDynamicRegionIDs();
     const staticRegions = UICtrl.getStaticRegionIDs();
     const toolbarElements = UICtrl.getToolButtonIDs();
@@ -1774,7 +1783,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       }
 
       // !VA Add click handlers for Inspector - there's only the clipboard button now but there could be more. 
-      var dvClickables = [ iInspectors.btnToggleCcp ];
+      var dvClickables = [ inspectorElements.btnToggleCcp ];
       for (let i = 0; i < dvClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         dvClickables[i] = document.querySelector(dvClickables[i]);
@@ -1805,14 +1814,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA Misc Unused Handlers for review
       // =============================
       // !VA This was moved to initCCP I think
-      // addEventHandler(iInspectors.btnToggleCcp,'click',toggleCCP,false);
+      // addEventHandler(inspectorElements.btnToggleCcp,'click',toggleCCP,false);
 
       // Keypress handlers - showMobileImageButtons
       // ==================================
       
       // Keypress handlers - Misc
       // ==================================
-      // addEventHandler(iInspectors.btnToggleCcp,'keypress',toggleCCP,false);
+      // addEventHandler(inspectorElements.btnToggleCcp,'keypress',toggleCCP,false);
 
       // Blur handlers - handleInputBlur
       // =================================
@@ -1881,10 +1890,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           // curImg.src = e.target.result;
           curImg.src = e.target.result;
           let fileName;
-          // Read the iFilename of the FileReader object into a variable to pass to the getAppData function, otherwise the blob has no name
+          // Read the insFilename of the FileReader object into a variable to pass to the getAppData function, otherwise the blob has no name
           fileName = theFile.name;
-          // !VA Write the iFilename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
-          document.querySelector(iInspectors.iFilename).textContent = fileName;
+          // !VA Write the insFilename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
+          document.querySelector(inspectorElements.insFilename).textContent = fileName;
           
           // !VA Hide the dropArea - not sure if this is the right place for this.
           document.querySelector(staticRegions.dropArea).style.display = 'none';
@@ -2049,7 +2058,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           
     // !VA appController private function
     /* !VA This is a bit complicated but it expresses non-default field behavior:
-      --imgW and imgH fields should never show entereed values but rather only placeholders. This is because they actual values are reflected upon entering in the DISPLAY SIZE iInspectors and because any value entered in one of the fields would require an aspect ratio calculation to display in the other one. So one of the field values would have to update automatically which is distracting and confusing IMO especially since the values are presented clearly elsewhere.
+      --imgW and imgH fields should never show entereed values but rather only placeholders. This is because they actual values are reflected upon entering in the DISPLAY SIZE inspectorElements and because any value entered in one of the fields would require an aspect ratio calculation to display in the other one. So one of the field values would have to update automatically which is distracting and confusing IMO especially since the values are presented clearly elsewhere.
       --The other fields should show the current Appdata value, i.e. the actual DOM element dimensions or data property value, because these values are NOT reflected anywhere in a Inspector. So when they are changed, they need to be updated and when a user makes a bad entry, they have to be restored to what they were previously.
       --Default Tab behavior, i.e. cycling through the tab order, has to be maintained under consideration of the above 2 points.
     */
@@ -2120,7 +2129,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA Find out which key was struck
       keyup = evt.which || evt.keyCode || evt.key;
       // var Appdata = appController.initGetAppdata();
-      // !VA  On ESC, we want imgW and imgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the iInspectors and there's no need to recalc the W and H each time the user makes and entry - that would just be confusing. For viewerW, sSphonesW and lPhonesW, revert to the previously displayed value if the user escapes out of the input field. The previously displayed value will be either 1) the default in the HTML placeholder attribute or 2) the localStorage value. So, the localStorage value is false, get the placeholder, otherwise get the localStorage value.
+      // !VA  On ESC, we want imgW and imgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the inspectorElements and there's no need to recalc the W and H each time the user makes and entry - that would just be confusing. For viewerW, sSphonesW and lPhonesW, revert to the previously displayed value if the user escapes out of the input field. The previously displayed value will be either 1) the default in the HTML placeholder attribute or 2) the localStorage value. So, the localStorage value is false, get the placeholder, otherwise get the localStorage value.
       // !VA Esc key
       if (keyup == 27 ) {
         // !VA If the event target is the imgW or imgH input fields, on ESC exit the field and restore the placeholder set in the HTML file.

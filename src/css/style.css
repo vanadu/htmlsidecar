@@ -1388,28 +1388,28 @@ input:focus:-ms-input-placeholder {
   #btn-toggle-ccp.active {
     background-image: url("../img/clipboard-hover.png"); }
 
-#i-filename {
+#ins-filename {
   height: 22px;
   color: rgba(255, 255, 255, 0.8);
   font-size: 1rem;
   text-align: center; }
 
-#i-display-size::before {
+#ins-display-size::before {
   content: 'Display size: '; }
 
-#i-disk-size::before {
+#ins-disk-size::before {
   content: 'Size on Disk: '; }
 
-#i-aspect::before {
+#ins-aspect::before {
   content: 'Aspect Ratio: '; }
 
-#i-small-phones::before {
+#ins-small-phones::before {
   content: 'Small Phones: '; }
 
-#i-large-phones::before {
+#ins-large-phones::before {
   content: 'Large Phones: '; }
 
-#i-retina::before {
+#ins-retina::before {
   content: 'Retina: '; }
 
 .pop-font {
