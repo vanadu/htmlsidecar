@@ -1376,8 +1376,10 @@ input:focus:-ms-input-placeholder {
   list-style-type: none; }
 
 .inspector-content, .inspector-label, .inspector-x, .no-image {
-  display: inline;
-  color: auto !important; }
+  display: inline; }
+
+.inspector-click:hover {
+  cursor: pointer; }
 
 #btn-toggle-ccp {
   display: block;

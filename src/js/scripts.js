@@ -309,48 +309,36 @@ var Witty = (function () {
     // !VA UIController private
     // !VA Reboot: passing in Appdata...it was inspectorElements, but writeInspectors doesn't pass inspectorElements. So let's see if there's a difference between the passed Appdata and the queried Appdata. Not relevant at this point since Appdata has no data...
     function evalInspectorAlerts(passedAppdata) {
-
-
+      console.log('evalInspectorAlerts running');
       // !VA Branch: inspectorClipboardOutput (051320)
-      // !VA Get list of all the inspector labels
-      let allInspectorLabels = [];
+
+      // !VA init inspector and flagged inspector lists
+      let allInspectors = [];
       // !VA Array to hold the flagged inspector labels
-      let flaggedInspectorLabels = [];
-
+      let flaggedInspectors = [];
       // !VA Get all the Inspector labels
-      allInspectorLabels = UIController.getInspectorLabelsIDs();
-      console.log('allInspectorLabels');
-      console.dir(allInspectorLabels);
-
+      allInspectors = UIController.getInspectorLabelsIDs();
+      console.log('allInspectors');
+      console.dir(allInspectors);
       // !VA Query Appdata
-      var Appdata = {};
+      let Appdata = {};
       Appdata = appController.initGetAppdata(false);
-      // console.dir(Appdata);
       // !VA Size On Disk is NOT 2X the Display Size: flag Size on Disk and Retina
-
-
-
-      
-
       if (Appdata.imgNW < (Appdata.imgW * 2) ) {
-        flaggedInspectorLabels.push(allInspectorLabels.insDisplaySizeLabel);
+        flaggedInspectors.push(allInspectors.insDiskSizeLabel);
       } 
       // !VA Small phones isn't at least 2X size on Disk and Retina
       if (Appdata.imgNW < (Appdata.sPhonesW * 2) ) {
-        flaggedInspectorLabels.push(allInspectorLabels.insSmallPhones);
-      } 
+        flaggedInspectors.push(allInspectors.insSmallPhonesLabel);
+      }
       // !VA Large phones isn't at least 2X Size on Disk and Retina
       if (Appdata.imgNW < (Appdata.lPhonesW * 2) ) {
-        flaggedInspectorLabels.push(allInspectorLabels.insLargePhones);
+        flaggedInspectors.push(allInspectors.insLargePhonesLabel);
       } 
-
-      console.log('flaggedInspectorLabels');
-      console.dir(flaggedInspectorLabels);
-
       // !VA Reset all the dim viewer alerts by passing in the entire Inspector array
-      UIController.writeInspectorAlerts(allInspectorLabels, false);
+      UIController.writeInspectorAlerts(allInspectors, false);
       // !VA Now set the individual dim viewer alerts for the current image.
-      UIController.writeInspectorAlerts(flaggedInspectorLabels, true);
+      UIController.writeInspectorAlerts(flaggedInspectors, true);
     }
 
 
@@ -590,35 +578,30 @@ var Witty = (function () {
         document.querySelector(inspectorValues.insRetinaHeightValue).innerHTML = (Appdata.imgH * 2);
 
         // // !VA  Display the clipboard button
-        // document.querySelector(inspectorElements.btnToggleCcp).style.display = 'block';
+        document.querySelector(inspectorElements.btnToggleCcp).style.display = 'block';
         // !VA Call evalInspectorAlerts to calculate which Inspector values don't meet HTML email specs.
         // !VA Reboot: nothing is passed here, although evalInspectorAlerts expects an argument. So lets' try to pass Appdata
         evalInspectorAlerts(Appdata);
       },
 
       //UIController public
-      writeInspectorAlerts: function(curInspectors, bool) {
+      writeInspectorAlerts: function(flaggedInspectors, bool) {
         // !VA if evalInspectorAlerts returns true, then the Inspector should be displayed in red. To reset the dim alert, set to style color to 'auto'.
         var att = bool;
         bool ? att = 'red': att = 'inherit';
-        // !VA We want to use this same function to reset the dim alerts when a new image is loaded. For that, we need to pass in an array of all the Inspector IDs, not just an array of the ones that are already red. So, first test if the argument is an object, and if it is convert it into a list of values so the loop will accept it.
-
-        console.log('curInspectors');
-        console.dir(curInspectors);
-
-        var foo = document.getElementsByClassName('inspector-label');
-        console.log('foo is: ' + foo);
+        // !VA We want to use this same function to reset the dim alerts when a new image is loaded. So first, reset all the inspector labels to their inherited font.
         for (let i = 0; i < document.getElementsByClassName('inspector-label').length; i++) {
-          document.getElementsByClassName('inspector-label')[i].style.color = att;
+          document.getElementsByClassName('inspector-label')[i].style.color = 'inherit';
         }
-
-        // if (Array.isArray(curInspectors) === false) {
-        //   curInspectors = Object.values(curInspectors);
-        // }
+        // !VA Now loop throught the flagged inspectors from evalInspectorAlerts and apply the alert font
+        // !VA Test if the argument is an object, and if it is convert it into a list of values so the loop will accept it.
+        if (Array.isArray(flaggedInspectors) === false) {
+          flaggedInspectors = Object.values(flaggedInspectors);
+        }
         // // !VA For each Inspector passed from evalInspectorAlerts, set the font color style based on the bool argument passed in.
-        // for (let i = 0; i < curInspectors.length; i++) {
-        //   document.querySelector(curInspectors[i]).style.color = att;
-        // }
+        for (let i = 0; i < flaggedInspectors.length; i++) {
+          document.querySelector(flaggedInspectors[i]).style.color = att;
+        }
       },
 
       // !VA UIController public
@@ -1801,8 +1784,35 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       writeClipboard(id, clipboardStr);
     }
 
-    function handleInspectorClicks(evt) {
+    function handleInspectorClicks(targetid) {
       console.log('handleInspectorClicks running');
+      console.log('targetid is: ' + targetid);
+      let Appdata, val;
+      Appdata = appController.initGetAppdata(false);
+      // !VA We should probably set up and object for this, but for now:
+      switch(true) {
+      case targetid === 'ins-display-size-width-value':
+        val = Appdata.imgW;
+        break;
+      case targetid === 'ins-display-size-height-value':
+        val = Appdata.imgH;
+        break;
+      case targetid === 'ins-small-phones-width-value':
+        val = Appdata.sPhonesW;
+        break;
+      case targetid === 'ins-small-phones-height-value':
+        val = Appdata.sPhonesH;
+        break;
+      case targetid === 'ins-large-phones-width-value':
+        val = Appdata.lPhonesH;
+        break;
+      case targetid === 'ins-large-phones-height-value':
+        val = Appdata.lPhonesH;
+        break;
+      default:
+        // code block
+      } 
+      writeClipboard(targetid, val);
     }
 
 
@@ -1815,9 +1825,24 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA Called from eventHandler to initialize clipboard functionality
       doClipboard: function(evt) {
         console.log('doClipboard running');
-        let id = evt.target.id;
+        
+        let targetid = evt.target.id;
+        console.log('targetid is: ' + targetid);
         // !VA If the clicked element id is a Make Tag button, run getUserSelections, otherwise run makeCSSRule.
-        id.includes('tag') ? getUserSelections(id) : makeCssRule(id);
+        switch(true) {
+        case targetid.includes('tag') :
+          getUserSelections(targetid);
+          break;
+        case targetid.includes('css') :
+          makeCssRule(targetid);
+          break;
+        case targetid.includes('ins') :
+          handleInspectorClicks(targetid);
+          break;
+        default:
+          // code block
+        } 
+        return targetid;
       },
 
       // !VA Test function
@@ -1924,9 +1949,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
       // !VA Add event handlers for Inspector clickable elements: Display Size, Small Phones and Large Phones values in the programmatically created SPAN tags
       const insValueClickables = [ inspectorValues.insDisplaySizeWidthValue, inspectorValues.insDisplaySizeHeightValue, inspectorValues.insSmallPhonesWidthValue, inspectorValues.insSmallPhonesHeightValue, inspectorValues.insLargePhonesWidthValue, inspectorValues.insLargePhonesHeightValue ];
-      for (let i = 0; i < insValueClickables.length; i++) {
-        console.log('insValueClickables[i] is: ' +  insValueClickables[i]);
-      }
       // console.log('insValueClickables is: ' + insValueClickables);
       for (let i = 0; i < insValueClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
@@ -2797,7 +2819,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         imgH: 'ipt-tbr-imgheight',
         sPhonesW: 'ipt-tbr-sphones-width',
         lPhonesW: 'ipt-tbr-lphones-width'
-
       };
       // !VA This should return directly wihout a ret variable as tmp storage.
       var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
