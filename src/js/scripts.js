@@ -163,6 +163,30 @@ var Witty = (function () {
       spnLargePhonesWidth: '#spn-large-phones-width',
     };
 
+    const inspectorLabels = {
+      insDisplaySizeLabel: '#ins-display-size-label',
+      insDiskSizeLabel: '#ins-disk-size-label',
+      insAspectLabel: '#ins-aspect-label',
+      insSmallPhonesLabel: '#ins-small-phones-label',
+      insLargePhonesLabel: '#ins-large-phones-label',
+      insRetinaLabel: '#ins-retina-label'
+    };
+
+    const inspectorValues = {
+      insDisplaySizeWidthValue: '#ins-display-size-width-value',
+      insDisplaySizeHeightValue: '#ins-display-size-height-value',
+      insDiskSizeWidthValue: '#ins-disk-size-width-value',
+      insDiskSizeHeightValue: '#ins-disk-size-height-value',
+      insAspectValue: '#ins-aspect-value',
+      insSmallPhonesWidthValue: '#ins-small-phones-width-value',
+      insSmallPhonesHeightValue: '#ins-small-phones-height-value',
+      insLargePhonesWidthValue: '#ins-large-phones-width-value',
+      insLargePhonesHeightValue: '#ins-large-phones-height-value',
+      insRetinaWidthValue: '#ins-retina-width-value',
+      insRetinaHeightValue: '#ins-retina-height-value',
+    };
+
+
     // !VA UIController: toolButton ID Strings
     const toolbarElements = {
       iptTbrViewerW: '#ipt-tbr-viewerw',
@@ -285,38 +309,62 @@ var Witty = (function () {
     // !VA UIController private
     // !VA Reboot: passing in Appdata...it was inspectorElements, but writeInspectors doesn't pass inspectorElements. So let's see if there's a difference between the passed Appdata and the queried Appdata. Not relevant at this point since Appdata has no data...
     function evalInspectorAlerts(passedAppdata) {
-      var allInspectors;
-      allInspectors = UIController.getInspectorIDs();
+
+
+      // !VA Branch: inspectorClipboardOutput (051320)
+      // !VA Get list of all the inspector labels
+      let allInspectorLabels = [];
+      // !VA Array to hold the flagged inspector labels
+      let flaggedInspectorLabels = [];
+
+      // !VA Get all the Inspector labels
+      allInspectorLabels = UIController.getInspectorLabelsIDs();
+      console.log('allInspectorLabels');
+      console.dir(allInspectorLabels);
+
       // !VA Query Appdata
       var Appdata = {};
       Appdata = appController.initGetAppdata(false);
       // console.dir(Appdata);
       // !VA Size On Disk is NOT 2X the Display Size: flag Size on Disk and Retina
-      var curInspector = [];
-      if (Appdata.imgNW <= (Appdata.imgW * 2) ) {
-        curInspector.push(allInspectors.insDisksize);
+
+
+
+      
+
+      if (Appdata.imgNW < (Appdata.imgW * 2) ) {
+        flaggedInspectorLabels.push(allInspectorLabels.insDisplaySizeLabel);
       } 
       // !VA Small phones isn't at least 2X size on Disk and Retina
       if (Appdata.imgNW < (Appdata.sPhonesW * 2) ) {
-        curInspector.push(allInspectors.insSmallPhones);
+        flaggedInspectorLabels.push(allInspectorLabels.insSmallPhones);
       } 
       // !VA Large phones isn't at least 2X Size on Disk and Retina
       if (Appdata.imgNW < (Appdata.lPhonesW * 2) ) {
-        curInspector.push(allInspectors.insLargePhones);
+        flaggedInspectorLabels.push(allInspectorLabels.insLargePhones);
       } 
 
+      console.log('flaggedInspectorLabels');
+      console.dir(flaggedInspectorLabels);
+
       // !VA Reset all the dim viewer alerts by passing in the entire Inspector array
-      UIController.writeInspectorAlerts(inspectorElements, false);
+      UIController.writeInspectorAlerts(allInspectorLabels, false);
       // !VA Now set the individual dim viewer alerts for the current image.
-      UIController.writeInspectorAlerts(curInspector, true);
+      UIController.writeInspectorAlerts(flaggedInspectorLabels, true);
     }
 
 
     // !VA UIController public functions
     return {
       // !VA V2 Return all the strings for the UI element's IDs
-      getInspectorIDs: function() {
+      getInspectorElementIDs: function() {
         return inspectorElements;
+      },
+      getInspectorValuesIDs: function() {
+        return inspectorValues;
+      },
+      getInspectorLabelsIDs: function() {
+        return inspectorLabels;
       },
       // !VA Reboot: This is wrong now after renaming
       getToolButtonIDs: function() {
@@ -387,6 +435,7 @@ var Witty = (function () {
 
       // !VA UIController public
       initUI: function(initMode) {
+
         const delayInMilliseconds = 10;
         console.log('initMode is: ' + initMode);
         // !VA Here we initialze DEV mode, i.e. reading a hardcoded image from the HTML file instead of loading one manually in production mode
@@ -419,6 +468,11 @@ var Witty = (function () {
         // localStorage.clear();
         // !VA If localStorage is set for viewerW, sPhonesW or lgPhones, add the localStorage value to curDeviceWidths, otherwise set the defaults used when the app is used for the first time or no user-values are entered.
         
+        // !VA Branch: inspectorClipboardOutput (051320)
+        // var faa = document.querySelector(inspectorElements.spnDisplaySizeHeight).id;
+        // console.log('faa is: ' + faa);
+
+
         arr = [ 'viewerW', 'sPhonesW', 'lPhonesW' ];
         // !VA If there's localStorage, push it to the curDeviceWidths array. Otherwise, push false.
         for (let i = 0; i < arr.length; i++) {
@@ -441,19 +495,50 @@ var Witty = (function () {
         document.querySelector(staticRegions.tbrContainer).style.display = 'none';
         document.querySelector(inspectorElements.btnToggleCcp).style.display = 'none';
 
-        const iArray = Object.values(inspectorElements);
         // !VA Branch: inspectorClipboardOutput (051320)
         // !VA Loop through all but the last six items in inspectorElements - those are the display size values.
-        for ( let i = 0; i < iArray.length - 6; i++ ) {
-          if ( iArray[i] !== '#btn-toggle-ccp' &&  iArray[i] !== '#ins-filename' ) {
-            document.querySelector(iArray[i]).innerHTML = '<span class="pop-font">&nbsp;&nbsp;No Image</span>';
-          } 
-        } 
+        // const iArray = Object.values(inspectorElements);
+
+        // !VA Branch: inspectorClipboardOutput (051320) This is where it is. THis removed the contents of the parents of the spans. Let's try just applying the pop-font to the elements rather replacing the innerHTML 
+        /* !VA  
+         We don't need to do anything in initUI to the inspectors, since No Image is hard-coded in the HTML now.
+        */
+
+
+        // var foo1 = document.querySelector(inspectorElements.insDisplay);
+        // console.log('foo1 is:');
+        // console.log(foo1);
+        
+        // for ( let i = 0; i < iArray.length - 6; i++ ) {
+        //   if ( iArray[i] !== '#btn-toggle-ccp' &&  iArray[i] !== '#ins-filename' ) {
+        //     // document.querySelector(iArray[i]).innerHTML = '<span class="pop-font">&nbsp;&nbsp;No Image</span>';
+
+        //   } 
+        // } 
+
+
+
+        // for ( let i = 0; i < iArray.length - 6; i++ ) {
+        //   if ( iArray[i] !== '#btn-toggle-ccp' &&  iArray[i] !== '#ins-filename' ) {
+        //     // document.querySelector(iArray[i]).innerHTML = '<span class="pop-font">&nbsp;&nbsp;No Image</span>';
+        //     document.querySelector(iArray[i]).classList.add = 'pop-font';
+        //     var foo = document.querySelector(iArray[i]).innerHTML;
+        //     console.log('foo is: ' + foo);
+        //     document.querySelector(iArray[i]).innerHTML = 'No Image' + foo; 
+        //     console.log('document.querySelector(iArray[i]).innerHTML is: ' + document.querySelector(iArray[i]).innerHTML);
+        //   } 
+        // } 
+
+
+
+        
       },
 
       // !VA UIController public
       writeInspectors: function() {
         // !VA We need the current value in inspectorElements.insSmallPhones and inspectorElements.insLargePhones to display all the inspectorElements. So, if it's not explicitly user-defined, then use the default placeholder value from the HTML, then get the height from getAspectRatio
+        // !VA NOTE: The span elements for Display Size, Small Phones and Large Phones are defined in the HTML and are overwritten here with the innerHTML attribute. They're hard-coded in the HTML file so the inspectorClickables array can be created at runtime. Otherwise, if we just create them here, they won't exist at runtime when the inspectorClickables array is created to initialize the click handlers resulting in an exception. 
+        // !VA NOTE: The better way to do this would be to apply the pop-font class to the span elements and write the Appdata values to the innerHTML of the spans, see below
         var Appdata = {};
         // !VA Get the current Appdata
         Appdata = appController.initGetAppdata();
@@ -461,14 +546,51 @@ var Witty = (function () {
         document.querySelector(staticRegions.dropArea).style.display = 'none';
         // Write the inspectorElements
         document.querySelector(inspectorElements.insFilename).innerHTML = `<span class='pop-font'>${Appdata.fname}</span>`;
-        document.querySelector(inspectorElements.insDisplay).innerHTML = `<span class='pop-font'><span id="spn-display-size-width">${Appdata.imgW}</span> X <span id="spn-display-size-height">${Appdata.imgH}</span></span>`;
-        document.querySelector(inspectorElements.insDisksize).innerHTML = `<span class='pop-font'>${Appdata.imgNW} X ${Appdata.imgNH}</span>`;
-        document.querySelector(inspectorElements.insAspect).innerHTML = `<span class='pop-font'>${Appdata.aspect[1]}</span>` ;
-        document.querySelector(inspectorElements.insSmallPhones).innerHTML = `<span class='pop-font'><span id='spn-small-phones-width'>${Appdata.sPhonesW}</span> X <span id='spn-small-phones-height'>${Appdata.sPhonesH}</span></span>` ;
-        document.querySelector(inspectorElements.insLargePhones).innerHTML = `<span class='pop-font'><span id='spn-large-phones-width'>${Appdata.lPhonesW}</span> X <span id='spn-large-phones-height'>${Appdata.lPhonesH}</span></span>` ;
-        document.querySelector(inspectorElements.insRetina).innerHTML = `<span class='pop-font'>${2 * Appdata.imgW}</span> X <span class='pop-font'>${2 * Appdata.imgH}`;
-        // !VA  Display the clipboard button
-        document.querySelector(inspectorElements.btnToggleCcp).style.display = 'block';
+        // !VA Rewriting Inspector span handling, see above, but it's not working and I need to come back to it later
+
+        /* !VA  
+        
+        
+        
+        */
+
+        // document.querySelector(inspectorElements.spnDisplaySizeHeight).classList.add('pop-font');
+        // document.querySelector(inspectorElements.spnDisplaySizeWidth).classList.add('pop-font');
+        // document.querySelector(inspectorElements.spnDisplaySizeHeight).innerHTML = Appdata.imgH;
+        // document.querySelector(inspectorElements.spnDisplaySizeWidth).innerHTML = Appdata.imgW;
+        // !VA Original code
+        // !VA Branch: inspectorClipboardOutput (051320)
+        /* !VA  The problem here appears to be that in replacing the existing element with this innerHTML, the click handler is destroyed. But I can't figure out where these hard-coded HTML elements are destroyed because at this point, they don't exist either  */
+
+        // !VA Hide all the No Image P elements
+        for (let i = 0; i < document.getElementsByClassName('no-image').length; i++) {
+          document.getElementsByClassName('no-image')[i].style.display = 'none';
+        }
+        // !VA Show all the inspector-label, inspector-x and inspector-values 
+        for (let i = 0; i < document.getElementsByClassName('inspector-label').length; i++) {
+          document.getElementsByClassName('inspector-label')[i].style.display = 'inline';
+        }
+        for (let i = 0; i < document.getElementsByClassName('inspector-x').length; i++) {
+          document.getElementsByClassName('inspector-label')[i].style.display = 'inline';
+        }
+        for (let i = 0; i < document.getElementsByClassName('inspector-value').length; i++) {
+          document.getElementsByClassName('inspector-value')[i].style.display = 'inline';
+        }
+        // !VA Display the respective Appdata value in the respective inspector value span 
+        document.querySelector(inspectorValues.insDisplaySizeWidthValue).innerHTML = Appdata.imgW;
+        document.querySelector(inspectorValues.insDisplaySizeHeightValue).innerHTML = Appdata.imgH;
+        document.querySelector(inspectorValues.insDiskSizeWidthValue).innerHTML = Appdata.imgNW;
+        document.querySelector(inspectorValues.insDiskSizeHeightValue).innerHTML = Appdata.imgNH;
+        document.querySelector(inspectorValues.insSmallPhonesWidthValue).innerHTML = Appdata.sPhonesW;
+        document.querySelector(inspectorValues.insSmallPhonesHeightValue).innerHTML = Appdata.sPhonesH;
+        document.querySelector(inspectorValues.insLargePhonesWidthValue).innerHTML = Appdata.lPhonesW;
+        document.querySelector(inspectorValues.insLargePhonesHeightValue).innerHTML = Appdata.lPhonesH;
+        document.querySelector(inspectorValues.insAspectValue).innerHTML = Appdata.aspect[1];
+        document.querySelector(inspectorValues.insRetinaWidthValue).innerHTML = (Appdata.imgW * 2);
+        document.querySelector(inspectorValues.insRetinaHeightValue).innerHTML = (Appdata.imgH * 2);
+
+        // // !VA  Display the clipboard button
+        // document.querySelector(inspectorElements.btnToggleCcp).style.display = 'block';
         // !VA Call evalInspectorAlerts to calculate which Inspector values don't meet HTML email specs.
         // !VA Reboot: nothing is passed here, although evalInspectorAlerts expects an argument. So lets' try to pass Appdata
         evalInspectorAlerts(Appdata);
@@ -480,13 +602,23 @@ var Witty = (function () {
         var att = bool;
         bool ? att = 'red': att = 'inherit';
         // !VA We want to use this same function to reset the dim alerts when a new image is loaded. For that, we need to pass in an array of all the Inspector IDs, not just an array of the ones that are already red. So, first test if the argument is an object, and if it is convert it into a list of values so the loop will accept it.
-        if (Array.isArray(curInspectors) === false) {
-          curInspectors = Object.values(curInspectors);
+
+        console.log('curInspectors');
+        console.dir(curInspectors);
+
+        var foo = document.getElementsByClassName('inspector-label');
+        console.log('foo is: ' + foo);
+        for (let i = 0; i < document.getElementsByClassName('inspector-label').length; i++) {
+          document.getElementsByClassName('inspector-label')[i].style.color = att;
         }
-        // !VA For each Inspector passed from evalInspectorAlerts, set the font color style based on the bool argument passed in.
-        for (let i = 0; i < curInspectors.length; i++) {
-          document.querySelector(curInspectors[i]).style.color = att;
-        }
+
+        // if (Array.isArray(curInspectors) === false) {
+        //   curInspectors = Object.values(curInspectors);
+        // }
+        // // !VA For each Inspector passed from evalInspectorAlerts, set the font color style based on the bool argument passed in.
+        // for (let i = 0; i < curInspectors.length; i++) {
+        //   document.querySelector(curInspectors[i]).style.color = att;
+        // }
       },
 
       // !VA UIController public
@@ -617,7 +749,9 @@ var Witty = (function () {
 
     // !VA CBController private functions
     // !VA NOTE: If we want to access any of the DOM IDs we have to call them from UIController where they're defined.
-    var inspectorElements = UIController.getInspectorIDs();
+    var inspectorElements = UIController.getInspectorElementIDs();
+    var inspectorValues = UIController.getInspectorValuesIDs();
+    var inspectorLabels = UIController.getInspectorLabelsIDs();
     var ccpUserInput = UIController.getCcpUserInputIDs();
     var btnCcpMakeClips = UIController.getBtnCcpMakeClips();
 
@@ -628,6 +762,7 @@ var Witty = (function () {
     }
 
     // !VA ATTRIBUTE FUNCTIONS
+    // !VA CBController private
     function getAttributes() {
       var Appdata = appController.initGetAppdata();
       let target, checked, str, options, selectid;
@@ -1665,6 +1800,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA Write CSS code to clipboard
       writeClipboard(id, clipboardStr);
     }
+
+    function handleInspectorClicks(evt) {
+      console.log('handleInspectorClicks running');
+    }
+
+
     // !VA END CLIPBOARD FUNCTIONS
 
     // !VA CBController public functions 
@@ -1673,8 +1814,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
       // !VA Called from eventHandler to initialize clipboard functionality
       doClipboard: function(evt) {
+        console.log('doClipboard running');
         let id = evt.target.id;
-        // !VA If the clicked element id is a Make Tag button, run makeNodeList, otherwise run makeCSSRule.
+        // !VA If the clicked element id is a Make Tag button, run getUserSelections, otherwise run makeCSSRule.
         id.includes('tag') ? getUserSelections(id) : makeCssRule(id);
       },
 
@@ -1690,7 +1832,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
   var appController = (function(CBCtrl, UICtrl) {
 
     // !VA Getting DOM ID strings from UIController
-    const inspectorElements = UICtrl.getInspectorIDs();
+    const inspectorElements = UICtrl.getInspectorElementIDs();
+    const inspectorValues = UICtrl.getInspectorValuesIDs();
+    const inspectorLabels = UICtrl.getInspectorLabelsIDs();
     const dynamicRegions = UICtrl.getDynamicRegionIDs();
     const staticRegions = UICtrl.getStaticRegionIDs();
     const toolbarElements = UICtrl.getToolButtonIDs();
@@ -1774,7 +1918,24 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         addEventHandler((tbKeypresses[i]),'blur',handleBlur,false);
       }
 
-      // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. Currently only the img class input does that.
+      var foo = document.querySelector(inspectorValues.insDisplaySizeWidthValue).id;
+      console.log('foo is: ' + foo);
+
+
+      // !VA Add event handlers for Inspector clickable elements: Display Size, Small Phones and Large Phones values in the programmatically created SPAN tags
+      const insValueClickables = [ inspectorValues.insDisplaySizeWidthValue, inspectorValues.insDisplaySizeHeightValue, inspectorValues.insSmallPhonesWidthValue, inspectorValues.insSmallPhonesHeightValue, inspectorValues.insLargePhonesWidthValue, inspectorValues.insLargePhonesHeightValue ];
+      for (let i = 0; i < insValueClickables.length; i++) {
+        console.log('insValueClickables[i] is: ' +  insValueClickables[i]);
+      }
+      // console.log('insValueClickables is: ' + insValueClickables);
+      for (let i = 0; i < insValueClickables.length; i++) {
+        // !VA convert the ID string to the object inside the loop
+        insValueClickables[i] = document.querySelector(insValueClickables[i]);
+        console.log('insValueClickables[i].id is: ' + insValueClickables[i].id);
+        addEventHandler(insValueClickables[i],'click',CBController.doClipboard,false);
+      }
+
+      // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. These are the class input elements for ccp Img, Td and Table options
       const ccpKeypresses = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass ];
       for (let i = 0; i < ccpKeypresses.length; i++) {
         // !VA convert the ID string to the object inside the loop
@@ -2292,9 +2453,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           // !VA Write the imgViewer value to localStorage. 
           console.log('writing LS');
           localStorage.setItem('viewerW', val);
-          console.log('Setting localStorage viewerW');
-          var foo = appController.getLocalStorage();
-          console.log('foo is: ' + foo);
+          // console.log('Setting localStorage viewerW');
+          // var foo = appController.getLocalStorage();
+          // console.log('foo is: ' + foo);
           break;
         case prop === 'imgW' :
           document.querySelector(dynamicRegions.curImg).style.width = val + 'px';
@@ -2744,9 +2905,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // !VA Hide the CCP
         document.querySelector(staticRegions.ccpContainer).classList.remove('active');
         setupEventListeners();
+        
         // !VA  Test if there is currently #cur-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
         var curImgExists = document.querySelector(dynamicRegions.curImg);
-        
+
         if (curImgExists) {
           initMode = 'devmode';
           UICtrl.initUI();
@@ -2754,6 +2916,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           initMode = 'prdmode';
           // !VA  - Initialize the app UI and wait for input
         }
+
         UICtrl.initUI(initMode);
       }
     };

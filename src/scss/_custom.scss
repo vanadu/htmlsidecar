@@ -519,6 +519,10 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   text-transform: uppercase;
   list-style-type: none;
 }
+.inspector-content, .inspector-label, .inspector-x, .no-image  {
+  display: inline;
+  color: auto !important;
+}
 #btn-toggle-ccp {
   display: block;
   width: 40px;
@@ -541,27 +545,29 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   text-align: center;
 
 }
-#ins-display-size {
-  &::before {content: 'Display size: '}
-}
-#ins-disk-size {
-  &::before {content: 'Size on Disk: '} 
-}
-#ins-aspect {
-  &::before {content: 'Aspect Ratio: '} 
-}
-#ins-small-phones {
-  &::before {content: 'Small Phones: '}
-}
-#ins-large-phones {
-  &::before {content: 'Large Phones: '}
-}
-#ins-retina {
-  &::before {content: 'Retina: '}
-}
+// #ins-display-size {
+//   &::before {content: 'Display size: '}
+// }
+// #ins-disk-size {
+//   &::before {content: 'Size on Disk: '} 
+// }
+// #ins-aspect {
+//   &::before {content: 'Aspect Ratio: '} 
+// }
+// #ins-small-phones {
+//   &::before {content: 'Small Phones: '}
+// }
+// #ins-large-phones {
+//   &::before {content: 'Large Phones: '}
+// }
+// #ins-retina {
+//   &::before {content: 'Retina: '}
+// }
 .pop-font {
   // VA! Reboot: Pop font for Inspector
-  color: $inspector-pop-font-color;
+  // VA! Need the important hack to override the alert style set in writeInspectorAlerts
+  color: $inspector-pop-font-color !important;
+  
 }
 
 
