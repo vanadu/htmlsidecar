@@ -13,53 +13,44 @@ DONE: Populate inputs with defaults in vmlbutton and
 DONE: Fix viewer doesn't resize horizontally any more in PROD mode or show the Inspectors - but works in DEV mode.
 DONE: rtl class attribute shows when nothing is entered: it should be hidden. FIXED in setPosSwitchNodeAttributes
 DONE: Notate all functions with module and private/public
+DONE: run queryDOMElements only on enter, not on every keypress - in order to do this, need to get the previous value of the input so the user can ESC out of the field without implementing changed value. Right  now we are getting this value from Appdata. FIXED - Now gets value from HTML element placeholder or from localStorage
+DONE: CCP input fields should select all when clicked in like they do in the toolbar - no they shouldn't for now. User should be able to set the cursor in the field and change any value that way.
+DONE: Make mrk => box function...not sure where though or whether it's necessary since it's just a one-liner. Leave it, it's just a one-liner
 
 
-TODO: run queryDOMElements only on enter, not on every keypress - in order to do this, need to get the previous value of the input so the user can ESC out of the field without implementing changed value. Right  now we are getting this value from Appdata. 
 
 
 TODO: Add error handling and the isErr argument to makeTdNode and makeTableNode so that the Clipboard object can discern between success messages and 'alert' messages, i.e. when the Clipboard output should be reviewed by the user for some reason, i.e. when vmlbutton height doesn't match the height of the loaded image.
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
 TODO: curImg doesn't resize back if you change viewerW to smaller than curImg and then change it back. It should follow the size of viewerW shouldn't it? Maybe not...
-TODO: CCP input fields should select all when clicked in like they do in the toolbar
+DONE: Make bgcolor add the hash if it's not in the value. Don't do that, need to allow for non-hash values like color aliases
+DONE: Fix table width: doesn't reflect what's in toolbar viewer width field. FIXED - Appears to work as designed, imgW in Parent table width and viewerW in Wrapper table width
 
 
 Error Handling
 --------------
-vmlbutton: TD width and height MUST BE entered, otherwise the button has no dimensions
-vmlbutton: TD Height has to equal the Display Height, otherwise, the graphic will not fit the button
 
 
-NOTES from first tutorial attempts:
-	Why is Wrapper table and parent table being output as two clips in ClipClip?
-	Why is CSS table buttons outputting duplicate clips in ClipClip?
-	Why is td css button not including the element name in the selector? This is now a TODO.
-	Wh are  table css buttons not showing when class is entered? Sometimes they don't...
-	When wrapper table is selected and a class is entered in both, which one use output with the CSS buttons?
 
 TODO: The CSS output will need to be revisited for td and table.
-TODO: Figure out why queryDOMElements is running mutliple times per CB build.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
-TODO: Add some kind of fluid option to the img options. Cerberus hard codes it into the img tag. That needs to be tested. Litmus overrides the width and height style properties in the CSS media queries. Need to test before that is implemented - but there's no reason to include a fluid option if that's settable in CSS.
-TODO: Fix table width: doesn't reflect what's in toolbar viewer width field.
 TODO: Fix Include wrapper table options don't appear if the CCP is closed and re-opened 
+TODO: Assign tab order
 
 
-/* !VA  - 06.23.19
+/* !VA  - For Consideration
 =========================================================
 
+TODO: Add some kind of fluid option to the img options. Cerberus hard codes it into the img tag. That needs to be tested. Litmus overrides the width and height style properties in the CSS media queries. Need to test before that is implemented - but there's no reason to include a fluid option if that's settable in CSS.
 TODO: rewrite getAppdata to only query specific items in the array, or at least use destructuring to only make a const out of which ever Appdata property is needed in the respective function.
 TOD0: Think about making getAppdata only query a specific property if possible.
 TODO: CCP numeric input fiels need an input validator
 TODO: Fix being able to resize viewerW smaller than imgW - current behavior is imgw resizes with viewerW. If that's the desired behavior, imgW still doesn't write the udpated width to Appdata, that needs to be fixed.
-TODO: Make mrk => box function...not sure where though or whether it's necessary since it's just a one-liner.
 TODO: Fix bug - load 400X1000, multiple click on +50, Display Size shows 450 but the img doesn't grow...
 TODO: Parent table class att only shows in CB output if Wrapper is selected, not in just the Partent table output.
-TODO: Make bgcolor add the hash if it's not in the value
 TODO: Fix, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
-TODO: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- I think. Not sure if this is the right behavior...think bout it. Probably not.YOUTBV
+TODO: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- I think. Not sure if this is the right behavior...think bout it. Probably not. I think it does this anyway. 
 TODO: Assign keyboard  shortcuts
-TODO: Assign tab order
 
 
 
