@@ -17,9 +17,13 @@ $image-toolbar-bkgd-color:        #FFF;
 
 
 //DIM VIEWERS
-$inspector-font-color:          rgba(160, 160, 160, 1);              
-$inspector-pop-font-color:      rgba(255, 255, 255, .9);   
-$filename-viewer-font-color:      rgba(255, 255, 255, .8);
+$inspector-font-color:             rgba(160, 160, 160, 1);              
+$inspector-pop-font-color:         rgba(255, 255, 255, .9);
+// VA! Red 139,0,0
+$inspector-hover-font-color:       rgba(139, 0, 0, .9) !important;
+$inspector-shift-hover-font-color: rgba(255, 255, 255, .9);  
+$inspector-ctrl-hover-font-color:  rgba(255, 255, 255, .9); 
+$filename-viewer-font-color:       rgba(255, 255, 255, .8);
 
 //TOOLTIPS
 $tooltip-bg-color:                rgba(107, 107, 107, .9);
@@ -517,10 +521,11 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   font-weight: normal;
   text-transform: uppercase;
   list-style-type: none;
-  // VA!Hover on clickable Inspector elements
+  // VA!Hover on clickable Inspector value elements
   .inspector-click {
     &:hover {
       cursor: pointer;
+      color: #e29b02 !important;
     }
   }
 }
@@ -573,10 +578,17 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   // VA! Reboot: Pop font for Inspector
   // VA! Need the important hack to override the alert style set in writeInspectorAlerts
   color: $inspector-pop-font-color !important;
-  
 }
 
+// .inspector-shift-hover-font {
 
+// }
+// .inspector-ctrl-hover-font {
+
+// }
+// .inspector-hover-font {
+//   color: $inspector-hover-font-color;
+// }
 
 
 

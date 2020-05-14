@@ -16,10 +16,17 @@ DONE: Notate all functions with module and private/public
 DONE: run queryDOMElements only on enter, not on every keypress - in order to do this, need to get the previous value of the input so the user can ESC out of the field without implementing changed value. Right  now we are getting this value from Appdata. FIXED - Now gets value from HTML element placeholder or from localStorage
 DONE: CCP input fields should select all when clicked in like they do in the toolbar - no they shouldn't for now. User should be able to set the cursor in the field and change any value that way.
 DONE: Make mrk => box function...not sure where though or whether it's necessary since it's just a one-liner. Leave it, it's just a one-liner
+DONE: Changing Inspector element hover color based on whether the SHIFT or CTRL key is pressed: I tried a number of approaches to getting different hover colors for SHIFT and CTRL but it's not worth the hassle. The shiftKey event only fires when the key is pressed down or up. The mouseenter and mouseleave event only fires when you enter or leave the element. Trying to trap the SHIFT press either while SHIFT is pressed outside the element while the element is entered OR while the mouse is inside the element proved too much for me. All that is even worse because if the focus isn't in the Witty window, which it is not most of the time while the user switches back and forth to the editor, then the mouse events won't fire. Plus, the keypress events don't appear to fire on non-input elements, so you'd have to trap the keypress on the document and then I don't even know how you'd drill down to limit it to the Inspector element. In short - we're going with a single gold CSS hover which works even if Witty doesn't have the focus. The rest we'll have to do with tooltips. This item is closed.
 
 
 
 
+
+
+
+
+
+TODO: Add tooltops
 TODO: Add error handling and the isErr argument to makeTdNode and makeTableNode so that the Clipboard object can discern between success messages and 'alert' messages, i.e. when the Clipboard output should be reviewed by the user for some reason, i.e. when vmlbutton height doesn't match the height of the loaded image.
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
 TODO: curImg doesn't resize back if you change viewerW to smaller than curImg and then change it back. It should follow the size of viewerW shouldn't it? Maybe not...
@@ -94,40 +101,12 @@ var Witty = (function () {
   // testbut.addEventListener('click', runMe, false);
   // // testBut.addEventListener('click', runMe, false);
 
-  // function runMe(evt) {
-
-  //   var str = 'btn-ccp-make-table-dsktp-css-rule'
-  //   var str1 = str.slice(-4);
-
-  
+  function runMe(evt) {
+    console.log('runMe running');
 
 
-
-  //   let output;
-  //   let classname = 'alsdfadf';
-  //   let val = 848;
-  //   let id = 'runMe';
-  //   output = `${classname} { width: ${val}px !important}`;
-
-  //   var currentCB = new ClipboardJS('#' + id, {
-  //     text: function(trigger) {
-
-  //       // var clipboardStr = ccpImgBuildHtmlClip();
-  //       // !VA Write success message to app message area on success
-  //       currentCB.on('success', function(event) {
-  //         appController.initMessage(false, 'copied_2_CB');
-  //         // debugger;
-  //       });
-
-  //       currentCB.on('error', function(e) {
-  //         console.error('Action:', e.action);
-  //         console.error('Trigger:', e.trigger);
-  //       });
-  //       // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
-  //       return output;
-  //     }
-  //   });
-  // }
+    
+  }
 
 
   // !VA GLOBAL
@@ -135,14 +114,15 @@ var Witty = (function () {
   myObject.variable = 'This is a string';
 
 
-  
-
+  // !VA Initialize Appdata object
+  let Appdata = {};
 
 
   var UIController = (function() {
 
-    // !VA This is where Appdata should be initialized
-    var Appdata = {};
+
+
+    // !VA Alias 
 
     // !VA UIController: Inspector ID strings
     const inspectorElements = {
@@ -289,7 +269,7 @@ var Witty = (function () {
       btnCcpMakeTdDsktpCssRule:  '#btn-ccp-make-td-dsktp-css-rule',
       btnCcpMakeTdSmphnCssRule: '#btn-ccp-make-td-smphn-css-rule',
       btnCcpMakeTdLgphnCssRule: '#btn-ccp-make-td-lgphn-css-rule',
-      // !VA Make Table CSS Rule Buttons
+      // !VA Make Table CSS Rule  Buttons
       btnCcpMakeTableDsktpCssRule:  '#btn-ccp-make-table-dsktp-css-rule',
       btnCcpMakeTableSmphnCssRule: '#btn-ccp-make-table-smphn-css-rule',
       btnCcpMakeTableLgphnCssRule: '#btn-ccp-make-table-lgphn-css-rule',
@@ -299,8 +279,10 @@ var Witty = (function () {
     // !VA Run test function on page load
     // document.addEventListener('DOMContentLoaded', function() {
     //   setTimeout(function(){ 
-    //     var fug = document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag);
-    //     fug.click();
+    //     // var fug = document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag);
+    //     // fug.click();
+
+
 
     //   }, 500);
     // });
@@ -309,17 +291,12 @@ var Witty = (function () {
     // !VA UIController private
     // !VA Reboot: passing in Appdata from 
     function evalInspectorAlerts(Appdata) {
-      console.log('evalInspectorAlerts running');
-      // !VA Branch: inspectorClipboardOutput (051320)
-
       // !VA init inspector and flagged inspector lists
       let allInspectors = [];
       // !VA Array to hold the flagged inspector labels
       let flaggedInspectors = [];
       // !VA Get all the Inspector labels
       allInspectors = UIController.getInspectorLabelsIDs();
-      console.log('allInspectors');
-      console.dir(allInspectors);
       // !VA Query Appdata
       // let Appdata = {};
       // Appdata = appController.initGetAppdata(false);
@@ -428,7 +405,6 @@ var Witty = (function () {
         console.log('initMode is: ' + initMode);
         // !VA Here we initialze DEV mode, i.e. reading a hardcoded image from the HTML file instead of loading one manually in production mode
         if (initMode === 'devmode') {
-          console.log('initUI devmode');
           // !VA Set a timeout to give the image time to load
           setTimeout(function() {
             // !VA Show the toolbar and curImg region
@@ -466,7 +442,7 @@ var Witty = (function () {
         for (let i = 0; i < arr.length; i++) {
           localStorage.getItem(arr[i]) ? curDeviceWidths.push(localStorage.getItem(arr[i])) : curDeviceWidths.push(false);
         }
-        console.log('curDeviceWidths is: ' + curDeviceWidths);
+
         // !VA If there's a localStorage for viewerW, put that value into the viewerW field of the toolbar, otherwise use the default. NOTE: The default is set ONLY in the HTML element's placeholder. The advantage of this is that we can get it anytime without having to set a global variable or localStorage for the default.
         curDeviceWidths[0] ?  document.querySelector(toolbarElements.iptTbrViewerW).value = curDeviceWidths[0] : document.querySelector(toolbarElements.iptTbrViewerW).value = document.querySelector(toolbarElements.iptTbrViewerW).placeholder;
         // !VA If there's a localStorage for sPhonesW, get it, otherwise set the default to the placeholder in the HTML element on index.html. Then set the toolbar input field AND the sphonesw data attribute to this value. NOTE: The default is set ONLY in the HTML element's placeholder!
@@ -545,11 +521,11 @@ var Witty = (function () {
       displayTdOptions: function(evt) {
         console.log('displayTdOptions running');
         // !VA Array including all the defined options for each tdoption radio
-        let allTdOptions = [], optionsToShow = [], targetid, parentDivId;
+        let allTdOptions = [], optionsToShow = [], targetalias, parentDivId;
         let Appdata;
         Appdata = appController.initGetAppdata();
-        // !VA Set the target id of the click event
-        targetid = evt.target.id;
+        // !VA Add the hash to the target id to match it with the alias
+        targetalias = '#' + evt.target.id;
         // !VA Populate allTdOptions with all the defined Td options
         allTdOptions = [ ccpUserInput.iptCcpTdClass,  ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor, ccpUserInput.iptCcpTdFontColor, ccpUserInput.iptCcpTdBorderColor, ccpUserInput.iptCcpTdBorderRadius  ];
         // !VA This function gets the id of the parent div of the td option to be displayed/hidden. We need the parent div because it contains label and input of the element, not just the input field or dropdown list itself.
@@ -576,21 +552,25 @@ var Witty = (function () {
         document.querySelector(ccpUserInput.iptCcpTdBgColor).value = '';
         // !VA Determine which tdoptions radio button is selected based on the click event and run showOptions for the selected TD radio option.
         switch(true) {
-        case targetid === ccpUserInput.rdoCcpTdBasic.slice(1) || targetid === ccpUserInput.rdoCcpTdExcludeimg.slice(1):
+        // !VA td options basic and excludeimg
+        case targetalias === ccpUserInput.rdoCcpTdBasic || targetalias === ccpUserInput.rdoCcpTdExcludeimg:
           optionsToShow = [ ccpUserInput.iptCcpTdClass,  ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor ];
           // !VA Run showOptions to get the parent div of the options to show for these tdoption radio selections and apply the active class to display them.
           showOptions(optionsToShow);
           break;
-        case targetid === ccpUserInput.rdoCcpTdPosswitch.slice(1):
+          // !VA tdoption posswitch
+        case targetalias === ccpUserInput.rdoCcpTdPosswitch:
           // !VA TODO: Cerebrus has NO td options except width: 100% - let's add 'class' andleave it like that for the time being and see if there's a case where any other options are useful. 
           optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTdBgColor ];
           showOptions(optionsToShow);
           break;
-        case targetid === ccpUserInput.rdoCcpTdImgswap.slice(1):
+          // !VA tdoption imgswap
+        case targetalias === ccpUserInput.rdoCcpTdImgswap:
           optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign ];
           showOptions(optionsToShow);
           break;
-        case targetid === ccpUserInput.rdoCcpTdBgimage.slice(1):
+          // !VA tdoption bgimage
+        case targetalias === ccpUserInput.rdoCcpTdBgimage:
           // !VA bgcolor, width, height, valign
           optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor ];
           showOptions(optionsToShow);
@@ -600,7 +580,8 @@ var Witty = (function () {
           // !VA Include the default bgcolor as per Stig
           document.querySelector(ccpUserInput.iptCcpTdBgColor).value = '#7bceeb';
           break;
-        case targetid === ccpUserInput.rdoCcpTdVmlbutton.slice(1):
+          // !VA tdoption vmlbutton
+        case targetalias === ccpUserInput.rdoCcpTdVmlbutton:
           optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor, ccpUserInput.iptCcpTdFontColor, ccpUserInput.iptCcpTdBorderColor, ccpUserInput.iptCcpTdBorderRadius ];
           showOptions(optionsToShow);
           // !VA The height and width field require an entry otherwise the button can't be built, that's why Stig has default values of 40/200 in his code. So we include the defaults here when the inputs are displayed and include error handling if the user omits one
@@ -1721,51 +1702,127 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       writeClipboard(id, clipboardStr);
     }
 
-    function handleInspectorClicks(targetid) {
+    function handleInspectorClicks(targetid, modifierKey) {
+      // console.clear();
       console.log('handleInspectorClicks running');
       console.log('targetid is: ' + targetid);
-      let Appdata, val;
+      let Appdata, clipboardStr, widthval, heightval;
+
+      var el = document.querySelector('#' + targetid);
+      el.onmouseover = isOver();
+      console.log('el');
+      console.log(el);
+      
+      function isOver() {
+        console.log('isOver running');
+      }
+
+      widthval = heightval = '';
+      // !VA Get Appdata
       Appdata = appController.initGetAppdata(false);
-      // !VA We should probably set up and object for this, but for now:
+      // !VA Get the value to output to Clipboard based on whether shift or ctrl is pressed
+      function getVal( widthval, heightval, modifierKey ) {
+        console.log('modifierKey is: ' + modifierKey);
+        let str1, str2, val;
+        console.log('widthval  is: ' + widthval );
+        console.log('heightval is: ' + heightval);
+        if ( !widthval || !heightval ) {
+          console.log('this is a value click');
+          widthval ? str1 = 'width' : str1 = 'height';
+          console.log('str1 is: ' + str1);
+          
+          widthval ? val = widthval : val = heightval; 
+          console.log('val is: ' + val);
+          if ( modifierKey === 'shift') {
+            clipboardStr = str1 + '="' + val + '" ';
+          } else if ( modifierKey === 'ctrl') {
+            clipboardStr = str1 + ': ' + val + 'px; ';
+          } else {
+            clipboardStr = val;
+          }
+
+
+        } else {
+          console.log('this is a label click');
+          str1 = 'width';
+          str2 = 'height';
+          if ( modifierKey === 'shift') {
+            clipboardStr = str1 + '="' + widthval + '" ' + str2 + '=' + heightval + ' ';
+          } else if ( modifierKey === 'ctrl') {
+            clipboardStr = str1 + ': ' + widthval + 'px; ' + str2 + ': ' + heightval + 'px; ';
+          } else {
+            clipboardStr = widthval + ' X ' + heightval;
+          }
+        }
+        return clipboardStr;
+      }
+      // !VA Get the Appdata value for the clicked Inspector element and get the Clipboard string based on whether shif or ctrl is pressed 
       switch(true) {
+      // !VA Inspector Label clicked
+      case targetid === 'ins-display-size-label':
+        widthval = Appdata.imgW;
+        heightval = Appdata.imgH;
+        clipboardStr = getVal( widthval, heightval, modifierKey);
+        break;
+      case targetid === 'ins-small-phones-label':
+        widthval = Appdata.sPhonesW;
+        heightval = Appdata.sPhonesH;
+        clipboardStr = getVal( widthval, heightval, modifierKey);
+        break;
+      case targetid === 'ins-large-phones-label':
+        widthval = Appdata.lPhonesW;
+        heightval = Appdata.lPhonesH;
+        clipboardStr = getVal( widthval, heightval, modifierKey);
+        break;
+      // !VA Inspector Value clicked
       case targetid === 'ins-display-size-width-value':
-        val = Appdata.imgW;
+        widthval = Appdata.imgW;
+        clipboardStr = getVal( widthval, heightval, modifierKey);
         break;
       case targetid === 'ins-display-size-height-value':
-        val = Appdata.imgH;
+        heightval = Appdata.imgH;
+        clipboardStr = getVal( widthval, heightval, modifierKey);
         break;
       case targetid === 'ins-small-phones-width-value':
-        val = Appdata.sPhonesW;
+        widthval = Appdata.sPhonesW;
+        clipboardStr = getVal( widthval, heightval, modifierKey);
         break;
       case targetid === 'ins-small-phones-height-value':
-        val = Appdata.sPhonesH;
+        heightval = Appdata.sPhonesH;
+        clipboardStr = getVal( widthval, heightval, modifierKey);
         break;
       case targetid === 'ins-large-phones-width-value':
-        val = Appdata.lPhonesH;
+        widthval = Appdata.lPhonesW;
+        clipboardStr = getVal( widthval, heightval, modifierKey);
         break;
       case targetid === 'ins-large-phones-height-value':
-        val = Appdata.lPhonesH;
+        heightval = Appdata.lPhonesH;
+        clipboardStr = getVal( widthval, heightval, modifierKey);
         break;
       default:
         // code block
       } 
-      writeClipboard(targetid, val);
+      writeClipboard(targetid, clipboardStr);
     }
-
-
     // !VA END CLIPBOARD FUNCTIONS
 
     // !VA CBController public functions 
     return {
 
-
       // !VA Called from eventHandler to initialize clipboard functionality
       doClipboard: function(evt) {
         console.log('doClipboard running');
-        
-        let targetid = evt.target.id;
-        console.log('targetid is: ' + targetid);
-        // !VA If the clicked element id is a Make Tag button, run getUserSelections, otherwise run makeCSSRule.
+        let targetid, modifierKey;
+        targetid = evt.target.id;
+        // !VA Determined if shift or ctrl is pressed while clicked
+        if (evt.shiftKey) { 
+          modifierKey = 'shift';
+        } else if (evt.ctrlKey ) {
+          modifierKey = 'ctrl';
+        } else {
+          modifierKey = false;
+        }
+        // !VA Determine which element is clicked -- makeTag button, makeCSSRule button or Inspector element and run getUserSelections, makeCSSRule or handleInspectorClicks respectively.
         switch(true) {
         case targetid.includes('tag') :
           getUserSelections(targetid);
@@ -1774,7 +1831,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           makeCssRule(targetid);
           break;
         case targetid.includes('ins') :
-          handleInspectorClicks(targetid);
+          handleInspectorClicks(targetid, modifierKey);
           break;
         default:
           // code block
@@ -1884,14 +1941,26 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       console.log('foo is: ' + foo);
 
 
-      // !VA Add event handlers for Inspector clickable elements: Display Size, Small Phones and Large Phones values in the programmatically created SPAN tags
-      const insValueClickables = [ inspectorValues.insDisplaySizeWidthValue, inspectorValues.insDisplaySizeHeightValue, inspectorValues.insSmallPhonesWidthValue, inspectorValues.insSmallPhonesHeightValue, inspectorValues.insLargePhonesWidthValue, inspectorValues.insLargePhonesHeightValue ];
-      // console.log('insValueClickables is: ' + insValueClickables);
-      for (let i = 0; i < insValueClickables.length; i++) {
+      // !VA Add click event handlers for Inspector clickable elements: Display Size, Small Phones and Large Phones values in the programmatically created SPAN tags
+      const inspectorClickables = [ inspectorLabels.insDisplaySizeLabel, inspectorLabels.insSmallPhonesLabel, inspectorLabels.insLargePhonesLabel, inspectorValues.insDisplaySizeWidthValue, inspectorValues.insDisplaySizeHeightValue, inspectorValues.insSmallPhonesWidthValue, inspectorValues.insSmallPhonesHeightValue, inspectorValues.insLargePhonesWidthValue, inspectorValues.insLargePhonesHeightValue ];
+      // console.log('inspectorClickables is: ' + inspectorClickables);
+      for (let i = 0; i < inspectorClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
-        insValueClickables[i] = document.querySelector(insValueClickables[i]);
-        console.log('insValueClickables[i].id is: ' + insValueClickables[i].id);
-        addEventHandler(insValueClickables[i],'click',CBController.doClipboard,false);
+        inspectorClickables[i] = document.querySelector(inspectorClickables[i]);
+        // console.log('inspectorClickables[i].id is: ' + inspectorClickables[i].id);
+        // addEventHandler(inspectorClickables[i],'mouseenter',CBController.enteredMe,false);
+        addEventHandler(inspectorClickables[i],'click',CBController.doClipboard,false);
+      }
+
+      // !VA Add mouseover event handlers for Inspector clickable elements: Display Size, Small Phones and Large Phones values in the programmatically created SPAN tags
+      const inspectorHoverables = [ inspectorLabels.insDisplaySizeLabel, inspectorLabels.insSmallPhonesLabel, inspectorLabels.insLargePhonesLabel, inspectorValues.insDisplaySizeWidthValue, inspectorValues.insDisplaySizeHeightValue, inspectorValues.insSmallPhonesWidthValue, inspectorValues.insSmallPhonesHeightValue, inspectorValues.insLargePhonesWidthValue, inspectorValues.insLargePhonesHeightValue ];
+      // console.log('inspectorClickables is: ' + inspectorClickables);
+      for (let i = 0; i < inspectorHoverables.length; i++) {
+        // !VA convert the ID string to the object inside the loop
+        inspectorHoverables[i] = document.querySelector(inspectorHoverables[i]);
+        console.log('inspectorHoverables[i].id is: ' + inspectorHoverables[i].id);
+        addEventHandler(inspectorHoverables[i],'mouseenter',CBController.enteredMe,false);
+
       }
 
       // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. These are the class input elements for ccp Img, Td and Table options
