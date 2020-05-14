@@ -1367,19 +1367,18 @@ input:focus:-ms-input-placeholder {
   width: 200px; }
 
 .inspector {
-  padding: 2px 2px 2px 0px;
+  padding: 2px 2px 2px 0;
   border: 0;
   font-family: "Ubuntu", Arial, Helvetica, sans-serif;
   font-size: 1em;
   font-weight: normal;
   text-transform: uppercase;
   list-style-type: none; }
+  .inspector .inspector-click:hover {
+    cursor: pointer; }
 
 .inspector-content, .inspector-label, .inspector-x, .no-image {
   display: inline; }
-
-.inspector-click:hover {
-  cursor: pointer; }
 
 #btn-toggle-ccp {
   display: block;

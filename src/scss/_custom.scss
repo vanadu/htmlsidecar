@@ -488,7 +488,6 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 .inspectors-left-col, .inspectors-right-col, .inspectors-center-col {
   display: flex;
 }
-
 .inspector-list {
   width: 240px;
   margin: 0;
@@ -510,30 +509,25 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   width: 200px;
 }
 .inspector {
-  padding: 2px 2px 2px 0px;
+  padding: 2px 2px 2px 0;
   border: 0;
+  // VA! Reboot: default pop-font, inherited in writeInspectorAlerts
   font-family: $inspector-font-family;
-  // VA! Reboot: color is inherited from parent in JS if not pop-font due to Inspector Alert
   font-size: 1em;
   font-weight: normal;
   text-transform: uppercase;
   list-style-type: none;
-}
-.inspector-content, .inspector-label, .inspector-x, .no-image  {
-  display: inline;
-}
-// VA! Hover on clickable Inspector elements
-// #ins-display-size-width-value, #ins-display-size-height-value, #ins-small-phone-width-value, #ins-small-phone-height-value, #ins-large-phone-width-value, #ins-large-phone-height-value {
-//   &:hover {
-//     cursor: pointer;
-//   }
-// }
-.inspector-click {
-  &:hover {
-    cursor: pointer;
+  // VA!Hover on clickable Inspector elements
+  .inspector-click {
+    &:hover {
+      cursor: pointer;
+    }
   }
 }
 
+.inspector-content, .inspector-label, .inspector-x, .no-image  {
+  display: inline;
+}
 
 #btn-toggle-ccp {
   display: block;

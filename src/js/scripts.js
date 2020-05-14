@@ -307,8 +307,8 @@ var Witty = (function () {
 
 
     // !VA UIController private
-    // !VA Reboot: passing in Appdata...it was inspectorElements, but writeInspectors doesn't pass inspectorElements. So let's see if there's a difference between the passed Appdata and the queried Appdata. Not relevant at this point since Appdata has no data...
-    function evalInspectorAlerts(passedAppdata) {
+    // !VA Reboot: passing in Appdata from 
+    function evalInspectorAlerts(Appdata) {
       console.log('evalInspectorAlerts running');
       // !VA Branch: inspectorClipboardOutput (051320)
 
@@ -321,8 +321,8 @@ var Witty = (function () {
       console.log('allInspectors');
       console.dir(allInspectors);
       // !VA Query Appdata
-      let Appdata = {};
-      Appdata = appController.initGetAppdata(false);
+      // let Appdata = {};
+      // Appdata = appController.initGetAppdata(false);
       // !VA Size On Disk is NOT 2X the Display Size: flag Size on Disk and Retina
       if (Appdata.imgNW < (Appdata.imgW * 2) ) {
         flaggedInspectors.push(allInspectors.insDiskSizeLabel);
@@ -335,10 +335,10 @@ var Witty = (function () {
       if (Appdata.imgNW < (Appdata.lPhonesW * 2) ) {
         flaggedInspectors.push(allInspectors.insLargePhonesLabel);
       } 
-      // !VA Reset all the dim viewer alerts by passing in the entire Inspector array
-      UIController.writeInspectorAlerts(allInspectors, false);
+      // !VA Reset all the dim viewer alerts by passing in the entire Inspector array. We're running this function twice here, each time with different parameters -- could be DRYer but it works and 
+      // UIController.writeInspectorAlerts(allInspectors, false);
       // !VA Now set the individual dim viewer alerts for the current image.
-      UIController.writeInspectorAlerts(flaggedInspectors, true);
+      UIController.writeInspectorAlerts(flaggedInspectors);
     }
 
 
@@ -483,50 +483,12 @@ var Witty = (function () {
         document.querySelector(staticRegions.tbrContainer).style.display = 'none';
         document.querySelector(inspectorElements.btnToggleCcp).style.display = 'none';
 
-        // !VA Branch: inspectorClipboardOutput (051320)
-        // !VA Loop through all but the last six items in inspectorElements - those are the display size values.
-        // const iArray = Object.values(inspectorElements);
-
-        // !VA Branch: inspectorClipboardOutput (051320) This is where it is. THis removed the contents of the parents of the spans. Let's try just applying the pop-font to the elements rather replacing the innerHTML 
-        /* !VA  
-         We don't need to do anything in initUI to the inspectors, since No Image is hard-coded in the HTML now.
-        */
-
-
-        // var foo1 = document.querySelector(inspectorElements.insDisplay);
-        // console.log('foo1 is:');
-        // console.log(foo1);
-        
-        // for ( let i = 0; i < iArray.length - 6; i++ ) {
-        //   if ( iArray[i] !== '#btn-toggle-ccp' &&  iArray[i] !== '#ins-filename' ) {
-        //     // document.querySelector(iArray[i]).innerHTML = '<span class="pop-font">&nbsp;&nbsp;No Image</span>';
-
-        //   } 
-        // } 
-
-
-
-        // for ( let i = 0; i < iArray.length - 6; i++ ) {
-        //   if ( iArray[i] !== '#btn-toggle-ccp' &&  iArray[i] !== '#ins-filename' ) {
-        //     // document.querySelector(iArray[i]).innerHTML = '<span class="pop-font">&nbsp;&nbsp;No Image</span>';
-        //     document.querySelector(iArray[i]).classList.add = 'pop-font';
-        //     var foo = document.querySelector(iArray[i]).innerHTML;
-        //     console.log('foo is: ' + foo);
-        //     document.querySelector(iArray[i]).innerHTML = 'No Image' + foo; 
-        //     console.log('document.querySelector(iArray[i]).innerHTML is: ' + document.querySelector(iArray[i]).innerHTML);
-        //   } 
-        // } 
-
-
-
-        
+        // !VA Inspector initialization comes now from the HTML file. The default 'No Image' is display: inline in CSS. When an image is loaded, inspectors are populated with values in UIController.writeInspectors.
       },
 
       // !VA UIController public
       writeInspectors: function() {
-        // !VA We need the current value in inspectorElements.insSmallPhones and inspectorElements.insLargePhones to display all the inspectorElements. So, if it's not explicitly user-defined, then use the default placeholder value from the HTML, then get the height from getAspectRatio
-        // !VA NOTE: The span elements for Display Size, Small Phones and Large Phones are defined in the HTML and are overwritten here with the innerHTML attribute. They're hard-coded in the HTML file so the inspectorClickables array can be created at runtime. Otherwise, if we just create them here, they won't exist at runtime when the inspectorClickables array is created to initialize the click handlers resulting in an exception. 
-        // !VA NOTE: The better way to do this would be to apply the pop-font class to the span elements and write the Appdata values to the innerHTML of the spans, see below
+        // !VA Hide  the default 'No Image' value displayed when the app is opened with no image and display the Inspector values for the current image, show the Clipboard button and call evalInspectorAlerts to determine which Inspector labels should get dimension alerts (red font applied). 
         var Appdata = {};
         // !VA Get the current Appdata
         Appdata = appController.initGetAppdata();
@@ -534,35 +496,13 @@ var Witty = (function () {
         document.querySelector(staticRegions.dropArea).style.display = 'none';
         // Write the inspectorElements
         document.querySelector(inspectorElements.insFilename).innerHTML = `<span class='pop-font'>${Appdata.fname}</span>`;
-        // !VA Rewriting Inspector span handling, see above, but it's not working and I need to come back to it later
-
-        /* !VA  
-        
-        
-        
-        */
-
-        // document.querySelector(inspectorElements.spnDisplaySizeHeight).classList.add('pop-font');
-        // document.querySelector(inspectorElements.spnDisplaySizeWidth).classList.add('pop-font');
-        // document.querySelector(inspectorElements.spnDisplaySizeHeight).innerHTML = Appdata.imgH;
-        // document.querySelector(inspectorElements.spnDisplaySizeWidth).innerHTML = Appdata.imgW;
-        // !VA Original code
-        // !VA Branch: inspectorClipboardOutput (051320)
-        /* !VA  The problem here appears to be that in replacing the existing element with this innerHTML, the click handler is destroyed. But I can't figure out where these hard-coded HTML elements are destroyed because at this point, they don't exist either  */
-
-        // !VA Hide all the No Image P elements
+        // !VA Inspectors: Hide all the P elements with the class 'no-image' that contain the default 'No Image' text 
         for (let i = 0; i < document.getElementsByClassName('no-image').length; i++) {
           document.getElementsByClassName('no-image')[i].style.display = 'none';
         }
         // !VA Show all the inspector-label, inspector-x and inspector-values 
         for (let i = 0; i < document.getElementsByClassName('inspector-label').length; i++) {
           document.getElementsByClassName('inspector-label')[i].style.display = 'inline';
-        }
-        for (let i = 0; i < document.getElementsByClassName('inspector-x').length; i++) {
-          document.getElementsByClassName('inspector-label')[i].style.display = 'inline';
-        }
-        for (let i = 0; i < document.getElementsByClassName('inspector-value').length; i++) {
-          document.getElementsByClassName('inspector-value')[i].style.display = 'inline';
         }
         // !VA Display the respective Appdata value in the respective inspector value span 
         document.querySelector(inspectorValues.insDisplaySizeWidthValue).innerHTML = Appdata.imgW;
@@ -576,7 +516,6 @@ var Witty = (function () {
         document.querySelector(inspectorValues.insAspectValue).innerHTML = Appdata.aspect[1];
         document.querySelector(inspectorValues.insRetinaWidthValue).innerHTML = (Appdata.imgW * 2);
         document.querySelector(inspectorValues.insRetinaHeightValue).innerHTML = (Appdata.imgH * 2);
-
         // // !VA  Display the clipboard button
         document.querySelector(inspectorElements.btnToggleCcp).style.display = 'block';
         // !VA Call evalInspectorAlerts to calculate which Inspector values don't meet HTML email specs.
@@ -585,20 +524,18 @@ var Witty = (function () {
       },
 
       //UIController public
-      writeInspectorAlerts: function(flaggedInspectors, bool) {
-        // !VA if evalInspectorAlerts returns true, then the Inspector should be displayed in red. To reset the dim alert, set to style color to 'auto'.
-        var att = bool;
-        bool ? att = 'red': att = 'inherit';
+      writeInspectorAlerts: function(flaggedInspectors) {
+        // !VA flaggedInspectors are displayed in red font 
+        const att = 'red';
         // !VA We want to use this same function to reset the dim alerts when a new image is loaded. So first, reset all the inspector labels to their inherited font.
         for (let i = 0; i < document.getElementsByClassName('inspector-label').length; i++) {
           document.getElementsByClassName('inspector-label')[i].style.color = 'inherit';
         }
-        // !VA Now loop throught the flagged inspectors from evalInspectorAlerts and apply the alert font
-        // !VA Test if the argument is an object, and if it is convert it into a list of values so the loop will accept it.
+        // !VA Now loop throught the flagged inspectors from evalInspectorAlerts and apply the alert font. First, test if the argument is an object, and if it is convert it into a list of values so the loop will accept it.
         if (Array.isArray(flaggedInspectors) === false) {
           flaggedInspectors = Object.values(flaggedInspectors);
         }
-        // // !VA For each Inspector passed from evalInspectorAlerts, set the font color style based on the bool argument passed in.
+        // // !VA For each flaggedInspector from evalInspectorAlerts, set the font color style 
         for (let i = 0; i < flaggedInspectors.length; i++) {
           document.querySelector(flaggedInspectors[i]).style.color = att;
         }
