@@ -7,6 +7,7 @@
 =========================================================
 // !VA 05.07.20
 Status:
+DONE: Add tooltips
 DONE: Fix imgswap codeBlock output: alt tag has quotes following, alt doesn't work. THis was fixed in an earlier commit.
 DONE: vmlbutton - add default 40/200 width and height as per Stig and add error handling if one of the values is omitted.
 DONE: Populate inputs with defaults in vmlbutton and 
@@ -21,12 +22,9 @@ DONE: Changing Inspector element hover color based on whether the SHIFT or CTRL 
 
 
 
-
-
-
-
-
-TODO: Add tooltips
+TODO: Add animation to tooltips
+TODO: Fix tooltip cursor not changing to help cursor on Display Size and other elements with clipboard clicks.
+TODO: Add error to vmlbutton height not matching img height
 TODO: Add error handling and the isErr argument to makeTdNode and makeTableNode so that the Clipboard object can discern between success messages and 'alert' messages, i.e. when the Clipboard output should be reviewed by the user for some reason, i.e. when vmlbutton height doesn't match the height of the loaded image.
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
 TODO: curImg doesn't resize back if you change viewerW to smaller than curImg and then change it back. It should follow the size of viewerW shouldn't it? Maybe not...
@@ -604,10 +602,11 @@ var Witty = (function () {
       showTooltip: function(targetid, tooltipContent) {
         console.log('handleTooltips running');
         console.log('tooltipContent is: ' + tooltipContent);
-        let el, ttipEl, timer;
+        let el, ttipEl, timer, delay;
         el = document.querySelector(targetid);
         ttipEl = document.getElementById('ttip-content');
         ttipEl.innerHTML = '';
+        delay = 500;
         el.addEventListener('mouseleave', leaveMe, false);
 
         function setDelay() {
@@ -616,7 +615,7 @@ var Witty = (function () {
             el.classList.remove('ttip');
             el.classList.add('active');
             ttipEl.innerHTML = tooltipContent;
-          }, 2000);
+          }, delay);
         }
         setDelay();
 

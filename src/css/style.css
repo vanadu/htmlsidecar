@@ -1427,7 +1427,7 @@ input:focus:-ms-input-placeholder {
   cursor: default; }
 
 .active {
-  cursor: pointer; }
+  cursor: help; }
 
 #msg-container {
   display: block;
