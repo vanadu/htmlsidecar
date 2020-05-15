@@ -2959,8 +2959,29 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         ipt_ccp_img_alt: 'Enter text for the ALT attribute of the Clipboard output. You can use placeholder text and replace it globally later.',
         ipt_ccp_img_alt_label: 'Enter text for the ALT attribute of the Clipboard output. You can use placeholder text and replace it globally later.',
         ccp_img_include_width_height: 'If checked, width and height will be added to the IMG tag\'s style attribute in the Clipboard output.',
-        ccp_img_include_width_height_label: 'If checked, width and height will be added to the IMG tag\'s style attribute in the Clipboard output.'
-        
+        ccp_img_include_width_height_label: 'If checked, width and height will be added to the IMG tag\'s style attribute in the Clipboard output.',
+        ccp_img_include_anchor: 'If checked, the IMG tag will be wrapped in an A tag with the HREF attribute set to # in the Clipboard output',
+        ccp_img_include_anchor_label: 'If checked, the IMG tag will be wrapped in an A tag with the HREF attribute set to # in the Clipboard output',
+        sel_ccp_td_align: 'Set the TD tag\'s align attribute. The default is \'left\'',
+        sel_ccp_td_align_label: 'Set the TD tag\'s align attribute. The default is \'left\'',
+        sel_ccp_td_valign: 'Set the TD tag\'s valign attribute. The default is \'top\'',
+        sel_ccp_td_valign_label: 'Set the TD tag\'s valign attribute. The default is \'top\'',
+        ipt_ccp_td_class: 'Add a class attribute to the TD tag. If a class is entered, the Make TD CSS Rule buttons appear.',
+        ipt_ccp_td_class_label: 'Add a class attribute to the IMG tag. If a class is entered, the Make TD CSS Rule buttons appear.',
+        ipt_ccp_td_bgcolor: 'Set the bgcolor attribute for the TD tag. You can use a hex value,a valid CSS color alias or any string. Hex values must be prepended with a # character.',
+        ipt_ccp_td_bgcolor_label: 'Set the bgcolor attribute for the TD tag. You can use a hex value, a CSS color alias or any string. Hex values must be prepended with a # character.',
+        rdo_ccp_td_basic: 'TBD',
+        rdo_ccp_td_basic_label: 'TBD',
+        rdo_ccp_td_excludeimg: 'TBD',
+        rdo_ccp_td_excludeimg_label: 'TBD',
+        rdo_ccp_td_posswitch: 'TBD',
+        rdo_ccp_td_poswitch_label: 'TBD',
+        rdo_ccp_td_bgimage: 'TBD',
+        rdo_ccp_td_bgimage_label: 'TBD',
+        rdo_ccp_td_vmlbutton: 'TBD',
+        rdo_ccp_td_vmlbutton_label: 'TBD',
+        ipt_ccp_table_class: 'Add a class attribute to the parent TABLE tag. If a class is entered, the Make TABLE CSS Rule buttons appear.',
+        ipt_ccp_img_table_label: 'Add a class attribute to the parent TABLE tag. If a class is entered, the Make TABLE CSS Rule buttons appear.',
 
 
 
