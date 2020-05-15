@@ -20,7 +20,7 @@ $image-toolbar-bkgd-color:        #FFF;
 $inspector-font-color:             rgba(160, 160, 160, 1);              
 $inspector-pop-font-color:         rgba(255, 255, 255, .9);
 // VA! Red 139,0,0
-$inspector-hover-font-color:       rgba(139, 0, 0, .9) !important;
+$inspector-hover-color:            #e29b02;
 $inspector-shift-hover-font-color: rgba(255, 255, 255, .9);  
 $inspector-ctrl-hover-font-color:  rgba(255, 255, 255, .9); 
 $filename-viewer-font-color:       rgba(255, 255, 255, .8);
@@ -289,9 +289,15 @@ button:disabled  {
 }
 
 // TOOLS
+
+
+
+
+
+
 // VA! Reboot 
 #toolbar-container {
-  display: none;
+  display: block;
   position: absolute;
   top: 0;
   left: 0;
@@ -311,21 +317,11 @@ button:disabled  {
   }
 }
 
-// IMAGE TOOLBAR
-// VA! Reboot: not even sure this one is necessary
-/* VA! Reboot: removed this in HTML
-.toolbar-content {
-  display: block;
-  position: relative;
-  width: 100%;
-  height: 35px;
-  background: $image-toolbar-bkgd-color;
-}
-*/
-
 // UL -- Toolbar button container 
 .toolbar-buttons {
+  // z-index: -1;
   display: flex;
+  // display: none;
   align-items: center;
   justify-content: space-between;
   width: 90%;
@@ -524,8 +520,8 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   // VA!Hover on clickable Inspector value elements
   .inspector-click {
     &:hover {
+      color: $inspector-hover-color !important;
       cursor: pointer;
-      color: #e29b02 !important;
     }
   }
 }
@@ -580,15 +576,49 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   color: $inspector-pop-font-color !important;
 }
 
-// .inspector-shift-hover-font {
+// VA! TOOLTIP DISPLAY
+#ttip-container {
+  display: block;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 40px;
+  padding: 0 40px 0 30px;
+  left: 0;
+}
 
-// }
-// .inspector-ctrl-hover-font {
+.ttip-content-container {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  width: 100%;
+  height: 38px;
+  padding: 0 40px 0 30px;
+  // background: rgba($color: #000000, $alpha: 0.95);
+  z-index: -1;
+  p {
+    display: block;
+    height: 100%;
+    color: #2c2c2c;
+    font-size: 1rem;
+    line-height: 1.125rem;
+    text-align: center;
+    opacity: 1;
+    z-index: -1;
+    // border: 1px solid blue;
+  }
+  span.tooltip-heading {
+    font-weight: bold;
+  }
 
-// }
-// .inspector-hover-font {
-//   color: $inspector-hover-font-color;
-// }
+}
+
+.ttip {
+  cursor: default;
+}
+.active {
+  cursor: pointer;
+}
 
 
 

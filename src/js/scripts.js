@@ -26,7 +26,7 @@ DONE: Changing Inspector element hover color based on whether the SHIFT or CTRL 
 
 
 
-TODO: Add tooltops
+TODO: Add tooltips
 TODO: Add error handling and the isErr argument to makeTdNode and makeTableNode so that the Clipboard object can discern between success messages and 'alert' messages, i.e. when the Clipboard output should be reviewed by the user for some reason, i.e. when vmlbutton height doesn't match the height of the loaded image.
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
 TODO: curImg doesn't resize back if you change viewerW to smaller than curImg and then change it back. It should follow the size of viewerW shouldn't it? Maybe not...
@@ -122,8 +122,7 @@ var Witty = (function () {
 
 
 
-    // !VA Alias 
-
+    // !VA Element Aliases
     // !VA UIController: Inspector ID strings
     const inspectorElements = {
       insFilename: '#ins-filename',
@@ -420,7 +419,7 @@ var Witty = (function () {
             appController.initCalcViewerSize();
             // !VA Open the CCP by default in dev mode
             // !VA First, set it to the opposite of how you want to start it.
-            document.querySelector(staticRegions.ccpContainer).classList.remove('active');
+            document.querySelector(staticRegions.ccpContainer).classList.add('active');
             // !VA Then run initCCP to initialize - initInitCCP is the public appController function included just to access appcontroller private initCCP from the UIController module
             appController.initInitCCP();
           }, delayInMilliseconds);
@@ -497,6 +496,9 @@ var Witty = (function () {
         // !VA Call evalInspectorAlerts to calculate which Inspector values don't meet HTML email specs.
         // !VA Reboot: nothing is passed here, although evalInspectorAlerts expects an argument. So lets' try to pass Appdata
         evalInspectorAlerts(Appdata);
+
+
+
       },
 
       //UIController public
@@ -598,6 +600,38 @@ var Witty = (function () {
         } 
       },
 
+      // !VA UIController public
+      showTooltip: function(targetid, tooltipContent) {
+        console.log('handleTooltips running');
+        console.log('tooltipContent is: ' + tooltipContent);
+        let el, ttipEl, timer;
+        el = document.querySelector(targetid);
+        ttipEl = document.getElementById('ttip-content');
+        ttipEl.innerHTML = '';
+        el.addEventListener('mouseleave', leaveMe, false);
+
+        function setDelay() {
+          timer = setTimeout(() => {
+            console.log('NOW');
+            el.classList.remove('ttip');
+            el.classList.add('active');
+            ttipEl.innerHTML = tooltipContent;
+          }, 2000);
+        }
+        setDelay();
+
+        function cancelDelay() {
+          clearTimeout(timer);
+        }
+
+        function leaveMe() {
+          cancelDelay();
+          el.classList.add('ttip');
+          el.classList.remove('active');
+          document.getElementById('ttip-content').innerHTML = '';
+        }
+      },
+
       // UIController: Flash a status message in the app message area
       // !VA TODO: Review this. We could probably fold this into the error handler but that's going to be complicated enough as it is and this is just for status messages
       // !VA UIController public
@@ -642,7 +676,14 @@ var Witty = (function () {
         }, 
         del);
       },
+
     };
+
+
+
+
+
+
   })();
 
 
@@ -1862,6 +1903,59 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
     
     //EVENT HANDLING START 
+
+    function getTooltip(evt) {
+      console.log('getTooltip running');
+      let targetid, tooltipid, tooltipContent;
+      targetid = '#' + evt.target.id;
+      tooltipid = evt.target.id.replace(/-/gi, '_');
+      tooltipContent = tooltipStrings(tooltipid);
+      console.log('tooltipContent is: ' + tooltipContent);
+      UIController.showTooltip(targetid, tooltipContent);
+    } 
+
+    function tooltipStrings(tooltipid) {
+      console.log('tooltipStrings running');
+      console.log('tooltipid is: ' + tooltipid);
+      let tooltipContent;
+      tooltipContent = '';
+      const tooltipStrings = {
+        ipt_tbr_viewerw: 'Set the width of the image\'s parent table for Clipboard output.<br /><span style="white-space: nowrap">Maximum width is 800px.</span>',
+        btn_tbr_incr50: 'Increase the image width by 50px and set the height proportionally. <span style="white-space: nowrap">The width can\'t exceed parent table width.</span>',
+        btn_tbr_incr10: 'Increase the image width by 10px and set the height proportionally. <span style="white-space: nowrap">The width can\'t exceed the width of the parent table.</span>',
+        btn_tbr_incr01: 'Increase the image width by 1px and set the height proportionally. <span style="white-space: nowrap">The width can\'t exceed the width of the parent table.</span>',
+        ipt_tbr_imgwidth: 'Set the image display width and resize height proportionally. <span style="white-space: nowrap">Image width can\'t exceed parent table width.</span>',
+        ipt_tbr_imgheight: 'Set the image display height and resize width proportionally. <span style="white-space: nowrap">Image width can\'t exceed parent table width.</span>',
+        btn_tbr_decr01: 'Decrease the image width by 1px and set the height proportionally.',
+        btn_tbr_decr10: 'Decrease the image width by 10px and set the height proportionally.',
+        btn_tbr_decr50: 'Decrease the image width by 50px and set the height proportionally.',
+        ipt_tbr_sphones_width: 'Set the width for small mobile devices to be used for CSS Clipboard output.',
+        ipt_tbr_lphones_width: 'Set the width for larger mobile devices to be used for CSS Clipboard output.',
+        ins_display_size_label: 'Displays the scaled image dimensions if smaller than Size On Disk. Set width or height in toolbar. Shift+Click to copy attributes. Ctrl+Click to copy style properties.',
+        ins_display_size_width_value: 'Click to copy the width, SHIFT+Click to copy width attribute, <span style="white-space: nowrap">CTRL+Click to copy width style property.</span>',
+        ins_display_size_height_value: 'Click to copy the height, SHIFT+Click to copy height attribute, <span style="white-space: nowrap">CTRL+Click to copy height style property.</span>',
+        ins_disk_size_label: 'Displays the actual resolution of the image as stored on disk. For retina devices, the file\'s actual resolution should be at least twice the display size.',
+        ins_aspect_label: 'Displays the aspect ratio (width: height) of the current image.',
+        ins_small_phones_label: 'Set the image width for small mobile devices. Image height is calculated proportionally. Shift+Click to copy attributes. Ctrl+Click to copy style properties.',
+        ins_small_phones_width_value: 'Click to copy the width, SHIFT+Click to copy width attribute, <span style="white-space: nowrap">CTRL+Click to copy width style property.</span>',
+        ins_small_phones_height_value: 'Click to copy the height, SHIFT+Click to copy height attribute, <span style="white-space: nowrap">CTRL+Click to copy height style property.</span>',
+        ins_large_phones_label: 'Set the image width for larger mobile devices. Image height is calculated proportionally. Shift+Click to copy attributes. Ctrl+Click to copy style properties.',
+        ins_large_phones_width_value: 'Click to copy the width, SHIFT+Click to copy width attribute, <span style="white-space: nowrap">CTRL+Click to copy width style property.</span>',
+        ins_large_phones_height_value: 'Click to copy the height, SHIFT+Click to copy height attribute, <span style="white-space: nowrap">CTRL+Click to copy height style property.</span>',
+        ins_retina_label: 'Displays the recommended image file resolution at the current display size. If this value is less than 2X the display, small phones or large phones values, those values are shown in red.',
+
+      };
+      for (let [key, value] of Object.entries(tooltipStrings)) {
+        // console.log(`${key}: ${value}`);
+        if (key  === tooltipid) {
+          tooltipContent = value;
+          // console.log('value is: ' + value);
+        }
+      }
+      return tooltipContent;
+    }
+
+
     // !VA appController private
     var setupEventListeners = function() {
 
@@ -1909,6 +2003,38 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
 
+      // !VA Add hover event handlers for tooltip triggers
+      var toolbarIds = Object.values(toolbarElements);
+      let el;
+      for (let i = 0; i < toolbarIds.length; i++) {
+        // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
+        el = document.querySelector(toolbarIds[i]);
+        // console.log(el);
+        addEventHandler(el, 'mouseenter', getTooltip, false);
+      }
+      var inspectorLabelIds = Object.values(inspectorLabels);
+      for (let i = 0; i < inspectorLabelIds.length; i++) {
+        // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
+        el = document.querySelector(inspectorLabelIds[i]);
+        // console.log(el);
+        addEventHandler(el, 'mouseenter', getTooltip, false);
+      }
+      var inspectorValueIds = Object.values(inspectorValues);
+      for (let i = 0; i < inspectorValueIds.length; i++) {
+        // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
+        el = document.querySelector(inspectorValueIds[i]);
+        // console.log(el);
+        addEventHandler(el, 'mouseenter', getTooltip, false);
+      }
+      var ccpUserInputIds = Object.values(ccpUserInput);
+      for (let i = 0; i < ccpUserInputIds.length; i++) {
+        // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
+        el = document.querySelector(ccpUserInputIds[i]);
+        // console.log(el);
+        addEventHandler(el, 'mouseenter', getTooltip, false);
+      }
+
+
       // !VA Add click and blur event handlers for clickable toolbarElements 
       const tbClickables = [ toolbarElements.btnTbrIncr50, toolbarElements.btnTbrIncr10, toolbarElements.btnTbrIncr01, toolbarElements.btnTbrDecr50, toolbarElements.btnTbrDecr10, toolbarElements.btnTbrDecr01  ];
       for (let i = 0; i < tbClickables.length; i++) {
@@ -1937,10 +2063,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         addEventHandler((tbKeypresses[i]),'blur',handleBlur,false);
       }
 
-      var foo = document.querySelector(inspectorValues.insDisplaySizeWidthValue).id;
-      console.log('foo is: ' + foo);
-
-
       // !VA Add click event handlers for Inspector clickable elements: Display Size, Small Phones and Large Phones values in the programmatically created SPAN tags
       const inspectorClickables = [ inspectorLabels.insDisplaySizeLabel, inspectorLabels.insSmallPhonesLabel, inspectorLabels.insLargePhonesLabel, inspectorValues.insDisplaySizeWidthValue, inspectorValues.insDisplaySizeHeightValue, inspectorValues.insSmallPhonesWidthValue, inspectorValues.insSmallPhonesHeightValue, inspectorValues.insLargePhonesWidthValue, inspectorValues.insLargePhonesHeightValue ];
       // console.log('inspectorClickables is: ' + inspectorClickables);
@@ -1958,7 +2080,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       for (let i = 0; i < inspectorHoverables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         inspectorHoverables[i] = document.querySelector(inspectorHoverables[i]);
-        console.log('inspectorHoverables[i].id is: ' + inspectorHoverables[i].id);
+        // console.log('inspectorHoverables[i].id is: ' + inspectorHoverables[i].id);
         addEventHandler(inspectorHoverables[i],'mouseenter',CBController.enteredMe,false);
 
       }
@@ -2183,14 +2305,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     }
 
     function handleOnfocus(evt) {
-      console.log('handleOnfocus running');
-      console.log('evt.target is: ' + evt.target);
+      // console.log('handleOnfocus running');
+      // console.log('evt.target is: ' + evt.target);
       let targ = evt.target;
-      console.log('targ.id is: ' + targ.id);
+      // console.log('targ.id is: ' + targ.id);
       let val = targ.value;
-      console.log('val is: ' + val);
-      
-    
+      // console.log('val is: ' + val);
     }
 
 
@@ -2778,6 +2898,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // 'btn-ccp-table-dsktp-build-css-clip-but': 'CSS class delaration copied to the Clipboard',
         // 'btn-ccp-table-lgphn-build-css-clip-but': 'CSS class delaration for tablets copied to the Clipboard',
         // 'btn-ccp-make-table-smphn-css-rule-but': 'CSS class delaration for phones copied to the Clipboard',
+
       };
       // !VA Loop through the error ID/message pairs and find the match
       for (const [key, value] of Object.entries(messages)) { 
@@ -2917,6 +3038,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA appController public
       init: function(){
         console.log('App initialized.');
+
+
+        window.onclick = e => {
+          console.log(e.target);
+          console.log(e.target.tagName);
+        } 
 
         // !VA Determine if the window is an isolate window, i.e. should be displayed with just the Witty app in window with fixed dimensions without header or tutorial content.
         let curUrl, initMode;

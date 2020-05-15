@@ -76,6 +76,17 @@
 
     <!-- #msg-container -->
     <div id="msg-container" >
+
+      <div id="ttip-container">
+        <div class="ttip-content-container">
+          <p id="ttip-content">
+              <!-- Placeholder error message -->
+            <!-- <span class="tooltip-heading">Display Size:</span> Scaled image dimensions if smaller than Size On Disk. Set width or height in toolbar. Shift+Click to copy attributes. Ctrl+Click to copy style properties.  -->
+          </p>
+        </div>
+      </div>
+
+
       <div class="msg-content-container">
         <h4 id="msg-content">
             <!-- Placeholder error message -->
@@ -85,7 +96,6 @@
     </div>
     <!-- /#msg-container -->
 
-    
     <!-- #inspector-container -->
     <div id="inspector-container">
       <!-- #inspectors -->
@@ -95,7 +105,7 @@
         <div class="inspectors-left-col">
           <ul class="inspector-list">
             <li id="ins-display-size" class="inspector">
-              <p id="ins-display-size-label" class="inspector-label inspector-click">Display Size:</p>
+              <p id="ins-display-size-label" class="inspector-label inspector-click" data-tip="This is the tip!">Display Size:</p>
               <p class="no-image pop-font">No Image</p>
               <span id="ins-display-size-width-value" class="inspector-value inspector-click pop-font"></span><span class="inspector-x"> X </span><span id="ins-display-size-height-value" class="inspector-value inspector-click pop-font"></span>
             </li>
@@ -149,12 +159,10 @@
     <!-- #toolbar-container -->
     <div id="toolbar-container">
       <!-- #toolbar -->
-
-
         <!-- #toolbar-buttons -->
         <ul class="toolbar-buttons btn-group" role="group" aria-label="...">
             <!-- VA! viewerW value is set from localStorage or CSS in calcViewerSize -->
-            <li><div class="ttip"><input id="ipt-tbr-viewerw" class="toolbar-input btn btn-default" type="text" value="" placeholder="650" tabindex="1"><span class="ttiptext">Enter container width as positive integer</span></div></li>
+            <li><input id="ipt-tbr-viewerw" class="ttip toolbar-input btn btn-default" type="text" value="" placeholder="650" tabindex="1"></li>
             <!-- TODO: Replace this image with a SVG or HTML entity -->
             <li role="separator"><img class="divider" src="img/divider.png" alt="witty.JS"></li>
             <li><div class="ttip"><button id="btn-tbr-incr50" type="button" class="toolbar-but btn btn-default"  tabindex="7"></button><span class="ttiptext">Grow image 50px</span></div></li>
