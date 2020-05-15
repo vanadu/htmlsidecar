@@ -20,8 +20,8 @@ DONE: Make mrk => box function...not sure where though or whether it's necessary
 DONE: Changing Inspector element hover color based on whether the SHIFT or CTRL key is pressed: I tried a number of approaches to getting different hover colors for SHIFT and CTRL but it's not worth the hassle. The shiftKey event only fires when the key is pressed down or up. The mouseenter and mouseleave event only fires when you enter or leave the element. Trying to trap the SHIFT press either while SHIFT is pressed outside the element while the element is entered OR while the mouse is inside the element proved too much for me. All that is even worse because if the focus isn't in the Witty window, which it is not most of the time while the user switches back and forth to the editor, then the mouse events won't fire. Plus, the keypress events don't appear to fire on non-input elements, so you'd have to trap the keypress on the document and then I don't even know how you'd drill down to limit it to the Inspector element. In short - we're going with a single gold CSS hover which works even if Witty doesn't have the focus. The rest we'll have to do with tooltips. This item is closed.
 
 
-
-
+TODO: Remove all bootstrap tooltips
+TODO: Finish adding tooltip strings
 TODO: Add animation to tooltips
 TODO: Fix tooltip cursor not changing to help cursor on Display Size and other elements with clipboard clicks.
 TODO: Add error to vmlbutton height not matching img height
@@ -202,16 +202,15 @@ var Witty = (function () {
     // !VA  UIController: ccpUserInput ID Strings
     // !VA imgAnchor is just a flag for the status of the checkbox. The actual propStrings have to have an Open and Close property.
     const ccpUserInput = {
+      // !VA Not renaming the checkbox/checkmarks because they already have code that queries the last three characters to determine if mrk or box...
+      // !VA IMG tag user input
       iptCcpImgClass: '#ipt-ccp-img-class',
-      // imgAnchor: '#chk-ccp-img-anchor',
-      // !VA iptCcpImgAlt
       iptCcpImgAlt: '#ipt-ccp-img-alt',
-      // !VA This isn't even a thing... probably delete it 04.28.19
-      // !VA Not renaming the checkbox/checkmarks for now because they already have code that queries the last three characters to determine if mrk or box...
       spnCcpImgIncludeWidthHeightCheckmrk: '#spn-ccp-img-include-width-height-checkmrk',
       selCcpImgAlign: '#sel-ccp-img-align',
       iptCcpImgRelPath: '#ipt-ccp-img-relpath',
       spnCcpImgIncludeAnchorCheckmrk: '#spn-ccp-img-include-anchor-checkmrk',
+      // !VA TD tag user input
       iptCcpTdClass: '#ipt-ccp-td-class',
       selCcpTdAlign: '#sel-ccp-td-align',
       selCcpTdValign: '#sel-ccp-td-valign',
@@ -221,34 +220,42 @@ var Witty = (function () {
       iptCcpTdFontColor: '#ipt-ccp-td-fontcolor',
       iptCcpTdBorderColor: '#ipt-ccp-td-bordercolor',
       iptCcpTdBorderRadius: '#ipt-ccp-td-borderradius',
-      // !VA spn-ccp-td-bgimage-checkmrk
-      // !VA This is deprecated as of today
-      // spnCcpTdBgimageCheckmrk: '#spn-ccp-td-bgimage-checkmrk',
       rdoCcpTdBasic: '#rdo-ccp-td-basic',
       rdoCcpTdExcludeimg: '#rdo-ccp-td-excludeimg',
       rdoCcpTdImgswap: '#rdo-ccp-td-imgswap',
       rdoCcpTdPosswitch: '#rdo-ccp-td-posswitch',
       rdoCcpTdBgimage: '#rdo-ccp-td-bgimage',
       rdoCcpTdVmlbutton: '#rdo-ccp-td-vmlbutton',
-
-
+      // !VA TABLE tag user input
       iptCcpTableClass: '#ipt-ccp-table-class',
       selCcpTableAlign: '#sel-ccp-table-align',
-      // !VA iptCcpTableWidth
       iptCcpTableWidth: '#ipt-ccp-table-width',
       // !VA Not in use yet
       // tableMaxWidth: '#ipt-ccp-table-max-width',
       iptCcpTableBgColor: '#ipt-ccp-table-bgcolor',
       spnCcpTableIncludeWrapperCheckmrk: '#spn-ccp-table-include-wrapper-checkmrk',
-      // !VA spn-ccp-table-include-wrapper-checkmrk
       iptCcpTableWrapperClass: '#ipt-ccp-table-wrapper-class',
       iptCcpTableWrapperWidth: '#ipt-ccp-table-wrapper-width',
       selCcpTableWrapperAlign: '#sel-ccp-table-wrapper-align',
       iptCcpTableWrapperBgColor: '#ipt-ccp-table-wrapper-bgcolor',
     };
 
-    //inspectorElements.btnToggleCcp
-    //inspectorElements.btnToggleCcp for assembling the clipboard create tag buttons. We also store the functions that are run in the CBController module to build the clipboard snippets when each of these elements is clicked so that we can just loop through the properties, get the current event target and run the associated function without an extra switch statement or other conditional at that stage.
+
+    // const foobar = {
+    //   name:'myname'
+    // }
+
+    // !VA CCP Elements used for tooltips. This is a different list than the CCPUserInput elements although some are duplicated. The element that triggers the tooltip has to be the parent element of the input or checkbox element, otherwise if the user hovers over a label instead of the actual input element, nothing happens.
+    const ccpUserInputLabels = {
+      selCcpImgAlignLabel: '#sel-ccp-img-align-label',
+      iptCcpImgClassLabel: '#ipt-ccp-img-class-label',
+      iptCcpImgRelpathLabel: '#ipt-ccp-img-relpath-label',
+      iptCcpImgAltLabel: '#ipt-ccp-img-alt-label',
+      iptCcpImgIncludeWidthHeightLabel: '#ccp-img-include-width-height-label',
+
+    };
+
+
 
     const btnCcpMakeClips = {
       // !VA Build HTML Clipboard Buttons
@@ -338,11 +345,11 @@ var Witty = (function () {
       getStaticRegionIDs: function() {
         return staticRegions;
       },
-      // getCcpPropStringsIDs: function() {
-      //   return ccpPropStrings;
-      // },
       getCcpUserInputIDs: function() {
         return ccpUserInput;
+      },
+      getCcpUserInputLabelIds: function() {
+        return ccpUserInputLabels;
       },
       getBtnCcpMakeClips: function() {
         return btnCcpMakeClips;
@@ -417,7 +424,7 @@ var Witty = (function () {
             appController.initCalcViewerSize();
             // !VA Open the CCP by default in dev mode
             // !VA First, set it to the opposite of how you want to start it.
-            document.querySelector(staticRegions.ccpContainer).classList.add('active');
+            document.querySelector(staticRegions.ccpContainer).classList.remove('active');
             // !VA Then run initCCP to initialize - initInitCCP is the public appController function included just to access appcontroller private initCCP from the UIController module
             appController.initInitCCP();
           }, delayInMilliseconds);
@@ -601,7 +608,7 @@ var Witty = (function () {
       // !VA UIController public
       showTooltip: function(targetid, tooltipContent) {
         console.log('handleTooltips running');
-        console.log('tooltipContent is: ' + tooltipContent);
+        // console.log('tooltipContent is: ' + tooltipContent);
         let el, ttipEl, timer, delay;
         el = document.querySelector(targetid);
         ttipEl = document.getElementById('ttip-content');
@@ -1898,62 +1905,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     const staticRegions = UICtrl.getStaticRegionIDs();
     const toolbarElements = UICtrl.getToolButtonIDs();
     const ccpUserInput = UICtrl.getCcpUserInputIDs();
+    const ccpUserInputLabels = UICtrl.getCcpUserInputLabelIds();
     const btnCcpMakeClips =  UICtrl.getBtnCcpMakeClips();
 
     
     //EVENT HANDLING START 
-
-    function getTooltip(evt) {
-      console.log('getTooltip running');
-      let targetid, tooltipid, tooltipContent;
-      targetid = '#' + evt.target.id;
-      tooltipid = evt.target.id.replace(/-/gi, '_');
-      tooltipContent = tooltipStrings(tooltipid);
-      console.log('tooltipContent is: ' + tooltipContent);
-      UIController.showTooltip(targetid, tooltipContent);
-    } 
-
-    function tooltipStrings(tooltipid) {
-      console.log('tooltipStrings running');
-      console.log('tooltipid is: ' + tooltipid);
-      let tooltipContent;
-      tooltipContent = '';
-      const tooltipStrings = {
-        ipt_tbr_viewerw: 'Set the width of the image\'s parent table for Clipboard output.<br /><span style="white-space: nowrap">Maximum width is 800px.</span>',
-        btn_tbr_incr50: 'Increase the image width by 50px and set the height proportionally. <span style="white-space: nowrap">The width can\'t exceed parent table width.</span>',
-        btn_tbr_incr10: 'Increase the image width by 10px and set the height proportionally. <span style="white-space: nowrap">The width can\'t exceed the width of the parent table.</span>',
-        btn_tbr_incr01: 'Increase the image width by 1px and set the height proportionally. <span style="white-space: nowrap">The width can\'t exceed the width of the parent table.</span>',
-        ipt_tbr_imgwidth: 'Set the image display width and resize height proportionally. <span style="white-space: nowrap">Image width can\'t exceed parent table width.</span>',
-        ipt_tbr_imgheight: 'Set the image display height and resize width proportionally. <span style="white-space: nowrap">Image width can\'t exceed parent table width.</span>',
-        btn_tbr_decr01: 'Decrease the image width by 1px and set the height proportionally.',
-        btn_tbr_decr10: 'Decrease the image width by 10px and set the height proportionally.',
-        btn_tbr_decr50: 'Decrease the image width by 50px and set the height proportionally.',
-        ipt_tbr_sphones_width: 'Set the width for small mobile devices to be used for CSS Clipboard output.',
-        ipt_tbr_lphones_width: 'Set the width for larger mobile devices to be used for CSS Clipboard output.',
-        ins_display_size_label: 'Displays the scaled image dimensions if smaller than Size On Disk. Set width or height in toolbar. Shift+Click to copy attributes. Ctrl+Click to copy style properties.',
-        ins_display_size_width_value: 'Click to copy the width, SHIFT+Click to copy width attribute, <span style="white-space: nowrap">CTRL+Click to copy width style property.</span>',
-        ins_display_size_height_value: 'Click to copy the height, SHIFT+Click to copy height attribute, <span style="white-space: nowrap">CTRL+Click to copy height style property.</span>',
-        ins_disk_size_label: 'Displays the actual resolution of the image as stored on disk. For retina devices, the file\'s actual resolution should be at least twice the display size.',
-        ins_aspect_label: 'Displays the aspect ratio (width: height) of the current image.',
-        ins_small_phones_label: 'Set the image width for small mobile devices. Image height is calculated proportionally. Shift+Click to copy attributes. Ctrl+Click to copy style properties.',
-        ins_small_phones_width_value: 'Click to copy the width, SHIFT+Click to copy width attribute, <span style="white-space: nowrap">CTRL+Click to copy width style property.</span>',
-        ins_small_phones_height_value: 'Click to copy the height, SHIFT+Click to copy height attribute, <span style="white-space: nowrap">CTRL+Click to copy height style property.</span>',
-        ins_large_phones_label: 'Set the image width for larger mobile devices. Image height is calculated proportionally. Shift+Click to copy attributes. Ctrl+Click to copy style properties.',
-        ins_large_phones_width_value: 'Click to copy the width, SHIFT+Click to copy width attribute, <span style="white-space: nowrap">CTRL+Click to copy width style property.</span>',
-        ins_large_phones_height_value: 'Click to copy the height, SHIFT+Click to copy height attribute, <span style="white-space: nowrap">CTRL+Click to copy height style property.</span>',
-        ins_retina_label: 'Displays the recommended image file resolution at the current display size. If this value is less than 2X the display, small phones or large phones values, those values are shown in red.',
-
-      };
-      for (let [key, value] of Object.entries(tooltipStrings)) {
-        // console.log(`${key}: ${value}`);
-        if (key  === tooltipid) {
-          tooltipContent = value;
-          // console.log('value is: ' + value);
-        }
-      }
-      return tooltipContent;
-    }
-
 
     // !VA appController private
     var setupEventListeners = function() {
@@ -1995,10 +1951,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
       // !VA Event handler for initializing event listeners 
       function addEventHandler(oNode, evt, oFunc, bCaptures) {
-        //Removing this -- apparently IE 9 and 10 support addEventListener
-        // if (typeof(window.event) != "undefined")
-        // 	oNode.attachEvent("on"+evt, oFunc);
-        // else
+        // console.log('oNode is:');
+        // console.log(oNode);
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
 
@@ -2025,11 +1979,40 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // console.log(el);
         addEventHandler(el, 'mouseenter', getTooltip, false);
       }
+      // !VA To get the tooltip targets, we need both the input element and its label because the user will probably click on the label. We might not even need the ccpUserInput element itself but rather only the label, but for now we'll use both. We could loop through the parent DIV of the input element and add the eventHandler that way, but then we can't remove the input element if we decide we don't need the tooltip on it, so we'll do them separately.
       var ccpUserInputIds = Object.values(ccpUserInput);
       for (let i = 0; i < ccpUserInputIds.length; i++) {
-        // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
         el = document.querySelector(ccpUserInputIds[i]);
         // console.log(el);
+        addEventHandler(el, 'mouseenter', getTooltip, false);
+      }
+
+      // !VA All the labels have the same id as the inputs with -label appended except the mock checkboxes, whose label has no text and only serves to style the mock checkbox. So for the mock checkboxes, transform the id into the id of the actual text label by removing the spn- prefix and replacing 'checkmrk' with 'label'.
+      let labelid, labelel;
+      for (let i = 0; i < ccpUserInputIds.length; i++) {
+      // for (let i = 0; i < 3; i++) {
+        labelid = ccpUserInputIds[i];
+        if (labelid.includes('checkmrk')) {
+          // !VA Remove the spn prefix
+          labelid = labelid.replace(/spn-/g, '');
+          // !VA Replace checkmrk with label
+          labelid = labelid.replace(/checkmrk/g, 'label');
+        } else {
+          labelid = labelid + '-label';
+        }
+        console.log(labelid);
+        
+        // !VA get the element with the labelid
+        labelel = document.querySelector(labelid);
+        // !VA Add the event listener
+        addEventHandler(labelel, 'mouseenter', getTooltip, false);
+      }
+
+
+      var btnCcpMakeClipIds = Object.values(btnCcpMakeClips);
+
+      for (let i = 0; i < btnCcpMakeClipIds.length; i++) {
+        el = document.querySelector(btnCcpMakeClipIds[i]);
         addEventHandler(el, 'mouseenter', getTooltip, false);
       }
 
@@ -2862,7 +2845,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       }
     }
 
-    //  !VA ERROR HANDLING
+    //  !VA ERROR AND MESSAGE HANDLING
     // ==============================
     // !VA appController private
     // !VA Stores for all app error and status messages
@@ -2916,7 +2899,85 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       retArray = appMessages(isErr, messCode);
       UIController.flashAppMessage(retArray);
     }
+    // !VA END MESSAGE HANDLING
 
+    // !VA TOOLTIPS
+    function getTooltip(evt) {
+      console.clear();
+      console.log('getTooltip running');
+
+      let targetid, tooltipid, tooltipContent;
+      // !VA Get the id from the event target
+      targetid = '#' + evt.target.id;
+      // !VA Replace the hypens with underscores - that will be the unique tooltip string ID
+      tooltipid = evt.target.id.replace(/-/gi, '_');
+      // !VA Get the tooltip content from the tool string ID
+      tooltipContent = tooltipStrings(tooltipid);
+      // !VA Run showTooltip to show the tooltip in #ttip-content
+      UIController.showTooltip(targetid, tooltipContent);
+    } 
+
+    function tooltipStrings(tooltipid) {
+      console.log('tooltipStrings running');
+      console.log('tooltipid is: ' + tooltipid);
+      let tooltipContent;
+      // !VA Set tooltipContent to '', overwrites tooltipContent being undefined if tooltipid is invalid
+      tooltipContent = '';
+      const tooltipStrings = {
+        ipt_tbr_viewerw: 'Set the width of the image\'s parent table for Clipboard output.<br /><span style="white-space: nowrap">Maximum width is 800px.</span>',
+        btn_tbr_incr50: 'Increase the image width by 50px and set the height proportionally. <span style="white-space: nowrap">The width can\'t exceed parent table width.</span>',
+        btn_tbr_incr10: 'Increase the image width by 10px and set the height proportionally. <span style="white-space: nowrap">The width can\'t exceed the width of the parent table.</span>',
+        btn_tbr_incr01: 'Increase the image width by 1px and set the height proportionally. <span style="white-space: nowrap">The width can\'t exceed the width of the parent table.</span>',
+        ipt_tbr_imgwidth: 'Set the image display width and resize height proportionally. <span style="white-space: nowrap">Image width can\'t exceed parent table width.</span>',
+        ipt_tbr_imgheight: 'Set the image display height and resize width proportionally. <span style="white-space: nowrap">Image width can\'t exceed parent table width.</span>',
+        btn_tbr_decr01: 'Decrease the image width by 1px and set the height proportionally.',
+        btn_tbr_decr10: 'Decrease the image width by 10px and set the height proportionally.',
+        btn_tbr_decr50: 'Decrease the image width by 50px and set the height proportionally.',
+        ipt_tbr_sphones_width: 'Set the width for small mobile devices to be used for CSS Clipboard output.',
+        ipt_tbr_lphones_width: 'Set the width for larger mobile devices to be used for CSS Clipboard output.',
+        ins_display_size_label: 'Displays the scaled image dimensions if smaller than Size On Disk. Set width or height in toolbar. Shift+Click to copy attributes. Ctrl+Click to copy style properties.',
+        ins_display_size_width_value: 'Click to copy the width, SHIFT+Click to copy width attribute, <span style="white-space: nowrap">CTRL+Click to copy width style property.</span>',
+        ins_display_size_height_value: 'Click to copy the height, SHIFT+Click to copy height attribute, <span style="white-space: nowrap">CTRL+Click to copy height style property.</span>',
+        ins_disk_size_label: 'Displays the actual resolution of the image as stored on disk. For retina devices, the file\'s actual resolution should be at least twice the display size.',
+        ins_aspect_label: 'Displays the aspect ratio (width: height) of the current image.',
+        ins_small_phones_label: 'Set the image width for small mobile devices. Image height is calculated proportionally. Shift+Click to copy attributes. Ctrl+Click to copy style properties.',
+        ins_small_phones_width_value: 'Click to copy the width, SHIFT+Click to copy width attribute, <span style="white-space: nowrap">CTRL+Click to copy width style property.</span>',
+        ins_small_phones_height_value: 'Click to copy the height, SHIFT+Click to copy height attribute, <span style="white-space: nowrap">CTRL+Click to copy height style property.</span>',
+        ins_large_phones_label: 'Set the image width for larger mobile devices. Image height is calculated proportionally. Shift+Click to copy attributes. Ctrl+Click to copy style properties.',
+        ins_large_phones_width_value: 'Click to copy the width, SHIFT+Click to copy width attribute, <span style="white-space: nowrap">CTRL+Click to copy width style property.</span>',
+        ins_large_phones_height_value: 'Click to copy the height, SHIFT+Click to copy height attribute, <span style="white-space: nowrap">CTRL+Click to copy height style property.</span>',
+        ins_retina_label: 'Displays the recommended image file resolution at the current display size. If this value is less than 2X the display, small phones or large phones values, those values are shown in red.',
+        btn_ccp_make_img_tag: 'Output an HTML IMG tag with the selected options to the Clipboard.',
+        btn_ccp_make_td_tag: 'Output an HTML TD tag with the selected options to the Clipboard.',
+        btn_ccp_make_table_tag: 'Output and HTML TABLE tag with the selected options to the Clipboard',
+        sel_ccp_img_align: 'Set the align attribute of the IMG tag.',
+        sel_ccp_img_align_label: 'Set the align attribute of the IMG tag.',
+        ipt_ccp_img_class: 'Add a class attribute to the IMG tag. If a class is entered, the Make Image CSS Rule buttons appear.',
+        ipt_ccp_img_class_label: 'Add a class attribute to the IMG tag. If a class is entered, the Make Image CSS Rule buttons appear.',
+        ipt_ccp_img_relpath: 'Enter the relative path to the image to include in the src attribute of the Clipboard output. The default is \'img\'',
+        ipt_ccp_img_relpath_label: 'Enter the relative path to the image to include in the src attribute of the Clipboard output. The default is \'img\'',
+        ipt_ccp_img_alt: 'Enter text for the ALT attribute of the Clipboard output. You can use placeholder text and replace it globally later.',
+        ipt_ccp_img_alt_label: 'Enter text for the ALT attribute of the Clipboard output. You can use placeholder text and replace it globally later.',
+        ccp_img_include_width_height: 'If checked, width and height will be added to the IMG tag\'s style attribute in the Clipboard output.',
+        ccp_img_include_width_height_label: 'If checked, width and height will be added to the IMG tag\'s style attribute in the Clipboard output.'
+        
+
+
+
+      };
+      for (let [key, value] of Object.entries(tooltipStrings)) {
+        // console.log(`${key}: ${value}`);
+        if (key  === tooltipid) {
+          tooltipContent = value;
+          // console.log('value is: ' + value);
+        }
+      }
+      return tooltipContent;
+    }
+    // !VA END TOOLTIP HANDLING
+
+
+    // !VA MISC FUNCTIONS
     // appController private 
     function validateInteger(inputVal) {
       // !VA Since integer validation is used for all height/width input fields, including those not yet implemented
@@ -2934,8 +2995,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     }
     //  !VA END ERROR HANDLING
 
-
-    // !VA MISC FUNCTIONS
     // !VA appController private
     // !VA Need to get the Appdata property that corresponds to the ID of the DOM input element that sets it. It's easier to just create a list of these correspondences than to rename the whole UI elements and Appdata properties so they correspond, or to create functions that use string methods to extract them from each other.
     function elementIdToAppdataProp(str) {
@@ -3040,8 +3099,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
 
         window.onclick = e => {
+          console.log('Clicked element');
           console.log(e.target);
-          console.log(e.target.tagName);
         } 
 
         // !VA Determine if the window is an isolate window, i.e. should be displayed with just the Witty app in window with fixed dimensions without header or tutorial content.

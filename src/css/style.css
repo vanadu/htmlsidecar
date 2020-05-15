@@ -1424,7 +1424,8 @@ input:focus:-ms-input-placeholder {
     font-weight: bold; }
 
 .ttip {
-  cursor: default; }
+  cursor: default;
+  z-index: 100; }
 
 .active {
   cursor: help; }
