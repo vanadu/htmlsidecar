@@ -76,35 +76,23 @@ var Witty = (function () {
   //   }, 500);
   // });
 
-  // !VA Run on page load
-  // document.addEventListener("DOMContentLoaded", function() {
-  // console.log('DOMContentLoaded');
-
-
-  // });
-
-  // !VA DEV Test function to get the clicked element to the console
-  // (function () {
-  //   document.addEventListener('click', function(e) {
-  //     e = e || window.event;
-  //     var target = e.target || e.srcElement,
-  //       text = target.textContent || target.innerText;   
-  //   }, false);
-  // })();
-
-
+  // !VA Test function to identify the target of the mouseclick
+  // window.onclick = e => {
+  //   console.log('Clicked element');
+  //   console.log(e.target);
+  // };
 
   // !VA Click on Witty logo to run test function
   // var testbut = document.querySelector('#testme');
   // testbut.addEventListener('click', runMe, false);
   // // testBut.addEventListener('click', runMe, false);
 
-  function runMe(evt) {
-    console.log('runMe running');
+  // function runMe(evt) {
+  //   console.log('runMe running');
 
 
     
-  }
+  // }
 
 
   // !VA GLOBAL
@@ -608,20 +596,22 @@ var Witty = (function () {
       // !VA UIController public
       showTooltip: function(targetid, tooltipContent) {
         console.log('handleTooltips running');
-        // console.log('tooltipContent is: ' + tooltipContent);
-        let el, ttipEl, timer, delay;
+        console.log('targetid showTooltip is: ' + targetid);
+        let el,ttipEl, timer, delay;
+        // !VA Get the element that is the target of the mouseenter event, i.e. the element for which the tooltip is to be displayed
         el = document.querySelector(targetid);
-        ttipEl = document.getElementById('ttip-content');
-        ttipEl.innerHTML = '';
-        delay = 500;
+        // !VA Get the element in which the tooltip is to be displayed. This is the P element that lives in ttip-content-container.
+        delay = 2000;
         el.addEventListener('mouseleave', leaveMe, false);
-
+        ttipEl = document.getElementById('ttip-content');
+        
         function setDelay() {
           timer = setTimeout(() => {
             console.log('NOW');
-            el.classList.remove('ttip');
             el.classList.add('active');
+            el.classList.remove('ttip');
             ttipEl.innerHTML = tooltipContent;
+            ttipEl.classList.add('active');
           }, delay);
         }
         setDelay();
@@ -634,7 +624,9 @@ var Witty = (function () {
           cancelDelay();
           el.classList.add('ttip');
           el.classList.remove('active');
-          document.getElementById('ttip-content').innerHTML = '';
+          ttipEl.classList.remove('active');
+          // !VA This not the place to reset the innerHTML
+          // document.getElementById('ttip-content').innerHTML = '';
         }
       },
 
@@ -979,6 +971,7 @@ var Witty = (function () {
       // !VA Initialize the clipboard-building process by getting those user selections in the CCP that determine the structure of the clipboard output and put those selections into the uSels object.
       let uSels = {};
       uSels = {
+        
         buttonClicked: '',
         hasAnchor: getCheckboxSelection(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk),
         hasWrapper: getCheckboxSelection(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk),
@@ -1956,7 +1949,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
 
-      // !VA Add hover event handlers for tooltip triggers
+      // !VA TOOLTIP TRIGGERS
+      // !VA Add tooltip triggers for toolbar elements
       var toolbarIds = Object.values(toolbarElements);
       let el;
       for (let i = 0; i < toolbarIds.length; i++) {
@@ -1965,6 +1959,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // console.log(el);
         addEventHandler(el, 'mouseenter', getTooltip, false);
       }
+      // !VA Add tooltip triggers for Inspector labels
       var inspectorLabelIds = Object.values(inspectorLabels);
       for (let i = 0; i < inspectorLabelIds.length; i++) {
         // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
@@ -1972,6 +1967,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // console.log(el);
         addEventHandler(el, 'mouseenter', getTooltip, false);
       }
+      // !VA Add tooltip triggers for Inspector Value  elements
       var inspectorValueIds = Object.values(inspectorValues);
       for (let i = 0; i < inspectorValueIds.length; i++) {
         // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
@@ -1979,6 +1975,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // console.log(el);
         addEventHandler(el, 'mouseenter', getTooltip, false);
       }
+      
+      // !VA Add tooltip triggers for CCP user input elements
       // !VA To get the tooltip targets, we need both the input element and its label because the user will probably click on the label. We might not even need the ccpUserInput element itself but rather only the label, but for now we'll use both. We could loop through the parent DIV of the input element and add the eventHandler that way, but then we can't remove the input element if we decide we don't need the tooltip on it, so we'll do them separately.
       var ccpUserInputIds = Object.values(ccpUserInput);
       for (let i = 0; i < ccpUserInputIds.length; i++) {
@@ -1986,31 +1984,29 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // console.log(el);
         addEventHandler(el, 'mouseenter', getTooltip, false);
       }
-
+      // !VA Add tooltip triggers for CCP user input label elements
       // !VA All the labels have the same id as the inputs with -label appended except the mock checkboxes, whose label has no text and only serves to style the mock checkbox. So for the mock checkboxes, transform the id into the id of the actual text label by removing the spn- prefix and replacing 'checkmrk' with 'label'.
       let labelid, labelel;
+      // !VA Loop through the CCP user input element ids
       for (let i = 0; i < ccpUserInputIds.length; i++) {
-      // for (let i = 0; i < 3; i++) {
         labelid = ccpUserInputIds[i];
+        // !VA If the label contains 'checkmrk'...
         if (labelid.includes('checkmrk')) {
           // !VA Remove the spn prefix
           labelid = labelid.replace(/spn-/g, '');
           // !VA Replace checkmrk with label
           labelid = labelid.replace(/checkmrk/g, 'label');
         } else {
+          // !VA If it's not a checkmark, just append -label to the id to get the label id
           labelid = labelid + '-label';
         }
-        console.log(labelid);
-        
         // !VA get the element with the labelid
         labelel = document.querySelector(labelid);
-        // !VA Add the event listener
+        // !VA Add the event listener to th label element
         addEventHandler(labelel, 'mouseenter', getTooltip, false);
       }
-
-
+      // !VA Add tooltip targets to the Make Clip buttons - both the Make HTML and Make CSS buttons
       var btnCcpMakeClipIds = Object.values(btnCcpMakeClips);
-
       for (let i = 0; i < btnCcpMakeClipIds.length; i++) {
         el = document.querySelector(btnCcpMakeClipIds[i]);
         addEventHandler(el, 'mouseenter', getTooltip, false);
@@ -2855,11 +2851,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       let messages = {
         // !VA Error messages
         not_Integer: 'This value has to be a positive whole number - try again or press ESC.',
-        imgW_GT_viewerW: `The image width has to be less than the width of its container table, which is now&nbsp;set&nbsp;to&nbsp;${Appdata.viewerW}px.`,
-        tbButton_LT_zero: 'Sorry, that would make one of the image dimensions less than 0.',
-        tbButton_GT_viewerW: `Sorry, that would make the image wider than its container, which is currently set at ${Appdata.viewerW}px`,
+        imgW_GT_viewerW: `Image width must be less than the current parent table width of ${Appdata.viewerW}px. Make the parent table wider first.`,
+        tbButton_LT_zero: 'Image dimension can\'t be less than 1.',
+        tbButton_GT_viewerW: `Image can't be wider than its parent table. Parent table width is currently ${Appdata.viewerW}px`,
         // !VA maxViewerWidth issue here, see message below;
-        viewerW_GT_maxViewerWidth: `The container table width can't be greater than the width of the app itself &mdash; 800px.`,
+        viewerW_GT_maxViewerWidth: 'Parent table width can\'t exceed can\'t exceed app width: 800px.',
         not_an_integer: 'Not an integer: please enter a positive whole number for width.',
         vmlbutton_no_value: 'Height and width must be entered to create a VML button.',
         vmlbutton_height_mismatch: 'Is the correct image loaded? Img height should match entry. Check the code output. ',
@@ -2902,27 +2898,31 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA END MESSAGE HANDLING
 
     // !VA TOOLTIPS
+    // !VA appController private
+    // !VA Called from the event handler to generate the tooltip unique id from the event target id. 
     function getTooltip(evt) {
-      console.clear();
       console.log('getTooltip running');
-
       let targetid, tooltipid, tooltipContent;
       // !VA Get the id from the event target
       targetid = '#' + evt.target.id;
       // !VA Replace the hypens with underscores - that will be the unique tooltip string ID
       tooltipid = evt.target.id.replace(/-/gi, '_');
-      // !VA Get the tooltip content from the tool string ID
+      // !VA Get the tooltip content from the tool string ID in tooltipStrings
       tooltipContent = tooltipStrings(tooltipid);
       // !VA Run showTooltip to show the tooltip in #ttip-content
+      console.log('targetid gettooltip is: ' + targetid);
       UIController.showTooltip(targetid, tooltipContent);
     } 
 
+    // !VA appController private
+    // !VA Key/value pairs containing the unique tooltip ID generate from target ID of the mouseenter event and the corresponding tooltip content.
     function tooltipStrings(tooltipid) {
       console.log('tooltipStrings running');
       console.log('tooltipid is: ' + tooltipid);
       let tooltipContent;
-      // !VA Set tooltipContent to '', overwrites tooltipContent being undefined if tooltipid is invalid
+      // !VA Set tooltipContent to ''. This overwrites tooltipContent being undefined if tooltipid is invalid
       tooltipContent = '';
+      // !VA Tooltip unique code/value pairs defined here
       const tooltipStrings = {
         ipt_tbr_viewerw: 'Set the width of the image\'s parent table for Clipboard output.<br /><span style="white-space: nowrap">Maximum width is 800px.</span>',
         btn_tbr_incr50: 'Increase the image width by 50px and set the height proportionally. <span style="white-space: nowrap">The width can\'t exceed parent table width.</span>',
@@ -2981,22 +2981,33 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         rdo_ccp_td_vmlbutton: 'TBD',
         rdo_ccp_td_vmlbutton_label: 'TBD',
         ipt_ccp_table_class: 'Add a class attribute to the parent TABLE tag. If a class is entered, the Make TABLE CSS Rule buttons appear.',
-        ipt_ccp_img_table_label: 'Add a class attribute to the parent TABLE tag. If a class is entered, the Make TABLE CSS Rule buttons appear.',
-
-
-
+        ipt_ccp_table_class_label: 'Add a class attribute to the parent TABLE tag. If a class is entered, the Make TABLE CSS Rule buttons appear.',
+        ipt_ccp_table_width: 'TBD',
+        ipt_ccp_table_width_label: 'TBD',
+        sel_ccp_table_align: 'Set the parent TABLE tag\'s align attribute. The default is \'left\'',
+        sel_ccp_table_align_label: 'Set the parent TABLE tag\'s align attribute. The default is \'left\'',
+        ipt_ccp_table_bgcolor: 'Set the bgcolor attribute for the parent TABLE tag. You can use a hex value,a valid CSS color alias or any string. Hex values must be prepended with a # character.',
+        ipt_ccp_table_bgcolor_label: 'Set the bgcolor attribute for the parent TABLE tag. You can use a hex value, a CSS color alias or any string. Hex values must be prepended with a # character.',
+        ccp_table_include_wrapper: 'TBD',
+        ccp_table_include_wrapper_label: 'TBD',
+        ipt_ccp_table_wrapper_class: 'Add a class attribute to the wrapper TABLE tag or accept the default \'devicewidth\'. ',
+        ipt_ccp_table_wrapper_class_label: 'Add a class attribute to the wrapper TABLE tag or accept the default \'devicewidth\'.',
+        ipt_ccp_table_wrapper_width: 'TBD',
+        ipt_ccp_table_wrapper_width_label: 'TBD',
+        sel_ccp_table_wrapper_align: 'Set the wrapper TABLE tag\'s align attribute. The default is \'left\'',
+        sel_ccp_table_align_wrapper_label: 'Set the wrapper TABLE tag\'s align attribute. The default is \'left\'',
+        ipt_ccp_table_wrapper_bgcolor: 'Set the bgcolor attribute for the wrapper TABLE tag. You can use a hex value,a valid CSS color alias or any string. Hex values must be prepended with a # character.',
+        ipt_ccp_table_bgcolor_wrapper_bgcolor_label: 'Set the bgcolor attribute for the wrapper TABLE tag. You can use a hex value, a CSS color alias or any string. Hex values must be prepended with a # character.'
       };
+      // !VA Loop through the tooltip unique ids and if one matches event's target id, return it as tooltipContent
       for (let [key, value] of Object.entries(tooltipStrings)) {
-        // console.log(`${key}: ${value}`);
         if (key  === tooltipid) {
           tooltipContent = value;
-          // console.log('value is: ' + value);
         }
       }
       return tooltipContent;
     }
     // !VA END TOOLTIP HANDLING
-
 
     // !VA MISC FUNCTIONS
     // appController private 
@@ -3117,12 +3128,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA appController public
       init: function(){
         console.log('App initialized.');
-
-
-        window.onclick = e => {
-          console.log('Clicked element');
-          console.log(e.target);
-        } 
 
         // !VA Determine if the window is an isolate window, i.e. should be displayed with just the Witty app in window with fixed dimensions without header or tutorial content.
         let curUrl, initMode;

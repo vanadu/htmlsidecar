@@ -596,28 +596,32 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   padding: 0 40px 0 30px;
   // background: rgba($color: #000000, $alpha: 0.95);
   z-index: -1;
-  p {
+  #ttip-content {
     display: block;
     height: 100%;
-    color: #2c2c2c;
+    transition: opacity .125s;
+    color: #04508e;
     font-size: 1rem;
+    font-style: italic;
     line-height: 1.125rem;
     text-align: center;
-    opacity: 1;
+    opacity: 0;
     z-index: -1;
-    // border: 1px solid blue;
+    &.active {
+      transition: opacity .125s;
+      opacity: 1;
+    }
   }
-  span.tooltip-heading {
-    font-weight: bold;
-  }
-
 }
 
 .ttip {
+  // VA! Show the default cursor for the mouseenter event target, i.e. the cursor that is displayed before the active class with the help cursor is applied below.
+  // VA! NOTE: There's got to be a better way to do this, need to revisit it.
   cursor: default;
   z-index: 100;
 }
 .active {
+  // VA! Replace the default cursor of the mouseenter event target (i.e. the element for which the tooltip is being displayed) with a help cursor.
   cursor: help;
 }
 
@@ -677,10 +681,10 @@ h4#msg-content {
   // margin-top: 1rem;
   margin: 0;
   padding: 0;
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-style: italic;
   font-weight: normal;
-  line-height: 1.75rem;
+  line-height: 1.25rem;
   text-align: center;
 }
 
@@ -763,53 +767,6 @@ output {
   top: -72px;
   left: -86px;
 }
-
-// TOOLTIPS 
-// VA! Tooltips are annoying -- unless I can figure out a way to make them useful I'm turning them off here by setting opacity by turning off the ttip opacity transition and turning off ttiptext opacity and visibility  
-
-.ttip {
-  display: inline-block;
-  position: relative;
-  &:hover {
-    .ttiptext {
-      opacity: 0;
-      visibility: hidden;
-    }
-  }
-  .ttiptext {
-    position: absolute;
-    bottom: 125%;
-    left: 50%;
-    width: 100px;
-    margin-left: -60px;
-    padding: 5px 5px;
-    // transition: opacity 1s;
-    border-radius: 6px;
-    background-color: $tooltip-bg-color;
-    color: $tooltip-font-color;
-    font-size: 10px;
-    font-weight: normal;
-    text-align: center;
-    opacity: 0;
-    visibility: hidden;
-    z-index: 1;
-    &::after {
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      margin-left: -5px;
-      border-width: 5px;
-      border-style: solid;
-      border-color: $tooltip-border-color;
-      content: '';
-    }
-  }
-}
-
-// .ttip:hover .ttiptext {
-//   visibility: visible;
-//   opacity: 1;
-// }
 
 // CLIPBOARD CONTROL PANEL
 #ccp-blocker {
