@@ -18,12 +18,15 @@ DONE: run queryDOMElements only on enter, not on every keypress - in order to do
 DONE: CCP input fields should select all when clicked in like they do in the toolbar - no they shouldn't for now. User should be able to set the cursor in the field and change any value that way.
 DONE: Make mrk => box function...not sure where though or whether it's necessary since it's just a one-liner. Leave it, it's just a one-liner
 DONE: Changing Inspector element hover color based on whether the SHIFT or CTRL key is pressed: I tried a number of approaches to getting different hover colors for SHIFT and CTRL but it's not worth the hassle. The shiftKey event only fires when the key is pressed down or up. The mouseenter and mouseleave event only fires when you enter or leave the element. Trying to trap the SHIFT press either while SHIFT is pressed outside the element while the element is entered OR while the mouse is inside the element proved too much for me. All that is even worse because if the focus isn't in the Witty window, which it is not most of the time while the user switches back and forth to the editor, then the mouse events won't fire. Plus, the keypress events don't appear to fire on non-input elements, so you'd have to trap the keypress on the document and then I don't even know how you'd drill down to limit it to the Inspector element. In short - we're going with a single gold CSS hover which works even if Witty doesn't have the focus. The rest we'll have to do with tooltips. This item is closed.
+DONE: Remove all bootstrap tooltips
+DONE: Finish adding tooltip strings - some TBD strings remain
+DONE: Add animation to tooltips
+DONE: Fix tooltip cursor not changing to help cursor on Display Size and other elements with clipboard clicks. That is not going to happen since the clipboard clicks on the label are governed by the hover pseudoelement which overrides the mouseenter event, I think. Closed.
+DONE: Cancel tooltips when error message is displayed.
 
-
-TODO: Remove all bootstrap tooltips
-TODO: Finish adding tooltip strings
-TODO: Add animation to tooltips
-TODO: Fix tooltip cursor not changing to help cursor on Display Size and other elements with clipboard clicks.
+TODO: Fix the CSS Rule buttons disappearing when hovered or clicked. It's because they get the class ttip for some reason.
+TODO: Fix that error messages stay displayed for the entire timeout even if another error message is triggered. 
+TODO: Fix that the tooltip timeout isn't reset when the element is clicked.This whole thing with the tooltips, app messages and error messages needs to be rethought. 
 TODO: Add error to vmlbutton height not matching img height
 TODO: Add error handling and the isErr argument to makeTdNode and makeTableNode so that the Clipboard object can discern between success messages and 'alert' messages, i.e. when the Clipboard output should be reviewed by the user for some reason, i.e. when vmlbutton height doesn't match the height of the loaded image.
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
@@ -394,7 +397,7 @@ var Witty = (function () {
       initUI: function(initMode) {
 
         const delayInMilliseconds = 10;
-        console.log('initMode is: ' + initMode);
+        // console.log('initMode is: ' + initMode);
         // !VA Here we initialze DEV mode, i.e. reading a hardcoded image from the HTML file instead of loading one manually in production mode
         if (initMode === 'devmode') {
           // !VA Set a timeout to give the image time to load
@@ -514,7 +517,7 @@ var Witty = (function () {
 
       // !VA UIController public
       displayTdOptions: function(evt) {
-        console.log('displayTdOptions running');
+        // console.log('displayTdOptions running');
         // !VA Array including all the defined options for each tdoption radio
         let allTdOptions = [], optionsToShow = [], targetalias, parentDivId;
         let Appdata;
@@ -611,7 +614,8 @@ var Witty = (function () {
             el.classList.add('active');
             el.classList.remove('ttip');
             ttipEl.innerHTML = tooltipContent;
-            ttipEl.classList.add('active');
+            // !VA If an error message is being displayed now, then do not show the tooltip. The user has to exit the element and reenter it once the error message is done displaying if they want to see the tooltip. This is a funky tertiary but I tried it with an if ! clause and it didn't work, so leave it for now.
+            document.getElementById('msg-content').classList.contains('show-err') ? document.getElementById('msg-content').classList.contains('show-err') :  ttipEl.classList.add('active');
           }, delay);
         }
         setDelay();
@@ -636,12 +640,13 @@ var Witty = (function () {
       flashAppMessage: function(messArray) {
         // !VA Receives an array of a boolean error flag and the message to be displayed.
         // !VA Init error flag, message string and timeout delay
+
+        console.log('flashAppMessage running');
         let isErr, mess, del;
         isErr = messArray[0];
         mess = messArray[1];
 
-        // !VA Get the message container and display text into variables
-        let msgContainer = document.querySelector(staticRegions.msgContainer);
+        // !VA Get the message content and display text into variables
         let msgDisplay = document.querySelector(staticRegions.msgDisplay);
         let ccpBlocker = document.querySelector(staticRegions.ccpBlocker);
         let messType;
@@ -651,23 +656,25 @@ var Witty = (function () {
         // !VA If isErr is false, then it's a status message, overlay the CCP blocker to prevent user input while the CSS transitions run and the status message is displayed. Cheap, but effective solution.
         isErr ? isErr : ccpBlocker.style.display = 'block';
         // !VA Add the class that displays the message
-        msgContainer.classList.add(messType);
+        msgDisplay.classList.add(messType);
         // !VA Write the message to the message display area
         msgDisplay.innerHTML = mess;
         // !VA Add the class to show the message
-        msgContainer.classList.add(messType);
+        msgDisplay.classList.add(messType);
         // !VA If it's an error, let it display for 2.5 seconds. If it's a status, just flash it because while it's onscreen the CCP blocker is active and we want that to be short.
         isErr ? del = 2500 : del = 500;
+        // !VA Remove the tooltip active class in #ttip-content if an app message is displayed. To display the tooltip again, the user has to exit the element and reenter it.
+        document.getElementById('ttip-content').classList.remove('active');
 
         // !VA Show the message for two seconds
         window.setTimeout(function() {
         // !VA After two seconds, hide the message and remove the blocker
-          msgContainer.classList.add('hide-mess');
+          msgDisplay.classList.add('hide-mess');
           ccpBlocker.style.display = 'none';
           setTimeout(function(){
             // !VA Once the opacity transition for the message has completed, remove the show-mess class from the element and set the innerHTML back to empty
-            msgContainer.classList.remove(messType);
-            msgContainer.classList.remove('hide-mess');
+            msgDisplay.classList.remove(messType);
+            msgDisplay.classList.remove('hide-mess');
             msgDisplay.innerHTML = '';
 
           },250);
@@ -2901,7 +2908,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA appController private
     // !VA Called from the event handler to generate the tooltip unique id from the event target id. 
     function getTooltip(evt) {
-      console.log('getTooltip running');
+      // console.log('getTooltip running');
       let targetid, tooltipid, tooltipContent;
       // !VA Get the id from the event target
       targetid = '#' + evt.target.id;
@@ -2910,15 +2917,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA Get the tooltip content from the tool string ID in tooltipStrings
       tooltipContent = tooltipStrings(tooltipid);
       // !VA Run showTooltip to show the tooltip in #ttip-content
-      console.log('targetid gettooltip is: ' + targetid);
+      // console.log('targetid gettooltip is: ' + targetid);
       UIController.showTooltip(targetid, tooltipContent);
     } 
 
     // !VA appController private
     // !VA Key/value pairs containing the unique tooltip ID generate from target ID of the mouseenter event and the corresponding tooltip content.
     function tooltipStrings(tooltipid) {
-      console.log('tooltipStrings running');
-      console.log('tooltipid is: ' + tooltipid);
+      // console.log('tooltipStrings running');
+      // console.log('tooltipid is: ' + tooltipid);
       let tooltipContent;
       // !VA Set tooltipContent to ''. This overwrites tooltipContent being undefined if tooltipid is invalid
       tooltipContent = '';

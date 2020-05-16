@@ -581,10 +581,10 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   display: block;
   position: absolute;
   top: 0;
+  left: 0;
   width: 100%;
   height: 40px;
   padding: 0 40px 0 30px;
-  left: 0;
 }
 
 .ttip-content-container {
@@ -628,7 +628,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 
 
 // APP ERROR DISPLAY
-#msg-container {
+#msg-container {   
   display: block;
   position: relative;
   top: -40px;
@@ -636,11 +636,29 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   left: 0;
   width: 100%;
   height: 35px;
+}
+.msg-content-container {
+  width: 100%;
+  height: 1.75rem;
+  // margin-top: 1rem;
+  margin: 0;
+  padding: 0;
+
+}
+
+// VA! Message content
+#msg-content {
+  font-size: 1rem;
+  font-style: italic;
+  font-weight: normal;
+  line-height: 1.25rem;
+  text-align: center;
   opacity: 1;
   &.show-err {
     opacity: 1;
-    transition: opacity .25s ease-in-out;
+    transition: opacity .125s ease-in-out;
     color: #FF0000;
+
     // transform: translate(0, 85px);
     // transition: transform 250ms;
     // -webkit-transform: scaleX(0);
@@ -648,7 +666,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   }
   &.hide-err {
     opacity: 0;
-    transition: opacity .25s ease-in-out;
+    transition: opacity .125s ease-in-out;
     // transform: translate(0, 0px);
     // transition: transform 250ms;
     // -webkit-transform: scaleX(0);
@@ -656,7 +674,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   }
   &.show-mess {
     opacity: 1;
-    transition: opacity .25s ease-in-out;
+    transition: opacity .125s ease-in-out;
     color: #959595;
     // transform: translate(0, 85px);
     // transition: transform 250ms;
@@ -665,28 +683,17 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   }
   &.hide-mess {
     opacity: 0;
-    transition: opacity .25s ease-in-out;
+    transition: opacity .125s ease-in-out;
     color: #959595;
     // transform: translate(0, 85px);
     // transition: transform 250ms;
     // -webkit-transform: scaleX(0);
     // -webkit-transition: -webkit-transform 500ms;
   }
+
 }
 
-// VA! Message content
-h4#msg-content {
-  width: 100%;
-  height: 1.75rem;
-  // margin-top: 1rem;
-  margin: 0;
-  padding: 0;
-  font-size: 1rem;
-  font-style: italic;
-  font-weight: normal;
-  line-height: 1.25rem;
-  text-align: center;
-}
+
 
 // MAIN IMAGE VIEWER
 #main-image-viewer {
