@@ -552,24 +552,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   text-align: center;
 
 }
-// #ins-display-size {
-//   &::before {content: 'Display size: '}
-// }
-// #ins-disk-size {
-//   &::before {content: 'Size on Disk: '} 
-// }
-// #ins-aspect {
-//   &::before {content: 'Aspect Ratio: '} 
-// }
-// #ins-small-phones {
-//   &::before {content: 'Small Phones: '}
-// }
-// #ins-large-phones {
-//   &::before {content: 'Large Phones: '}
-// }
-// #ins-retina {
-//   &::before {content: 'Retina: '}
-// }
+
 .pop-font {
   // VA! Reboot: Pop font for Inspector
   // VA! Need the important hack to override the alert style set in writeInspectorAlerts
@@ -577,42 +560,27 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 }
 
 // VA! TOOLTIP DISPLAY
-#ttip-container {
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 40px;
-  padding: 0 40px 0 30px;
-}
+// #ttip-container {
+//   display: block;
+//   position: absolute;
+//   top: 0;
+//   left: 0;
+//   width: 100%;
+//   height: 40px;
+//   padding: 0 40px 0 30px;
+// }
 
-.ttip-content-container {
-  display: flex;
-  align-content: center;
-  justify-content: center;
-  width: 100%;
-  height: 38px;
-  padding: 0 40px 0 30px;
-  // background: rgba($color: #000000, $alpha: 0.95);
-  z-index: -1;
-  #ttip-content {
-    display: block;
-    height: 100%;
-    transition: opacity .125s;
-    color: #04508e;
-    font-size: 1rem;
-    font-style: italic;
-    line-height: 1.125rem;
-    text-align: center;
-    opacity: 0;
-    z-index: -1;
-    &.active {
-      transition: opacity .125s;
-      opacity: 1;
-    }
-  }
-}
+// .ttip-content-container {
+//   display: flex;
+//   align-content: center;
+//   justify-content: center;
+//   width: 100%;
+//   height: 38px;
+//   padding: 0 40px 0 30px;
+//   // background: rgba($color: #000000, $alpha: 0.95);
+//   z-index: -1;
+
+// }
 
 .ttip {
   // VA! Show the default cursor for the mouseenter event target, i.e. the cursor that is displayed before the active class with the help cursor is applied below.
@@ -628,69 +596,47 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 
 
 // APP ERROR DISPLAY
-#msg-container {   
-  display: block;
+#app-message-container {
+  display: flex;
+  // flex-direction: column;
   position: relative;
   top: -40px;
   // top: 0px;
   left: 0;
   width: 100%;
   height: 35px;
+  border: 1px solid blue;
 }
-.msg-content-container {
+
+#tip-content, #err-content, #msg-content {
+  position: absolute;
+  display: block;
   width: 100%;
-  height: 1.75rem;
-  // margin-top: 1rem;
-  margin: 0;
-  padding: 0;
-
-}
-
-// VA! Message content
-#msg-content {
+  height: 100%;
+  transition: opacity .125s;
   font-size: 1rem;
   font-style: italic;
-  font-weight: normal;
-  line-height: 1.25rem;
+  line-height: 1.125rem;
   text-align: center;
-  opacity: 1;
-  &.show-err {
+  opacity: 0;
+  z-index: -1;
+  &.active {
+    transition: opacity .125s;
     opacity: 1;
-    transition: opacity .125s ease-in-out;
-    color: #FF0000;
+  }
+}
 
-    // transform: translate(0, 85px);
-    // transition: transform 250ms;
-    // -webkit-transform: scaleX(0);
-    // -webkit-transition: -webkit-transform 500ms;
-  }
-  &.hide-err {
-    opacity: 0;
-    transition: opacity .125s ease-in-out;
-    // transform: translate(0, 0px);
-    // transition: transform 250ms;
-    // -webkit-transform: scaleX(0);
-    // -webkit-transition: -webkit-transform 500ms;
-  }
-  &.show-mess {
-    opacity: 1;
-    transition: opacity .125s ease-in-out;
-    color: #959595;
-    // transform: translate(0, 85px);
-    // transition: transform 250ms;
-    // -webkit-transform: scaleX(0);
-    // -webkit-transition: -webkit-transform 500ms;
-  }
-  &.hide-mess {
-    opacity: 0;
-    transition: opacity .125s ease-in-out;
-    color: #959595;
-    // transform: translate(0, 85px);
-    // transition: transform 250ms;
-    // -webkit-transform: scaleX(0);
-    // -webkit-transition: -webkit-transform 500ms;
-  }
-
+#tip-content {
+  color: #04508e;
+  border: 1px solid magenta;
+}
+#err-content {
+  color: #FF0000;
+  border: 1px solid magenta;
+  // opacity: 1;
+}
+#msg-content {
+  color: #959595;
 }
 
 

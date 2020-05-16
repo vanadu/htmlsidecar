@@ -26,7 +26,7 @@ DONE: Cancel tooltips when error message is displayed.
 
 TODO: Fix the CSS Rule buttons disappearing when hovered or clicked. It's because they get the class ttip for some reason.
 TODO: Fix that error messages stay displayed for the entire timeout even if another error message is triggered. 
-TODO: Fix that the tooltip timeout isn't reset when the element is clicked.This whole thing with the tooltips, app messages and error messages needs to be rethought. 
+TODO: Fix that the tooltip timeout isn't reset when the element is clicked. This whole thing with the tooltips, app messages and error messages needs to be rethought. 
 TODO: Add error to vmlbutton height not matching img height
 TODO: Add error handling and the isErr argument to makeTdNode and makeTableNode so that the Clipboard object can discern between success messages and 'alert' messages, i.e. when the Clipboard output should be reviewed by the user for some reason, i.e. when vmlbutton height doesn't match the height of the loaded image.
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
@@ -231,11 +231,12 @@ var Witty = (function () {
       iptCcpTableWrapperBgColor: '#ipt-ccp-table-wrapper-bgcolor',
     };
 
-
+    
+    
     // const foobar = {
-    //   name:'myname'
-    // }
-
+      //   name:'myname'
+      // }
+      
     // !VA CCP Elements used for tooltips. This is a different list than the CCPUserInput elements although some are duplicated. The element that triggers the tooltip has to be the parent element of the input or checkbox element, otherwise if the user hovers over a label instead of the actual input element, nothing happens.
     const ccpUserInputLabels = {
       selCcpImgAlignLabel: '#sel-ccp-img-align-label',
@@ -243,11 +244,9 @@ var Witty = (function () {
       iptCcpImgRelpathLabel: '#ipt-ccp-img-relpath-label',
       iptCcpImgAltLabel: '#ipt-ccp-img-alt-label',
       iptCcpImgIncludeWidthHeightLabel: '#ccp-img-include-width-height-label',
-
+      
     };
-
-
-
+      
     const btnCcpMakeClips = {
       // !VA Build HTML Clipboard Buttons
       // !VA NEW
@@ -255,7 +254,7 @@ var Witty = (function () {
       // btnCcpImgBuildHtmlClip: '#btn-ccp-img-build-html-clip',
       btnCcpMakeTdTag: '#btn-ccp-make-td-tag',
       btnCcpMakeTableTag: '#btn-ccp-make-table-tag',
-
+      
       // !VA Make Image CSS Rule Buttons
       btnCcpMakeImgDsktpCssRule: '#btn-ccp-make-img-dsktp-css-rule',
       btnCcpMakeImgSmphnCssRule: '#btn-ccp-make-img-smphn-css-rule',
@@ -270,6 +269,15 @@ var Witty = (function () {
       btnCcpMakeTableLgphnCssRule: '#btn-ccp-make-table-lgphn-css-rule',
       
     };
+    
+    // !VA Appmessage elements
+    const appMessageElements = {
+      tipContent: '#tip-content',
+      msgContent: '#msg-content',
+      errContent: '#err-content'
+    };
+
+
 
     // !VA Run test function on page load
     // document.addEventListener('DOMContentLoaded', function() {
@@ -313,7 +321,6 @@ var Witty = (function () {
       UIController.writeInspectorAlerts(flaggedInspectors);
     }
 
-
     // !VA UIController public functions
     return {
       // !VA V2 Return all the strings for the UI element's IDs
@@ -344,6 +351,9 @@ var Witty = (function () {
       },
       getBtnCcpMakeClips: function() {
         return btnCcpMakeClips;
+      },
+      getAppMessageElements: function() {
+        return appMessageElements;
       },
 
       // !VA UIController public
@@ -415,7 +425,7 @@ var Witty = (function () {
             appController.initCalcViewerSize();
             // !VA Open the CCP by default in dev mode
             // !VA First, set it to the opposite of how you want to start it.
-            document.querySelector(staticRegions.ccpContainer).classList.remove('active');
+            document.querySelector(staticRegions.ccpContainer).classList.add('active');
             // !VA Then run initCCP to initialize - initInitCCP is the public appController function included just to access appcontroller private initCCP from the UIController module
             appController.initInitCCP();
           }, delayInMilliseconds);
@@ -596,91 +606,47 @@ var Witty = (function () {
         } 
       },
 
+
       // !VA UIController public
-      showTooltip: function(targetid, tooltipContent) {
-        console.log('handleTooltips running');
-        console.log('targetid showTooltip is: ' + targetid);
-        let el,ttipEl, timer, delay;
-        // !VA Get the element that is the target of the mouseenter event, i.e. the element for which the tooltip is to be displayed
-        el = document.querySelector(targetid);
-        // !VA Get the element in which the tooltip is to be displayed. This is the P element that lives in ttip-content-container.
-        delay = 2000;
-        el.addEventListener('mouseleave', leaveMe, false);
-        ttipEl = document.getElementById('ttip-content');
-        
-        function setDelay() {
-          timer = setTimeout(() => {
-            console.log('NOW');
-            el.classList.add('active');
-            el.classList.remove('ttip');
-            ttipEl.innerHTML = tooltipContent;
-            // !VA If an error message is being displayed now, then do not show the tooltip. The user has to exit the element and reenter it once the error message is done displaying if they want to see the tooltip. This is a funky tertiary but I tried it with an if ! clause and it didn't work, so leave it for now.
-            document.getElementById('msg-content').classList.contains('show-err') ? document.getElementById('msg-content').classList.contains('show-err') :  ttipEl.classList.add('active');
-          }, delay);
+      // !VA This has to cancel the timeouts for the runmn
+      showAppMessages: function (appMessType, appMessContent ) {
+        console.log('showAppMessages running');
+        console.log('appMessType is: ' + appMessType);
+        console.log('appMessContent is: ' + appMessContent);
+        let tipElement, msgElement, errElement;
+        tipElement = document.querySelector(appMessageElements.tipContent);
+        msgElement = document.querySelector(appMessageElements.msgContent);
+        errElement = document.querySelector(appMessageElements.errContent);
+        tipElement.innerHTML = '';
+        msgElement.innerHTML = '';
+        errElement.classList.remove('active');
+        tipElement.classList.remove('active');
+        msgElement.classList.remove('active');
+        errElement.innerHTML = '';
+        if ( appMessType === 'err') {
+          errElement.innerHTML = appMessContent;
+          errElement.classList.add('active');
+        } else if (appMessType === 'msg') {
+          msgElement.innerHTML = appMessContent;
+          msgElement.classList.add('active');
         }
-        setDelay();
-
-        function cancelDelay() {
-          clearTimeout(timer);
-        }
-
-        function leaveMe() {
-          cancelDelay();
-          el.classList.add('ttip');
-          el.classList.remove('active');
-          ttipEl.classList.remove('active');
-          // !VA This not the place to reset the innerHTML
-          // document.getElementById('ttip-content').innerHTML = '';
-        }
-      },
-
-      // UIController: Flash a status message in the app message area
-      // !VA TODO: Review this. We could probably fold this into the error handler but that's going to be complicated enough as it is and this is just for status messages
-      // !VA UIController public
-      flashAppMessage: function(messArray) {
-        // !VA Receives an array of a boolean error flag and the message to be displayed.
-        // !VA Init error flag, message string and timeout delay
-
-        console.log('flashAppMessage running');
-        let isErr, mess, del;
-        isErr = messArray[0];
-        mess = messArray[1];
-
-        // !VA Get the message content and display text into variables
-        let msgDisplay = document.querySelector(staticRegions.msgDisplay);
-        let ccpBlocker = document.querySelector(staticRegions.ccpBlocker);
-        let messType;
-        // !VA If it's an error, show class show-err, otherwise it's a status message so show-mess
-        isErr ? messType = 'show-err' : messType = 'show-mess';
-
-        // !VA If isErr is false, then it's a status message, overlay the CCP blocker to prevent user input while the CSS transitions run and the status message is displayed. Cheap, but effective solution.
-        isErr ? isErr : ccpBlocker.style.display = 'block';
-        // !VA Add the class that displays the message
-        msgDisplay.classList.add(messType);
-        // !VA Write the message to the message display area
-        msgDisplay.innerHTML = mess;
-        // !VA Add the class to show the message
-        msgDisplay.classList.add(messType);
-        // !VA If it's an error, let it display for 2.5 seconds. If it's a status, just flash it because while it's onscreen the CCP blocker is active and we want that to be short.
-        isErr ? del = 2500 : del = 500;
-        // !VA Remove the tooltip active class in #ttip-content if an app message is displayed. To display the tooltip again, the user has to exit the element and reenter it.
-        document.getElementById('ttip-content').classList.remove('active');
-
+        var del = 2000;
         // !VA Show the message for two seconds
         window.setTimeout(function() {
         // !VA After two seconds, hide the message and remove the blocker
-          msgDisplay.classList.add('hide-mess');
-          ccpBlocker.style.display = 'none';
-          setTimeout(function(){
-            // !VA Once the opacity transition for the message has completed, remove the show-mess class from the element and set the innerHTML back to empty
-            msgDisplay.classList.remove(messType);
-            msgDisplay.classList.remove('hide-mess');
-            msgDisplay.innerHTML = '';
+          errElement.classList.remove('active');
+          // ccpBlocker.style.display = 'none';
 
-          },250);
         }, 
         del);
+
+
       },
+
+
+
+
+
 
     };
 
@@ -974,6 +940,7 @@ var Witty = (function () {
     // !VA NODE FUNCTIONS
     // !VA Get the user selections that define the clipboard output configuration- the clicked Options button, the Include anchor checkbox and the Include wrapper table checkbox. The nodeList used for the indents as well as the indent implementation will depend on these options -- only the basic TD radio button option generates a simple nodeList structure whose indents can be processed with a simple for loop. The other options generate nodeLists with text nodes and comments that require a custom indent scheme.
     // !VA CBController private
+    
     function getUserSelections( id ) {
       // !VA Initialize the clipboard-building process by getting those user selections in the CCP that determine the structure of the clipboard output and put those selections into the uSels object.
       let uSels = {};
@@ -993,15 +960,19 @@ var Witty = (function () {
       } else {
         uSels.buttonClicked = 'tablebut';
       }
-      buildOutputNodeList( uSels );
+      // !VA Branch: reconfigureMessages (051620): id added to arguments
+      buildOutputNodeList( id, uSels );
     }
 
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
     // !VA CBController private
-    function buildOutputNodeList( uSels ) {
+    // !VA Branch: reconfigureMessages (051620) id added to parameters
+    function buildOutputNodeList( id, uSels ) {
+      console.log('buildOutputNodeList id is: ' + id);
       let tableNodeFragment, nl, frag, outputNL, clipboardStr;
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
-      tableNodeFragment = makeTableNode( uSels );
+      // !VA Branch: reconfigureMessages (051620) id added to arguments
+      tableNodeFragment = makeTableNode( id, uSels );
       // !VA Create the full nodeList from the tableNodeFragment. If tableNodeFragment is null, return to abort without creating Clipboard object.
       try {
         nl = tableNodeFragment.querySelectorAll('*');
@@ -1060,14 +1031,14 @@ var Witty = (function () {
           frag = nl[extractPos];
           break;
         default:
-          console.log('Error in buildOutputNodeList: case not defined');
+          console.log('Error in buildOutputNodeList: case not defined, id is: ' + id);
           // Default code block, this should be an error code
         }
         // !VA Append the fragment to the container
         container.appendChild(frag);
         // !VA Create the outputNL nodeList to pass to the Clipboard object
         outputNL = container.querySelectorAll('*');
-        applyIndents( uSels, outputNL );
+        applyIndents( id, uSels, outputNL );
         clipboardStr = outputNL[0].outerHTML;
 
       // !VA imgSwap and bgimage option - includes MS conditional code retrieved by getImgSwapBlock, getBgimageBlock, getVMLBlock which includes getIndent functions. First, run applyIndents on outputNL. applyIndents also inserts tokens at the position where the codeBlock is to be inserted. The parent nodelist is converted to a string, the code blocks are retrieved, indents are inserted, and finally the codeblocks are inserted into the string between the tags of the last node in the outputNL.outerHTML string. 
@@ -1103,17 +1074,17 @@ var Witty = (function () {
         // !VA Create the nodeList to pass to the Clipboard object. 
         outputNL = container.querySelectorAll('*');
         // !VA Apply the indents and insert the tokens marking the position for inserting the MS conditional code.
-        applyIndents(uSels, outputNL);
+        applyIndents(id, uSels, outputNL);
         // !VA Convert outputNL to a string (including tokens for inserting MS conditional code) for output to Clipboard object.
         clipboardStr = outputNL[0].outerHTML;
         
         // !VA Get the codeBlock corresponding to the selected TD option
         if ( uSels.selectedRadio === 'imgswap') {
-          codeBlock = getImgSwapBlock(indentLevel);
+          codeBlock = getImgSwapBlock( id, indentLevel);
         } else if (  uSels.selectedRadio === 'bgimage' ) {
-          codeBlock = getBgimageBlock(indentLevel);
+          codeBlock = getBgimageBlock(id, indentLevel);
         } else if (uSels.selectedRadio === 'vmlbutton') {
-          codeBlock = getVmlButtonBlock(indentLevel);
+          codeBlock = getVmlButtonBlock(id, indentLevel);
         }
         // !VA Replace the tokens in clipboardStr that were added in applyIndents with the respective codeBlock
         clipboardStr = clipboardStr.replace('/replacestart//replaceend/', codeBlock + '\n');
@@ -1134,7 +1105,7 @@ var Witty = (function () {
 
     // !VA Make the nodes for the 'posswitch option' using the DIR attribute
     // !VA CBController private
-    function makePosSwitchNodes() {
+    function makePosSwitchNodes( id ) {
       // !VA Declare the arrays for new element names and new element types
       let containerIds = [], containerElements = [], sibling1Ids = [], sibling1Elements = [], sibling2Ids = [], sibling2Elements = [], containerNodes = [], sibling1Nodes = [], sibling2Nodes = [];
       // !VA Declare loop iterators
@@ -1316,7 +1287,7 @@ var Witty = (function () {
 
     // !VA Make the img node, including anchor if it is checked
     // !VA CBController private
-    function makeImgNode ( ) {
+    function makeImgNode ( id ) {
       // !VA Id is passed but not used here,  because we're only building the node.
       let Attributes;
       Attributes = getAttributes();
@@ -1362,7 +1333,7 @@ var Witty = (function () {
 
     // !VA Make the TD node
     // !VA CBController private
-    function makeTdNode( uSels ) {
+    function makeTdNode( id, uSels ) {
       // !VA Variables for error handling - need to include this in the return value so the Clipboard object can differentiate between alert and success messages. 
       let isErr;
       // !VA NOTE: No trapped errors here yet that would pass a code, but that will probably come.
@@ -1394,7 +1365,7 @@ var Witty = (function () {
         // !VA Branch: implementExcludeImg (050420)
         // !VA If 'basic' is checked, create imgNode and append it, otherwise exclude the imgNode.
         if (uSels.selectedRadio === 'basic') {
-          imgNode = makeImgNode();
+          imgNode = makeImgNode( id );
           // !VA We need to include the imgNode here ONLY if Bgimage is unchecked
           tdInner.appendChild(imgNode);
         }
@@ -1421,7 +1392,7 @@ var Witty = (function () {
         break;
       // case (selectedRadio === 'posswitch'):
       case (uSels.selectedRadio === 'posswitch'):
-        tdInner  = makePosSwitchNodes();
+        tdInner  = makePosSwitchNodes( id );
         break;
       // case (selectedRadio === 'vmlbutton'):
       case (uSels.selectedRadio === 'vmlbutton'):
@@ -1436,7 +1407,7 @@ var Witty = (function () {
         }
         // !VA TODO: If the height entered doesn't match the height of the loaded image, then the user probably has forgotten to load the image used for the button background, so the code output will probably not be what the user expects. Output the code, but show an alert in the message bar. This is going to require making a different clipboard message for alerts. It will also require somehow informing the Clipboard object that two different messages can be displayed onsuccess - one success message and one alert message. That will require passing an error status along with tdNodeFragment and tableNodeFragment, which will require returning an array rather than just the node fragment. 
         if (document.querySelector(ccpUserInput.iptCcpTdHeight).value !== Attributes.imgHeight) {
-          appController.initMessage(true, 'vmlbutton_height_mismatch');
+          appController.initMessage(id, true, 'vmlbutton_height_mismatch');
           console.log('ALERT vmlbutton: height value doesn\'t match height of loaded image');
         } 
         break;
@@ -1446,8 +1417,12 @@ var Witty = (function () {
       // // !VA Set the node fragment to the TD node
       tdNodeFragment.appendChild(tdInner);
       // !VA TODO: This error handling is poor because it only allows for one possible error. But, it does return nothing, which is then passed on to the calling function and terminates in buildOutputNodeList
+      // !VA Branch: reconfigureMessages (051620) Try catch this error belongs here
       if (isErr) { 
-        appController.initMessage(true, 'vmlbutton_no_value');
+        console.log('makeTdNode: vml_button_no_value error: id is: ' + id);
+        // !VA Branch: reconfigureMessages (051620) New appmessage handling
+        appController.handleAppMessages('vml_button_no_value');
+        // appController.initMessage(id, true, 'vmlbutton_no_value');
         console.log('returning...');
         return;
       } else {
@@ -1457,7 +1432,7 @@ var Witty = (function () {
 
     // !VA Make the table node, including parent and wrapper table if selected
     // !VA CBController private
-    function makeTableNode( uSels ) {
+    function makeTableNode( id, uSels ) {
       let Attributes;
       Attributes = getAttributes();
       // !VA This isn't defined because there's not identified error condition as yet. See the return statement of makeTdNode for handling method.
@@ -1489,12 +1464,13 @@ var Witty = (function () {
       // !VA Build the inner tr
       tableInner.appendChild(trInner);
       // !VA Get the inner TD from makeTdNode and append it to the nodeFragment
-      tdNodeFragment = makeTdNode( uSels );
+      tdNodeFragment = makeTdNode( id, uSels );
       // !VA If tdNodeFragment is null, then there was an error in makeTdNode, so console the error and return null to buildOutputNodeList to abort.
       try {
         trInner.appendChild(tdNodeFragment);
       } catch (e) {
-        console.log('Error in makeTableNode: tdNodeFragment is null');
+        // !VA Branch: reconfigureMessages (051620) Add error message here, in the meantime console.log id
+        console.log('Error in makeTableNode: tdNodeFragment is null: id is: ' + id);
         return;
       }
       // !VA If include table wrapper is checked, build the outer table and return it
@@ -1530,7 +1506,7 @@ var Witty = (function () {
     // !VA START TD OPTIONS MS-CONDITIONAL CODE BLOCKS
     // !VA These are the code blocks that contain MS conditionals in comment nodes or text nodes, i.e. mobile swap, background image, and vmlbutton
     // !VA UIController private
-    function getImgSwapBlock( indentLevel ) {
+    function getImgSwapBlock( id, indentLevel ) {
       let Appdata, Attributes, linebreak;
       Attributes = getAttributes();
       Appdata = appController.initGetAppdata();
@@ -1547,7 +1523,7 @@ var Witty = (function () {
     }
 
     // !VA UIController private
-    function getBgimageBlock( indentLevel) {
+    function getBgimageBlock( id, indentLevel) {
       console.log('getBgiamgeBlock running');
       let Attributes;
       Attributes = getAttributes();
@@ -1566,7 +1542,7 @@ var Witty = (function () {
     }
 
     // !VA CBController private
-    function getVmlButtonBlock (indentLevel) {
+    function getVmlButtonBlock ( id, indentLevel) {
       let Attributes;
       Attributes = getAttributes();
       // console.dir(Attributes);
@@ -1578,6 +1554,11 @@ var Witty = (function () {
       // !VA Define the innerHTML of the vmlbutton code
       vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:${tdHeight}px;v-text-anchor:middle;width:${tdWidth}px;" arcsize="10%" strokecolor="#1e3650" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc}" color="#556270" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Show me the button!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="#"
 style="background-color:#556270;background-image:url(${Attributes.imgSrc});border:1px solid #1e3650;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:${tdHeight}px;text-align:center;text-decoration:none;width:${tdWidth}px;-webkit-text-size-adjust:none;mso-hide:all;">Show me the button!</a></div>`;
+      try {
+        !vmlButtonStr;
+      } catch (error) {
+        console.log('ERROR in getVmlButtonBlock: vmlButtonStr does not exist: id is:' + id);
+      }
       return vmlButtonStr;
     }
     // !VA END TD OPTIONS MS-CONDITIONAL CODE BLOCKS
@@ -1585,7 +1566,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA INDENT FUNCTIONS
     // !VA CBController private
     // !VA NOTE: This routine identifies if the nodes 1) contain the id 'stack-column-center' 2) contain MS conditional code and 2) contain an A tag. It applies indents accordingly to the nodes using insertAdjacentHTML. 1) Is problematic because if that class name is not present in the HTML file, the indent will break. I couldn't figure out a way to do this without the id by looking for sibling nodes, so trying to create options for three or even two column tables will be ridiculous time-consuming - not an option for now.
-    function applyIndents( uSels, outputNL ) {
+    function applyIndents( id, uSels, outputNL ) {
       // console.log('applyIndents running');
       // !VA Create array to store indent strings
       let indents = [];
@@ -1655,6 +1636,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
             if ( i === outputNL.length - 1) {
               outputNL[i].innerHTML = '\n' + getIndent(stackColumnIndentLevel) + '  <!-- ADD YOUR CONTENT HERE --> \n' + getIndent(stackColumnIndentLevel);
             }
+            try {
+              !outputNL;
+            } catch (error) {
+              console.log('applyIndents: outputNL does not exist: id is: '+ id);
+            }
           }
         }
       }
@@ -1674,6 +1660,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
 
     // !VA CLIPBOARD FUNCTIONS
+    // !VA CBController private
     function writeClipboard(id, str) {
       console.log('writeClipboard running');
       console.log('str: ');
@@ -1687,8 +1674,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           // !VA Write success message to app message area on success
           // !VA TODO: Need to differentiate between success messages and alert messages displayed in the message bar. 
           currentCB.on('success', function(event) {
-            appController.initMessage(false, 'copied_2_CB');
-            // debugger;
+            appController.handleAppMessages('msg_copied_2_CB');
           });
   
           currentCB.on('error', function(e) {
@@ -1907,7 +1893,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     const ccpUserInput = UICtrl.getCcpUserInputIDs();
     const ccpUserInputLabels = UICtrl.getCcpUserInputLabelIds();
     const btnCcpMakeClips =  UICtrl.getBtnCcpMakeClips();
-
+    const appMessageElements =  UICtrl.getAppMessageElements();
     
     //EVENT HANDLING START 
 
@@ -1964,7 +1950,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
         el = document.querySelector(toolbarIds[i]);
         // console.log(el);
-        addEventHandler(el, 'mouseenter', getTooltip, false);
+        addEventHandler(el, 'mouseenter', appController.handleAppMessages, false);
       }
       // !VA Add tooltip triggers for Inspector labels
       var inspectorLabelIds = Object.values(inspectorLabels);
@@ -1972,7 +1958,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
         el = document.querySelector(inspectorLabelIds[i]);
         // console.log(el);
-        addEventHandler(el, 'mouseenter', getTooltip, false);
+        addEventHandler(el, 'mouseenter', appController.handleAppMessages, false);
       }
       // !VA Add tooltip triggers for Inspector Value  elements
       var inspectorValueIds = Object.values(inspectorValues);
@@ -1980,7 +1966,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
         el = document.querySelector(inspectorValueIds[i]);
         // console.log(el);
-        addEventHandler(el, 'mouseenter', getTooltip, false);
+        addEventHandler(el, 'mouseenter', appController.handleAppMessages, false);
       }
       
       // !VA Add tooltip triggers for CCP user input elements
@@ -1989,7 +1975,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       for (let i = 0; i < ccpUserInputIds.length; i++) {
         el = document.querySelector(ccpUserInputIds[i]);
         // console.log(el);
-        addEventHandler(el, 'mouseenter', getTooltip, false);
+        addEventHandler(el, 'mouseenter', appController.handleAppMessages, false);
       }
       // !VA Add tooltip triggers for CCP user input label elements
       // !VA All the labels have the same id as the inputs with -label appended except the mock checkboxes, whose label has no text and only serves to style the mock checkbox. So for the mock checkboxes, transform the id into the id of the actual text label by removing the spn- prefix and replacing 'checkmrk' with 'label'.
@@ -2010,13 +1996,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // !VA get the element with the labelid
         labelel = document.querySelector(labelid);
         // !VA Add the event listener to th label element
-        addEventHandler(labelel, 'mouseenter', getTooltip, false);
+        addEventHandler(labelel, 'mouseenter', appController.handleAppMessages, false);
       }
       // !VA Add tooltip targets to the Make Clip buttons - both the Make HTML and Make CSS buttons
       var btnCcpMakeClipIds = Object.values(btnCcpMakeClips);
       for (let i = 0; i < btnCcpMakeClipIds.length; i++) {
         el = document.querySelector(btnCcpMakeClipIds[i]);
-        addEventHandler(el, 'mouseenter', getTooltip, false);
+        addEventHandler(el, 'mouseenter', appController.handleAppMessages, false);
       }
 
 
@@ -2251,7 +2237,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA ============================================================
 
     // !VA Drag and Drop Handler 
-    // !VA appController public function
+    // !VA appController private function
     function handleDragOver(evt) {
       //prevent the bubbling of the event to the parent event handler
       evt.stopPropagation();
@@ -2302,13 +2288,30 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA appController private 
     // !VA Preprocess mouse events and route them to respective eval handler.
     function handleMouseEvents(evt) {
-      console.log('handleMouseEvents running');
+      // console.log('handleMouseEvents running');
+      // console.clear();
       // !VA Carryover from earlier handleUserAction
       // !VA Get the target element of the click
       var el = document.getElementById(this.id);
       var args = { };
       args.target = el.id;
-      
+      // !VA Branch: reconfigureMessages (051620) Check if any appMessages are running
+      try {
+        // console.log('handleMouseEvents try: ');
+        var vals = [], msgElement;
+        // vals = (Object.values(appMessageElements));
+        for (let i = 0; i < vals.length; i++) {
+          // console.log('vals[i] is: ' +  vals[i]);
+          msgElement = document.querySelector(vals[i]);
+          // console.log('msgElement is: ' + msgElement);
+          // console.log('msgElement[i].id is: ' + msgElement[i].id);
+          // // if (msgElement.classList.contains('active')) {
+          // //   console.log('vals[i] is: ' + vals[i]) + ' is active';
+          // // }
+        }
+      } catch (error) {
+        // console.log('handleMouseEvents catch:');
+      }
       // !VA Handle the increment toolbuttons
       if (event.type === 'click') {
         switch (true) {
@@ -2319,12 +2322,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           var val, isErr;
           // !VA We need to query Appdata properties to get the current value of imgW so we can add the toolbutton increments to id
           var Appdata = {};
+          // !VA Branch: reconfigureMessages (051620)
+          // !VA Cancel any running appmessage timeouts and animations
+
+
           Appdata = appController.initGetAppdata();
           // !VA This is a click on one of the toolbutton increment buttons, so we're dealing with the Appdata.imgW property.
           args.prop = 'imgW';
           // !VA The last 2 chars of the id indicate the value by which the img dimension should be incremented,so get the last 2 chars and convert to integer
           val = parseInt(el.id.slice(-2));
-          // !VA If the target ID includes 'grow' then the image dimension will be incremented, if 'shrink' then it will be decremented
+          // !VA If the target ID includes 'incr' then the image dimension will be incremented, if 'decr' then it will be decremented
           (el.id.includes('incr')) ? val : val = -val;
           // !VA Add val to the current imgW to get the value to be passed to checkUserInput for error parsing.
           val = Appdata.imgW + val;
@@ -2360,7 +2367,20 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA TODO: Why are there unused elements and what is actually happening here?
     function handleKeydown(evt) {
       // console.log('handleKeydown running');
-
+      try {
+        console.log('handleKeyDown try: ');
+        var vals = [], msgElement;
+        vals = (Object.values(appMessageElements));
+        for (let i = 0; i < vals.length; i++) {
+          console.log('vals[i] is: ' +  vals[i]);
+          msgElement = document.getElementById(vals[i]);
+          if (msgElement.classList.contains('active')) {
+            console.log('is active');
+          }
+        }
+      } catch (error) {
+        console.log('handleMouseEvents catch:');
+      }
       // !VA Get the keypress
       keydown = evt.which || evt.keyCode || evt.key;
       // !VA Only set vars and get values if Tab and Enter keys were pressed
@@ -2454,18 +2474,19 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     function checkUserInput(args) {
       // !VA Destructure args
       const { target, prop, val } = args;
-      var errCode;
+      let appMessCode;
       var isErr;
       isErr = false;
       var Appdata= {};
       Appdata = appController.initGetAppdata();
       // !VA TODO: Setting maxViewerWidth just for now
       var maxViewerWidth = 800;
-
+      // !VA Branch: reconfigureMessages (051620) 
+      // !VA First, check if there's a message running
       // !VA First, we validate that the user-entered value is an integer and if so, set the error variables.
       if (validateInteger(val)) {
         // !VA NOTE: This is where we could easily trap the negative button increment if it falls below 0 to send a different message than just the standard 'not_Integer' message. Revisit.
-        errCode = 'not_Integer';
+        appMessCode = 'err_not_Integer';
         isErr = true;
       } else {
         // !VA Now, we handle the error cases if user has entered a value in the imgViewer field 
@@ -2477,7 +2498,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           } else if (val > maxViewerWidth ) {
             // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px - and the user-entered value exceeds this, so error.
             isErr = true;
-            errCode = 'viewerW_GT_maxViewerWidth';
+            appMessCode = 'err_viewerW_GT_maxViewerWidth';
           } else {
             // !VA first write val to the viewerW input's value
             // document.querySelector(dynamicRegions.imgViewer).value = val;
@@ -2491,7 +2512,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           if (val > Appdata.viewerW ) {
             // !VA errorHandler!
             isErr = true;
-            errCode = 'imgW_GT_viewerW';
+            appMessCode = 'err_imgW_GT_viewerW';
           }
           break;
         // !VA TODO: Handle the imageheight toolButton input
@@ -2513,7 +2534,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
       if (isErr) {
         // !VA IF Error pass the code to errorHandler to get the error message
-        appController.initMessage(isErr, errCode);
+        appController.handleAppMessages( appMessCode );
       } else {
         // !VA If no error, pass false back to handleKeyup and continue.
         isErr = false;
@@ -2852,7 +2873,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // ==============================
     // !VA appController private
     // !VA Stores for all app error and status messages
-    function appMessages(isErr, messCode) {
+    function appMessages(id, isErr, messCode) {
       let Appdata = appController.initGetAppdata();
       let mess;
       let messages = {
@@ -2869,7 +2890,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         
 
         // !VA Status messages
-        copied_2_CB: 'Code snippet copied to Clipboard!',
+        msg_copied_2_CB: 'Code snippet copied to Clipboard!',
         // !VA TODO: Status messages 
         // 'btn-ccp-make-img-tag': '<img> HTML element copied to Clipboard',
         // 'btn-ccp-td-build-html-clip': '<td> HTML element copied to Clipboard',
@@ -2891,128 +2912,158 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           mess = value;
         }
       }
-      return [isErr, mess];
+      return [id, isErr, mess];
     }
 
     // !VA appController private
-    function messageHandler(isErr, messCode) {
+    function messageHandler(id, isErr, messCode) {
       // !VA This doesn't really do anything but pass the code to appMessages, return the message and convert the isErr/message pair to an array so it can be passed as array to flashAppMessage which then breaks it down again into strings...pretty useless. 
       var retArray = [];
       // !VA Call appMessages to get the message for the messCode provided, returned as array with a bool and a string.
-      retArray = appMessages(isErr, messCode);
+      retArray = appMessages(id, isErr, messCode);
       UIController.flashAppMessage(retArray);
     }
     // !VA END MESSAGE HANDLING
 
+
+
+    // !VA Branch: reconfigureMessages (051620)
+    // !VA NEW MESSAGE HANDLING
+    function getAppMessage(evt) {
+      
+    }
+
+
+
+
+
+
     // !VA TOOLTIPS
     // !VA appController private
     // !VA Called from the event handler to generate the tooltip unique id from the event target id. 
-    function getTooltip(evt) {
-      // console.log('getTooltip running');
-      let targetid, tooltipid, tooltipContent;
-      // !VA Get the id from the event target
-      targetid = '#' + evt.target.id;
-      // !VA Replace the hypens with underscores - that will be the unique tooltip string ID
-      tooltipid = evt.target.id.replace(/-/gi, '_');
-      // !VA Get the tooltip content from the tool string ID in tooltipStrings
-      tooltipContent = tooltipStrings(tooltipid);
-      // !VA Run showTooltip to show the tooltip in #ttip-content
-      // console.log('targetid gettooltip is: ' + targetid);
-      UIController.showTooltip(targetid, tooltipContent);
-    } 
+    // function getTooltip(evt) {
+    //   // console.log('getTooltip running');
+    //   let targetid, tooltipid, tooltipContent;
+    //   // !VA Get the id from the event target
+    //   targetid = '#' + evt.target.id;
+    //   // !VA Replace the hypens with underscores - that will be the unique tooltip string ID
+    //   tooltipid = evt.target.id.replace(/-/gi, '_');
+    //   // !VA Get the tooltip content from the tool string ID in tooltipStrings
+    //   tooltipContent = tooltipStrings(tooltipid);
+    //   // !VA Run showTooltip to show the tooltip in #ttip-content
+    //   // console.log('targetid gettooltip is: ' + targetid);
+    //   UIController.showTooltip(targetid, tooltipContent);
+    // } 
 
     // !VA appController private
     // !VA Key/value pairs containing the unique tooltip ID generate from target ID of the mouseenter event and the corresponding tooltip content.
-    function tooltipStrings(tooltipid) {
+    function getAppMessageStrings( appMessCode) {
+      let Appdata;
+      Appdata = appController.initGetAppdata();
       // console.log('tooltipStrings running');
       // console.log('tooltipid is: ' + tooltipid);
-      let tooltipContent;
+      let appMessContent;
       // !VA Set tooltipContent to ''. This overwrites tooltipContent being undefined if tooltipid is invalid
-      tooltipContent = '';
+      appMessContent = '';
       // !VA Tooltip unique code/value pairs defined here
-      const tooltipStrings = {
-        ipt_tbr_viewerw: 'Set the width of the image\'s parent table for Clipboard output.<br /><span style="white-space: nowrap">Maximum width is 800px.</span>',
-        btn_tbr_incr50: 'Increase the image width by 50px and set the height proportionally. <span style="white-space: nowrap">The width can\'t exceed parent table width.</span>',
-        btn_tbr_incr10: 'Increase the image width by 10px and set the height proportionally. <span style="white-space: nowrap">The width can\'t exceed the width of the parent table.</span>',
-        btn_tbr_incr01: 'Increase the image width by 1px and set the height proportionally. <span style="white-space: nowrap">The width can\'t exceed the width of the parent table.</span>',
-        ipt_tbr_imgwidth: 'Set the image display width and resize height proportionally. <span style="white-space: nowrap">Image width can\'t exceed parent table width.</span>',
-        ipt_tbr_imgheight: 'Set the image display height and resize width proportionally. <span style="white-space: nowrap">Image width can\'t exceed parent table width.</span>',
-        btn_tbr_decr01: 'Decrease the image width by 1px and set the height proportionally.',
-        btn_tbr_decr10: 'Decrease the image width by 10px and set the height proportionally.',
-        btn_tbr_decr50: 'Decrease the image width by 50px and set the height proportionally.',
-        ipt_tbr_sphones_width: 'Set the width for small mobile devices to be used for CSS Clipboard output.',
-        ipt_tbr_lphones_width: 'Set the width for larger mobile devices to be used for CSS Clipboard output.',
-        ins_display_size_label: 'Displays the scaled image dimensions if smaller than Size On Disk. Set width or height in toolbar. Shift+Click to copy attributes. Ctrl+Click to copy style properties.',
-        ins_display_size_width_value: 'Click to copy the width, SHIFT+Click to copy width attribute, <span style="white-space: nowrap">CTRL+Click to copy width style property.</span>',
-        ins_display_size_height_value: 'Click to copy the height, SHIFT+Click to copy height attribute, <span style="white-space: nowrap">CTRL+Click to copy height style property.</span>',
-        ins_disk_size_label: 'Displays the actual resolution of the image as stored on disk. For retina devices, the file\'s actual resolution should be at least twice the display size.',
-        ins_aspect_label: 'Displays the aspect ratio (width: height) of the current image.',
-        ins_small_phones_label: 'Set the image width for small mobile devices. Image height is calculated proportionally. Shift+Click to copy attributes. Ctrl+Click to copy style properties.',
-        ins_small_phones_width_value: 'Click to copy the width, SHIFT+Click to copy width attribute, <span style="white-space: nowrap">CTRL+Click to copy width style property.</span>',
-        ins_small_phones_height_value: 'Click to copy the height, SHIFT+Click to copy height attribute, <span style="white-space: nowrap">CTRL+Click to copy height style property.</span>',
-        ins_large_phones_label: 'Set the image width for larger mobile devices. Image height is calculated proportionally. Shift+Click to copy attributes. Ctrl+Click to copy style properties.',
-        ins_large_phones_width_value: 'Click to copy the width, SHIFT+Click to copy width attribute, <span style="white-space: nowrap">CTRL+Click to copy width style property.</span>',
-        ins_large_phones_height_value: 'Click to copy the height, SHIFT+Click to copy height attribute, <span style="white-space: nowrap">CTRL+Click to copy height style property.</span>',
-        ins_retina_label: 'Displays the recommended image file resolution at the current display size. If this value is less than 2X the display, small phones or large phones values, those values are shown in red.',
-        btn_ccp_make_img_tag: 'Output an HTML IMG tag with the selected options to the Clipboard.',
-        btn_ccp_make_td_tag: 'Output an HTML TD tag with the selected options to the Clipboard.',
-        btn_ccp_make_table_tag: 'Output and HTML TABLE tag with the selected options to the Clipboard',
-        sel_ccp_img_align: 'Set the align attribute of the IMG tag.',
-        sel_ccp_img_align_label: 'Set the align attribute of the IMG tag.',
-        ipt_ccp_img_class: 'Add a class attribute to the IMG tag. If a class is entered, the Make Image CSS Rule buttons appear.',
-        ipt_ccp_img_class_label: 'Add a class attribute to the IMG tag. If a class is entered, the Make Image CSS Rule buttons appear.',
-        ipt_ccp_img_relpath: 'Enter the relative path to the image to include in the src attribute of the Clipboard output. The default is \'img\'',
-        ipt_ccp_img_relpath_label: 'Enter the relative path to the image to include in the src attribute of the Clipboard output. The default is \'img\'',
-        ipt_ccp_img_alt: 'Enter text for the ALT attribute of the Clipboard output. You can use placeholder text and replace it globally later.',
-        ipt_ccp_img_alt_label: 'Enter text for the ALT attribute of the Clipboard output. You can use placeholder text and replace it globally later.',
-        ccp_img_include_width_height: 'If checked, width and height will be added to the IMG tag\'s style attribute in the Clipboard output.',
-        ccp_img_include_width_height_label: 'If checked, width and height will be added to the IMG tag\'s style attribute in the Clipboard output.',
-        ccp_img_include_anchor: 'If checked, the IMG tag will be wrapped in an A tag with the HREF attribute set to # in the Clipboard output',
-        ccp_img_include_anchor_label: 'If checked, the IMG tag will be wrapped in an A tag with the HREF attribute set to # in the Clipboard output',
-        sel_ccp_td_align: 'Set the TD tag\'s align attribute. The default is \'left\'',
-        sel_ccp_td_align_label: 'Set the TD tag\'s align attribute. The default is \'left\'',
-        sel_ccp_td_valign: 'Set the TD tag\'s valign attribute. The default is \'top\'',
-        sel_ccp_td_valign_label: 'Set the TD tag\'s valign attribute. The default is \'top\'',
-        ipt_ccp_td_class: 'Add a class attribute to the TD tag. If a class is entered, the Make TD CSS Rule buttons appear.',
-        ipt_ccp_td_class_label: 'Add a class attribute to the IMG tag. If a class is entered, the Make TD CSS Rule buttons appear.',
-        ipt_ccp_td_bgcolor: 'Set the bgcolor attribute for the TD tag. You can use a hex value,a valid CSS color alias or any string. Hex values must be prepended with a # character.',
-        ipt_ccp_td_bgcolor_label: 'Set the bgcolor attribute for the TD tag. You can use a hex value, a CSS color alias or any string. Hex values must be prepended with a # character.',
-        rdo_ccp_td_basic: 'TBD',
-        rdo_ccp_td_basic_label: 'TBD',
-        rdo_ccp_td_excludeimg: 'TBD',
-        rdo_ccp_td_excludeimg_label: 'TBD',
-        rdo_ccp_td_posswitch: 'TBD',
-        rdo_ccp_td_poswitch_label: 'TBD',
-        rdo_ccp_td_bgimage: 'TBD',
-        rdo_ccp_td_bgimage_label: 'TBD',
-        rdo_ccp_td_vmlbutton: 'TBD',
-        rdo_ccp_td_vmlbutton_label: 'TBD',
-        ipt_ccp_table_class: 'Add a class attribute to the parent TABLE tag. If a class is entered, the Make TABLE CSS Rule buttons appear.',
-        ipt_ccp_table_class_label: 'Add a class attribute to the parent TABLE tag. If a class is entered, the Make TABLE CSS Rule buttons appear.',
-        ipt_ccp_table_width: 'TBD',
-        ipt_ccp_table_width_label: 'TBD',
-        sel_ccp_table_align: 'Set the parent TABLE tag\'s align attribute. The default is \'left\'',
-        sel_ccp_table_align_label: 'Set the parent TABLE tag\'s align attribute. The default is \'left\'',
-        ipt_ccp_table_bgcolor: 'Set the bgcolor attribute for the parent TABLE tag. You can use a hex value,a valid CSS color alias or any string. Hex values must be prepended with a # character.',
-        ipt_ccp_table_bgcolor_label: 'Set the bgcolor attribute for the parent TABLE tag. You can use a hex value, a CSS color alias or any string. Hex values must be prepended with a # character.',
-        ccp_table_include_wrapper: 'TBD',
-        ccp_table_include_wrapper_label: 'TBD',
-        ipt_ccp_table_wrapper_class: 'Add a class attribute to the wrapper TABLE tag or accept the default \'devicewidth\'. ',
-        ipt_ccp_table_wrapper_class_label: 'Add a class attribute to the wrapper TABLE tag or accept the default \'devicewidth\'.',
-        ipt_ccp_table_wrapper_width: 'TBD',
-        ipt_ccp_table_wrapper_width_label: 'TBD',
-        sel_ccp_table_wrapper_align: 'Set the wrapper TABLE tag\'s align attribute. The default is \'left\'',
-        sel_ccp_table_align_wrapper_label: 'Set the wrapper TABLE tag\'s align attribute. The default is \'left\'',
-        ipt_ccp_table_wrapper_bgcolor: 'Set the bgcolor attribute for the wrapper TABLE tag. You can use a hex value,a valid CSS color alias or any string. Hex values must be prepended with a # character.',
-        ipt_ccp_table_bgcolor_wrapper_bgcolor_label: 'Set the bgcolor attribute for the wrapper TABLE tag. You can use a hex value, a CSS color alias or any string. Hex values must be prepended with a # character.'
+      const getAppMessageStrings = {
+        // !VA STATUS
+        msg_copied_2_CB: 'Code snippet copied to Clipboard!',
+        // !VA ERRORS
+        err_not_Integer: 'This value has to be a positive whole number - try again or press ESC.',
+        err_imgW_GT_viewerW: `Image width must be less than the current parent table width of ${Appdata.viewerW}px. Make the parent table wider first.`,
+        err_tbButton_LT_zero: 'Image dimension can\'t be less than 1.',
+        err_tbButton_GT_viewerW: `Image can't be wider than its parent table. Parent table width is currently ${Appdata.viewerW}px`,
+        // !VA maxViewerWidth issue here, see message below;
+        err_viewerW_GT_maxViewerWidth: 'Parent table width can\'t exceed can\'t exceed app width: 800px.',
+        err_not_an_integer: 'Not an integer: please enter a positive whole number for width.',
+        err_vmlbutton_no_value: 'Height and width must be entered to create a VML button.',
+        err_vmlbutton_height_mismatch: 'Is the correct image loaded? Img height should match entry. Check the code output. ',
+
+
+        // !VA TOOLTIPS
+        tip_ipt_tbr_viewerw: 'Set the width of the image\'s parent table for Clipboard output.<br /><span style="white-space: nowrap">Maximum width is 800px.</span>',
+        tip_btn_tbr_incr50: 'Increase the image width by 50px and set the height proportionally. <span style="white-space: nowrap">The width can\'t exceed parent table width.</span>',
+        tip_btn_tbr_incr10: 'Increase the image width by 10px and set the height proportionally. <span style="white-space: nowrap">The width can\'t exceed the width of the parent table.</span>',
+        tip_btn_tbr_incr01: 'Increase the image width by 1px and set the height proportionally. <span style="white-space: nowrap">The width can\'t exceed the width of the parent table.</span>',
+        tip_ipt_tbr_imgwidth: 'Set the image display width and resize height proportionally. <span style="white-space: nowrap">Image width can\'t exceed parent table width.</span>',
+        tip_ipt_tbr_imgheight: 'Set the image display height and resize width proportionally. <span style="white-space: nowrap">Image width can\'t exceed parent table width.</span>',
+        tip_btn_tbr_decr01: 'Decrease the image width by 1px and set the height proportionally.',
+        tip_btn_tbr_decr10: 'Decrease the image width by 10px and set the height proportionally.',
+        tip_btn_tbr_decr50: 'Decrease the image width by 50px and set the height proportionally.',
+        tip_ipt_tbr_sphones_width: 'Set the width for small mobile devices to be used for CSS Clipboard output.',
+        tip_ipt_tbr_lphones_width: 'Set the width for larger mobile devices to be used for CSS Clipboard output.',
+        tip_ins_display_size_label: 'Displays the scaled image dimensions if smaller than Size On Disk. Set width or height in toolbar. Shift+Click to copy attributes. Ctrl+Click to copy style properties.',
+        tip_ins_display_size_width_value: 'Click to copy the width, SHIFT+Click to copy width attribute, <span style="white-space: nowrap">CTRL+Click to copy width style property.</span>',
+        tip_ins_display_size_height_value: 'Click to copy the height, SHIFT+Click to copy height attribute, <span style="white-space: nowrap">CTRL+Click to copy height style property.</span>',
+        tip_ins_disk_size_label: 'Displays the actual resolution of the image as stored on disk. For retina devices, the file\'s actual resolution should be at least twice the display size.',
+        tip_ins_aspect_label: 'Displays the aspect ratio (width: height) of the current image.',
+        tip_ins_small_phones_label: 'Set the image width for small mobile devices. Image height is calculated proportionally. Shift+Click to copy attributes. Ctrl+Click to copy style properties.',
+        tip_ins_small_phones_width_value: 'Click to copy the width, SHIFT+Click to copy width attribute, <span style="white-space: nowrap">CTRL+Click to copy width style property.</span>',
+        tip_ins_small_phones_height_value: 'Click to copy the height, SHIFT+Click to copy height attribute, <span style="white-space: nowrap">CTRL+Click to copy height style property.</span>',
+        tip_ins_large_phones_label: 'Set the image width for larger mobile devices. Image height is calculated proportionally. Shift+Click to copy attributes. Ctrl+Click to copy style properties.',
+        tip_ins_large_phones_width_value: 'Click to copy the width, SHIFT+Click to copy width attribute, <span style="white-space: nowrap">CTRL+Click to copy width style property.</span>',
+        tip_ins_large_phones_height_value: 'Click to copy the height, SHIFT+Click to copy height attribute, <span style="white-space: nowrap">CTRL+Click to copy height style property.</span>',
+        tip_ins_retina_label: 'Displays the recommended image file resolution at the current display size. If this value is less than 2X the display, small phones or large phones values, those values are shown in red.',
+        tip_btn_ccp_make_img_tag: 'Output an HTML IMG tag with the selected options to the Clipboard.',
+        tip_btn_ccp_make_td_tag: 'Output an HTML TD tag with the selected options to the Clipboard.',
+        tip_btn_ccp_make_table_tag: 'Output and HTML TABLE tag with the selected options to the Clipboard',
+        tip_sel_ccp_img_align: 'Set the align attribute of the IMG tag.',
+        tip_sel_ccp_img_align_label: 'Set the align attribute of the IMG tag.',
+        tip_ipt_ccp_img_class: 'Add a class attribute to the IMG tag. If a class is entered, the Make Image CSS Rule buttons appear.',
+        tip_ipt_ccp_img_class_label: 'Add a class attribute to the IMG tag. If a class is entered, the Make Image CSS Rule buttons appear.',
+        tip_ipt_ccp_img_relpath: 'Enter the relative path to the image to include in the src attribute of the Clipboard output. The default is \'img\'',
+        tip_ipt_ccp_img_relpath_label: 'Enter the relative path to the image to include in the src attribute of the Clipboard output. The default is \'img\'',
+        tip_ipt_ccp_img_alt: 'Enter text for the ALT attribute of the Clipboard output. You can use placeholder text and replace it globally later.',
+        tip_ipt_ccp_img_alt_label: 'Enter text for the ALT attribute of the Clipboard output. You can use placeholder text and replace it globally later.',
+        tip_ccp_img_include_width_height: 'If checked, width and height will be added to the IMG tag\'s style attribute in the Clipboard output.',
+        tip_ccp_img_include_width_height_label: 'If checked, width and height will be added to the IMG tag\'s style attribute in the Clipboard output.',
+        tip_ccp_img_include_anchor: 'If checked, the IMG tag will be wrapped in an A tag with the HREF attribute set to # in the Clipboard output',
+        tip_ccp_img_include_anchor_label: 'If checked, the IMG tag will be wrapped in an A tag with the HREF attribute set to # in the Clipboard output',
+        tip_sel_ccp_td_align: 'Set the TD tag\'s align attribute. The default is \'left\'',
+        tip_sel_ccp_td_align_label: 'Set the TD tag\'s align attribute. The default is \'left\'',
+        tip_sel_ccp_td_valign: 'Set the TD tag\'s valign attribute. The default is \'top\'',
+        tip_sel_ccp_td_valign_label: 'Set the TD tag\'s valign attribute. The default is \'top\'',
+        tip_ipt_ccp_td_class: 'Add a class attribute to the TD tag. If a class is entered, the Make TD CSS Rule buttons appear.',
+        tip_ipt_ccp_td_class_label: 'Add a class attribute to the IMG tag. If a class is entered, the Make TD CSS Rule buttons appear.',
+        tip_ipt_ccp_td_bgcolor: 'Set the bgcolor attribute for the TD tag. You can use a hex value,a valid CSS color alias or any string. Hex values must be prepended with a # character.',
+        tip_ipt_ccp_td_bgcolor_label: 'Set the bgcolor attribute for the TD tag. You can use a hex value, a CSS color alias or any string. Hex values must be prepended with a # character.',
+        tip_rdo_ccp_td_basic: 'TBD',
+        tip_rdo_ccp_td_basic_label: 'TBD',
+        tip_rdo_ccp_td_excludeimg: 'TBD',
+        tip_rdo_ccp_td_excludeimg_label: 'TBD',
+        tip_rdo_ccp_td_posswitch: 'TBD',
+        tip_rdo_ccp_td_poswitch_label: 'TBD',
+        tip_rdo_ccp_td_bgimage: 'TBD',
+        tip_rdo_ccp_td_bgimage_label: 'TBD',
+        tip_rdo_ccp_td_vmlbutton: 'TBD',
+        tip_rdo_ccp_td_vmlbutton_label: 'TBD',
+        tip_ipt_ccp_table_class: 'Add a class attribute to the parent TABLE tag. If a class is entered, the Make TABLE CSS Rule buttons appear.',
+        tip_ipt_ccp_table_class_label: 'Add a class attribute to the parent TABLE tag. If a class is entered, the Make TABLE CSS Rule buttons appear.',
+        tip_ipt_ccp_table_width: 'TBD',
+        tip_ipt_ccp_table_width_label: 'TBD',
+        tip_sel_ccp_table_align: 'Set the parent TABLE tag\'s align attribute. The default is \'left\'',
+        tip_sel_ccp_table_align_label: 'Set the parent TABLE tag\'s align attribute. The default is \'left\'',
+        tip_ipt_ccp_table_bgcolor: 'Set the bgcolor attribute for the parent TABLE tag. You can use a hex value,a valid CSS color alias or any string. Hex values must be prepended with a # character.',
+        tip_ipt_ccp_table_bgcolor_label: 'Set the bgcolor attribute for the parent TABLE tag. You can use a hex value, a CSS color alias or any string. Hex values must be prepended with a # character.',
+        tip_ccp_table_include_wrapper: 'TBD',
+        tip_ccp_table_include_wrapper_label: 'TBD',
+        tip_ipt_ccp_table_wrapper_class: 'Add a class attribute to the wrapper TABLE tag or accept the default \'devicewidth\'. ',
+        tip_ipt_ccp_table_wrapper_class_label: 'Add a class attribute to the wrapper TABLE tag or accept the default \'devicewidth\'.',
+        tip_ipt_ccp_table_wrapper_width: 'TBD',
+        tip_ipt_ccp_table_wrapper_width_label: 'TBD',
+        tip_sel_ccp_table_wrapper_align: 'Set the wrapper TABLE tag\'s align attribute. The default is \'left\'',
+        tip_sel_ccp_table_align_wrapper_label: 'Set the wrapper TABLE tag\'s align attribute. The default is \'left\'',
+        tip_ipt_ccp_table_wrapper_bgcolor: 'Set the bgcolor attribute for the wrapper TABLE tag. You can use a hex value,a valid CSS color alias or any string. Hex values must be prepended with a # character.',
+        tip_ipt_ccp_table_bgcolor_wrapper_bgcolor_label: 'Set the bgcolor attribute for the wrapper TABLE tag. You can use a hex value, a CSS color alias or any string. Hex values must be prepended with a # character.'
       };
       // !VA Loop through the tooltip unique ids and if one matches event's target id, return it as tooltipContent
-      for (let [key, value] of Object.entries(tooltipStrings)) {
-        if (key  === tooltipid) {
-          tooltipContent = value;
+      for (let [key, value] of Object.entries(getAppMessageStrings)) {
+        if (key  === appMessCode) {
+          appMessContent = value;
         }
       }
-      return tooltipContent;
+      return appMessContent;
     }
     // !VA END TOOLTIP HANDLING
 
@@ -3090,6 +3141,48 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       return Appdata;
     }
 
+    function handleTooltips(targetid, appMessContent ) {
+      console.log('handleTooltips running');
+      let timer, targetElement, appMessContainer;
+      targetElement = document.querySelector( '#' + targetid);
+      targetElement.addEventListener('mouseleave', leaveMe, false);
+      appMessContainer = document.querySelector(appMessageElements.tipContent);
+      
+      
+      
+      function showTooltip( appMessContent, delay) {
+        timer = setTimeout(() => {
+          console.log('NOW');
+          appMessContainer.innerHTML = appMessContent;
+          targetElement.classList.add('active');
+          appMessContainer.classList.add('active');
+
+        }, delay);
+      }
+
+      function cancelDelay() {
+        clearTimeout(timer);
+      }
+
+      function leaveMe() {
+        cancelDelay();
+        // !VA Remove the class on the targetElement that shows the help cursor
+        targetElement.classList.remove('active');
+        // !VA Remove the class on the appMessContainer element 
+        appMessContainer.classList.remove('active');
+        // !VA This not the place to reset the innerHTML
+        // document.getElementById('ttip-content').innerHTML = '';
+      }
+
+      showTooltip(appMessContent, 2000);
+
+
+
+
+    }
+
+
+
     // !VA appController public functions
     return {
       // !VA Dev Mode pass-thru public functions to expose calcViewerSize and initCCP to UIController.initUI
@@ -3098,14 +3191,42 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         calcViewerSize();
       },
       // !VA appController public
+      // !VA NOTE: I'm not sure why this is public here - when would initCCP have to cross modules?
       initInitCCP: function() {
         initCCP();
       },
 
+      // !VA appController public
+      handleAppMessages: function ( appMessCode ) {
+        console.log('handleAppMessages running');
+        console.log('appMessCode is: ' + appMessCode);
+        // console.log('appController public handleAppMessages running');
+        let targetid, appMessType, appMessContent;
+        // !VA If appMessCode is an object, then it originated in an addEventListener, so it must be a tooltip because those are the only appMessages that originate there. Parse the target id from the event and convert it to a valid appMessCode, i.e. underscores instead of hyphens.
+        // !VA Get the appMessContent from the appMessCode
+        // !VA Get the appMessType from the appMessCode
+        // console.log('appMessType is: ' + appMessType);
+        if (typeof(appMessCode) === 'object') { 
+          targetid = appMessCode.target.id;
+          console.log('targetid is: ' + targetid);
+          appMessCode = 'tip_' + appMessCode.target.id.replace(/-/gi, '_'); 
+        }
+        appMessType = appMessCode.slice(0, 3);
+        appMessContent = getAppMessageStrings(appMessCode); 
+        console.log('appMessContent is: ' + appMessContent);
+        console.log('appMessCode is: ' + appMessCode);
+        appMessType === 'tip' ? handleTooltips(targetid, appMessContent) : UIController.showAppMessages(appMessType, appMessContent);
+
+        console.log('Mark1');
+        
+      },
+
+
+
       // !VA Were putting this here so it can be accessed from either other module -- all it does it get the code and pass it on to the private appController function that finds the error code from the string and passes that on to UIController for display.
       // !VA appController public
-      initMessage: function(isErr, errCode) {
-        messageHandler(isErr, errCode);
+      initMessage: function(id, isErr, errCode) {
+        messageHandler(id, isErr, errCode);
       },
 
       // !VA This is a pass-thru to access queryDOMElements (public UIController)  to get the current dimensions of the dynamic DOM elements and data attributes, and getAppdata (private appController) to calculate the non-DOM Appdata properties. We do this here because Appdata has to be queried in all three modules, so it has to be accessible in all of them, and because getAppdata needs getAspectRatio which belongs in appController.

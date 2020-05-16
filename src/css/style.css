@@ -1394,38 +1394,6 @@ input:focus:-ms-input-placeholder {
 .pop-font {
   color: rgba(255, 255, 255, 0.9) !important; }
 
-#ttip-container {
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 40px;
-  padding: 0 40px 0 30px; }
-
-.ttip-content-container {
-  display: flex;
-  align-content: center;
-  justify-content: center;
-  width: 100%;
-  height: 38px;
-  padding: 0 40px 0 30px;
-  z-index: -1; }
-  .ttip-content-container #ttip-content {
-    display: block;
-    height: 100%;
-    transition: opacity .125s;
-    color: #04508e;
-    font-size: 1rem;
-    font-style: italic;
-    line-height: 1.125rem;
-    text-align: center;
-    opacity: 0;
-    z-index: -1; }
-    .ttip-content-container #ttip-content.active {
-      transition: opacity .125s;
-      opacity: 1; }
-
 .ttip {
   cursor: default;
   z-index: 100; }
@@ -1433,42 +1401,41 @@ input:focus:-ms-input-placeholder {
 .active {
   cursor: help; }
 
-#msg-container {
-  display: block;
+#app-message-container {
+  display: flex;
   position: relative;
   top: -40px;
   left: 0;
   width: 100%;
-  height: 35px; }
+  height: 35px;
+  border: 1px solid blue; }
 
-.msg-content-container {
+#tip-content, #err-content, #msg-content {
+  position: absolute;
+  display: block;
   width: 100%;
-  height: 1.75rem;
-  margin: 0;
-  padding: 0; }
-
-#msg-content {
+  height: 100%;
+  transition: opacity .125s;
   font-size: 1rem;
   font-style: italic;
-  font-weight: normal;
-  line-height: 1.25rem;
+  line-height: 1.125rem;
   text-align: center;
-  opacity: 1; }
-  #msg-content.show-err {
-    opacity: 1;
-    transition: opacity .125s ease-in-out;
-    color: #FF0000; }
-  #msg-content.hide-err {
-    opacity: 0;
-    transition: opacity .125s ease-in-out; }
-  #msg-content.show-mess {
-    opacity: 1;
-    transition: opacity .125s ease-in-out;
-    color: #959595; }
-  #msg-content.hide-mess {
-    opacity: 0;
-    transition: opacity .125s ease-in-out;
-    color: #959595; }
+  opacity: 0;
+  z-index: -1; }
+  #tip-content.active, #err-content.active, #msg-content.active {
+    transition: opacity .125s;
+    opacity: 1; }
+
+#tip-content {
+  color: #04508e;
+  border: 1px solid magenta; }
+
+#err-content {
+  color: #FF0000;
+  border: 1px solid magenta; }
+
+#msg-content {
+  color: #959595; }
 
 #main-image-viewer {
   position: absolute;
