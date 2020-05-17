@@ -1014,6 +1014,8 @@ body {
 html {
   font-size: 16px;
   box-sizing: border-box; }
+  html.modifier-pressed {
+    cursor: help !important; }
 
 body {
   min-height: 100% !important;
@@ -2022,5 +2024,11 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/@supports   */
     -moz-appearance: none !important;
     background: white url("data:image/gif;base64,R0lGODlhBgAGAKEDAFVVVX9/f9TU1CgmNyH5BAEKAAMALAAAAAAGAAYAAAIODA4hCDKWxlhNvmCnGwUAOw==") right center no-repeat !important;
     background-position: calc(100% - 5px) center !important; } }
+
+button, .btn, .btn-default {
+  cursor: inherit; }
+
+#testme.active {
+  background: yellow; }
 
 /*# sourceMappingURL=style.css.map */

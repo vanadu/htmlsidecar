@@ -24,7 +24,10 @@ DONE: Add animation to tooltips
 DONE: Fix tooltip cursor not changing to help cursor on Display Size and other elements with clipboard clicks. That is not going to happen since the clipboard clicks on the label are governed by the hover pseudoelement which overrides the mouseenter event, I think. Closed.
 DONE: Cancel tooltips when error message is displayed.
 
-TODO: Revisit tooltip implementation, it sucks with the tips showing on mouseenter. Try it with the ALT key
+TODO: Revisit tooltip implementation, it sucks with the tips showing on mouseenter. After trying a few things, it looks like holding ALT+CTRL and pointing at the tooltip element, whereby the tooltip stays displayed until ALT+CTRL is released, is most promising. See the mouseIn function below.
+
+
+
 TODO: Fix the CSS Rule buttons disappearing when hovered or clicked. It's because they get the class ttip for some reason.
 TODO: Fix that error messages stay displayed for the entire timeout even if another error message is triggered. 
 TODO: Fix that the tooltip timeout isn't reset when the element is clicked. This whole thing with the tooltips, app messages and error messages needs to be rethought. 
@@ -87,17 +90,61 @@ var Witty = (function () {
   // };
 
   // !VA Click on Witty logo to run test function
-  // var testbut = document.querySelector('#testme');
-  // testbut.addEventListener('click', runMe, false);
-  // // testBut.addEventListener('click', runMe, false);
+  var testbut = document.querySelector('#testme');
+  testbut.addEventListener('mouseenter', runMe, false);
+  // testBut.addEventListener('click', runMe, false);
 
-  // function runMe(evt) {
-  //   console.log('runMe running');
+  function runMe(evt) {
+    console.log('runMe running');
+    testbut.classList.add('active')
+  }
+
+  function mouseIn(evt) {
+    console.log('mouseIn running');
+    testbut.classList.add('active')
+  }
+  
+  function mouseOut(evt) {
+    console.log('mouseOut running');
+
+  }
+
+  
+  
+  function testAlt() {
+    console.log('testAlt');
+    if (event.altKey) {
+      console.log('ALT');
+    }
+  }
+
+  // !VA Test for modifier key
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('running');
+    const rootElement = document.querySelector(':root');
+    console.log('rootElement is: ' + rootElement);
+    document.addEventListener('keydown', function(event) {
+      if (event.altKey && event.ctrlKey) {
+        rootElement.classList.add('modifier-pressed');
+        console.log('Modifier pressed');
+        testbut.addEventListener('mouseenter', mouseIn, false);
 
 
-    
-  // }
 
+        
+      }
+      
+    });
+    document.addEventListener('keyup', function(event) {
+      if (event.altKey || event.ctrlKey) {
+        rootElement.classList.remove('modifier-pressed');
+        console.log('Modifier released');
+        testbut.classList.remove('active');
+        
+      }
+    });
+
+  });
 
   // !VA GLOBAL
   let myObject = {};
@@ -292,6 +339,9 @@ var Witty = (function () {
     // });
 
 
+  
+
+
     // !VA UIController private
     // !VA Reboot: passing in Appdata from 
     function evalInspectorAlerts(Appdata) {
@@ -323,19 +373,20 @@ var Witty = (function () {
     }
 
 
-    function showAppMessages(appMessContainer, tooltipTarget) {
+    function showAppMessages(appMessContainerId, tooltipTarget) {
+      
       console.log('showAppMessages running');
       // !VA Show the current appMessage. If the current appMessage is a tooltip, then show the help cursor while the mouse is in the tooltip element.
-      console.log('appMessContainer is: ' + appMessContainer);
+      console.log('appMessContainer is: ' + appMessContainerId);
       console.log('tooltipTarget is: ' + tooltipTarget);
-      document.querySelector(appMessContainer).classList.add('active');
+      document.querySelector(appMessContainerId).classList.add('active');
       if (document.querySelector(tooltipTarget)) { document.querySelector(tooltipTarget).classList.add('active'); } 
     }
 
-    function hideAppMessages(appMessContainer, tooltipTarget) {
+    function hideAppMessages(appMessContainerId, tooltipTarget) {
       console.log('hideAppMessages running');
       // !VA Show the current appMessage. If the current appMessage is a tooltip, then restore the default cursor when the mouse leaves the tooltip element.
-      document.querySelector(appMessContainer).classList.remove('active');
+      document.querySelector(appMessContainerId).classList.remove('active');
       if (document.querySelector(tooltipTarget)) { document.querySelector(tooltipTarget).classList.remove('active'); } 
 
 
@@ -346,10 +397,10 @@ var Witty = (function () {
 
       // !VA UIController public
       // !VA This has to cancel the timeouts for the runmn
-      displayAppMessages: function (isShow, appMessContainer, tooltipTarget) {
+      displayAppMessages: function (isShow, appMessContainerId, tooltipTarget) {
         console.log('displayAppMessages running');
 
-        isShow ? showAppMessages(appMessContainer, tooltipTarget) : hideAppMessages(appMessContainer, tooltipTarget);
+        isShow ? showAppMessages(appMessContainerId, tooltipTarget) : hideAppMessages(appMessContainerId, tooltipTarget);
       },
 
 
@@ -423,7 +474,6 @@ var Witty = (function () {
         
         // !VA Get the data properties for iptTbrSmallPhonesW and sPhonesH
         // !VA This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
-        // !VA Branch: implementPhonesLocalStorage (050920)
 
         els.sPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).getAttribute('data-sphonesw'), 10);
         els.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
@@ -467,10 +517,6 @@ var Witty = (function () {
         // localStorage.clear();
         // !VA If localStorage is set for viewerW, sPhonesW or lgPhones, add the localStorage value to curDeviceWidths, otherwise set the defaults used when the app is used for the first time or no user-values are entered.
         
-        // !VA Branch: inspectorClipboardOutput (051320)
-        // var faa = document.querySelector(inspectorElements.spnDisplaySizeHeight).id;
-        // console.log('faa is: ' + faa);
-
 
         arr = [ 'viewerW', 'sPhonesW', 'lPhonesW' ];
         // !VA If there's localStorage, push it to the curDeviceWidths array. Otherwise, push false.
@@ -862,7 +908,7 @@ var Witty = (function () {
 
     // !VA CBController private
     function getCheckboxSelection(target) {
-      // console.clear();
+      
       let chkboxid, checked;
       chkboxid = document.querySelector(target).id;
       chkboxid = chkboxid.replace('mrk', 'box');
@@ -1348,7 +1394,6 @@ var Witty = (function () {
         if (Attributes.tdValign) { tdInner.vAlign = Attributes.tdValign; }
         if (Attributes.tdHeight) { tdInner.height = Attributes.imgWidth; }
         if (Attributes.tdWidth) { tdInner.width = Attributes.imgHeight; }
-        // !VA Branch: implementExcludeImg (050420)
         // !VA If 'basic' is checked, create imgNode and append it, otherwise exclude the imgNode.
         if (uSels.selectedRadio === 'basic') {
           imgNode = makeImgNode( id );
@@ -1722,7 +1767,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     }
 
     function handleInspectorClicks(targetid, modifierKey) {
-      // console.clear();
+      
       console.log('handleInspectorClicks running');
       console.log('targetid is: ' + targetid);
       let Appdata, clipboardStr, widthval, heightval;
@@ -2275,7 +2320,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA Preprocess mouse events and route them to respective eval handler.
     function handleMouseEvents(evt) {
       // console.log('handleMouseEvents running');
-      // console.clear();
+      
       // !VA Carryover from earlier handleUserAction
       // !VA Get the target element of the click
       var el = document.getElementById(this.id);
@@ -2855,92 +2900,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       }
     }
 
-    //  !VA ERROR AND MESSAGE HANDLING
-    // ==============================
-    // !VA appController private
-    // !VA Stores for all app error and status messages
-    function appMessages(id, isErr, messCode) {
-      let Appdata = appController.initGetAppdata();
-      let mess;
-      let messages = {
-        // !VA Error messages
-        not_Integer: 'This value has to be a positive whole number - try again or press ESC.',
-        imgW_GT_viewerW: `Image width must be less than the current parent table width of ${Appdata.viewerW}px. Make the parent table wider first.`,
-        tbButton_LT_zero: 'Image dimension can\'t be less than 1.',
-        tbButton_GT_viewerW: `Image can't be wider than its parent table. Parent table width is currently ${Appdata.viewerW}px`,
-        // !VA maxViewerWidth issue here, see message below;
-        viewerW_GT_maxViewerWidth: 'Parent table width can\'t exceed can\'t exceed app width: 800px.',
-        not_an_integer: 'Not an integer: please enter a positive whole number for width.',
-        vmlbutton_no_value: 'Height and width must be entered to create a VML button.',
-        vmlbutton_height_mismatch: 'Is the correct image loaded? Img height should match entry. Check the code output. ',
-        
-
-        // !VA Status messages
-        msg_copied_2_CB: 'Code snippet copied to Clipboard!',
-        // !VA TODO: Status messages 
-        // 'btn-ccp-make-img-tag': '<img> HTML element copied to Clipboard',
-        // 'btn-ccp-td-build-html-clip': '<td> HTML element copied to Clipboard',
-        // 'btn-ccp-table-build-html-clip': '<table> HTML element copied to Clipboard',
-        // 'btn-ccp-make-img-dsktp-css-rule-but': 'CSS class delaration copied to the Clipboard',
-        // 'btn-ccp-img-lgphn-build-css-clip-but': 'CSS class delaration for tablets copied to the Clipboard',
-        // 'btn-ccp-img-smphn-build-css-clip-but': 'CSS class delaration for phones copied to the Clipboard',
-        // 'btn-ccp-make-td-dsktp-css-rule-but': 'CSS class delaration copied to the Clipboard!',
-        // 'btn-ccp-td-lgphn-build-css-clip-but': 'CSS class delaration for tablets copied to the Clipboard',
-        // 'btn-ccp-td-smphn-build-css-clip-but': 'CSS class delaration for phones copied to the Clipboard',
-        // 'btn-ccp-table-dsktp-build-css-clip-but': 'CSS class delaration copied to the Clipboard',
-        // 'btn-ccp-table-lgphn-build-css-clip-but': 'CSS class delaration for tablets copied to the Clipboard',
-        // 'btn-ccp-make-table-smphn-css-rule-but': 'CSS class delaration for phones copied to the Clipboard',
-
-      };
-      // !VA Loop through the error ID/message pairs and find the match
-      for (const [key, value] of Object.entries(messages)) { 
-        if (key === messCode ) {
-          mess = value;
-        }
-      }
-      return [id, isErr, mess];
-    }
-
-    // !VA appController private
-    function messageHandler(id, isErr, messCode) {
-      // !VA This doesn't really do anything but pass the code to appMessages, return the message and convert the isErr/message pair to an array so it can be passed as array to flashAppMessage which then breaks it down again into strings...pretty useless. 
-      var retArray = [];
-      // !VA Call appMessages to get the message for the messCode provided, returned as array with a bool and a string.
-      retArray = appMessages(id, isErr, messCode);
-      UIController.flashAppMessage(retArray);
-    }
-    // !VA END MESSAGE HANDLING
-
-
-
-    // !VA Branch: reconfigureMessages (051620)
-    // !VA NEW MESSAGE HANDLING
-    function getAppMessage(evt) {
-      
-    }
-
-
-
-
-
-
-    // !VA TOOLTIPS
-    // !VA appController private
-    // !VA Called from the event handler to generate the tooltip unique id from the event target id. 
-    // function getTooltip(evt) {
-    //   // console.log('getTooltip running');
-    //   let targetid, tooltipid, tooltipContent;
-    //   // !VA Get the id from the event target
-    //   targetid = '#' + evt.target.id;
-    //   // !VA Replace the hypens with underscores - that will be the unique tooltip string ID
-    //   tooltipid = evt.target.id.replace(/-/gi, '_');
-    //   // !VA Get the tooltip content from the tool string ID in tooltipStrings
-    //   tooltipContent = tooltipStrings(tooltipid);
-    //   // !VA Run showTooltip to show the tooltip in #ttip-content
-    //   // console.log('targetid gettooltip is: ' + targetid);
-    //   UIController.showTooltip(targetid, tooltipContent);
-    // } 
-
+ 
+    // !VA Message handling
     // !VA appController private
     // !VA Key/value pairs containing the unique tooltip ID generate from target ID of the mouseenter event and the corresponding tooltip content.
     function getAppMessageStrings( appMessCode) {
@@ -3160,10 +3121,46 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       }
     }
 
+    function processAppTips2(targetid, appMessContent, delayduration) {
+      
+      console.log('processAppTips2 running');
+
+      let tooltipTarget, appMessContainer, appMessContainerId;
+      appMessContainerId = appMessageElements.tipContent;
+      appMessContainer = document.querySelector(appMessageElements.tipContent);
+      showTip(appMessContent);
+      tooltipTarget = '#' + targetid;
+      appMessContainer.innerHTML = appMessContent;
+      UIController.displayAppMessages( true, appMessContainerId, false );
+      
+      function showTip() {
+        timer = setTimeout(() => {
+          // console.log('NOW');
+          // !VA Read the appMessContent into the tooltip content element
+          // !VA Here we call UIController.showAppMess. It needs two parameters for tooltips - the targetElement that gets the help cursor and the appMessElement that gets the appMessContent. We put the targetid at the end because it will only have a value for tooltips - for the other two message types it will be undefined.
+          console.log('appMessContainerId is: ' + appMessContainerId);
+          UIController.displayAppMessages(false, appMessContainerId, false );
+        }, delayduration[1]);
+      }
+      // !VA Clear the timeout 'timer' and remove the message when the mouse leaves the tooltip element.
+      function cancelTimeout() {
+        clearTimeout(timer);
+      }
+      // !VA Runs on mouseleave,  call displayAppMessages to hide the tooltip and change back to the default cursor.
+      function cancelAppMess() {
+        // !VA Run function to clear the timeout 'timer' when the mouse leaves the tooltip element
+        cancelTimeout();
+        // !VA Run displayAppMessages with isShow = false to hide the tooltip and remove the help cursor from the target element.
+
+      }
+
+
+    }
+
     // !VA appController private
     // !VA Preprocess error messages before sending them to UIController.displayAppMessages
     function processAppMessages(appMessType, appMessContent, delayduration ) {
-      console.clear();
+      
       console.log('preprocessAppErrs running');
       console.log('appMessType is: ' + appMessType);
       console.log('appMessContent is: ' + appMessContent);
@@ -3219,15 +3216,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA So now the problem is that tooltips require the caller id because the tooltip shows on mouseenter and has to hide on mouseleave, and we need the id for the mouseleave to create the eventListener for it. So:
       // !VA Call showAppMessages with two parameters: targetid, which is either a string for tooltips or false for msg and err, and the second parameter is the appMessContent.
       handleAppMessages: function ( appMessCode ) {
-        // console.clear();
+        
         console.log('handleAppMessages running');
         // console.log('appController public handleAppMessages running');
-        let targetid, appMessType, appMessContent;
+        let evt, targetid, appMessType, appMessContent;
         // !VA If appMessCode is an object, then it originated in an addEventListener, so it must be a tooltip because those are the only appMessages that originate there. Parse the target id from the event and convert it to a valid appMessCode, i.e. underscores instead of hyphens.
         if (typeof(appMessCode) === 'object') { 
-          targetid = appMessCode.target.id;
+          evt = appMessCode;
+          targetid = evt.target.id;
           // console.log('targetid is: ' + targetid);
-          appMessCode = 'tip_' + appMessCode.target.id.replace(/-/gi, '_'); 
+          appMessCode = 'tip_' + evt.target.id.replace(/-/gi, '_'); 
         }
         // !VA Get the appMessContent from the passed appMessCode, which is now conformant to all three appMessage types
         appMessContent = getAppMessageStrings(appMessCode); 
@@ -3239,7 +3237,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // !VA The tooltip appMessType now contains the id instead of the type, so search for a hyphen to select the tooltip.
         if (appMessType.includes('-')) {
           delayduration = [ 3000, 0 ];
-          processAppTips( appMessType, appMessContent, delayduration );
+          // !VA Branch: tryAltTooltips (051720) 
+
+          if (evt.ctrlKey || evt.altKey) {
+            console.log('Ctrl + Alt pressed');
+            processAppTips2( appMessType, appMessContent, delayduration );
+          }
+
+
         } else if (appMessType === 'msg' || appMessType === 'err') {
           console.log('appMessCode is: ' + appMessCode);
           appMessType === 'err' ? delayduration = [ 0, 2500] : delayduration = [ 0, 750 ];
@@ -3254,12 +3259,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       },
 
 
-
-      // !VA Were putting this here so it can be accessed from either other module -- all it does it get the code and pass it on to the private appController function that finds the error code from the string and passes that on to UIController for display.
-      // !VA appController public
-      initMessage: function(id, isErr, errCode) {
-        messageHandler(id, isErr, errCode);
-      },
 
       // !VA This is a pass-thru to access queryDOMElements (public UIController)  to get the current dimensions of the dynamic DOM elements and data attributes, and getAppdata (private appController) to calculate the non-DOM Appdata properties. We do this here because Appdata has to be queried in all three modules, so it has to be accessible in all of them, and because getAppdata needs getAspectRatio which belongs in appController.
       // !VA appController public
