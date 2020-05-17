@@ -5,9 +5,9 @@
 // !VA GENERAL NOTES
 /* !VA  - April Reboot Notes
 =========================================================
-// !VA 05.07.20
+// !VA 05.17.20
 Status:
-DONE: Add tooltips
+DONE: AppMessage implementation mostly done, but the tooltip implementation sucks. Must revisit
 DONE: Fix imgswap codeBlock output: alt tag has quotes following, alt doesn't work. THis was fixed in an earlier commit.
 DONE: vmlbutton - add default 40/200 width and height as per Stig and add error handling if one of the values is omitted.
 DONE: Populate inputs with defaults in vmlbutton and 
@@ -24,6 +24,7 @@ DONE: Add animation to tooltips
 DONE: Fix tooltip cursor not changing to help cursor on Display Size and other elements with clipboard clicks. That is not going to happen since the clipboard clicks on the label are governed by the hover pseudoelement which overrides the mouseenter event, I think. Closed.
 DONE: Cancel tooltips when error message is displayed.
 
+TODO: Revisit tooltip implementation, it sucks with the tips showing on mouseenter. Try it with the ALT key
 TODO: Fix the CSS Rule buttons disappearing when hovered or clicked. It's because they get the class ttip for some reason.
 TODO: Fix that error messages stay displayed for the entire timeout even if another error message is triggered. 
 TODO: Fix that the tooltip timeout isn't reset when the element is clicked. This whole thing with the tooltips, app messages and error messages needs to be rethought. 
