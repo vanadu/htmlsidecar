@@ -321,8 +321,39 @@ var Witty = (function () {
       UIController.writeInspectorAlerts(flaggedInspectors);
     }
 
+
+    function showAppMessages(appMessContainer, tooltipTarget) {
+      console.log('showAppMessages running');
+      // !VA Show the current appMessage. If the current appMessage is a tooltip, then show the help cursor while the mouse is in the tooltip element.
+      console.log('appMessContainer is: ' + appMessContainer);
+      console.log('tooltipTarget is: ' + tooltipTarget);
+      document.querySelector(appMessContainer).classList.add('active');
+      if (document.querySelector(tooltipTarget)) { document.querySelector(tooltipTarget).classList.add('active'); } 
+    }
+
+    function hideAppMessages(appMessContainer, tooltipTarget) {
+      console.log('hideAppMessages running');
+      // !VA Show the current appMessage. If the current appMessage is a tooltip, then restore the default cursor when the mouse leaves the tooltip element.
+      console.log('appMessContainer is: ' + appMessContainer);
+      console.log('tooltipTarget is: ' + tooltipTarget);
+      document.querySelector(appMessContainer).classList.remove('active');
+      if (document.querySelector(tooltipTarget)) { document.querySelector(tooltipTarget).classList.remove('active'); } 
+
+
+    }
+
     // !VA UIController public functions
     return {
+
+      // !VA UIController public
+      // !VA This has to cancel the timeouts for the runmn
+      displayAppMessages: function (isShow, appMessContainer, tooltipTarget) {
+        console.log('displayAppMessages running');
+
+        isShow ? showAppMessages(appMessContainer, tooltipTarget) : hideAppMessages(appMessContainer, tooltipTarget);
+      },
+
+
       // !VA V2 Return all the strings for the UI element's IDs
       getInspectorElementIDs: function() {
         return inspectorElements;
@@ -607,53 +638,9 @@ var Witty = (function () {
       },
 
 
-      // !VA UIController public
-      // !VA This has to cancel the timeouts for the runmn
-      showAppMessages: function (appMessType, appMessContent ) {
-        console.log('showAppMessages running');
-        console.log('appMessType is: ' + appMessType);
-        console.log('appMessContent is: ' + appMessContent);
-        let tipElement, msgElement, errElement;
-        tipElement = document.querySelector(appMessageElements.tipContent);
-        msgElement = document.querySelector(appMessageElements.msgContent);
-        errElement = document.querySelector(appMessageElements.errContent);
-        tipElement.innerHTML = '';
-        msgElement.innerHTML = '';
-        errElement.classList.remove('active');
-        tipElement.classList.remove('active');
-        msgElement.classList.remove('active');
-        errElement.innerHTML = '';
-        if ( appMessType === 'err') {
-          errElement.innerHTML = appMessContent;
-          errElement.classList.add('active');
-        } else if (appMessType === 'msg') {
-          msgElement.innerHTML = appMessContent;
-          msgElement.classList.add('active');
-        }
-        var del = 2000;
-        // !VA Show the message for two seconds
-        window.setTimeout(function() {
-        // !VA After two seconds, hide the message and remove the blocker
-          errElement.classList.remove('active');
-          // ccpBlocker.style.display = 'none';
-
-        }, 
-        del);
-
-
-      },
-
-
-
-
 
 
     };
-
-
-
-
-
 
   })();
 
@@ -3141,47 +3128,41 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       return Appdata;
     }
 
-    function handleTooltips(targetid, appMessContent ) {
+    // !VA appController private
+    // !VA Preprocess tooltips before sending them to UIController.displayAppMessages
+    function processAppTips(targetid, appMessContent, delayduration ) {
       console.log('handleTooltips running');
-      let timer, targetElement, appMessContainer;
-      targetElement = document.querySelector( '#' + targetid);
-      targetElement.addEventListener('mouseleave', leaveMe, false);
-      appMessContainer = document.querySelector(appMessageElements.tipContent);
+      console.log('delayduration is: ' + delayduration);
+      let timer, tooltipTarget;
+      tooltipTarget = '#' + targetid;
+      // !VA Initialize event listener for when the mouse leaves the tooltip target 
+      document.querySelector(tooltipTarget).addEventListener('mouseleave', hideTooltip, false);
       
+      // !VA Run the showTooltip function to set the tooltip display delay and mouseleave behavior
+      showTooltip(appMessContent, 2000);
       
-      
-      function showTooltip( appMessContent, delay) {
+      // !VA Function to show the tooltip after the delay specified in delayduration array in appController.handleAppMessages
+      function showTooltip( appMessContent) {
         timer = setTimeout(() => {
           console.log('NOW');
-          appMessContainer.innerHTML = appMessContent;
-          targetElement.classList.add('active');
-          appMessContainer.classList.add('active');
-
-        }, delay);
+          // !VA Read the appMessContent into the tooltip content element
+          document.querySelector(appMessageElements.tipContent).innerHTML = appMessContent;
+          // !VA Here we call UIController.showAppMess. It needs two parameters for tooltips - the targetElement that gets the help cursor and the appMessElement that gets the appMessContent. We put the targetid at the end because it will only have a value for tooltips - for the other two message types it will be undefined.
+          UIController.displayAppMessages( true, appMessageElements.tipContent, tooltipTarget );
+        }, delayduration[0]);
       }
-
+      // !VA Clear the timeout 'timer' and remove the message when the mouse leaves the tooltip element.
       function cancelDelay() {
         clearTimeout(timer);
       }
 
-      function leaveMe() {
+      function hideTooltip() {
+        // !VA Run function to clear the timeout 'timer' when the mouse leaves the tooltip element
         cancelDelay();
-        // !VA Remove the class on the targetElement that shows the help cursor
-        targetElement.classList.remove('active');
-        // !VA Remove the class on the appMessContainer element 
-        appMessContainer.classList.remove('active');
-        // !VA This not the place to reset the innerHTML
-        // document.getElementById('ttip-content').innerHTML = '';
+        // !VA Run displayAppMessages with isShow = false to hide the tooltip and remove the help cursor.
+        UIController.displayAppMessages(false, appMessageElements.tipContent, tooltipTarget );
       }
-
-      showTooltip(appMessContent, 2000);
-
-
-
-
     }
-
-
 
     // !VA appController public functions
     return {
@@ -3197,28 +3178,48 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       },
 
       // !VA appController public
+      // !VA APP MESSAGES START
+      // !VA This is the entry point where we sort the three types of messages. We have the target id for all three types. For tooltips, we have it in the event object passed in from the event handler. For msg and err, we can't get it because handleAppMessages only takes one parameter -- either the event for tooltips or the appMessCode for msg and err. 
+      // !VA So now the problem is that tooltips require the caller id because the tooltip shows on mouseenter and has to hide on mouseleave, and we need the id for the mouseleave to create the eventListener for it. So:
+      // !VA Call showAppMessages with two parameters: targetid, which is either a string for tooltips or false for msg and err, and the second parameter is the appMessContent.
       handleAppMessages: function ( appMessCode ) {
+        console.clear();
         console.log('handleAppMessages running');
+
         console.log('appMessCode is: ' + appMessCode);
         // console.log('appController public handleAppMessages running');
         let targetid, appMessType, appMessContent;
         // !VA If appMessCode is an object, then it originated in an addEventListener, so it must be a tooltip because those are the only appMessages that originate there. Parse the target id from the event and convert it to a valid appMessCode, i.e. underscores instead of hyphens.
-        // !VA Get the appMessContent from the appMessCode
-        // !VA Get the appMessType from the appMessCode
-        // console.log('appMessType is: ' + appMessType);
         if (typeof(appMessCode) === 'object') { 
           targetid = appMessCode.target.id;
           console.log('targetid is: ' + targetid);
           appMessCode = 'tip_' + appMessCode.target.id.replace(/-/gi, '_'); 
         }
-        appMessType = appMessCode.slice(0, 3);
-        appMessContent = getAppMessageStrings(appMessCode); 
-        console.log('appMessContent is: ' + appMessContent);
         console.log('appMessCode is: ' + appMessCode);
-        appMessType === 'tip' ? handleTooltips(targetid, appMessContent) : UIController.showAppMessages(appMessType, appMessContent);
+        // !VA Get the appMessContent from the passed appMessCode, which is now conformant to all three appMessage types
+        appMessContent = getAppMessageStrings(appMessCode); 
+        // !VA If the passed appMessCode contains a hyphen, then it's a target id and not an appMessCode, because appMessCodes only have underscores. Thus, it must be a tooltip, so pass the id to showAppMessages. Otherwise, take the first three characters of the appMessCode and pass them as the appMessType to indicate whether it's a msg or err.
+        appMessCode.includes('tip_') ? appMessType = targetid : appMessType = appMessCode.slice(0, 3);
 
-        console.log('Mark1');
+        // !VA Now set the delay and duration array
+
+        var delayduration = [];
+        if (appMessType.includes('-')) {
+          delayduration = [ 3000, 0 ];
+          processAppTips( appMessType, appMessContent, delayduration );
+        } else if (appMessType === 'err') {
+          delayduration = [ 0, 2000 ];
+          processAppErrs (appMessType, appMessContent, delayduration);
+        } else if (appMessType === 'msg') {
+          delayduration = [ 0, 250];
+          processAppMsgs (appMessType, appMessContent, delayduration );
+        } else {
+          console.log('Error: appMessType unknown');
+        }
         
+        // !VA Now we have to have separate functions for setting the timing.
+
+
       },
 
 
