@@ -24,7 +24,19 @@ DONE: Add animation to tooltips
 DONE: Fix tooltip cursor not changing to help cursor on Display Size and other elements with clipboard clicks. That is not going to happen since the clipboard clicks on the label are governed by the hover pseudoelement which overrides the mouseenter event, I think. Closed.
 DONE: Cancel tooltips when error message is displayed.
 
-TODO: Revisit tooltip implementation, it sucks with the tips showing on mouseenter. After trying a few things, it looks like holding ALT+CTRL and pointing at the tooltip element, whereby the tooltip stays displayed until ALT+CTRL is released, is most promising. See the mouseIn function below.
+TODO: Revisit tooltip implementation, it sucks with the tips showing on mouseenter. After trying a few things, it looks like holding ALT+CTRL and pointing at the tooltip element, whereby the tooltip stays displayed until ALT+CTRL is released, is most promising. See the mouseIn function below. ALT+CTRL + mouseenter on tooltip element shows a special highlight color AND covers the app area with the blocker which stays on until the modifier keys are released.
+
+// !VA Branch: tryAltTooltips (051720)
+// !VA NOW...
+1) create tooltipEventListeners in appController
+2) create on page load event listener to activate the modifier keypress globally.
+3) Somehow trigger the mouseenter event from within the page load event so the page load event can access the event properties - we need to properties to get the target of the mouseenter event. The only way to do this is to trigger the event from within the page load function. But a function within the DOMLoaded function isn't accessible outside that scope, so we can't call that function from the mouseenter event handler. I can get the event handler to initialize outside the DOMLoaded function and can get it to change properties of the tooltip trigger element, so I should be able to write the trigger elements tooltip content to the appMessage area. BUT I cannot figure out how to pass the id off the tooltip trigger element to the keyup event listener...but I don't even NEED to do that! 
+
+
+
+
+
+
 
 
 
@@ -90,61 +102,14 @@ var Witty = (function () {
   // };
 
   // !VA Click on Witty logo to run test function
-  var testbut = document.querySelector('#testme');
-  testbut.addEventListener('mouseenter', runMe, false);
-  // testBut.addEventListener('click', runMe, false);
-
-  function runMe(evt) {
-    console.log('runMe running');
-    testbut.classList.add('active')
-  }
-
-  function mouseIn(evt) {
-    console.log('mouseIn running');
-    testbut.classList.add('active')
-  }
-  
-  function mouseOut(evt) {
-    console.log('mouseOut running');
-
-  }
-
-  
-  
-  function testAlt() {
-    console.log('testAlt');
-    if (event.altKey) {
-      console.log('ALT');
-    }
-  }
-
-  // !VA Test for modifier key
-  document.addEventListener('DOMContentLoaded', function() {
-    console.log('running');
-    const rootElement = document.querySelector(':root');
-    console.log('rootElement is: ' + rootElement);
-    document.addEventListener('keydown', function(event) {
-      if (event.altKey && event.ctrlKey) {
-        rootElement.classList.add('modifier-pressed');
-        console.log('Modifier pressed');
-        testbut.addEventListener('mouseenter', mouseIn, false);
+  // var testbut = document.querySelector('#testme');
+  // function runMe(evt) {
+  //   console.log('runMe running');
+  //   testbut.classList.add('active')
+  // }
 
 
 
-        
-      }
-      
-    });
-    document.addEventListener('keyup', function(event) {
-      if (event.altKey || event.ctrlKey) {
-        rootElement.classList.remove('modifier-pressed');
-        console.log('Modifier released');
-        testbut.classList.remove('active');
-        
-      }
-    });
-
-  });
 
   // !VA GLOBAL
   let myObject = {};
@@ -278,13 +243,7 @@ var Witty = (function () {
       selCcpTableWrapperAlign: '#sel-ccp-table-wrapper-align',
       iptCcpTableWrapperBgColor: '#ipt-ccp-table-wrapper-bgcolor',
     };
-
     
-    
-    // const foobar = {
-      //   name:'myname'
-      // }
-      
     // !VA CCP Elements used for tooltips. This is a different list than the CCPUserInput elements although some are duplicated. The element that triggers the tooltip has to be the parent element of the input or checkbox element, otherwise if the user hovers over a label instead of the actual input element, nothing happens.
     const ccpUserInputLabels = {
       selCcpImgAlignLabel: '#sel-ccp-img-align-label',
@@ -1927,45 +1886,70 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     const appMessageElements =  UICtrl.getAppMessageElements();
     
     //EVENT HANDLING START 
-
     // !VA appController private
-    var setupEventListeners = function() {
+    // !VA Branch: tryAltTooltips (051720)
+    // !VA Creating a separate EventListener setup function specifically for tooltips, because this function will be run on DOMContentLoaded in an iife every time the CTRL + ALT key combination is pressed. The onModifierKeypress function should live in appController, I think. The tooltips themselves can be displayed either through UIController.showAppMessages or a new, separate UIController public function.
 
-      //DRAG AND DROP PROCESSING START
-      // Event Listeners for Drag and Drop
-      // !VA dropArea is the screen region that will accept the drop event 
-      var dropArea = document.querySelector(dynamicRegions.appContainer);
-      dropArea.addEventListener('dragover', handleDragOver, false);
-    
-      // !VA Initiates the FileReader function to get the dropped image data
-      dropArea.addEventListener('drop', handleFileSelect, false);
-      // Drag and Drop Listener 
-      //DRAG AND DROP PROCESSING END
 
-      // !VA Add the click event listener for creating the isolate popup
-      var runIsolateApp = document.querySelector(staticRegions.hdrIsolateApp);
-      runIsolateApp.addEventListener('click', isolateApp, false);
+    function handleTooltipTriggers(evt) {
+      console.log('handleTooltipTriggers running');
+      console.log('evt here is: ' + evt);
+      let targetid;
+      targetid = '#' + evt.target.id;
+      var blob = targetid;
+      showTooltip(targetid);
+    }
 
-      // !VA Create the isolate popup with no frills and a fixed window sized to the Witty app dimensions
-      function isolateApp() {
-        console.log('isolateApp running');
-        // !VA Put a query string in the URL to indicate that the child window is isolated
-        let curURL = window.location.href + '?isolate=' + true;
-        // !VA Not 
-        let win;
-        // !VA Open a new fixed-size window with no browser elements except the URL bar
-        // !VA Not currently using the window object that the open method creates, but leave it for reference
-        win = window.open(curURL,'targetWindow',  
-          `toolbar=no,
-          location=yes,
-          status=no,
-          menubar=no,
-          scrollbars=no,
-          resizable=no,
-          width=870,
-          height=775`);
+    function showTooltip(targetid) {
+      console.log('targetid is: ' + targetid);
+      let appMessContent, tipContentContainer;
+      // !VA Convert the targetid to appMessCode
+
+      // !VA Get the appMessContent for the tooltip trigger from the appMessCode
+      appMessContent = 'This is just some dummy content...';
+      // !VA 
+      tipContentContainer = document.querySelector(appMessageElements.tipContent);
+      tipContentContainer.style.opacity = '1';
+      tipContentContainer.innerHTML = appMessContent;
+
+      document.querySelector(targetid).style.backgroundColor = 'yellow';
+      return targetid;
+    }
+
+
+    function initEventListeners() {
+      // !VA Here we initialize the event listeners for ALL the tooltip triggers
+      // !VA Add tooltip triggers for toolbar elements
+      console.log('initEventListeners running');
+
+      // !VA Event handler for initializing event listeners, just as in setupEventListeners
+      function addEventHandler(oNode, evt, oFunc, bCaptures) {
+        // console.log('oNode is:');
+        // console.log(oNode);
+        oNode.addEventListener(evt, oFunc, bCaptures);
+      }
+      // !VA initialize the toolbar tooltip triggers
+      var toolbarIds = Object.values(toolbarElements);
+      let el;
+      for (let i = 0; i < toolbarIds.length; i++) {
+        // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
+        el = document.querySelector(toolbarIds[i]);
+        // console.log(el);
+        addEventHandler(el, 'mouseenter', handleTooltipTriggers, false);
       }
 
+      
+      return el;
+
+
+    }
+
+
+
+    // var tooltipEventListeners = function () {
+    function tooltipEventListeners() {
+      
+      
       // !VA Event handler for initializing event listeners 
       function addEventHandler(oNode, evt, oFunc, bCaptures) {
         // console.log('oNode is:');
@@ -1973,23 +1957,28 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
 
+
+
+
+
+
       // !VA TOOLTIP TRIGGERS
       // !VA Add tooltip triggers for toolbar elements
       var toolbarIds = Object.values(toolbarElements);
       let el;
-      for (let i = 0; i < toolbarIds.length; i++) {
-        // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
-        el = document.querySelector(toolbarIds[i]);
-        // console.log(el);
-        addEventHandler(el, 'mouseenter', appController.handleAppMessages, false);
-      }
+      // for (let i = 0; i < toolbarIds.length; i++) {
+      //   // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
+      //   el = document.querySelector(toolbarIds[i]);
+      //   // console.log(el);
+      //   addEventHandler(el, 'mouseenter', myFunc, false);
+      // }
       // !VA Add tooltip triggers for Inspector labels
       var inspectorLabelIds = Object.values(inspectorLabels);
       for (let i = 0; i < inspectorLabelIds.length; i++) {
         // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
         el = document.querySelector(inspectorLabelIds[i]);
         // console.log(el);
-        addEventHandler(el, 'mouseenter', appController.handleAppMessages, false);
+        addEventHandler(el, 'mouseenter', handleTooltips, false);
       }
       // !VA Add tooltip triggers for Inspector Value  elements
       var inspectorValueIds = Object.values(inspectorValues);
@@ -1997,7 +1986,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
         el = document.querySelector(inspectorValueIds[i]);
         // console.log(el);
-        addEventHandler(el, 'mouseenter', appController.handleAppMessages, false);
+        addEventHandler(el, 'mouseenter', handleTooltips, false);
       }
       
       // !VA Add tooltip triggers for CCP user input elements
@@ -2006,7 +1995,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       for (let i = 0; i < ccpUserInputIds.length; i++) {
         el = document.querySelector(ccpUserInputIds[i]);
         // console.log(el);
-        addEventHandler(el, 'mouseenter', appController.handleAppMessages, false);
+        addEventHandler(el, 'mouseenter', handleTooltips, false);
       }
       // !VA Add tooltip triggers for CCP user input label elements
       // !VA All the labels have the same id as the inputs with -label appended except the mock checkboxes, whose label has no text and only serves to style the mock checkbox. So for the mock checkboxes, transform the id into the id of the actual text label by removing the spn- prefix and replacing 'checkmrk' with 'label'.
@@ -2027,14 +2016,45 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // !VA get the element with the labelid
         labelel = document.querySelector(labelid);
         // !VA Add the event listener to th label element
-        addEventHandler(labelel, 'mouseenter', appController.handleAppMessages, false);
+        addEventHandler(labelel, 'mouseenter', handleTooltips, false);
       }
       // !VA Add tooltip targets to the Make Clip buttons - both the Make HTML and Make CSS buttons
       var btnCcpMakeClipIds = Object.values(btnCcpMakeClips);
       for (let i = 0; i < btnCcpMakeClipIds.length; i++) {
         el = document.querySelector(btnCcpMakeClipIds[i]);
-        addEventHandler(el, 'mouseenter', appController.handleAppMessages, false);
+        addEventHandler(el, 'mouseenter', handleTooltips, false);
       }
+
+
+      
+    }
+
+
+    // !VA appController private
+    var setupEventListeners = function() {
+
+      //DRAG AND DROP PROCESSING START
+      // Event Listeners for Drag and Drop
+      // !VA dropArea is the screen region that will accept the drop event 
+      var dropArea = document.querySelector(dynamicRegions.appContainer);
+      dropArea.addEventListener('dragover', handleDragOver, false);
+    
+      // !VA Initiates the FileReader function to get the dropped image data
+      dropArea.addEventListener('drop', handleFileSelect, false);
+      // Drag and Drop Listener 
+      //DRAG AND DROP PROCESSING END
+
+      // !VA Add the click event listener for creating the isolate popup
+      var runIsolateApp = document.querySelector(staticRegions.hdrIsolateApp);
+      runIsolateApp.addEventListener('click', isolateApp, false);
+
+      // !VA Event handler for initializing event listeners 
+      function addEventHandler(oNode, evt, oFunc, bCaptures) {
+        // console.log('oNode is:');
+        // console.log(oNode);
+        oNode.addEventListener(evt, oFunc, bCaptures);
+      }
+
 
 
       // !VA Add click and blur event handlers for clickable toolbarElements 
@@ -2263,6 +2283,51 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       reader.readAsDataURL(f);
     }
     //FILEREADER OBJECT PROCESSING END
+
+    // !VA TOOLTIP MODIFIER KEYPRESS HANDLING
+    // appController private
+    function handleTooltips(evt) {
+      console.log('handleTooltips running');
+      console.log('evt');
+      console.log(evt);
+
+      
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Running on DOM content load');
+
+      var foo, fi, fa, fum;
+      const rootElement = document.querySelector(':root');
+      console.log('rootElement is: ' + rootElement);
+      // !VA It appears toolbarElements is available in this function, so it is scoped to appController
+      // console.log('tooltipEventListeners is: ' + tooltipEventListeners);
+
+      document.addEventListener('keydown', function(event) {
+        if (event.altKey && event.ctrlKey) {
+          rootElement.classList.add('modifier-pressed');
+          // console.log('Modifier pressed');
+          
+          initEventListeners();
+
+        }
+      });
+      document.addEventListener('keyup', function(event) {
+        if (event.altKey || event.ctrlKey) {
+          let tipContentContainer;
+          rootElement.classList.remove('modifier-pressed');
+          console.log('Modifier released');
+          tipContentContainer = document.querySelector(appMessageElements.tipContent);
+          tipContentContainer.innerHTML = '';
+        }
+      });
+
+
+    });
+
+
+
             
     // !VA INPUT HANDLING
     // !VA ============================================================
@@ -3015,6 +3080,28 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA END TOOLTIP HANDLING
 
     // !VA MISC FUNCTIONS
+
+    // !VA appContoller private
+    // !VA Create the isolate popup with no frills and a fixed window sized to the Witty app dimensions
+    function isolateApp() {
+      console.log('isolateApp running');
+      // !VA Put a query string in the URL to indicate that the child window is isolated
+      let curURL = window.location.href + '?isolate=' + true;
+      // !VA NOTE: win isn't accessed, but it might be later.  
+      let win;
+      // !VA Open a new fixed-size window with no browser elements except the URL bar
+      // !VA Not currently using the window object that the open method creates, but leave it for reference
+      win = window.open(curURL,'targetWindow',  
+        `toolbar=no,
+        location=yes,
+        status=no,
+        menubar=no,
+        scrollbars=no,
+        resizable=no,
+        width=870,
+        height=775`);
+    }
+
     // appController private 
     function validateInteger(inputVal) {
       // !VA Since integer validation is used for all height/width input fields, including those not yet implemented
@@ -3190,11 +3277,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // !VA Run function to clear the timeout 'timer' when the mouse leaves the tooltip element
         cancelTimeout();
         // !VA Run displayAppMessages with isShow = false to hide the tooltip and remove the help cursor from the target element.
-
       }
-
-
-
     }
 
     // !VA appController public functions
@@ -3252,11 +3335,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         } else {
           console.log('Error: appMessType unknown');
         }
-        
-        // !VA Now we have to have separate functions for setting the timing.
 
 
       },
+
+
 
 
 
