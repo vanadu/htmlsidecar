@@ -5,8 +5,9 @@
 // !VA GENERAL NOTES
 /* !VA  - April Reboot Notes
 =========================================================
-// !VA 05.17.20
+// !VA 05.18.20
 Status:
+DONE: Implement ALT+CTRL+Hover tooltips.
 DONE: AppMessage implementation mostly done, but the tooltip implementation sucks. Must revisit
 DONE: Fix imgswap codeBlock output: alt tag has quotes following, alt doesn't work. THis was fixed in an earlier commit.
 DONE: vmlbutton - add default 40/200 width and height as per Stig and add error handling if one of the values is omitted.
@@ -24,13 +25,11 @@ DONE: Add animation to tooltips
 DONE: Fix tooltip cursor not changing to help cursor on Display Size and other elements with clipboard clicks. That is not going to happen since the clipboard clicks on the label are governed by the hover pseudoelement which overrides the mouseenter event, I think. Closed.
 DONE: Cancel tooltips when error message is displayed.
 
+
+TODO: FIx quirks with error messages - first one after refresh displays late, messages don't cancel when leaving the target element.
 TODO: Revisit tooltip implementation, it sucks with the tips showing on mouseenter. After trying a few things, it looks like holding ALT+CTRL and pointing at the tooltip element, whereby the tooltip stays displayed until ALT+CTRL is released, is most promising. See the mouseIn function below. ALT+CTRL + mouseenter on tooltip element shows a special highlight color AND covers the app area with the blocker which stays on until the modifier keys are released.
 
-// !VA Branch: tryAltTooltips (051720)
-// !VA NOW...
-1) create tooltipEventListeners in appController
-2) create on page load event listener to activate the modifier keypress globally.
-3) Somehow trigger the mouseenter event from within the page load event so the page load event can access the event properties - we need to properties to get the target of the mouseenter event. The only way to do this is to trigger the event from within the page load function. But a function within the DOMLoaded function isn't accessible outside that scope, so we can't call that function from the mouseenter event handler. I can get the event handler to initialize outside the DOMLoaded function and can get it to change properties of the tooltip trigger element, so I should be able to write the trigger elements tooltip content to the appMessage area. BUT I cannot figure out how to pass the id off the tooltip trigger element to the keyup event listener...but I don't even NEED to do that! 
+
 
 
 
@@ -358,7 +357,9 @@ var Witty = (function () {
       // !VA This has to cancel the timeouts for the runmn
       displayAppMessages: function (isShow, appMessContainerId, tooltipTarget) {
         console.log('displayAppMessages running');
-
+        console.log('isShow is: ' + isShow);
+        console.log('appMessContainerId is: ' + appMessContainerId);
+        console.log('tooltipTarget is: ' + tooltipTarget);
         isShow ? showAppMessages(appMessContainerId, tooltipTarget) : hideAppMessages(appMessContainerId, tooltipTarget);
       },
 
@@ -1887,42 +1888,69 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     
     //EVENT HANDLING START 
     // !VA appController private
-    // !VA Branch: tryAltTooltips (051720)
+    // !VA Branch: implementModifierTooltips (051820)
     // !VA Creating a separate EventListener setup function specifically for tooltips, because this function will be run on DOMContentLoaded in an iife every time the CTRL + ALT key combination is pressed. The onModifierKeypress function should live in appController, I think. The tooltips themselves can be displayed either through UIController.showAppMessages or a new, separate UIController public function.
+    // !VA Process the tooltip triggers when the mouseenter event is fired on them, i.e. get the appMessCode, appMessContent and duration and pass to showTooltip
 
+    // !VA IMPORTANT: addEventListeners and removeEventListeners require a NAMED function, not just a function definition. If you just use a function definition, you can create the eventListener but you can't remove it because Javascript doesn't know which one you want to remove. Worse, it fails silently. So always name your function calls into a var when adding/removing event listeners!
 
-    function handleTooltipTriggers(evt) {
+    var handleTooltipTriggers = function handleTooltipTriggers(evt) {
       console.log('handleTooltipTriggers running');
-      console.log('evt here is: ' + evt);
-      let targetid;
-      targetid = '#' + evt.target.id;
-      var blob = targetid;
-      showTooltip(targetid);
-    }
+      console.log('evt is');
+      console.log(evt);
+      
+      let tooltipTarget, appMessCode, appMessContent, appMessContainer, duration;
+      // !VA Get the id of the tooltip trigger
+      tooltipTarget = '#' + evt.target.id;
+      // !VA Duplicate evt into appMessCode - we could just receive the event as appMessCode but it's more transparent to do it explicitly
+      appMessCode = evt;      
 
-    function showTooltip(targetid) {
+      appMessContainer = document.querySelector(appMessageElements.tipContent);
+      // !VA Branch: implementModifierTooltips (051820)
+      // !VA Below is duplicated in handleAppMessages
+      // !VA If appMessCode is an object, then it originated in an addEventListener, so it must be a tooltip because those are the only appMessages that originate there. Parse the target id from the event and convert it to a valid appMessCode, i.e. underscores instead of hyphens.
+      if (typeof(appMessCode) === 'object') { 
+        evt = appMessCode;
+        // console.log('targetid is: ' + targetid);
+        appMessCode = 'tip_' + evt.target.id.replace(/-/gi, '_'); 
+      }
+      // !VA Get the appMessContent from the passed appMessCode, which is now conformant to all three appMessage types
+      appMessContent = getAppMessageStrings(appMessCode); 
+      appMessContainer.innerHTML = appMessContent;
+      // !VA If the passed appMessCode contains a hyphen, then it's a target id and not an appMessCode, because appMessCodes only have underscores. Thus, it must be a tooltip, so pass the id to showAppMessages. Otherwise, take the first three characters of the appMessCode and pass them as the appMessType to indicate whether it's a msg or err.
+      // appMessCode.includes('tip_') ? appMessType = tooltipTarget : appMessType = appMessCode.slice(0, 3);
+      // !VA Branch: implementModifierTooltips (051820) END handleAppMessages duplication
+
+      // !VA Branch: implementModifierTooltips (051820)
+      // !VA Tooltips don't require any duration so set that to false
+      duration = false;
+      
+      
+      
+      
+      // !VA Don't really need the id, but do need the appMessType, appMessContent and duration, even if it is falsy
+      // !VA Don't forget that appMessType contains the targetid at this point for tooltips, so we pass it as tooltipTarget
+      UIController.displayAppMessages(true, appMessageElements.tipContent, tooltipTarget);
+      // showTooltip(appMessType, appMessContent, duration);
+    };
+
+    // !VA showTooltip can be folded into UIController.showAppMessage
+    function showTooltip(appMessType, appMessContent, duration) {
+      console.log('showTooltip running');
+      let targetid, tipContentContainer;
+      targetid = appMessType;
       console.log('targetid is: ' + targetid);
-      let appMessContent, tipContentContainer;
-      // !VA Convert the targetid to appMessCode
-
-      // !VA Get the appMessContent for the tooltip trigger from the appMessCode
-      appMessContent = 'This is just some dummy content...';
-      // !VA 
+      // !VA targetid is received here as appMessType but passed as the targetid of the tooltip trigger, so put it into targetid for transparency's sake
       tipContentContainer = document.querySelector(appMessageElements.tipContent);
       tipContentContainer.style.opacity = '1';
       tipContentContainer.innerHTML = appMessContent;
-
-      document.querySelector(targetid).style.backgroundColor = 'yellow';
-      return targetid;
     }
 
 
-    function initEventListeners() {
-      // !VA Here we initialize the event listeners for ALL the tooltip triggers
-      // !VA Add tooltip triggers for toolbar elements
-      console.log('initEventListeners running');
-
-      // !VA Event handler for initializing event listeners, just as in setupEventListeners
+    // !VA ADD EVENT LISTENERS FOR TOOLTIP TRIGGERS
+    function addTooltipEventListeners() {
+      console.log('addTooltipEventListeners running');
+      // !VA Event handler for initializing tooltip event listeners 
       function addEventHandler(oNode, evt, oFunc, bCaptures) {
         // console.log('oNode is:');
         // console.log(oNode);
@@ -1935,50 +1963,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
         el = document.querySelector(toolbarIds[i]);
         // console.log(el);
-        addEventHandler(el, 'mouseenter', handleTooltipTriggers, false);
+        addEventHandler(el, 'mouseenter', handleTooltipTriggers, true);
       }
-
-      
-      return el;
-
-
-    }
-
-
-
-    // var tooltipEventListeners = function () {
-    function tooltipEventListeners() {
-      
-      
-      // !VA Event handler for initializing event listeners 
-      function addEventHandler(oNode, evt, oFunc, bCaptures) {
-        // console.log('oNode is:');
-        // console.log(oNode);
-        oNode.addEventListener(evt, oFunc, bCaptures);
-      }
-
-
-
-
-
-
-      // !VA TOOLTIP TRIGGERS
-      // !VA Add tooltip triggers for toolbar elements
-      var toolbarIds = Object.values(toolbarElements);
-      let el;
-      // for (let i = 0; i < toolbarIds.length; i++) {
-      //   // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
-      //   el = document.querySelector(toolbarIds[i]);
-      //   // console.log(el);
-      //   addEventHandler(el, 'mouseenter', myFunc, false);
-      // }
       // !VA Add tooltip triggers for Inspector labels
       var inspectorLabelIds = Object.values(inspectorLabels);
       for (let i = 0; i < inspectorLabelIds.length; i++) {
         // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
         el = document.querySelector(inspectorLabelIds[i]);
         // console.log(el);
-        addEventHandler(el, 'mouseenter', handleTooltips, false);
+        addEventHandler(el, 'mouseenter', handleTooltipTriggers, true);
       }
       // !VA Add tooltip triggers for Inspector Value  elements
       var inspectorValueIds = Object.values(inspectorValues);
@@ -1986,16 +1979,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
         el = document.querySelector(inspectorValueIds[i]);
         // console.log(el);
-        addEventHandler(el, 'mouseenter', handleTooltips, false);
+        addEventHandler(el, 'mouseenter', handleTooltipTriggers, true);
       }
-      
       // !VA Add tooltip triggers for CCP user input elements
       // !VA To get the tooltip targets, we need both the input element and its label because the user will probably click on the label. We might not even need the ccpUserInput element itself but rather only the label, but for now we'll use both. We could loop through the parent DIV of the input element and add the eventHandler that way, but then we can't remove the input element if we decide we don't need the tooltip on it, so we'll do them separately.
       var ccpUserInputIds = Object.values(ccpUserInput);
       for (let i = 0; i < ccpUserInputIds.length; i++) {
         el = document.querySelector(ccpUserInputIds[i]);
         // console.log(el);
-        addEventHandler(el, 'mouseenter', handleTooltips, false);
+        addEventHandler(el, 'mouseenter', handleTooltipTriggers, true);
       }
       // !VA Add tooltip triggers for CCP user input label elements
       // !VA All the labels have the same id as the inputs with -label appended except the mock checkboxes, whose label has no text and only serves to style the mock checkbox. So for the mock checkboxes, transform the id into the id of the actual text label by removing the spn- prefix and replacing 'checkmrk' with 'label'.
@@ -2016,19 +2008,86 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // !VA get the element with the labelid
         labelel = document.querySelector(labelid);
         // !VA Add the event listener to th label element
-        addEventHandler(labelel, 'mouseenter', handleTooltips, false);
+        addEventHandler(labelel, 'mouseenter', handleTooltipTriggers, true);
       }
       // !VA Add tooltip targets to the Make Clip buttons - both the Make HTML and Make CSS buttons
       var btnCcpMakeClipIds = Object.values(btnCcpMakeClips);
       for (let i = 0; i < btnCcpMakeClipIds.length; i++) {
         el = document.querySelector(btnCcpMakeClipIds[i]);
-        addEventHandler(el, 'mouseenter', handleTooltips, false);
+        addEventHandler(el, 'mouseenter', handleTooltipTriggers, true);
       }
-
-
-      
     }
 
+    function removeTooltipEventListeners() {
+      // !VA Event handler for initializing tooltip event listeners 
+      console.log('removeTooltipEventListeners running');
+      function removeEventHandler(oNode, evt, oFunc, bCaptures) {
+        // console.log('oNode is:');
+        // console.log(oNode);
+        oNode.removeEventListener(evt, oFunc, bCaptures);
+      }
+      // !VA initialize the toolbar tooltip triggers
+      var toolbarIds = Object.values(toolbarElements);
+      let el;
+      for (let i = 0; i < toolbarIds.length; i++) {
+        // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
+        el = document.querySelector(toolbarIds[i]);
+        // console.log(el);
+
+        removeEventHandler(el, 'mouseenter', handleTooltipTriggers, true);
+      }
+      // !VA Add tooltip triggers for Inspector labels
+      var inspectorLabelIds = Object.values(inspectorLabels);
+      for (let i = 0; i < inspectorLabelIds.length; i++) {
+        // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
+        el = document.querySelector(inspectorLabelIds[i]);
+        // console.log(el);
+        removeEventHandler(el, 'mouseenter', handleTooltipTriggers, true);
+      }
+      // !VA Add tooltip triggers for Inspector Value  elements
+      var inspectorValueIds = Object.values(inspectorValues);
+      for (let i = 0; i < inspectorValueIds.length; i++) {
+        // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
+        el = document.querySelector(inspectorValueIds[i]);
+        // console.log(el);
+        removeEventHandler(el, 'mouseenter', handleTooltipTriggers, true);
+      }
+      // !VA Add tooltip triggers for CCP user input elements
+      // !VA To get the tooltip targets, we need both the input element and its label because the user will probably click on the label. We might not even need the ccpUserInput element itself but rather only the label, but for now we'll use both. We could loop through the parent DIV of the input element and add the eventHandler that way, but then we can't remove the input element if we decide we don't need the tooltip on it, so we'll do them separately.
+      var ccpUserInputIds = Object.values(ccpUserInput);
+      for (let i = 0; i < ccpUserInputIds.length; i++) {
+        el = document.querySelector(ccpUserInputIds[i]);
+        // console.log(el);
+        removeEventHandler(el, 'mouseenter', handleTooltipTriggers, true);
+      }
+      // !VA Add tooltip triggers for CCP user input label elements
+      // !VA All the labels have the same id as the inputs with -label appended except the mock checkboxes, whose label has no text and only serves to style the mock checkbox. So for the mock checkboxes, transform the id into the id of the actual text label by removing the spn- prefix and replacing 'checkmrk' with 'label'.
+      let labelid, labelel;
+      // !VA Loop through the CCP user input element ids
+      for (let i = 0; i < ccpUserInputIds.length; i++) {
+        labelid = ccpUserInputIds[i];
+        // !VA If the label contains 'checkmrk'...
+        if (labelid.includes('checkmrk')) {
+          // !VA Remove the spn prefix
+          labelid = labelid.replace(/spn-/g, '');
+          // !VA Replace checkmrk with label
+          labelid = labelid.replace(/checkmrk/g, 'label');
+        } else {
+          // !VA If it's not a checkmark, just append -label to the id to get the label id
+          labelid = labelid + '-label';
+        }
+        // !VA get the element with the labelid
+        labelel = document.querySelector(labelid);
+        // !VA Add the event listener to th label element
+        removeEventHandler(labelel, 'mouseenter', handleTooltipTriggers, true);
+      }
+      // !VA Add tooltip targets to the Make Clip buttons - both the Make HTML and Make CSS buttons
+      var btnCcpMakeClipIds = Object.values(btnCcpMakeClips);
+      for (let i = 0; i < btnCcpMakeClipIds.length; i++) {
+        el = document.querySelector(btnCcpMakeClipIds[i]);
+        removeEventHandler(el, 'mouseenter', handleTooltipTriggers, true);
+      }
+    }
 
     // !VA appController private
     var setupEventListeners = function() {
@@ -2284,33 +2343,27 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     }
     //FILEREADER OBJECT PROCESSING END
 
-    // !VA TOOLTIP MODIFIER KEYPRESS HANDLING
-    // appController private
-    function handleTooltips(evt) {
-      console.log('handleTooltips running');
-      console.log('evt');
-      console.log(evt);
 
-      
-    }
-
-
+    // !VA sdf MODIFIER KEYS FOR TOOLTIP DISPLAY
     document.addEventListener('DOMContentLoaded', function() {
       console.log('Running on DOM content load');
 
-      var foo, fi, fa, fum;
+      var fi, fa, fum;
+      // var foo = function myFunction(evt) {
+      //   handleTooltipTriggers(evt);
+      // };
+
       const rootElement = document.querySelector(':root');
       console.log('rootElement is: ' + rootElement);
       // !VA It appears toolbarElements is available in this function, so it is scoped to appController
-      // console.log('tooltipEventListeners is: ' + tooltipEventListeners);
-
+      // console.log('addTooltipEventListeners is: ' + addTooltipEventListeners);
       document.addEventListener('keydown', function(event) {
         if (event.altKey && event.ctrlKey) {
+          // !VA Branch: implementModifierTooltips (051820)
+          // !VA This is the class that changes the default cursor into a help cursor
           rootElement.classList.add('modifier-pressed');
-          // console.log('Modifier pressed');
-          
-          initEventListeners();
-
+          // !VA Add eventListeners for all tooltip trigger elements. IMPORTANT: addEventListeners requires that the function argument be a NAMED function (i.e. var myName = function(myName) ...) , otherwise removeEventListeners can NOT remove it because it can't identify it. Interestingly, addTooltipEventListeners gives all the event listeners for all the triggers the same named function as argument, and it works. I was afraid there would be a name conflict, but there doesn't appear to be -- the eventListeners do get removed below when the modifier keys are released.
+          addTooltipEventListeners();
         }
       });
       document.addEventListener('keyup', function(event) {
@@ -2320,10 +2373,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           console.log('Modifier released');
           tipContentContainer = document.querySelector(appMessageElements.tipContent);
           tipContentContainer.innerHTML = '';
+          // !VA Branch: implementModifierTooltips (051820)
+          // !VA Remove the event listeners when the modifier keys are released.
+          removeTooltipEventListeners();
         }
       });
-
-
     });
 
 
@@ -3175,78 +3229,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       return Appdata;
     }
 
-    // !VA appController private
-    // !VA Preprocess tooltips before sending them to UIController.displayAppMessages
-    function processAppTips(targetid, appMessContent, delayduration ) {
-      console.log('handleTooltips running');
-      let timer, tooltipTarget;
-      tooltipTarget = '#' + targetid;
-      // !VA Initialize event listener for when the mouse leaves the tooltip target 
-      document.querySelector(tooltipTarget).addEventListener('mouseleave', hideTooltip, false);
-      // !VA Run the showTooltip function to set the tooltip display delay and mouseleave behavior
-      showTooltip(appMessContent);
-      // !VA Function to show the tooltip after the delay specified in delayduration array in appController.handleAppMessages
-      function showTooltip( appMessContent) {
-        timer = setTimeout(() => {
-          console.log('NOW');
-          // !VA Read the appMessContent into the tooltip content element
-          document.querySelector(appMessageElements.tipContent).innerHTML = appMessContent;
-          // !VA Here we call UIController.showAppMess. It needs two parameters for tooltips - the targetElement that gets the help cursor and the appMessElement that gets the appMessContent. We put the targetid at the end because it will only have a value for tooltips - for the other two message types it will be undefined.
-          UIController.displayAppMessages( true, appMessageElements.tipContent, tooltipTarget );
-        }, delayduration[0]);
-      }
-      // !VA Clear the timeout 'timer' and remove the message when the mouse leaves the tooltip element.
-      function cancelDelay() {
-        clearTimeout(timer);
-      }
-      // !VA Runs on mouseleave,  call displayAppMessages to hide the tooltip and change back to the default cursor.
-      function hideTooltip() {
-        // !VA Run function to clear the timeout 'timer' when the mouse leaves the tooltip element
-        cancelDelay();
-        // !VA Run displayAppMessages with isShow = false to hide the tooltip and remove the help cursor from the target element.
-        UIController.displayAppMessages(false, appMessageElements.tipContent, tooltipTarget );
-      }
-    }
-
-    function processAppTips2(targetid, appMessContent, delayduration) {
-      
-      console.log('processAppTips2 running');
-
-      let tooltipTarget, appMessContainer, appMessContainerId;
-      appMessContainerId = appMessageElements.tipContent;
-      appMessContainer = document.querySelector(appMessageElements.tipContent);
-      showTip(appMessContent);
-      tooltipTarget = '#' + targetid;
-      appMessContainer.innerHTML = appMessContent;
-      UIController.displayAppMessages( true, appMessContainerId, false );
-      
-      function showTip() {
-        timer = setTimeout(() => {
-          // console.log('NOW');
-          // !VA Read the appMessContent into the tooltip content element
-          // !VA Here we call UIController.showAppMess. It needs two parameters for tooltips - the targetElement that gets the help cursor and the appMessElement that gets the appMessContent. We put the targetid at the end because it will only have a value for tooltips - for the other two message types it will be undefined.
-          console.log('appMessContainerId is: ' + appMessContainerId);
-          UIController.displayAppMessages(false, appMessContainerId, false );
-        }, delayduration[1]);
-      }
-      // !VA Clear the timeout 'timer' and remove the message when the mouse leaves the tooltip element.
-      function cancelTimeout() {
-        clearTimeout(timer);
-      }
-      // !VA Runs on mouseleave,  call displayAppMessages to hide the tooltip and change back to the default cursor.
-      function cancelAppMess() {
-        // !VA Run function to clear the timeout 'timer' when the mouse leaves the tooltip element
-        cancelTimeout();
-        // !VA Run displayAppMessages with isShow = false to hide the tooltip and remove the help cursor from the target element.
-
-      }
-
-
-    }
 
     // !VA appController private
     // !VA Preprocess error messages before sending them to UIController.displayAppMessages
-    function processAppMessages(appMessType, appMessContent, delayduration ) {
+    function processAppMessages(appMessType, appMessContent, duration ) {
       
       console.log('preprocessAppErrs running');
       console.log('appMessType is: ' + appMessType);
@@ -3266,7 +3252,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           // !VA Here we call UIController.showAppMess. It needs two parameters for tooltips - the targetElement that gets the help cursor and the appMessElement that gets the appMessContent. We put the targetid at the end because it will only have a value for tooltips - for the other two message types it will be undefined.
           console.log('appMessContainerId is: ' + appMessContainerId);
           UIController.displayAppMessages(false, appMessContainerId, false );
-        }, delayduration[1]);
+        }, duration);
       }
       // !VA Clear the timeout 'timer' and remove the message when the mouse leaves the tooltip element.
       function cancelTimeout() {
@@ -3298,11 +3284,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA This is the entry point where we sort the three types of messages. We have the target id for all three types. For tooltips, we have it in the event object passed in from the event handler. For msg and err, we can't get it because handleAppMessages only takes one parameter -- either the event for tooltips or the appMessCode for msg and err. 
       // !VA So now the problem is that tooltips require the caller id because the tooltip shows on mouseenter and has to hide on mouseleave, and we need the id for the mouseleave to create the eventListener for it. So:
       // !VA Call showAppMessages with two parameters: targetid, which is either a string for tooltips or false for msg and err, and the second parameter is the appMessContent.
-      handleAppMessages: function ( appMessCode ) {
+      handleAppMessages: function ( evt ) {
         
         console.log('handleAppMessages running');
         // console.log('appController public handleAppMessages running');
-        let evt, targetid, appMessType, appMessContent;
+        let targetid, appMessCode, appMessType, appMessContent;
+        // !VA Duplicate evt into appMessCode - we could just receive the event as appMessCode but it's more transparent to do it explicitly
+        appMessCode = evt;
         // !VA If appMessCode is an object, then it originated in an addEventListener, so it must be a tooltip because those are the only appMessages that originate there. Parse the target id from the event and convert it to a valid appMessCode, i.e. underscores instead of hyphens.
         if (typeof(appMessCode) === 'object') { 
           evt = appMessCode;
@@ -3316,22 +3304,20 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         appMessCode.includes('tip_') ? appMessType = targetid : appMessType = appMessCode.slice(0, 3);
         
         // !VA Now set the delay and duration array
-        var delayduration = [];
+        var duration;
         // !VA The tooltip appMessType now contains the id instead of the type, so search for a hyphen to select the tooltip.
         if (appMessType.includes('-')) {
-          delayduration = [ 3000, 0 ];
-          // !VA Branch: tryAltTooltips (051720) 
+          duration = 0;
+          // !VA Branch: implementModifierTooltips (051820)
+          // !VA Nothing is being done here  now because tooltips don't require any preprocessing, I don't think
+          console.log('Nothing is being done here');
 
-          if (evt.ctrlKey || evt.altKey) {
-            console.log('Ctrl + Alt pressed');
-            processAppTips2( appMessType, appMessContent, delayduration );
-          }
 
 
         } else if (appMessType === 'msg' || appMessType === 'err') {
           console.log('appMessCode is: ' + appMessCode);
-          appMessType === 'err' ? delayduration = [ 0, 2500] : delayduration = [ 0, 750 ];
-          processAppMessages (appMessType, appMessContent, delayduration );
+          appMessType === 'err' ? duration = 2500 : duration = 750;
+          processAppMessages (appMessType, appMessContent, duration );
         } else {
           console.log('Error: appMessType unknown');
         }
