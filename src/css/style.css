@@ -1192,6 +1192,18 @@ button:disabled {
   min-height: 725px;
   margin: 45px auto 0; }
 
+#app-blocker {
+  display: none;
+  position: absolute;
+  top: -5px;
+  left: 0;
+  width: 850px;
+  height: 720px !important;
+  background: transparent;
+  z-index: 999; }
+  #app-blocker.active {
+    display: block; }
+
 #toolbar-container {
   display: block;
   position: absolute;
@@ -1213,30 +1225,7 @@ button:disabled {
   width: 90%;
   margin: 0 auto;
   padding: 0;
-  list-style-type: none;
-  /* VA! Reboot: Removing all this superluous functionality
-  #toggle-retina, #toggle-image-size {
-    width: 50px;
-    height: 32px;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 45px 27px;
-  }
-  #toggle-retina {
-    background-image: url('../img/retina-button.png');
-  }
-  
-  #toggle-retina.active {
-  background-image: url('../img/retina-button-active.png');
-  }
-  
-  #toggle-image-size {
-    background-image: url('../img/display-button.png');
-    .active {
-      background-image: url('../img/disk-button.png');
-    }
-  }
-  */ }
+  list-style-type: none; }
   .toolbar-buttons .btn {
     padding: 0; }
   .toolbar-buttons .toolbar-input {
@@ -1396,21 +1385,13 @@ input:focus:-ms-input-placeholder {
 .pop-font {
   color: rgba(255, 255, 255, 0.9) !important; }
 
-.ttip {
-  cursor: default;
-  z-index: 100; }
-
-.active {
-  cursor: help; }
-
 #app-message-container {
   display: flex;
   position: relative;
   top: -40px;
   left: 0;
   width: 100%;
-  height: 35px;
-  border: 1px solid blue; }
+  height: 35px; }
 
 #tip-content, #err-content, #msg-content {
   position: absolute;
@@ -1429,12 +1410,10 @@ input:focus:-ms-input-placeholder {
     opacity: 1; }
 
 #tip-content {
-  color: #04508e;
-  border: 1px solid magenta; }
+  color: #04508e; }
 
 #err-content {
-  color: #FF0000;
-  border: 1px solid magenta; }
+  color: #FF0000; }
 
 #msg-content {
   color: #959595; }
@@ -1501,16 +1480,6 @@ output {
   top: -72px;
   left: -86px; }
 
-#ccp-blocker {
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 800px;
-  height: 530px !important;
-  background: transparent;
-  z-index: 999; }
-
 #ccp {
   position: relative;
   width: 98%;
@@ -1523,7 +1492,8 @@ output {
   border-radius: 10px;
   background: #000000;
   opacity: .91;
-  z-index: 100; }
+  z-index: 100;
+  cursor: default; }
   #ccp.active {
     transform: scaleX(1); }
   #ccp h2 {

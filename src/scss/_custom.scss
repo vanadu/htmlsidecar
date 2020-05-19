@@ -290,6 +290,20 @@ button:disabled  {
   min-height: 725px;
   margin: 45px auto 0;
 }
+// VA! Add a blocker overlay to prevent user input while error and status messages are showing. Tooltip messages don't need the blocker since they depend on user input, not setTimeOut, to show and hide.
+#app-blocker {
+  display: none;
+  position: absolute;
+  top: -5px;
+  left: 0;
+  width: 850px;
+  height: 720px !important;
+  background: transparent;
+  z-index: 999;
+  &.active {
+    display: block;
+  }
+}
 
 // TOOLS
 
@@ -399,29 +413,6 @@ button:disabled  {
     background: url('../img/large-phones-toolbar-icon.png') no-repeat scroll 7px 2px;
     background-size: 34px 24px;
   }
-  /* VA! Reboot: Removing all this superluous functionality
-  #toggle-retina, #toggle-image-size {
-    width: 50px;
-    height: 32px;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 45px 27px;
-  }
-  #toggle-retina {
-    background-image: url('../img/retina-button.png');
-  }
-  
-  #toggle-retina.active {
-  background-image: url('../img/retina-button-active.png');
-  }
-  
-  #toggle-image-size {
-    background-image: url('../img/display-button.png');
-    .active {
-      background-image: url('../img/disk-button.png');
-    }
-  }
-  */
 }
 
 // TODO: Nest this under toolbar-buttons so that the JS works to make it
@@ -562,39 +553,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   color: $inspector-pop-font-color !important;
 }
 
-// VA! TOOLTIP DISPLAY
-// #ttip-container {
-//   display: block;
-//   position: absolute;
-//   top: 0;
-//   left: 0;
-//   width: 100%;
-//   height: 40px;
-//   padding: 0 40px 0 30px;
-// }
 
-// .ttip-content-container {
-//   display: flex;
-//   align-content: center;
-//   justify-content: center;
-//   width: 100%;
-//   height: 38px;
-//   padding: 0 40px 0 30px;
-//   // background: rgba($color: #000000, $alpha: 0.95);
-//   z-index: -1;
-
-// }
-
-.ttip {
-  // VA! Show the default cursor for the mouseenter event target, i.e. the cursor that is displayed before the active class with the help cursor is applied below.
-  // VA! NOTE: There's got to be a better way to do this, need to revisit it.
-  cursor: default;
-  z-index: 100;
-}
-.active {
-  // VA! Replace the default cursor of the mouseenter event target (i.e. the element for which the tooltip is being displayed) with a help cursor.
-  cursor: help;
-}
 
 
 
@@ -608,7 +567,6 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   left: 0;
   width: 100%;
   height: 35px;
-  border: 1px solid blue;
 }
 
 #tip-content, #err-content, #msg-content {
@@ -629,14 +587,12 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   }
 }
 
+
 #tip-content {
   color: #04508e;
-  border: 1px solid magenta;
 }
 #err-content {
   color: #FF0000;
-  border: 1px solid magenta;
-  // opacity: 1;
 }
 #msg-content {
   color: #959595;
@@ -725,16 +681,7 @@ output {
 }
 
 // CLIPBOARD CONTROL PANEL
-#ccp-blocker {
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 800px;
-  height: 530px !important;
-  background: transparent;
-  z-index: 999;
-}
+
 #ccp {
   position: relative;
   width: 98%;
@@ -748,6 +695,7 @@ output {
   background: #000000;
   opacity: .91;
   z-index: 100;
+  cursor: default;
   // -webkit-transform: scaleX(0);
   // -webkit-transition: -webkit-transform 500ms;
   // Animation
