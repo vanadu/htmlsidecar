@@ -24,24 +24,13 @@ DONE: Finish adding tooltip strings - some TBD strings remain
 DONE: Add animation to tooltips
 DONE: Fix tooltip cursor not changing to help cursor on Display Size and other elements with clipboard clicks. That is not going to happen since the clipboard clicks on the label are governed by the hover pseudoelement which overrides the mouseenter event, I think. Closed.
 DONE: Cancel tooltips when error message is displayed.
-
-
-TODO: FIx quirks with error messages - first one after refresh displays late, messages don't cancel when leaving the target element. Probably entains enabling the blocking element above the toolbar buttons for hte duration of the error/msg display.
-TODO: Revisit tooltip implementation, it sucks with the tips showing on mouseenter. After trying a few things, it looks like holding ALT+CTRL and pointing at the tooltip element, whereby the tooltip stays displayed until ALT+CTRL is released, is most promising. See the mouseIn function below. ALT+CTRL + mouseenter on tooltip element shows a special highlight color AND covers the app area with the blocker which stays on until the modifier keys are released.
-
+DONE: FIx quirks with error messages - first one after refresh displays late, messages don't cancel when leaving the target element. Probably entains enabling the blocking element above the toolbar buttons for hte duration of the error/msg display.
+DONE: Fix the CSS Rule buttons disappearing when hovered or clicked. It's because they get the class ttip for some reason. ttip class deleted, deprecated.
 
 
 
 
-
-
-
-
-
-
-TODO: Fix the CSS Rule buttons disappearing when hovered or clicked. It's because they get the class ttip for some reason.
-TODO: Fix that error messages stay displayed for the entire timeout even if another error message is triggered. 
-TODO: Fix that the tooltip timeout isn't reset when the element is clicked. This whole thing with the tooltips, app messages and error messages needs to be rethought. 
+TODO: Comment and clean up appMessages.
 TODO: Add error to vmlbutton height not matching img height
 TODO: Add error handling and the isErr argument to makeTdNode and makeTableNode so that the Clipboard object can discern between success messages and 'alert' messages, i.e. when the Clipboard output should be reviewed by the user for some reason, i.e. when vmlbutton height doesn't match the height of the loaded image.
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
