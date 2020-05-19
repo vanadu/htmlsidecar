@@ -26,13 +26,16 @@ DONE: Fix tooltip cursor not changing to help cursor on Display Size and other e
 DONE: Cancel tooltips when error message is displayed.
 DONE: FIx quirks with error messages - first one after refresh displays late, messages don't cancel when leaving the target element. Probably entains enabling the blocking element above the toolbar buttons for hte duration of the error/msg display.
 DONE: Fix the CSS Rule buttons disappearing when hovered or clicked. It's because they get the class ttip for some reason. ttip class deleted, deprecated.
+DONE: Comment and clean up appMessages.
 
 
 
 
-TODO: Comment and clean up appMessages.
+
+TODO: No tooltip available for posswitch and imgswap
+TODO: Tooltips don't appear on checkboxes
 TODO: Add error to vmlbutton height not matching img height
-TODO: Add error handling and the isErr argument to makeTdNode and makeTableNode so that the Clipboard object can discern between success messages and 'alert' messages, i.e. when the Clipboard output should be reviewed by the user for some reason, i.e. when vmlbutton height doesn't match the height of the loaded image.
+TODO: Add error handling and the isErr argument to makeTdNode and makeTableNode so that the Clipboard object can discern between success messages and 'alert' messages, i.e. when the Clipboard output should be reviewed by the user for some reason, i.e. when vmlbutton height doesn't match the height of the loaded image. I don't think this is possible due to Clipboard object constraints
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
 TODO: curImg doesn't resize back if you change viewerW to smaller than curImg and then change it back. It should follow the size of viewerW shouldn't it? Maybe not...
 DONE: Make bgcolor add the hash if it's not in the value. Don't do that, need to allow for non-hash values like color aliases
@@ -208,7 +211,6 @@ var Witty = (function () {
       tbrContainer: '#toolbar-container',
       ccpContainer: '#ccp',
       msgContainer: '#msg-container',
-      msgDisplay: '#msg-content',
       appBlocker: '#app-blocker',
       hdrIsolateApp: '.header-isolate-app'
     };
@@ -350,19 +352,22 @@ var Witty = (function () {
       console.log('appMessContainer is: ' + appMessContainerId);
       console.log('tooltipTarget is: ' + tooltipTarget);
 
-      if (!appMessContainerId.includes('tip')) {
-        console.log('blocker added');
-        document.querySelector(staticRegions.appBlocker).classList.add('active');
-      }
-      
 
       document.querySelector(appMessContainerId).classList.add('active');
+      if (!appMessContainerId.includes('tip')) {
+
+
+        document.querySelector(staticRegions.appBlocker).classList.add('active');
+
+      } 
 
     }
 
+
     function hideAppMessages(appMessContainerId, tooltipTarget) {
       console.log('hideAppMessages running');
-      // !VA Show the current appMessage. If the current appMessage is a tooltip, then restore the default cursor when the mouse leaves the tooltip element.
+
+      // !VA Hide current app message
 
       console.log('removing blocker');
       document.querySelector(staticRegions.appBlocker).classList.remove('active');
@@ -379,10 +384,7 @@ var Witty = (function () {
       // !VA UIController public
       // !VA This has to cancel the timeouts for the runmn
       displayAppMessages: function (isShow, appMessContainerId, tooltipTarget) {
-        console.log('displayAppMessages running');
-        console.log('isShow is: ' + isShow);
-        console.log('appMessContainerId is: ' + appMessContainerId);
-        console.log('tooltipTarget is: ' + tooltipTarget);
+        // !VA Pass-thur public function to pass display actions to the UIController. If isShow is true, call showAppMessages. If it's false, call hideAppMessages. NOTE: the tooltip appMessage is undisplayed in 
         isShow ? showAppMessages(appMessContainerId, tooltipTarget) : hideAppMessages(appMessContainerId, tooltipTarget);
       },
 
@@ -1917,59 +1919,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
     // !VA IMPORTANT: addEventListeners and removeEventListeners require a NAMED function, not just a function definition. If you just use a function definition, you can create the eventListener but you can't remove it because Javascript doesn't know which one you want to remove. Worse, it fails silently. So always name your function calls into a var when adding/removing event listeners!
     // !VA NOTE: variable name can't be the same as the function name. Otherwise, you can add and remove the event listener only ONCE, but not multiple times.
-
-    var tooltipTriggers = function handleTooltipTriggers(evt) {
-      console.log('handleTooltipTriggers running');
-      console.log('evt is');
-      console.log(evt);
-      
-      let tooltipTarget, appMessCode, appMessContent, appMessContainer, duration;
-      // !VA Get the id of the tooltip trigger
-      tooltipTarget = '#' + evt.target.id;
-      // !VA Duplicate evt into appMessCode - we could just receive the event as appMessCode but it's more transparent to do it explicitly
-      appMessCode = evt;      
-
-      appMessContainer = document.querySelector(appMessageElements.tipContent);
-      // !VA Branch: implementModifierTooltips (051820)
-      // !VA Below is duplicated in handleAppMessages
-      // !VA If appMessCode is an object, then it originated in an addEventListener, so it must be a tooltip because those are the only appMessages that originate there. Parse the target id from the event and convert it to a valid appMessCode, i.e. underscores instead of hyphens.
-      if (typeof(appMessCode) === 'object') { 
-        evt = appMessCode;
-        // console.log('targetid is: ' + targetid);
-        appMessCode = 'tip_' + evt.target.id.replace(/-/gi, '_'); 
-      }
-      // !VA Get the appMessContent from the passed appMessCode, which is now conformant to all three appMessage types
-      appMessContent = getAppMessageStrings(appMessCode); 
-      console.log('appMessContent is: ' + appMessContent);
-      appMessContainer.innerHTML = appMessContent;
-      // !VA If the passed appMessCode contains a hyphen, then it's a target id and not an appMessCode, because appMessCodes only have underscores. Thus, it must be a tooltip, so pass the id to showAppMessages. Otherwise, take the first three characters of the appMessCode and pass them as the appMessType to indicate whether it's a msg or err.
-      // appMessCode.includes('tip_') ? appMessType = tooltipTarget : appMessType = appMessCode.slice(0, 3);
-      // !VA Branch: implementModifierTooltips (051820) END handleAppMessages duplication
-
-      // !VA Branch: implementModifierTooltips (051820)
-      // !VA Tooltips don't require any duration so set that to false
-      duration = false;
-      
-      
-      
-      
-      // !VA Don't really need the id, but do need the appMessType, appMessContent and duration, even if it is falsy
-      // !VA Don't forget that appMessType contains the targetid at this point for tooltips, so we pass it as tooltipTarget
-      UIController.displayAppMessages(true, appMessageElements.tipContent, tooltipTarget);
-      // showTooltip(appMessType, appMessContent, duration);
+    var tooltipTriggers = function tooltipTriggers(evt) { 
+      // !VA Named function to include as function parameter in tooltip event handlers. IMPORTANT: anonymous functions can't be removed with removeEventListener. That's why it has to be named. This is just a pass-thru to get to appController.handleAppMessages.
+      appController.handleAppMessages(evt);
     };
 
-    // !VA showTooltip can be folded into UIController.showAppMessage
-    function showTooltip(appMessType, appMessContent, duration) {
-      console.log('showTooltip running');
-      let targetid, tipContentContainer;
-      targetid = appMessType;
-      console.log('targetid is: ' + targetid);
-      // !VA targetid is received here as appMessType but passed as the targetid of the tooltip trigger, so put it into targetid for transparency's sake
-      tipContentContainer = document.querySelector(appMessageElements.tipContent);
-      tipContentContainer.style.opacity = '1';
-      tipContentContainer.innerHTML = appMessContent;
-    }
+
+
+
 
 
     // !VA ADD EVENT LISTENERS FOR TOOLTIP TRIGGERS
@@ -2373,32 +2330,20 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     document.addEventListener('DOMContentLoaded', function() {
       console.log('Running on DOM content load');
 
-      var fi, fa, fum;
-      // var foo = function myFunction(evt) {
-      //   handleTooltipTriggers(evt);
-      // };
-
+      // !VA Get the root (html) element 
       const rootElement = document.querySelector(':root');
-      console.log('rootElement is: ' + rootElement);
-      // !VA It appears toolbarElements is available in this function, so it is scoped to appController
-      // console.log('addTooltipEventListeners is: ' + addTooltipEventListeners);
+      // !VA Add a keydown event listener to trap the Alt + Ctrl key combination
       document.addEventListener('keydown', function(event) {
         if (event.altKey && event.ctrlKey) {
-          // !VA Branch: implementModifierTooltips (051820)
-          // !VA This is the class that changes the default cursor into a help cursor
+          // !VA This is the class that changes the default cursor into a help cursor. While the key combo is pressed, add the modifier-pressed class to the root element which displays the help cursor on the cursor 
           rootElement.classList.add('modifier-pressed');
-          // !VA Add eventListeners for all tooltip trigger elements. IMPORTANT: addEventListeners requires that the function argument be a NAMED function (i.e. var myName = function(myName) ...) , otherwise removeEventListeners can NOT remove it because it can't identify it. Interestingly, addTooltipEventListeners gives all the event listeners for all the triggers the same named function as argument, and it works. I was afraid there would be a name conflict, but there doesn't appear to be -- the eventListeners do get removed below when the modifier keys are released.
-          // document.querySelector(toolbarElements.btnTbrIncr50).addEventListener('mouseenter', boogers, false);
-
-          // testbut.onmouseenter = function() {
-
-          //   testbut2.addEventListener('click', addMe, false);
-          // };
-
+          // !VA Add eventListeners for all tooltip trigger elements. IMPORTANT: addEventListeners requires that the function argument be a NAMED function (i.e. var myName = function(myName) ...) , otherwise removeEventListeners can't remove it because it can't identify it. Interestingly, addTooltipEventListeners gives all the event listeners for all the triggers the same named function as argument, and it works. I was afraid there would be a name conflict, but there doesn't appear to be -- the eventListeners do get removed below when the modifier keys are released.
           addTooltipEventListeners();
         }
       });
       document.addEventListener('keyup', function(event) {
+        // !VA On keyup if either the Alt or Ctrl key is released, remove the active class from the appBlocker, remove the modifier-pressed class on the root element to change back to the default cursor, reset the innerHTML of the tipContentContainer to '', then remove all the eventListeners from all the tooltip tarets. 
+        // !VA NOTE: This should be revisited to make it DRYer, it shouldn't be necessary to have two separate functions that include all the tooltip targets to loop through to add/remove event listeners from all of them. 
         if (event.altKey || event.ctrlKey) {
           let tipContentContainer, appBlocker;
           appBlocker = document.querySelector(staticRegions.appBlocker);
@@ -2406,15 +2351,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           console.log('Modifier released');
           tipContentContainer = document.querySelector(appMessageElements.tipContent);
           tipContentContainer.innerHTML = '';
-          // !VA Branch: implementModifierTooltips (051820)
-          // !VA Remove the event listeners when the modifier keys are released.
-          // console.log('removing event listener');
-          // document.querySelector(toolbarElements.btnTbrIncr50).removeEventListener('mouseenter', boogers, false);
           if (appBlocker.classList.contains('active')) { appBlocker.classList.remove('active'); }
-
-
-          // testbut2.removeEventListener('click', addMe, false);
-
           removeTooltipEventListeners();
         }
       });
@@ -3271,21 +3208,18 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
 
     // !VA appController private
-    // !VA Preprocess error messages before sending them to UIController.displayAppMessages
+    // !VA Preprocess error messages before sending them to UIController.displayAppMessages. This is where the setTimeOut for err and msg messages lives.
     function processAppMessages(appMessType, appMessContent, duration ) {
       
       console.log('preprocessAppErrs running');
       console.log('appMessType is: ' + appMessType);
       console.log('appMessContent is: ' + appMessContent);
       let appMessContainerId, appMessContainer, timer;
+      // !VA 
       appMessType === 'err' ? appMessContainerId = appMessageElements.errContent : appMessContainerId = appMessageElements.msgContent; 
       appMessContainer = document.querySelector(appMessContainerId);
-      
 
-
-
-
-
+      // !VA Set the innerHTML of the respective appMessContainer.
       appMessContainer.innerHTML = appMessContent;
       UIController.displayAppMessages( true, appMessContainerId, false );
       
@@ -3326,41 +3260,51 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         
         console.log('handleAppMessages running');
         // console.log('appController public handleAppMessages running');
-        let targetid, appMessCode, appMessType, appMessContent;
+        let appMessCode, appMessType, appMessContent, duration, appMessContainerId, tooltipTarget, timer;
         // !VA Duplicate evt into appMessCode - we could just receive the event as appMessCode but it's more transparent to do it explicitly
         appMessCode = evt;
         // !VA If appMessCode is an object, then it originated in an addEventListener, so it must be a tooltip because those are the only appMessages that originate there. Parse the target id from the event and convert it to a valid appMessCode, i.e. underscores instead of hyphens.
         if (typeof(appMessCode) === 'object') { 
-          evt = appMessCode;
-          targetid = evt.target.id;
+          // evt = appMessCode;
+          tooltipTarget = '#' + evt.target.id;
           // console.log('targetid is: ' + targetid);
           appMessCode = 'tip_' + evt.target.id.replace(/-/gi, '_'); 
+          appMessType = 'tip';
         }
+        // !VA Get the id of the container in which the appMessage is displayed based on the first three chars of appMessCode.
+        appMessContainerId = '#' + appMessCode.slice(0, 3) + '-content';
         // !VA Get the appMessContent from the passed appMessCode, which is now conformant to all three appMessage types
         appMessContent = getAppMessageStrings(appMessCode); 
-        // !VA If the passed appMessCode contains a hyphen, then it's a target id and not an appMessCode, because appMessCodes only have underscores. Thus, it must be a tooltip, so pass the id to showAppMessages. Otherwise, take the first three characters of the appMessCode and pass them as the appMessType to indicate whether it's a msg or err.
-        appMessCode.includes('tip_') ? appMessType = targetid : appMessType = appMessCode.slice(0, 3);
-        
-        // !VA Now set the delay and duration array
-        var duration;
-        // !VA The tooltip appMessType now contains the id instead of the type, so search for a hyphen to select the tooltip.
-        if (appMessType.includes('-')) {
-          duration = 0;
-          // !VA Branch: implementModifierTooltips (051820)
-          // !VA Nothing is being done here  now because tooltips don't require any preprocessing, I don't think
-          console.log('Nothing is being done here');
-
-
-
-        } else if (appMessType === 'msg' || appMessType === 'err') {
-          console.log('appMessCode is: ' + appMessCode);
-          appMessType === 'err' ? duration = 2500 : duration = 750;
-          processAppMessages (appMessType, appMessContent, duration );
+        // !VA Get the first three characters of the appMessCode to determine the appMessType. If those chars are 'err' or 'msg', set the duration. Otherwise, it's a tooltip, and no duration is required since the user manually undisplays the message by releasing Ctrl + Alt.
+        // !VA Set the duration of err and msg appMessages
+        if ( appMessCode.slice(0, 3) === 'err' ) {
+          duration = 2500;
+          appMessType = 'err';
+        } else if ( appMessCode.slice(0,3 ) === 'msg' ) {
+          duration = 750;
+          appMessType = 'msg';
         } else {
-          console.log('Error: appMessType unknown');
+          console.log('Tooltip: no duration set');
         }
-
-
+        // !VA Set the innerHTML of the appMessContainer to the current appMessContent
+        document.querySelector(appMessContainerId).innerHTML = appMessContent;
+        // !VA displayAppMessages with the isShow parameter = true to display the appMessage. 
+        if (appMessType === 'tip') {
+          // !VA Display the message -- if it's a tooltip include the target ID of the tooltip target, 
+          UIController.displayAppMessages( true, appMessContainerId, tooltipTarget );
+        } else {
+          // !VA otherwise set that parameter to false - it's not needed
+          UIController.displayAppMessages( true, appMessContainerId, false );
+        }
+        // !VA If appMessType is err or msg, call setTimeout to set the duration of the message, i.e. time delay before the message is undisplayed.
+        if ( appMessType === 'err' || appMessType === 'msg') {
+          timer = setTimeout(() => {
+            // !VA Read the appMessContent into the tooltip content element
+            // !VA Call displayAppMessages with the isTrue parameter = false to undisplay the message after the timeout. 
+            console.log('appMessContainerId is: ' + appMessContainerId);
+            UIController.displayAppMessages(false, appMessContainerId, false );
+          }, duration);
+        }
       },
 
 
