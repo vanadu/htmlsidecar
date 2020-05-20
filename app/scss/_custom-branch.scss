@@ -1,0 +1,1329 @@
+// VA! Dev styles
+.devred { border: 1px solid red !important; }
+.devblue { border: 1px solid blue !important; }
+.devgreen { border: 1px solid green !important; }
+.devmag { border: 1px solid magenta !important; }
+
+// VARIABLES - COLOR
+$primary-bg-color:                #337AB7;
+$primary-font-color:              #FFF;
+// HEADER
+$dim-color:           #B7B233;
+$whit-color:          #B77033;
+$header-subtext-color:            #959595;
+
+// IMAGE TOOLBAR
+$image-toolbar-bkgd-color:        #FFF;
+
+
+//DIM VIEWERS
+$inspector-font-color:          rgba(160, 160, 160, 1);              
+$inspector-pop-font-color:      rgba(255, 255, 255, .9);   
+$filename-viewer-font-color:      rgba(255, 255, 255, .8);
+
+//TOOLTIPS
+$tooltip-bg-color:                rgba(107, 107, 107, .9);
+$tooltip-font-color:              #FFF;
+$tooltip-border-color:            #555 transparent transparent transparent;
+
+
+//CCP
+$fieldset-border-color:           #959595;
+$fieldset-legend-color:           #959595;
+
+
+// VARIABLES - TYPOGRAPHY
+$primary-font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+$inspector-font-family: 'Ubuntu', Arial, Helvetica, sans-serif;
+
+// VA! This is the old logo font, has nothing to do with the app
+$dimwhit-font-family: 'Ubuntu', Arial, Helvetica, sans-serif;
+
+// VA! STYLES
+// VA! Reboot: box-sizing from Bootstrap in case I decide to remove Bootstrap
+* {
+  box-sizing: border-box;
+}
+*, ::after, ::before {
+  box-sizing: border-box;
+}
+
+// VA! Reboot: Overriding the default Bootstrap root font size of 10px
+html {
+  font-size: 16px;
+}
+body {
+  // VA!Reboot: not sure what this does.
+  min-height: 100% !important; 
+  font-family: $primary-font-family;
+  font-size: 1rem;
+}
+
+// VA! Reboot: only for content, probably can delete
+span.code {
+  font-family: 'Courier New', monospace;
+}
+
+// VA! Reboot: not sure what this does
+// FIX
+button:disabled  {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.navbar-container {
+  position: relative;
+  height: 40px;
+  margin-bottom: 3px;
+  border-bottom: 1px solid $primary-bg-color;
+  background: $primary-bg-color;
+}
+
+.navbar {
+  display: block;
+  position: relative;
+  width: 1200px;
+  margin: 0 auto;
+  li {
+    display: block;
+    float: left;
+    a {
+      color: $primary-font-color;
+    }
+  }
+}
+
+// HERO/HEADER
+.header-container {
+  position: relative;
+  width: 100%;
+  height: 125px;
+  margin: 0 auto;
+  padding-top: 10px;
+  padding-bottom: 5px;
+  // border-top: 1px solid $primary-bg-color;
+  // border-bottom: 1px solid $primary-bg-color;
+}
+
+.header-content {
+  display: block;
+  height: 70px;
+  position: relative;
+  width: 1000px;
+}
+
+.header-headline {
+  float: left;
+  position: relative;
+  height: 76px;
+  width: 490px;
+  // margin: 0 auto;
+  margin-left: 20px;
+  .header-logo {
+    position: relative;
+    width: 240px;
+    height: 46px;
+    float: left;
+    margin-top: 8px;
+    h1 {
+      font-family: $inspector-font-family;
+      position: absolute;
+      top: 0;
+      font-size: 48px;
+      font-weight: bold;
+      margin: 0;
+      padding: 0;
+      color: $whit-color;
+    }
+    .header-version {
+      position: absolute;
+      font-size: 12px;
+      bottom: -2px;
+      right: 14px;;
+      p {
+        color: #959595;
+        margin: 0;
+        padding: 0;
+      }
+    }
+    // border: 1px solid black;
+    img {
+      display: block;
+      // margin: 0 auto;
+    }
+  }
+  .header-image {
+    // position: absolute;
+    // top: 0;
+    float: left;
+    width: 90px;
+    margin-top: 4px;
+    img {
+      width: 90px;
+      margin-top: -12px;
+      &.right, .left {position: absolute;}
+      &.right {right: 0;}
+      &.left {left: 0;}
+    }
+  }
+  .header-divider {
+    float: right;
+    width: 18px;
+    height: 57px;
+    margin-top: 4px;
+    border-left: 8px solid #b7b233;
+    border-right: 8px solid #b77033;
+  }
+  .header-slug {
+
+  }
+}
+
+
+
+.header-subtext, .header-slug {
+  float: right;
+  h2 {
+    width: 100%;
+    margin-top: 6px;
+    padding: 0;
+    color: $header-subtext-color;
+    font-size: 24px;
+    text-align: left;
+    text-transform: uppercase;
+    a {
+      color: $header-subtext-color;
+      text-decoration: none;
+    }
+    .initial-cap {
+      font-size: 110%;
+      font-weight: 800;
+    }
+    .whit-initial-cap {
+      color: $whit-color;
+    }
+    .dim-initial-cap {
+      color: $dim-color;
+    }
+    span.header-version {
+      font-size: 12px;
+    }
+  }
+}
+
+.header-slug {
+  width: 600px;
+}
+
+
+// APP-CONTAINER
+#app-container {
+  display: block;
+  position: relative;
+  // VA! This yields a viewport width of 802, which allows a user-entered width of 800 max
+  width: 850px;
+  min-height: 679px;
+  margin: 15px auto 100px;
+}
+
+// TOOLS
+// VA! Reboot 
+#toolbar-container {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 35px;
+  &.show-err {
+    transform: translate(0, 50px);
+    transition: transform 250ms;
+    // -webkit-transform: scaleX(0);
+    // -webkit-transition: -webkit-transform 500ms;
+  }
+  &.hide-err {
+    transform: translate(0, 0);
+    transition: transform 250ms;
+    // -webkit-transform: scaleX(0);
+    // -webkit-transition: -webkit-transform 500ms;
+  }
+}
+
+// IMAGE TOOLBAR
+// VA! Reboot: not even sure this one is necessary
+/* VA! Reboot: removed this in HTML
+.toolbar-content {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 35px;
+  background: $image-toolbar-bkgd-color;
+}
+*/
+
+// UL -- Toolbar button container 
+.toolbar-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
+  margin: 0 auto;
+  padding: 0;
+  list-style-type: none;
+  // VA! Reboot: replacing all the element selectors with class selectors and removing their parent li selector from the hierarchy
+  .btn {
+    // VA! Overrides Bootstrap default padding in buttons.less
+    padding: 0;
+  }
+  // VA! Reboot: deleted input selector, moved input styling to class .toolbar-input
+  .toolbar-input {
+    width: 50px;
+    height: 32px;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    font-style: italic;
+    line-height: 18px;
+    text-align: center;
+  }
+  // VA! Reboot: Style all the toolbar buttons
+  .toolbar-but {
+    width: 50px;
+    height: 30px;
+    background-size: cover;
+  }
+  // VA! Reboot: deleted img selector, moved img styling to class .toolbar-but
+  // VA! Reboot: deleted .divider child selector under input selector, moved divider styling to class .divider
+  .divider {
+    width: 5px;
+    height: 18px;
+    margin: 0 7px;
+    opacity: .2;
+  }
+  // VA! Reboot: deleted img element in HTML and set the background image of each toolbar-button to its corresponding image
+  #btn-tbr-incr50 {
+    background-image: url('../img/incr50-button.png');
+  }
+  #btn-tbr-incr10 {
+    background-image: url('../img/incr10-button.png');
+  }
+  #btn-tbr-incr01 {
+    background-image: url('../img/incr01-button.png');
+  }
+  #btn-tbr-decr01 {
+    background-image: url('../img/decr01-button.png');
+  }
+  #btn-tbr-decr10 {
+    background-image: url('../img/decr10-button.png');
+  }
+  #btn-tbr-decr50 {
+    background-image: url('../img/decr50-button.png');
+  }
+  // VA! Reboot: Deleted #tb-but-mobile-swap 
+  #ipt-tbr-viewerw {
+    width: 80px;
+    padding-left: 30px;
+    background: url('../img/table-icon.png') no-repeat scroll 7px 7px;
+    text-align: center;
+  }
+  #ipt-tbr-sphones-width {
+    width: 70px;
+    padding-left: 30px;
+    background: url('../img/small-phones-toolbar-icon.png') no-repeat scroll 12px 2px;
+    background-size: 15px 26px;
+  }
+  #ipt-tbr-lphones-width {
+    width: 85px;
+    padding-left: 30px;
+    background: url('../img/large-phones-toolbar-icon.png') no-repeat scroll 7px 2px;
+    background-size: 34px 24px;
+  }
+  /* VA! Reboot: Removing all this superluous functionality
+  #toggle-retina, #toggle-image-size {
+    width: 50px;
+    height: 32px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 45px 27px;
+  }
+  #toggle-retina {
+    background-image: url('../img/retina-button.png');
+  }
+  
+  #toggle-retina.active {
+  background-image: url('../img/retina-button-active.png');
+  }
+  
+  #toggle-image-size {
+    background-image: url('../img/display-button.png');
+    .active {
+      background-image: url('../img/disk-button.png');
+    }
+  }
+  */
+}
+
+// TODO: Nest this under toolbar-buttons so that the JS works to make it
+// disappear on focus
+// VA! Reboot: I don't know what this does.
+input:focus::-webkit-input-placeholder { color:transparent; }
+input:focus:-moz-placeholder { color:transparent; } /* FF 4-18 */
+input:focus::-moz-placeholder { color:transparent; } /* FF 19+ */
+input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
+
+
+
+
+// IMAGE-VIEWPORT- contains dim viewer, dim-error-container and ccp
+#image-viewport {
+  display: block;
+  position: absolute;
+  top: 40px;
+  width: 850px;
+  height: 679px;
+  // width: 100%;
+  // height: 1170px !important;
+  // !VA Setting min height here because anything less than 679px won't make enough room for CCP
+  min-height: 679px !important;
+  margin: 0 auto;
+  border-top: 110px solid #000;
+  border-right:  24px solid #000;
+  border-bottom:  24px solid #000;
+  border-left:  24px solid #000;
+
+  border-radius: 10px;
+  // overflow: auto;
+  background: #E1E1E1 url('../img/html-email-icon-blue.png') repeat;
+  z-index: 2;
+}
+
+// INSPECTORS
+#inspector-container {
+  display: flex;
+  position: absolute;
+  top: 50px;
+  justify-content: space-evenly;
+  width: 100%;
+  height:  95px;
+  margin: 0;
+  padding: 0;
+  background-color: #000000;
+  color: $inspector-font-color;
+  // VA! Testing
+  overflow: hidden;
+  z-index: 3;
+  // VA! Reboot: I can't remember what this does.
+  &.show-err {
+    transform: translate(0, -85px);
+    transition: transform 250ms;
+    // -webkit-transform: scaleX(0);
+    // -webkit-transition: -webkit-transform 500ms;
+  }
+  &.hide-err {
+    transform: translate(0, 0);
+    transition: transform 250ms;
+    // -webkit-transform: scaleX(0);
+    // -webkit-transition: -webkit-transform 500ms;
+  }
+}
+
+.inspectors-left-col, .inspectors-right-col, .inspectors-center-col {
+  display: flex;
+}
+
+.inspector-list {
+  width: 240px;
+  margin: 0;
+  padding: 0;
+}
+.inspectors-left-col {
+  justify-content: flex-end;
+  width: 280px;
+  margin-top: 3px;
+}
+.inspectors-right-col {
+  justify-content: flex-end;
+  width: 300px;
+  margin-top: 3px;
+}
+.inspectors-center-col {
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 200px;
+}
+.inspector {
+  padding: 2px 2px 2px 0px;
+  border: 0;
+  font-family: $inspector-font-family;
+  // VA! Reboot: color is inherited from parent in JS if not pop-font due to Inspector Alert
+  font-size: 1em;
+  font-weight: normal;
+  text-transform: uppercase;
+  list-style-type: none;
+}
+#btn-toggle-ccp {
+  display: block;
+  width: 40px;
+  height: 47px;
+  margin: 10px auto 0;
+  border: 0;
+  background-color: transparent;
+  background-image: url('../img/clipboard.png');
+  background-position: center top;
+  background-size: 40px 47px; 
+  &.active {
+    // VA! Reboot: bg image not swapping on active and the image is misnamed - it should be clipboard-active. There should be a different hover image.
+    background-image: url('../img/clipboard-hover.png');
+  }
+}
+#i-filename {
+  height: 22px;
+  color: $filename-viewer-font-color;
+  font-size: 1rem;
+  text-align: center;
+
+}
+#i-display-size {
+  &::before {content: 'Display size: '}
+}
+#i-disk-size {
+  &::before {content: 'Size on Disk: '} 
+}
+#i-aspect {
+  &::before {content: 'Aspect Ratio: '} 
+}
+#i-small-phones {
+  &::before {content: 'Small Phones: '}
+}
+#i-large-phones {
+  &::before {content: 'Large Phones: '}
+}
+#i-retina {
+  &::before {content: 'Retina: '}
+}
+.pop-font {
+  // VA! Reboot: Pop font for Inspector
+  color: $inspector-pop-font-color;
+}
+
+
+
+
+
+// APP ERROR DISPLAY
+#msg-container {
+  display: block;
+  position: relative;
+  top: -65px;
+  // top: 0px;
+  left: 0;
+  width: 100%;
+  height: 65px;
+  opacity: 1;
+  &.show-err {
+    opacity: 1;
+    transition: opacity .25s ease-in-out;
+    color: #FF0000;
+    // transform: translate(0, 85px);
+    // transition: transform 250ms;
+    // -webkit-transform: scaleX(0);
+    // -webkit-transition: -webkit-transform 500ms;
+  }
+  &.hide-err {
+    opacity: 0;
+    transition: opacity .25s ease-in-out;
+    // transform: translate(0, 0px);
+    // transition: transform 250ms;
+    // -webkit-transform: scaleX(0);
+    // -webkit-transition: -webkit-transform 500ms;
+  }
+  &.show-mess {
+    opacity: 1;
+    transition: opacity .25s ease-in-out;
+    color: #959595;
+    // transform: translate(0, 85px);
+    // transition: transform 250ms;
+    // -webkit-transform: scaleX(0);
+    // -webkit-transition: -webkit-transform 500ms;
+  }
+  &.hide-mess {
+    opacity: 0;
+    transition: opacity .25s ease-in-out;
+    color: #959595;
+    // transform: translate(0, 85px);
+    // transition: transform 250ms;
+    // -webkit-transform: scaleX(0);
+    // -webkit-transition: -webkit-transform 500ms;
+  }
+  // dim-errors
+  table {
+    display: block;
+    position: relative;
+    width: 650px;
+    height: 100%;
+    margin: 0 auto;
+    // msg-content
+    td {
+      width: 650px;
+      height: 65px;
+      font-size: 17px;
+      line-height: 18px;
+      font-style: italic;
+      font-weight: normal;
+      text-align: center;
+      text-transform: none;
+      vertical-align: middle;
+      // overflow: hidden;
+    }
+  }
+}
+
+
+// MAIN IMAGE VIEWER
+#main-image-viewer {
+  width: 650px;
+  height: 450px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  // !VA Width and height should only be set programmatically
+  transform:  translateY(-50%) translateX(-50%);
+  background: #e1e1e1 url('../img/html-email-icon-white.png') repeat;
+}
+
+#main-image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform:  translateY(-50%) translateX(-50%);
+  z-index: -1;
+  // The displayed img
+  #main-img {
+    border: 1px dotted #959595;
+  }
+  // DROP AREA
+  #drop-area {
+    display: block;
+    position: relative;
+    width: 600px;
+    min-height: 400px;
+    border: 2px dashed #bbb;
+    border-radius: 10px;
+    // :VA Fix the vendor prefixes
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    .drop-callout {
+      margin-top: 0;
+      padding: 15px 25px;
+      color: #959595;
+      font-size: 40px;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    .drop-area-content {
+      display: block;
+      margin: 0 20px 10px 40px;
+      color: #959595;
+      font-size: 16px !important;
+
+    }
+    // span
+    .witty {
+      color: #6a6a6a;
+      font-size: 110%;
+    }
+  }
+}
+
+// :VA Not sure where this goes
+output {
+  // :VA override bootstrap default -- !important required here
+  padding: 0 !important;
+}
+
+// :VA Not sure where this goes
+#ipad-container {
+  position: absolute;
+  top: -72px;
+  left: -86px;
+}
+
+// TOOLTIPS 
+// VA! Tooltips are annoying -- unless I can figure out a way to make them useful I'm turning them off here by setting opacity by turning off the ttip opacity transition and turning off ttiptext opacity and visibility  
+
+.ttip {
+  display: inline-block;
+  position: relative;
+  &:hover {
+    .ttiptext {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+  .ttiptext {
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    width: 100px;
+    margin-left: -60px;
+    padding: 5px 5px;
+    // transition: opacity 1s;
+    border-radius: 6px;
+    background-color: $tooltip-bg-color;
+    color: $tooltip-font-color;
+    font-size: 10px;
+    font-weight: normal;
+    text-align: center;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 1;
+    &::after {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: $tooltip-border-color;
+      content: '';
+    }
+  }
+}
+
+// .ttip:hover .ttiptext {
+//   visibility: visible;
+//   opacity: 1;
+// }
+
+// CLIPBOARD CONTROL PANEL
+#ccp-blocker {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 800px;
+  height: 530px !important;
+  background: transparent;
+  z-index: 999;
+}
+#ccp {
+  position: relative;
+  width: 98%;
+  height: 530px;
+  margin: 6px auto 0;
+  padding: 0;
+  transform: scaleX(0);
+  transition: transform 100ms;
+  border: 1px solid #161616;
+  border-radius: 10px;
+  background: #000000;
+  opacity: .91;
+  z-index: 100;
+  // -webkit-transform: scaleX(0);
+  // -webkit-transition: -webkit-transform 500ms;
+  // Animation
+  // Get rid of vendor prefixes
+  &.active {
+    // :VA Fix the vendor prefixes
+    // -webkit-transform: scaleX(1);
+    transform: scaleX(1);
+  }
+  h2 {
+    display: block;
+    margin: 8px 0 0 0;
+    padding: 0;
+    color: $primary-font-color;
+    font-size: 14px;
+    text-align: center;
+  }
+}
+
+
+#ccp-content {
+  // VA! Reboot: Working
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  width: 100%;
+  height: 500px;
+  // margin: 0 auto;
+  padding: 0 10px;
+  // Global CCP character styles
+
+  input, label {
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 300;
+  }
+  select {
+    width: 80px;
+    font-size: 14px;
+  }
+  input {
+    border: 1px solid #616161;
+    background: #000000;
+    color: #FFFFFF;
+  }
+  // VA! Set the height of each option fieldset
+  fieldset#ccp-img-options, fieldset#ccp-td-options, fieldset#ccp-table-options {
+    height: 160px;
+  }
+
+
+  // VA! Set the width of the 4 options columns in each fieldset
+  fieldset {
+    position: relative;
+    width: 100%;
+    margin-bottom: 5px;
+    border: 1px solid $fieldset-border-color;
+    border-radius: 5px;
+
+    legend {
+      width: 145px;
+      height: 20px;
+      margin: 0 0 0 20px;
+      padding: 0 10px;
+      border: none;
+      color: $fieldset-legend-color;
+      font-size: 16px;
+      font-weight: 400;
+    }
+
+    .ccp-options-col-1 {
+      // VA! Reboot: Moved out of parent hierarchy
+    }
+    .ccp-options-col-2 {
+      // VA! Reboot: Moved out of parent hierarchy
+    }
+    .ccp-options-col-3 {
+      // VA! Reboot: Moved out of parent hierarchy
+      
+
+  
+      // .ccp-table-include-wrapper-container {
+      //   display: block !important;
+      // }
+      
+
+      // VA! The Wrapper table label has to align left because it also serves as the option group heading
+      #chk-ccp-table-include-wrapper {
+        margin-left: -40px;
+      }
+      .ccp-options-col-4 {
+      // VA! Reboot: Moved out of parent hierarchy
+      }
+
+    }
+
+  }
+}
+// VA! Reboot: NEW
+// VA! All the columns are absolutely positioned 2px from top
+.ccp-options-col-1, .ccp-options-col-2, .ccp-options-col-3, .ccp-options-col-4 {
+  position: absolute;
+  top: 2px;
+}
+.ccp-options-col-1 {
+  // !VA Width is actually irrelevant here since these elements are absolutely positioned
+  left: 0;
+  width: 92px;
+  height: 120px;
+  margin: 0 7px;
+  border: 1px solid transparent;
+  .ccp-but {
+    width: 90px;
+    height: 90px; 
+    padding-right: 7px;
+    float: left;
+    display: block;
+    border: none;
+    background-size: 90px 46px !important;
+  }
+}
+.ccp-options-col-2 {
+  left: 120px;
+  width: 230px;
+
+  label  {
+    width: 60px;
+    margin-bottom: 5px;
+    padding-right: 2px;
+    text-align: right;
+  }
+  input {
+    width: 150px;
+  }
+}
+.ccp-options-col-3 {
+  left: 350px;
+  width: 300px;
+  margin-left: 10px; 
+  // VA! All these labels have to be targeted individually to ge the alignment right because bgcolor is an input label and the othe three are checkbox labels that have a label acting as mock checkbox. 
+}
+.ccp-options-col-4 {
+  left: 680px;
+  width: 70px;
+  .ccp-but {
+    display: block;
+    width: 60px;
+    height: 35px;
+    margin-bottom: 9px;
+    // border: 1px solid transparent;
+    background-color:  transparent;
+    cursor: default;
+    border: none;
+    background-size:  60px 35px !important;
+    &.active {
+      display: block;
+      cursor: pointer;
+    }
+  }
+}
+// VA! Reboot: Headings for table options
+.ccp-heading {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  font-size: .85rem;
+  font-weight: bold;
+  color: #a8a8a8;
+  color: #FFFFFF;
+  font-style: italic;
+}
+
+
+
+// VA! Custom, i.e Mock checkbox
+/* These are the actual text labels for the checkboxes. */
+.mock-checkbox-container  {
+  width: 100%;
+  display: block;
+  position: relative;
+  // padding-left: 35px;
+  margin-bottom: 3px;
+  cursor: pointer;
+  // font-size: 22px;
+  text-align: left;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  z-index: 100;
+  a {
+    font-weight: bold;
+    text-decoration: underline;
+  }
+}
+// VA! Individual Styling for the Mock Checkboxes
+/* These are the hidden browser's default checkboxes. VA! It appears they are attached to the first label element in the parent container */
+.ccp-img-include-width-height-container input, .ccp-td-bgimage-container input, .ccp-table-include-wrapper-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox -- this is the span after the checkbox input element. */
+#spn-ccp-img-include-width-height-checkmrk, #spn-ccp-td-bgimage-checkmrk, #spn-ccp-table-include-wrapper-checkmrk {
+  position: absolute;
+  top: 3px;
+  // left: 40px;
+  height: 15px;
+  width: 15px;
+  background-color: #eee;
+  display: block;
+  z-index: 100;
+}
+
+/* On mouse-over, add a grey background color */
+.ccp-img-include-width-height-container:hover input ~ #spn-ccp-img-include-width-height-checkmrk, .ccp-td-bgimage-container:hover input ~ #spn-ccp-td-bgimage-checkmrk, .ccp-table-include-wrapper-container:hover input ~ #spn-ccp-table-include-wrapper-checkmrk {
+  background-color: #ccc;
+}
+/* When the checkbox is checked, add a gray background */
+.ccp-img-include-width-height-container input:checked ~ #spn-ccp-img-include-width-height-checkmrk, .ccp-td-bgimage-container input:checked ~ #spn-ccp-td-bgimage-checkmrk, .ccp-table-include-wrapper-container input:checked ~ #spn-ccp-table-include-wrapper-checkmrk {
+  background-color: #5f5e5e;
+}
+
+/* Create the checkmrk/indicator (hidden when not checked) */
+#spn-ccp-img-include-width-height-checkmrk:after, #spn-ccp-td-bgimage-checkmrk:after, #spn-ccp-table-include-wrapper-checkmrk:after  {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmrk when checked */
+.ccp-img-include-width-height-container input:checked ~ #spn-ccp-img-include-width-height-checkmrk:after, .ccp-td-bgimage-container input:checked ~ #spn-ccp-td-bgimage-checkmrk:after, .ccp-table-include-wrapper-container input:checked ~ #spn-ccp-table-include-wrapper-checkmrk:after  {
+  display: block;
+
+}
+
+
+/* Style the checkmrk/indicator */
+.ccp-img-include-width-height-container #spn-ccp-img-include-width-height-checkmrk:after, .ccp-td-bgimage-container #spn-ccp-td-bgimage-checkmrk:after, .ccp-table-include-wrapper-container #spn-ccp-table-include-wrapper-checkmrk:after {
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+
+}
+
+
+
+
+// VA! This is the extra label I added because the prodecure I used for the mock checkbox didn't include a label
+#ccp-img-include-width-height-label, #ccp-td-bgimage-label, #ccp-table-include-wrapper-label  {
+  width: 100%;
+  padding-left: 34px;
+  text-align: left;
+}
+
+
+// VA! Reboot: Here are all the CCP button images and their hovers
+#btn-ccp-img-build-html-clip {
+  background: #000000 url('../img/img-to-cb-html.png') no-repeat center;
+  background-size: 90px 46px;
+  &:hover {
+    background-image: url('../img/img-to-cb-html-hover.png');
+  }
+}
+#btn-ccp-td-build-html-clip {
+  background: #000000 url('../img/td-to-cb-html-icon.png') no-repeat center;
+  &:hover {
+    background-image: url('../img/td-to-cb-html-icon-hover.png');
+  }
+}
+#btn-ccp-table-build-html-clip {
+  background: #000000 url('../img/table-to-cb-html-icon.png') no-repeat center;
+  &:hover {
+    background-image: url('../img/table-to-cb-html-icon-hover.png');
+  }
+}
+
+#btn-ccp-img-dsktp-build-css-clip.active {
+  background:  #000000 url('../img/img-display-css-to-clipboard-icon.png') no-repeat center;
+  &:hover {
+    background-image:  url('../img/img-display-css-to-clipboard-icon-hover.png');
+  }
+}
+#btn-ccp-img-lgphn-build-css-clip.active {
+  background:  #000000 url('../img/img-lphone-css-to-clipboard-icon.png') no-repeat center;
+  &:hover {
+    background-image:  url('../img/img-lphone-css-to-clipboard-icon-hover.png');
+  }
+}
+#btn-ccp-img-smphn-build-css-clip.active {
+  background:  #000000 url('../img/img-sphone-css-to-clipboard-icon.png') no-repeat center;
+  &:hover {
+    background-image:  url('../img/img-sphone-css-to-clipboard-icon-hover.png');
+  }
+}
+
+#btn-ccp-td-dsktp-build-css-clip.active {
+  background:  #000000 url('../img/td-display-css-to-clipboard-icon.png') no-repeat center;
+  &:hover {
+    background-image:  url('../img/td-display-css-to-clipboard-icon-hover.png');
+  }
+}
+#btn-ccp-td-lgphn-build-css-clip.active {
+  background:  #000000 url('../img/td-lphone-css-to-clipboard-icon.png') no-repeat center;
+  &:hover {
+    background-image:  url('../img/td-lphone-css-to-clipboard-icon-hover.png');
+  }
+}
+#btn-ccp-td-smphn-build-css-clip.active {
+  background:  #000000 url('../img/td-sphone-css-to-clipboard-icon.png') no-repeat center;
+  &:hover {
+    background-image:  url('../img/td-sphone-css-to-clipboard-icon-hover.png');
+  }
+}
+
+#btn-ccp-table-dsktp-build-css-clip.active {
+  background:  #000000 url('../img/table-display-css-to-clipboard-icon.png') no-repeat center;
+  &:hover {
+    background-image:  url('../img/table-display-css-to-clipboard-icon-hover.png');
+  }
+}
+#btn-ccp-table-lgphn-build-css-clip.active {
+  background:  #000000 url('../img/table-lphone-css-to-clipboard-icon.png') no-repeat center;
+  &:hover {
+    background-image:  url('../img/table-lphone-css-to-clipboard-icon-hover.png');
+  }
+}
+#btn-ccp-table-smphn-build-css-clip.active {
+  background:  #000000 url('../img/table-sphone-css-to-clipboard-icon.png') no-repeat center;
+  &:hover {
+    background-image:  url('../img/table-sphone-css-to-clipboard-icon-hover.png');
+  }
+}
+
+
+
+// VA! 03.26.18
+#table-max-width {
+  display: none;
+}
+
+
+// Stopping here 12/6/17
+
+
+/* Input placeholder */
+//Get rid of these vendor prefixes
+#ccp input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: #959595;
+  font-style: italic;
+}
+#ccp input::-moz-placeholder { /* Firefox 19+ */
+  color: #959595;
+  font-style: italic;
+}
+#ccp input:-ms-input-placeholder { /* IE 10+ */
+  color: #959595;
+  font-style: italic;
+}
+#ccp input:-moz-placeholder { /* Firefox 18- */
+  color: #959595;
+  font-style: italic;
+}
+
+// CCP CLose Button
+#ccp-close {
+  position: absolute;
+  top: 450px;
+  right: 20px;
+  width: 80px;
+  float: right;
+  background-image: url(../img/close-icon.png);
+  background-repeat: no-repeat;
+  background-position: center right;
+  color: #FFFFFF;
+  font-size: 16px;
+  text-transform: uppercase;
+  opacity: 1;
+}
+
+
+// Separators =========================================
+.separator1 {
+  width: 100%;
+  height: 9px;
+  border-top: 3px solid $whit-color;
+  border-bottom: 3px solid $dim-color;
+}
+
+
+
+.page-content-heading {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+  p.tl-dr {
+    color: #979595;
+    font-family: $primary-font-family;
+    font-size: 48px;
+    text-align: center;
+    font-weight: normal;
+    margin: 0;
+    padding: 0;
+    span.dim-color {
+      color: $dim-color;
+    }
+    span.whit-color {
+      color: $whit-color;
+    }
+  }
+}
+
+
+
+
+figure {
+  position: relative;
+  margin: 15px 0 !important;
+  padding: 0 0 10px;
+  border-top: 1px solid $dim-color;
+  border-bottom: 1px solid $whit-color;
+  &.qs-clipboard-functions {
+    position: relative;
+    width: 100%;
+    // !VA CLEARFIX! WORKS!
+    &::after {
+      display: block;
+      clear: both;
+      content: '';
+    }
+    .qs-clipboard-functions-left {
+      display: block;
+      position: relative;
+      width: 50%;
+      float: left;
+    }
+    .qs-clipboard-functions-right {
+      display: block;
+      position: relative;
+      width: 50%;
+      float: left;
+    }
+
+  }
+  
+  h4 {
+    margin-bottom: 5px;
+    font-size: 18px;
+    font-style: italic;
+  }
+  img {
+    margin-bottom: 10px;
+    &.qs-inspector-content {
+      width: 800px;
+      height: 102px;
+    }
+    &.qs-image-resize-tools {
+      width: 646px; 
+      height: 50px;
+    }
+    &.qs-ccp-but {
+      width: 85px;
+      height: 50px;
+      float: left;
+      margin: 0 20px 10px 0;
+    }
+  }
+  figcaption, aside {
+    margin-top: 5px;
+    font-size: 16px;
+    line-height: 19px;
+    &.qs-ccp-but-caption {
+      min-height: 60px;
+      margin-bottom: 15px;
+      padding-right: 50px;
+    }
+  }
+ 
+
+  img {
+    &.qs-viewer-width-icon {
+      vertical-align: -12px;
+    }
+  }
+  img {
+    &.viewer-width-field {
+      width: 146px;
+      height: 50px;
+    }
+  }
+}
+
+
+
+
+// Page Content =========================================
+
+.content-section {
+  // height: 600px;
+  display: block;
+  margin: 0 auto 50px;
+  max-width: 768px;
+  padding: 0 30px;
+@media (min-width: 576px) { 
+  max-width: 768px;
+}
+@media (min-width: 768px) {
+  max-width: 992px;
+ }
+@media (min-width: 992px) {
+  max-width: 1200px;
+ }
+@media (min-width: 1200px) { }
+
+  h1 {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+  }
+  h2 {
+    font-size: 26px;
+  }
+  h3 {
+    margin-top: 35px;
+    margin-bottom: 0;
+    font-size: 21px;
+    font-weight: bold;
+  }
+  h4, li, p {
+    color: #535353;
+    font-size: 21px;
+  }
+  span.note {
+    color: #959595;
+    font-weight: bold;
+  }
+  span.ui-element {
+    color: #000000;
+    // font-weight: bold;
+  }
+  img {
+    &.qs-viewer-width-icon {
+      width: 30px;
+      height: 18px;
+      // vertical-align: -12px;
+    }
+    &.qs-image-button-icon {
+      width: 26px;
+      height: 18px;
+      // vertical-align: -12px;
+    }
+    &.qs-clipboard-but-icon {
+      width: 24px;
+      height: 21px;
+      // vertical-align: -12px;
+    }
+  }
+  ul.new-features li {
+    font-size: 16px;
+    line-height: 18px;
+    margin-top: 10px;
+  }
+}
+
+
+.video {
+  position: relative;
+  width: 720px;
+  iframe {
+    display: block;
+    position: relative;
+    margin: 0 auto;
+  }
+}
+
+/* TEST */
+#test-container {
+  display: block;
+  width: 800px;
+  height: 600px;
+  margin: 0 auto;
+}
+
+#test-left {
+  float: left;
+  width: 390px;
+  height: 100%;
+}
+
+#test-right {
+  float: right;
+  width: 390px;
+  height: 100%;
+}
+
+#test-right * {
+  border: 1px solid magenta;
+}
+

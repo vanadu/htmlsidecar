@@ -1,2 +1,0 @@
-Q-Why isn't there any input validation in the CCP input fields
-A-Witty is designed to generate code blocks, not enforce code validation. Code validation is the job of your code editor. Let's say you want Witty to add placeholder values for height or width that you can search and replace with real values later. You don't want to use an integer for the placeholder because that will create valid HTML that will be reflected in your build. You want to use a value that the browser will ignore. Witty lets you do that.

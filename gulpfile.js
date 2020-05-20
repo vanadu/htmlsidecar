@@ -26,8 +26,8 @@ gulp = require('gulp'),
 
 // folders
 folder = {
-  src: 'src/',
-  build: 'build/'
+  src: 'app/',
+  build: 'dist/'
 };
 // image processing - newer/imagenim
 gulp.task('images', function() {
@@ -147,7 +147,7 @@ gulp.task('watch', function() {
 
 // Don't know where this is from but works for me now
 gulp.task('map', function() {
-  gulp.src('src/scss/style.scss')
+  gulp.src('app/scss/style.scss')
   // .pipe(sourcemaps.init())
     .pipe(sass())
     .on('error', function (err) {
@@ -157,7 +157,7 @@ gulp.task('map', function() {
     })
     // .pipe(sourcemaps.write('.'))
     // had a hell of a time figuring out the pattern for writing files
-    .pipe(gulp.dest('src/css'));
+    .pipe(gulp.dest('app/css'));
 });
 
 
@@ -165,7 +165,7 @@ gulp.task('map', function() {
 gulp.task('serve', ['sass'], function() {
   
   browserSync.init({
-    server: "./src",
+    server: "./app",
     port: 3300,
     // Port for the browser-sync UI
     ui: {
@@ -180,19 +180,19 @@ gulp.task('serve', ['sass'], function() {
   });
   
         
-  // gulp.watch("src/scss/*.scss", ['sass']);
-  gulp.watch("src/scss/**/*.scss", ['sass']);
+  // gulp.watch("app/scss/*.scss", ['sass']);
+  gulp.watch("app/scss/**/*.scss", ['sass']);
 
   
 
   //enclose multiple file parameters in brackets -- works :VA
-  gulp.watch(['src/*.html', 'src/js/*.js']).on('change', browserSync.reload);
+  gulp.watch(['app/*.html', 'app/js/*.js']).on('change', browserSync.reload);
   // gulp.watch("").on('change', browserSync.reload); don't need anymore, see above :VA
 });
 
 // Compile sass into CSS & auto-inject into browsers
 gulp.task('sass', function() {
-  return gulp.src("src/scss/style.scss")
+  return gulp.src("app/scss/style.scss")
     .pipe(sourcemaps.init())
     .pipe(sass())
     // Prevent gulp from abort on error every time a property is replaced with a variable
@@ -203,7 +203,7 @@ gulp.task('sass', function() {
       this.emit('end');
     })
     .pipe(sourcemaps.write('.'))
-    .pipe(gulp.dest("src/css"))
+    .pipe(gulp.dest("app/css"))
     .pipe(browserSync.stream());
 });
   
