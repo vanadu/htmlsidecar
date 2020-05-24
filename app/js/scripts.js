@@ -17,7 +17,7 @@ DONE: rtl class attribute shows when nothing is entered: it should be hidden. FI
 DONE: Notate all functions with module and private/public
 DONE: run queryDOMElements only on enter, not on every keypress - in order to do this, need to get the previous value of the input so the user can ESC out of the field without implementing changed value. Right  now we are getting this value from Appdata. FIXED - Now gets value from HTML element placeholder or from localStorage
 DONE: CCP input fields should select all when clicked in like they do in the toolbar - no they shouldn't for now. User should be able to set the cursor in the field and change any value that way.
-DONE: Make mrk => box function...not sure where though or whether it's necessary since it's just a one-liner. Leave it, it's just a one-liner
+DONE: Make mrk => box function...not sure where thoutgh or whether it's necessary since it's just a one-liner. Leave it, it's just a one-liner
 DONE: Changing Inspector element hover color based on whether the SHIFT or CTRL key is pressed: I tried a number of approaches to getting different hover colors for SHIFT and CTRL but it's not worth the hassle. The shiftKey event only fires when the key is pressed down or up. The mouseenter and mouseleave event only fires when you enter or leave the element. Trying to trap the SHIFT press either while SHIFT is pressed outside the element while the element is entered OR while the mouse is inside the element proved too much for me. All that is even worse because if the focus isn't in the Witty window, which it is not most of the time while the user switches back and forth to the editor, then the mouse events won't fire. Plus, the keypress events don't appear to fire on non-input elements, so you'd have to trap the keypress on the document and then I don't even know how you'd drill down to limit it to the Inspector element. In short - we're going with a single gold CSS hover which works even if Witty doesn't have the focus. The rest we'll have to do with tooltips. This item is closed.
 DONE: Remove all bootstrap tooltips
 DONE: Finish adding tooltip strings - some TBD strings remain
@@ -30,7 +30,7 @@ DONE: Comment and clean up appMessages.
 
 
 
-
+TODO: Remove X from No Image strings
 
 TODO: No tooltip available for posswitch and imgswap
 TODO: Tooltips don't appear on checkboxes
@@ -545,6 +545,9 @@ var Witty = (function () {
         // !VA Show all the inspector-label, inspector-x and inspector-values 
         for (let i = 0; i < document.getElementsByClassName('inspector-label').length; i++) {
           document.getElementsByClassName('inspector-label')[i].style.display = 'inline';
+        }
+        for (let i = 0; i < document.getElementsByClassName('inspector-x').length; i++) {
+          document.getElementsByClassName('inspector-x')[i].style.display = 'inline';
         }
         // !VA Display the respective Appdata value in the respective inspector value span 
         document.querySelector(inspectorValues.insDisplaySizeWidthValue).innerHTML = Appdata.imgW;

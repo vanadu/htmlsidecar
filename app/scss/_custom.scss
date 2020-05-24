@@ -524,6 +524,10 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   display: inline;
 }
 
+.inspector-x {
+  display: none;
+}
+
 #btn-toggle-ccp {
   display: block;
   width: 40px;
