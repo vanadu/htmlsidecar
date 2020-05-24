@@ -27,11 +27,12 @@ DONE: Cancel tooltips when error message is displayed.
 DONE: FIx quirks with error messages - first one after refresh displays late, messages don't cancel when leaving the target element. Probably entains enabling the blocking element above the toolbar buttons for hte duration of the error/msg display.
 DONE: Fix the CSS Rule buttons disappearing when hovered or clicked. It's because they get the class ttip for some reason. ttip class deleted, deprecated.
 DONE: Comment and clean up appMessages.
-
-
-
 DONE: Remove X from No Image strings
-TODO: Change table options: if width = Appdata.viewerW then class = devicewidth else class = none
+DONE: Change table options: if width = Appdata.viewerW then class = devicewidth else class = none
+
+
+
+TODO: Figure out how to prevent getAttributes from being called multiple times. That is multiple DOM accesses...no good.
 TODO: No tooltip available for posswitch and imgswap
 TODO: Tooltips don't appear on checkboxes
 TODO: Add error to vmlbutton height not matching img height
@@ -148,7 +149,6 @@ var Witty = (function () {
       insLargePhones: '#ins-large-phones',
       insRetina: '#ins-retina',
       btnToggleCcp: '#btn-toggle-ccp',
-      // !VA Branch: inspectorClipboardOutput (051320)
       spnDisplaySizeHeight: '#spn-display-size-height',
       spnDisplaySizeWidth: '#spn-display-size-width',
       spnSmallPhonesHeight: '#spn-small-phones-height',
@@ -347,7 +347,6 @@ var Witty = (function () {
     function showAppMessages(appMessContainerId, tooltipTarget) {
       
       console.log('showAppMessages running');
-      // !VA Branch: implementModifierTooltips (051820) DEPRECATED
       // !VA Show the current appMessage. If the current appMessage is a tooltip, then show the help cursor while the mouse is in the tooltip element.
       console.log('appMessContainer is: ' + appMessContainerId);
       console.log('tooltipTarget is: ' + tooltipTarget);
@@ -699,6 +698,8 @@ var Witty = (function () {
     function getAttributes() {
       var Appdata = appController.initGetAppdata();
       let target, checked, str, options, selectid;
+      console.log('Appdata:');
+      console.dir(Appdata);
       var Attributes = {
         // !VA IMG attributes
         imgClass: (function() {
@@ -1472,11 +1473,6 @@ var Witty = (function () {
       // table.className = Attributes.tableClass;
       // !VA table align attribute
       if (Attributes.tableAlign) { tableInner.align = Attributes.tableAlign; }
-      // !VA width attribute -- the default is the current display size, so it gets the value from the toolbar viewerW input field.
-
-      // !VA NOTE: That's not right. If the image width is equal to the container width, i.e. if imgW = viewerW, then the image is the same as the desktop display width. So 1) the input field should be locked because the parent table can't be smaller than the image it contains and 2) The parent table should get the class devicewidth by default because the image is the same size as the display width i.e. viewerW. 
-
-      // !VA If the image width < viewerW, then 1) the input is unlocked, 2) the value defaults to the image width and 3) the class input is blanked out. The user can enter any value up to the viewerW. If val > viewerW, then error. 
 
       tableInner.width = Attributes.tableWidth;
       // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for now
@@ -1921,7 +1917,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     
     //EVENT HANDLING START 
     // !VA appController private
-    // !VA Branch: implementModifierTooltips (051820)
     // !VA Creating a separate EventListener setup function specifically for tooltips, because this function will be run on DOMContentLoaded in an iife every time the CTRL + ALT key combination is pressed. The onModifierKeypress function should live in appController, I think. The tooltips themselves can be displayed either through UIController.showAppMessages or a new, separate UIController public function.
     // !VA Process the tooltip triggers when the mouseenter event is fired on them, i.e. get the appMessCode, appMessContent and duration and pass to showTooltip
 
@@ -2791,8 +2786,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       }
       // !VA In either case, use the CSS value for height, unless the height of the loaded image is greater than the CSS value.
       viewerH = parseInt(compStyles.getPropertyValue('height'), 10);
-      // !VA Branch: implementPhonesLocalStorage (050920) Don't even know if I have to do this here
-
       // !VA If we're initializing a new image, use the naturalWidth and naturalHeight. If we're updating via user input, we need to use the display image and height, imgW and imgH. If we're initializing, then Appdata.imgW and Appdata.imgH will be 0 or falsy because it hasn't been resized yet. So we need to make the following decision based on the _actual_ image width and height, which will be different based on whether we're initializing or updating.
       // !VA I thought I fixed this...it appears to only apply to dev mode.
       var actualW, actualH;
@@ -2883,7 +2876,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       document.querySelector(dynamicRegions.curImg).style.height =imgH + 'px';
       document.querySelector(dynamicRegions.imgViewer).style.height = viewerH + 'px';
       document.querySelector(dynamicRegions.imgViewport).style.height = viewportH + 'px';
-      document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';;
+      document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';
+
+      // !VA reinit the CCP
+      updateCCP();
+
       // !VA Now that the image and its containers are written to the DOM, go ahead and write the Inspectors.
       UICtrl.writeInspectors();
     }
@@ -2891,43 +2888,65 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA NOTE:  So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. Here, there are 5 mutable elements and 5 properties. Only one of the properties has changed. So we loop through them all, find the match for the prop argument, then update only the element/data property that matches. This is a mickey-mouse solution but it works for now. Ideally we will pass in a key/value pair including the property name and the ID alias so we can use properties... in case there are more than one. 
     // !VA That concept is bad because it requires constant DOM access 05.11.20
 
-
-    // !VA CCP FUNCTIONS
-    // !VA appController private 
-    function initCCP() {
+    // !VA Update the CCP. This is called when the CCP is opened with the CCP button and/or when a user input is made on the toolbar that results in a call to resizeContainers.
+    // !VA IMPORTANT: This is the wrong way to handle this, but I can't deal with it right now. First, dynamically displayed elements should not be initialized here, but in initCCP. Second, this causes the Include wrapper checkbox to be ignored sometimes when you open the CCP. It's a bug. Put it in the list.
+    function updateCCP() {
       // !VA Get Appdata
       var Appdata = appController.initGetAppdata();
-      let ccpCheckmarks, ccpCheckboxes, wrapperItemsToHide, selectedRadio;
-      // !VA The app initializes with the CCP closed, so toggle it on and off here.
-      document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
-      // !VA If the CCP is open:
+      // !VA Init elements that are initialized when the CCP is updated
+      let ccpCheckmarks, wrapperItemsToHide, selectedRadio;
+      // !VA Initialize all the dynamically modified CCP elements
+      // !VA IMPORTANT: This is where the Include wrapper checkbox is failing when the CCP is initially opened.
       if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
         // !VA We have to initialize CCP DOM elements here because they don't exist until the CCP is displayed.
 
         // !VA CCP Checkboxes - these are mock checkboxes with custom styling, so the ID names have to be converted to checkbox names in order to select or deselect them. We attach the event handler to the checkmark, not the checkbox. The checkmark is converted to checkbox for handling in toggleCheckbox.
         ccpCheckmarks = [ ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk, ccpUserInput.spnCcpImgIncludeAnchorCheckmrk, ccpUserInput.spnCcpTableIncludeWrapperCheckmrk ];
-        ccpCheckboxes = [];
         for (let i = 0; i < ccpCheckmarks.length; i++) {
           document.querySelector(ccpCheckmarks[i]).addEventListener('click', handleCCPInput, false);
         }
-
-        // !VA Initialize with all the 'Wrapper table' options undisplayed - uncomment this for DEV
-        let wrapperItemsToHide = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
+        // !VA Initialize with all the 'Wrapper table' options undisplayed - uncomment this for DEV. NOTE: These are the IDs of the parent div's of the input elements, not the input elements themselves. They are only referenced here once, so there are no aliases for them. 
+        wrapperItemsToHide = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
         for (let i = 0; i < wrapperItemsToHide.length; i++) {
           document.querySelector(wrapperItemsToHide[i]).style.display = 'none'; 
         }
-
         // !VA Find out which tdoption is selected and send a click to that option to run displayTdOptions and display the appropriate attributes for that option
         selectedRadio = document.querySelector('input[name="tdoptions"]:checked');
         selectedRadio.click();
-
-        // !VA Default for table width
-        document.querySelector(ccpUserInput.iptCcpTableWidth).value = `${Appdata.imgW}`;
+        // !VA Handle what to do if the current image width equals the viewer width. In that case, the class should be 'devicewidth' and the table width field should be disabled, because a table width can't be less than the image it contains. If Appdata.imgW === Appdata.viewerW, then disable the field because a table width can't be less than the image it contains. In this case, tableClass should default to 'devicewidth'. If Appdata.imgW < viewerW, then show tableWidth = imgWidth and leave the class field blank so the user can enter a class if desired.
+        // !VA NOTE: This should be extracted to a separate function, too much repetition.
+        if ( Appdata.imgW ===  Appdata.viewerW ) {
+          document.querySelector(ccpUserInput.iptCcpTableWidth).value = Appdata.viewerW;
+          document.querySelector(ccpUserInput.iptCcpTableWidth).disabled = true;
+          document.querySelector(ccpUserInput.iptCcpTableWidth).classList.add('disabled');
+          document.querySelector(ccpUserInput.iptCcpTableClass).value = 'devicewidth';
+        } else {
+          document.querySelector(ccpUserInput.iptCcpTableWidth).value = Appdata.imgW;
+          document.querySelector(ccpUserInput.iptCcpTableWidth).disabled = false;
+          document.querySelector(ccpUserInput.iptCcpTableWidth).classList.remove('disabled');
+          document.querySelector(ccpUserInput.iptCcpTableClass).value = '';
+        }
         // !VA Defaults for wrapper width and class
-        document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value = `${Appdata.viewerW}`;
+        document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value = Appdata.viewerW;
         document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
 
       }
+
+
+
+    }
+
+
+    // !VA CCP FUNCTIONS
+    // !VA appController private 
+    function initCCP() {
+      // !VA Get Appdata
+
+      // !VA The app initializes with the CCP closed, so toggle it on and off here.
+      document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
+      // !VA If the CCP is open:
+      updateCCP();
+
     }
       
     // !VA  appController private
