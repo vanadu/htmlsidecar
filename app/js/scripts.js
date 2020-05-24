@@ -30,8 +30,8 @@ DONE: Comment and clean up appMessages.
 
 
 
-TODO: Remove X from No Image strings
-
+DONE: Remove X from No Image strings
+TODO: Change table options: if width = Appdata.viewerW then class = devicewidth else class = none
 TODO: No tooltip available for posswitch and imgswap
 TODO: Tooltips don't appear on checkboxes
 TODO: Add error to vmlbutton height not matching img height
@@ -1473,6 +1473,11 @@ var Witty = (function () {
       // !VA table align attribute
       if (Attributes.tableAlign) { tableInner.align = Attributes.tableAlign; }
       // !VA width attribute -- the default is the current display size, so it gets the value from the toolbar viewerW input field.
+
+      // !VA NOTE: That's not right. If the image width is equal to the container width, i.e. if imgW = viewerW, then the image is the same as the desktop display width. So 1) the input field should be locked because the parent table can't be smaller than the image it contains and 2) The parent table should get the class devicewidth by default because the image is the same size as the display width i.e. viewerW. 
+
+      // !VA If the image width < viewerW, then 1) the input is unlocked, 2) the value defaults to the image width and 3) the class input is blanked out. The user can enter any value up to the viewerW. If val > viewerW, then error. 
+
       tableInner.width = Attributes.tableWidth;
       // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for now
       if (Attributes.tableBgcolor) { tableInner.bgColor = Attributes.tableBgcolor; }
