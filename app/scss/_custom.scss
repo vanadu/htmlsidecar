@@ -8,15 +8,15 @@
 $primary-bg-color:                #337AB7;
 $primary-font-color:              #FFF;
 // HEADER
-$dim-color:           #B7B233;
-$whit-color:          #B77033;
+$logo-color:                      #AD1310;
+$logo-font:                        'Titillium Web', 'Lucida Grande', 'Lucida', sans-serif;
 $header-subtext-color:            #959595;
 
-// IMAGE TOOLBAR
+// APP IMAGE TOOLBAR
 $image-toolbar-bkgd-color:        #FFF;
 
 
-//DIM VIEWERS
+//APP INSPECTORS
 $inspector-font-color:             rgba(160, 160, 160, 1);              
 $inspector-pop-font-color:         rgba(255, 255, 255, .9);
 // VA! Red 139,0,0
@@ -25,13 +25,13 @@ $inspector-shift-hover-font-color: rgba(255, 255, 255, .9);
 $inspector-ctrl-hover-font-color:  rgba(255, 255, 255, .9); 
 $filename-viewer-font-color:       rgba(255, 255, 255, .8);
 
-//TOOLTIPS
+//APP TOOLTIPS
 $tooltip-bg-color:                rgba(107, 107, 107, .9);
 $tooltip-font-color:              #FFF;
 $tooltip-border-color:            #555 transparent transparent transparent;
 
 
-//CCP
+//APP CCP
 $fieldset-border-color:           #959595;
 $fieldset-legend-color:           #959595;
 
@@ -40,8 +40,7 @@ $fieldset-legend-color:           #959595;
 $primary-font-family: 'Open Sans', Arial, Helvetica, sans-serif;
 $inspector-font-family: 'Ubuntu', Arial, Helvetica, sans-serif;
 
-// VA! This is the old logo font, has nothing to do with the app
-$dimwhit-font-family: 'Ubuntu', Arial, Helvetica, sans-serif;
+
 
 // VA! STYLES
 // VA! Reboot: box-sizing from Bootstrap in case I decide to remove Bootstrap
@@ -161,9 +160,8 @@ button:disabled  {
   display: block;
   position: relative;
   width: 100%;
-  height: 93px;
+  height: 65px;
   margin: 0 auto 40px;
-  padding-top: 10px;
   padding-bottom: 5px;
 }
 
@@ -192,26 +190,26 @@ button:disabled  {
   justify-content: flex-start;
   width: 100%;
   height: 80px;
-  padding-left: 60px;
+  padding: 0 0 0 60px;
 }
 
 .header-text {
-  width: 600px;
+  width: 500px;
 }
 
 .header-headline {
   position: relative;
   width: 440px;
-  height: 76px;
+  height: 46px;
   float: left;
 }
 
 .header-image {
   position: relative;
   // top: 0;
-  width: 113px;
+  width: 70px;
   height: 90px;
-  margin-top: -8px;
+  margin-top: 5px;
   margin-left: -8px;
   float: left;
   // VA! z-index is for the 'runMe' link, only for dev
@@ -224,23 +222,23 @@ button:disabled  {
 
 .header-logo {
   position: relative;
-  width: 330px;
-  height: 48px;
-
+  width: 225px;
+  height: 32px;
   h1 {
     top: 0;
     margin: 0;
     padding: 0;
-    color: $whit-color;
-    font-family: $inspector-font-family;
-    font-size: 48px;
+    color: $logo-color;
+    // color: #F24747;
+    font-family: $logo-font;
+    font-size: 32px;
     font-weight: bold;
   }
   .header-version {
     position: absolute;
     font-size: 12px;
-    bottom: -2px;
-    right: 14px;;
+    top: 17px;
+    right: 0;
     p {
       color: #959595;
       margin: 0;
@@ -250,7 +248,7 @@ button:disabled  {
 }
 
 
-.header-subtext {
+.header-slug {
   position: relative;
   width: 100%;
   h2 {
@@ -258,27 +256,18 @@ button:disabled  {
     margin-top: 6px;
     padding: 0;
     color: $header-subtext-color;
-    font-size: 24px;
+    font-size: 20px;
     text-align: left;
     text-transform: uppercase;
-    a {
-      color: $header-subtext-color;
-      text-decoration: none;
-    }
-    .initial-cap {
-      font-size: 110%;
-      font-weight: 800;
-    }
-    .whit-initial-cap {
-      color: $whit-color;
-    }
-    .dim-initial-cap {
-      color: $dim-color;
-    }
-    span.header-version {
-      font-size: 12px;
-    }
+    // border: 1px solid red;
   }
+}
+
+.initial-cap {
+  color: $logo-color;
+  font-size: 110%;
+  font-weight: 800;
+  // border: 1px solid red;
 }
 
 // APP-CONTAINER
@@ -1215,115 +1204,116 @@ fieldset {
 
 
 // Separators =========================================
-.separator1 {
-  width: 100%;
-  height: 9px;
-  border-top: 3px solid $whit-color;
-  border-bottom: 3px solid $dim-color;
-}
+// VA! I assume this is deprecated
+// .separator1 {
+//   width: 100%;
+//   height: 9px;
+//   border-top: 3px solid $whit-color;
+//   border-bottom: 3px solid $dim-color;
+// }
+
+
+// VA! I assume this is deprecated
+// .page-content-heading {
+//   max-width: 1200px;
+//   margin: 0 auto;
+//   padding: 0;
+//   p.tl-dr {
+//     color: #979595;
+//     font-family: $primary-font-family;
+//     font-size: 48px;
+//     text-align: center;
+//     font-weight: normal;
+//     margin: 0;
+//     padding: 0;
+//     span.dim-color {
+//       color: $dim-color;
+//     }
+//     span.whit-color {
+//       color: $whit-color;
+//     }
+//   }
+// }
 
 
 
-.page-content-heading {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0;
-  p.tl-dr {
-    color: #979595;
-    font-family: $primary-font-family;
-    font-size: 48px;
-    text-align: center;
-    font-weight: normal;
-    margin: 0;
-    padding: 0;
-    span.dim-color {
-      color: $dim-color;
-    }
-    span.whit-color {
-      color: $whit-color;
-    }
-  }
-}
+// VA! I assume this is deprecated
+// figure {
+//   position: relative;
+//   margin: 15px 0 !important;
+//   padding: 0 0 10px;
+//   border-top: 1px solid $dim-color;
+//   border-bottom: 1px solid $whit-color;
+//   &.qs-clipboard-functions {
+//     position: relative;
+//     width: 100%;
+//     // !VA CLEARFIX! WORKS!
+//     &::after {
+//       display: block;
+//       clear: both;
+//       content: '';
+//     }
+//     .qs-clipboard-functions-left {
+//       display: block;
+//       position: relative;
+//       width: 50%;
+//       float: left;
+//     }
+//     .qs-clipboard-functions-right {
+//       display: block;
+//       position: relative;
+//       width: 50%;
+//       float: left;
+//     }
 
-
-
-
-figure {
-  position: relative;
-  margin: 15px 0 !important;
-  padding: 0 0 10px;
-  border-top: 1px solid $dim-color;
-  border-bottom: 1px solid $whit-color;
-  &.qs-clipboard-functions {
-    position: relative;
-    width: 100%;
-    // !VA CLEARFIX! WORKS!
-    &::after {
-      display: block;
-      clear: both;
-      content: '';
-    }
-    .qs-clipboard-functions-left {
-      display: block;
-      position: relative;
-      width: 50%;
-      float: left;
-    }
-    .qs-clipboard-functions-right {
-      display: block;
-      position: relative;
-      width: 50%;
-      float: left;
-    }
-
-  }
+//   }
   
-  h4 {
-    margin-bottom: 5px;
-    font-size: 18px;
-    font-style: italic;
-  }
-  img {
-    margin-bottom: 10px;
-    &.qs-inspector-content {
-      width: 800px;
-      height: 102px;
-    }
-    &.qs-image-resize-tools {
-      width: 646px; 
-      height: 50px;
-    }
-    &.qs-ccp-but {
-      width: 85px;
-      height: 50px;
-      float: left;
-      margin: 0 20px 10px 0;
-    }
-  }
-  figcaption, aside {
-    margin-top: 5px;
-    font-size: 16px;
-    line-height: 19px;
-    &.qs-ccp-but-caption {
-      min-height: 60px;
-      margin-bottom: 15px;
-      padding-right: 50px;
-    }
-  }
+//   h4 {
+//     margin-bottom: 5px;
+//     font-size: 18px;
+//     font-style: italic;
+//   }
+//   img {
+//     margin-bottom: 10px;
+//     &.qs-inspector-content {
+//       width: 800px;
+//       height: 102px;
+//     }
+//     &.qs-image-resize-tools {
+//       width: 646px; 
+//       height: 50px;
+//     }
+//     &.qs-ccp-but {
+//       width: 85px;
+//       height: 50px;
+//       float: left;
+//       margin: 0 20px 10px 0;
+//     }
+//   }
+//   figcaption, aside {
+//     margin-top: 5px;
+//     font-size: 16px;
+//     line-height: 19px;
+//     &.qs-ccp-but-caption {
+//       min-height: 60px;
+//       margin-bottom: 15px;
+//       padding-right: 50px;
+//     }
+//   }
  
 
-  img {
-    &.qs-viewer-width-icon {
-      vertical-align: -12px;
-    }
-  }
-  img {
-    &.viewer-width-field {
-      width: 146px;
-      height: 50px;
-    }
-  }
-}
+//   img {
+//     &.qs-viewer-width-icon {
+//       vertical-align: -12px;
+//     }
+//   }
+//   img {
+//     &.viewer-width-field {
+//       width: 146px;
+//       height: 50px;
+//     }
+//   }
+// }
 
 
 
