@@ -31,7 +31,24 @@ DONE: Remove X from No Image strings
 DONE: Change table options: if width = Appdata.viewerW then class = devicewidth else class = none
 
 
+TODO: Add target="_blank" to A tag
+TODO: Implement fluid option in IMG options.
+// !VA Branch: makeFluidOption (052620)
+/* !VA  FULL WIDTH TABLES
+  .responsive-table {
+    width: 100% !important;
+  }
+  .img-max {
+    max-width: 100% !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 500px;" class="responsive-table">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <img src="hero-1.jpg" width="500" height="400" border="0" alt="Insert alt text here" style="display: block; color: #666666;  font-family: Helvetica, arial, sans-serif; font-size: 16px;" class="img-max">
 
+*/
+/*
 TODO: Figure out how to prevent getAttributes from being called multiple times. That is multiple DOM accesses...no good.
 TODO: No tooltip available for posswitch and imgswap
 TODO: Tooltips don't appear on checkboxes
