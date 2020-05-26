@@ -223,6 +223,8 @@
                   </div> 
 
 
+
+
                   <!-- VA! V2 Leaving this out for now... -->
                   <!-- <div id="img-width">
                       <label id="img-width-label" for="img-width">width=</label> 
@@ -266,12 +268,19 @@
                   </label> 
                   </div> 
 
-                    <!-- VA! V2 Leaving this out for now... -->
-                    <!-- <div id="img-max-width"> -->
-                        <!-- VA! These options are set in handleTableWidth -->
-                        <!-- <label for="img-max-width-input">max-width:</label>
-                        <input id="img-max-width-input" value="" placeholder="" />
-                    </div> -->
+                  <div class="ccp-img-type-container">
+                    <div id="ccp-img-fixed" class="ccp-img-type" > 
+                      <input name="imgtype" checked type="radio" id="rdo-ccp-img-fixed"  value="imgfixed">
+                      <label class="rdo-ccp-img-fixed-label" id="rdo-ccp-img-fixed-label" for="rdo-ccp-img-fixed">
+                        Fixed image
+                    </div>
+
+                    <div id="ccp-img-fluid" class="ccp-img-type"> 
+                      <input name="imgtype" type="radio" id="rdo-ccp-img-fixed"  value="imgfluid">
+                      <label class="rdo-ccp-img-fluid-label" id="rdo-ccp-img-fluid-label" for="rdo-ccp-img-fluid">
+                        Fluid image
+                    </div> 
+                  </div>
                 </div>
                 <div class="ccp-options-col-4"> 
                   <div id="ccp-make-img-dsktp-css-rule" class="ccp-but-container"> 
@@ -503,7 +512,7 @@
           <!-- /#drop-area -->
             <!-- DEVIMG HERE -->
             <div id="cur-img-container">
-              <!-- <img src="img/TEST/_625X525.png" data-is-dev1=true    id="cur-img" alt=""> -->
+              <img src="img/witty-logo-colors-dark.png" data-is-dev1=true  id="cur-img" alt="">
               <!-- <img src="img/sdtour/bo-ben.png" data-is-dev1=true    id="cur-img" alt=""> -->
             </div>
             <!-- USER-SELECTED IMAGE PROGRAMMATICALLY INSERTED HERE -->

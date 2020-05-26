@@ -810,7 +810,6 @@ fieldset {
   justify-content: space-evenly;
 }
 
-
 // VA! Reboot: NEW
 // VA! All the columns are absolutely positioned 2px from top
 .ccp-options-col-1, .ccp-options-col-2, .ccp-options-col-3, .ccp-options-col-4 {
@@ -819,10 +818,6 @@ fieldset {
   margin: 0;
   padding: 0;
 }
-
-
-
-
 .ccp-options-col-1 {
   // !VA Height is irrelevant here since these elements get their height from the parent
   left: 0;
@@ -877,8 +872,24 @@ fieldset {
       width: 250px;
     }
   }
-
+  .ccp-img-type-container {
+    display: flex;
+    width: 80%;
+  }
+  .ccp-img-type {
+    display: flex;
+    width: 50%;
+    #rdo-ccp-img-fixed, #rdo-ccp-img-fluid {
+      width: 15%;
+      margin: -3px 0 0 -3px;
+    }
+  }
+  // VA! branch: makeFluidOption Just removing this from the DOM for now, but the functionality will have to be removed as well
+  #ccp-img-include-width-height {
+    display: none;
+  }
 }
+
 .ccp-options-col-4 {
   left: 680px;
   width: 70px;

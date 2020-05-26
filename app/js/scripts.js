@@ -5,7 +5,47 @@
 // !VA GENERAL NOTES
 /* !VA  - April Reboot Notes
 =========================================================
-// !VA 05.18.20
+// !VA 05.26.20
+TODO: Implement fluid option in IMG options.
+// !VA Branch: makeFluidOption (052620)
+So what we need to do is:
+1)Integrate the 'include height nd width in style tag' into the 'fixed image' option
+  * mark all of include... functionality in the JS
+  * 
+2) Switch between the table options for parent and wrapper in initUI
+
+
+
+/* !VA  FULL WIDTH TABLES
+  .responsive-table {
+    width: 100% !important;
+  }
+  .img-max {
+    max-width: 100% !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 500px;" class="responsive-table">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <img src="hero-1.jpg" width="500" height="400" border="0" alt="Insert alt text here" style="display: block; color: #666666;  font-family: Helvetica, arial, sans-serif; font-size: 16px;" class="img-max">
+
+
+
+
+
+  
+*/
+/*
+
+
+
+
+
+
+
+
+
+
 Status:
 DONE: Implement ALT+CTRL+Hover tooltips.
 DONE: AppMessage implementation mostly done, but the tooltip implementation sucks. Must revisit
@@ -30,25 +70,9 @@ DONE: Comment and clean up appMessages.
 DONE: Remove X from No Image strings
 DONE: Change table options: if width = Appdata.viewerW then class = devicewidth else class = none
 
-
+TODO: Remove include width and height in style - that will be default for fixed image
+TODO: Make the filename div wider
 TODO: Add target="_blank" to A tag
-TODO: Implement fluid option in IMG options.
-// !VA Branch: makeFluidOption (052620)
-/* !VA  FULL WIDTH TABLES
-  .responsive-table {
-    width: 100% !important;
-  }
-  .img-max {
-    max-width: 100% !important;
-    width: 100% !important;
-    height: auto !important;
-  }
-  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 500px;" class="responsive-table">
-  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-  <img src="hero-1.jpg" width="500" height="400" border="0" alt="Insert alt text here" style="display: block; color: #666666;  font-family: Helvetica, arial, sans-serif; font-size: 16px;" class="img-max">
-
-*/
-/*
 TODO: Figure out how to prevent getAttributes from being called multiple times. That is multiple DOM accesses...no good.
 TODO: No tooltip available for posswitch and imgswap
 TODO: Tooltips don't appear on checkboxes
@@ -506,7 +530,7 @@ var Witty = (function () {
             appController.initCalcViewerSize();
             // !VA Open the CCP by default in dev mode
             // !VA First, set it to the opposite of how you want to start it.
-            document.querySelector(staticRegions.ccpContainer).classList.add('active');
+            document.querySelector(staticRegions.ccpContainer).classList.remove('active');
             // !VA Then run initCCP to initialize - initInitCCP is the public appController function included just to access appcontroller private initCCP from the UIController module
             appController.initInitCCP();
           }, delayInMilliseconds);
