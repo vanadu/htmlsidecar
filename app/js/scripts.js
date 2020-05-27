@@ -19,8 +19,11 @@ There are three situations where the fluid/fixed CCP options need to be updated.
 2) When the CCP is opened - that will take place in updateCCP 
 3) When a value is changed in the toolbar - this should have no effect on the state of the fluid/fixed options but it will happen automatically because updateCCP is now run in resizeContainers.
 
-So we need to trap the user fixed/fluid selection...in 
+So we need to trap the user fixed/fluid selection...in displayImgTypeOptions.
 
+// !VA Here we have to 1) Write the class img-fluid to the CCP img class input 2) Add the width="100%" attribute to the parent table 3) Add the max-width: Appdata.imgW to the style attribue of the wrapper table 4) Add the width="100%" attribute to the wrapper table 5) Add the class="responsive-table" attribute to the wrapper table. 
+
+We do not need to add the max-width option to the table wrapper options in CCP because that takes place in the style attribute and isn't user-definable. 
 
 
 
@@ -84,6 +87,7 @@ DONE: Remove X from No Image strings
 DONE: Change table options: if width = Appdata.viewerW then class = devicewidth else class = none
 DONE: Add target="_blank" to A tag
 
+TODO: Remove all writing of values from initUI and put them in getAttributes. initUI should only be for turning display amd disabling on and off
 TODO: Remove include width and height in style - that will be default for fixed image
 TODO: Make the filename div wider
 TODO: Figure out how to prevent getAttributes from being called multiple times. That is multiple DOM accesses...no good.
@@ -745,13 +749,18 @@ var Witty = (function () {
     function getAttributes() {
       console.log('getAttributes running');
       var Appdata = appController.initGetAppdata();
-      let target, checked, str, options, selectid;
+      let target, checked, str, options, selectid, isFixed;
       // console.log('Appdata:');
       // console.dir(Appdata);
+      // !VA Find out whether the Fixed Image radio button is selected.
+      isFixed = getRadioState(ccpUserInput.rdoCcpImgFixed);
       var Attributes = {
         // !VA IMG attributes
         imgClass: (function() {
-          return ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpImgClass).value);
+          // !VA Branch: makeFluidOption (052620)
+          // !VA For fixed images, if there's a class name entered into the class input, return the input value, or if the class input is empty, don't include the class attribute. For fluid images, return the class name 'img-fluid'.
+          isFixed ? str = ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpImgClass).value) : str = 'img-fluid';
+          return str;
         })(),
         imgWidth: (function() {
           return Appdata.imgW;
@@ -769,31 +778,10 @@ var Witty = (function () {
         })(),
         // !VA Branch: makeFluidOption (052620)
         imgStyle: (function() {
-          // !VA Get the selected state of the fixed imgType radio. If it is not selected, then the fluid option is selected.
-          let isFixed;
-          isFixed = getRadioState(ccpUserInput.rdoCcpImgFixed);
-
-
-
-          if (isFixed) {
-            str = `display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;`;
-          } else {
-            str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;';
-          }
+          // !VA Get the selected state of the fixed imgType radio. If it is not selected, then the fluid option is selected. If fixed, include the width and height in the style attribute. If fluid, don't include them
+          isFixed ? str = `display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;` : str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;';
           return str;
         })(),
-        // imgStyle: (function() {
-        //   let target, checked, str;
-        //   target = ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk;
-        //   // !VA Branch: makeFluidOption (052620)
-        //   checked = getCheckboxSelection(target);
-        //   if (checked === true) {
-        //     str = `display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;`;
-        //   } else {
-        //     str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;';
-        //   }
-        //   return str;
-        // })(),
         imgAlign: (function() {  
           str = '', options = [], selectid = '';
           selectid = ccpUserInput.selCcpImgAlign;
@@ -868,7 +856,10 @@ var Witty = (function () {
           return ccpIfNoUserInput('class',document.querySelector(ccpUserInput.iptCcpTableClass).value);
         })(),
         tableWidth: (function() {
-          return document.querySelector(ccpUserInput.iptCcpTableWidth).value;
+          // !VA IMPORTANT!  All writing of values should be done here, not in initUI. initUI should ONLY turn display on and off.
+          // !VA If If isFixed, return the value of the table width field. If isFixed is false, then fluid images is selected, so return 100% for the tableWidth.
+          isFixed ? str = document.querySelector(ccpUserInput.iptCcpTableWidth).value : str = '100%';
+          return str;
         })(),
         tableBgcolor: (function() {
           return ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.iptCcpTableBgColor).value);
@@ -904,6 +895,19 @@ var Witty = (function () {
         })(),
         tableTagWrapperBgcolor: (function() {
           return ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.iptCcpTableWrapperBgColor).value);
+        })(),
+        // !VA Branch: makeFluidOption (052620)
+        tableTagWrapperStyle: (function() {
+          // !VA Only include a style attribute for the wrapper for fluid images.  The conditional for this is in makeTableNode and there's no case where a style attribute is included for fixed images, so just provide the style attribute string to return
+
+          let isFixed;
+          isFixed = getRadioState(ccpUserInput.rdoCcpImgFixed);
+          if (isFixed) {
+            str = '';
+          } else {
+            str = `max-width: ${Appdata.imgW}`;
+          }
+          return str;
         })(),
       };
       return Attributes;
@@ -1587,6 +1591,10 @@ var Witty = (function () {
       tableOuter.width = Attributes.tableTagWrapperWidth;
       // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for now. 
       if (Attributes.tableTagWrapperBgcolor) { tableOuter.bgColor = Attributes.tableTagWrapperBgcolor; }
+      // !VA Style attribute - only included for fluid images
+      if (getRadioState(ccpUserInput.rdoCcpImgFluid)) {
+        tableOuter.setAttribute('style', Attributes.tableTagWrapperStyle); 
+      }
       // !VA Add default border, cellspacing, cellpadding and role for accessiblity
       tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
       tableOuter.setAttribute('role', 'presentation'); 
@@ -3014,7 +3022,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         selectedRadio = document.querySelector('input[name="tdoptions"]:checked');
         selectedRadio.click();
         // !VA Handle what to do if the current image width equals the viewer width. In that case, the class should be 'devicewidth' and the table width field should be disabled, because a table width can't be less than the image it contains. If Appdata.imgW === Appdata.viewerW, then disable the field because a table width can't be less than the image it contains. In this case, tableClass should default to 'devicewidth'. If Appdata.imgW < viewerW, then show tableWidth = imgWidth and leave the class field blank so the user can enter a class if desired.
-        // !VA NOTE: This should be extracted to a separate function, too much repetition.
+        // !VA NOTE: This should be extracted to a separate function, too much repetition. Plus, this belongs in getAttributes, I think, since it's writing values rather than just turning the display on/off.
         if ( Appdata.imgW ===  Appdata.viewerW ) {
           document.querySelector(ccpUserInput.iptCcpTableWidth).value = Appdata.viewerW;
           document.querySelector(ccpUserInput.iptCcpTableWidth).disabled = true;
