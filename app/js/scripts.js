@@ -422,6 +422,14 @@ var Witty = (function () {
     // !VA UIController public functions
     return {
 
+
+      displayAttributes: function (target, val) {
+        console.log('displayAttributes running');
+
+
+
+      },
+
       // !VA UIController public
       // !VA This has to cancel the timeouts for the runmn
       displayAppMessages: function (isShow, appMessContainerId, tooltipTarget) {
@@ -630,13 +638,6 @@ var Witty = (function () {
         }
       },
 
-      // !VA UIController public
-      displayImgTypeOptions: function(evt) {
-        // !VA Here we have to 1) Write the class img-fluid to the CCP img class input 2) Add the width="100%" attribute to the parent table 3) Add the max-width: Appdata.imgW to the style attribue of the wrapper table 4) Add the width="100%" attribute to the wrapper table 5) Add the class="responsive-table" attribute to the wrapper table. 
-        console.log('displayImgTypeOptions running');
-        console.log('evt.target.id is: ' + evt.target.id);
-      },
-
 
 
       // !VA UIController public
@@ -759,7 +760,9 @@ var Witty = (function () {
         imgClass: (function() {
           // !VA Branch: makeFluidOption (052620)
           // !VA For fixed images, if there's a class name entered into the class input, return the input value, or if the class input is empty, don't include the class attribute. For fluid images, return the class name 'img-fluid'.
-          isFixed ? str = ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpImgClass).value) : str = 'img-fluid';
+          target = ccpUserInput.iptCcpImgClass;
+          console.log('target is: ' + target);
+          isFixed ? str = ccpGetAttValue('class',document.querySelector(target).value) : str = 'img-fluid';
           return str;
         })(),
         imgWidth: (function() {
@@ -858,6 +861,19 @@ var Witty = (function () {
         tableWidth: (function() {
           // !VA IMPORTANT!  All writing of values should be done here, not in initUI. initUI should ONLY turn display on and off.
           // !VA If If isFixed, return the value of the table width field. If isFixed is false, then fluid images is selected, so return 100% for the tableWidth.
+          /* !VA  
+          // !VA There is more complex logic here:
+          If fixed images:
+            * If The input value = viewerW, the class is devicewidth
+            * IF the input value != viewerW, the class is the user input
+            * 
+          If fluid images:
+            * The class is 
+          
+          
+          
+          
+          */
           isFixed ? str = document.querySelector(ccpUserInput.iptCcpTableWidth).value : str = '100%';
           return str;
         })(),
@@ -1395,11 +1411,15 @@ var Witty = (function () {
     }
 
     // !VA Make the img node, including anchor if it is checked
+    // !VA IMPORTANT: Attributes should be passed, not called.
     // !VA CBController private
     function makeImgNode ( id ) {
+      console.log('makeImgNode');
       // !VA Id is passed but not used here,  because we're only building the node.
       let Attributes;
       Attributes = getAttributes();
+      console.log('Attributes');
+      console.dir(Attributes);
       let imgNode, returnNodeFragment;
       // !VA Create the image node
       imgNode = document.createElement('img');
@@ -2290,7 +2310,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         if (ccpUserInput[i].substring(0, 12) === '#rdo-ccp-img') {
           selectedRadio = document.querySelector(ccpUserInput[i]);
           // !VA Add an event handler to trap clicks to the tdoptions radio button
-          addEventHandler(selectedRadio,'click',UIController.displayImgTypeOptions,false);
+          addEventHandler(selectedRadio,'click',updateCCP,false);
         }
       }
 
@@ -2996,7 +3016,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
     // !VA Update the CCP. This is called when the CCP is opened with the CCP button and/or when a user input is made on the toolbar that results in a call to resizeContainers.
     // !VA IMPORTANT: This is the wrong way to handle this, but I can't deal with it right now. First, dynamically displayed elements should not be initialized here, but in initCCP. Second, this causes the Include wrapper checkbox to be ignored sometimes when you open the CCP. It's a bug. Put it in the list.
+    // !VA appController private
     function updateCCP() {
+      console.log('updateCCP running');
       // !VA Get Appdata
       var Appdata = appController.initGetAppdata();
       // !VA Init elements that are initialized when the CCP is updated
