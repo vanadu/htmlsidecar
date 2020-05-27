@@ -747,10 +747,12 @@ var Witty = (function () {
 
     // !VA ATTRIBUTE FUNCTIONS
     // !VA CBController private
+    // !VA Branch: reconfig (052720)
+    // !VA Each attribute is either get-only or settable. If it is get-only, then the user-defined value is accessed directly from the DOM element. If it is a preset, then the value is defined programmatically based on a condition. For instance, the class name 'img-fluid' is a preset that becomes active when the user selects the Fluid image option. In this case, the CCP element corresponding to the attribute is written to the ccpElement variable for output to the CCP via displayAttribute function.  The displayAttribute must take both the attribute value AND the id of th element that receives the value. If the ccpElement variable is falsy, then the attribute and its CCP element are not added to the array passed to displayElement.
     function getAttributes() {
       console.log('getAttributes running');
       var Appdata = appController.initGetAppdata();
-      let target, checked, str, options, selectid, isFixed;
+      let target, checked, str, options, selectid, ccpElement, isFixed;
       // console.log('Appdata:');
       // console.dir(Appdata);
       // !VA Find out whether the Fixed Image radio button is selected.
@@ -760,21 +762,25 @@ var Witty = (function () {
         imgClass: (function() {
           // !VA Branch: makeFluidOption (052620)
           // !VA For fixed images, if there's a class name entered into the class input, return the input value, or if the class input is empty, don't include the class attribute. For fluid images, return the class name 'img-fluid'.
-          target = ccpUserInput.iptCcpImgClass;
+          ccpElement = ccpUserInput.iptCcpImgClass;
           console.log('target is: ' + target);
-          isFixed ? str = ccpGetAttValue('class',document.querySelector(target).value) : str = 'img-fluid';
+          isFixed ? str = ccpGetAttValue('class',document.querySelector(ccpElement).value) : str = 'img-fluid';
           return str;
         })(),
         imgWidth: (function() {
+          // !VA Get-only
           return Appdata.imgW;
         })(),
         imgHeight: (function() {
+          // !VA Get-only
           return Appdata.imgH;
         })(),
         imgAlt: (function() {
+          // !VA Get-only
           return ccpGetAttValue('alt',document.querySelector(ccpUserInput.iptCcpImgAlt).value);
         })(),
         imgSrc: (function() {
+          // !VA Get-only
           if (document.querySelector(ccpUserInput.iptCcpImgRelPath).value) {
             return document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + document.querySelector(inspectorElements.insFilename).textContent;
           }
@@ -782,10 +788,12 @@ var Witty = (function () {
         // !VA Branch: makeFluidOption (052620)
         imgStyle: (function() {
           // !VA Get the selected state of the fixed imgType radio. If it is not selected, then the fluid option is selected. If fixed, include the width and height in the style attribute. If fluid, don't include them
+          // !VA This value is never displayed in CCP, only written to Clipboard object, so it's actually get-only despite having a condition.
           isFixed ? str = `display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;` : str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;';
           return str;
         })(),
         imgAlign: (function() {  
+          // !VA This value is get-only.
           str = '', options = [], selectid = '';
           selectid = ccpUserInput.selCcpImgAlign;
           options = [ '', 'left', 'center', 'right'];
@@ -793,45 +801,53 @@ var Witty = (function () {
           return str;
         })(),
         imgIncludeAnchor: (function() {
+          // !VA This value is get-only.
           let target, checked;
           target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
           checked = getCheckboxSelection(target);
           return checked;
         })(),
         // !VA TD Attributes
-        // !VA TD Width and height from Appdata = imgW and imgW -- only used for Stig's BG image 
+        // !VA TD Width and height from Appdata = imgW and imgW -- only used for Stig's BG image
         tdAppdataWidth: (function() {
+          // !VA This value is get-only.
           return Appdata.imgW;
         })(),
         tdAppdataHeight: (function() {
+          // !VA This value is get-only.
           return Appdata.imgH;
         })(),
         tdHeight: (function() {
+          // !VA This value is get-only.
           return ccpIfNoUserInput('height',document.querySelector(ccpUserInput.iptCcpTdHeight).value);
         })(),
         tdWidth: (function() {
+          // !VA This value is get-only.
           return ccpIfNoUserInput('width',document.querySelector(ccpUserInput.iptCcpTdWidth).value);
         })(),
+        // !VA The selected tdoption radio button determines which TD options will be displayed/undisplayed. Only the checked one will be displayed; all other ones will be undisplayed  
         tdBasic: (function() {
-          target = ccpUserInput.rdoCcpTdBasic;
-          checked = getRadioState(target);
+          ccpElement = ccpUserInput.rdoCcpTdBasic;
+          checked = getRadioState(ccpElement);
           return checked;
         })(),
         tdImgswap: (function() {
-          target = ccpUserInput.rdoCcpTdBasic;
-          checked = getRadioState(target);
+          ccpElement = ccpUserInput.rdoCcpTdBasic;
+          checked = getRadioState(ccpElement);
           return checked;
         })(),
         tdBgimage: (function() {
-          target = ccpUserInput.rdoCcpTdBgimage;
+          ccpElement = ccpUserInput.rdoCcpTdBgimage;
+          checked = getRadioState(ccpElement);
           return checked;
         })(),
         tdPosswitch: (function() {
-          target = ccpUserInput.rdoCcpTdPosswitch;
-          checked = getRadioState(target);
+          ccpElement = ccpUserInput.rdoCcpTdPosswitch;
+          checked = getRadioState(ccpElement);
           return checked;
         })(),
         tdAlign: (function() {
+          // !VA This value is get-only
           let str = '', options = [], selectid = '';
           selectid = ccpUserInput.selCcpTdAlign;
           options = [ '', 'left', 'center', 'right'];
@@ -839,6 +855,7 @@ var Witty = (function () {
           return str;
         })(),
         tdValign: (function() {
+          // !VA This value is get-only
           let str = '', options = [], selectid = '';
           selectid = ccpUserInput.selCcpTdValign;
           options = [ '', 'top', 'middle', 'bottom'];
@@ -846,17 +863,22 @@ var Witty = (function () {
           return str;
         })(),
         tdClass: (function() {
+          // !VA This value is get-only
           return ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpTdClass).value);
         })(),
         tdBgcolor: (function() {
+          // !VA This value is get-only
           return ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpTdBgColor).value);
         })(),
         tdBackground: (function() {
+          // !VA This value is get-only
           return document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + (Appdata.fname);
         })(),
         // !VA TABLE attributes
         tableClass: (function() {
-          return ccpIfNoUserInput('class',document.querySelector(ccpUserInput.iptCcpTableClass).value);
+          // !VA This value depends on the status of the Fixed/Fluid image radio button
+          ccpElement = ccpUserInput.iptCcpTableClass;
+          return ccpIfNoUserInput('class',document.querySelector(ccpElement).value);
         })(),
         tableWidth: (function() {
           // !VA IMPORTANT!  All writing of values should be done here, not in initUI. initUI should ONLY turn display on and off.
@@ -866,14 +888,12 @@ var Witty = (function () {
           If fixed images:
             * If The input value = viewerW, the class is devicewidth
             * IF the input value != viewerW, the class is the user input
-            * 
+            * The table width is always Appdata.imgW
           If fluid images:
-            * The class is 
-          
-          
-          
-          
+            * The class is always the user input, even though that could cause problems for the user.
+            The table width input field is always 100%
           */
+         // !VA Branch: reconfig (052720) HERE
           isFixed ? str = document.querySelector(ccpUserInput.iptCcpTableWidth).value : str = '100%';
           return str;
         })(),
@@ -926,7 +946,18 @@ var Witty = (function () {
           return str;
         })(),
       };
+      displayAttributes(Attributes);
       return Attributes;
+    }
+
+    // !VA CBController private
+    function displayAttributes(Attributes) {
+      console.log('displayAttributes running');
+      console.log('Attributes:');
+      console.dir(Attributes);
+
+      document.querySelector(ccpUserInput.iptCcpImgClass).value = Attributes.imgClass;
+
     }
 
     // !VA 02.17.20 This is the same as ccpIfNoUserInput except it returns ONLY the value, not the attribute name -- but we don't need this now, because if it has not value, then, well it has no value.
@@ -1415,11 +1446,10 @@ var Witty = (function () {
     // !VA CBController private
     function makeImgNode ( id ) {
       console.log('makeImgNode');
+      console.log('id is: ' + id);
       // !VA Id is passed but not used here,  because we're only building the node.
       let Attributes;
       Attributes = getAttributes();
-      console.log('Attributes');
-      console.dir(Attributes);
       let imgNode, returnNodeFragment;
       // !VA Create the image node
       imgNode = document.createElement('img');
@@ -3016,6 +3046,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
     // !VA Update the CCP. This is called when the CCP is opened with the CCP button and/or when a user input is made on the toolbar that results in a call to resizeContainers.
     // !VA IMPORTANT: This is the wrong way to handle this, but I can't deal with it right now. First, dynamically displayed elements should not be initialized here, but in initCCP. Second, this causes the Include wrapper checkbox to be ignored sometimes when you open the CCP. It's a bug. Put it in the list.
+
+    // !VA Branch: reconfig (052720)
+    // !VA updateCCP should be in UIController and should be called from displayAttributes. displayAttributes should collect all the CCP elements and their attribute values, and pass the whole schmear as an array to updateCCP. So we don't want to do the DOM access in displayAttributes. 
+    // !VA getAttributes already has most of the element ids in the respective attribute functions.
+
+
     // !VA appController private
     function updateCCP() {
       console.log('updateCCP running');
