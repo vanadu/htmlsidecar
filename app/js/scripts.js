@@ -748,11 +748,11 @@ var Witty = (function () {
     // !VA ATTRIBUTE FUNCTIONS
     // !VA CBController private
     // !VA Branch: reconfig (052720)
-    // !VA Each attribute is either get-only or settable. If it is get-only, then the user-defined value is accessed directly from the DOM element. If it is a preset, then the value is defined programmatically based on a condition. For instance, the class name 'img-fluid' is a preset that becomes active when the user selects the Fluid image option. In this case, the CCP element corresponding to the attribute is written to the ccpElement variable for output to the CCP via displayAttribute function.  The displayAttribute must take both the attribute value AND the id of th element that receives the value. If the ccpElement variable is falsy, then the attribute and its CCP element are not added to the array passed to displayElement.
+    // !VA Each attribute is either get-only or settable. If it is get-only, then the user-defined value is accessed directly from the DOM element. If it is a preset, then the value is defined programmatically based on a condition. For instance, the class name 'img-fluid' is a preset that becomes active when the user selects the Fluid image option. In this case, the CCP element corresponding to the attribute is written to the ccpElementId variable for output to the CCP via displayAttribute function.  The displayAttribute must take both the attribute value AND the id of th element that receives the value. If the ccpElementId variable is falsy, then the attribute and its CCP element are not added to the array passed to displayElement.
     function getAttributes() {
       console.log('getAttributes running');
       var Appdata = appController.initGetAppdata();
-      let target, checked, str, options, selectid, ccpElement, isFixed;
+      let checked, str, options, selectid, ccpElementId, isFixed;
       // console.log('Appdata:');
       // console.dir(Appdata);
       // !VA Find out whether the Fixed Image radio button is selected.
@@ -762,9 +762,9 @@ var Witty = (function () {
         imgClass: (function() {
           // !VA Branch: makeFluidOption (052620)
           // !VA For fixed images, if there's a class name entered into the class input, return the input value, or if the class input is empty, don't include the class attribute. For fluid images, return the class name 'img-fluid'.
-          ccpElement = ccpUserInput.iptCcpImgClass;
-          console.log('target is: ' + target);
-          isFixed ? str = ccpGetAttValue('class',document.querySelector(ccpElement).value) : str = 'img-fluid';
+          ccpElementId = ccpUserInput.iptCcpImgClass;
+          console.log('ccpElementId is: ' + ccpElementId);
+          isFixed ? str = ccpGetAttValue('class',document.querySelector(ccpElementId).value) : str = 'img-fluid';
           return str;
         })(),
         imgWidth: (function() {
@@ -827,23 +827,23 @@ var Witty = (function () {
         })(),
         // !VA The selected tdoption radio button determines which TD options will be displayed/undisplayed. Only the checked one will be displayed; all other ones will be undisplayed  
         tdBasic: (function() {
-          ccpElement = ccpUserInput.rdoCcpTdBasic;
-          checked = getRadioState(ccpElement);
+          ccpElementId = ccpUserInput.rdoCcpTdBasic;
+          checked = getRadioState(ccpElementId);
           return checked;
         })(),
         tdImgswap: (function() {
-          ccpElement = ccpUserInput.rdoCcpTdBasic;
-          checked = getRadioState(ccpElement);
+          ccpElementId = ccpUserInput.rdoCcpTdBasic;
+          checked = getRadioState(ccpElementId);
           return checked;
         })(),
         tdBgimage: (function() {
-          ccpElement = ccpUserInput.rdoCcpTdBgimage;
-          checked = getRadioState(ccpElement);
+          ccpElementId = ccpUserInput.rdoCcpTdBgimage;
+          checked = getRadioState(ccpElementId);
           return checked;
         })(),
         tdPosswitch: (function() {
-          ccpElement = ccpUserInput.rdoCcpTdPosswitch;
-          checked = getRadioState(ccpElement);
+          ccpElementId = ccpUserInput.rdoCcpTdPosswitch;
+          checked = getRadioState(ccpElementId);
           return checked;
         })(),
         tdAlign: (function() {
@@ -876,9 +876,19 @@ var Witty = (function () {
         })(),
         // !VA TABLE attributes
         tableClass: (function() {
+          console.clear();
+          // !VA Branch: reconfig (052720)
           // !VA This value depends on the status of the Fixed/Fluid image radio button
-          ccpElement = ccpUserInput.iptCcpTableClass;
-          return ccpIfNoUserInput('class',document.querySelector(ccpElement).value);
+          ccpElementId = ccpUserInput.iptCcpTableClass;
+          if (isFixed) {
+            // !VA If imgType is fixed, then set tableClass to 'devicewidth' if the imgW equals the viewerW. Otherrwise, set it to the user input.
+            document.querySelector(ccpElementId).value === Appdata.viewerW ? str = 'devicewidth' : 
+              str = ccpIfNoUserInput('class',document.querySelector(ccpElementId).value);
+          } else {
+            // !VA If the imgType is fluid, set the class input value to the user input, even though that might have unforseen consequences for the user.
+            str = ccpIfNoUserInput('class',document.querySelector(ccpElementId).value);
+          }
+          return str;
         })(),
         tableWidth: (function() {
           // !VA IMPORTANT!  All writing of values should be done here, not in initUI. initUI should ONLY turn display on and off.
@@ -893,8 +903,9 @@ var Witty = (function () {
             * The class is always the user input, even though that could cause problems for the user.
             The table width input field is always 100%
           */
-         // !VA Branch: reconfig (052720) HERE
+          // !VA Branch: reconfig (052720) HERE
           isFixed ? str = document.querySelector(ccpUserInput.iptCcpTableWidth).value : str = '100%';
+          console.log('tableWidth str is: ' + str);
           return str;
         })(),
         tableBgcolor: (function() {
@@ -917,7 +928,12 @@ var Witty = (function () {
           return checked;
         })(),
         tableTagWrapperClass: (function() {
-          return ccpIfNoUserInput('class',document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value);
+          // !VA Branch: reconfig (052720)
+          // !VA If imgType is fixed, set the default class to 'devicewidth'. If it's fluid, set it to 'responsive-table' as per the Litmus newsletter template.
+          isFixed ? str = 'devicewidth' : str = 'responsive-table';
+          console.log('tableWrapperClass str is: ' + str);
+          // return ccpIfNoUserInput('class',document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value);
+          return str;
         })(),
         tableTagWrapperAlign: (function() {
           let str = '', options = [], selectid = '';
@@ -927,22 +943,24 @@ var Witty = (function () {
           return str;
         })(),
         tableTagWrapperWidth: (function() {
-          return document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value;
+          // !VA Branch: reconfig (052720)
+          // !VA This value depends on the selection under Fixed image. 
+          ccpElementId = ccpUserInput.iptCcpTableWrapperWidth;
+          // !VA If the imgTyp is fixed, set the wrappe width to the value of the input field, which for the most part will be viewerW. If it's fluid, set it to 100%
+          isFixed ? str = document.querySelector(ccpElementId).value : str = '100%';
+          console.log('tableWrapperWidth str is: ' + str);
+
+          return str;
         })(),
         tableTagWrapperBgcolor: (function() {
           return ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.iptCcpTableWrapperBgColor).value);
         })(),
         // !VA Branch: makeFluidOption (052620)
         tableTagWrapperStyle: (function() {
+          // !VA This value is get-only
           // !VA Only include a style attribute for the wrapper for fluid images.  The conditional for this is in makeTableNode and there's no case where a style attribute is included for fixed images, so just provide the style attribute string to return
-
-          let isFixed;
-          isFixed = getRadioState(ccpUserInput.rdoCcpImgFixed);
-          if (isFixed) {
-            str = '';
-          } else {
-            str = `max-width: ${Appdata.imgW}`;
-          }
+          isFixed ? str = '' : str = `max-width: ${Appdata.imgW}`;
+          console.log('tableWrapperStyle str is: ' + str);
           return str;
         })(),
       };
@@ -953,8 +971,8 @@ var Witty = (function () {
     // !VA CBController private
     function displayAttributes(Attributes) {
       console.log('displayAttributes running');
-      console.log('Attributes:');
-      console.dir(Attributes);
+      // console.log('Attributes:');
+      // console.dir(Attributes);
 
       document.querySelector(ccpUserInput.iptCcpImgClass).value = Attributes.imgClass;
 
@@ -1012,6 +1030,7 @@ var Witty = (function () {
     }
 
     // !VA CBController private
+    // !VA TODO: Change target here to alias
     function getCheckboxSelection(target) {
       
       let chkboxid, checked;
@@ -1029,15 +1048,17 @@ var Witty = (function () {
     }
 
     // !VA CBController private
-    function getRadioState(target) {
-      let radioid, checked;
-      radioid = document.querySelector(target).id; 
-      if (document.querySelector('#' + radioid).checked === false) {
+    function getRadioState(ccpElementId) {
+      // !VA Passing in the ID, not the alias
+      let checked;
+      if (document.querySelector(ccpElementId).checked === false) {
         // !VA Radio button is NOT SELECTED
         checked = false;
+        console.log('checked is: ' + checked);
       } else {
-      // !VA Radio button IS SELECTED
+        // !VA Radio button IS SELECTED
         checked = true;
+        console.log('checked is: ' + checked);
       }
       return checked;
     }
@@ -3081,20 +3102,20 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         selectedRadio.click();
         // !VA Handle what to do if the current image width equals the viewer width. In that case, the class should be 'devicewidth' and the table width field should be disabled, because a table width can't be less than the image it contains. If Appdata.imgW === Appdata.viewerW, then disable the field because a table width can't be less than the image it contains. In this case, tableClass should default to 'devicewidth'. If Appdata.imgW < viewerW, then show tableWidth = imgWidth and leave the class field blank so the user can enter a class if desired.
         // !VA NOTE: This should be extracted to a separate function, too much repetition. Plus, this belongs in getAttributes, I think, since it's writing values rather than just turning the display on/off.
-        if ( Appdata.imgW ===  Appdata.viewerW ) {
-          document.querySelector(ccpUserInput.iptCcpTableWidth).value = Appdata.viewerW;
-          document.querySelector(ccpUserInput.iptCcpTableWidth).disabled = true;
-          document.querySelector(ccpUserInput.iptCcpTableWidth).classList.add('disabled');
-          document.querySelector(ccpUserInput.iptCcpTableClass).value = 'devicewidth';
-        } else {
-          document.querySelector(ccpUserInput.iptCcpTableWidth).value = Appdata.imgW;
-          document.querySelector(ccpUserInput.iptCcpTableWidth).disabled = false;
-          document.querySelector(ccpUserInput.iptCcpTableWidth).classList.remove('disabled');
-          document.querySelector(ccpUserInput.iptCcpTableClass).value = '';
-        }
+        // if ( Appdata.imgW ===  Appdata.viewerW ) {
+        //   document.querySelector(ccpUserInput.iptCcpTableWidth).value = Appdata.viewerW;
+        //   document.querySelector(ccpUserInput.iptCcpTableWidth).disabled = true;
+        //   document.querySelector(ccpUserInput.iptCcpTableWidth).classList.add('disabled');
+        //   document.querySelector(ccpUserInput.iptCcpTableClass).value = 'devicewidth';
+        // } else {
+        //   document.querySelector(ccpUserInput.iptCcpTableWidth).value = Appdata.imgW;
+        //   document.querySelector(ccpUserInput.iptCcpTableWidth).disabled = false;
+        //   document.querySelector(ccpUserInput.iptCcpTableWidth).classList.remove('disabled');
+        //   document.querySelector(ccpUserInput.iptCcpTableClass).value = '';
+        // }
         // !VA Defaults for wrapper width and class
-        document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value = Appdata.viewerW;
-        document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
+        // document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value = Appdata.viewerW;
+        // document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
 
       }
 
