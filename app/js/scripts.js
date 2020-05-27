@@ -748,39 +748,39 @@ var Witty = (function () {
     // !VA ATTRIBUTE FUNCTIONS
     // !VA CBController private
     // !VA Branch: reconfig (052720)
-    // !VA Each attribute is either get-only or settable. If it is get-only, then the user-defined value is accessed directly from the DOM element. If it is a preset, then the value is defined programmatically based on a condition. For instance, the class name 'img-fluid' is a preset that becomes active when the user selects the Fluid image option. In this case, the CCP element corresponding to the attribute is written to the ccpElementId variable for output to the CCP via displayAttribute function.  The displayAttribute must take both the attribute value AND the id of th element that receives the value. If the ccpElementId variable is falsy, then the attribute and its CCP element are not added to the array passed to displayElement.
+    // !VA Each attribute is either get-only or settable. If it is get-only, then the user-defined value is accessed directly from the DOM element. If it is a preset, then the value is defined programmatically based on a condition. For instance, the class name 'img-fluid' is a preset that becomes active when the user selects the Fluid image option. In this case, the CCP element ID corresponding to the attribute is written to the ccpElementId variable for output to the CCP via the displayAttribute function.  The displayAttribute must take both the attribute value AND the id of th element that receives the value. So, for all of the attributes that require a write to the CCP UI, use the ccpElementId variable for the CCP element id. If the ccpElementId variable is falsy, then no DOM access is required, so the attribute and its CCP element are not added to the array passed to displayElement.
     function getAttributes() {
       console.log('getAttributes running');
       var Appdata = appController.initGetAppdata();
       let checked, str, options, selectid, ccpElementId, isFixed;
       // console.log('Appdata:');
       // console.dir(Appdata);
-      // !VA Find out whether the Fixed Image radio button is selected.
+      // !VA Find out whether the Fixed Image radio button is selected. If it's not, then Fluid image is selected
       isFixed = getRadioState(ccpUserInput.rdoCcpImgFixed);
       var Attributes = {
         // !VA IMG attributes
         imgClass: (function() {
           // !VA Branch: makeFluidOption (052620)
           // !VA For fixed images, if there's a class name entered into the class input, return the input value, or if the class input is empty, don't include the class attribute. For fluid images, return the class name 'img-fluid'.
+          // !VA This value is written to CCP so use ccpElementId
           ccpElementId = ccpUserInput.iptCcpImgClass;
-          console.log('ccpElementId is: ' + ccpElementId);
           isFixed ? str = ccpGetAttValue('class',document.querySelector(ccpElementId).value) : str = 'img-fluid';
           return str;
         })(),
         imgWidth: (function() {
-          // !VA Get-only
+          // !VA This value is get-only
           return Appdata.imgW;
         })(),
         imgHeight: (function() {
-          // !VA Get-only
+          // !VA This value is get-only
           return Appdata.imgH;
         })(),
         imgAlt: (function() {
-          // !VA Get-only
+          // !VA This value is get-only
           return ccpGetAttValue('alt',document.querySelector(ccpUserInput.iptCcpImgAlt).value);
         })(),
         imgSrc: (function() {
-          // !VA Get-only
+          // !VA This value is get-only
           if (document.querySelector(ccpUserInput.iptCcpImgRelPath).value) {
             return document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + document.querySelector(inspectorElements.insFilename).textContent;
           }
@@ -788,7 +788,7 @@ var Witty = (function () {
         // !VA Branch: makeFluidOption (052620)
         imgStyle: (function() {
           // !VA Get the selected state of the fixed imgType radio. If it is not selected, then the fluid option is selected. If fixed, include the width and height in the style attribute. If fluid, don't include them
-          // !VA This value is never displayed in CCP, only written to Clipboard object, so it's actually get-only despite having a condition.
+          // !VA This value is never displayed in CCP, only written to Clipboard object, so it's  get-only.
           isFixed ? str = `display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;` : str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;';
           return str;
         })(),
@@ -827,21 +827,32 @@ var Witty = (function () {
         })(),
         // !VA The selected tdoption radio button determines which TD options will be displayed/undisplayed. Only the checked one will be displayed; all other ones will be undisplayed  
         tdBasic: (function() {
+          // !VA This is a tdoptions selection radio - use ccpElementId
           ccpElementId = ccpUserInput.rdoCcpTdBasic;
+          checked = getRadioState(ccpElementId);
+          return checked;
+        })(),
+        tdExcludeimg: (function() {
+          // !VA This is a tdoptions selection radio - use ccpElementId
+          ccpElementId = ccpUserInput.rdoCcpTdExcludeimg;
           checked = getRadioState(ccpElementId);
           return checked;
         })(),
         tdImgswap: (function() {
-          ccpElementId = ccpUserInput.rdoCcpTdBasic;
+          // !VA This is a tdoptions selection radio - use ccpElementId
+          ccpElementId = ccpUserInput.rdoCcpTdImgswap;
+          console.log('ccpElementId is: ' + ccpElementId);
           checked = getRadioState(ccpElementId);
           return checked;
         })(),
         tdBgimage: (function() {
+          // !VA This is a tdoptions selection radio - use ccpElementId
           ccpElementId = ccpUserInput.rdoCcpTdBgimage;
           checked = getRadioState(ccpElementId);
           return checked;
         })(),
         tdPosswitch: (function() {
+          // !VA This is a tdoptions selection radio - use ccpElementId
           ccpElementId = ccpUserInput.rdoCcpTdPosswitch;
           checked = getRadioState(ccpElementId);
           return checked;
@@ -878,7 +889,7 @@ var Witty = (function () {
         tableClass: (function() {
           console.clear();
           // !VA Branch: reconfig (052720)
-          // !VA This value depends on the status of the Fixed/Fluid image radio button
+          // !VA This value depends on the status of the Fixed/Fluid image radio button, so use ccpElementId
           ccpElementId = ccpUserInput.iptCcpTableClass;
           if (isFixed) {
             // !VA If imgType is fixed, then set tableClass to 'devicewidth' if the imgW equals the viewerW. Otherrwise, set it to the user input.
@@ -891,36 +902,25 @@ var Witty = (function () {
           return str;
         })(),
         tableWidth: (function() {
-          // !VA IMPORTANT!  All writing of values should be done here, not in initUI. initUI should ONLY turn display on and off.
-          // !VA If If isFixed, return the value of the table width field. If isFixed is false, then fluid images is selected, so return 100% for the tableWidth.
-          /* !VA  
-          // !VA There is more complex logic here:
-          If fixed images:
-            * If The input value = viewerW, the class is devicewidth
-            * IF the input value != viewerW, the class is the user input
-            * The table width is always Appdata.imgW
-          If fluid images:
-            * The class is always the user input, even though that could cause problems for the user.
-            The table width input field is always 100%
-          */
-          // !VA Branch: reconfig (052720) HERE
-          isFixed ? str = document.querySelector(ccpUserInput.iptCcpTableWidth).value : str = '100%';
-          console.log('tableWidth str is: ' + str);
+          // !VA The value is written to the table width field - use ccpElementId
+          ccpElementId = ccpUserInput.iptCcpTableWidth;
+          isFixed ? str = document.querySelector(ccpElementId).value : str = '100%';
+          // console.log('tableWidth str is: ' + str);
           return str;
         })(),
         tableBgcolor: (function() {
           return ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.iptCcpTableBgColor).value);
         })(),
         tableAlign: (function() {
+          // !VA This value is get-only.
           let str = '', options = [], selectid = '';
           selectid = ccpUserInput.selCcpTableAlign;
-          
           options = [ '', 'left', 'center', 'right'];
           str = getAlignAttribute( selectid, options );
-          
           return str;
         })(),
         tableIncludeWrapper: (function() {
+          // !VA This value is get-only.
           let target, checked;
           // !VA Branch: makeFluidOption (052620)
           target = ccpUserInput.spnCcpTableIncludeWrapperCheckmrk;
@@ -929,6 +929,7 @@ var Witty = (function () {
         })(),
         tableTagWrapperClass: (function() {
           // !VA Branch: reconfig (052720)
+          // !VA This value is get-only - writes to style attribute of clipboard output but not CCP
           // !VA If imgType is fixed, set the default class to 'devicewidth'. If it's fluid, set it to 'responsive-table' as per the Litmus newsletter template.
           isFixed ? str = 'devicewidth' : str = 'responsive-table';
           console.log('tableWrapperClass str is: ' + str);
@@ -936,6 +937,7 @@ var Witty = (function () {
           return str;
         })(),
         tableTagWrapperAlign: (function() {
+          // !VA This value is get-only.
           let str = '', options = [], selectid = '';
           selectid = ccpUserInput.selCcpTableWrapperAlign;
           options = [ '', 'left', 'center', 'right'];
@@ -960,7 +962,7 @@ var Witty = (function () {
           // !VA This value is get-only
           // !VA Only include a style attribute for the wrapper for fluid images.  The conditional for this is in makeTableNode and there's no case where a style attribute is included for fixed images, so just provide the style attribute string to return
           isFixed ? str = '' : str = `max-width: ${Appdata.imgW}`;
-          console.log('tableWrapperStyle str is: ' + str);
+          // console.log('tableWrapperStyle str is: ' + str);
           return str;
         })(),
       };
@@ -971,10 +973,10 @@ var Witty = (function () {
     // !VA CBController private
     function displayAttributes(Attributes) {
       console.log('displayAttributes running');
-      // console.log('Attributes:');
-      // console.dir(Attributes);
+      console.log('Attributes:');
+      console.dir(Attributes);
 
-      document.querySelector(ccpUserInput.iptCcpImgClass).value = Attributes.imgClass;
+      
 
     }
 
@@ -1049,6 +1051,8 @@ var Witty = (function () {
 
     // !VA CBController private
     function getRadioState(ccpElementId) {
+      console.log('getRadioState running');
+      console.log('ccpElementId is: ' + ccpElementId);
       // !VA Passing in the ID, not the alias
       let checked;
       if (document.querySelector(ccpElementId).checked === false) {
