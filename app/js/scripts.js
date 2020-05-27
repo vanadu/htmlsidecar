@@ -14,6 +14,19 @@ So what we need to do is:
   * 
 2) Switch between the table options for parent and wrapper in initUI
 
+There are three situations where the fluid/fixed CCP options need to be updated.
+1) When the user selects fixed or fluid.
+2) When the CCP is opened - that will take place in updateCCP 
+3) When a value is changed in the toolbar - this should have no effect on the state of the fluid/fixed options but it will happen automatically because updateCCP is now run in resizeContainers.
+
+So we need to trap the user fixed/fluid selection...in 
+
+
+
+
+
+
+
 
 
 /* !VA  FULL WIDTH TABLES
@@ -32,10 +45,10 @@ So what we need to do is:
 
 
 
-
   
 */
 /*
+
 
 
 
@@ -69,10 +82,10 @@ DONE: Fix the CSS Rule buttons disappearing when hovered or clicked. It's becaus
 DONE: Comment and clean up appMessages.
 DONE: Remove X from No Image strings
 DONE: Change table options: if width = Appdata.viewerW then class = devicewidth else class = none
+DONE: Add target="_blank" to A tag
 
 TODO: Remove include width and height in style - that will be default for fixed image
 TODO: Make the filename div wider
-TODO: Add target="_blank" to A tag
 TODO: Figure out how to prevent getAttributes from being called multiple times. That is multiple DOM accesses...no good.
 TODO: No tooltip available for posswitch and imgswap
 TODO: Tooltips don't appear on checkboxes
@@ -263,7 +276,10 @@ var Witty = (function () {
       // !VA IMG tag user input
       iptCcpImgClass: '#ipt-ccp-img-class',
       iptCcpImgAlt: '#ipt-ccp-img-alt',
-      spnCcpImgIncludeWidthHeightCheckmrk: '#spn-ccp-img-include-width-height-checkmrk',
+      // !VA Branch: makeFluidOption (052620)
+      // spnCcpImgIncludeWidthHeightCheckmrk: '#spn-ccp-img-include-width-height-checkmrk',
+      rdoCcpImgFixed: '#rdo-ccp-img-fixed',
+      rdoCcpImgFluid: '#rdo-ccp-img-fluid',
       selCcpImgAlign: '#sel-ccp-img-align',
       iptCcpImgRelPath: '#ipt-ccp-img-relpath',
       spnCcpImgIncludeAnchorCheckmrk: '#spn-ccp-img-include-anchor-checkmrk',
@@ -386,36 +402,17 @@ var Witty = (function () {
 
 
     function showAppMessages(appMessContainerId, tooltipTarget) {
-      
-      console.log('showAppMessages running');
       // !VA Show the current appMessage. If the current appMessage is a tooltip, then show the help cursor while the mouse is in the tooltip element.
-      console.log('appMessContainer is: ' + appMessContainerId);
-      console.log('tooltipTarget is: ' + tooltipTarget);
-
-
       document.querySelector(appMessContainerId).classList.add('active');
       if (!appMessContainerId.includes('tip')) {
-
-
         document.querySelector(staticRegions.appBlocker).classList.add('active');
-
       } 
-
     }
 
-
     function hideAppMessages(appMessContainerId, tooltipTarget) {
-      console.log('hideAppMessages running');
-
       // !VA Hide current app message
-
-      console.log('removing blocker');
       document.querySelector(staticRegions.appBlocker).classList.remove('active');
-
       document.querySelector(appMessContainerId).classList.remove('active');
-
-
-
     }
 
     // !VA UIController public functions
@@ -630,8 +627,17 @@ var Witty = (function () {
       },
 
       // !VA UIController public
-      displayTdOptions: function(evt) {
-        // console.log('displayTdOptions running');
+      displayImgTypeOptions: function(evt) {
+        // !VA Here we have to 1) Write the class img-fluid to the CCP img class input 2) Add the width="100%" attribute to the parent table 3) Add the max-width: Appdata.imgW to the style attribue of the wrapper table 4) Add the width="100%" attribute to the wrapper table 5) Add the class="responsive-table" attribute to the wrapper table. 
+        console.log('displayImgTypeOptions running');
+        console.log('evt.target.id is: ' + evt.target.id);
+      },
+
+
+
+      // !VA UIController public
+      displayTdTypeOptions: function(evt) {
+        // console.log('displayTdTypeOptions running');
         // !VA Array including all the defined options for each tdoption radio
         let allTdOptions = [], optionsToShow = [], targetalias, parentDivId;
         let Appdata;
@@ -706,7 +712,7 @@ var Witty = (function () {
           document.querySelector(ccpUserInput.iptCcpTdBorderRadius).value = '4';
           break;
         default:
-          console.log('ERROR: UIController.displayTdOptions public');
+          console.log('ERROR: UIController.displayTdTypeOptions public');
         } 
       },
 
@@ -737,10 +743,11 @@ var Witty = (function () {
     // !VA ATTRIBUTE FUNCTIONS
     // !VA CBController private
     function getAttributes() {
+      console.log('getAttributes running');
       var Appdata = appController.initGetAppdata();
       let target, checked, str, options, selectid;
-      console.log('Appdata:');
-      console.dir(Appdata);
+      // console.log('Appdata:');
+      // console.dir(Appdata);
       var Attributes = {
         // !VA IMG attributes
         imgClass: (function() {
@@ -760,17 +767,33 @@ var Witty = (function () {
             return document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + document.querySelector(inspectorElements.insFilename).textContent;
           }
         })(),
+        // !VA Branch: makeFluidOption (052620)
         imgStyle: (function() {
-          let target, checked, str;
-          target = ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk;
-          checked = getCheckboxSelection(target);
-          if (checked === true) {
+          // !VA Get the selected state of the fixed imgType radio. If it is not selected, then the fluid option is selected.
+          let isFixed;
+          isFixed = getRadioState(ccpUserInput.rdoCcpImgFixed);
+
+
+
+          if (isFixed) {
             str = `display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;`;
           } else {
             str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;';
           }
           return str;
         })(),
+        // imgStyle: (function() {
+        //   let target, checked, str;
+        //   target = ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk;
+        //   // !VA Branch: makeFluidOption (052620)
+        //   checked = getCheckboxSelection(target);
+        //   if (checked === true) {
+        //     str = `display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;`;
+        //   } else {
+        //     str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;';
+        //   }
+        //   return str;
+        // })(),
         imgAlign: (function() {  
           str = '', options = [], selectid = '';
           selectid = ccpUserInput.selCcpImgAlign;
@@ -800,12 +823,12 @@ var Witty = (function () {
         })(),
         tdBasic: (function() {
           target = ccpUserInput.rdoCcpTdBasic;
-          checked = getRadioSelection(target);
+          checked = getRadioState(target);
           return checked;
         })(),
         tdImgswap: (function() {
           target = ccpUserInput.rdoCcpTdBasic;
-          checked = getRadioSelection(target);
+          checked = getRadioState(target);
           return checked;
         })(),
         tdBgimage: (function() {
@@ -814,7 +837,7 @@ var Witty = (function () {
         })(),
         tdPosswitch: (function() {
           target = ccpUserInput.rdoCcpTdPosswitch;
-          checked = getRadioSelection(target);
+          checked = getRadioState(target);
           return checked;
         })(),
         tdAlign: (function() {
@@ -861,6 +884,7 @@ var Witty = (function () {
         })(),
         tableIncludeWrapper: (function() {
           let target, checked;
+          // !VA Branch: makeFluidOption (052620)
           target = ccpUserInput.spnCcpTableIncludeWrapperCheckmrk;
           checked = getCheckboxSelection(target);
           return checked;
@@ -954,7 +978,21 @@ var Witty = (function () {
     }
 
     // !VA CBController private
-    function getRadioSelection(target) {
+    function getRadioState(target) {
+      let radioid, checked;
+      radioid = document.querySelector(target).id; 
+      if (document.querySelector('#' + radioid).checked === false) {
+        // !VA Radio button is NOT SELECTED
+        checked = false;
+      } else {
+      // !VA Radio button IS SELECTED
+        checked = true;
+      }
+      return checked;
+    }
+
+    // !VA CBController private
+    function getImgType(target) {
       let radioid, checked;
       radioid = document.querySelector(target).id; 
       if (document.querySelector('#' + radioid).checked === false) {
@@ -966,6 +1004,10 @@ var Witty = (function () {
       }
       return checked;
     }
+
+
+
+
 
     // clipboardController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
     // !VA TODO: This should be in handleUserInput
@@ -1009,6 +1051,7 @@ var Witty = (function () {
       uSels = {
         
         buttonClicked: '',
+        // !VA Branch: makeFluidOption (052620)
         hasAnchor: getCheckboxSelection(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk),
         hasWrapper: getCheckboxSelection(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk),
         selectedRadio: document.querySelector('input[name="tdoptions"]:checked').value
@@ -1030,7 +1073,6 @@ var Witty = (function () {
     // !VA CBController private
     // !VA Branch: reconfigureMessages (051620) id added to parameters
     function buildOutputNodeList( id, uSels ) {
-      console.log('buildOutputNodeList id is: ' + id);
       let tableNodeFragment, nl, frag, outputNL, clipboardStr;
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
       // !VA Branch: reconfigureMessages (051620) id added to arguments
@@ -1300,6 +1342,7 @@ var Witty = (function () {
       img_switchcontent1Attr = {
         width: Attributes.imgWidth,
         height: Attributes.imgHeight,
+        // !VA Branch: makeFluidOption (052620)
         style: Attributes.imgStyle,
         src: Attributes.imgSrc,
         alt: Attributes.imgAlt
@@ -1370,6 +1413,7 @@ var Witty = (function () {
       imgNode.width = Attributes.imgWidth;
       // !VA height attribute
       imgNode.height = Attributes.imgHeight;
+      // !VA Branch: makeFluidOption (052620)
       // !VA style attribute
       imgNode.setAttribute('style', Attributes.imgStyle);
       // !VA NOTE: align attribute is deprecated in html5 so is it needed?
@@ -1383,6 +1427,7 @@ var Witty = (function () {
         let anchor = document.createElement('a');
         anchor.href = '#';
         anchor.setAttribute('style', 'color: #FF0000');
+        anchor.setAttribute('target', '_blank');
         anchor.appendChild(imgNode);
         returnNodeFragment.appendChild(anchor);
       } else {
@@ -1416,7 +1461,6 @@ var Witty = (function () {
       switch(true) {
       // case (selectedRadio === 'basic'):
       case (uSels.selectedRadio === 'basic' || uSels.selectedRadio === 'excludeimg'):
-        console.log('makeTdNode basic OR excludeimg');
         // !VA class attribute
         if (Attributes.tdClass) { tdInner.className = Attributes.tdClass; }
         // !VA valign attribute
@@ -1447,8 +1491,8 @@ var Witty = (function () {
         tdInner.vAlign = Attributes.tdValign;
         // !VA Set the background attribute to the current path/filename
         tdInner.setAttribute('background', Attributes.tdBackground);
-        // !VA Fallback bgcolor now set in UIController.displayTdOptions
-        // !VA Include fallback color from the default set in displayTdOptions
+        // !VA Fallback bgcolor now set in UIController.displayTdTypeOptions
+        // !VA Include fallback color from the default set in displayTdTypeOptions
         // Attributes.tdBgcolor ? tdInner.bgColor = Attributes.tdBgcolor : tdInner.bgColor = '#7bceeb';
         break;
       // case (selectedRadio === 'posswitch'):
@@ -1457,7 +1501,7 @@ var Witty = (function () {
         break;
       // case (selectedRadio === 'vmlbutton'):
       case (uSels.selectedRadio === 'vmlbutton'):
-        // !VA Height and width fields have to be entered, otherwise the button can't be built. Button width and height are set here in makeTdNode, the rest of the options are set in getVmlCodeBlock in buildOutputNodeList. The defaults of 40/200 as per Stig are set in UIController.displayTdOptions. So if there's no value for td height and width, then the user has deleted the default and not replaced it with a valid entry. In this case, throw an ERROR and abort before it gets to the clipboard.
+        // !VA Height and width fields have to be entered, otherwise the button can't be built. Button width and height are set here in makeTdNode, the rest of the options are set in getVmlCodeBlock in buildOutputNodeList. The defaults of 40/200 as per Stig are set in UIController.displayTdTypeOptions. So if there's no value for td height and width, then the user has deleted the default and not replaced it with a valid entry. In this case, throw an ERROR and abort before it gets to the clipboard.
         if (!document.querySelector(ccpUserInput.iptCcpTdHeight).value || !document.querySelector(ccpUserInput.iptCcpTdWidth).value) {
           console.log('ERROR in makeTdNode vmlbutton: no value for either height or width');
           isErr = true;
@@ -1593,7 +1637,7 @@ var Witty = (function () {
       linebreak = '\n';
       // !VA 03.09.2020 Set the indentLevel to 1 for now
       fallback = '#7bceeb';
-      // !VA The fallback color is written to the bgcolor input in displayTdOptions, so get it from there
+      // !VA The fallback color is written to the bgcolor input in displayTdTypeOptions, so get it from there
       Attributes.tdBgcolor ? bgcolor = Attributes.tdBgcolor : bgcolor = document.querySelector(ccpUserInput.iptCcpTdBgColor).value;
 
       // !VA Define the innerHTML of the bgimage code
@@ -1609,7 +1653,7 @@ var Witty = (function () {
       // console.dir(Attributes);
       let vmlButtonStr, linebreak, tdHeight, tdWidth;
       linebreak = '\n';
-      // !VA Defaults for height and width are set in displayTdOptions, so get the values from the inputs
+      // !VA Defaults for height and width are set in displayTdTypeOptions, so get the values from the inputs
       tdHeight = document.querySelector(ccpUserInput.iptCcpTdHeight).value;
       tdWidth = document.querySelector(ccpUserInput.iptCcpTdWidth).value;
       // !VA Define the innerHTML of the vmlbutton code
@@ -1724,8 +1768,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
     // !VA CBController private
     function writeClipboard(id, str) {
       console.log('writeClipboard running');
-      console.log('str: ');
-      console.log(str);
+      // console.log('str: ');
+      // console.log(str);
       let clipboardStr;
       // !VA clipboardStr is returned to clipboard.js
       clipboardStr = str;
@@ -2019,6 +2063,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA All the labels have the same id as the inputs with -label appended except the mock checkboxes, whose label has no text and only serves to style the mock checkbox. So for the mock checkboxes, transform the id into the id of the actual text label by removing the spn- prefix and replacing 'checkmrk' with 'label'.
       let labelid, labelel;
       // !VA Loop through the CCP user input element ids
+      // !VA Branch: makeFluidOption (052620)
       for (let i = 0; i < ccpUserInputIds.length; i++) {
         labelid = ccpUserInputIds[i];
         // !VA If the label contains 'checkmrk'...
@@ -2221,11 +2266,23 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA eventListeners for the tdOptions radio buttons for showing/hiding options based on selectedRadio
       for(let i in ccpUserInput) {
         let selectedRadio;
-        // !VA Target only those ccpUserInput elements whose first 4 characters are #rdo. This identifies them as the radio button options.
-        if (ccpUserInput[i].substring(0, 4) === '#rdo') {
+        // !VA Target only those ccpUserInput elements whose first 4 characters are #rdo-ccp-td. This identifies them as the radio button options.
+        if (ccpUserInput[i].substring(0, 11) === '#rdo-ccp-td') {
           selectedRadio = document.querySelector(ccpUserInput[i]);
           // !VA Add an event handler to trap clicks to the tdoptions radio button
-          addEventHandler(selectedRadio,'click',UIController.displayTdOptions,false);
+          addEventHandler(selectedRadio,'click',UIController.displayTdTypeOptions,false);
+        }
+      }
+
+      
+      // !VA eventListeners for the imgType radio buttons for showing/hiding options based on selectedRadio
+      for(let i in ccpUserInput) {
+        let selectedRadio;
+        // !VA Target only those ccpUserInput elements whose first 12 characters are #rdo-ccp-img. This identifies them as the fluid/fixed radio button options.
+        if (ccpUserInput[i].substring(0, 12) === '#rdo-ccp-img') {
+          selectedRadio = document.querySelector(ccpUserInput[i]);
+          // !VA Add an event handler to trap clicks to the tdoptions radio button
+          addEventHandler(selectedRadio,'click',UIController.displayImgTypeOptions,false);
         }
       }
 
@@ -2942,7 +2999,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         // !VA We have to initialize CCP DOM elements here because they don't exist until the CCP is displayed.
 
         // !VA CCP Checkboxes - these are mock checkboxes with custom styling, so the ID names have to be converted to checkbox names in order to select or deselect them. We attach the event handler to the checkmark, not the checkbox. The checkmark is converted to checkbox for handling in toggleCheckbox.
-        ccpCheckmarks = [ ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk, ccpUserInput.spnCcpImgIncludeAnchorCheckmrk, ccpUserInput.spnCcpTableIncludeWrapperCheckmrk ];
+        // !VA Branch: makeFluidOption (052620)
+        // ccpCheckmarks = [ ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk, ccpUserInput.spnCcpImgIncludeAnchorCheckmrk, ccpUserInput.spnCcpTableIncludeWrapperCheckmrk ];
+        ccpCheckmarks = [ ccpUserInput.spnCcpImgIncludeAnchorCheckmrk, ccpUserInput.spnCcpTableIncludeWrapperCheckmrk ];
         for (let i = 0; i < ccpCheckmarks.length; i++) {
           document.querySelector(ccpCheckmarks[i]).addEventListener('click', handleCCPInput, false);
         }
@@ -2951,7 +3010,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
         for (let i = 0; i < wrapperItemsToHide.length; i++) {
           document.querySelector(wrapperItemsToHide[i]).style.display = 'none'; 
         }
-        // !VA Find out which tdoption is selected and send a click to that option to run displayTdOptions and display the appropriate attributes for that option
+        // !VA Find out which tdoption is selected and send a click to that option to run displayTdTypeOptions and display the appropriate attributes for that option
         selectedRadio = document.querySelector('input[name="tdoptions"]:checked');
         selectedRadio.click();
         // !VA Handle what to do if the current image width equals the viewer width. In that case, the class should be 'devicewidth' and the table width field should be disabled, because a table width can't be less than the image it contains. If Appdata.imgW === Appdata.viewerW, then disable the field because a table width can't be less than the image it contains. In this case, tableClass should default to 'devicewidth'. If Appdata.imgW < viewerW, then show tableWidth = imgWidth and leave the class field blank so the user can enter a class if desired.
@@ -3274,9 +3333,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       return Appdata;
     }
 
-
     // !VA appController private
     // !VA Preprocess error messages before sending them to UIController.displayAppMessages. This is where the setTimeOut for err and msg messages lives.
+    // !VA IMPORTANT This appears to be deprecated
     function processAppMessages(appMessType, appMessContent, duration ) {
       
       console.log('preprocessAppErrs running');
@@ -3299,7 +3358,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
 
         // !VA Read the appMessContent into the tooltip content element
         // !VA Here we call UIController.showAppMess. It needs two parameters for tooltips - the targetElement that gets the help cursor and the appMessElement that gets the appMessContent. We put the targetid at the end because it will only have a value for tooltips - for the other two message types it will be undefined.
-        console.log('appMessContainerId is: ' + appMessContainerId);
         UIController.displayAppMessages(false, appMessContainerId, false );
       }, duration);
 
@@ -3325,8 +3383,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
       // !VA So now the problem is that tooltips require the caller id because the tooltip shows on mouseenter and has to hide on mouseleave, and we need the id for the mouseleave to create the eventListener for it. So:
       // !VA Call showAppMessages with two parameters: targetid, which is either a string for tooltips or false for msg and err, and the second parameter is the appMessContent.
       handleAppMessages: function ( evt ) {
-        
-        console.log('handleAppMessages running');
         // console.log('appController public handleAppMessages running');
         let appMessCode, appMessType, appMessContent, duration, appMessContainerId, tooltipTarget, timer;
         // !VA Duplicate evt into appMessCode - we could just receive the event as appMessCode but it's more transparent to do it explicitly
@@ -3369,7 +3425,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc});borde
           timer = setTimeout(() => {
             // !VA Read the appMessContent into the tooltip content element
             // !VA Call displayAppMessages with the isTrue parameter = false to undisplay the message after the timeout. 
-            console.log('appMessContainerId is: ' + appMessContainerId);
             UIController.displayAppMessages(false, appMessContainerId, false );
           }, duration);
         }

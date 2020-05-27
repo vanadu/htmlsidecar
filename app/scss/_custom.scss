@@ -1046,7 +1046,11 @@ fieldset {
   z-index: 111;
 }
 
-
+// VA! Hide the real checkbox input element so that it doesn't obscure the imgtype radio buttons below.
+#chk-ccp-img-include-anchor-checkbox {
+  display: none !important;
+  border: 1px solid magenta;
+}
 
 
 // VA! TD Radio buttons
