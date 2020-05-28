@@ -442,15 +442,19 @@ var Witty = (function () {
     }
 
     // !VA UIController private
-    function updateCcp() {
+    function updateCcp(filteredAttributes) {
       console.log('updateCcp running');
       // !VA Get Appdata
       var Appdata = appController.initGetAppdata();
+      console.log('filteredAttributes:');
+      console.dir(filteredAttributes);
 
       // !VA Init elements that are initialized when the CCP is updated
       let ccpCheckmarks, wrapperItemsToHide, selectedTdOption;
       // !VA Initialize all the dynamically modified CCP elements
       // !VA IMPORTANT: This is where the Include wrapper checkbox is failing when the CCP is initially opened.
+      // !VA Branch: reconfigureGetAttributes (052820)
+      // !VA Changing this from testing for the active class
       if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
         // !VA We have to initialize CCP DOM elements here because they don't exist until the CCP is displayed.
 
@@ -467,6 +471,8 @@ var Witty = (function () {
           document.querySelector(wrapperItemsToHide[i]).style.display = 'none'; 
         }
         // !VA Find out which tdoption is selected and send a click to that option to run displayTdTypeOptions and display the appropriate attributes for that option
+        // !VA Branch: reconfigureGetAttributes (052820)
+        // !VA This is no good. Mickey mouse shit, sending a click programattically...and it doesn't work when the ccp is first initialized in devmode....no idea why... wtf
         selectedTdOption = document.querySelector('input[name="tdoptions"]:checked');
         selectedTdOption.click();
         // !VA Handle what to do if the current image width equals the viewer width. In that case, the class should be 'devicewidth' and the table width field should be disabled, because a table width can't be less than the image it contains. If Appdata.imgW === Appdata.viewerW, then disable the field because a table width can't be less than the image it contains. In this case, tableClass should default to 'devicewidth'. If Appdata.imgW < viewerW, then show tableWidth = imgWidth and leave the class field blank so the user can enter a class if desired.
@@ -498,8 +504,14 @@ var Witty = (function () {
     return {
 
       // !VA Pass-thru to get to updateCcp - used in initUI, resizeContainers
-      initUpdateCcp: function () {
-        updateCcp();
+      initUpdateCcp: function (Attributes) {
+        // console.log('initCcp Attributes:');
+        // console.dir(Attributes);
+        // !VA Branch: reconfigureGetAttributes (052820)
+        // !VA Note that there's no argument being passed here although filteredAttributes is expected. This is a problem because when Ccp is initialized with the clibboard Button there's not filteredAttributes and hence no way to populate the Ccp elements...should have seen that coming...fuck! So what I need to do is run getAttributes and return the filteredAttributes
+        // UIController.filterCcpAttributes(Attributes);
+
+
       },
 
       // !VA UIController public
@@ -843,7 +855,8 @@ var Witty = (function () {
 
     // !VA ATTRIBUTE FUNCTIONS
     // !VA CBController private
-    // !VA Branch: reconfig (052720)
+    // !VA Branch: writeAttributesToCcp (052820)
+    // !VA Update this comment: displayAttributes is deprecated
     // !VA Each attribute is either get-only or settable. If it is get-only, then the user-defined value is accessed directly from the DOM element. If it is a preset, then the value is defined programmatically based on a condition. For instance, the class name 'img-fluid' is a preset that becomes active when the user selects the Fluid image option. In this case, the CCP element ID corresponding to the attribute is written to the ccpElementId variable for output to the CCP via the displayAttribute function.  The displayAttribute must take both the attribute value AND the id of th element that receives the value. So, for all of the attributes that require a write to the CCP UI, use the ccpElementId variable for the CCP element id. If the ccpElementId variable is falsy, then no DOM access is required, so the attribute and its CCP element are not added to the array passed to displayElement.
     // !VA NOTE: Could probably make all the retObject arguments ccpElementId, str and consolidate this function somehow -- think about it.
     function getAttributes() {
@@ -1083,11 +1096,10 @@ var Witty = (function () {
         })(),
         tableIncludeWrapper: (function() {
           // !VA This value is get-only.
-          ccpElementId = false;
-          let target, checked;
-          // !VA Branch: makeFluidOption (052620)
-          target = ccpUserInput.spnCcpTableIncludeWrapperCheckmrk;
-          checked = getCheckboxSelection(target);
+          // !VA Branch: reconfigureGetAttributes (052820)
+          // !VA Changing this to CCP-write to clean up updateCcp
+          ccpElementId = ccpUserInput.spnCcpTableIncludeWrapperCheckmrk;
+          checked = getCheckboxSelection(ccpElementId);
           retObj = returnObject( ccpElementId, checked );
           return retObj;
         })(),
@@ -2197,6 +2209,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CBController public functions 
     return {
 
+      // !VA I wish I didn't have to do this but...
+      initGetAttributes: function () {
+        console.log('initGetAttributes running');
+        let Attributes = [];
+        Attributes = getAttributes();
+        console.log(Attributes);
+        return Attributes;
+      },
+
+
       // !VA Called from eventHandler to initialize clipboard functionality
       doClipboard: function(evt) {
         console.log('doClipboard running');
@@ -2491,6 +2513,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA convert the ID string to the object inside the loop
         inspectorHoverables[i] = document.querySelector(inspectorHoverables[i]);
         // console.log('inspectorHoverables[i].id is: ' + inspectorHoverables[i].id);
+        // !VA IMPORTANT: WTF is this?
         addEventHandler(inspectorHoverables[i],'mouseenter',CBController.enteredMe,false);
 
       }
@@ -2508,6 +2531,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       for (let i = 0; i < dvClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         dvClickables[i] = document.querySelector(dvClickables[i]);
+        console.log('HERE');
         addEventHandler((dvClickables[i]),'click',initCcp,false);
       }
 
@@ -3235,7 +3259,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';
 
       // !VA reinit the CCP
-      UIController.initUpdateCcp();
+      // !VA Branch: reconfigureGetAttributes (052820)
+      // !VA This doesn't appear to be necessary - wtf
+      // UIController.initUpdateCcp();
 
       // !VA Now that the image and its containers are written to the DOM, go ahead and write the Inspectors.
       UICtrl.writeInspectors();
@@ -3262,8 +3288,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA The app initializes with the CCP closed, so toggle it on and off here.
       document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
-      // !VA If the CCP is open:
-      UIController.initUpdateCcp();
+      // !VA Branch: reconfigureGetAttributes (052820)
+      // !VA Something fishy here...but it appears to work. Call getAttributes and run updateCcp when the clipboard button is clicked.
+      CBController.initGetAttributes();
+
 
     }
       
