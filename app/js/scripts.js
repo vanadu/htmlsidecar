@@ -401,18 +401,107 @@ var Witty = (function () {
       document.querySelector(appMessContainerId).classList.remove('active');
     }
 
+    // !VA Toggle checkboxes and run any associated actions
+    // !VA TODO: This function is misnamed, it only pertains to mock checkbox processing
+    // !VA UIController private
+    function handleCCPInput(event) {
+      // !VA Get the Appdata for the input default value
+      var data = appController.initGetAppdata();
+      var chkId, checkbox;
+      // !VA Toggle CCP checkboxes and run associated operations. The CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
+      // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
+      var wrapperItemsToShow = [];
+
+      // !VA With this mock checkmark structure, the clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it. 
+      // !VA Reboot: Also have to replace the 3-char element identifier.
+      chkId = event.target.id;
+      chkId = chkId.replace('mrk', 'box');
+      chkId = chkId.replace('spn', 'chk');
+      checkbox = document.getElementById(chkId);
+      checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
+
+      // !VA Now run any actions associated with the checkbox
+      // !VA TODO: This value needs to be refreshed when the CCP is opened. In fact, entering new values in any of the toolButton inputs has to call a refresh of Appdata and a closing-reopening of the CCP so the values can refresh.
+      
+      // !VA Defaults for wrapper width and class
+      document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value = `${data.viewerW}`;
+      document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
+      // !VA Show wrapper table options if the checked element is 'table-include-wrapper-checkbox'
+      if (checkbox.id === 'chk-ccp-table-include-wrapper-checkbox') {
+        wrapperItemsToShow = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
+        if (checkbox.checked) {
+          for (let i = 0; i < wrapperItemsToShow.length; i++) {
+            document.querySelector(wrapperItemsToShow[i]).style.display = 'block'; 
+          }
+        } else {
+          for (let i = 0; i < wrapperItemsToShow.length; i++) {
+            document.querySelector(wrapperItemsToShow[i]).style.display = 'none'; 
+          }
+        }
+      }
+    }
+
+    // !VA UIController private
+    function updateCcp() {
+      console.log('updateCcp running');
+      // !VA Get Appdata
+      var Appdata = appController.initGetAppdata();
+
+      // !VA Init elements that are initialized when the CCP is updated
+      let ccpCheckmarks, wrapperItemsToHide, selectedTdOption;
+      // !VA Initialize all the dynamically modified CCP elements
+      // !VA IMPORTANT: This is where the Include wrapper checkbox is failing when the CCP is initially opened.
+      if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
+        // !VA We have to initialize CCP DOM elements here because they don't exist until the CCP is displayed.
+
+        // !VA CCP Checkboxes - these are mock checkboxes with custom styling, so the ID names have to be converted to checkbox names in order to select or deselect them. We attach the event handler to the checkmark, not the checkbox. The checkmark is converted to checkbox for handling in toggleCheckbox.
+        // !VA Branch: makeFluidOption (052620)
+        // ccpCheckmarks = [ ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk, ccpUserInput.spnCcpImgIncludeAnchorCheckmrk, ccpUserInput.spnCcpTableIncludeWrapperCheckmrk ];
+        ccpCheckmarks = [ ccpUserInput.spnCcpImgIncludeAnchorCheckmrk, ccpUserInput.spnCcpTableIncludeWrapperCheckmrk ];
+        for (let i = 0; i < ccpCheckmarks.length; i++) {
+          document.querySelector(ccpCheckmarks[i]).addEventListener('click', handleCCPInput, false);
+        }
+        // !VA Initialize with all the 'Wrapper table' options undisplayed - uncomment this for DEV. NOTE: These are the IDs of the parent div's of the input elements, not the input elements themselves. They are only referenced here once, so there are no aliases for them. 
+        wrapperItemsToHide = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
+        for (let i = 0; i < wrapperItemsToHide.length; i++) {
+          document.querySelector(wrapperItemsToHide[i]).style.display = 'none'; 
+        }
+        // !VA Find out which tdoption is selected and send a click to that option to run displayTdTypeOptions and display the appropriate attributes for that option
+        selectedTdOption = document.querySelector('input[name="tdoptions"]:checked');
+        selectedTdOption.click();
+        // !VA Handle what to do if the current image width equals the viewer width. In that case, the class should be 'devicewidth' and the table width field should be disabled, because a table width can't be less than the image it contains. If Appdata.imgW === Appdata.viewerW, then disable the field because a table width can't be less than the image it contains. In this case, tableClass should default to 'devicewidth'. If Appdata.imgW < viewerW, then show tableWidth = imgWidth and leave the class field blank so the user can enter a class if desired.
+        // !VA NOTE: This should be extracted to a separate function, too much repetition. Plus, this belongs in getAttributes, I think, since it's writing values rather than just turning the display on/off.
+        // if ( Appdata.imgW ===  Appdata.viewerW ) {
+        //   document.querySelector(ccpUserInput.iptCcpTableWidth).value = Appdata.viewerW;
+        //   document.querySelector(ccpUserInput.iptCcpTableWidth).disabled = true;
+        //   document.querySelector(ccpUserInput.iptCcpTableWidth).classList.add('disabled');
+        //   document.querySelector(ccpUserInput.iptCcpTableClass).value = 'devicewidth';
+        // } else {
+        //   document.querySelector(ccpUserInput.iptCcpTableWidth).value = Appdata.imgW;
+        //   document.querySelector(ccpUserInput.iptCcpTableWidth).disabled = false;
+        //   document.querySelector(ccpUserInput.iptCcpTableWidth).classList.remove('disabled');
+        //   document.querySelector(ccpUserInput.iptCcpTableClass).value = '';
+        // }
+        // !VA Defaults for wrapper width and class
+        // document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value = Appdata.viewerW;
+        // document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
+
+      }
+
+
+
+    }
+
+
+
     // !VA UIController public functions
     return {
 
-      // !VA Branch: reconfig (052720)
-      // !VA This works. Issues:
-      /* !VA  
-      Clicking on the fixed/fluid radios don't update the CCP. We need to update the CCP but can't do it from CBController. 
-      Can't call this from the eventListener because that passes the event not the filteredAttributes. Try calling getAttributes from the eventListener
-      Actually what we need to do is JUST get the filtered attributes to update the CCP. 
-      
-      
-      */
+      // !VA Pass-thru to get to updateCcp - used in initUI, resizeContainers
+      initUpdateCcp: function () {
+        updateCcp();
+      },
+
       // !VA UIController public
       filterCcpAttributes: function (Attributes) {
         // console.log('filterCcpAttributes running');
@@ -427,7 +516,7 @@ var Witty = (function () {
             delete filteredAttributes[i];
           }
         }
-        // console.dir(filteredAttributes);
+        updateCcp(filteredAttributes);
 
         
       },
@@ -526,6 +615,11 @@ var Witty = (function () {
         // console.log('initMode is: ' + initMode);
         // !VA Here we initialze DEV mode, i.e. reading a hardcoded image from the HTML file instead of loading one manually in production mode
         if (initMode === 'devmode') {
+
+          // !VA The app initializes with the CCP closed, so toggle it on and off here.
+          // document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
+
+
           // !VA Set a timeout to give the image time to load
           setTimeout(function() {
             // !VA Show the toolbar and curImg region
@@ -541,9 +635,9 @@ var Witty = (function () {
             appController.initCalcViewerSize();
             // !VA Open the CCP by default in dev mode
             // !VA First, set it to the opposite of how you want to start it.
-            document.querySelector(staticRegions.ccpContainer).classList.remove('active');
-            // !VA Then run initCCP to initialize - initInitCCP is the public appController function included just to access appcontroller private initCCP from the UIController module
-            appController.initInitCCP();
+            document.querySelector(staticRegions.ccpContainer).classList.add('active');
+            // !VA Then run updateCCP to initialize - initUpdateCcp is the public UIController function included just to access UiController private updateCccp from the appController module
+            UIController.initUpdateCcp();
           }, delayInMilliseconds);
         }
         // !VA The rest of the routine applies to DEV and PROD modes
@@ -1171,8 +1265,8 @@ var Witty = (function () {
     
     function getUserSelections( id ) {
       // !VA Initialize the clipboard-building process by getting those user selections in the CCP that determine the structure of the clipboard output and put those selections into the uSels object. The elements that determine the nodeList structure and thus the Clipboard output are: the makeTag buttons and the imgType radio buttons. The imgType (fluid or fixed) determines which td option is selected and has to be processed independently of the other uSels. The fluid imgType is a preset that always has to have the tdopton 'basic'. So first, preselect the tdoption 'basic' if the imgType is fluid, then proceed.
-      console.log('getUserSelections running');
-      console.log('id is: ' + id);
+      // console.log('getUserSelections running');
+      // console.log('id is: ' + id);
       let imgType, selectedTdOption;
       let uSels = {};
       // !VA Get the selected imgType regardless of which button was clicked to trigger this function. 
@@ -1204,9 +1298,9 @@ var Witty = (function () {
     // !VA CBController private
     // !VA Branch: reconfigureMessages (051620) id added to parameters
     function buildOutputNodeList( id, uSels ) {
-      console.log('buildOutputNodeList running:');
-      console.log('uSels:');
-      console.dir(uSels);
+      // console.log('buildOutputNodeList running:');
+      // console.log('uSels:');
+      // console.dir(uSels);
       // !VA Branch: reconfigureGetAttributes (052820)
       // !VA This will be the only place getAttributes is called. Everywhere else it is passed as an argument to the called function.
       let Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
@@ -2414,7 +2508,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       for (let i = 0; i < dvClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         dvClickables[i] = document.querySelector(dvClickables[i]);
-        addEventHandler((dvClickables[i]),'click',initCCP,false);
+        addEventHandler((dvClickables[i]),'click',initCcp,false);
       }
 
       // !VA We need eventListeners for ALL the clipboard buttons so make an eventListener for each value in the btnCcpMakeClips object. We need a for in loop for objects
@@ -2452,7 +2546,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA Misc Unused Handlers for review
       // =============================
-      // !VA This was moved to initCCP I think
+      // !VA This was moved to initCcp I think
       // addEventHandler(inspectorElements.btnToggleCcp,'click',toggleCCP,false);
 
       // Keypress handlers - showMobileImageButtons
@@ -3141,7 +3235,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';
 
       // !VA reinit the CCP
-      updateCCP();
+      UIController.initUpdateCcp();
 
       // !VA Now that the image and its containers are written to the DOM, go ahead and write the Inspectors.
       UICtrl.writeInspectors();
@@ -3151,114 +3245,30 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA That concept is bad because it requires constant DOM access 05.11.20
 
     // !VA Update the CCP. This is called when the CCP is opened with the CCP button and/or when a user input is made on the toolbar that results in a call to resizeContainers.
-    // !VA IMPORTANT: This is the wrong way to handle this, but I can't deal with it right now. First, dynamically displayed elements should not be initialized here, but in initCCP. Second, this causes the Include wrapper checkbox to be ignored sometimes when you open the CCP. It's a bug. Put it in the list.
+    // !VA IMPORTANT: This is the wrong way to handle this, but I can't deal with it right now. First, dynamically displayed elements should not be initialized here, but in initCcp. Second, this causes the Include wrapper checkbox to be ignored sometimes when you open the CCP. It's a bug. Put it in the list.
 
     // !VA Branch: reconfig (052720)
-    // !VA updateCCP should be in UIController and should be called from displayAttributes. displayAttributes should collect all the CCP elements and their attribute values, and pass the whole schmear as an array to updateCCP. So we don't want to do the DOM access in displayAttributes. 
+    // !VA updateCcp should be in UIController and should be called from displayAttributes. displayAttributes should collect all the CCP elements and their attribute values, and pass the whole schmear as an array to updateCcp. So we don't want to do the DOM access in displayAttributes. 
     // !VA getAttributes already has most of the element ids in the respective attribute functions.
 
 
     // !VA appController private
-    function updateCCP() {
-      // !VA Get Appdata
-      var Appdata = appController.initGetAppdata();
-      // !VA Init elements that are initialized when the CCP is updated
-      let ccpCheckmarks, wrapperItemsToHide, selectedTdOption;
-      // !VA Initialize all the dynamically modified CCP elements
-      // !VA IMPORTANT: This is where the Include wrapper checkbox is failing when the CCP is initially opened.
-      if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
-        // !VA We have to initialize CCP DOM elements here because they don't exist until the CCP is displayed.
-
-        // !VA CCP Checkboxes - these are mock checkboxes with custom styling, so the ID names have to be converted to checkbox names in order to select or deselect them. We attach the event handler to the checkmark, not the checkbox. The checkmark is converted to checkbox for handling in toggleCheckbox.
-        // !VA Branch: makeFluidOption (052620)
-        // ccpCheckmarks = [ ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk, ccpUserInput.spnCcpImgIncludeAnchorCheckmrk, ccpUserInput.spnCcpTableIncludeWrapperCheckmrk ];
-        ccpCheckmarks = [ ccpUserInput.spnCcpImgIncludeAnchorCheckmrk, ccpUserInput.spnCcpTableIncludeWrapperCheckmrk ];
-        for (let i = 0; i < ccpCheckmarks.length; i++) {
-          document.querySelector(ccpCheckmarks[i]).addEventListener('click', handleCCPInput, false);
-        }
-        // !VA Initialize with all the 'Wrapper table' options undisplayed - uncomment this for DEV. NOTE: These are the IDs of the parent div's of the input elements, not the input elements themselves. They are only referenced here once, so there are no aliases for them. 
-        wrapperItemsToHide = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
-        for (let i = 0; i < wrapperItemsToHide.length; i++) {
-          document.querySelector(wrapperItemsToHide[i]).style.display = 'none'; 
-        }
-        // !VA Find out which tdoption is selected and send a click to that option to run displayTdTypeOptions and display the appropriate attributes for that option
-        selectedTdOption = document.querySelector('input[name="tdoptions"]:checked');
-        selectedTdOption.click();
-        // !VA Handle what to do if the current image width equals the viewer width. In that case, the class should be 'devicewidth' and the table width field should be disabled, because a table width can't be less than the image it contains. If Appdata.imgW === Appdata.viewerW, then disable the field because a table width can't be less than the image it contains. In this case, tableClass should default to 'devicewidth'. If Appdata.imgW < viewerW, then show tableWidth = imgWidth and leave the class field blank so the user can enter a class if desired.
-        // !VA NOTE: This should be extracted to a separate function, too much repetition. Plus, this belongs in getAttributes, I think, since it's writing values rather than just turning the display on/off.
-        // if ( Appdata.imgW ===  Appdata.viewerW ) {
-        //   document.querySelector(ccpUserInput.iptCcpTableWidth).value = Appdata.viewerW;
-        //   document.querySelector(ccpUserInput.iptCcpTableWidth).disabled = true;
-        //   document.querySelector(ccpUserInput.iptCcpTableWidth).classList.add('disabled');
-        //   document.querySelector(ccpUserInput.iptCcpTableClass).value = 'devicewidth';
-        // } else {
-        //   document.querySelector(ccpUserInput.iptCcpTableWidth).value = Appdata.imgW;
-        //   document.querySelector(ccpUserInput.iptCcpTableWidth).disabled = false;
-        //   document.querySelector(ccpUserInput.iptCcpTableWidth).classList.remove('disabled');
-        //   document.querySelector(ccpUserInput.iptCcpTableClass).value = '';
-        // }
-        // !VA Defaults for wrapper width and class
-        // document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value = Appdata.viewerW;
-        // document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
-
-      }
-
-
-
-    }
 
 
     // !VA CCP FUNCTIONS
     // !VA appController private 
-    function initCCP() {
+    function initCcp() {
       // !VA Get Appdata
 
       // !VA The app initializes with the CCP closed, so toggle it on and off here.
       document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
       // !VA If the CCP is open:
-      updateCCP();
+      UIController.initUpdateCcp();
 
     }
       
     // !VA  appController private
-    // !VA Toggle checkboxes and run any associated actions
-    // !VA TODO: This function is misnamed, it only pertains to mock checkbox processing
-    function handleCCPInput(event) {
-      // !VA Get the Appdata for the input default value
-      var data = appController.initGetAppdata();
-      var chkId, checkbox;
-      // !VA Toggle CCP checkboxes and run associated operations. The CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
-      // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
-      var wrapperItemsToShow = [];
 
-      // !VA With this mock checkmark structure, the clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it. 
-      // !VA Reboot: Also have to replace the 3-char element identifier.
-      chkId = event.target.id;
-      chkId = chkId.replace('mrk', 'box');
-      chkId = chkId.replace('spn', 'chk');
-      checkbox = document.getElementById(chkId);
-      checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
-
-      // !VA Now run any actions associated with the checkbox
-      // !VA TODO: This value needs to be refreshed when the CCP is opened. In fact, entering new values in any of the toolButton inputs has to call a refresh of Appdata and a closing-reopening of the CCP so the values can refresh.
-      
-      // !VA Defaults for wrapper width and class
-      document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value = `${data.viewerW}`;
-      document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
-      // !VA Show wrapper table options if the checked element is 'table-include-wrapper-checkbox'
-      if (checkbox.id === 'chk-ccp-table-include-wrapper-checkbox') {
-        wrapperItemsToShow = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
-        if (checkbox.checked) {
-          for (let i = 0; i < wrapperItemsToShow.length; i++) {
-            document.querySelector(wrapperItemsToShow[i]).style.display = 'block'; 
-          }
-        } else {
-          for (let i = 0; i < wrapperItemsToShow.length; i++) {
-            document.querySelector(wrapperItemsToShow[i]).style.display = 'none'; 
-          }
-        }
-      }
-    }
 
 
     // !VA Show element when input in another element is made 
@@ -3537,15 +3547,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA appController public functions
     return {
-      // !VA Dev Mode pass-thru public functions to expose calcViewerSize and initCCP to UIController.initUI
+      // !VA Dev Mode pass-thru public functions to expose calcViewerSize and initCcp to UIController.initUI
       // !VA appController public
       initCalcViewerSize: function() {
         calcViewerSize();
-      },
-      // !VA appController public
-      // !VA NOTE: I'm not sure why this is public here - when would initCCP have to cross modules?
-      initInitCCP: function() {
-        initCCP();
       },
 
       // !VA appController public
