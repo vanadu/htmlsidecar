@@ -1205,10 +1205,13 @@ var Witty = (function () {
     // !VA CBController private
     // !VA Branch: reconfigureMessages (051620) id added to parameters
     function buildOutputNodeList( id, uSels ) {
-      let tableNodeFragment, nl, frag, outputNL, clipboardStr;
+      // !VA Branch: reconfigureGetAttributes (052820)
+      // !VA This will be the only place getAttributes is called. Everywhere else it is passed as an argument to the called function.
+      let Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
+      Attributes = getAttributes();
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
       // !VA Branch: reconfigureMessages (051620) id added to arguments
-      tableNodeFragment = makeTableNode( id, uSels );
+      tableNodeFragment = makeTableNode( id, uSels, Attributes );
       // !VA Create the full nodeList from the tableNodeFragment. If tableNodeFragment is null, return to abort without creating Clipboard object.
       try {
         nl = tableNodeFragment.querySelectorAll('*');
@@ -1316,11 +1319,11 @@ var Witty = (function () {
         
         // !VA Get the codeBlock corresponding to the selected TD option
         if ( uSels.selectedRadio === 'imgswap') {
-          codeBlock = getImgSwapBlock( id, indentLevel);
+          codeBlock = getImgSwapBlock( id, indentLevel, Attributes);
         } else if (  uSels.selectedRadio === 'bgimage' ) {
-          codeBlock = getBgimageBlock(id, indentLevel);
+          codeBlock = getBgimageBlock(id, indentLevel, Attributes);
         } else if (uSels.selectedRadio === 'vmlbutton') {
-          codeBlock = getVmlButtonBlock(id, indentLevel);
+          codeBlock = getVmlButtonBlock(id, indentLevel, Attributes);
         }
         // !VA Replace the tokens in clipboardStr that were added in applyIndents with the respective codeBlock
         clipboardStr = clipboardStr.replace('/replacestart//replaceend/', codeBlock + '\n');
@@ -1341,7 +1344,7 @@ var Witty = (function () {
 
     // !VA Make the nodes for the 'posswitch option' using the DIR attribute
     // !VA CBController private
-    function makePosSwitchNodes( id ) {
+    function makePosSwitchNodes( id, Attributes ) {
       // !VA Declare the arrays for new element names and new element types
       let containerIds = [], containerElements = [], sibling1Ids = [], sibling1Elements = [], sibling2Ids = [], sibling2Elements = [], containerNodes = [], sibling1Nodes = [], sibling2Nodes = [];
       // !VA Declare loop iterators
@@ -1404,7 +1407,7 @@ var Witty = (function () {
       // !VA Set the container to return to the top node of the tree
       let container = (containerNodes[0]);
       // !VA Call the function that sets the attributes for the nodes
-      container = setPosSwitchNodeAttributes(container);
+      container = setPosSwitchNodeAttributes(container, Attributes);
       // !VA Copy the container to tdInner. This is for nomenclature, because all the other makeNode functions return the container under the name tdInner
       var tdInner = container.children[0]; 
       // !VA Return the container to makeTdNodes
@@ -1412,10 +1415,11 @@ var Witty = (function () {
     }
 
     // !VA Set the attributes for the nodes in the 'posswitch' option using the DIR attribute
-    function setPosSwitchNodeAttributes(container) {
+    function setPosSwitchNodeAttributes(container, Attributes) {
       // !VA Get the Td attributes, we need them for height and width
       var nodeList, index;
-      let Attributes = getAttributes();
+      // !VA Branch: reconfigureGetAttributes (052820)
+      // let Attributes = getAttributes();
       let nodeAttributes = [];
 
       // !VA Initialize the objects that contain the attributes for the individual nodes
@@ -1525,12 +1529,13 @@ var Witty = (function () {
     // !VA Make the img node, including anchor if it is checked
     // !VA IMPORTANT: Attributes should be passed, not called.
     // !VA CBController private
-    function makeImgNode ( id ) {
+    // !VA Branch: reconfigureGetAttributes (052820)
+    function makeImgNode ( id, Attributes ) {
       // console.log('makeImgNode');
       // console.log('id is: ' + id);
       // !VA Id is passed but not used here,  because we're only building the node.
-      let Attributes;
-      Attributes = getAttributes();
+      // let Attributes;
+      // Attributes = getAttributes();
       let imgNode, returnNodeFragment;
       // !VA Create the image node
       imgNode = document.createElement('img');
@@ -1575,14 +1580,16 @@ var Witty = (function () {
 
     // !VA Make the TD node
     // !VA CBController private
-    function makeTdNode( id, uSels ) {
+    // !VA Branch: reconfigureGetAttributes (052820)
+    function makeTdNode( id, uSels, Attributes ) {
       // !VA Variables for error handling - need to include this in the return value so the Clipboard object can differentiate between alert and success messages. 
       let isErr;
       // !VA NOTE: No trapped errors here yet that would pass a code, but that will probably come.
       let errCode;
       // !VA Get the node attributes
-      let Attributes;
-      Attributes = getAttributes();
+      // !VA Branch: reconfigureGetAttributes (052820)
+      // let Attributes;
+      // Attributes = getAttributes();
       let tdInner, imgNode;
       // !VA Create the TD node for the parent TD
       tdInner = document.createElement('td');
@@ -1605,7 +1612,8 @@ var Witty = (function () {
         if (Attributes.tdWidth.str) { tdInner.width = Attributes.imgHeight.str; }
         // !VA If 'basic' is checked, create imgNode and append it, otherwise exclude the imgNode.
         if (uSels.selectedRadio === 'basic') {
-          imgNode = makeImgNode( id );
+          // !VA Branch: reconfigureGetAttributes (052820)
+          imgNode = makeImgNode( id, Attributes );
           // !VA We need to include the imgNode here ONLY if Bgimage is unchecked
           tdInner.appendChild(imgNode);
         }
@@ -1632,7 +1640,7 @@ var Witty = (function () {
         break;
       // case (selectedRadio === 'posswitch'):
       case (uSels.selectedRadio === 'posswitch'):
-        tdInner  = makePosSwitchNodes( id );
+        tdInner  = makePosSwitchNodes( id, Attributes );
         break;
       // case (selectedRadio === 'vmlbutton'):
       case (uSels.selectedRadio === 'vmlbutton'):
@@ -1673,11 +1681,12 @@ var Witty = (function () {
 
     // !VA Make the table node, including parent and wrapper table if selected
     // !VA CBController private
-    function makeTableNode( id, uSels ) {
-      let Attributes;
-      Attributes = getAttributes();
-      // !VA This isn't defined because there's not identified error condition as yet. See the return statement of makeTdNode for handling method.
-      let isErr;
+
+    function makeTableNode( id, uSels, Attributes ) {
+      
+      // let Attributes;
+      // Attributes = getAttributes();
+      // console.log('makeTableNode getAttributes');
       // !VA Variables for parent and wrapper table, parent and wrapper tr, and wrapper td. Parent td is called from makeTdNode and is appended to tdNodeFragment. tableNodeFragment is the node that contains the entire nodelist which is returned to buildOutputNodeList
       let tableOuter, trOuter, tdOuter, tableInner, trInner, tdNodeFragment, tableNodeFragment;
       tableNodeFragment = document.createDocumentFragment();
@@ -1705,7 +1714,8 @@ var Witty = (function () {
       // !VA Build the inner tr
       tableInner.appendChild(trInner);
       // !VA Get the inner TD from makeTdNode and append it to the nodeFragment
-      tdNodeFragment = makeTdNode( id, uSels );
+      // !VA Branch: reconfigureGetAttributes (052820)
+      tdNodeFragment = makeTdNode( id, uSels, Attributes );
       // !VA If tdNodeFragment is null, then there was an error in makeTdNode, so console the error and return null to buildOutputNodeList to abort.
       try {
         trInner.appendChild(tdNodeFragment);
@@ -1751,9 +1761,10 @@ var Witty = (function () {
     // !VA START TD OPTIONS MS-CONDITIONAL CODE BLOCKS
     // !VA These are the code blocks that contain MS conditionals in comment nodes or text nodes, i.e. mobile swap, background image, and vmlbutton
     // !VA UIController private
-    function getImgSwapBlock( id, indentLevel ) {
-      let Appdata, Attributes, linebreak;
-      Attributes = getAttributes();
+    function getImgSwapBlock( id, indentLevel, Attributes ) {
+      // !VA Branch: reconfigureGetAttributes (052820)
+      let Appdata, linebreak;
+      // Attributes = getAttributes();
       Appdata = appController.initGetAppdata();
       linebreak = '\n';
       let mobileFilename, mobileSwapStr;
@@ -1770,10 +1781,11 @@ var Witty = (function () {
     }
 
     // !VA UIController private
-    function getBgimageBlock( id, indentLevel) {
+    function getBgimageBlock( id, indentLevel, Attributes ) {
       console.log('getBgiamgeBlock running');
-      let Attributes;
-      Attributes = getAttributes();
+      // !VA Branch: reconfigureGetAttributes (052820)
+      // let Attributes;
+      // Attributes = getAttributes();
       let bgimageStr, fallback, bgcolor;
       let linebreak;
       linebreak = '\n';
@@ -1789,9 +1801,10 @@ var Witty = (function () {
     }
 
     // !VA CBController private
-    function getVmlButtonBlock ( id, indentLevel) {
-      let Attributes;
-      Attributes = getAttributes();
+    function getVmlButtonBlock ( id, indentLevel, Attributes) {
+      // !VA Branch: reconfigureGetAttributes (052820)
+      // let Attributes;
+      // Attributes = getAttributes();
       // console.dir(Attributes);
       let vmlButtonStr, linebreak, tdHeight, tdWidth;
       linebreak = '\n';
