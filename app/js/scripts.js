@@ -415,9 +415,9 @@ var Witty = (function () {
       */
       // !VA UIController public
       filterCcpAttributes: function (Attributes) {
-        console.log('filterCcpAttributes running');
-        console.log('Attributes:');
-        console.dir(Attributes);
+        // console.log('filterCcpAttributes running');
+        // console.log('Attributes:');
+        // console.dir(Attributes);
         let filteredAttributes = [];
 
         // !VA NOTE: This can probably be done with an ES6 method, come back to it.
@@ -427,7 +427,7 @@ var Witty = (function () {
             delete filteredAttributes[i];
           }
         }
-        console.dir(filteredAttributes);
+        // console.dir(filteredAttributes);
 
         
       },
@@ -754,7 +754,7 @@ var Witty = (function () {
     function getAttributes() {
       console.log('getAttributes running');
       var Appdata = appController.initGetAppdata();
-      let checked, str, options, selectid, ccpElementId, isFixed, Attributes, retObj;
+      let checked, str, options, selectid, ccpElementId, imgType, Attributes, retObj;
       // console.log('Appdata:');
       // console.dir(Appdata);
       // !VA Find out whether the Fixed Image radio button is selected. If it's not, then Fluid image is selected
@@ -768,12 +768,24 @@ var Witty = (function () {
       }
       Attributes = {
         // !VA IMG attributes
+        imgType: (function() {
+          // !VA Branch: reconfigureGetAttributes (052820)
+          // !VA For fixed images, if there's a class name entered into the class input, return the input value, or if the class input is empty, don't include the class attribute. For fluid images, return the class name 'img-fluid'.
+          // !VA This value is written to CCP so use ccpElementId
+          // !VA This element is get-only
+          ccpElementId = false;
+          getRadioState(ccpUserInput.rdoCcpImgFixed) ? str = 'fixed' : str = 'fluid';
+          imgType = str;
+          retObj = returnObject(ccpElementId, str);
+          return retObj;
+        })(),
         imgClass: (function() {
           // !VA Branch: makeFluidOption (052620)
           // !VA For fixed images, if there's a class name entered into the class input, return the input value, or if the class input is empty, don't include the class attribute. For fluid images, return the class name 'img-fluid'.
           // !VA This value is written to CCP so use ccpElementId
+          console.log('imgType is: ' + imgType);
           ccpElementId = ccpUserInput.iptCcpImgClass;
-          isFixed ? str = ccpGetAttValue('class',document.querySelector(ccpElementId).value) : str = 'img-fluid';
+          imgType === 'fixed' ? str = ccpGetAttValue('class',document.querySelector(ccpElementId).value) : str = 'img-fluid';
           retObj = returnObject(ccpElementId, str);
           return retObj;
         })(),
@@ -802,8 +814,8 @@ var Witty = (function () {
             str =  document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + document.querySelector(inspectorElements.insFilename).textContent;
           }
           retObj = returnObject( ccpElementId, str);
-          console.log('retObj is:');
-          console.log(retObj);
+          // console.log('retObj is:');
+          // console.log(retObj);
           
           return retObj;
         })(),
@@ -812,7 +824,7 @@ var Witty = (function () {
           // !VA Get the selected state of the fixed imgType radio. If it is not selected, then the fluid option is selected. If fixed, include the width and height in the style attribute. If fluid, don't include them
           // !VA This value is never displayed in CCP, only written to Clipboard object, so it's  get-only.
           ccpElementId = false;
-          isFixed ? str = `display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;` : str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;';
+          imgType === 'fixed' ? str = `display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;` : str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;';
           retObj = returnObject(ccpElementId , str);
           return retObj;
         })(),
@@ -941,8 +953,8 @@ var Witty = (function () {
           // !VA Branch: reconfig (052720)
           // !VA This value depends on the status of the Fixed/Fluid image radio button, so use ccpElementId
           ccpElementId = ccpUserInput.iptCcpTableClass;
-          if (isFixed) {
-            // !VA If imgType is fixed, then set tableClass to 'devicewidth' if the imgW equals the viewerW. Otherrwise, set it to the user input.
+          if (imgType === 'fixed') {
+            // !VA If imgType is fixed, then set tableClass to 'devicewidth' if the imgW equals the viewerW. Otherwise, set it to the user input.
             document.querySelector(ccpElementId).value === Appdata.viewerW ? str = 'devicewidth' : 
               str = ccpIfNoUserInput('class',document.querySelector(ccpElementId).value);
           } else {
@@ -955,7 +967,7 @@ var Witty = (function () {
         tableWidth: (function() {
           // !VA The value is written to the table width field - use ccpElementId
           ccpElementId = ccpUserInput.iptCcpTableWidth;
-          isFixed ? str = document.querySelector(ccpElementId).value : str = '100%';
+          imgType === 'fixed' ? str = document.querySelector(ccpElementId).value : str = '100%';
           // console.log('tableWidth str is: ' + str);
           retObj = returnObject( ccpElementId, str );
           return retObj;
@@ -991,7 +1003,7 @@ var Witty = (function () {
           // !VA This value is get-only - writes to style attribute of clipboard output but not CCP
           // !VA If imgType is fixed, set the default class to 'devicewidth'. If it's fluid, set it to 'responsive-table' as per the Litmus newsletter template.
           ccpElementId = false;
-          isFixed ? str = 'devicewidth' : str = 'responsive-table';
+          imgType === 'fixed' ? str = 'devicewidth' : str = 'responsive-table';
           // return ccpIfNoUserInput('class',document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value);
           retObj = returnObject( ccpElementId, str );
           return retObj;
@@ -1011,7 +1023,7 @@ var Witty = (function () {
           // !VA This value depends on the selection under Fixed image. 
           ccpElementId = ccpUserInput.iptCcpTableWrapperWidth;
           // !VA If the imgTyp is fixed, set the wrappe width to the value of the input field, which for the most part will be viewerW. If it's fluid, set it to 100%
-          isFixed ? str = document.querySelector(ccpElementId).value : str = '100%';
+          imgType === 'fixed' ? str = document.querySelector(ccpElementId).value : str = '100%';
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
@@ -1026,7 +1038,7 @@ var Witty = (function () {
           // !VA This value is get-only
           ccpElementId = false;
           // !VA Only include a style attribute for the wrapper for fluid images.  The conditional for this is in makeTableNode and there's no case where a style attribute is included for fixed images, so just provide the style attribute string to return
-          isFixed ? str = '' : str = `max-width: ${Appdata.imgW}`;
+          imgType === 'fixed' ? str = '' : str = `max-width: ${Appdata.imgW}`;
           // console.log('tableWrapperStyle str is: ' + str);
           retObj = returnObject( ccpElementId, str );
           return retObj;
@@ -1159,20 +1171,27 @@ var Witty = (function () {
     // !VA CBController private
     
     function getUserSelections( id ) {
-      // !VA Initialize the clipboard-building process by getting those user selections in the CCP that determine the structure of the clipboard output and put those selections into the uSels object.
+      // !VA Initialize the clipboard-building process by getting those user selections in the CCP that determine the structure of the clipboard output and put those selections into the uSels object. The elements that determine the nodeList structure and thus the Clipboard output are: the makeTag buttons and the imgType radio buttons. The imgType (fluid or fixed) determines which td option is selected and has to be processed independently of the other uSels. The fluid imgType is a preset that always has to have the tdopton 'basic'. So first, preselect the tdoption 'basic' if the imgType is fluid, then proceed.
+      console.log('getUserSelections running');
+      console.log('id is: ' + id);
+      let imgType, selectedTdOption;
       let uSels = {};
+      // !VA Get the selected imgType regardless of which button was clicked to trigger this function. 
+      getRadioState(ccpUserInput.rdoCcpImgFixed) ? imgType = 'fixed' : imgType = 'fluid';
+      console.log('imgType is: ' + imgType);
+      // !VA If imgType is fluid, set selectedTdOption to 'basic', otherwise set the selectedTd option to whichever option is selected. This logic is actually reflected in getAttributes. 
+      imgType === 'fluid' ? selectedTdOption = 'basic' : selectedTdOption = document.querySelector('input[name="tdoptions"]:checked').value;
+      // !VA Initialize uSels
       uSels = {
-        
         buttonClicked: '',
-        // !VA Branch: makeFluidOption (052620)
         hasAnchor: getCheckboxSelection(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk),
         hasWrapper: getCheckboxSelection(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk),
-        selectedRadio: document.querySelector('input[name="tdoptions"]:checked').value
+        selectedTdOption: selectedTdOption
       };
       if (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)) { 
         uSels.buttonClicked = 'imgbut';
-        // !VA Override the selectedRadio value for the IMG button - the IMG button will ALWAYS output img/anchor tags to the clipboard no matter which tdoptions radio button is selected.
-        uSels.selectedRadio = 'basic';
+        // !VA Override the selectedTdOption value for the IMG button - the IMG button will ALWAYS output img/anchor tags to the clipboard no matter which tdoptions radio button is selected.
+        uSels.selectedTdOption = 'basic';
       } else if (id === btnCcpMakeClips.btnCcpMakeTdTag.slice(1)) { 
         uSels.buttonClicked = 'tdbut';
       } else {
@@ -1186,6 +1205,9 @@ var Witty = (function () {
     // !VA CBController private
     // !VA Branch: reconfigureMessages (051620) id added to parameters
     function buildOutputNodeList( id, uSels ) {
+      console.log('buildOutputNodeList running:');
+      console.log('uSels:');
+      console.dir(uSels);
       // !VA Branch: reconfigureGetAttributes (052820)
       // !VA This will be the only place getAttributes is called. Everywhere else it is passed as an argument to the called function.
       let Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
@@ -1204,7 +1226,7 @@ var Witty = (function () {
       var container = document.createElement('div');
 
       // !VA Basic TD Options - This should be extracted to a separate function
-      if (uSels.selectedRadio === 'basic' || uSels.selectedRadio === 'excludeimg' || uSels.selectedRadio === 'posswitch') {
+      if (uSels.selectedTdOption === 'basic' || uSels.selectedTdOption === 'excludeimg' || uSels.selectedTdOption === 'posswitch') {
         // !VA Deterimine which makeNode button was clicked and extract a nodeList fragment with only those nodes that correspond to the clicked button. The index position of the extracted fragments is determined by the length of the tableNodeFragment nodeList minus an integer to compensate for the 0-based nodeList indices.
         let rtlNodePos, extractPos;
         // !VA For the posswitch option: Get the position of the RTL node, if it exists. 
@@ -1225,11 +1247,11 @@ var Witty = (function () {
         case (uSels.buttonClicked === 'tdbut'):
           console.log('tdbut');
           // !VA basic option is selected 
-          if ( uSels.selectedRadio === 'basic') { 
+          if ( uSels.selectedTdOption === 'basic') { 
             // !VA We can hardcode this for now, but that will be a problem if any other options with other nodes are added.
             uSels.hasAnchor ? extractPos = nl.length - 3 : extractPos = nl.length - 2;
             // frag = nl[extractPos];
-          } else if ( uSels.selectedRadio === 'excludeimg') {
+          } else if ( uSels.selectedTdOption === 'excludeimg') {
             extractPos = 5;
             // !VA posswitch option is selected
           } else {
@@ -1262,7 +1284,7 @@ var Witty = (function () {
         clipboardStr = outputNL[0].outerHTML;
 
       // !VA imgSwap and bgimage option - includes MS conditional code retrieved by getImgSwapBlock, getBgimageBlock, getVMLBlock which includes getIndent functions. First, run applyIndents on outputNL. applyIndents also inserts tokens at the position where the codeBlock is to be inserted. The parent nodelist is converted to a string, the code blocks are retrieved, indents are inserted, and finally the codeblocks are inserted into the string between the tags of the last node in the outputNL.outerHTML string. 
-      } else if (uSels.selectedRadio === 'imgswap' || uSels.selectedRadio  === 'bgimage' || uSels.selectedRadio === 'vmlbutton') {
+      } else if (uSels.selectedTdOption === 'imgswap' || uSels.selectedTdOption  === 'bgimage' || uSels.selectedTdOption === 'vmlbutton') {
         // !VA Start with the tdbut makeNode button because the img makeNode button isn't referenced in the imgswap option. The A/IMG tags are hard-coded into the MS Conditional code in getImgSwapBlock. Also, there's a switch to include/exclude the A/IMG node in makeTdNode.
         // !VA extractNodeIndex is the nl index position at which the nodes are extracted to build outputNL. It equals the nodeList length minus the indentLevel.
         let extractNodeIndex;
@@ -1299,11 +1321,11 @@ var Witty = (function () {
         clipboardStr = outputNL[0].outerHTML;
         
         // !VA Get the codeBlock corresponding to the selected TD option
-        if ( uSels.selectedRadio === 'imgswap') {
+        if ( uSels.selectedTdOption === 'imgswap') {
           codeBlock = getImgSwapBlock( id, indentLevel, Attributes);
-        } else if (  uSels.selectedRadio === 'bgimage' ) {
+        } else if (  uSels.selectedTdOption === 'bgimage' ) {
           codeBlock = getBgimageBlock(id, indentLevel, Attributes);
-        } else if (uSels.selectedRadio === 'vmlbutton') {
+        } else if (uSels.selectedTdOption === 'vmlbutton') {
           codeBlock = getVmlButtonBlock(id, indentLevel, Attributes);
         }
         // !VA Replace the tokens in clipboardStr that were added in applyIndents with the respective codeBlock
@@ -1582,8 +1604,8 @@ var Witty = (function () {
       if (Attributes.tdBgcolor.str) { tdInner.bgColor = Attributes.tdBgcolor.str; }
       // !VA Now add the attributes included only with the default Td configuration
       switch(true) {
-      // case (selectedRadio === 'basic'):
-      case (uSels.selectedRadio === 'basic' || uSels.selectedRadio === 'excludeimg'):
+      // case (selectedTdOption === 'basic'):
+      case (uSels.selectedTdOption === 'basic' || uSels.selectedTdOption === 'excludeimg'):
         // !VA class attribute
         if (Attributes.tdClass.str) { tdInner.className = Attributes.tdClass.str; }
         // !VA valign attribute
@@ -1592,21 +1614,21 @@ var Witty = (function () {
         if (Attributes.tdHeight.str) { tdInner.height = Attributes.imgWidth.str; }
         if (Attributes.tdWidth.str) { tdInner.width = Attributes.imgHeight.str; }
         // !VA If 'basic' is checked, create imgNode and append it, otherwise exclude the imgNode.
-        if (uSels.selectedRadio === 'basic') {
+        if (uSels.selectedTdOption === 'basic') {
           // !VA Branch: reconfigureGetAttributes (052820)
           imgNode = makeImgNode( id, Attributes );
           // !VA We need to include the imgNode here ONLY if Bgimage is unchecked
           tdInner.appendChild(imgNode);
         }
         break;
-      // case (selectedRadio === 'imgswap'):
-      case (uSels.selectedRadio === 'imgswap'):
+      // case (selectedTdOption === 'imgswap'):
+      case (uSels.selectedTdOption === 'imgswap'):
         if (Attributes.tdClass.str) { tdInner.className = Attributes.tdClass.str; }
         if (Attributes.tdValign.str) { tdInner.vAlign = Attributes.tdValign.str; }
         if (Attributes.tdAlign.str) { tdInner.align = Attributes.tdAlign.str; }
         break;
-      // case (selectedRadio === 'bgimage'):
-      case (uSels.selectedRadio === 'bgimage'):
+      // case (selectedTdOption === 'bgimage'):
+      case (uSels.selectedTdOption === 'bgimage'):
         console.log('makeTdNode bgimage');
         // !VA Create the parent node to which the bgimage code block will be appended after outputNL is converted to text in buildOutputNodeList.
         // !VA Include width, height and valign as per Stig's version
@@ -1619,12 +1641,12 @@ var Witty = (function () {
         // !VA Include fallback color from the default set in displayTdTypeOptions
         // Attributes.tdBgcolor ? tdInner.bgColor = Attributes.tdBgcolor : tdInner.bgColor = '#7bceeb';
         break;
-      // case (selectedRadio === 'posswitch'):
-      case (uSels.selectedRadio === 'posswitch'):
+      // case (selectedTdOption === 'posswitch'):
+      case (uSels.selectedTdOption === 'posswitch'):
         tdInner  = makePosSwitchNodes( id, Attributes );
         break;
-      // case (selectedRadio === 'vmlbutton'):
-      case (uSels.selectedRadio === 'vmlbutton'):
+      // case (selectedTdOption === 'vmlbutton'):
+      case (uSels.selectedTdOption === 'vmlbutton'):
         // !VA Height and width fields have to be entered, otherwise the button can't be built. Button width and height are set here in makeTdNode, the rest of the options are set in getVmlCodeBlock in buildOutputNodeList. The defaults of 40/200 as per Stig are set in UIController.displayTdTypeOptions. So if there's no value for td height and width, then the user has deleted the default and not replaced it with a valid entry. In this case, throw an ERROR and abort before it gets to the clipboard.
         if (!document.querySelector(ccpUserInput.iptCcpTdHeight).value || !document.querySelector(ccpUserInput.iptCcpTdWidth).value) {
           console.log('ERROR in makeTdNode vmlbutton: no value for either height or width');
@@ -1817,7 +1839,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       let stackColumnIndentLevel;
       // !VA Flag for whether to insert the tokens used to insert the MS conditional code blocks after converting the output node list to text.
       let hasMSConditional;
-      if ( uSels.selectedRadio === 'imgswap' || uSels.selectedRadio === 'bgimage' || uSels.selectedRadio === 'vmlbutton') {
+      if ( uSels.selectedTdOption === 'imgswap' || uSels.selectedTdOption === 'bgimage' || uSels.selectedTdOption === 'vmlbutton') {
         hasMSConditional = true;
       }
       for (let i = 0; i < outputNL.length; i++) {
@@ -2085,6 +2107,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Called from eventHandler to initialize clipboard functionality
       doClipboard: function(evt) {
         console.log('doClipboard running');
+        console.clear();
         let targetid, modifierKey;
         targetid = evt.target.id;
         // !VA Determined if shift or ctrl is pressed while clicked
@@ -2095,16 +2118,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         } else {
           modifierKey = false;
         }
-        // !VA If the CCP image fluid/fixed radio button is clicked, then
+        // !VA If the CCP image fluid/fixed radio button is clicked, then 
         if (targetid.includes('fixed') || targetid.includes('fluid')) {
           console.log('fixed/fluid');
           getAttributes();
         }
 
 
-        // !VA Determine which element is clicked -- makeTag button, makeCSSRule button or Inspector element and run getUserSelections, makeCSSRule or handleInspectorClicks respectively.
+        // !VA Determine which element is clicked -- imgType (fluid or fixed), makeTag button, makeCSSRule button or Inspector element and run getUserSelections, makeCSSRule or handleInspectorClicks respectively. If an imgType button is clicked, we need to rebuild the nodeList because changing to fluid from fixed might result in a change to the tdoptions, plus we  need to rebuilt the Attributes object because the attributes have changed, which requires a CCP update. Changing the selected td option if fluid is selected also has to be done in getUserSelections, because the fluid option will only work with tdbasic,  so let's call getUserSelections for 'tag', 'fluid' and 'fixed'.
         switch(true) {
-        case targetid.includes('tag') :
+        case targetid.includes('tag') || targetid.includes('fluid') || targetid.includes('fixed') :
           getUserSelections(targetid);
           break;
         case targetid.includes('css') :
@@ -2405,26 +2428,26 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         }
       }
 
-      // !VA eventListeners for the tdOptions radio buttons for showing/hiding options based on selectedRadio
+      // !VA eventListeners for the tdOptions radio buttons for showing/hiding options based on selectedTdOption
       for(let i in ccpUserInput) {
-        let selectedRadio;
+        let selectedTdOption;
         // !VA Target only those ccpUserInput elements whose first 4 characters are #rdo-ccp-td. This identifies them as the radio button options.
         if (ccpUserInput[i].substring(0, 11) === '#rdo-ccp-td') {
-          selectedRadio = document.querySelector(ccpUserInput[i]);
+          selectedTdOption = document.querySelector(ccpUserInput[i]);
           // !VA Add an event handler to trap clicks to the tdoptions radio button
-          addEventHandler(selectedRadio,'click',UIController.displayTdTypeOptions,false);
+          addEventHandler(selectedTdOption,'click',UIController.displayTdTypeOptions,false);
         }
       }
 
       
-      // !VA eventListeners for the imgType radio buttons for showing/hiding options based on selectedRadio
+      // !VA eventListeners for the imgType radio buttons for showing/hiding options based on selectedTdOption
       for(let i in ccpUserInput) {
-        let selectedRadio;
+        let selectedTdOption;
         // !VA Target only those ccpUserInput elements whose first 12 characters are #rdo-ccp-img. This identifies them as the fluid/fixed radio button options.
         if (ccpUserInput[i].substring(0, 12) === '#rdo-ccp-img') {
-          selectedRadio = document.querySelector(ccpUserInput[i]);
+          selectedTdOption = document.querySelector(ccpUserInput[i]);
           // !VA Add an event handler to trap clicks to the tdoptions radio button
-          addEventHandler(selectedRadio,'click',CBController.doClipboard,false);
+          addEventHandler(selectedTdOption,'click',CBController.doClipboard,false);
         }
       }
 
@@ -3141,7 +3164,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Get Appdata
       var Appdata = appController.initGetAppdata();
       // !VA Init elements that are initialized when the CCP is updated
-      let ccpCheckmarks, wrapperItemsToHide, selectedRadio;
+      let ccpCheckmarks, wrapperItemsToHide, selectedTdOption;
       // !VA Initialize all the dynamically modified CCP elements
       // !VA IMPORTANT: This is where the Include wrapper checkbox is failing when the CCP is initially opened.
       if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
@@ -3160,8 +3183,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           document.querySelector(wrapperItemsToHide[i]).style.display = 'none'; 
         }
         // !VA Find out which tdoption is selected and send a click to that option to run displayTdTypeOptions and display the appropriate attributes for that option
-        selectedRadio = document.querySelector('input[name="tdoptions"]:checked');
-        selectedRadio.click();
+        selectedTdOption = document.querySelector('input[name="tdoptions"]:checked');
+        selectedTdOption.click();
         // !VA Handle what to do if the current image width equals the viewer width. In that case, the class should be 'devicewidth' and the table width field should be disabled, because a table width can't be less than the image it contains. If Appdata.imgW === Appdata.viewerW, then disable the field because a table width can't be less than the image it contains. In this case, tableClass should default to 'devicewidth'. If Appdata.imgW < viewerW, then show tableWidth = imgWidth and leave the class field blank so the user can enter a class if desired.
         // !VA NOTE: This should be extracted to a separate function, too much repetition. Plus, this belongs in getAttributes, I think, since it's writing values rather than just turning the display on/off.
         // if ( Appdata.imgW ===  Appdata.viewerW ) {
