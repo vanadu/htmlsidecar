@@ -165,15 +165,6 @@ var Witty = (function () {
     foo ?  testbut2.addEventListener('click', addMe, false) : testbut2.removeEventListener('click', addMe, false);
   };
 
-  
-
-
-
-
-
-
-
-
   // !VA GLOBAL
   let myObject = {};
   myObject.variable = 'This is a string';
@@ -423,13 +414,20 @@ var Witty = (function () {
       
       */
       // !VA UIController public
-      initUpdateCCP: function (filteredAttributes) {
-        // console.log('initUpdateCCP running');
-        // console.log('filteredAttributes:');
-        // console.dir(filteredAttributes);
+      filterCcpAttributes: function (Attributes) {
+        console.log('filterCcpAttributes running');
+        console.log('Attributes:');
+        console.dir(Attributes);
+        let filteredAttributes = [];
 
-
-
+        // !VA NOTE: This can probably be done with an ES6 method, come back to it.
+        filteredAttributes = Object.values(Attributes);
+        for (let i = 0; i < filteredAttributes.length; i++) {
+          if (filteredAttributes[i].id === false) {
+            delete filteredAttributes[i];
+          }
+        }
+        console.dir(filteredAttributes);
 
         
       },
@@ -1034,26 +1032,9 @@ var Witty = (function () {
           return retObj;
         })(),
       };
-      displayAttributes(Attributes);
+      // !VA Pass the attributes generated above to CBController for updating the CCP display with the appropriate attributes. 
+      UIController.filterCcpAttributes(Attributes);
       return Attributes;
-    }
-
-    // !VA CBController private
-    function displayAttributes(Attributes) {
-
-      // console.log('displayAttributes running');
-      // console.log('Attributes:');
-      // console.dir(Attributes);
-      let filteredAttributes;
-
-      filteredAttributes = Object.values(Attributes);
-      for (let i = 0; i < filteredAttributes.length; i++) {
-        if (filteredAttributes[i].id === false) {
-          delete filteredAttributes[i];
-        }
-      }
-      UIController.initUpdateCCP(filteredAttributes);
-
     }
 
     // !VA 02.17.20 This is the same as ccpIfNoUserInput except it returns ONLY the value, not the attribute name -- but we don't need this now, because if it has not value, then, well it has no value.
@@ -2114,6 +2095,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         } else {
           modifierKey = false;
         }
+        // !VA If the CCP image fluid/fixed radio button is clicked, then
+        if (targetid.includes('fixed') || targetid.includes('fluid')) {
+          console.log('fixed/fluid');
+          getAttributes();
+        }
+
+
         // !VA Determine which element is clicked -- makeTag button, makeCSSRule button or Inspector element and run getUserSelections, makeCSSRule or handleInspectorClicks respectively.
         switch(true) {
         case targetid.includes('tag') :
@@ -2436,7 +2424,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         if (ccpUserInput[i].substring(0, 12) === '#rdo-ccp-img') {
           selectedRadio = document.querySelector(ccpUserInput[i]);
           // !VA Add an event handler to trap clicks to the tdoptions radio button
-          addEventHandler(selectedRadio,'click',handleMouseEvents,false);
+          addEventHandler(selectedRadio,'click',CBController.doClipboard,false);
         }
       }
 
@@ -3530,7 +3518,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Dev Mode pass-thru public functions to expose calcViewerSize and initCCP to UIController.initUI
       // !VA appController public
       initCalcViewerSize: function() {
-        calcViewerSize()
+        calcViewerSize();
       },
       // !VA appController public
       // !VA NOTE: I'm not sure why this is public here - when would initCCP have to cross modules?
