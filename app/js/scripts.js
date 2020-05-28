@@ -752,17 +752,17 @@ var Witty = (function () {
     function getAttributes() {
       console.log('getAttributes running');
       var Appdata = appController.initGetAppdata();
-      let checked, str, options, selectid, ccpElementId, isFixed, Attributes, retArr;
+      let checked, str, options, selectid, ccpElementId, isFixed, Attributes, retObj;
       // console.log('Appdata:');
       // console.dir(Appdata);
       // !VA Find out whether the Fixed Image radio button is selected. If it's not, then Fluid image is selected
       isFixed = getRadioState(ccpUserInput.rdoCcpImgFixed);
       // !VA Create the array to return. First value is the id of the CCP element, second value is the string to write to the CCP element.
-      function returnArray(ccpElementId, str ) {
-        let arr = [];
-        arr[0] = ccpElementId;
-        arr[1] = str;
-        return arr;
+      function returnObject(ccpElementId, str ) {
+        let obj = {};
+        obj.id = ccpElementId;
+        obj.str = str;
+        return obj;
       }
       Attributes = {
         // !VA IMG attributes
@@ -772,26 +772,26 @@ var Witty = (function () {
           // !VA This value is written to CCP so use ccpElementId
           ccpElementId = ccpUserInput.iptCcpImgClass;
           isFixed ? str = ccpGetAttValue('class',document.querySelector(ccpElementId).value) : str = 'img-fluid';
-          retArr = returnArray(ccpElementId, str);
-          return retArr;
+          retObj = returnObject(ccpElementId, str);
+          return retObj;
         })(),
         imgWidth: (function() {
           // !VA This value is get-only
           ccpElementId = false;
-          retArr = returnArray(ccpElementId, Appdata.imgW);
-          return retArr;
+          retObj = returnObject(ccpElementId, Appdata.imgW);
+          return retObj;
         })(),
         imgHeight: (function() {
           // !VA This value is get-only
           ccpElementId = false;
-          retArr = returnArray(ccpElementId, Appdata.imgH);
-          return retArr;
+          retObj = returnObject(ccpElementId, Appdata.imgH);
+          return retObj;
         })(),
         imgAlt: (function() {
           // !VA This value is get-only
           ccpElementId = false;
-          retArr = returnArray(ccpElementId, ccpGetAttValue('alt',document.querySelector(ccpUserInput.iptCcpImgAlt).value));
-          return retArr;
+          retObj = returnObject(ccpElementId, ccpGetAttValue('alt',document.querySelector(ccpUserInput.iptCcpImgAlt).value));
+          return retObj;
         })(),
         imgSrc: (function() {
           // !VA This value is get-only
@@ -799,8 +799,8 @@ var Witty = (function () {
           if (document.querySelector(ccpUserInput.iptCcpImgRelPath).value) {
             str =  document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + document.querySelector(inspectorElements.insFilename).textContent;
           }
-          retArr = returnArray( ccpElementId, str);
-          return retArr;
+          retObj = returnObject( ccpElementId, str);
+          return retObj;
         })(),
         // !VA Branch: makeFluidOption (052620)
         imgStyle: (function() {
@@ -808,8 +808,8 @@ var Witty = (function () {
           // !VA This value is never displayed in CCP, only written to Clipboard object, so it's  get-only.
           ccpElementId = false;
           isFixed ? str = `display: block; width: ${Appdata.imgW}px; height: ${Appdata.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;` : str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;';
-          retArr = returnArray(ccpElementId , str);
-          return retArr;
+          retObj = returnObject(ccpElementId , str);
+          return retObj;
         })(),
         imgAlign: (function() {  
           // !VA This value is get-only.
@@ -818,8 +818,8 @@ var Witty = (function () {
           selectid = ccpUserInput.selCcpImgAlign;
           options = [ '', 'left', 'center', 'right'];
           str = getAlignAttribute( selectid, options );
-          retArr = returnArray(ccpElementId, str);
-          return retArr;
+          retObj = returnObject(ccpElementId, str);
+          return retObj;
         })(),
         imgIncludeAnchor: (function() {
           // !VA This value is get-only.
@@ -827,71 +827,71 @@ var Witty = (function () {
           let target, checked;
           target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
           checked = getCheckboxSelection(target);
-          retArr = returnArray( ccpElementId, checked );
-          return retArr;
+          retObj = returnObject( ccpElementId, checked );
+          return retObj;
         })(),
         // !VA TD Attributes
         // !VA TD Width and height from Appdata = imgW and imgW -- only used for Stig's BG image
         tdAppdataWidth: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
-          retArr = returnArray( ccpElementId, Appdata.imgW );
-          return retArr;
+          retObj = returnObject( ccpElementId, Appdata.imgW );
+          return retObj;
         })(),
         tdAppdataHeight: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
-          retArr = returnArray( ccpElementId, Appdata.imgH );
-          return retArr;
+          retObj = returnObject( ccpElementId, Appdata.imgH );
+          return retObj;
         })(),
         tdHeight: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
-          retArr = returnArray( ccpElementId, ccpIfNoUserInput('height',document.querySelector(ccpUserInput.iptCcpTdHeight).value));
-          return retArr;
+          retObj = returnObject( ccpElementId, ccpIfNoUserInput('height',document.querySelector(ccpUserInput.iptCcpTdHeight).value));
+          return retObj;
         })(),
         tdWidth: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
-          retArr = returnArray( ccpElementId, ccpIfNoUserInput('width',document.querySelector(ccpUserInput.iptCcpTdWidth).value) );
-          return retArr;
+          retObj = returnObject( ccpElementId, ccpIfNoUserInput('width',document.querySelector(ccpUserInput.iptCcpTdWidth).value) );
+          return retObj;
         })(),
         // !VA The selected tdoption radio button determines which TD options will be displayed/undisplayed. Only the checked one will be displayed; all other ones will be undisplayed  
         tdBasic: (function() {
           // !VA This is a tdoptions selection radio - use ccpElementId
           ccpElementId = ccpUserInput.rdoCcpTdBasic;
           checked = getRadioState(ccpElementId);
-          retArr = returnArray( ccpElementId, checked );
-          return retArr;
+          retObj = returnObject( ccpElementId, checked );
+          return retObj;
         })(),
         tdExcludeimg: (function() {
           // !VA This is a tdoptions selection radio - use ccpElementId
           ccpElementId = ccpUserInput.rdoCcpTdExcludeimg;
           checked = getRadioState(ccpElementId);
-          retArr = returnArray( ccpElementId, checked );
-          return retArr;
+          retObj = returnObject( ccpElementId, checked );
+          return retObj;
         })(),
         tdImgswap: (function() {
           // !VA This is a tdoptions selection radio - use ccpElementId
           ccpElementId = ccpUserInput.rdoCcpTdImgswap;
           console.log('ccpElementId is: ' + ccpElementId);
           checked = getRadioState(ccpElementId);
-          retArr = returnArray( ccpElementId, checked );
-          return retArr;
+          retObj = returnObject( ccpElementId, checked );
+          return retObj;
         })(),
         tdBgimage: (function() {
           // !VA This is a tdoptions selection radio - use ccpElementId
           ccpElementId = ccpUserInput.rdoCcpTdBgimage;
           checked = getRadioState(ccpElementId);
-          retArr = returnArray( ccpElementId, checked );
-          return retArr;
+          retObj = returnObject( ccpElementId, checked );
+          return retObj;
         })(),
         tdPosswitch: (function() {
           // !VA This is a tdoptions selection radio - use ccpElementId
           ccpElementId = ccpUserInput.rdoCcpTdPosswitch;
           checked = getRadioState(ccpElementId);
-          retArr = returnArray( ccpElementId, checked );
-          return retArr;
+          retObj = returnObject( ccpElementId, checked );
+          return retObj;
         })(),
         tdAlign: (function() {
           // !VA This value is get-only
@@ -900,8 +900,8 @@ var Witty = (function () {
           selectid = ccpUserInput.selCcpTdAlign;
           options = [ '', 'left', 'center', 'right'];
           str = getAlignAttribute( selectid, options );
-          retArr = returnArray( ccpElementId, str );
-          return retArr;
+          retObj = returnObject( ccpElementId, str );
+          return retObj;
         })(),
         tdValign: (function() {
           // !VA This value is get-only
@@ -910,26 +910,26 @@ var Witty = (function () {
           selectid = ccpUserInput.selCcpTdValign;
           options = [ '', 'top', 'middle', 'bottom'];
           str = getAlignAttribute( selectid, options );
-          retArr = returnArray( ccpElementId, str );
-          return retArr;
+          retObj = returnObject( ccpElementId, str );
+          return retObj;
         })(),
         tdClass: (function() {
           // !VA This value is get-only
           ccpElementId = false;
-          retArr = returnArray( ccpElementId, ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpTdClass).value) );
-          return retArr;
+          retObj = returnObject( ccpElementId, ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpTdClass).value) );
+          return retObj;
         })(),
         tdBgcolor: (function() {
           // !VA This value is get-only
           ccpElementId = false;
-          retArr = returnArray( ccpElementId, ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpTdBgColor).value) );
-          return retArr;
+          retObj = returnObject( ccpElementId, ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpTdBgColor).value) );
+          return retObj;
         })(),
         tdBackground: (function() {
           // !VA This value is get-only
           ccpElementId = false;
-          retArr = returnArray( ccpElementId, document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + (Appdata.fname) );
-          return retArr;
+          retObj = returnObject( ccpElementId, document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + (Appdata.fname) );
+          return retObj;
         })(),
         // !VA TABLE attributes
         tableClass: (function() {
@@ -945,22 +945,22 @@ var Witty = (function () {
             // !VA If the imgType is fluid, set the class input value to the user input, even though that might have unforseen consequences for the user.
             str = ccpIfNoUserInput('class',document.querySelector(ccpElementId).value);
           }
-          retArr = returnArray( ccpElementId, str );
-          return retArr;
+          retObj = returnObject( ccpElementId, str );
+          return retObj;
         })(),
         tableWidth: (function() {
           // !VA The value is written to the table width field - use ccpElementId
           ccpElementId = ccpUserInput.iptCcpTableWidth;
           isFixed ? str = document.querySelector(ccpElementId).value : str = '100%';
           // console.log('tableWidth str is: ' + str);
-          retArr = returnArray( ccpElementId, str );
-          return retArr;
+          retObj = returnObject( ccpElementId, str );
+          return retObj;
         })(),
         tableBgcolor: (function() {
           // !VA This value is get-only
           ccpElementId = false;
-          retArr = returnArray( ccpElementId, ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.iptCcpTableBgColor).value));
-          return retArr;
+          retObj = returnObject( ccpElementId, ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.iptCcpTableBgColor).value));
+          return retObj;
         })(),
         tableAlign: (function() {
           // !VA This value is get-only.
@@ -969,8 +969,8 @@ var Witty = (function () {
           selectid = ccpUserInput.selCcpTableAlign;
           options = [ '', 'left', 'center', 'right'];
           str = getAlignAttribute( selectid, options );
-          retArr = returnArray( ccpElementId, str );
-          return retArr;
+          retObj = returnObject( ccpElementId, str );
+          return retObj;
         })(),
         tableIncludeWrapper: (function() {
           // !VA This value is get-only.
@@ -979,8 +979,8 @@ var Witty = (function () {
           // !VA Branch: makeFluidOption (052620)
           target = ccpUserInput.spnCcpTableIncludeWrapperCheckmrk;
           checked = getCheckboxSelection(target);
-          retArr = returnArray( ccpElementId, checked );
-          return retArr;
+          retObj = returnObject( ccpElementId, checked );
+          return retObj;
         })(),
         tableTagWrapperClass: (function() {
           // !VA Branch: reconfig (052720)
@@ -989,8 +989,8 @@ var Witty = (function () {
           ccpElementId = false;
           isFixed ? str = 'devicewidth' : str = 'responsive-table';
           // return ccpIfNoUserInput('class',document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value);
-          retArr = returnArray( ccpElementId, str );
-          return retArr;
+          retObj = returnObject( ccpElementId, str );
+          return retObj;
         })(),
         tableTagWrapperAlign: (function() {
           // !VA This value is get-only.
@@ -999,8 +999,8 @@ var Witty = (function () {
           selectid = ccpUserInput.selCcpTableWrapperAlign;
           options = [ '', 'left', 'center', 'right'];
           str = getAlignAttribute( selectid, options );
-          retArr = returnArray( ccpElementId, str );
-          return retArr;
+          retObj = returnObject( ccpElementId, str );
+          return retObj;
         })(),
         tableTagWrapperWidth: (function() {
           // !VA Branch: reconfig (052720)
@@ -1008,14 +1008,14 @@ var Witty = (function () {
           ccpElementId = ccpUserInput.iptCcpTableWrapperWidth;
           // !VA If the imgTyp is fixed, set the wrappe width to the value of the input field, which for the most part will be viewerW. If it's fluid, set it to 100%
           isFixed ? str = document.querySelector(ccpElementId).value : str = '100%';
-          retArr = returnArray( ccpElementId, str );
-          return retArr;
+          retObj = returnObject( ccpElementId, str );
+          return retObj;
         })(),
         tableTagWrapperBgcolor: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
-          retArr = returnArray( ccpElementId,ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.iptCcpTableWrapperBgColor).value));
-          return retArr;
+          retObj = returnObject( ccpElementId,ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.iptCcpTableWrapperBgColor).value));
+          return retObj;
         })(),
         // !VA Branch: makeFluidOption (052620)
         tableTagWrapperStyle: (function() {
@@ -1024,8 +1024,8 @@ var Witty = (function () {
           // !VA Only include a style attribute for the wrapper for fluid images.  The conditional for this is in makeTableNode and there's no case where a style attribute is included for fixed images, so just provide the style attribute string to return
           isFixed ? str = '' : str = `max-width: ${Appdata.imgW}`;
           // console.log('tableWrapperStyle str is: ' + str);
-          retArr = returnArray( ccpElementId, str );
-          return retArr;
+          retObj = returnObject( ccpElementId, str );
+          return retObj;
         })(),
       };
       displayAttributes(Attributes);
@@ -1035,12 +1035,18 @@ var Witty = (function () {
     // !VA CBController private
     function displayAttributes(Attributes) {
       console.log('displayAttributes running');
-      console.log('Attributes:');
-      console.dir(Attributes);
-      var ccpAttributes = Object.entries(Attributes);
-      console.log('ccpAttributes:');
-      console.dir(ccpAttributes);
-      
+      // console.log('Attributes:');
+      // console.dir(Attributes);
+      let filtered;
+
+      filtered = Object.values(Attributes);
+      for (let i = 0; i < filtered.length; i++) {
+        if (filtered[i].id === false) {
+          delete filtered[i];
+        }
+      }
+      console.log('filtered:');
+      console.dir(filtered);
 
     }
 
