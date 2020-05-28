@@ -751,14 +751,13 @@ var Witty = (function () {
     // !VA CBController private
     // !VA Branch: reconfig (052720)
     // !VA Each attribute is either get-only or settable. If it is get-only, then the user-defined value is accessed directly from the DOM element. If it is a preset, then the value is defined programmatically based on a condition. For instance, the class name 'img-fluid' is a preset that becomes active when the user selects the Fluid image option. In this case, the CCP element ID corresponding to the attribute is written to the ccpElementId variable for output to the CCP via the displayAttribute function.  The displayAttribute must take both the attribute value AND the id of th element that receives the value. So, for all of the attributes that require a write to the CCP UI, use the ccpElementId variable for the CCP element id. If the ccpElementId variable is falsy, then no DOM access is required, so the attribute and its CCP element are not added to the array passed to displayElement.
+    // !VA NOTE: Could probably make all the retObject arguments ccpElementId, str and consolidate this function somehow -- think about it.
     function getAttributes() {
       console.log('getAttributes running');
       var Appdata = appController.initGetAppdata();
       let checked, str, options, selectid, ccpElementId, imgType, Attributes, retObj;
       // console.log('Appdata:');
       // console.dir(Appdata);
-      // !VA Find out whether the Fixed Image radio button is selected. If it's not, then Fluid image is selected
-      isFixed = getRadioState(ccpUserInput.rdoCcpImgFixed);
       // !VA Create the array to return. First value is the id of the CCP element, second value is the string to write to the CCP element.
       function returnObject(ccpElementId, str ) {
         let obj = {};
@@ -775,6 +774,7 @@ var Witty = (function () {
           // !VA This element is get-only
           ccpElementId = false;
           getRadioState(ccpUserInput.rdoCcpImgFixed) ? str = 'fixed' : str = 'fluid';
+          // !VA Copy the radio state into local variable imgType so we can access it from within this function.
           imgType = str;
           retObj = returnObject(ccpElementId, str);
           return retObj;
@@ -783,7 +783,6 @@ var Witty = (function () {
           // !VA Branch: makeFluidOption (052620)
           // !VA For fixed images, if there's a class name entered into the class input, return the input value, or if the class input is empty, don't include the class attribute. For fluid images, return the class name 'img-fluid'.
           // !VA This value is written to CCP so use ccpElementId
-          console.log('imgType is: ' + imgType);
           ccpElementId = ccpUserInput.iptCcpImgClass;
           imgType === 'fixed' ? str = ccpGetAttValue('class',document.querySelector(ccpElementId).value) : str = 'img-fluid';
           retObj = returnObject(ccpElementId, str);
