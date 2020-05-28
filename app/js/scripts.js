@@ -9,26 +9,17 @@
 TODO: Implement fluid option in IMG options.
 // !VA Branch: makeFluidOption (052620)
 So what we need to do is:
-1)Integrate the 'include height nd width in style tag' into the 'fixed image' option
-  * mark all of include... functionality in the JS
-  * 
-2) Switch between the table options for parent and wrapper in initUI
+The challenge now is how to balance the needs of updatihg the CCP against the modular structure of the app. We have calls we need to make to getAttributes, which is now in CBController. But it needs to be accessed from appConroller because that's where the event handler is that handles the fixed/fluid button. This might be a good time to also reevaluate all the repeated calls to getAttributes. What we need to do is move getAttributes to appController, consolidate the calls to appController down to a single one and pass it everywhere else as a parameter.
 
-There are three situations where the fluid/fixed CCP options need to be updated.
-1) When the user selects fixed or fluid.
-2) When the CCP is opened - that will take place in updateCCP 
-3) When a value is changed in the toolbar - this should have no effect on the state of the fluid/fixed options but it will happen automatically because updateCCP is now run in resizeContainers.
-
-So we need to trap the user fixed/fluid selection...in displayImgTypeOptions.
-
-// !VA Here we have to 1) Write the class img-fluid to the CCP img class input 2) Add the width="100%" attribute to the parent table 3) Add the max-width: Appdata.imgW to the style attribue of the wrapper table 4) Add the width="100%" attribute to the wrapper table 5) Add the class="responsive-table" attribute to the wrapper table. 
-
-We do not need to add the max-width option to the table wrapper options in CCP because that takes place in the style attribute and isn't user-definable. 
-
-
-
-
-
+Where is getAttributes called from in CBController?
+setPosSwitchNodeAttributes
+makeImgNode
+makeTdNode
+makeTableNode
+getImgSwapBlock
+getBgimageBlock
+getVmlButtonBlock
+makeCssRule
 
 
 
@@ -422,12 +413,25 @@ var Witty = (function () {
     // !VA UIController public functions
     return {
 
+      // !VA Branch: reconfig (052720)
+      // !VA This works. Issues:
+      /* !VA  
+      Clicking on the fixed/fluid radios don't update the CCP. We need to update the CCP but can't do it from CBController. 
+      Can't call this from the eventListener because that passes the event not the filteredAttributes. Try calling getAttributes from the eventListener
+      Actually what we need to do is JUST get the filtered attributes to update the CCP. 
+      
+      
+      */
+      // !VA UIController public
+      initUpdateCCP: function (filteredAttributes) {
+        // console.log('initUpdateCCP running');
+        // console.log('filteredAttributes:');
+        // console.dir(filteredAttributes);
 
-      displayAttributes: function (target, val) {
-        console.log('displayAttributes running');
 
 
 
+        
       },
 
       // !VA UIController public
@@ -800,6 +804,9 @@ var Witty = (function () {
             str =  document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + document.querySelector(inspectorElements.insFilename).textContent;
           }
           retObj = returnObject( ccpElementId, str);
+          console.log('retObj is:');
+          console.log(retObj);
+          
           return retObj;
         })(),
         // !VA Branch: makeFluidOption (052620)
@@ -874,7 +881,7 @@ var Witty = (function () {
         tdImgswap: (function() {
           // !VA This is a tdoptions selection radio - use ccpElementId
           ccpElementId = ccpUserInput.rdoCcpTdImgswap;
-          console.log('ccpElementId is: ' + ccpElementId);
+          // console.log('ccpElementId is: ' + ccpElementId);
           checked = getRadioState(ccpElementId);
           retObj = returnObject( ccpElementId, checked );
           return retObj;
@@ -933,7 +940,6 @@ var Witty = (function () {
         })(),
         // !VA TABLE attributes
         tableClass: (function() {
-          console.clear();
           // !VA Branch: reconfig (052720)
           // !VA This value depends on the status of the Fixed/Fluid image radio button, so use ccpElementId
           ccpElementId = ccpUserInput.iptCcpTableClass;
@@ -1034,19 +1040,19 @@ var Witty = (function () {
 
     // !VA CBController private
     function displayAttributes(Attributes) {
-      console.log('displayAttributes running');
+
+      // console.log('displayAttributes running');
       // console.log('Attributes:');
       // console.dir(Attributes);
-      let filtered;
+      let filteredAttributes;
 
-      filtered = Object.values(Attributes);
-      for (let i = 0; i < filtered.length; i++) {
-        if (filtered[i].id === false) {
-          delete filtered[i];
+      filteredAttributes = Object.values(Attributes);
+      for (let i = 0; i < filteredAttributes.length; i++) {
+        if (filteredAttributes[i].id === false) {
+          delete filteredAttributes[i];
         }
       }
-      console.log('filtered:');
-      console.dir(filtered);
+      UIController.initUpdateCCP(filteredAttributes);
 
     }
 
@@ -1121,7 +1127,6 @@ var Witty = (function () {
 
     // !VA CBController private
     function getRadioState(ccpElementId) {
-      console.log('getRadioState running');
       // !VA Passing in the ID, not the alias
       let checked;
       if (document.querySelector(ccpElementId).checked === false) {
@@ -1419,17 +1424,17 @@ var Witty = (function () {
       nodeList = container.querySelectorAll( '*' );
       // !VA Build the objects that contain the attributes that will be set on the nodeList nodes.
       // !VA If the class input element under td options is empty, do nothing, otherwise add the class to the container TD and set the class attribute
-      !Attributes.tdClass[1] ? !Attributes.tdClass[1] : nodeList[0].setAttribute('class', Attributes.tdClass[1]);
+      !Attributes.tdClass.str ? !Attributes.tdClass.str : nodeList[0].setAttribute('class', Attributes.tdClass.str);
       // !VA If the bkgrnd color input element under td options is empty, do nothing, otherwise add the bkgrnd color to the container TD and set the bgcolor attribute
-      !Attributes.tdBgcolor[1] ? !Attributes.tdBgcolor[1] : nodeList[0].setAttribute('bgcolor', Attributes.tdBgcolor[1]);
+      !Attributes.tdBgcolor.str ? !Attributes.tdBgcolor.str : nodeList[0].setAttribute('bgcolor', Attributes.tdBgcolor.str);
       // !VA Add the rest of the attributes to the nodes
       td_switchcontainerAttr = {
         dir: 'rtl',
         // !VA class: see above
         // !VA bgcolor: see above
         width: '100%',
-        align: Attributes.tdAlign[1],
-        valign: Attributes.tdValign[1],
+        align: Attributes.tdAlign.str,
+        valign: Attributes.tdValign.str,
       };
       table_switchparentAttr = {
         role: 'presentation',
@@ -1467,12 +1472,12 @@ var Witty = (function () {
         color: 'red'
       };
       img_switchcontent1Attr = {
-        width: Attributes.imgWidth[1],
-        height: Attributes.imgHeight[1],
+        width: Attributes.imgWidth.str,
+        height: Attributes.imgHeight.str,
         // !VA Branch: makeFluidOption (052620)
-        style: Attributes.imgStyle[1],
-        src: Attributes.imgSrc[1],
-        alt: Attributes.imgAlt[1]
+        style: Attributes.imgStyle.str,
+        src: Attributes.imgSrc.str,
+        alt: Attributes.imgAlt.str
       };
       td_switchsibling2Attr = {
         width: '50%',
@@ -1521,8 +1526,8 @@ var Witty = (function () {
     // !VA IMPORTANT: Attributes should be passed, not called.
     // !VA CBController private
     function makeImgNode ( id ) {
-      console.log('makeImgNode');
-      console.log('id is: ' + id);
+      // console.log('makeImgNode');
+      // console.log('id is: ' + id);
       // !VA Id is passed but not used here,  because we're only building the node.
       let Attributes;
       Attributes = getAttributes();
@@ -1534,26 +1539,26 @@ var Witty = (function () {
       // !VA Set the img attributes. 
       // !VA Class attribute - Add to the node only if the attribute is set, i.e. the input has an entry
       // !VA Add to the node only if the attribute is set, i.e. the input has an entry
-      if (Attributes.imgClass[1]) { imgNode.className = Attributes.imgClass[1]; }
+      if (Attributes.imgClass.str) { imgNode.className = Attributes.imgClass.str; }
       // !VA alt attribute - Add to the node only if the attribute is set, i.e. the input has an entry
-      if (Attributes.imgAlt[1]) { imgNode.alt = Attributes.imgAlt[1]; }
+      if (Attributes.imgAlt.str) { imgNode.alt = Attributes.imgAlt.str; }
       // !VA src attribute;
-      imgNode.src = Attributes.imgSrc[1];
+      imgNode.src = Attributes.imgSrc.str;
       // !VA width attribute
-      imgNode.width = Attributes.imgWidth[1];
+      imgNode.width = Attributes.imgWidth.str;
       // !VA height attribute
-      imgNode.height = Attributes.imgHeight[1];
+      imgNode.height = Attributes.imgHeight.str;
       // !VA Branch: makeFluidOption (052620)
       // !VA style attribute
-      imgNode.setAttribute('style', Attributes.imgStyle[1]);
+      imgNode.setAttribute('style', Attributes.imgStyle.str);
       // !VA NOTE: align attribute is deprecated in html5 so is it needed?
       // !VA alt attribute - Add to the node only if the attribute is set, i.e. the selected option isn't 'none'. i.e. falsy
-      if (Attributes.imgAlign[1]) { imgNode.align = Attributes.imgAlign[1]; }
+      if (Attributes.imgAlign.str) { imgNode.align = Attributes.imgAlign.str; }
       // !VA border attribute
       imgNode.border = '0';
       
       // !VA If the include anchor option is checked, create the anchor element, add the attributes, append the imgNode to the nodeFragment, and return it.
-      if(Attributes.imgIncludeAnchor[1] === true) {
+      if(Attributes.imgIncludeAnchor.str === true) {
         let anchor = document.createElement('a');
         anchor.href = '#';
         anchor.setAttribute('style', 'color: #FF0000');
@@ -1586,18 +1591,18 @@ var Witty = (function () {
       tdNodeFragment = document.createDocumentFragment();
       // !VA TODO: There are NO attributes that are included in ALL the tdoptions, but it's very repetitive to include these options individually. Think about how this can be made DRYer, like it was done in makePosSwitchNodes and setPosSwitchNodeAttributes
       // !VA bgcolor attribute. Pass the input value, don't prepend hex # character for now
-      if (Attributes.tdBgcolor[1]) { tdInner.bgColor = Attributes.tdBgcolor[1]; }
+      if (Attributes.tdBgcolor.str) { tdInner.bgColor = Attributes.tdBgcolor.str; }
       // !VA Now add the attributes included only with the default Td configuration
       switch(true) {
       // case (selectedRadio === 'basic'):
       case (uSels.selectedRadio === 'basic' || uSels.selectedRadio === 'excludeimg'):
         // !VA class attribute
-        if (Attributes.tdClass[1]) { tdInner.className = Attributes.tdClass[1]; }
+        if (Attributes.tdClass.str) { tdInner.className = Attributes.tdClass.str; }
         // !VA valign attribute
-        if (Attributes.tdAlign[1]) { tdInner.align = Attributes.tdAlign[1]; }
-        if (Attributes.tdValign[1]) { tdInner.vAlign = Attributes.tdValign[1]; }
-        if (Attributes.tdHeight[1]) { tdInner.height = Attributes.imgWidth[1]; }
-        if (Attributes.tdWidth[1]) { tdInner.width = Attributes.imgHeight[1]; }
+        if (Attributes.tdAlign.str) { tdInner.align = Attributes.tdAlign.str; }
+        if (Attributes.tdValign.str) { tdInner.vAlign = Attributes.tdValign.str; }
+        if (Attributes.tdHeight.str) { tdInner.height = Attributes.imgWidth.str; }
+        if (Attributes.tdWidth.str) { tdInner.width = Attributes.imgHeight.str; }
         // !VA If 'basic' is checked, create imgNode and append it, otherwise exclude the imgNode.
         if (uSels.selectedRadio === 'basic') {
           imgNode = makeImgNode( id );
@@ -1607,20 +1612,20 @@ var Witty = (function () {
         break;
       // case (selectedRadio === 'imgswap'):
       case (uSels.selectedRadio === 'imgswap'):
-        if (Attributes.tdClass[1]) { tdInner.className = Attributes.tdClass[1]; }
-        if (Attributes.tdValign[1]) { tdInner.vAlign = Attributes.tdValign[1]; }
-        if (Attributes.tdAlign[1]) { tdInner.align = Attributes.tdAlign[1]; }
+        if (Attributes.tdClass.str) { tdInner.className = Attributes.tdClass.str; }
+        if (Attributes.tdValign.str) { tdInner.vAlign = Attributes.tdValign.str; }
+        if (Attributes.tdAlign.str) { tdInner.align = Attributes.tdAlign.str; }
         break;
       // case (selectedRadio === 'bgimage'):
       case (uSels.selectedRadio === 'bgimage'):
         console.log('makeTdNode bgimage');
         // !VA Create the parent node to which the bgimage code block will be appended after outputNL is converted to text in buildOutputNodeList.
         // !VA Include width, height and valign as per Stig's version
-        tdInner.width = Attributes.tdAppdataWidth[1];
-        tdInner.height = Attributes.tdAppdataHeight[1];
-        tdInner.vAlign = Attributes.tdValign[1];
+        tdInner.width = Attributes.tdAppdataWidth.str;
+        tdInner.height = Attributes.tdAppdataHeight.str;
+        tdInner.vAlign = Attributes.tdValign.str;
         // !VA Set the background attribute to the current path/filename
-        tdInner.setAttribute('background', Attributes.tdBackground[1]);
+        tdInner.setAttribute('background', Attributes.tdBackground.str);
         // !VA Fallback bgcolor now set in UIController.displayTdTypeOptions
         // !VA Include fallback color from the default set in displayTdTypeOptions
         // Attributes.tdBgcolor ? tdInner.bgColor = Attributes.tdBgcolor : tdInner.bgColor = '#7bceeb';
@@ -1637,12 +1642,13 @@ var Witty = (function () {
           isErr = true;
         } else {
           // !VA Set the width and height in the TD node, not in the code block
-          tdInner.width = Attributes.tdWidth[1];
-          tdInner.height = Attributes.tdHeight[1];
+          tdInner.width = Attributes.tdWidth.str;
+          tdInner.height = Attributes.tdHeight.str;
         }
         // !VA TODO: If the height entered doesn't match the height of the loaded image, then the user probably has forgotten to load the image used for the button background, so the code output will probably not be what the user expects. Output the code, but show an alert in the message bar. This is going to require making a different clipboard message for alerts. It will also require somehow informing the Clipboard object that two different messages can be displayed onsuccess - one success message and one alert message. That will require passing an error status along with tdNodeFragment and tableNodeFragment, which will require returning an array rather than just the node fragment. 
-        if (document.querySelector(ccpUserInput.iptCcpTdHeight).value !== Attributes.imgHeight[1]) {
-          appController.initMessage(id, true, 'vmlbutton_height_mismatch');
+        if (document.querySelector(ccpUserInput.iptCcpTdHeight).value !== Attributes.imgHeight.str) {
+          // !VA TODO: This error message throws an error...
+          // appController.handleAppMessages('vmlbutton_height_mismatch');
           console.log('ALERT vmlbutton: height value doesn\'t match height of loaded image');
         } 
         break;
@@ -1684,14 +1690,14 @@ var Witty = (function () {
       // !VA Make the inner table. If Include wrapper table is unchecked, we return just the inner table. If it's checked, we return the inner table and the outer table 
       // !VA Add inner table attributes
       // !VA table class attribute
-      if (Attributes.tableClass[1]) { tableInner.className = Attributes.tableClass[1]; }
+      if (Attributes.tableClass.str) { tableInner.className = Attributes.tableClass.str; }
       // table.className = Attributes.tableClass;
       // !VA table align attribute
-      if (Attributes.tableAlign[1]) { tableInner.align = Attributes.tableAlign[1]; }
+      if (Attributes.tableAlign.str) { tableInner.align = Attributes.tableAlign.str; }
 
-      tableInner.width = Attributes.tableWidth[1];
+      tableInner.width = Attributes.tableWidth.str;
       // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for now
-      if (Attributes.tableBgcolor[1]) { tableInner.bgColor = Attributes.tableBgcolor[1]; }
+      if (Attributes.tableBgcolor.str) { tableInner.bgColor = Attributes.tableBgcolor.str; }
       // !VA Add border, cellspacing and cellpadding
       tableInner.border = '0', tableInner.cellSpacing = '0', tableInner.cellPadding = '0';
       tableInner.setAttribute('role', 'presentation'); 
@@ -1710,16 +1716,16 @@ var Witty = (function () {
       }
       // !VA If include table wrapper is checked, build the outer table and return it
       // !VA table wrapper class
-      if (Attributes.tableTagWrapperAlign[1]) { tableOuter.align = Attributes.tableTagWrapperAlign[1]; }
+      if (Attributes.tableTagWrapperAlign.str) { tableOuter.align = Attributes.tableTagWrapperAlign.str; }
       // !VA wrapper table align attribute
-      if (Attributes.tableTagWrapperClass[1]) { tableOuter.className = Attributes.tableTagWrapperClass[1]; }
+      if (Attributes.tableTagWrapperClass.str) { tableOuter.className = Attributes.tableTagWrapperClass.str; }
       // !VA the default wrapper table width is the current display size - so it gets the value from the toolbar's Content Width field.
-      tableOuter.width = Attributes.tableTagWrapperWidth[1];
+      tableOuter.width = Attributes.tableTagWrapperWidth.str;
       // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for now. 
-      if (Attributes.tableTagWrapperBgcolor[1]) { tableOuter.bgColor = Attributes.tableTagWrapperBgcolor[1]; }
+      if (Attributes.tableTagWrapperBgcolor.str) { tableOuter.bgColor = Attributes.tableTagWrapperBgcolor.str; }
       // !VA Style attribute - only included for fluid images
       if (getRadioState(ccpUserInput.rdoCcpImgFluid)) {
-        tableOuter.setAttribute('style', Attributes.tableTagWrapperStyle[1]); 
+        tableOuter.setAttribute('style', Attributes.tableTagWrapperStyle.str); 
       }
       // !VA Add default border, cellspacing, cellpadding and role for accessiblity
       tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
@@ -1729,9 +1735,9 @@ var Witty = (function () {
       // !VA Append the outer td to the outer tr
       trOuter.appendChild(tdOuter);
       // !VA Add the outer td attributes
-      if (Attributes.tdAlign[1]) { tdOuter.align = Attributes.tdAlign[1]; }
+      if (Attributes.tdAlign.str) { tdOuter.align = Attributes.tdAlign.str; }
       // !VA valign attribute
-      if (Attributes.tdValign[1]) { tdOuter.vAlign = Attributes.tdValign[1]; }
+      if (Attributes.tdValign.str) { tdOuter.vAlign = Attributes.tdValign.str; }
       // !VA Append the inner table to the outer table's td
       tdOuter.appendChild(tableInner);
       // !VA Pass the outer table to the tableNodeFragment.
@@ -1752,11 +1758,13 @@ var Witty = (function () {
       linebreak = '\n';
       let mobileFilename, mobileSwapStr;
       // !VA Create the mobile image filename: Get the current image file's filename and append the name with '-mob'.
-      mobileFilename = Attributes.imgSrc[1];
+
+      mobileFilename = Attributes.imgSrc.str;
+      console.log('mobileFilename is: ' + mobileFilename);
       // !VA The regex for appending the filename with '-mob'.
       mobileFilename = mobileFilename.replace(/(.jpg|.png|.gif|.svg)/g, '_mob$1');
       // !VA Create the code for the mobile swap TD as a Comment node of the parent td. 
-      mobileSwapStr = `${linebreak}${getIndent(indentLevel)}<a href="#"><img class="hide" alt="${Attributes.imgAlt[1]}" width="${Attributes.imgWidth[1]}" height="${Attributes.imgHeight[1]}" src="${Attributes.imgSrc[1]}" border="0" style="width: ${Attributes.imgWidth[1]}px; height: ${Attributes.imgHeight[1]}px; margin: 0; border: none; outline: none; text-decoration: none; display: block; "></a>${linebreak}${getIndent(indentLevel)}<!--[if !mso]><!-->${linebreak}${getIndent(indentLevel)}<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">${linebreak}${getIndent(indentLevel)}<a href="#"><img class="mobileshow" alt="${Attributes.imgAlt[1]}" width="${Appdata.sPhonesW}" height="${Appdata.sPhonesH}" src="${mobileFilename}" border="0" style="width: ${Appdata.sPhonesW}px; height: ${Appdata.sPhonesH}px; margin: 0; border: none; outline: none; text-decoration: none; display: block;" /></a>${linebreak}${getIndent(indentLevel)}<!--</span>-->${linebreak}${getIndent(indentLevel)}<!--<![endif]-->`;
+      mobileSwapStr = `${linebreak}${getIndent(indentLevel)}<a href="#"><img class="hide" alt="${Attributes.imgAlt.str}" width="${Attributes.imgWidth.str}" height="${Attributes.imgHeight.str}" src="${Attributes.imgSrc.str}" border="0" style="width: ${Attributes.imgWidth.str}px; height: ${Attributes.imgHeight.str}px; margin: 0; border: none; outline: none; text-decoration: none; display: block; "></a>${linebreak}${getIndent(indentLevel)}<!--[if !mso]><!-->${linebreak}${getIndent(indentLevel)}<span style="width:0; overflow:hidden; float:left; display:none; max-height:0; line-height:0;" class="mobileshow">${linebreak}${getIndent(indentLevel)}<a href="#"><img class="mobileshow" alt="${Attributes.imgAlt.str}" width="${Appdata.sPhonesW}" height="${Appdata.sPhonesH}" src="${mobileFilename}" border="0" style="width: ${Appdata.sPhonesW}px; height: ${Appdata.sPhonesH}px; margin: 0; border: none; outline: none; text-decoration: none; display: block;" /></a>${linebreak}${getIndent(indentLevel)}<!--</span>-->${linebreak}${getIndent(indentLevel)}<!--<![endif]-->`;
       // !VA Return the code block with indents and linebreaks
       return mobileSwapStr;
     }
@@ -1772,10 +1780,10 @@ var Witty = (function () {
       // !VA 03.09.2020 Set the indentLevel to 1 for now
       fallback = '#7bceeb';
       // !VA The fallback color is written to the bgcolor input in displayTdTypeOptions, so get it from there
-      Attributes.tdBgcolor[1] ? bgcolor = Attributes.tdBgcolor[1] : bgcolor = document.querySelector(ccpUserInput.iptCcpTdBgColor).value;
+      Attributes.tdBgcolor.str ? bgcolor = Attributes.tdBgcolor.str : bgcolor = document.querySelector(ccpUserInput.iptCcpTdBgColor).value;
 
       // !VA Define the innerHTML of the bgimage code
-      bgimageStr = `${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth[1]}px;height:${Attributes.imgHeight[1]}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.tdBackground[1]}" color="${bgcolor}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}${getIndent(indentLevel)}<div>${linebreak}${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div>${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}  </v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect>${linebreak}${getIndent(indentLevel)}<![endif]-->`;
+      bgimageStr = `${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth.str}px;height:${Attributes.imgHeight.str}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.tdBackground.str}" color="${bgcolor}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}${getIndent(indentLevel)}<div>${linebreak}${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div>${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}  </v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect>${linebreak}${getIndent(indentLevel)}<![endif]-->`;
       // !VA Return the code block with line breaks and indents
       return bgimageStr;
     }
@@ -1791,8 +1799,8 @@ var Witty = (function () {
       tdHeight = document.querySelector(ccpUserInput.iptCcpTdHeight).value;
       tdWidth = document.querySelector(ccpUserInput.iptCcpTdWidth).value;
       // !VA Define the innerHTML of the vmlbutton code
-      vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:${tdHeight}px;v-text-anchor:middle;width:${tdWidth}px;" arcsize="10%" strokecolor="#1e3650" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc[1]}" color="#556270" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Show me the button!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="#"
-style="background-color:#556270;background-image:url(${Attributes.imgSrc[1]});border:1px solid #1e3650;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:${tdHeight}px;text-align:center;text-decoration:none;width:${tdWidth}px;-webkit-text-size-adjust:none;mso-hide:all;">Show me the button!</a></div>`;
+      vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:${tdHeight}px;v-text-anchor:middle;width:${tdWidth}px;" arcsize="10%" strokecolor="#1e3650" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc.str}" color="#556270" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Show me the button!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="#"
+style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});border:1px solid #1e3650;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:${tdHeight}px;text-align:center;text-decoration:none;width:${tdWidth}px;-webkit-text-size-adjust:none;mso-hide:all;">Show me the button!</a></div>`;
       try {
         !vmlButtonStr;
       } catch (error) {
@@ -1940,30 +1948,29 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc[1]});bo
       // isErr = false;
       switch(true) {
       case (id.includes('img-dsktp')):
-        // args[0] = Attributes.imgClass, args[1] = Attributes.imgWidth, args[2] = Attributes.imgHeight;
-        clipboardStr = `img.${Attributes.imgClass[1]} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important; }`;
+        clipboardStr = `img.${Attributes.imgClass.str} { width: ${Appdata.imgW}px !important; height: ${Appdata.imgH}px !important; }`;
         break;
       case (id.includes('img-smphn')):
-        clipboardStr = `img.${Attributes.imgClass[1]} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important; }`;
+        clipboardStr = `img.${Attributes.imgClass.str} { width: ${Appdata.sPhonesW}px !important; height: ${Appdata.sPhonesH}px !important; }`;
         break;
       case (id.includes('img-lgphn')):
-        clipboardStr = `img.${Attributes.imgClass[1]} { width: ${Appdata.lPhonesW}px !important; height: ${Appdata.lPhonesH}px !important; }`;
+        clipboardStr = `img.${Attributes.imgClass.str} { width: ${Appdata.lPhonesW}px !important; height: ${Appdata.lPhonesH}px !important; }`;
         break;
       case (id.includes('td-dsktp') || id.includes('td-smphn') || id.includes('td-lgphn')) :
-        if ( Attributes.tdHeight[1]) {
-          clipboardStr = `td.${Attributes.tdClass[1]} { height: ${Attributes.tdHeight[1]}px !important; }`;
+        if ( Attributes.tdHeight.str) {
+          clipboardStr = `td.${Attributes.tdClass.str} { height: ${Attributes.tdHeight.str}px !important; }`;
         } else {
-          clipboardStr = `td.${Attributes.tdClass[1]} {  }`;
+          clipboardStr = `td.${Attributes.tdClass.str} {  }`;
         }
         break;
       case (id.includes('table-dsktp')):
-        clipboardStr = `table.${Attributes.tableClass[1]} { width: ${Attributes.tableWidth[1]}px !important; align: ${Attributes.tableAlign[1]} !important; }`;
+        clipboardStr = `table.${Attributes.tableClass.str} { width: ${Attributes.tableWidth.str}px !important; align: ${Attributes.tableAlign.str} !important; }`;
         break;
       case (id.includes('table-smphn')):
-        clipboardStr = `table.${Attributes.tableClass[1]} { width: ${Appdata.sPhonesW}px !important; align: ${Attributes.tableAlign[1]} !important; }`;
+        clipboardStr = `table.${Attributes.tableClass.str} { width: ${Appdata.sPhonesW}px !important; align: ${Attributes.tableAlign.str} !important; }`;
         break;
       case (id.includes('table-lgphn')):
-        clipboardStr = `table.${Attributes.tableClass[1]} { width: ${Appdata.lPhonesW}px !important; align: ${Attributes.tableAlign[1]} !important; }`;
+        clipboardStr = `table.${Attributes.tableClass.str} { width: ${Appdata.lPhonesW}px !important; align: ${Attributes.tableAlign.str} !important; }`;
         break;
       default:
         console.log('ERROR in makeCssRule: case not');
@@ -2416,7 +2423,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc[1]});bo
         if (ccpUserInput[i].substring(0, 12) === '#rdo-ccp-img') {
           selectedRadio = document.querySelector(ccpUserInput[i]);
           // !VA Add an event handler to trap clicks to the tdoptions radio button
-          addEventHandler(selectedRadio,'click',updateCCP,false);
+          addEventHandler(selectedRadio,'click',handleMouseEvents,false);
         }
       }
 
@@ -3130,7 +3137,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc[1]});bo
 
     // !VA appController private
     function updateCCP() {
-      console.log('updateCCP running');
       // !VA Get Appdata
       var Appdata = appController.initGetAppdata();
       // !VA Init elements that are initialized when the CCP is updated
@@ -3511,7 +3517,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc[1]});bo
       // !VA Dev Mode pass-thru public functions to expose calcViewerSize and initCCP to UIController.initUI
       // !VA appController public
       initCalcViewerSize: function() {
-        calcViewerSize();
+        calcViewerSize()
       },
       // !VA appController public
       // !VA NOTE: I'm not sure why this is public here - when would initCCP have to cross modules?
