@@ -470,7 +470,7 @@ var Witty = (function () {
       }
     }
 
-    function handleCcpImgType(evt, ccpAttributes, blib) {
+    function handleCcpImgType(evt, ccpAttributes) {
       // console.log('evt is: ' + evt);
       // console.clear();
       console.log('handleCcpImgType running');
@@ -488,27 +488,21 @@ var Witty = (function () {
       for (let i = 0; i < ccpAttributes.length; i++) {
         // console.log('ccpAttributes[i].id is: ' +  ccpAttributes[i].id);
         
-        if (ccpAttributes[i].id.includes('fixed')  ) {
+        if (ccpAttributes[i].id.includes('fixed') || ccpAttributes[i].id.includes('fluid')) {
           console.log('ccpAttributes[i].id is: ' + ccpAttributes[i].id);
-          if (ccpAttributes[i].id == '#' + evt.target.id) {
+          if (ccpAttributes[i].id !== '#' + evt.target.id) {
             console.log('HIT');
+            if (ccpAttributes[i].id.includes('fixed')) {
+              ccpAttributes[i].id = '#rdo-ccp-img-fluid';
+              ccpAttributes[i].str = 'fluid';
+            } else {
+              ccpAttributes[i].id = '#rdo-ccp-img-fixed';
+              ccpAttributes[i].str = 'fixed';
+            }
           }
-
-
-
-          ccpAttributes[i].id.includes('fixed') ? ccpAttributes[i].id = '#rdo-ccp-img-fixed' : ccpAttributes[i].id = '#rdo-ccp-img-fluid';
-          ccpAttributes[i].id.includes('fixed') ? ccpAttributes[i].str = 'fixed' : ccpAttributes[i].str = 'fluid';
-          document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blib, false);
-          return;
         }
       }
-
-      // refreshCcp(ccpAttributes);
-      // updateCcp(ccpAttributes);
-
-      // }
-
-
+      refreshCcp(ccpAttributes);
     }
 
     // !VA 
@@ -552,22 +546,22 @@ var Witty = (function () {
         console.log('not yet implemented');
       }
       
-      var blib = function (evt) {
-        evt.stopPropagation;
-        handleCcpImgType(evt, ccpAttributes, blib);
-        document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blib, false);
-        // document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blib, false);
+      // var blib = function (evt) {
+      //   evt.stopPropagation;
+      //   handleCcpImgType(evt, ccpAttributes, blib);
+      //   document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blib, false);
+      //   // document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blib, false);
 
-        return;
+      //   return;
         
-      };
+      // };
       
       // !VA Do all the CCP element initialization actions only if the CCP is displayed, i.e. has class 'active'
       // !VA PROBLEM: updateCcp is running again when the ccp is closed...causing a problem here.
       if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
 
         // debugger;
-        document.querySelector(ccpUserInput.rdoCcpImgFixed).addEventListener('click',blib, false);
+        // document.querySelector(ccpUserInput.rdoCcpImgFixed).addEventListener('click',blib, false);
         // document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blib, false);
 
 
@@ -575,11 +569,13 @@ var Witty = (function () {
         // !VA ImgType Options and Event Handler
         // document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blib, false);
 
-        // var ccpImgType = [ ccpUserInput.rdoCcpImgFixed ];
-        // for (let i = 0; i < ccpImgType.length; i++) {
-        //   document.querySelector(ccpImgType[i]).addEventListener('click',blib, false);
+        var ccpImgType = [ ccpUserInput.rdoCcpImgFixed, ccpUserInput.rdoCcpImgFluid ];
+        for (let i = 0; i < ccpImgType.length; i++) {
+          document.querySelector(ccpImgType[i]).addEventListener('click',function() {
+            handleCcpImgType(event, ccpAttributes);
+          }, false);
           
-        // }
+        }
 
 
 
