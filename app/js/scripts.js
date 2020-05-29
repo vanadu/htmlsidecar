@@ -36,6 +36,7 @@ makeCssRule
   <table width="100%" border="0" cellspacing="0" cellpadding="0">
   <img src="hero-1.jpg" width="500" height="400" border="0" alt="Insert alt text here" style="display: block; color: #666666;  font-family: Helvetica, arial, sans-serif; font-size: 16px;" class="img-max">
 
+I've spent two days working with this. There are all sorts of pitfalls -- but the bottom line is that it didn't work. The root of the problem was that I was trying to make the entire Ccp update happen from a separate function, updateCcp, where also the logic for the imgType buttons lived. That didn't work because the imgType buttons rely on the data in getAttributes, and calling getAttributes called updateCcp, and a clusterfuck of circular logic and loops ensued. I will have to go back to the original plan - save this version and group the imgType logic in with the makeNode buttons, keeping them separate from updateCcp.
 
 
 
@@ -504,7 +505,7 @@ var Witty = (function () {
       Appdata = appController.initGetAppdata();
       // !VA The problem is that as soon as we call getAttributes, we get into a loop because that calls updateCcp. But we can't update the attributes in order to call the new ones to update the Ccp with without updating the attributes...I have a logical conundrum here. The problem is that the ImgType buttons MUST somehow update the All the attributes. Let's go back to passing ccpAttributes and see what happens. 
 
-      // !VA Maybe all this attribute stuff was overengineering things...
+      // !VA Maybe all this attribute stuff was overengineering things...don't forget that the Attributes are ONLY for output to the Clipboard. The Ccp should reflect that but doesn't have to get the info from there. At least not yet because I don't know how to do it. It would be ideal though. Ideally the imgtype buttons would get their event handlers elsewhere, outside of updateCcp, and would access getAttributes to get its data. And ONLY THEN would it call updateCcp and then for the sole purpose of updating the Ccp.
 
 
       console.log('ccpAttributes');
