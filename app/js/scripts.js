@@ -558,57 +558,15 @@ var Witty = (function () {
       // !VA Stopped here. Getting confused. Go back and look at the checkbox handling again in handleCcpWrapperOptions - it is very convoluted.Plus, it doesn't take the Attributes into account - doesn't reflect the changes when fluid is selected
       // !VA WHY IS updateCCP running when you close the CCP?
       // !VA The big problem is that Attributes aren't updating when CCP elements like fluid fixed are clicked. That is addressed by calling initGetAttributes in handleCcpImgType, but its another call to getAttributes. Also, you can't pass ccpAttributes and call initGetAttributes in the same function you passed it to, becuase a loop will ensue. What I need to do is build a subobject of Attributes from within updateCcp that only contains the pertinent Ccp UI elements and pass that. 
-      
-
-
       let selectedTdOption;
-
-      // doImgTypeClick(evt);
-      // !VA I remember there's a way to pass an argument in an eventListener but not today
-
 
       function handleCcpAnchorOptions() {
         console.log('not yet implemented');
       }
-      
-      var blib = function (evt) {
-        // debugger;
-        evt.stopPropagation ? evt.stopPropagation() : evt.cancelBubble = true;
-        handleCcpImgType(evt, ccpAttributes);
-        // document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blib, false);
-        // document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blib, false);
-        
-      };
 
-      var blab = function (evt) {
-        // debugger;
-        evt.stopPropagation ? evt.stopPropagation() : evt.cancelBubble = true;
-        handleCcpImgType(evt, ccpAttributes);
-        // document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blab, false);
-        // document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blib, false);
-        
-      };
-      
       // !VA Do all the CCP element initialization actions only if the CCP is displayed, i.e. has class 'active'
       // !VA PROBLEM: updateCcp is running again when the ccp is closed...causing a problem here.
       if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
-
-        // debugger;
-        // document.querySelector(ccpUserInput.rdoCcpImgFixed).addEventListener('click',blib, false);
-        // document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blib, false);
-
-
-        // !VA Branch: reconfigureGetAttributes (052820)
-        // !VA ImgType Options and Event Handler
-        // var ccpImgType = [ ccpUserInput.rdoCcpImgFixed, ccpUserInput.rdoCcpImgFluid ];
-        // for (let i = 0; i < ccpImgType.length; i++) {
-        //   document.querySelector(ccpImgType[i]).addEventListener('click',blib, false);
-          
-        // }
-        document.querySelector(ccpUserInput.rdoCcpImgFixed).addEventListener('click',blib, false);
-        document.querySelector(ccpUserInput.rdoCcpImgFluid).addEventListener('click',blab, false);
-
-        
 
         // !VA Wrapper Table Options and Event Handler. For now, pass in the false argument in order to skip over the toggling of the checkbox on click. If there's no event, then there's no click. IMPORTANT: This will change when we move updateCcp into the background and the clipboard button just displays/undisplays
         // handleCcpWrapperOptions(false, ccpAttributes);
@@ -621,10 +579,6 @@ var Witty = (function () {
         document.querySelector(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk).addEventListener('click', function () {
           handleCcpWrapperOptions(event, handleCcpAnchorOptions);
         }, false);
-
-
-
-
         // !VA Find out which tdoption is selected and send a click to that option to run displayTdTypeOptions and display the appropriate attributes for that option
         // !VA Branch: reconfigureGetAttributes (052820)
         // !VA This is no good. Mickey mouse shit, sending a click programattically...and it doesn't work when the ccp is first initialized in devmode....no idea why... wtf
@@ -648,9 +602,6 @@ var Witty = (function () {
         // document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
 
       }
-
-
-
     }
 
 
@@ -673,7 +624,7 @@ var Witty = (function () {
           }
         }
         ccpAttributes = arr.filter(Boolean);
-        updateCcp(ccpAttributes);
+        // updateCcp(ccpAttributes);
       },
 
       // !VA UIController public
@@ -973,16 +924,6 @@ var Witty = (function () {
           console.log('ERROR: UIController.displayTdTypeOptions public');
         } 
       },
-
-      toggleImgType: function (evt) {
-
-        console.log('event.target.id: ' + event.target.id);
-        console.log('document.querySelector(ccpUserInput.rdoCcpImgFixed).value is: ' + document.querySelector(ccpUserInput.rdoCcpImgFixed).value);
-
-        
-      },
-
-
     };
 
   })();
@@ -2686,7 +2627,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       for (let i = 0; i < dvClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         dvClickables[i] = document.querySelector(dvClickables[i]);
-        console.log('HERE');
         addEventHandler((dvClickables[i]),'click',initCcp,false);
       }
 
@@ -2713,16 +2653,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       
       // !VA eventListeners for the imgType radio buttons for showing/hiding options based on selectedTdOption are initialized in updateCcp
-      // for(let i in ccpUserInput) {
-      //   let selectedImgType;
-      //   // !VA Target only those ccpUserInput elements whose first 12 characters are #rdo-ccp-img. This identifies them as the fluid/fixed radio button options.
-      //   if (ccpUserInput[i].substring(0, 12) === '#rdo-ccp-img') {
-      //     console.log('i is: ' + i);
-      //     selectedImgType = document.querySelector(ccpUserInput[i]);
-      //     // !VA Add an event handler to trap clicks to the tdoptions radio button
-      //     addEventHandler(selectedImgType,'click',UIController.toggleImgType,false);
-      //   }
-      // }
+      for(let i in ccpUserInput) {
+        let selectedImgType;
+        // !VA Target only those ccpUserInput elements whose first 12 characters are #rdo-ccp-img. This identifies them as the fluid/fixed radio button options.
+        if (ccpUserInput[i].substring(0, 12) === '#rdo-ccp-img') {
+          selectedImgType = document.querySelector(ccpUserInput[i]);
+          // !VA Add an event handler to trap clicks to the tdoptions radio button
+          addEventHandler(selectedImgType,'click',toggleImgType,false);
+        }
+      }
 
 
       // !VA Misc Unused Handlers for review
@@ -3451,6 +3390,33 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
     }
+
+    function toggleImgType() {
+      console.log('toggleImgType running');
+      let Attributes;
+      Attributes = CBController.initGetAttributes();
+      console.log('toggleImgType Attributes:');
+      console.dir(Attributes);
+       
+      // for (let i = 0; i < ccpAttributes.length; i++) {
+      //   if (ccpAttributes[i].id.includes('fixed') || ccpAttributes[i].id.includes('fluid')) {
+      //     if (ccpAttributes[i].id !== '#' + evt.target.id) {
+      //       if (ccpAttributes[i].id.includes('fixed')) {
+      //         ccpAttributes[i].id = '#rdo-ccp-img-fluid';
+      //         ccpAttributes[i].str = 'fluid';
+      //       } else {
+      //         ccpAttributes[i].id = '#rdo-ccp-img-fixed';
+      //         ccpAttributes[i].str = 'fixed';
+      //       }
+      //     }
+      //   }
+      // }
+
+      
+    }
+
+
+    // !VA END CCP FUNCTIONS
       
     // !VA  appController private
     // !VA Show element when input in another element is made 
