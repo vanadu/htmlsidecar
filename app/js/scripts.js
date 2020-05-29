@@ -494,7 +494,7 @@ var Witty = (function () {
 
       // console.log('Attributes');
       // console.dir(Attributes);
-      refreshCcp(ccpAttributes);
+      // refreshCcp(ccpAttributes);
     }
 
     // !VA 
@@ -531,10 +531,6 @@ var Witty = (function () {
         wrapperTableWidth = '100%';
         console.log('wrapperTableWidth is: ' + wrapperTableWidth);
       }
-
-
-
-      
     }
 
 
@@ -1168,7 +1164,7 @@ var Witty = (function () {
         tableWidth: (function() {
           // !VA The value is written to the table width field - use ccpElementId
           ccpElementId = ccpUserInput.iptCcpTableWidth;
-          imgType === 'fixed' ? str = document.querySelector(ccpElementId).value : str = '100%';
+          imgType === 'fixed' ? str = Appdata.imgW : str = '100%';
           // console.log('tableWidth str is: ' + str);
           retObj = returnObject( ccpElementId, str );
           return retObj;
@@ -1223,7 +1219,7 @@ var Witty = (function () {
           // !VA This value depends on the selection under Fixed image. 
           ccpElementId = ccpUserInput.iptCcpTableWrapperWidth;
           // !VA If the imgTyp is fixed, set the wrappe width to the value of the input field, which for the most part will be viewerW. If it's fluid, set it to 100%
-          imgType === 'fixed' ? str = document.querySelector(ccpElementId).value : str = '100%';
+          imgType === 'fixed' ? str = Appdata.viewerW : str = '100%';
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
@@ -1245,7 +1241,8 @@ var Witty = (function () {
         })(),
       };
       // !VA Pass the attributes generated above to CBController for updating the CCP display with the appropriate attributes. 
-      UIController.filterCcpAttributes(Attributes);
+      // !VA Branch: rethinkImgTypeLogic (052920)
+      // UIController.filterCcpAttributes(Attributes);
       return Attributes;
     }
 
@@ -2650,7 +2647,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           addEventHandler(selectedTdOption,'click',UIController.displayTdTypeOptions,false);
         }
       }
-
       
       // !VA eventListeners for the imgType radio buttons for showing/hiding options based on selectedTdOption are initialized in updateCcp
       for(let i in ccpUserInput) {
@@ -2663,6 +2659,21 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         }
       }
 
+      // !VA eventListeners for the Include Wrapper checkbox
+      let includeWrapperCheckbox = document.querySelector(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk);
+      addEventHandler(includeWrapperCheckbox,'click',toggleIncludeWrapper,false);
+
+
+
+      for(let i in ccpUserInput) {
+        let selectedImgType;
+        // !VA Target only those ccpUserInput elements whose first 12 characters are #rdo-ccp-img. This identifies them as the fluid/fixed radio button options.
+        if (ccpUserInput[i].substring(0, 12) === '#rdo-ccp-img') {
+          selectedImgType = document.querySelector(ccpUserInput[i]);
+          // !VA Add an event handler to trap clicks to the tdoptions radio button
+          addEventHandler(selectedImgType,'click',toggleImgType,false);
+        }
+      }
 
       // !VA Misc Unused Handlers for review
       // =============================
@@ -3381,6 +3392,19 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private 
     function initCcp() {
       // !VA Get Appdata
+      // !VA Branch: rethinkImgTypeLogic (052920)
+      // !VA Initialize the fixed/fluid imgType buttons - call getAttributes and populate the CCP elements with values based on whether fixed or fluid is selected.
+      toggleImgType();
+
+      // !VA Initialize the Include wrapper checkboxes. Pass in false for the evt argument for initialization so that the function skips over the button click condition and just executes the display/undisplay functionality.
+      toggleIncludeWrapper(false);
+
+      // !VA Initialize the tdoptions radio group to 'basic' if the 'fluid' imgType is selected
+      if (document.querySelector(ccpUserInput.rdoCcpImgFluid).checked === true) {
+        document.querySelector(ccpUserInput.rdoCcpTdBasic).checked = true;
+        document.querySelector(ccpUserInput.rdoCcpTdExcludeimg).disabled = true;
+      } 
+
 
       // !VA The app initializes with the CCP closed, so toggle it on and off here.
       document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
@@ -3388,31 +3412,72 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Something fishy here...but it appears to work. Call getAttributes and run updateCcp when the clipboard button is clicked.
       CBController.initGetAttributes();
 
+    }
+
+    function toggleIncludeWrapper(evt) {
+      console.log('toggleIncludeWrapper running');
+      var chkId, checkbox;
+      let wrapperItems = [];
+      // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
+      wrapperItems = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
+      // !VA Branch: reconfigureGetAttributes (052820)
+      // !VA chkId will always be ccpUserInput.spnCcpTableIncludeWrapperCheckmrk here because that's what the event listener was defined on. But this is a mock checkbox, so convert the ccpUserInput alias to the id of the actual checkbox element in order to toggle it 
+      chkId = ccpUserInput.spnCcpTableIncludeWrapperCheckmrk;
+      chkId = chkId.replace('mrk', 'box');
+      chkId = chkId.replace('spn', 'chk');
+      checkbox = document.querySelector(chkId);
+
+      // !VA If there's an event, there was a click. If there is no event, then the CCP is being initialized by clicking the Clipboard button.
+      if (evt) {
+        // !VA Toggle the checkmark on click
+        checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
+      } 
+      // !VA Display/undisplay wrapper table options when checkbox is toggled
+      if (checkbox.checked) {
+        for (let i = 0; i < wrapperItems.length; i++) {
+          document.querySelector(wrapperItems[i]).style.display = 'block'; 
+        }
+      } else {
+        for (let i = 0; i < wrapperItems.length; i++) {
+          document.querySelector(wrapperItems[i]).style.display = 'none'; 
+        }
+      }
+
 
     }
 
+
+    // !VA Branch: rethinkImgTypeLogic (052920)
     function toggleImgType() {
       console.log('toggleImgType running');
       let Attributes;
+      console.clear();
       Attributes = CBController.initGetAttributes();
       console.log('toggleImgType Attributes:');
       console.dir(Attributes);
+      let parentTableWidth, tableWrapperClass, tableWrapperWidth;
        
-      // for (let i = 0; i < ccpAttributes.length; i++) {
-      //   if (ccpAttributes[i].id.includes('fixed') || ccpAttributes[i].id.includes('fluid')) {
-      //     if (ccpAttributes[i].id !== '#' + evt.target.id) {
-      //       if (ccpAttributes[i].id.includes('fixed')) {
-      //         ccpAttributes[i].id = '#rdo-ccp-img-fluid';
-      //         ccpAttributes[i].str = 'fluid';
-      //       } else {
-      //         ccpAttributes[i].id = '#rdo-ccp-img-fixed';
-      //         ccpAttributes[i].str = 'fixed';
-      //       }
-      //     }
-      //   }
-      // }
+      // !VA Getting from Attributes
+      tableWrapperClass = Attributes.tableTagWrapperClass.str;
+      parentTableWidth = Attributes.tableWidth.str;
+      tableWrapperWidth = Attributes.tableTagWrapperWidth.str;
 
+      console.log('tableWrapperClass is: ' + tableWrapperClass);
+      console.log('parentTableWidth is: ' + parentTableWidth);
+      console.log('tableWrapperWidth is: ' + tableWrapperWidth);
       
+      // !VA Writing to CCP
+      document.querySelector(ccpUserInput.iptCcpTableWidth).value = parentTableWidth;
+      document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = tableWrapperClass;
+      document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value = tableWrapperWidth;
+
+      // !VA Branch: rethinkImgTypeLogic (052920)
+      // !VA Still need to disable the other options for fluid and enable them for fixed.
+      if (Attributes.imgType.str === 'fluid') {
+        console.log('fluid');
+        document.querySelector(ccpUserInput.rdoCcpTdBasic).checked = true;
+
+      }
     }
 
 
