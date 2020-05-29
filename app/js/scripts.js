@@ -401,24 +401,40 @@ var Witty = (function () {
       document.querySelector(appMessContainerId).classList.remove('active');
     }
 
+
+
     // !VA Toggle checkboxes and run any associated actions
     // !VA TODO: This function is misnamed, it only pertains to mock checkbox processing
     // !VA UIController private
-    function handleCCPInput(event) {
+    function handleCcpWrapperOptions(evt, ccpAttributes) {
+      console.log('handleCcpWrapperOptions running');
+      // console.log('ccpAttributes');
+      // console.log(ccpAttributes);
+      
       // !VA Get the Appdata for the input default value
       var data = appController.initGetAppdata();
       var chkId, checkbox;
-      // !VA Toggle CCP checkboxes and run associated operations. The CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
+      let wrapperItems = [];
       // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
-      var wrapperItemsToShow = [];
+      wrapperItems = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
 
-      // !VA With this mock checkmark structure, the clicked element is the checkmark, so we have to convert that ID to the corresponding checkbox before we can toggle it. 
-      // !VA Reboot: Also have to replace the 3-char element identifier.
+      console.log('mark1');
       chkId = event.target.id;
       chkId = chkId.replace('mrk', 'box');
       chkId = chkId.replace('spn', 'chk');
       checkbox = document.getElementById(chkId);
-      checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
+
+      // !VA If there's an event, there was a click
+      if (evt) {
+        // !VA Toggle the checkmark on click
+        checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
+      } else {
+        // !VA Only apply Attributes and update CCP
+
+      }
+
+      // !VA Toggle CCP checkboxes and run associated operations. The CSS calls for hiding the actual checkbox element and showing a span with a 'proxy' checkbox. We call it 'checkmrk' to make it easier to replace it with 'checkbox' here. 
+
 
       // !VA Now run any actions associated with the checkbox
       // !VA TODO: This value needs to be refreshed when the CCP is opened. In fact, entering new values in any of the toolButton inputs has to call a refresh of Appdata and a closing-reopening of the CCP so the values can refresh.
@@ -428,48 +444,107 @@ var Witty = (function () {
       document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
       // !VA Show wrapper table options if the checked element is 'table-include-wrapper-checkbox'
       if (checkbox.id === 'chk-ccp-table-include-wrapper-checkbox') {
-        wrapperItemsToShow = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
+        wrapperItems = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
         if (checkbox.checked) {
-          for (let i = 0; i < wrapperItemsToShow.length; i++) {
-            document.querySelector(wrapperItemsToShow[i]).style.display = 'block'; 
+          for (let i = 0; i < wrapperItems.length; i++) {
+            document.querySelector(wrapperItems[i]).style.display = 'block'; 
           }
         } else {
-          for (let i = 0; i < wrapperItemsToShow.length; i++) {
-            document.querySelector(wrapperItemsToShow[i]).style.display = 'none'; 
+          for (let i = 0; i < wrapperItems.length; i++) {
+            document.querySelector(wrapperItems[i]).style.display = 'none'; 
           }
         }
       }
     }
 
+    function handleCcpImgType(evt) {
+      console.log('evt is: ' + evt);
+      console.log('handleCcpImgType running');
+
+      let Attributes = CBController.initGetAttributes();
+      console.log('Attributes');
+      console.log(Attributes);
+          
+    }
+
     // !VA UIController private
-    function updateCcp(filteredAttributes) {
+    function updateCcp(ccpAttributes) {
+      // console.clear();
       console.log('updateCcp running');
       // !VA Get Appdata
       var Appdata = appController.initGetAppdata();
-      console.log('filteredAttributes:');
-      console.dir(filteredAttributes);
+      // !VA ccpAttributes is the shortlist of attributes whose values need to be reflected in the CCP. Passed in from filterCcpAttributes.
+      console.log('ccpAttributes:');
+      console.dir(ccpAttributes);
 
       // !VA Init elements that are initialized when the CCP is updated
-      let ccpCheckmarks, wrapperItemsToHide, selectedTdOption;
-      // !VA Initialize all the dynamically modified CCP elements
-      // !VA IMPORTANT: This is where the Include wrapper checkbox is failing when the CCP is initially opened.
-      // !VA Branch: reconfigureGetAttributes (052820)
-      // !VA Changing this from testing for the active class
-      if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
-        // !VA We have to initialize CCP DOM elements here because they don't exist until the CCP is displayed.
+      // !VA Wrapper table handling
 
-        // !VA CCP Checkboxes - these are mock checkboxes with custom styling, so the ID names have to be converted to checkbox names in order to select or deselect them. We attach the event handler to the checkmark, not the checkbox. The checkmark is converted to checkbox for handling in toggleCheckbox.
-        // !VA Branch: makeFluidOption (052620)
-        // ccpCheckmarks = [ ccpUserInput.spnCcpImgIncludeWidthHeightCheckmrk, ccpUserInput.spnCcpImgIncludeAnchorCheckmrk, ccpUserInput.spnCcpTableIncludeWrapperCheckmrk ];
+      // !VA Initialize the checkmark handling on ccp initialization, if no user click
+      // !VA Stopped here. Getting confused. Go back and look at the checkbox handling again in handleCcpWrapperOptions - it is very convoluted.Plus, it doesn't take the Attributes into account - doesn't reflect the changes when fluid is selected
+      // !VA WHY IS updateCCP running when you close the CCP?
+      // !VA The big problem is that Attributes aren't updating when CCP elements like fluid fixed are clicked. That is addressed by calling initGetAttributes in handleCcpImgType, but its another call to getAttributes. Also, you can't pass ccpAttributes and call initGetAttributes in the same function you passed it to, becuase a loop will ensue. What I need to do is build a subobject of Attributes from within updateCcp that only contains the pertinent Ccp UI elements and pass that. 
+
+
+
+      // !VA Pass in the false argument in order to skip over the toggling of the checkbox on click. If there's no event, then there's no click
+      doCheckmarkClick(false, ccpAttributes);
+      // !VA I remember there's a way to pass an argument in an eventListener but not today
+      function doCheckmarkClick(evt) {
+        // !VA Now we can pass the event and the ccpAttributes.
+        handleCcpWrapperOptions(evt, ccpAttributes);
+      }
+      // doImgTypeClick(evt);
+      // !VA I remember there's a way to pass an argument in an eventListener but not today
+      function doImgTypeClick(evt) {
+        // !VA Now we can pass the event and the ccpAttributes.
+
+        handleCcpImgType(evt);
+      }
+
+      let ccpCheckmarks, wrapperItems, selectedTdOption;
+      // !VA NOTE: These are not aliased
+      wrapperItems = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
+      // !VA Do all the CCP element initialization actions only if the CCP is displayed, i.e. has class 'active'
+      if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
+
+        // !VA Initialize Ccp with the appropriate options displayed or undisplayed, depending on the status of the checkbox
+        // for (let i = 0; i < ccpAttributes.length; i++) {
+        //   if ( ccpAttributes[i].id === ccpUserInput.spnCcpTableIncludeWrapperCheckmrk){
+        //     if (ccpAttributes[i].str) {
+        //       console.log('checked');
+        //       for (let i = 0; i < wrapperItems.length; i++) {
+        //         document.querySelector(wrapperItems[i]).style.display = 'block'; 
+        //       } 
+        //     } else {
+        //       for (let i = 0; i < wrapperItems.length; i++) {
+        //         document.querySelector(wrapperItems[i]).style.display = 'none'; 
+        //       } 
+        //     }
+        //   }
+        // }
+
+
+        // !VA Now we can initialize the event handler that will toggle the the checkbox
         ccpCheckmarks = [ ccpUserInput.spnCcpImgIncludeAnchorCheckmrk, ccpUserInput.spnCcpTableIncludeWrapperCheckmrk ];
         for (let i = 0; i < ccpCheckmarks.length; i++) {
-          document.querySelector(ccpCheckmarks[i]).addEventListener('click', handleCCPInput, false);
+          document.querySelector(ccpCheckmarks[i]).addEventListener('click', doCheckmarkClick, false);
         }
-        // !VA Initialize with all the 'Wrapper table' options undisplayed - uncomment this for DEV. NOTE: These are the IDs of the parent div's of the input elements, not the input elements themselves. They are only referenced here once, so there are no aliases for them. 
-        wrapperItemsToHide = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
-        for (let i = 0; i < wrapperItemsToHide.length; i++) {
-          document.querySelector(wrapperItemsToHide[i]).style.display = 'none'; 
+        var ccpImgType = [ ccpUserInput.rdoCcpImgFixed, ccpUserInput.rdoCcpImgFluid ];
+        for (let i = 0; i < ccpCheckmarks.length; i++) {
+          document.querySelector(ccpImgType[i]).addEventListener('click', doImgTypeClick, false);
         }
+
+
+
+
+
+
+
+
+
+
+
         // !VA Find out which tdoption is selected and send a click to that option to run displayTdTypeOptions and display the appropriate attributes for that option
         // !VA Branch: reconfigureGetAttributes (052820)
         // !VA This is no good. Mickey mouse shit, sending a click programattically...and it doesn't work when the ccp is first initialized in devmode....no idea why... wtf
@@ -503,34 +578,22 @@ var Witty = (function () {
     // !VA UIController public functions
     return {
 
-      // !VA Pass-thru to get to updateCcp - used in initUI, resizeContainers
-      initUpdateCcp: function (Attributes) {
-        // console.log('initCcp Attributes:');
-        // console.dir(Attributes);
-        // !VA Branch: reconfigureGetAttributes (052820)
-        // !VA Note that there's no argument being passed here although filteredAttributes is expected. This is a problem because when Ccp is initialized with the clibboard Button there's not filteredAttributes and hence no way to populate the Ccp elements...should have seen that coming...fuck! So what I need to do is run getAttributes and return the filteredAttributes
-        // UIController.filterCcpAttributes(Attributes);
-
-
-      },
-
       // !VA UIController public
       filterCcpAttributes: function (Attributes) {
         // console.log('filterCcpAttributes running');
         // console.log('Attributes:');
         // console.dir(Attributes);
-        let filteredAttributes = [];
+        let arr, ccpAttributes = [];
 
-        // !VA NOTE: This can probably be done with an ES6 method, come back to it.
-        filteredAttributes = Object.values(Attributes);
-        for (let i = 0; i < filteredAttributes.length; i++) {
-          if (filteredAttributes[i].id === false) {
-            delete filteredAttributes[i];
+        // !VA NOTE: This can probably be done with an ES6 method, come back to it. But for now, this removes the falsy array items, but doesn't get rid of them - the array still has emtpy slots for the 'deleted' array items. To permanently remove them, use the filter method.
+        arr = Object.values(Attributes);
+        for (let i = 0; i < arr.length; i++) {
+          if (arr[i].id === false) {
+            delete arr[i];
           }
         }
-        updateCcp(filteredAttributes);
-
-        
+        ccpAttributes = arr.filter(Boolean);
+        updateCcp(ccpAttributes);
       },
 
       // !VA UIController public
@@ -750,7 +813,7 @@ var Witty = (function () {
 
       // !VA UIController public
       displayTdTypeOptions: function(evt) {
-        // console.log('displayTdTypeOptions running');
+        console.log('displayTdTypeOptions running');
         // !VA Array including all the defined options for each tdoption radio
         let allTdOptions = [], optionsToShow = [], targetalias, parentDivId;
         let Appdata;
@@ -829,7 +892,13 @@ var Witty = (function () {
         } 
       },
 
+      toggleImgType: function (evt) {
 
+        console.log('event.target.id: ' + event.target.id);
+        console.log('document.querySelector(ccpUserInput.rdoCcpImgFixed).value is: ' + document.querySelector(ccpUserInput.rdoCcpImgFixed).value);
+
+        
+      },
 
 
     };
@@ -876,14 +945,21 @@ var Witty = (function () {
         // !VA IMG attributes
         imgType: (function() {
           // !VA Branch: reconfigureGetAttributes (052820)
-          // !VA For fixed images, if there's a class name entered into the class input, return the input value, or if the class input is empty, don't include the class attribute. For fluid images, return the class name 'img-fluid'.
-          // !VA This value is written to CCP so use ccpElementId
-          // !VA This element is get-only
-          ccpElementId = false;
-          getRadioState(ccpUserInput.rdoCcpImgFixed) ? str = 'fixed' : str = 'fluid';
-          // !VA Copy the radio state into local variable imgType so we can access it from within this function.
+          // !VA This value is written to CCP so we can pre-select the tdoption 'basic' if the imgType 'fluid' is selected. 
+          // !VA If the fixed radio button is checked, set ccpElementId to the fixed element id. Otherwise, set ccpElementId to the fluid element id. 
+          // console.log('document.querySelector(ccpUserInput.rdoCcpImgFixed).checked is: ' + document.querySelector(ccpUserInput.rdoCcpImgFixed).checked);
+          document.querySelector(ccpUserInput.rdoCcpImgFixed).checked ? ccpElementId = ccpUserInput.rdoCcpImgFixed : ccpElementId = ccpUserInput.rdoCcpImgFluid;
+          console.log('ccpElementId is: ' + ccpElementId);
+          // !VA Now get the str based on the above
+          ccpElementId === ccpUserInput.rdoCcpImgFixed ? str = 'fixed' : str = 'fluid';
+          console.log('str is: ' + str);
+          // !VA Locally, we need a variable for the imgType, so create one.
           imgType = str;
+
+
           retObj = returnObject(ccpElementId, str);
+          console.log('retObj');
+          console.log(retObj);
           return retObj;
         })(),
         imgClass: (function() {
@@ -1105,12 +1181,15 @@ var Witty = (function () {
         })(),
         tableTagWrapperClass: (function() {
           // !VA Branch: reconfig (052720)
-          // !VA This value is get-only - writes to style attribute of clipboard output but not CCP
+          // !VA This value writes to the CCP in the class input so populate ccpElementId
           // !VA If imgType is fixed, set the default class to 'devicewidth'. If it's fluid, set it to 'responsive-table' as per the Litmus newsletter template.
-          ccpElementId = false;
+          ccpElementId = ccpUserInput.iptCcpTableWrapperClass;
           imgType === 'fixed' ? str = 'devicewidth' : str = 'responsive-table';
           // return ccpIfNoUserInput('class',document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value);
           retObj = returnObject( ccpElementId, str );
+          console.log('retObj');
+          console.log(retObj);
+          
           return retObj;
         })(),
         tableTagWrapperAlign: (function() {
@@ -2214,7 +2293,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         console.log('initGetAttributes running');
         let Attributes = [];
         Attributes = getAttributes();
-        console.log(Attributes);
         return Attributes;
       },
 
@@ -2557,16 +2635,18 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
 
       
-      // !VA eventListeners for the imgType radio buttons for showing/hiding options based on selectedTdOption
-      for(let i in ccpUserInput) {
-        let selectedTdOption;
-        // !VA Target only those ccpUserInput elements whose first 12 characters are #rdo-ccp-img. This identifies them as the fluid/fixed radio button options.
-        if (ccpUserInput[i].substring(0, 12) === '#rdo-ccp-img') {
-          selectedTdOption = document.querySelector(ccpUserInput[i]);
-          // !VA Add an event handler to trap clicks to the tdoptions radio button
-          addEventHandler(selectedTdOption,'click',CBController.doClipboard,false);
-        }
-      }
+      // !VA eventListeners for the imgType radio buttons for showing/hiding options based on selectedTdOption are initialized in updateCcp
+      // for(let i in ccpUserInput) {
+      //   let selectedImgType;
+      //   // !VA Target only those ccpUserInput elements whose first 12 characters are #rdo-ccp-img. This identifies them as the fluid/fixed radio button options.
+      //   if (ccpUserInput[i].substring(0, 12) === '#rdo-ccp-img') {
+      //     console.log('i is: ' + i);
+      //     selectedImgType = document.querySelector(ccpUserInput[i]);
+      //     // !VA Add an event handler to trap clicks to the tdoptions radio button
+      //     addEventHandler(selectedImgType,'click',UIController.toggleImgType,false);
+      //   }
+      // }
+
 
       // !VA Misc Unused Handlers for review
       // =============================
@@ -3296,9 +3376,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
       
     // !VA  appController private
-
-
-
     // !VA Show element when input in another element is made 
     // !VA appController private
     function showElementOnInput(event) {
