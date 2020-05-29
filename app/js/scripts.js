@@ -473,25 +473,12 @@ var Witty = (function () {
     function handleCcpImgType(evt, ccpAttributes) {
       // console.log('evt is: ' + evt);
       // console.clear();
-      console.log('handleCcpImgType running');
-      console.log('evt.target.id is: ' + evt.target.id);
-      evt.stopPropagation? evt.stopPropagation() : evt.cancelBubble = true;
-      // debugger;
-      // console.log('ccpAttributes[0] is: ' + ccpAttributes[0]);
-      // console.log('event.target.id is: ' + event.target.id);
+      evt.stopPropagation ? evt.stopPropagation() : evt.cancelBubble = true;
 
-      // !VA Need to trap the id, test if it's the id of the current Attribute id and if it is return. This is to prevent running if the user clicks the already selected option. 
-      let curSelection, elFixed, elFluid;
-      elFixed = document.querySelector(ccpUserInput.rdoCcpImgFixed)
-
-
+      // !VA Toggle the imgType and write the new values to ccpAttributes
       for (let i = 0; i < ccpAttributes.length; i++) {
-        // console.log('ccpAttributes[i].id is: ' +  ccpAttributes[i].id);
-        
         if (ccpAttributes[i].id.includes('fixed') || ccpAttributes[i].id.includes('fluid')) {
-          console.log('ccpAttributes[i].id is: ' + ccpAttributes[i].id);
           if (ccpAttributes[i].id !== '#' + evt.target.id) {
-            console.log('HIT');
             if (ccpAttributes[i].id.includes('fixed')) {
               ccpAttributes[i].id = '#rdo-ccp-img-fluid';
               ccpAttributes[i].str = 'fluid';
@@ -502,14 +489,50 @@ var Witty = (function () {
           }
         }
       }
+      // !VA Pass the updated ccpAttributes to refreshCcp
+
+      // console.log('Attributes');
+      // console.dir(Attributes);
       refreshCcp(ccpAttributes);
     }
 
     // !VA 
     function refreshCcp(ccpAttributes) {
       console.log('refreshCcp running');
-      // console.log('ccpAttributes');
-      // console.dir(ccpAttributes);
+      let parentTableWidth, wrapperTableClass, wrapperTableWidth;
+      let Appdata = [];
+      Appdata = appController.initGetAppdata();
+      // !VA The problem is that as soon as we call getAttributes, we get into a loop because that calls updateCcp. But we can't update the attributes in order to call the new ones to update the Ccp with without updating the attributes...I have a logical conundrum here. The problem is that the ImgType buttons MUST somehow update the All the attributes. Let's go back to passing ccpAttributes and see what happens. 
+
+      // !VA Maybe all this attribute stuff was overengineering things...
+
+
+      console.log('ccpAttributes');
+      console.dir(ccpAttributes);
+      // let imgType, parentTableWidth, wrapperTableWidth, wrapperTableClass;
+
+      if (ccpAttributes[0].id.includes('fixed')) {
+        parentTableWidth = Appdata.imgW;
+        console.log('parentTableWidth is: ' + Appdata.imgW);
+        wrapperTableClass = 'devicewidth';
+        console.log('wrapperTableClass is: ' + 'wrapperTableClass');
+        wrapperTableWidth = Appdata.viewerW;
+        console.log('wrapperTableWidth is: ' + wrapperTableWidth);
+
+
+
+      } else if (ccpAttributes[0].id.includes('fluid')) {
+        console.log('Show fluid image options');
+        parentTableWidth = '100%';
+        console.log('parentTableWidth is: ' + parentTableWidth);
+        wrapperTableClass = 'responsive-table';
+        console.log('wrapperTableClass is: ' + wrapperTableClass);
+        wrapperTableWidth = '100%';
+        console.log('wrapperTableWidth is: ' + wrapperTableWidth);
+      }
+
+
+
       
     }
 
@@ -520,6 +543,7 @@ var Witty = (function () {
     function updateCcp(ccpAttributes) {
       // console.clear();
       console.log('updateCcp running');
+      // debugger;
       // !VA Get Appdata
       // var Appdata = appController.initGetAppdata();
       // !VA ccpAttributes is the shortlist of attributes whose values need to be reflected in the CCP. Passed in from filterCcpAttributes.
@@ -546,15 +570,23 @@ var Witty = (function () {
         console.log('not yet implemented');
       }
       
-      // var blib = function (evt) {
-      //   evt.stopPropagation;
-      //   handleCcpImgType(evt, ccpAttributes, blib);
-      //   document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blib, false);
-      //   // document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blib, false);
-
-      //   return;
+      var blib = function (evt) {
+        // debugger;
+        evt.stopPropagation ? evt.stopPropagation() : evt.cancelBubble = true;
+        handleCcpImgType(evt, ccpAttributes);
+        // document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blib, false);
+        // document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blib, false);
         
-      // };
+      };
+
+      var blab = function (evt) {
+        // debugger;
+        evt.stopPropagation ? evt.stopPropagation() : evt.cancelBubble = true;
+        handleCcpImgType(evt, ccpAttributes);
+        // document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blab, false);
+        // document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blib, false);
+        
+      };
       
       // !VA Do all the CCP element initialization actions only if the CCP is displayed, i.e. has class 'active'
       // !VA PROBLEM: updateCcp is running again when the ccp is closed...causing a problem here.
@@ -567,18 +599,15 @@ var Witty = (function () {
 
         // !VA Branch: reconfigureGetAttributes (052820)
         // !VA ImgType Options and Event Handler
-        // document.querySelector(ccpUserInput.rdoCcpImgFixed).removeEventListener('click',blib, false);
-
-        var ccpImgType = [ ccpUserInput.rdoCcpImgFixed, ccpUserInput.rdoCcpImgFluid ];
-        for (let i = 0; i < ccpImgType.length; i++) {
-          document.querySelector(ccpImgType[i]).addEventListener('click',function() {
-            handleCcpImgType(event, ccpAttributes);
-          }, false);
+        // var ccpImgType = [ ccpUserInput.rdoCcpImgFixed, ccpUserInput.rdoCcpImgFluid ];
+        // for (let i = 0; i < ccpImgType.length; i++) {
+        //   document.querySelector(ccpImgType[i]).addEventListener('click',blib, false);
           
-        }
+        // }
+        document.querySelector(ccpUserInput.rdoCcpImgFixed).addEventListener('click',blib, false);
+        document.querySelector(ccpUserInput.rdoCcpImgFluid).addEventListener('click',blab, false);
 
-
-
+        
 
         // !VA Wrapper Table Options and Event Handler. For now, pass in the false argument in order to skip over the toggling of the checkbox on click. If there's no event, then there's no click. IMPORTANT: This will change when we move updateCcp into the background and the clipboard button just displays/undisplays
         // handleCcpWrapperOptions(false, ccpAttributes);
@@ -2338,6 +2367,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         console.log('initGetAttributes running');
         let Attributes = [];
         Attributes = getAttributes();
+        // console.log('initgetAttributes:');
+        // console.dir(Attributes);
         return Attributes;
       },
 
@@ -3003,14 +3034,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     function handleKeydown(evt) {
       // console.log('handleKeydown running');
       try {
-        console.log('handleKeyDown try: ');
+        // console.log('handleKeyDown try: ');
         var vals = [], msgElement;
         vals = (Object.values(appMessageElements));
         for (let i = 0; i < vals.length; i++) {
-          console.log('vals[i] is: ' +  vals[i]);
+          // console.log('vals[i] is: ' +  vals[i]);
           msgElement = document.getElementById(vals[i]);
           if (msgElement.classList.contains('active')) {
-            console.log('is active');
+            // console.log('is active');
           }
         }
       } catch (error) {
@@ -3071,7 +3102,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA TODO: Why are there unused elements and what is actually happening here?
     // !VA keyPress handler for the ESC key.  This has to be handled on keyup, so we need a separate handler for it.
     function handleKeyup(evt) {
-      console.log('handleKeyUp running');
+      // console.log('handleKeyUp running');
       let prop, curLocalStorage;
       // !VA We only need the property here, so no need to create an args object. We could actually just use the target but since we're standardizing on property names, let's stick with that. Get the property name from the id of this, i.e. the event target
       prop = elementIdToAppdataProp(this.id);
