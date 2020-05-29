@@ -408,25 +408,25 @@ var Witty = (function () {
     // !VA UIController private
     function handleCcpWrapperOptions(evt, ccpAttributes) {
       console.log('handleCcpWrapperOptions running');
-      // console.log('ccpAttributes');
-      // console.log(ccpAttributes);
+      console.log('ccpAttributes');
+      console.log(ccpAttributes);
       
+      // var data = appController.initGetAppdata();
       // !VA Get the Appdata for the input default value
-      var data = appController.initGetAppdata();
       var chkId, checkbox;
       let wrapperItems = [];
       // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
       wrapperItems = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
 
-      console.log('mark1');
-      chkId = event.target.id;
-      chkId = chkId.replace('mrk', 'box');
-      chkId = chkId.replace('spn', 'chk');
-      checkbox = document.getElementById(chkId);
-
+      
       // !VA If there's an event, there was a click
       if (evt) {
         // !VA Toggle the checkmark on click
+        console.log('mark1');
+        chkId = event.target.id;
+        chkId = chkId.replace('mrk', 'box');
+        chkId = chkId.replace('spn', 'chk');
+        checkbox = document.getElementById(chkId);
         checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
       } else {
         // !VA Only apply Attributes and update CCP
@@ -440,21 +440,21 @@ var Witty = (function () {
       // !VA TODO: This value needs to be refreshed when the CCP is opened. In fact, entering new values in any of the toolButton inputs has to call a refresh of Appdata and a closing-reopening of the CCP so the values can refresh.
       
       // !VA Defaults for wrapper width and class
-      document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value = `${data.viewerW}`;
-      document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
+      // document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value = `${data.viewerW}`;
+      // document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
       // !VA Show wrapper table options if the checked element is 'table-include-wrapper-checkbox'
-      if (checkbox.id === 'chk-ccp-table-include-wrapper-checkbox') {
-        wrapperItems = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
-        if (checkbox.checked) {
-          for (let i = 0; i < wrapperItems.length; i++) {
-            document.querySelector(wrapperItems[i]).style.display = 'block'; 
-          }
-        } else {
-          for (let i = 0; i < wrapperItems.length; i++) {
-            document.querySelector(wrapperItems[i]).style.display = 'none'; 
-          }
-        }
-      }
+      // if (checkbox.id === 'chk-ccp-table-include-wrapper-checkbox') {
+      //   wrapperItems = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
+      //   if (checkbox.checked) {
+      //     for (let i = 0; i < wrapperItems.length; i++) {
+      //       document.querySelector(wrapperItems[i]).style.display = 'block'; 
+      //     }
+      //   } else {
+      //     for (let i = 0; i < wrapperItems.length; i++) {
+      //       document.querySelector(wrapperItems[i]).style.display = 'none'; 
+      //     }
+      //   }
+      // }
     }
 
     function handleCcpImgType(evt) {
@@ -469,13 +469,13 @@ var Witty = (function () {
 
     // !VA UIController private
     function updateCcp(ccpAttributes) {
-      // console.clear();
+      console.clear();
       console.log('updateCcp running');
       // !VA Get Appdata
       var Appdata = appController.initGetAppdata();
       // !VA ccpAttributes is the shortlist of attributes whose values need to be reflected in the CCP. Passed in from filterCcpAttributes.
-      console.log('ccpAttributes:');
-      console.dir(ccpAttributes);
+      // console.log('ccpAttributes:');
+      // console.dir(ccpAttributes);
 
       // !VA Init elements that are initialized when the CCP is updated
       // !VA Wrapper table handling
@@ -485,7 +485,10 @@ var Witty = (function () {
       // !VA WHY IS updateCCP running when you close the CCP?
       // !VA The big problem is that Attributes aren't updating when CCP elements like fluid fixed are clicked. That is addressed by calling initGetAttributes in handleCcpImgType, but its another call to getAttributes. Also, you can't pass ccpAttributes and call initGetAttributes in the same function you passed it to, becuase a loop will ensue. What I need to do is build a subobject of Attributes from within updateCcp that only contains the pertinent Ccp UI elements and pass that. 
 
-
+      for (let i = 0; i < ccpAttributes.length; i++) {
+        console.log('ccpAttributes[i] is: ' +  ccpAttributes[i]);
+      }
+      
 
       // !VA Pass in the false argument in order to skip over the toggling of the checkbox on click. If there's no event, then there's no click
       doCheckmarkClick(false, ccpAttributes);
@@ -712,7 +715,9 @@ var Witty = (function () {
             // !VA First, set it to the opposite of how you want to start it.
             document.querySelector(staticRegions.ccpContainer).classList.add('active');
             // !VA Then run updateCCP to initialize - initUpdateCcp is the public UIController function included just to access UiController private updateCccp from the appController module
-            UIController.initUpdateCcp();
+            // !VA Branch: reconfigureGetAttributes (052820)
+            var Attributes = CBController.initGetAttributes();
+            updateCcp(Attributes);
           }, delayInMilliseconds);
         }
         // !VA The rest of the routine applies to DEV and PROD modes
