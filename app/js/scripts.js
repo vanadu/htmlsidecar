@@ -5,6 +5,11 @@
 // !VA GENERAL NOTES
 /* !VA  - April Reboot Notes
 =========================================================
+// !VA 05.30.20 
+I'm pausing here to clean up all console calls and old comments. 
+
+
+
 // !VA 05.26.20
 TODO: Implement fluid option in IMG options.
 // !VA Branch: makeFluidOption (052620)
@@ -39,19 +44,10 @@ makeCssRule
 I've spent two days working with this. There are all sorts of pitfalls -- but the bottom line is that it didn't work. The root of the problem was that I was trying to make the entire Ccp update happen from a separate function, updateCcp, where also the logic for the imgType buttons lived. That didn't work because the imgType buttons rely on the data in getAttributes, and calling getAttributes called updateCcp, and a clusterfuck of circular logic and loops ensued. I will have to go back to the original plan - save this version and group the imgType logic in with the makeNode buttons, keeping them separate from updateCcp.
 
 TO FIX:
-Include Wrapper checkbox doesn't work properly
-TDoptions don't display on reload
+TODO: Include Wrapper checkbox doesn't display by default if fluid
+TODO: Ccp doesn't update if Toolbar value is changed unless it's closed and reopened
 
-
-
-  
-*/
-/*
-
-
-
-
-
+DONE: TDoptions don't display on reload
 
 
 
@@ -579,7 +575,7 @@ var Witty = (function () {
         document.querySelector(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk).addEventListener('click', function () {
           handleCcpWrapperOptions(event, handleCcpAnchorOptions);
         }, false);
-        // !VA Find out which tdoption is selected and send a click to that option to run displayTdTypeOptions and display the appropriate attributes for that option
+        // !VA Find out which tdoption is selected and send a click to that option to run showTdOptions and display the appropriate attributes for that option
         // !VA Branch: reconfigureGetAttributes (052820)
         // !VA This is no good. Mickey mouse shit, sending a click programattically...and it doesn't work when the ccp is first initialized in devmode....no idea why... wtf
         // selectedTdOption = document.querySelector('input[name="tdoptions"]:checked');
@@ -610,14 +606,14 @@ var Witty = (function () {
     return {
       // !VA Catch-all function for displaying/undisplaying, disabling/enabling and adding/removing classes to CCP elements. action is the action to execute, elemArray is the array of elements the action is to apply to and state is the toggle state whereby true turns the action on and false turns it off.
       handleCcpActions: function (action, elemArray, option ) {
-        console.clear();
+        // console.clear();
         console.log('handleCcpDisplay running');
-        console.log('action');
-        console.dir(action);
-        console.log('elemArray:');
-        console.dir(elemArray);
-        console.log('option');
-        console.dir(option);
+        // console.log('action');
+        // console.dir(action);
+        // console.log('elemArray:');
+        // console.dir(elemArray);
+        // console.log('option');
+        // console.dir(option);
         let elem;
         // !VA This function gets the id of the parent div of the td option to be displayed/hidden. We need the parent div because it contains label and input of the element, not just the input field or dropdown list itself.
         function getParentDiv(parentDivId) {
@@ -626,7 +622,7 @@ var Witty = (function () {
         }
 
         // !VA Function to show the specific options available for the selected TD options radio
-        function activeClass(elemArray, option) {
+        function setActiveClass(elemArray, option) {
           for (let i = 0; i < elemArray.length; i++) {
             // !VA If the action parameter contains the string 'parent' then apply/remove the active class to/from the parent of the target rather than the target itself.
             if (action.includes('parent')) {
@@ -653,14 +649,36 @@ var Witty = (function () {
         }
 
 
+        // !VA Disables/enables an input element, applies/removes the disabled-radio class to the input element, and applies the disabled class to the input element's label. NOTE: Currently need a separate function to disable text input elements but that can probably be folded into this.
+        let str, elementLabel;
+        function setDisabled(elemArray, option) {
+          for (let i = 0; i < elemArray.length; i++) {
+            if (option) {
+              str = elemArray[i];
+              elementLabel = str + '-label';
+              document.querySelector(elementLabel).classList.add('disabled');
+              document.querySelector(elemArray[i]).disabled = true;
+              document.querySelector(elemArray[i]).classList.add('disabled-radio');
+            } else {
+              str = elemArray[i];
+              elementLabel = str + '-label';
+              document.querySelector(elementLabel).classList.remove('disabled');
+              document.querySelector(elemArray[i]).disabled = false;
+              document.querySelector(elemArray[i]).classList.remove('disabled-radio');
+            }
+          }
+        }
+
+
         switch(true) {
         // !VA In showTdOptions: Active class must be applied to the parent div of the target in order to display/undisplay the container including input and label. 
-        case action === 'activateparent':
-          console.log('activateparent...');
-          activeClass(elemArray, option);
+        case action === 'setactiveparent':
+          console.log('setactiveparent...');
+          setActiveClass(elemArray, option);
           break;
-        case action === 'disable':
-          // code block
+        case action === 'setdisabledradio':
+          console.log('setdisabledradio...');
+          setDisabled(elemArray, option);
           break;
         case action === 'setvalue':
           console.log('setvalue');
@@ -669,9 +687,6 @@ var Witty = (function () {
         default:
           console.log('handleCcpActions: no action defined');
         } 
-
-
-
 
       },
 
@@ -793,6 +808,13 @@ var Witty = (function () {
             // !VA Then run updateCCP to initialize - initUpdateCcp is the public UIController function included just to access UiController private updateCccp from the appController module
             // !VA Branch: reconfigureGetAttributes (052820)
             var Attributes = CBController.initGetAttributes();
+
+            // !VA NOW: The toggle Ccp element functions are all in appController either I have to replicated them here or find another solution or live with the fact that they don't initialize. Or run initUI from here...
+            // toggleIncludeWrapper(false);
+            appController.initToggleImgType();
+            appController.initToggleIncludeWrapper();
+            appController.initShowTdOptions();
+
             // updateCcp(Attributes);
           }, delayInMilliseconds);
         }
@@ -1804,8 +1826,8 @@ var Witty = (function () {
         tdInner.vAlign = Attributes.tdValign.str;
         // !VA Set the background attribute to the current path/filename
         tdInner.setAttribute('background', Attributes.tdBackground.str);
-        // !VA Fallback bgcolor now set in UIController.displayTdTypeOptions
-        // !VA Include fallback color from the default set in displayTdTypeOptions
+        // !VA Fallback bgcolor now set in UIController.showTdOptions
+        // !VA Include fallback color from the default set in showTdOptions
         // Attributes.tdBgcolor ? tdInner.bgColor = Attributes.tdBgcolor : tdInner.bgColor = '#7bceeb';
         break;
       // case (selectedTdOption === 'posswitch'):
@@ -1814,7 +1836,7 @@ var Witty = (function () {
         break;
       // case (selectedTdOption === 'vmlbutton'):
       case (uSels.selectedTdOption === 'vmlbutton'):
-        // !VA Height and width fields have to be entered, otherwise the button can't be built. Button width and height are set here in makeTdNode, the rest of the options are set in getVmlCodeBlock in buildOutputNodeList. The defaults of 40/200 as per Stig are set in UIController.displayTdTypeOptions. So if there's no value for td height and width, then the user has deleted the default and not replaced it with a valid entry. In this case, throw an ERROR and abort before it gets to the clipboard.
+        // !VA Height and width fields have to be entered, otherwise the button can't be built. Button width and height are set here in makeTdNode, the rest of the options are set in getVmlCodeBlock in buildOutputNodeList. The defaults of 40/200 as per Stig are set in UIController.showTdOptions. So if there's no value for td height and width, then the user has deleted the default and not replaced it with a valid entry. In this case, throw an ERROR and abort before it gets to the clipboard.
         if (!document.querySelector(ccpUserInput.iptCcpTdHeight).value || !document.querySelector(ccpUserInput.iptCcpTdWidth).value) {
           console.log('ERROR in makeTdNode vmlbutton: no value for either height or width');
           isErr = true;
@@ -1961,7 +1983,7 @@ var Witty = (function () {
       linebreak = '\n';
       // !VA 03.09.2020 Set the indentLevel to 1 for now
       fallback = '#7bceeb';
-      // !VA The fallback color is written to the bgcolor input in displayTdTypeOptions, so get it from there
+      // !VA The fallback color is written to the bgcolor input in showTdOptions, so get it from there
       Attributes.tdBgcolor.str ? bgcolor = Attributes.tdBgcolor.str : bgcolor = document.querySelector(ccpUserInput.iptCcpTdBgColor).value;
 
       // !VA Define the innerHTML of the bgimage code
@@ -1978,7 +2000,7 @@ var Witty = (function () {
       // console.dir(Attributes);
       let vmlButtonStr, linebreak, tdHeight, tdWidth;
       linebreak = '\n';
-      // !VA Defaults for height and width are set in displayTdTypeOptions, so get the values from the inputs
+      // !VA Defaults for height and width are set in showTdOptions, so get the values from the inputs
       tdHeight = document.querySelector(ccpUserInput.iptCcpTdHeight).value;
       tdWidth = document.querySelector(ccpUserInput.iptCcpTdWidth).value;
       // !VA Define the innerHTML of the vmlbutton code
@@ -3355,6 +3377,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     function initCcp() {
       // !VA Get Appdata
       // !VA Branch: rethinkImgTypeLogic (052920)
+
+      // !VA We should be able to initialize the Ccp elements here without calling their toggle functions, 
       // !VA Initialize the fixed/fluid imgType buttons - call getAttributes and populate the CCP elements with values based on whether fixed or fluid is selected.
       toggleImgType();
 
@@ -3406,23 +3430,25 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
     }
 
+    // !VA appController private 
+    // !VA Contains the logic for displaying/undisplaying, disabling/enabling, setting/deleting values from the tdoptions radio input group. 
     function showTdOptions(evt) {
       console.log('showTdOptions running');
-
-      // !VA Moving this here from CBController public. The goal is to only have the logic here and move all the display functionality into universal UIController functions
-
-
       // !VA Array including all the defined options for each tdoption radio
       let allTdOptions = [], optionsToShow = [], valuesToSet = [], values = [], targetalias;
       let Appdata;
       Appdata = appController.initGetAppdata();
       // !VA Add the hash to the target id to match it with the alias
-      targetalias = '#' + evt.target.id;
+      // !VA DEVMODE: If dev mode, then false is passed in instead of an event, so just put in a dummy id to get it running
+      if (evt) { targetalias = '#' + evt.target.id; 
+      } else {
+        targetalias = ccpUserInput.rdoCcpTdBasic;
+      }
       // !VA Populate allTdOptions with all the defined Td options
       allTdOptions = [ ccpUserInput.iptCcpTdClass,  ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor, ccpUserInput.iptCcpTdFontColor, ccpUserInput.iptCcpTdBorderColor, ccpUserInput.iptCcpTdBorderRadius  ];
 
       // !VA Cycle through all the parent divs of each of the TD options and remove the active class to hide them all. This needs to be done before showing the specific options for the selected TD option radio
-      UIController.handleCcpActions( 'activateparent', allTdOptions, false);
+      UIController.handleCcpActions( 'setactiveparent', allTdOptions, false);
 
       // !VA Reset the height, width and bgcolor fields to '', otherwise the vmlbutton defaults will persist if the user selects the vmlbutton radio button. Pass false for the option argument to set the value to ''.
       valuesToSet = [ ccpUserInput.iptCcpTdHeight, ccpUserInput.iptCcpTdWidth, ccpUserInput.iptCcpTdBgColor ];
@@ -3436,28 +3462,26 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       case targetalias === ccpUserInput.rdoCcpTdBasic || targetalias === ccpUserInput.rdoCcpTdExcludeimg:
         optionsToShow = [ ccpUserInput.iptCcpTdClass,  ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor ];
         // !VA Run showOptions to get the 
-        UIController.handleCcpActions( 'activateparent', optionsToShow, true);
+        UIController.handleCcpActions( 'setactiveparent', optionsToShow, true);
         break;
         // !VA tdoption posswitch
       case targetalias === ccpUserInput.rdoCcpTdPosswitch:
         // !VA TODO: Cerebrus has NO td options except width: 100% - let's add 'class' andleave it like that for the time being and see if there's a case where any other options are useful. 
         optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTdBgColor ];
-        UIController.handleCcpActions( 'activateparent', optionsToShow, true);
+        UIController.handleCcpActions( 'setactiveparent', optionsToShow, true);
         break;
         // !VA tdoption imgswap
       case targetalias === ccpUserInput.rdoCcpTdImgswap:
         optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign ];
-        UIController.handleCcpActions( 'activateparent', optionsToShow, true);
+        UIController.handleCcpActions( 'setactiveparent', optionsToShow, true);
         break;
         // !VA tdoption bgimage
       case targetalias === ccpUserInput.rdoCcpTdBgimage:
         // !VA bgcolor, width, height, valign
         optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor ];
-        UIController.handleCcpActions( 'activateparent', optionsToShow, true);
+        UIController.handleCcpActions( 'setactiveparent', optionsToShow, true);
         // !VA Get the default height and width from Appdata and apply
         valuesToSet = [ ccpUserInput.iptCcpTdHeight, ccpUserInput.iptCcpTdWidth, ccpUserInput.iptCcpTdBgColor ];
-        console.log('valuesToSet:');
-        console.dir(valuesToSet);
         // !VA Don't forget values is an array and has to be handled as such in 
         values = [ Appdata.imgH, Appdata.imgW, '#7bceeb' ];
         UIController.handleCcpActions( 'setvalue', valuesToSet, values);
@@ -3465,7 +3489,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA tdoption vmlbutton
       case targetalias === ccpUserInput.rdoCcpTdVmlbutton:
         optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor, ccpUserInput.iptCcpTdFontColor, ccpUserInput.iptCcpTdBorderColor, ccpUserInput.iptCcpTdBorderRadius ];
-        UIController.handleCcpActions( 'activateparent', optionsToShow, true);
+        UIController.handleCcpActions( 'setactiveparent', optionsToShow, true);
         // !VA The height and width field require an entry otherwise the button can't be built, that's why Stig has default values of 40/200 in his code. So we include the defaults here when the inputs are displayed and include error handling if the user omits one
         // !VA Include the default bgcolor as per Stig
         valuesToSet = [ ccpUserInput.iptCcpTdHeight, ccpUserInput.iptCcpTdWidth, ccpUserInput.iptCcpTdBgColor, ccpUserInput.iptCcpTdFontColor, ccpUserInput.iptCcpTdBorderColor, ccpUserInput.iptCcpTdBorderRadius ];
@@ -3473,7 +3497,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         UIController.handleCcpActions( 'setvalue', valuesToSet, values);
         break;
       default:
-        console.log('ERROR: UIController.displayTdTypeOptions public');
+        console.log('ERROR: UIController.showTdOptions public');
       } 
     }
 
@@ -3481,53 +3505,26 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Branch: rethinkImgTypeLogic (052920)
     function toggleImgType() {
       console.log('toggleImgType running');
+      // !VA Get Attributes so we can assign them to the Ccp elements 
       let Attributes;
-      console.clear();
       Attributes = CBController.initGetAttributes();
-      console.log('toggleImgType Attributes:');
-      console.dir(Attributes);
-      let parentTableWidth, tableWrapperClass, tableWrapperWidth;
        
       // !VA Loop through Attributes and assign values to corresponding elements. The logic is included in the Attribute, so just assign the values here.
       const sourceAttributes = [ Attributes.tableTagWrapperClass.str, Attributes.tableWidth.str, Attributes.tableTagWrapperWidth.str];
       const targetCcpElement = [ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWidth, ccpUserInput.iptCcpTableWrapperWidth ];
       UIController.handleCcpActions( 'setvalue', targetCcpElement, sourceAttributes );
 
-      // !VA Stopped here...
-      // !VA Branch: rethinkImgTypeLogic (052920)
       // !VA Preselect the tdoption 'basic',  disable the other td options for fluid, and make sure the Include wrapper is checked and the options are displayed. The other td options won't work with or aren't applicable for fluid because fluid is only for images. 
-      if (Attributes.imgType.str === 'fluid') {
-        console.log('fluid');
-        document.querySelector(ccpUserInput.rdoCcpTdBasic).checked = true;
-        let str, elementLabel;
-        const toDisable = [ ccpUserInput.rdoCcpTdExcludeimg, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdBgimage, ccpUserInput.rdoCcpTdPosswitch, ccpUserInput.rdoCcpTdVmlbutton ];
-        for (let i = 0; i < toDisable.length; i++) {
-          str = toDisable[i];
-          elementLabel = str + '-label';
-          document.querySelector(elementLabel).classList.add('disabled');
-          document.querySelector(toDisable[i]).disabled = true;
-          document.querySelector(toDisable[i]).classList.add('disabled-radio');
-        }
+      // !VA Preselect the option 'basic'
+      document.querySelector(ccpUserInput.rdoCcpTdBasic).checked = true;
+      // !VA Array of radio input elements to disable
+      const toDisable = [ ccpUserInput.rdoCcpTdExcludeimg, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdBgimage, ccpUserInput.rdoCcpTdPosswitch, ccpUserInput.rdoCcpTdVmlbutton ];
+      // !VA Ternary operator to disable/enable radio input elements
+      Attributes.imgType.str === 'fluid' ? UIController.handleCcpActions( 'setdisabledradio', toDisable, true ) : UIController.handleCcpActions( 'setdisabledradio', toDisable, false);
 
-      } else {
-        let str, elementLabel;
-        const toDisable = [ ccpUserInput.rdoCcpTdExcludeimg, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdBgimage, ccpUserInput.rdoCcpTdPosswitch, ccpUserInput.rdoCcpTdVmlbutton ];
-        for (let i = 0; i < toDisable.length; i++) {
-          str = toDisable[i];
-          elementLabel = str + '-label';
-          console.log('elementLabel is: ' + elementLabel);
-          document.querySelector(elementLabel).classList.remove('disabled');
-          document.querySelector(toDisable[i]).disabled = false;
-          document.querySelector(toDisable[i]).classList.remove('disabled-radio');
-        }
-      }
+      // !VA If the include wrapper checkbox is not checked and the options aren't displayed for the fluid imgType options, check it and display the options.
 
 
-
-
-
-
-      
     }
 
 
@@ -3811,9 +3808,21 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController public functions
     return {
       // !VA Dev Mode pass-thru public functions to expose calcViewerSize and initCcp to UIController.initUI
-      // !VA appController public
+      // !VA appController public: DEVMODE
       initCalcViewerSize: function() {
         calcViewerSize();
+      },
+      // !VA appController public: DEVMODE
+      initToggleImgType: function () {
+        toggleImgType(false);
+      },
+      // !VA appController public: DEVMODE
+      initToggleIncludeWrapper: function () {
+        toggleIncludeWrapper(false);
+      },
+      // !VA appController public: DEVMODE
+      initShowTdOptions: function () {
+        showTdOptions(false);
       },
 
       // !VA appController public
@@ -3868,10 +3877,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           }, duration);
         }
       },
-
-
-
-
 
       // !VA This is a pass-thru to access queryDOMElements (public UIController)  to get the current dimensions of the dynamic DOM elements and data attributes, and getAppdata (private appController) to calculate the non-DOM Appdata properties. We do this here because Appdata has to be queried in all three modules, so it has to be accessible in all of them, and because getAppdata needs getAspectRatio which belongs in appController.
       // !VA appController public
