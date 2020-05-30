@@ -1076,13 +1076,16 @@ fieldset {
   }
 }
 
-// VA! TD options to show an hide based on selected radio
-#ccp-td-align, #ccp-td-valign, #ccp-td-class, #ccp-td-height, #ccp-td-width, #ccp-td-bgcolor, #ccp-td-fontcolor, #ccp-td-bordercolor, #ccp-td-borderradius {
+// VA! TD options to display/undisplay based on selected radio; table wrapper options to display/undisplay when Include table wrapper checkbox is checked/unchecked
+#ccp-td-align, #ccp-td-valign, #ccp-td-class, #ccp-td-height, #ccp-td-width, #ccp-td-bgcolor, #ccp-td-fontcolor, #ccp-td-bordercolor, #ccp-td-borderradius, #ccp-table-wrapper-class, #ccp-table-wrapper-width, #ccp-table-wrapper-align, #ccp-table-wrapper-bgcolor {
   display: none;
   &.active {
     display: block;
   }
-}  
+} 
+
+
+
 
 // VA! Reboot: 
 #ccp-table-include-wrapper-label {

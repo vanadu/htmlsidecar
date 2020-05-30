@@ -3,83 +3,18 @@
 // See C:\Users\VANA\OneDrive\WhittyReview_12.30.19.docx
 
 // !VA GENERAL NOTES
-/* !VA  - April Reboot Notes
+/* !VA  - May Reboot Notes
 =========================================================
 // !VA 05.30.20 
-I'm pausing here to clean up all console calls and old comments. 
-
-
-
-// !VA 05.26.20
-TODO: Implement fluid option in IMG options.
-// !VA Branch: makeFluidOption (052620)
-So what we need to do is:
-The challenge now is how to balance the needs of updatihg the CCP against the modular structure of the app. We have calls we need to make to getAttributes, which is now in CBController. But it needs to be accessed from appConroller because that's where the event handler is that handles the fixed/fluid button. This might be a good time to also reevaluate all the repeated calls to getAttributes. What we need to do is move getAttributes to appController, consolidate the calls to appController down to a single one and pass it everywhere else as a parameter.
-
-Where is getAttributes called from in CBController?
-setPosSwitchNodeAttributes
-makeImgNode
-makeTdNode
-makeTableNode
-getImgSwapBlock
-getBgimageBlock
-getVmlButtonBlock
-makeCssRule
-
-
-
-/* !VA  FULL WIDTH TABLES
-  .responsive-table {
-    width: 100% !important;
-  }
-  .img-max {
-    max-width: 100% !important;
-    width: 100% !important;
-    height: auto !important;
-  }
-  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 500px;" class="responsive-table">
-  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-  <img src="hero-1.jpg" width="500" height="400" border="0" alt="Insert alt text here" style="display: block; color: #666666;  font-family: Helvetica, arial, sans-serif; font-size: 16px;" class="img-max">
-
-I've spent two days working with this. There are all sorts of pitfalls -- but the bottom line is that it didn't work. The root of the problem was that I was trying to make the entire Ccp update happen from a separate function, updateCcp, where also the logic for the imgType buttons lived. That didn't work because the imgType buttons rely on the data in getAttributes, and calling getAttributes called updateCcp, and a clusterfuck of circular logic and loops ensued. I will have to go back to the original plan - save this version and group the imgType logic in with the makeNode buttons, keeping them separate from updateCcp.
+Milestone reached: imgType fluid/fixed implemented, mostly. I'm pausing here to clean up all console calls and old comments. Branching to milestoneCleanup053020
 
 TO FIX:
-TODO: Include Wrapper checkbox doesn't display by default if fluid
+DONE: TDoptions don't display on reload
+DONE: Include Wrapper checkbox doesn't display by default if fluid - fixed.
+
+TODO: Implement toggleIncludeAnchor
 TODO: Ccp doesn't update if Toolbar value is changed unless it's closed and reopened
 
-DONE: TDoptions don't display on reload
-
-
-
-
-
-
-Status:
-DONE: Figure out how to prevent getAttributes from being called multiple times. That is multiple DOM accesses...no good. Replaced all the function calls with passed arguments. Now getAttributes is only called in buildOutputNodeList
-DONE: Remove include width and height in style - that will be default for fixed image
-DONE: Implement ALT+CTRL+Hover tooltips.
-DONE: AppMessage implementation mostly done, but the tooltip implementation sucks. Must revisit
-DONE: Fix imgswap codeBlock output: alt tag has quotes following, alt doesn't work. THis was fixed in an earlier commit.
-DONE: vmlbutton - add default 40/200 width and height as per Stig and add error handling if one of the values is omitted.
-DONE: Populate inputs with defaults in vmlbutton and 
-DONE: Fix viewer doesn't resize horizontally any more in PROD mode or show the Inspectors - but works in DEV mode.
-DONE: rtl class attribute shows when nothing is entered: it should be hidden. FIXED in setPosSwitchNodeAttributes
-DONE: Notate all functions with module and private/public
-DONE: run queryDOMElements only on enter, not on every keypress - in order to do this, need to get the previous value of the input so the user can ESC out of the field without implementing changed value. Right  now we are getting this value from Appdata. FIXED - Now gets value from HTML element placeholder or from localStorage
-DONE: CCP input fields should select all when clicked in like they do in the toolbar - no they shouldn't for now. User should be able to set the cursor in the field and change any value that way.
-DONE: Make mrk => box function...not sure where thoutgh or whether it's necessary since it's just a one-liner. Leave it, it's just a one-liner
-DONE: Changing Inspector element hover color based on whether the SHIFT or CTRL key is pressed: I tried a number of approaches to getting different hover colors for SHIFT and CTRL but it's not worth the hassle. The shiftKey event only fires when the key is pressed down or up. The mouseenter and mouseleave event only fires when you enter or leave the element. Trying to trap the SHIFT press either while SHIFT is pressed outside the element while the element is entered OR while the mouse is inside the element proved too much for me. All that is even worse because if the focus isn't in the Witty window, which it is not most of the time while the user switches back and forth to the editor, then the mouse events won't fire. Plus, the keypress events don't appear to fire on non-input elements, so you'd have to trap the keypress on the document and then I don't even know how you'd drill down to limit it to the Inspector element. In short - we're going with a single gold CSS hover which works even if Witty doesn't have the focus. The rest we'll have to do with tooltips. This item is closed.
-DONE: Remove all bootstrap tooltips
-DONE: Finish adding tooltip strings - some TBD strings remain
-DONE: Add animation to tooltips
-DONE: Fix tooltip cursor not changing to help cursor on Display Size and other elements with clipboard clicks. That is not going to happen since the clipboard clicks on the label are governed by the hover pseudoelement which overrides the mouseenter event, I think. Closed.
-DONE: Cancel tooltips when error message is displayed.
-DONE: FIx quirks with error messages - first one after refresh displays late, messages don't cancel when leaving the target element. Probably entains enabling the blocking element above the toolbar buttons for hte duration of the error/msg display.
-DONE: Fix the CSS Rule buttons disappearing when hovered or clicked. It's because they get the class ttip for some reason. ttip class deleted, deprecated.
-DONE: Comment and clean up appMessages.
-DONE: Remove X from No Image strings
-DONE: Change table options: if width = Appdata.viewerW then class = devicewidth else class = none
-DONE: Add target="_blank" to A tag
 
 TODO: Remove all writing of values from initUI and put them in getAttributes. initUI should only be for turning display amd disabling on and off
 TODO: Make the filename div wider
@@ -92,12 +27,8 @@ TODO: curImg doesn't resize back if you change viewerW to smaller than curImg an
 DONE: Make bgcolor add the hash if it's not in the value. Don't do that, need to allow for non-hash values like color aliases
 DONE: Fix table width: doesn't reflect what's in toolbar viewer width field. FIXED - Appears to work as designed, imgW in Parent table width and viewerW in Wrapper table width
 
-
 Error Handling
 --------------
-
-
-
 TODO: The CSS output will need to be revisited for td and table.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
 TODO: Fix Include wrapper table options don't appear if the CCP is closed and re-opened 
@@ -117,9 +48,6 @@ TODO: Parent table class att only shows in CB output if Wrapper is selected, not
 TODO: Fix, when imgNW is greater than imgW the imgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
 TODO: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- I think. Not sure if this is the right behavior...think bout it. Probably not. I think it does this anyway. 
 TODO: Assign keyboard  shortcuts
-
-
-
 
 */
 //SCRIPT START
@@ -263,8 +191,6 @@ var Witty = (function () {
       // !VA IMG tag user input
       iptCcpImgClass: '#ipt-ccp-img-class',
       iptCcpImgAlt: '#ipt-ccp-img-alt',
-      // !VA Branch: makeFluidOption (052620)
-      // spnCcpImgIncludeWidthHeightCheckmrk: '#spn-ccp-img-include-width-height-checkmrk',
       rdoCcpImgFixed: '#rdo-ccp-img-fixed',
       rdoCcpImgFluid: '#rdo-ccp-img-fluid',
       selCcpImgAlign: '#sel-ccp-img-align',
@@ -403,211 +329,12 @@ var Witty = (function () {
     }
 
 
-
-    // !VA Toggle checkboxes and run any associated actions
-    // !VA TODO: This function is misnamed, it only pertains to mock checkbox processing
-    // !VA UIController private
-    function handleCcpWrapperOptions(evt, ccpAttributes) {
-      console.log('handleCcpWrapperOptions running');
-
-      
-      // var data = appController.initGetAppdata();
-      // !VA Get the Appdata for the input default value
-      var chkId, checkbox;
-      let wrapperItems = [];
-      // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
-      wrapperItems = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
-
-      // !VA Branch: reconfigureGetAttributes (052820)
-      // !VA chkId will always be ccpUserInput.spnCcpTableIncludeWrapperCheckmrk here because that's what the event listener was defined on. But this is a mock checkbox, so convert the ccpUserInput alias to the id of the actual checkbox element in order to toggle it 
-      chkId = ccpUserInput.spnCcpTableIncludeWrapperCheckmrk;
-      chkId = chkId.replace('mrk', 'box');
-      chkId = chkId.replace('spn', 'chk');
-      checkbox = document.querySelector(chkId);
-
-      // !VA If there's an event, there was a click. If there is no event, then the CCP is being initialized by clicking the Clipboard button.
-      if (evt) {
-        // !VA Toggle the checkmark on click
-        checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
-      } 
-
-      // !VA In either case, update the CCP and populate the Include wrapper table options with the appropriate values from ccpAttributes
-      // console.log('ccpAttributes:');
-      // console.dir(ccpAttributes);
-      // !VA Branch: reconfigureGetAttributes (052820)
-      // !VA Let's get the selected imgType option manually for now.
-      let parentTableWidth, wrapperTableWidth, wrapperTableClass; 
-      if (document.querySelector(ccpUserInput.rdoCcpImgFixed).checked === true ) {
-        console.log('fixed');
-
-      } else {
-        console.log('fluid');
-      }
-
-      // for (let i = 0; i < ccpAttributes.length; i++) {
-      //   console.log('ccpAttributes[i].id is: ' +  ccpAttributes[i].id);
-
-
-
-
-      // }
-
-
-      // !VA Now run any actions associated with the checkbox
-      // !VA TODO: This value needs to be refreshed when the CCP is opened. In fact, entering new values in any of the toolButton inputs has to call a refresh of Appdata and a closing-reopening of the CCP so the values can refresh.
-      
-      // !VA Defaults for wrapper width and class
-      // document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value = `${data.viewerW}`;
-      // document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
-      // !VA Display/undisplay wrapper table options when checkbox is toggled
-      if (checkbox.checked) {
-        for (let i = 0; i < wrapperItems.length; i++) {
-          document.querySelector(wrapperItems[i]).style.display = 'block'; 
-        }
-      } else {
-        for (let i = 0; i < wrapperItems.length; i++) {
-          document.querySelector(wrapperItems[i]).style.display = 'none'; 
-        }
-      }
-    }
-
-    function handleCcpImgType(evt, ccpAttributes) {
-      // console.log('evt is: ' + evt);
-      // console.clear();
-      evt.stopPropagation ? evt.stopPropagation() : evt.cancelBubble = true;
-
-      // !VA Toggle the imgType and write the new values to ccpAttributes
-      for (let i = 0; i < ccpAttributes.length; i++) {
-        if (ccpAttributes[i].id.includes('fixed') || ccpAttributes[i].id.includes('fluid')) {
-          if (ccpAttributes[i].id !== '#' + evt.target.id) {
-            if (ccpAttributes[i].id.includes('fixed')) {
-              ccpAttributes[i].id = '#rdo-ccp-img-fluid';
-              ccpAttributes[i].str = 'fluid';
-            } else {
-              ccpAttributes[i].id = '#rdo-ccp-img-fixed';
-              ccpAttributes[i].str = 'fixed';
-            }
-          }
-        }
-      }
-      // !VA Pass the updated ccpAttributes to refreshCcp
-
-      // console.log('Attributes');
-      // console.dir(Attributes);
-      // refreshCcp(ccpAttributes);
-    }
-
-    // !VA 
-    function refreshCcp(ccpAttributes) {
-      console.log('refreshCcp running');
-      let parentTableWidth, wrapperTableClass, wrapperTableWidth;
-      let Appdata = [];
-      Appdata = appController.initGetAppdata();
-      // !VA The problem is that as soon as we call getAttributes, we get into a loop because that calls updateCcp. But we can't update the attributes in order to call the new ones to update the Ccp with without updating the attributes...I have a logical conundrum here. The problem is that the ImgType buttons MUST somehow update the All the attributes. Let's go back to passing ccpAttributes and see what happens. 
-
-      // !VA Maybe all this attribute stuff was overengineering things...don't forget that the Attributes are ONLY for output to the Clipboard. The Ccp should reflect that but doesn't have to get the info from there. At least not yet because I don't know how to do it. It would be ideal though. Ideally the imgtype buttons would get their event handlers elsewhere, outside of updateCcp, and would access getAttributes to get its data. And ONLY THEN would it call updateCcp and then for the sole purpose of updating the Ccp.
-
-
-      console.log('ccpAttributes');
-      console.dir(ccpAttributes);
-      // let imgType, parentTableWidth, wrapperTableWidth, wrapperTableClass;
-
-      if (ccpAttributes[0].id.includes('fixed')) {
-        parentTableWidth = Appdata.imgW;
-        console.log('parentTableWidth is: ' + Appdata.imgW);
-        wrapperTableClass = 'devicewidth';
-        console.log('wrapperTableClass is: ' + 'wrapperTableClass');
-        wrapperTableWidth = Appdata.viewerW;
-        console.log('wrapperTableWidth is: ' + wrapperTableWidth);
-
-
-
-      } else if (ccpAttributes[0].id.includes('fluid')) {
-        console.log('Show fluid image options');
-        parentTableWidth = '100%';
-        console.log('parentTableWidth is: ' + parentTableWidth);
-        wrapperTableClass = 'responsive-table';
-        console.log('wrapperTableClass is: ' + wrapperTableClass);
-        wrapperTableWidth = '100%';
-        console.log('wrapperTableWidth is: ' + wrapperTableWidth);
-      }
-    }
-
-
-
-    // !VA UIController private
-    // !VA The plan here is to have updateCcp manage the Ccp display through the local ccpAttributes variable which would stay resident until the next update Attributes update which would only take place when a Toolbar value is changed or when a make clipboard button is clicked. So updateCcp would be run only when those events take place in the background, and then the clipboard button would only serve to display/undisplay the clipboard. But for the meantime, let's get updateCcp working with the correct Attribute values and then do the further implementation.
-    function updateCcp(ccpAttributes) {
-      // console.clear();
-      console.log('updateCcp running');
-      // debugger;
-      // !VA Get Appdata
-      // var Appdata = appController.initGetAppdata();
-      // !VA ccpAttributes is the shortlist of attributes whose values need to be reflected in the CCP. Passed in from filterCcpAttributes.
-      // console.log('ccpAttributes:');
-      // console.dir(ccpAttributes);
-
-      // !VA Init elements that are initialized when the CCP is updated
-      // !VA Wrapper table handling
-
-      // !VA Initialize the checkmark handling on ccp initialization, if no user click
-      // !VA Stopped here. Getting confused. Go back and look at the checkbox handling again in handleCcpWrapperOptions - it is very convoluted.Plus, it doesn't take the Attributes into account - doesn't reflect the changes when fluid is selected
-      // !VA WHY IS updateCCP running when you close the CCP?
-      // !VA The big problem is that Attributes aren't updating when CCP elements like fluid fixed are clicked. That is addressed by calling initGetAttributes in handleCcpImgType, but its another call to getAttributes. Also, you can't pass ccpAttributes and call initGetAttributes in the same function you passed it to, becuase a loop will ensue. What I need to do is build a subobject of Attributes from within updateCcp that only contains the pertinent Ccp UI elements and pass that. 
-      let selectedTdOption;
-
-      function handleCcpAnchorOptions() {
-        console.log('not yet implemented');
-      }
-
-      // !VA Do all the CCP element initialization actions only if the CCP is displayed, i.e. has class 'active'
-      // !VA PROBLEM: updateCcp is running again when the ccp is closed...causing a problem here.
-      if (document.querySelector(staticRegions.ccpContainer).classList.contains('active')) {
-
-        // !VA Wrapper Table Options and Event Handler. For now, pass in the false argument in order to skip over the toggling of the checkbox on click. If there's no event, then there's no click. IMPORTANT: This will change when we move updateCcp into the background and the clipboard button just displays/undisplays
-        // handleCcpWrapperOptions(false, ccpAttributes);
-        // !VA Now initialize the click event handler that will toggle the the checkbox ns run handleCcpWrapperOptions when the checkbox is clicked
-        document.querySelector(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk).addEventListener('click', function () {
-          handleCcpWrapperOptions(event, ccpAttributes);
-        }, false);
-
-
-        document.querySelector(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk).addEventListener('click', function () {
-          handleCcpWrapperOptions(event, handleCcpAnchorOptions);
-        }, false);
-        // !VA Find out which tdoption is selected and send a click to that option to run showTdOptions and display the appropriate attributes for that option
-        // !VA Branch: reconfigureGetAttributes (052820)
-        // !VA This is no good. Mickey mouse shit, sending a click programattically...and it doesn't work when the ccp is first initialized in devmode....no idea why... wtf
-        // selectedTdOption = document.querySelector('input[name="tdoptions"]:checked');
-        // selectedTdOption.click();
-        // !VA Handle what to do if the current image width equals the viewer width. In that case, the class should be 'devicewidth' and the table width field should be disabled, because a table width can't be less than the image it contains. If Appdata.imgW === Appdata.viewerW, then disable the field because a table width can't be less than the image it contains. In this case, tableClass should default to 'devicewidth'. If Appdata.imgW < viewerW, then show tableWidth = imgWidth and leave the class field blank so the user can enter a class if desired.
-        // !VA NOTE: This should be extracted to a separate function, too much repetition. Plus, this belongs in getAttributes, I think, since it's writing values rather than just turning the display on/off.
-        // if ( Appdata.imgW ===  Appdata.viewerW ) {
-        //   document.querySelector(ccpUserInput.iptCcpTableWidth).value = Appdata.viewerW;
-        //   document.querySelector(ccpUserInput.iptCcpTableWidth).disabled = true;
-        //   document.querySelector(ccpUserInput.iptCcpTableWidth).classList.add('disabled');
-        //   document.querySelector(ccpUserInput.iptCcpTableClass).value = 'devicewidth';
-        // } else {
-        //   document.querySelector(ccpUserInput.iptCcpTableWidth).value = Appdata.imgW;
-        //   document.querySelector(ccpUserInput.iptCcpTableWidth).disabled = false;
-        //   document.querySelector(ccpUserInput.iptCcpTableWidth).classList.remove('disabled');
-        //   document.querySelector(ccpUserInput.iptCcpTableClass).value = '';
-        // }
-        // !VA Defaults for wrapper width and class
-        // document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value = Appdata.viewerW;
-        // document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
-
-      }
-    }
-
-
-
     // !VA UIController public functions
     return {
       // !VA Catch-all function for displaying/undisplaying, disabling/enabling and adding/removing classes to CCP elements. action is the action to execute, elemArray is the array of elements the action is to apply to and state is the toggle state whereby true turns the action on and false turns it off.
       handleCcpActions: function (action, elemArray, option ) {
         // console.clear();
-        console.log('handleCcpDisplay running');
+        // console.log('handleCcpDisplay running');
         // console.log('action');
         // console.dir(action);
         // console.log('elemArray:');
@@ -734,7 +461,6 @@ var Witty = (function () {
       // !VA UIController public
       initToolbarInputs: function() {
         // !VA This is called from init (? ) and initializes the values of the toolbar viewerW, sPhonesW and lPhonesW values from either a default value or the localStorage values. Check if there are localStorage values, if not, initialize viewerW = 650, sPhonesW = 320, lPhonesW = 414 and write those to the toolbarUI. 
-        console.log('initToolbarInputs running');
       },
 
       // !VA UIController public getAppdata
@@ -742,7 +468,6 @@ var Witty = (function () {
 
       // !VA UIController public
       queryDOMElements: function() {
-        // console.log('queryDOMElements running');
         // !VA NEW This needs to ONLY return the non-calculated DOM elements and data properties: curImg.imgW, curImg.imgW, curImg.imgNW, curImg.NH and viewerW. Aspect is calculated so we don't need to get that here, leave that to appController.
         // !VA NEW We will get the individual properties and return them as an ES6 array.
         // !VA Declare the local vars
@@ -781,13 +506,11 @@ var Witty = (function () {
       initUI: function(initMode) {
 
         const delayInMilliseconds = 10;
-        // console.log('initMode is: ' + initMode);
         // !VA Here we initialze DEV mode, i.e. reading a hardcoded image from the HTML file instead of loading one manually in production mode
         if (initMode === 'devmode') {
 
           // !VA The app initializes with the CCP closed, so toggle it on and off here.
           // document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
-
 
           // !VA Set a timeout to give the image time to load
           setTimeout(function() {
@@ -805,9 +528,6 @@ var Witty = (function () {
             // !VA Open the CCP by default in dev mode
             // !VA First, set it to the opposite of how you want to start it.
             document.querySelector(staticRegions.ccpContainer).classList.add('active');
-            // !VA Then run updateCCP to initialize - initUpdateCcp is the public UIController function included just to access UiController private updateCccp from the appController module
-            // !VA Branch: reconfigureGetAttributes (052820)
-            var Attributes = CBController.initGetAttributes();
 
             // !VA NOW: The toggle Ccp element functions are all in appController either I have to replicated them here or find another solution or live with the fact that they don't initialize. Or run initUI from here...
             // toggleIncludeWrapper(false);
@@ -935,16 +655,12 @@ var Witty = (function () {
 
     // !VA ATTRIBUTE FUNCTIONS
     // !VA CBController private
-    // !VA Branch: writeAttributesToCcp (052820)
-    // !VA Update this comment: displayAttributes is deprecated
-    // !VA Each attribute is either get-only or settable. If it is get-only, then the user-defined value is accessed directly from the DOM element. If it is a preset, then the value is defined programmatically based on a condition. For instance, the class name 'img-fluid' is a preset that becomes active when the user selects the Fluid image option. In this case, the CCP element ID corresponding to the attribute is written to the ccpElementId variable for output to the CCP via the displayAttribute function.  The displayAttribute must take both the attribute value AND the id of th element that receives the value. So, for all of the attributes that require a write to the CCP UI, use the ccpElementId variable for the CCP element id. If the ccpElementId variable is falsy, then no DOM access is required, so the attribute and its CCP element are not added to the array passed to displayElement.
+    // !VA Each attribute is either get-only or settable. If it is get-only, then the user-defined value is accessed directly from the DOM element. If it is a preset, then the value is defined programmatically based on a condition. For instance, the class name 'img-fluid' is a preset that becomes active when the user selects the Fluid image option. In this case, the CCP element ID corresponding to the attribute is written to the ccpElementId variable. Otherwise, ccpElement takes the false flag.
     // !VA NOTE: Could probably make all the retObject arguments ccpElementId, str and consolidate this function somehow -- think about it.
     function getAttributes() {
       console.log('getAttributes running');
       var Appdata = appController.initGetAppdata();
       let checked, str, options, selectid, ccpElementId, imgType, Attributes, retObj;
-      // console.log('Appdata:');
-      // console.dir(Appdata);
       // !VA Create the array to return. First value is the id of the CCP element, second value is the string to write to the CCP element.
       function returnObject(ccpElementId, str ) {
         let obj = {};
@@ -955,10 +671,8 @@ var Witty = (function () {
       Attributes = {
         // !VA IMG attributes
         imgType: (function() {
-          // !VA Branch: reconfigureGetAttributes (052820)
           // !VA This value is written to CCP so we can pre-select the tdoption 'basic' if the imgType 'fluid' is selected. 
           // !VA If the fixed radio button is checked, set ccpElementId to the fixed element id. Otherwise, set ccpElementId to the fluid element id. 
-          // console.log('document.querySelector(ccpUserInput.rdoCcpImgFixed).checked is: ' + document.querySelector(ccpUserInput.rdoCcpImgFixed).checked);
           document.querySelector(ccpUserInput.rdoCcpImgFixed).checked ? ccpElementId = ccpUserInput.rdoCcpImgFixed : ccpElementId = ccpUserInput.rdoCcpImgFluid;
           // !VA Now get the str based on the above
           ccpElementId === ccpUserInput.rdoCcpImgFixed ? str = 'fixed' : str = 'fluid';
@@ -970,7 +684,6 @@ var Witty = (function () {
           return retObj;
         })(),
         imgClass: (function() {
-          // !VA Branch: makeFluidOption (052620)
           // !VA For fixed images, if there's a class name entered into the class input, return the input value, or if the class input is empty, don't include the class attribute. For fluid images, return the class name 'img-fluid'.
           // !VA This value is written to CCP so use ccpElementId
           ccpElementId = ccpUserInput.iptCcpImgClass;
@@ -1003,12 +716,8 @@ var Witty = (function () {
             str =  document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + document.querySelector(inspectorElements.insFilename).textContent;
           }
           retObj = returnObject( ccpElementId, str);
-          // console.log('retObj is:');
-          // console.log(retObj);
-          
           return retObj;
         })(),
-        // !VA Branch: makeFluidOption (052620)
         imgStyle: (function() {
           // !VA Get the selected state of the fixed imgType radio. If it is not selected, then the fluid option is selected. If fixed, include the width and height in the style attribute. If fluid, don't include them
           // !VA This value is never displayed in CCP, only written to Clipboard object, so it's  get-only.
@@ -1080,7 +789,6 @@ var Witty = (function () {
         tdImgswap: (function() {
           // !VA This is a tdoptions selection radio - use ccpElementId
           ccpElementId = ccpUserInput.rdoCcpTdImgswap;
-          // console.log('ccpElementId is: ' + ccpElementId);
           checked = getRadioState(ccpElementId);
           retObj = returnObject( ccpElementId, checked );
           return retObj;
@@ -1139,7 +847,6 @@ var Witty = (function () {
         })(),
         // !VA TABLE attributes
         tableClass: (function() {
-          // !VA Branch: reconfig (052720)
           // !VA This value depends on the status of the Fixed/Fluid image radio button, so use ccpElementId
           ccpElementId = ccpUserInput.iptCcpTableClass;
           if (imgType === 'fixed') {
@@ -1157,7 +864,6 @@ var Witty = (function () {
           // !VA The value is written to the table width field - use ccpElementId
           ccpElementId = ccpUserInput.iptCcpTableWidth;
           imgType === 'fixed' ? str = Appdata.imgW : str = '100%';
-          // console.log('tableWidth str is: ' + str);
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
@@ -1178,8 +884,6 @@ var Witty = (function () {
           return retObj;
         })(),
         tableIncludeWrapper: (function() {
-          // !VA This value is get-only.
-          // !VA Branch: reconfigureGetAttributes (052820)
           // !VA Changing this to CCP-write to clean up updateCcp
           ccpElementId = ccpUserInput.spnCcpTableIncludeWrapperCheckmrk;
           checked = getCheckboxSelection(ccpElementId);
@@ -1187,12 +891,10 @@ var Witty = (function () {
           return retObj;
         })(),
         tableTagWrapperClass: (function() {
-          // !VA Branch: reconfig (052720)
           // !VA This value writes to the CCP in the class input so populate ccpElementId
           // !VA If imgType is fixed, set the default class to 'devicewidth'. If it's fluid, set it to 'responsive-table' as per the Litmus newsletter template.
           ccpElementId = ccpUserInput.iptCcpTableWrapperClass;
           imgType === 'fixed' ? str = 'devicewidth' : str = 'responsive-table';
-          // return ccpIfNoUserInput('class',document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value);
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
@@ -1207,10 +909,9 @@ var Witty = (function () {
           return retObj;
         })(),
         tableTagWrapperWidth: (function() {
-          // !VA Branch: reconfig (052720)
           // !VA This value depends on the selection under Fixed image. 
           ccpElementId = ccpUserInput.iptCcpTableWrapperWidth;
-          // !VA If the imgTyp is fixed, set the wrappe width to the value of the input field, which for the most part will be viewerW. If it's fluid, set it to 100%
+          // !VA If the imgTyp is fixed, set the wrapper width to the value of the input field, which for the most part will be viewerW. If it's fluid, set it to 100%
           imgType === 'fixed' ? str = Appdata.viewerW : str = '100%';
           retObj = returnObject( ccpElementId, str );
           return retObj;
@@ -1221,24 +922,19 @@ var Witty = (function () {
           retObj = returnObject( ccpElementId,ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.iptCcpTableWrapperBgColor).value));
           return retObj;
         })(),
-        // !VA Branch: makeFluidOption (052620)
         tableTagWrapperStyle: (function() {
           // !VA This value is get-only
           ccpElementId = false;
           // !VA Only include a style attribute for the wrapper for fluid images.  The conditional for this is in makeTableNode and there's no case where a style attribute is included for fixed images, so just provide the style attribute string to return
           imgType === 'fixed' ? str = '' : str = `max-width: ${Appdata.imgW}`;
-          // console.log('tableWrapperStyle str is: ' + str);
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
       };
-      // !VA Pass the attributes generated above to CBController for updating the CCP display with the appropriate attributes. 
-      // !VA Branch: rethinkImgTypeLogic (052920)
-      // UIController.filterCcpAttributes(Attributes);
+      // !VA Return the Attributes defined above. 
       return Attributes;
     }
 
-    // !VA 02.17.20 This is the same as ccpIfNoUserInput except it returns ONLY the value, not the attribute name -- but we don't need this now, because if it has not value, then, well it has no value.
     // !VA CBController private
     function ccpGetAttValue(att, value) {
       // !VA We need get the insFilename from Appdata in case the user leaves 'path' empty
@@ -1311,14 +1007,13 @@ var Witty = (function () {
     function getRadioState(ccpElementId) {
       // !VA Passing in the ID, not the alias
       let checked;
+      // !VA IMPORTANT: Replace with ternary
       if (document.querySelector(ccpElementId).checked === false) {
         // !VA Radio button is NOT SELECTED
         checked = false;
-        // console.log('checked is: ' + checked);
       } else {
         // !VA Radio button IS SELECTED
         checked = true;
-        // console.log('checked is: ' + checked);
       }
       return checked;
     }
@@ -1361,13 +1056,10 @@ var Witty = (function () {
     
     function getUserSelections( id ) {
       // !VA Initialize the clipboard-building process by getting those user selections in the CCP that determine the structure of the clipboard output and put those selections into the uSels object. The elements that determine the nodeList structure and thus the Clipboard output are: the makeTag buttons and the imgType radio buttons. The imgType (fluid or fixed) determines which td option is selected and has to be processed independently of the other uSels. The fluid imgType is a preset that always has to have the tdopton 'basic'. So first, preselect the tdoption 'basic' if the imgType is fluid, then proceed.
-      // console.log('getUserSelections running');
-      // console.log('id is: ' + id);
       let imgType, selectedTdOption;
       let uSels = {};
       // !VA Get the selected imgType regardless of which button was clicked to trigger this function. 
       getRadioState(ccpUserInput.rdoCcpImgFixed) ? imgType = 'fixed' : imgType = 'fluid';
-      console.log('imgType is: ' + imgType);
       // !VA If imgType is fluid, set selectedTdOption to 'basic', otherwise set the selectedTd option to whichever option is selected. This logic is actually reflected in getAttributes. 
       imgType === 'fluid' ? selectedTdOption = 'basic' : selectedTdOption = document.querySelector('input[name="tdoptions"]:checked').value;
       // !VA Initialize uSels
@@ -1386,23 +1078,17 @@ var Witty = (function () {
       } else {
         uSels.buttonClicked = 'tablebut';
       }
-      // !VA Branch: reconfigureMessages (051620): id added to arguments
       buildOutputNodeList( id, uSels );
     }
 
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
     // !VA CBController private
-    // !VA Branch: reconfigureMessages (051620) id added to parameters
     function buildOutputNodeList( id, uSels ) {
-      // console.log('buildOutputNodeList running:');
-      // console.log('uSels:');
-      // console.dir(uSels);
-      // !VA Branch: reconfigureGetAttributes (052820)
-      // !VA This will be the only place getAttributes is called. Everywhere else it is passed as an argument to the called function.
+
+      // !VA This and toggleImgType (and possibly initCcp - that needs to be tested) are the only places where getAttributes is called. Everywhere else it is passed as an argument to the called function.
       let Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
       Attributes = getAttributes();
       // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
-      // !VA Branch: reconfigureMessages (051620) id added to arguments
       tableNodeFragment = makeTableNode( id, uSels, Attributes );
       // !VA Create the full nodeList from the tableNodeFragment. If tableNodeFragment is null, return to abort without creating Clipboard object.
       try {
@@ -1420,7 +1106,6 @@ var Witty = (function () {
         let rtlNodePos, extractPos;
         // !VA For the posswitch option: Get the position of the RTL node, if it exists. 
         for (let i = 0; i < nl.length; i++) {
-          // console.log('nl[i] is: ' +  nl[i]);
           if (nl[i].getAttribute('dir')  === 'rtl') {
             rtlNodePos = i;
           }
@@ -1608,12 +1293,9 @@ var Witty = (function () {
 
     // !VA Set the attributes for the nodes in the 'posswitch' option using the DIR attribute
     function setPosSwitchNodeAttributes(container, Attributes) {
-      // !VA Get the Td attributes, we need them for height and width
+      // !VA Passed-in Attributes provide height and width 
       var nodeList, index;
-      // !VA Branch: reconfigureGetAttributes (052820)
-      // let Attributes = getAttributes();
       let nodeAttributes = [];
-
       // !VA Initialize the objects that contain the attributes for the individual nodes
       let td_switchcontainerAttr, table_switchparentAttr, tr_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr, tr_switchchild1Attr, td_switchcontent1Attr, a_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, tr_switchchild2Attr, td_switchcontent2Attr; 
       // !VA Make the nodeList from the container passed in from makePosSwitchNodes to apply the attributes to.
@@ -1670,7 +1352,6 @@ var Witty = (function () {
       img_switchcontent1Attr = {
         width: Attributes.imgWidth.str,
         height: Attributes.imgHeight.str,
-        // !VA Branch: makeFluidOption (052620)
         style: Attributes.imgStyle.str,
         src: Attributes.imgSrc.str,
         alt: Attributes.imgAlt.str
@@ -1719,15 +1400,9 @@ var Witty = (function () {
     }
 
     // !VA Make the img node, including anchor if it is checked
-    // !VA IMPORTANT: Attributes should be passed, not called.
     // !VA CBController private
-    // !VA Branch: reconfigureGetAttributes (052820)
     function makeImgNode ( id, Attributes ) {
-      // console.log('makeImgNode');
-      // console.log('id is: ' + id);
       // !VA Id is passed but not used here,  because we're only building the node.
-      // let Attributes;
-      // Attributes = getAttributes();
       let imgNode, returnNodeFragment;
       // !VA Create the image node
       imgNode = document.createElement('img');
@@ -1745,15 +1420,11 @@ var Witty = (function () {
       imgNode.width = Attributes.imgWidth.str;
       // !VA height attribute
       imgNode.height = Attributes.imgHeight.str;
-      // !VA Branch: makeFluidOption (052620)
       // !VA style attribute
       imgNode.setAttribute('style', Attributes.imgStyle.str);
-      // !VA NOTE: align attribute is deprecated in html5 so is it needed?
-      // !VA alt attribute - Add to the node only if the attribute is set, i.e. the selected option isn't 'none'. i.e. falsy
       if (Attributes.imgAlign.str) { imgNode.align = Attributes.imgAlign.str; }
       // !VA border attribute
       imgNode.border = '0';
-      
       // !VA If the include anchor option is checked, create the anchor element, add the attributes, append the imgNode to the nodeFragment, and return it.
       if(Attributes.imgIncludeAnchor.str === true) {
         let anchor = document.createElement('a');
@@ -1772,16 +1443,11 @@ var Witty = (function () {
 
     // !VA Make the TD node
     // !VA CBController private
-    // !VA Branch: reconfigureGetAttributes (052820)
     function makeTdNode( id, uSels, Attributes ) {
       // !VA Variables for error handling - need to include this in the return value so the Clipboard object can differentiate between alert and success messages. 
       let isErr;
       // !VA NOTE: No trapped errors here yet that would pass a code, but that will probably come.
       let errCode;
-      // !VA Get the node attributes
-      // !VA Branch: reconfigureGetAttributes (052820)
-      // let Attributes;
-      // Attributes = getAttributes();
       let tdInner, imgNode;
       // !VA Create the TD node for the parent TD
       tdInner = document.createElement('td');
@@ -1793,7 +1459,7 @@ var Witty = (function () {
       if (Attributes.tdBgcolor.str) { tdInner.bgColor = Attributes.tdBgcolor.str; }
       // !VA Now add the attributes included only with the default Td configuration
       switch(true) {
-      // case (selectedTdOption === 'basic'):
+      // !VA If the 'td with options' or 'td with options (exclude img) radio buttons are checked...
       case (uSels.selectedTdOption === 'basic' || uSels.selectedTdOption === 'excludeimg'):
         // !VA class attribute
         if (Attributes.tdClass.str) { tdInner.className = Attributes.tdClass.str; }
@@ -1804,21 +1470,18 @@ var Witty = (function () {
         if (Attributes.tdWidth.str) { tdInner.width = Attributes.imgHeight.str; }
         // !VA If 'basic' is checked, create imgNode and append it, otherwise exclude the imgNode.
         if (uSels.selectedTdOption === 'basic') {
-          // !VA Branch: reconfigureGetAttributes (052820)
           imgNode = makeImgNode( id, Attributes );
-          // !VA We need to include the imgNode here ONLY if Bgimage is unchecked
           tdInner.appendChild(imgNode);
         }
         break;
-      // case (selectedTdOption === 'imgswap'):
+      // !VA (selectedTdOption === 'imgswap'):
       case (uSels.selectedTdOption === 'imgswap'):
         if (Attributes.tdClass.str) { tdInner.className = Attributes.tdClass.str; }
         if (Attributes.tdValign.str) { tdInner.vAlign = Attributes.tdValign.str; }
         if (Attributes.tdAlign.str) { tdInner.align = Attributes.tdAlign.str; }
         break;
-      // case (selectedTdOption === 'bgimage'):
+      // !VA (selectedTdOption === 'bgimage'):
       case (uSels.selectedTdOption === 'bgimage'):
-        console.log('makeTdNode bgimage');
         // !VA Create the parent node to which the bgimage code block will be appended after outputNL is converted to text in buildOutputNodeList.
         // !VA Include width, height and valign as per Stig's version
         tdInner.width = Attributes.tdAppdataWidth.str;
@@ -1828,15 +1491,14 @@ var Witty = (function () {
         tdInner.setAttribute('background', Attributes.tdBackground.str);
         // !VA Fallback bgcolor now set in UIController.showTdOptions
         // !VA Include fallback color from the default set in showTdOptions
-        // Attributes.tdBgcolor ? tdInner.bgColor = Attributes.tdBgcolor : tdInner.bgColor = '#7bceeb';
         break;
-      // case (selectedTdOption === 'posswitch'):
+      // !VA  (selectedTdOption === 'posswitch'):
       case (uSels.selectedTdOption === 'posswitch'):
         tdInner  = makePosSwitchNodes( id, Attributes );
         break;
-      // case (selectedTdOption === 'vmlbutton'):
+      // !VA  (selectedTdOption === 'vmlbutton'):
       case (uSels.selectedTdOption === 'vmlbutton'):
-        // !VA Height and width fields have to be entered, otherwise the button can't be built. Button width and height are set here in makeTdNode, the rest of the options are set in getVmlCodeBlock in buildOutputNodeList. The defaults of 40/200 as per Stig are set in UIController.showTdOptions. So if there's no value for td height and width, then the user has deleted the default and not replaced it with a valid entry. In this case, throw an ERROR and abort before it gets to the clipboard.
+        // !VA IMPORTANT: Height and width fields have to be entered, otherwise the button can't be built. Button width and height are set here in makeTdNode, the rest of the options are set in getVmlCodeBlock in buildOutputNodeList. The defaults of 40/200 as per Stig are set in UIController.showTdOptions. So if there's no value for td height and width, then the user has deleted the default and not replaced it with a valid entry. In this case, throw an ERROR and abort before it gets to the clipboard.
         if (!document.querySelector(ccpUserInput.iptCcpTdHeight).value || !document.querySelector(ccpUserInput.iptCcpTdWidth).value) {
           console.log('ERROR in makeTdNode vmlbutton: no value for either height or width');
           isErr = true;
@@ -1858,10 +1520,8 @@ var Witty = (function () {
       // // !VA Set the node fragment to the TD node
       tdNodeFragment.appendChild(tdInner);
       // !VA TODO: This error handling is poor because it only allows for one possible error. But, it does return nothing, which is then passed on to the calling function and terminates in buildOutputNodeList
-      // !VA Branch: reconfigureMessages (051620) Try catch this error belongs here
       if (isErr) { 
         console.log('makeTdNode: vml_button_no_value error: id is: ' + id);
-        // !VA Branch: reconfigureMessages (051620) New appmessage handling
         appController.handleAppMessages('vml_button_no_value');
         // appController.initMessage(id, true, 'vmlbutton_no_value');
         console.log('returning...');
@@ -1873,12 +1533,7 @@ var Witty = (function () {
 
     // !VA Make the table node, including parent and wrapper table if selected
     // !VA CBController private
-
     function makeTableNode( id, uSels, Attributes ) {
-      
-      // let Attributes;
-      // Attributes = getAttributes();
-      // console.log('makeTableNode getAttributes');
       // !VA Variables for parent and wrapper table, parent and wrapper tr, and wrapper td. Parent td is called from makeTdNode and is appended to tdNodeFragment. tableNodeFragment is the node that contains the entire nodelist which is returned to buildOutputNodeList
       let tableOuter, trOuter, tdOuter, tableInner, trInner, tdNodeFragment, tableNodeFragment;
       tableNodeFragment = document.createDocumentFragment();
@@ -1887,32 +1542,26 @@ var Witty = (function () {
       tdOuter = document.createElement('td');
       tableInner = document.createElement('table');
       trInner = document.createElement('tr');
-
       // !VA Make the inner table. If Include wrapper table is unchecked, we return just the inner table. If it's checked, we return the inner table and the outer table 
       // !VA Add inner table attributes
       // !VA table class attribute
       if (Attributes.tableClass.str) { tableInner.className = Attributes.tableClass.str; }
-      // table.className = Attributes.tableClass;
       // !VA table align attribute
       if (Attributes.tableAlign.str) { tableInner.align = Attributes.tableAlign.str; }
-
       tableInner.width = Attributes.tableWidth.str;
       // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for now
       if (Attributes.tableBgcolor.str) { tableInner.bgColor = Attributes.tableBgcolor.str; }
       // !VA Add border, cellspacing and cellpadding
       tableInner.border = '0', tableInner.cellSpacing = '0', tableInner.cellPadding = '0';
       tableInner.setAttribute('role', 'presentation'); 
-      
       // !VA Build the inner tr
       tableInner.appendChild(trInner);
       // !VA Get the inner TD from makeTdNode and append it to the nodeFragment
-      // !VA Branch: reconfigureGetAttributes (052820)
       tdNodeFragment = makeTdNode( id, uSels, Attributes );
       // !VA If tdNodeFragment is null, then there was an error in makeTdNode, so console the error and return null to buildOutputNodeList to abort.
       try {
         trInner.appendChild(tdNodeFragment);
       } catch (e) {
-        // !VA Branch: reconfigureMessages (051620) Add error message here, in the meantime console.log id
         console.log('Error in makeTableNode: tdNodeFragment is null: id is: ' + id);
         return;
       }
@@ -1954,16 +1603,12 @@ var Witty = (function () {
     // !VA These are the code blocks that contain MS conditionals in comment nodes or text nodes, i.e. mobile swap, background image, and vmlbutton
     // !VA UIController private
     function getImgSwapBlock( id, indentLevel, Attributes ) {
-      // !VA Branch: reconfigureGetAttributes (052820)
       let Appdata, linebreak;
-      // Attributes = getAttributes();
       Appdata = appController.initGetAppdata();
       linebreak = '\n';
       let mobileFilename, mobileSwapStr;
       // !VA Create the mobile image filename: Get the current image file's filename and append the name with '-mob'.
-
       mobileFilename = Attributes.imgSrc.str;
-      console.log('mobileFilename is: ' + mobileFilename);
       // !VA The regex for appending the filename with '-mob'.
       mobileFilename = mobileFilename.replace(/(.jpg|.png|.gif|.svg)/g, '_mob$1');
       // !VA Create the code for the mobile swap TD as a Comment node of the parent td. 
@@ -1974,10 +1619,6 @@ var Witty = (function () {
 
     // !VA UIController private
     function getBgimageBlock( id, indentLevel, Attributes ) {
-      console.log('getBgiamgeBlock running');
-      // !VA Branch: reconfigureGetAttributes (052820)
-      // let Attributes;
-      // Attributes = getAttributes();
       let bgimageStr, fallback, bgcolor;
       let linebreak;
       linebreak = '\n';
@@ -1985,7 +1626,6 @@ var Witty = (function () {
       fallback = '#7bceeb';
       // !VA The fallback color is written to the bgcolor input in showTdOptions, so get it from there
       Attributes.tdBgcolor.str ? bgcolor = Attributes.tdBgcolor.str : bgcolor = document.querySelector(ccpUserInput.iptCcpTdBgColor).value;
-
       // !VA Define the innerHTML of the bgimage code
       bgimageStr = `${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth.str}px;height:${Attributes.imgHeight.str}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.tdBackground.str}" color="${bgcolor}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}${getIndent(indentLevel)}<div>${linebreak}${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div>${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}  </v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect>${linebreak}${getIndent(indentLevel)}<![endif]-->`;
       // !VA Return the code block with line breaks and indents
@@ -1994,10 +1634,6 @@ var Witty = (function () {
 
     // !VA CBController private
     function getVmlButtonBlock ( id, indentLevel, Attributes) {
-      // !VA Branch: reconfigureGetAttributes (052820)
-      // let Attributes;
-      // Attributes = getAttributes();
-      // console.dir(Attributes);
       let vmlButtonStr, linebreak, tdHeight, tdWidth;
       linebreak = '\n';
       // !VA Defaults for height and width are set in showTdOptions, so get the values from the inputs
@@ -2019,7 +1655,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CBController private
     // !VA NOTE: This routine identifies if the nodes 1) contain the id 'stack-column-center' 2) contain MS conditional code and 2) contain an A tag. It applies indents accordingly to the nodes using insertAdjacentHTML. 1) Is problematic because if that class name is not present in the HTML file, the indent will break. I couldn't figure out a way to do this without the id by looking for sibling nodes, so trying to create options for three or even two column tables will be ridiculous time-consuming - not an option for now.
     function applyIndents( id, uSels, outputNL ) {
-      // console.log('applyIndents running');
       // !VA Create array to store indent strings
       let indents = [];
       // !VA Create array to store the positions of the stackable columns in the posswitch option.
@@ -2115,8 +1750,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CBController private
     function writeClipboard(id, str) {
       console.log('writeClipboard running');
-      // console.log('str: ');
-      // console.log(str);
       let clipboardStr;
       // !VA clipboardStr is returned to clipboard.js
       clipboardStr = str;
@@ -2187,36 +1820,22 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     function handleInspectorClicks(targetid, modifierKey) {
-      
-      console.log('handleInspectorClicks running');
-      console.log('targetid is: ' + targetid);
       let Appdata, clipboardStr, widthval, heightval;
-
       var el = document.querySelector('#' + targetid);
       el.onmouseover = isOver();
-      console.log('el');
-      console.log(el);
-      
       function isOver() {
         console.log('isOver running');
       }
-
       widthval = heightval = '';
       // !VA Get Appdata
       Appdata = appController.initGetAppdata(false);
       // !VA Get the value to output to Clipboard based on whether shift or ctrl is pressed
       function getVal( widthval, heightval, modifierKey ) {
-        console.log('modifierKey is: ' + modifierKey);
         let str1, str2, val;
-        console.log('widthval  is: ' + widthval );
-        console.log('heightval is: ' + heightval);
+        // !VA NOTE: This needs to be commented
         if ( !widthval || !heightval ) {
-          console.log('this is a value click');
           widthval ? str1 = 'width' : str1 = 'height';
-          console.log('str1 is: ' + str1);
-          
           widthval ? val = widthval : val = heightval; 
-          console.log('val is: ' + val);
           if ( modifierKey === 'shift') {
             clipboardStr = str1 + '="' + val + '" ';
           } else if ( modifierKey === 'ctrl') {
@@ -2224,10 +1843,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           } else {
             clipboardStr = val;
           }
-
-
         } else {
-          console.log('this is a label click');
+        // !VA NOTE: This needs to be commented
           str1 = 'width';
           str2 = 'height';
           if ( modifierKey === 'shift') {
@@ -2293,16 +1910,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CBController public functions 
     return {
 
-      // !VA I wish I didn't have to do this but...
+      // !VA Access to getAttributes from outside its native CBController module
       initGetAttributes: function () {
-        console.log('initGetAttributes running');
         let Attributes = [];
         Attributes = getAttributes();
-        // console.log('initgetAttributes:');
-        // console.dir(Attributes);
         return Attributes;
       },
-
 
       // !VA Called from eventHandler to initialize clipboard functionality
       doClipboard: function(evt) {
@@ -2318,13 +1931,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         } else {
           modifierKey = false;
         }
+        // !VA IMPORTANT: Is this still necessary? Attributes don't appear to be passed anywhere here, and the Attributes are called after getUserSelections in the switch statement below. I think this might be deprecated.
         // !VA If the CCP image fluid/fixed radio button is clicked, then 
         if (targetid.includes('fixed') || targetid.includes('fluid')) {
           console.log('fixed/fluid');
           getAttributes();
         }
-
-
         // !VA Determine which element is clicked -- imgType (fluid or fixed), makeTag button, makeCSSRule button or Inspector element and run getUserSelections, makeCSSRule or handleInspectorClicks respectively. If an imgType button is clicked, we need to rebuild the nodeList because changing to fluid from fixed might result in a change to the tdoptions, plus we  need to rebuilt the Attributes object because the attributes have changed, which requires a CCP update. Changing the selected td option if fluid is selected also has to be done in getUserSelections, because the fluid option will only work with tdbasic,  so let's call getUserSelections for 'tag', 'fluid' and 'fixed'.
         switch(true) {
         case targetid.includes('tag') || targetid.includes('fluid') || targetid.includes('fixed') :
@@ -2337,16 +1949,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           handleInspectorClicks(targetid, modifierKey);
           break;
         default:
-          // code block
+          console.log('ERROR in doClipboard: case not defined');
         } 
         return targetid;
       },
-
-      // !VA Test function
-      runTest: function() {
-        console.log('runTest running');
-
-      }
     };
   })();
 
@@ -2361,7 +1967,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     const staticRegions = UICtrl.getStaticRegionIDs();
     const toolbarElements = UICtrl.getToolButtonIDs();
     const ccpUserInput = UICtrl.getCcpUserInputIDs();
-    const ccpUserInputLabels = UICtrl.getCcpUserInputLabelIds();
+    // !VA Deprecated?
+    // const ccpUserInputLabels = UICtrl.getCcpUserInputLabelIds();
     const btnCcpMakeClips =  UICtrl.getBtnCcpMakeClips();
     const appMessageElements =  UICtrl.getAppMessageElements();
     
@@ -2369,7 +1976,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private
     // !VA Creating a separate EventListener setup function specifically for tooltips, because this function will be run on DOMContentLoaded in an iife every time the CTRL + ALT key combination is pressed. The onModifierKeypress function should live in appController, I think. The tooltips themselves can be displayed either through UIController.showAppMessages or a new, separate UIController public function.
     // !VA Process the tooltip triggers when the mouseenter event is fired on them, i.e. get the appMessCode, appMessContent and duration and pass to showTooltip
-
     // !VA IMPORTANT: addEventListeners and removeEventListeners require a NAMED function, not just a function definition. If you just use a function definition, you can create the eventListener but you can't remove it because Javascript doesn't know which one you want to remove. Worse, it fails silently. So always name your function calls into a var when adding/removing event listeners!
     // !VA NOTE: variable name can't be the same as the function name. Otherwise, you can add and remove the event listener only ONCE, but not multiple times.
     var tooltipTriggers = function tooltipTriggers(evt) { 
@@ -2377,43 +1983,30 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       appController.handleAppMessages(evt);
     };
 
-
-
-
-
-
     // !VA ADD EVENT LISTENERS FOR TOOLTIP TRIGGERS
+    // !VA NOTE: I'm sure the add and remove event listeners can be consolidated into one - but not today.
     function addTooltipEventListeners() {
-      console.log('addTooltipEventListeners running');
       // !VA Event handler for initializing tooltip event listeners 
       function addEventHandler(oNode, evt, oFunc, bCaptures) {
-        // console.log('oNode is:');
-        // console.log(oNode);
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
       // !VA initialize the toolbar tooltip triggers
       var toolbarIds = Object.values(toolbarElements);
       let el;
       for (let i = 0; i < toolbarIds.length; i++) {
-        // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
         el = document.querySelector(toolbarIds[i]);
-        // console.log(el);
         addEventHandler(el, 'mouseenter', tooltipTriggers, true);
       }
       // !VA Add tooltip triggers for Inspector labels
       var inspectorLabelIds = Object.values(inspectorLabels);
       for (let i = 0; i < inspectorLabelIds.length; i++) {
-        // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
         el = document.querySelector(inspectorLabelIds[i]);
-        // console.log(el);
         addEventHandler(el, 'mouseenter', tooltipTriggers, true);
       }
       // !VA Add tooltip triggers for Inspector Value  elements
       var inspectorValueIds = Object.values(inspectorValues);
       for (let i = 0; i < inspectorValueIds.length; i++) {
-        // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
         el = document.querySelector(inspectorValueIds[i]);
-        // console.log(el);
         addEventHandler(el, 'mouseenter', tooltipTriggers, true);
       }
       // !VA Add tooltip triggers for CCP user input elements
@@ -2421,14 +2014,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       var ccpUserInputIds = Object.values(ccpUserInput);
       for (let i = 0; i < ccpUserInputIds.length; i++) {
         el = document.querySelector(ccpUserInputIds[i]);
-        // console.log(el);
         addEventHandler(el, 'mouseenter', tooltipTriggers, true);
       }
       // !VA Add tooltip triggers for CCP user input label elements
       // !VA All the labels have the same id as the inputs with -label appended except the mock checkboxes, whose label has no text and only serves to style the mock checkbox. So for the mock checkboxes, transform the id into the id of the actual text label by removing the spn- prefix and replacing 'checkmrk' with 'label'.
       let labelid, labelel;
       // !VA Loop through the CCP user input element ids
-      // !VA Branch: makeFluidOption (052620)
       for (let i = 0; i < ccpUserInputIds.length; i++) {
         labelid = ccpUserInputIds[i];
         // !VA If the label contains 'checkmrk'...
@@ -2456,10 +2047,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     function removeTooltipEventListeners() {
       // !VA Event handler for initializing tooltip event listeners 
-      console.log('removeTooltipEventListeners running');
       function removeEventHandler(oNode, evt, oFunc, bCaptures) {
-        // console.log('oNode is:');
-        // console.log(oNode);
         oNode.removeEventListener(evt, oFunc, bCaptures);
       }
       // !VA initialize the toolbar tooltip triggers
@@ -2468,8 +2056,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       for (let i = 0; i < toolbarIds.length; i++) {
         // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
         el = document.querySelector(toolbarIds[i]);
-        // console.log(el);
-
         removeEventHandler(el, 'mouseenter', tooltipTriggers, true);
       }
       // !VA Add tooltip triggers for Inspector labels
@@ -2483,9 +2069,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Add tooltip triggers for Inspector Value  elements
       var inspectorValueIds = Object.values(inspectorValues);
       for (let i = 0; i < inspectorValueIds.length; i++) {
-        // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
         el = document.querySelector(inspectorValueIds[i]);
-        // console.log(el);
         removeEventHandler(el, 'mouseenter', tooltipTriggers, true);
       }
       // !VA Add tooltip triggers for CCP user input elements
@@ -2493,7 +2077,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       var ccpUserInputIds = Object.values(ccpUserInput);
       for (let i = 0; i < ccpUserInputIds.length; i++) {
         el = document.querySelector(ccpUserInputIds[i]);
-        // console.log(el);
         removeEventHandler(el, 'mouseenter', tooltipTriggers, true);
       }
       // !VA Add tooltip triggers for CCP user input label elements
@@ -2545,8 +2128,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA Event handler for initializing event listeners 
       function addEventHandler(oNode, evt, oFunc, bCaptures) {
-        // console.log('oNode is:');
-        // console.log(oNode);
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
 
@@ -2582,25 +2163,19 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA Add click event handlers for Inspector clickable elements: Display Size, Small Phones and Large Phones values in the programmatically created SPAN tags
       const inspectorClickables = [ inspectorLabels.insDisplaySizeLabel, inspectorLabels.insSmallPhonesLabel, inspectorLabels.insLargePhonesLabel, inspectorValues.insDisplaySizeWidthValue, inspectorValues.insDisplaySizeHeightValue, inspectorValues.insSmallPhonesWidthValue, inspectorValues.insSmallPhonesHeightValue, inspectorValues.insLargePhonesWidthValue, inspectorValues.insLargePhonesHeightValue ];
-      // console.log('inspectorClickables is: ' + inspectorClickables);
       for (let i = 0; i < inspectorClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         inspectorClickables[i] = document.querySelector(inspectorClickables[i]);
-        // console.log('inspectorClickables[i].id is: ' + inspectorClickables[i].id);
-        // addEventHandler(inspectorClickables[i],'mouseenter',CBController.enteredMe,false);
         addEventHandler(inspectorClickables[i],'click',CBController.doClipboard,false);
       }
 
       // !VA Add mouseover event handlers for Inspector clickable elements: Display Size, Small Phones and Large Phones values in the programmatically created SPAN tags
       const inspectorHoverables = [ inspectorLabels.insDisplaySizeLabel, inspectorLabels.insSmallPhonesLabel, inspectorLabels.insLargePhonesLabel, inspectorValues.insDisplaySizeWidthValue, inspectorValues.insDisplaySizeHeightValue, inspectorValues.insSmallPhonesWidthValue, inspectorValues.insSmallPhonesHeightValue, inspectorValues.insLargePhonesWidthValue, inspectorValues.insLargePhonesHeightValue ];
-      // console.log('inspectorClickables is: ' + inspectorClickables);
       for (let i = 0; i < inspectorHoverables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         inspectorHoverables[i] = document.querySelector(inspectorHoverables[i]);
-        // console.log('inspectorHoverables[i].id is: ' + inspectorHoverables[i].id);
         // !VA IMPORTANT: WTF is this?
         addEventHandler(inspectorHoverables[i],'mouseenter',CBController.enteredMe,false);
-
       }
 
       // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. These are the class input elements for ccp Img, Td and Table options
@@ -2896,7 +2471,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       var el = document.getElementById(this.id);
       var args = { };
       args.target = el.id;
-      // !VA Branch: reconfigureMessages (051620) Check if any appMessages are running
       try {
         // console.log('handleMouseEvents try: ');
         var vals = [], msgElement;
@@ -2923,10 +2497,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           var val, isErr;
           // !VA We need to query Appdata properties to get the current value of imgW so we can add the toolbutton increments to id
           var Appdata = {};
-          // !VA Branch: reconfigureMessages (051620)
           // !VA Cancel any running appmessage timeouts and animations
-
-
           Appdata = appController.initGetAppdata();
           // !VA This is a click on one of the toolbutton increment buttons, so we're dealing with the Appdata.imgW property.
           args.prop = 'imgW';
@@ -3082,7 +2653,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       Appdata = appController.initGetAppdata();
       // !VA TODO: Setting maxViewerWidth just for now
       var maxViewerWidth = 800;
-      // !VA Branch: reconfigureMessages (051620) 
       // !VA First, check if there's a message running
       // !VA First, we validate that the user-entered value is an integer and if so, set the error variables.
       if (validateInteger(val)) {
@@ -3343,90 +2913,59 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         viewportH = imgH + 145;
       } 
       appH = viewportH;
+      // !VA NOTE: This would be better as a loop
       document.querySelector(dynamicRegions.curImg).style.width = imgW + 'px';
       document.querySelector(dynamicRegions.curImg).style.height =imgH + 'px';
       document.querySelector(dynamicRegions.imgViewer).style.height = viewerH + 'px';
       document.querySelector(dynamicRegions.imgViewport).style.height = viewportH + 'px';
       document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';
-
-      // !VA reinit the CCP
-      // !VA Branch: reconfigureGetAttributes (052820)
-      // !VA This doesn't appear to be necessary - wtf
-      // UIController.initUpdateCcp();
-
       // !VA Now that the image and its containers are written to the DOM, go ahead and write the Inspectors.
       UICtrl.writeInspectors();
     }
-
-    // !VA NOTE:  So this was the concept - to have the image itself be the data store, not some object. Instead of updating the data store and writing the UI from that, you update the core UI element, then recalculate the data store each time it changes. Here, there are 5 mutable elements and 5 properties. Only one of the properties has changed. So we loop through them all, find the match for the prop argument, then update only the element/data property that matches. This is a mickey-mouse solution but it works for now. Ideally we will pass in a key/value pair including the property name and the ID alias so we can use properties... in case there are more than one. 
-    // !VA That concept is bad because it requires constant DOM access 05.11.20
-
-    // !VA Update the CCP. This is called when the CCP is opened with the CCP button and/or when a user input is made on the toolbar that results in a call to resizeContainers.
-    // !VA IMPORTANT: This is the wrong way to handle this, but I can't deal with it right now. First, dynamically displayed elements should not be initialized here, but in initCcp. Second, this causes the Include wrapper checkbox to be ignored sometimes when you open the CCP. It's a bug. Put it in the list.
-
-    // !VA Branch: reconfig (052720)
-    // !VA updateCcp should be in UIController and should be called from displayAttributes. displayAttributes should collect all the CCP elements and their attribute values, and pass the whole schmear as an array to updateCcp. So we don't want to do the DOM access in displayAttributes. 
-    // !VA getAttributes already has most of the element ids in the respective attribute functions.
-
-
-    // !VA appController private
 
 
     // !VA CCP FUNCTIONS
     // !VA appController private 
     function initCcp() {
-      // !VA Get Appdata
-      // !VA Branch: rethinkImgTypeLogic (052920)
-
-      // !VA We should be able to initialize the Ccp elements here without calling their toggle functions, 
       // !VA Initialize the fixed/fluid imgType buttons - call getAttributes and populate the CCP elements with values based on whether fixed or fluid is selected.
       toggleImgType();
-
       // !VA Initialize the Include wrapper checkboxes. Pass in false for the evt argument for initialization so that the function skips over the button click condition and just executes the display/undisplay functionality.
-      toggleIncludeWrapper(false);
-
+      toggleIncludeWrapper('init');
       // !VA Initialize the tdoptions radio group to 'basic' if the 'fluid' imgType is selected
+      // !VA NOTE: This would be better as a loop
       if (document.querySelector(ccpUserInput.rdoCcpImgFluid).checked === true) {
         document.querySelector(ccpUserInput.rdoCcpTdBasic).checked = true;
         document.querySelector(ccpUserInput.rdoCcpTdExcludeimg).disabled = true;
       } 
-
-
-      // !VA The app initializes with the CCP closed, so toggle it on and off here.
+      // !VA IMPORTANT: Isn't this done somewhere else too? The app initializes with the CCP closed, so toggle it on and off here.
       document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
-      // !VA Branch: reconfigureGetAttributes (052820)
-      // !VA Something fishy here...but it appears to work. Call getAttributes and run updateCcp when the clipboard button is clicked.
+      // !VA IMPORTANT: Determine if this initGetAttribute call is necessary since updateCcp is deprecated
       CBController.initGetAttributes();
-
     }
 
-    function toggleIncludeWrapper(evt) {
-      console.log('toggleIncludeWrapper running');
+    function toggleIncludeWrapper(option) {
       var chkId, checkbox;
       let wrapperItems = [];
-      // !VA Array of wrapper items to be displayed if 'Include wrapper table' is checked
-      wrapperItems = ['#ccp-table-wrapper-class', '#ccp-table-wrapper-width', '#ccp-table-wrapper-align', '#ccp-table-wrapper-bgcolor' ]; 
-      // !VA Branch: reconfigureGetAttributes (052820)
+      wrapperItems = [ ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth, ccpUserInput.selCcpTableWrapperAlign,  ccpUserInput.iptCcpTableWrapperBgColor ];
+      UIController.handleCcpActions( 'setactiveparent', wrapperItems, true);
       // !VA chkId will always be ccpUserInput.spnCcpTableIncludeWrapperCheckmrk here because that's what the event listener was defined on. But this is a mock checkbox, so convert the ccpUserInput alias to the id of the actual checkbox element in order to toggle it 
       chkId = ccpUserInput.spnCcpTableIncludeWrapperCheckmrk;
       chkId = chkId.replace('mrk', 'box');
       chkId = chkId.replace('spn', 'chk');
       checkbox = document.querySelector(chkId);
-
-      // !VA If there's an event, there was a click. If there is no event, then the CCP is being initialized by clicking the Clipboard button.
-      if (evt) {
-        // !VA Toggle the checkmark on click
+      // !VA There are four possible parameters for 'option': 1) 'init' = passed from initToggleIncludeWrapper, initialization on page reload 2) evt = click event passed from event handler when the checkbox is checked/unchecked 3) true, checks the checkbox programmatically and displays the options, called from toggleImgType and 4) false, currently no use case.
+      if (option.target) {
+        // !VA If option is a click event, toggle the checkmark on click
         checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
-      } 
+        checkbox.checked ? UIController.handleCcpActions( 'setactiveparent', wrapperItems, true) : UIController.handleCcpActions( 'setactiveparent', wrapperItems, false);
+      } else if (option === true ) {
+        checkbox.checked = true;
+        UIController.handleCcpActions( 'setactiveparent', wrapperItems, true);
+      } else if (option === 'init') {
       // !VA Display/undisplay wrapper table options when checkbox is toggled
-      if (checkbox.checked) {
-        for (let i = 0; i < wrapperItems.length; i++) {
-          document.querySelector(wrapperItems[i]).style.display = 'block'; 
-        }
+        checkbox.checked ? UIController.handleCcpActions( 'setactiveparent', wrapperItems, true) : UIController.handleCcpActions( 'setactiveparent', wrapperItems, false);
       } else {
-        for (let i = 0; i < wrapperItems.length; i++) {
-          document.querySelector(wrapperItems[i]).style.display = 'none'; 
-        }
+        console.log('ERROR in toggleIncludeWrapper: unkknown option argument');
       }
     }
 
@@ -3500,20 +3039,21 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         console.log('ERROR: UIController.showTdOptions public');
       } 
     }
+    
+    function toggleIncludeAnchor() {
+      console.log('toggleIncludeAnchor running: not yet implemented');
+    }
 
-
-    // !VA Branch: rethinkImgTypeLogic (052920)
+    // !VA Handles the CCP displau logic for the imgType fixed/fluid buttons. The Clipboard output logic is handled in getAttributes - this routine handles primarily the conditions for manipulating the CCP elements based on the logic defined in Attributes.
     function toggleImgType() {
-      console.log('toggleImgType running');
       // !VA Get Attributes so we can assign them to the Ccp elements 
       let Attributes;
+      // !VA This is the other place where getAttributes is accessed besides buildOutputNodeList and maybe initCcp.
       Attributes = CBController.initGetAttributes();
-       
       // !VA Loop through Attributes and assign values to corresponding elements. The logic is included in the Attribute, so just assign the values here.
       const sourceAttributes = [ Attributes.tableTagWrapperClass.str, Attributes.tableWidth.str, Attributes.tableTagWrapperWidth.str];
       const targetCcpElement = [ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWidth, ccpUserInput.iptCcpTableWrapperWidth ];
       UIController.handleCcpActions( 'setvalue', targetCcpElement, sourceAttributes );
-
       // !VA Preselect the tdoption 'basic',  disable the other td options for fluid, and make sure the Include wrapper is checked and the options are displayed. The other td options won't work with or aren't applicable for fluid because fluid is only for images. 
       // !VA Preselect the option 'basic'
       document.querySelector(ccpUserInput.rdoCcpTdBasic).checked = true;
@@ -3521,13 +3061,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       const toDisable = [ ccpUserInput.rdoCcpTdExcludeimg, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdBgimage, ccpUserInput.rdoCcpTdPosswitch, ccpUserInput.rdoCcpTdVmlbutton ];
       // !VA Ternary operator to disable/enable radio input elements
       Attributes.imgType.str === 'fluid' ? UIController.handleCcpActions( 'setdisabledradio', toDisable, true ) : UIController.handleCcpActions( 'setdisabledradio', toDisable, false);
-
       // !VA If the include wrapper checkbox is not checked and the options aren't displayed for the fluid imgType options, check it and display the options.
-
-
+      if (Attributes.imgType.str === 'fluid') { toggleIncludeWrapper(true); }
     }
-
-
     // !VA END CCP FUNCTIONS
       
     // !VA  appController private
@@ -3818,7 +3354,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       },
       // !VA appController public: DEVMODE
       initToggleIncludeWrapper: function () {
-        toggleIncludeWrapper(false);
+        toggleIncludeWrapper('init');
       },
       // !VA appController public: DEVMODE
       initShowTdOptions: function () {
