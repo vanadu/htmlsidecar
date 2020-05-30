@@ -498,7 +498,6 @@ var Witty = (function () {
         els.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
         els.iptTbrSPhonesWidth ? els.iptTbrSPhonesWidth : Appdata.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
         els.iptTbrLPhonesWidth ? els.iptTbrLPhonesWidth : Appdata.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
-        // console.dir(els);
         return els;
       },
 
@@ -1119,7 +1118,6 @@ var Witty = (function () {
           break;
         // !VA tdbut is clicked. Here we handle the 'basic', 'excludeimg' and 'posswitch' options because they process indents with no modifications. 'imgswap', 'bgimage' and 'vmlbutton' options are handled separately because they import comment nodes with MS conditional code
         case (uSels.buttonClicked === 'tdbut'):
-          console.log('tdbut');
           // !VA basic option is selected 
           if ( uSels.selectedTdOption === 'basic') { 
             // !VA We can hardcode this for now, but that will be a problem if any other options with other nodes are added.
@@ -1920,7 +1918,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Called from eventHandler to initialize clipboard functionality
       doClipboard: function(evt) {
         console.log('doClipboard running');
-        // console.clear();
         let targetid, modifierKey;
         targetid = evt.target.id;
         // !VA Determined if shift or ctrl is pressed while clicked
@@ -1934,7 +1931,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA IMPORTANT: Is this still necessary? Attributes don't appear to be passed anywhere here, and the Attributes are called after getUserSelections in the switch statement below. I think this might be deprecated.
         // !VA If the CCP image fluid/fixed radio button is clicked, then 
         if (targetid.includes('fixed') || targetid.includes('fluid')) {
-          console.log('fixed/fluid');
           getAttributes();
         }
         // !VA Determine which element is clicked -- imgType (fluid or fixed), makeTag button, makeCSSRule button or Inspector element and run getUserSelections, makeCSSRule or handleInspectorClicks respectively. If an imgType button is clicked, we need to rebuild the nodeList because changing to fluid from fixed might result in a change to the tdoptions, plus we  need to rebuilt the Attributes object because the attributes have changed, which requires a CCP update. Changing the selected td option if fluid is selected also has to be done in getUserSelections, because the fluid option will only work with tdbasic,  so let's call getUserSelections for 'tag', 'fluid' and 'fixed'.
@@ -2054,16 +2050,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       var toolbarIds = Object.values(toolbarElements);
       let el;
       for (let i = 0; i < toolbarIds.length; i++) {
-        // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
         el = document.querySelector(toolbarIds[i]);
         removeEventHandler(el, 'mouseenter', tooltipTriggers, true);
       }
       // !VA Add tooltip triggers for Inspector labels
       var inspectorLabelIds = Object.values(inspectorLabels);
       for (let i = 0; i < inspectorLabelIds.length; i++) {
-        // console.log('toolbarIds[i] is: ' +  toolbarIds[i]);
         el = document.querySelector(inspectorLabelIds[i]);
-        // console.log(el);
         removeEventHandler(el, 'mouseenter', tooltipTriggers, true);
       }
       // !VA Add tooltip triggers for Inspector Value  elements
@@ -2397,7 +2390,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           let tipContentContainer, appBlocker;
           appBlocker = document.querySelector(staticRegions.appBlocker);
           rootElement.classList.remove('modifier-pressed');
-          console.log('Modifier released');
           tipContentContainer = document.querySelector(appMessageElements.tipContent);
           tipContentContainer.innerHTML = '';
           if (appBlocker.classList.contains('active')) { appBlocker.classList.remove('active'); }
@@ -2434,7 +2426,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       this.select();
     }
 
-    // !VA TODO: Why is the argument  unused, why are there unused elements and what is actually happening here?
+    // !VA TODO: Why is the argument unused, why are there unused elements and what is actually happening here?
     // !VA appController private
     function handleBlur(evt) {
       // !VA Handle blur
@@ -2451,21 +2443,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
     }
 
+    // !VA NOTE: Needs to be commented
     function handleOnfocus(evt) {
-      // console.log('handleOnfocus running');
-      // console.log('evt.target is: ' + evt.target);
       let targ = evt.target;
-      // console.log('targ.id is: ' + targ.id);
       let val = targ.value;
-      // console.log('val is: ' + val);
     }
 
 
     // !VA appController private 
     // !VA Preprocess mouse events and route them to respective eval handler.
     function handleMouseEvents(evt) {
-      // console.log('handleMouseEvents running');
-      
       // !VA Carryover from earlier handleUserAction
       // !VA Get the target element of the click
       var el = document.getElementById(this.id);
@@ -2538,7 +2525,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
     // !VA TODO: Why are there unused elements and what is actually happening here?
     function handleKeydown(evt) {
-      // console.log('handleKeydown running');
       try {
         // console.log('handleKeyDown try: ');
         var vals = [], msgElement;
@@ -2608,7 +2594,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA TODO: Why are there unused elements and what is actually happening here?
     // !VA keyPress handler for the ESC key.  This has to be handled on keyup, so we need a separate handler for it.
     function handleKeyup(evt) {
-      // console.log('handleKeyUp running');
       let prop, curLocalStorage;
       // !VA We only need the property here, so no need to create an args object. We could actually just use the target but since we're standardizing on property names, let's stick with that. Get the property name from the id of this, i.e. the event target
       prop = elementIdToAppdataProp(this.id);
@@ -2627,7 +2612,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           curLocalStorage = appController.getLocalStorage();
           if (prop === 'viewerW') {
             curLocalStorage[0] ? this.value = curLocalStorage[0] : this.value = document.querySelector(toolbarElements.iptTbrViewerW).placeholder;
-            // console.log('document.querySelector(\'#\' + prop).placeholder is: ' + document.querySelector(toolbarElements.iptTbrViewerW).placeholder);
           } else if (prop === 'sPhonesW') {
             curLocalStorage[1] ? this.value = curLocalStorage[1] : this.value = document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder;
           } else if (prop === 'lPhonesW') {
@@ -2763,7 +2747,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA appController private
     function updateAppdata( ...params ) {
-      console.log('updateAppdata running');
       let prop, val;
       // !VA Each param pair is a property name prop and a value val. evalToolbarInput passes in one or more such pairs whose corresponding Appdata DOM element/data attribute has to be updated. So, loop through the argument arrays and update the corresponding DOM elements
       for (let i = 0; i < params.length; i++) {
@@ -2776,11 +2759,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         case prop === 'viewerW' :
           document.querySelector(dynamicRegions.imgViewer).style.width = val + 'px'; 
           // !VA Write the imgViewer value to localStorage. 
-          console.log('writing LS');
           localStorage.setItem('viewerW', val);
-          // console.log('Setting localStorage viewerW');
-          // var foo = appController.getLocalStorage();
-          // console.log('foo is: ' + foo);
           break;
         case prop === 'imgW' :
           document.querySelector(dynamicRegions.curImg).style.width = val + 'px';
@@ -2800,8 +2779,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           break;
         }
       }
-      // let Appdata = appController.initGetAppdata(false);
-      // console.dir(Appdata);
     }
 
     // !VA  appController private 
@@ -2972,7 +2949,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private 
     // !VA Contains the logic for displaying/undisplaying, disabling/enabling, setting/deleting values from the tdoptions radio input group. 
     function showTdOptions(evt) {
-      console.log('showTdOptions running');
       // !VA Array including all the defined options for each tdoption radio
       let allTdOptions = [], optionsToShow = [], valuesToSet = [], values = [], targetalias;
       let Appdata;
@@ -3107,8 +3083,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     function getAppMessageStrings( appMessCode) {
       let Appdata;
       Appdata = appController.initGetAppdata();
-      // console.log('tooltipStrings running');
-      // console.log('tooltipid is: ' + tooltipid);
       let appMessContent;
       // !VA Set tooltipContent to ''. This overwrites tooltipContent being undefined if tooltipid is invalid
       appMessContent = '';
@@ -3219,7 +3193,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appContoller private
     // !VA Create the isolate popup with no frills and a fixed window sized to the Witty app dimensions
     function isolateApp() {
-      console.log('isolateApp running');
       // !VA Put a query string in the URL to indicate that the child window is isolated
       let curURL = window.location.href + '?isolate=' + true;
       // !VA NOTE: win isn't accessed, but it might be later.  
@@ -3299,7 +3272,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA appController private
     function getAppdata() {
-      // console.log('getAppdata running');
       var Appdata = {};
       Appdata = UIController.queryDOMElements();
 
@@ -3308,37 +3280,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       Appdata.sPhonesH = Math.round(Appdata.sPhonesW * (1 / Appdata.aspect[0]));
       Appdata.lPhonesH = Math.round(Appdata.lPhonesW * (1 / Appdata.aspect[0]));
       return Appdata;
-    }
-
-    // !VA appController private
-    // !VA Preprocess error messages before sending them to UIController.displayAppMessages. This is where the setTimeOut for err and msg messages lives.
-    // !VA IMPORTANT This appears to be deprecated
-    function processAppMessages(appMessType, appMessContent, duration ) {
-      
-      console.log('preprocessAppErrs running');
-      console.log('appMessType is: ' + appMessType);
-      console.log('appMessContent is: ' + appMessContent);
-      let appMessContainerId, appMessContainer, timer;
-      // !VA 
-      appMessType === 'err' ? appMessContainerId = appMessageElements.errContent : appMessContainerId = appMessageElements.msgContent; 
-      appMessContainer = document.querySelector(appMessContainerId);
-
-      // !VA Set the innerHTML of the respective appMessContainer.
-      appMessContainer.innerHTML = appMessContent;
-      UIController.displayAppMessages( true, appMessContainerId, false );
-      
-
-        
-        
-      timer = setTimeout(() => {
-        // console.log('NOW');
-
-        // !VA Read the appMessContent into the tooltip content element
-        // !VA Here we call UIController.showAppMess. It needs two parameters for tooltips - the targetElement that gets the help cursor and the appMessElement that gets the appMessContent. We put the targetid at the end because it will only have a value for tooltips - for the other two message types it will be undefined.
-        UIController.displayAppMessages(false, appMessContainerId, false );
-      }, duration);
-
-
     }
 
     // !VA appController public functions
@@ -3367,7 +3308,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA So now the problem is that tooltips require the caller id because the tooltip shows on mouseenter and has to hide on mouseleave, and we need the id for the mouseleave to create the eventListener for it. So:
       // !VA Call showAppMessages with two parameters: targetid, which is either a string for tooltips or false for msg and err, and the second parameter is the appMessContent.
       handleAppMessages: function ( evt ) {
-        // console.log('appController public handleAppMessages running');
         let appMessCode, appMessType, appMessContent, duration, appMessContainerId, tooltipTarget, timer;
         // !VA Duplicate evt into appMessCode - we could just receive the event as appMessCode but it's more transparent to do it explicitly
         appMessCode = evt;
@@ -3375,7 +3315,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         if (typeof(appMessCode) === 'object') { 
           // evt = appMessCode;
           tooltipTarget = '#' + evt.target.id;
-          // console.log('targetid is: ' + targetid);
           appMessCode = 'tip_' + evt.target.id.replace(/-/gi, '_'); 
           appMessType = 'tip';
         }
@@ -3433,15 +3372,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         for (let i = 0; i < arr.length; i++) {
           localStorage.getItem(arr[i]) ? curLocalStorage.push(localStorage.getItem(arr[i])) : curLocalStorage.push(false);
         }
-        // console.log('curLocalStorage:');
-        // console.dir(curLocalStorage);
         return curLocalStorage;
       },
 
       // !VA appController public
       init: function(){
         console.log('App initialized.');
-
         // !VA Determine if the window is an isolate window, i.e. should be displayed with just the Witty app in window with fixed dimensions without header or tutorial content.
         let curUrl, initMode;
         // !VA If the value of the query string is true, then remove the header-container, isolate button and content from the DOM
