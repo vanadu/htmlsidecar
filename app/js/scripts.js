@@ -2648,7 +2648,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         }
       }
       
-      // !VA eventListeners for the imgType radio buttons for showing/hiding options based on selectedTdOption are initialized in updateCcp
+      // !VA eventListeners for the imgType radio buttons for showing/hiding options based on CCP fixed/fluid radio buttons
       for(let i in ccpUserInput) {
         let selectedImgType;
         // !VA Target only those ccpUserInput elements whose first 12 characters are #rdo-ccp-img. This identifies them as the fluid/fixed radio button options.
@@ -2659,21 +2659,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         }
       }
 
-      // !VA eventListeners for the Include Wrapper checkbox
+      // !VA eventListener for the Include Wrapper checkbox
       let includeWrapperCheckbox = document.querySelector(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk);
       addEventHandler(includeWrapperCheckbox,'click',toggleIncludeWrapper,false);
 
 
 
-      for(let i in ccpUserInput) {
-        let selectedImgType;
-        // !VA Target only those ccpUserInput elements whose first 12 characters are #rdo-ccp-img. This identifies them as the fluid/fixed radio button options.
-        if (ccpUserInput[i].substring(0, 12) === '#rdo-ccp-img') {
-          selectedImgType = document.querySelector(ccpUserInput[i]);
-          // !VA Add an event handler to trap clicks to the tdoptions radio button
-          addEventHandler(selectedImgType,'click',toggleImgType,false);
-        }
-      }
+
 
       // !VA Misc Unused Handlers for review
       // =============================
@@ -3457,19 +3449,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       console.dir(Attributes);
       let parentTableWidth, tableWrapperClass, tableWrapperWidth;
        
-      // !VA Getting from Attributes
-      tableWrapperClass = Attributes.tableTagWrapperClass.str;
-      parentTableWidth = Attributes.tableWidth.str;
-      tableWrapperWidth = Attributes.tableTagWrapperWidth.str;
-
-      console.log('tableWrapperClass is: ' + tableWrapperClass);
-      console.log('parentTableWidth is: ' + parentTableWidth);
-      console.log('tableWrapperWidth is: ' + tableWrapperWidth);
-      
-      // !VA Writing to CCP
-      document.querySelector(ccpUserInput.iptCcpTableWidth).value = parentTableWidth;
-      document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = tableWrapperClass;
-      document.querySelector(ccpUserInput.iptCcpTableWrapperWidth).value = tableWrapperWidth;
+      // !VA Loop through Attributes and assign values to corresponding
+      const sourceAttributes = [ Attributes.tableTagWrapperClass.str, Attributes.tableWidth.str, Attributes.tableTagWrapperWidth.str];
+      const targetCcpElement = [ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWidth, ccpUserInput.iptCcpTableWrapperWidth ];
+      for (let i = 0; i < sourceAttributes.length; i++) {
+        document.querySelector(targetCcpElement[i]).value = sourceAttributes[i];
+      }
 
       // !VA Branch: rethinkImgTypeLogic (052920)
       // !VA Still need to disable the other options for fluid and enable them for fixed.
@@ -3477,7 +3462,36 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         console.log('fluid');
         document.querySelector(ccpUserInput.rdoCcpTdBasic).checked = true;
 
+        let str, elementLabel;
+        const toDisable = [ ccpUserInput.rdoCcpTdExcludeimg, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdBgimage, ccpUserInput.rdoCcpTdPosswitch, ccpUserInput.rdoCcpTdVmlbutton ];
+        for (let i = 0; i < toDisable.length; i++) {
+          str = toDisable[i];
+          elementLabel = str + '-label';
+          console.log('elementLabel is: ' + elementLabel);
+          document.querySelector(elementLabel).classList.add('disabled');
+          document.querySelector(toDisable[i]).disabled = true;
+          document.querySelector(toDisable[i]).classList.add('disabled-radio');
+        }
+
+      } else {
+        let str, elementLabel;
+        const toDisable = [ ccpUserInput.rdoCcpTdExcludeimg, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdBgimage, ccpUserInput.rdoCcpTdPosswitch, ccpUserInput.rdoCcpTdVmlbutton ];
+        for (let i = 0; i < toDisable.length; i++) {
+          str = toDisable[i];
+          elementLabel = str + '-label';
+          console.log('elementLabel is: ' + elementLabel);
+          document.querySelector(elementLabel).classList.remove('disabled');
+          document.querySelector(toDisable[i]).disabled = false;
+          document.querySelector(toDisable[i]).classList.remove('disabled-radio');
+        }
       }
+
+
+
+
+
+
+      
     }
 
 
