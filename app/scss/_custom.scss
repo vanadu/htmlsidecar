@@ -516,9 +516,19 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 }
 // VA! Radio buttons
 .disabled-radio {
-  opacity: 0.4 !important;
+  opacity: .4 !important;
 }
 
+// #ccp-table-include-wrapper-container {
+//   pointer-events: none;
+//   border: 1px solid red;
+// }
+
+
+.testme {
+  pointer-events: none;
+  color: #959595 !important;
+}
 
 .inspector-content, .inspector-label, .inspector-x, .no-image  {
   display: inline;

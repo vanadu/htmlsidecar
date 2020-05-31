@@ -341,7 +341,7 @@ var Witty = (function () {
         // console.dir(elemArray);
         // console.log('option');
         // console.dir(option);
-        let elem;
+        let elem, str, elementLabel;
         // !VA This function gets the id of the parent div of the td option to be displayed/hidden. We need the parent div because it contains label and input of the element, not just the input field or dropdown list itself.
         function getParentDiv(parentDivId) {
           parentDivId = '#' + parentDivId.substring( 5 );
@@ -376,9 +376,9 @@ var Witty = (function () {
         }
 
 
-        // !VA Disables/enables an input element, applies/removes the disabled-radio class to the input element, and applies the disabled class to the input element's label. NOTE: Currently need a separate function to disable text input elements but that can probably be folded into this.
-        let str, elementLabel;
-        function setDisabled(elemArray, option) {
+        // !VA Disables/enables an radio button element, applies/removes the disabled-radio class to the input element, and applies the disabled class to the input element's label. NOTE: Currently need a separate function to disable text input elements but that can probably be folded into this.
+        elementLabel;
+        function setDisabledRadio(elemArray, option) {
           for (let i = 0; i < elemArray.length; i++) {
             if (option) {
               str = elemArray[i];
@@ -396,6 +396,24 @@ var Witty = (function () {
           }
         }
 
+        // !VA Disables/enables a text input field, applies/removes the disabled-input class to the input element, and applies the disabled class to the input element's label. NOTE: Currently need a separate function to disable radio button elements but that can probably be folded into this.
+        function setDisabledTextInput(elemArray, option) {
+          for (let i = 0; i < elemArray.length; i++) {
+            if (option) {
+              str = elemArray[i];
+              elementLabel = str + '-label';
+              document.querySelector(elementLabel).classList.add('disabled');
+              document.querySelector(elemArray[i]).disabled = true;
+              document.querySelector(elemArray[i]).classList.add('disabled');
+            } else {
+              str = elemArray[i];
+              elementLabel = str + '-label';
+              document.querySelector(elementLabel).classList.remove('disabled');
+              document.querySelector(elemArray[i]).disabled = false;
+              document.querySelector(elemArray[i]).classList.remove('disabled');
+            }
+          }
+        }
 
         switch(true) {
         // !VA In showTdOptions: Active class must be applied to the parent div of the target in order to display/undisplay the container including input and label. 
@@ -405,7 +423,11 @@ var Witty = (function () {
           break;
         case action === 'setdisabledradio':
           console.log('setdisabledradio...');
-          setDisabled(elemArray, option);
+          setDisabledRadio(elemArray, option);
+          break;
+        case action === 'setdisabledtextinput':
+          console.log('setdisabledtextinput...');
+          setDisabledTextInput(elemArray, option);
           break;
         case action === 'setvalue':
           console.log('setvalue');
@@ -414,7 +436,6 @@ var Witty = (function () {
         default:
           console.log('handleCcpActions: no action defined');
         } 
-
       },
 
       // !VA UIController public
@@ -2219,11 +2240,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         }
       }
 
-      // !VA eventListener for the Include Wrapper checkbox
+      // !VA eventListener for the Include Wrapper checkbox. Checkboxes need to have separate event handlers because their functions are too different to consolidate into a single one.
       let includeWrapperCheckbox = document.querySelector(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk);
       addEventHandler(includeWrapperCheckbox,'click',toggleIncludeWrapper,false);
 
-
+      // !VA eventListener for the Include Anchor checkbox. Checkboxes need to have separate event handlers because their functions are too different to consolidate into a single one.
+      let includeAnchorCheckbox = document.querySelector(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk);
+      addEventHandler(includeAnchorCheckbox,'click',toggleIncludeAnchor,false);
 
 
 
@@ -2920,6 +2943,23 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       CBController.initGetAttributes();
     }
 
+    function toggleIncludeAnchor(evt) {
+      console.log('toggleIncludeAnchor running: ');
+      let chkId, checkbox;
+      chkId = '#' + evt.target.id;
+      chkId = chkId.replace('mrk', 'box');
+      chkId = chkId.replace('spn', 'chk');
+      checkbox = document.querySelector(chkId);
+      // !VA NOTE: This should be a try/catch
+      if (checkbox) {
+        // !VA If option is a click event, toggle the checkmark on click
+        checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
+      // !VA Display/undisplay wrapper table options when checkbox is toggled
+      } else {
+        console.log('ERROR in toggleIncludeWrapper: unkknown argument');
+      }
+    }
+
     function toggleIncludeWrapper(option) {
       var chkId, checkbox;
       let wrapperItems = [];
@@ -3015,10 +3055,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         console.log('ERROR: UIController.showTdOptions public');
       } 
     }
-    
-    function toggleIncludeAnchor() {
-      console.log('toggleIncludeAnchor running: not yet implemented');
-    }
+
 
     // !VA Handles the CCP displau logic for the imgType fixed/fluid buttons. The Clipboard output logic is handled in getAttributes - this routine handles primarily the conditions for manipulating the CCP elements based on the logic defined in Attributes.
     function toggleImgType() {
@@ -3030,15 +3067,29 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       const sourceAttributes = [ Attributes.tableTagWrapperClass.str, Attributes.tableWidth.str, Attributes.tableTagWrapperWidth.str];
       const targetCcpElement = [ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWidth, ccpUserInput.iptCcpTableWrapperWidth ];
       UIController.handleCcpActions( 'setvalue', targetCcpElement, sourceAttributes );
-      // !VA Preselect the tdoption 'basic',  disable the other td options for fluid, and make sure the Include wrapper is checked and the options are displayed. The other td options won't work with or aren't applicable for fluid because fluid is only for images. 
-      // !VA Preselect the option 'basic'
-      document.querySelector(ccpUserInput.rdoCcpTdBasic).checked = true;
+      // !VA For the fluid imgType options, make sure Include wrapper table is checked, disable all the tdoptions except 'basic' then disable the checkbox, table wrapper class and width and parent table width options.
       // !VA Array of radio input elements to disable
-      const toDisable = [ ccpUserInput.rdoCcpTdExcludeimg, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdBgimage, ccpUserInput.rdoCcpTdPosswitch, ccpUserInput.rdoCcpTdVmlbutton ];
-      // !VA Ternary operator to disable/enable radio input elements
-      Attributes.imgType.str === 'fluid' ? UIController.handleCcpActions( 'setdisabledradio', toDisable, true ) : UIController.handleCcpActions( 'setdisabledradio', toDisable, false);
-      // !VA If the include wrapper checkbox is not checked and the options aren't displayed for the fluid imgType options, check it and display the options.
-      if (Attributes.imgType.str === 'fluid') { toggleIncludeWrapper(true); }
+      const tdOptionsDisable = [ ccpUserInput.rdoCcpTdExcludeimg, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdBgimage, ccpUserInput.rdoCcpTdPosswitch, ccpUserInput.rdoCcpTdVmlbutton ];
+      const includeWrapperOptionsToDisable = [ ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth ];
+      if (Attributes.imgType.str === 'fluid') { 
+        // !VA Preselect the option 'basic'. The other td options won't work with or aren't applicable for fluid because fluid is only for images. 
+        document.querySelector(ccpUserInput.rdoCcpTdBasic).checked = true;
+        toggleIncludeWrapper(true); 
+        UIController.handleCcpActions( 'setdisabledradio', tdOptionsDisable, true );
+        UIController.handleCcpActions( 'setdisabledtextinput', includeWrapperOptionsToDisable, true );
+        document.querySelector('#ccp-table-include-wrapper').classList.add('testme');
+        document.querySelector('#ccp-table-include-wrapper-label').classList.add('disabled');
+        document.querySelector(ccpUserInput.iptCcpTableWidth).classList.add('disabled');
+
+
+
+      } else {
+        UIController.handleCcpActions( 'setdisabledradio', tdOptionsDisable, false);
+        UIController.handleCcpActions( 'setdisabledtextinput', includeWrapperOptionsToDisable, false );
+        document.querySelector('#ccp-table-include-wrapper').classList.remove('testme');
+        document.querySelector('#ccp-table-include-wrapper-label').classList.remove('disabled');
+        document.querySelector(ccpUserInput.iptCcpTableWidth).classList.add('disabled');
+      }
     }
     // !VA END CCP FUNCTIONS
       
