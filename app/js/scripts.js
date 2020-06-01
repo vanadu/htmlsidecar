@@ -3077,7 +3077,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         toggleIncludeWrapper(true); 
         UIController.handleCcpActions( 'setdisabledradio', tdOptionsDisable, true );
         UIController.handleCcpActions( 'setdisabledtextinput', includeWrapperOptionsToDisable, true );
-        document.querySelector('#ccp-table-include-wrapper').classList.add('testme');
+        document.querySelector('#ccp-table-include-wrapper').classList.add('disable-checkbox');
         document.querySelector('#ccp-table-include-wrapper-label').classList.add('disabled');
         document.querySelector(ccpUserInput.iptCcpTableWidth).classList.add('disabled');
 
@@ -3086,7 +3086,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       } else {
         UIController.handleCcpActions( 'setdisabledradio', tdOptionsDisable, false);
         UIController.handleCcpActions( 'setdisabledtextinput', includeWrapperOptionsToDisable, false );
-        document.querySelector('#ccp-table-include-wrapper').classList.remove('testme');
+        document.querySelector('#ccp-table-include-wrapper').classList.remove('disable-checkbox');
         document.querySelector('#ccp-table-include-wrapper-label').classList.remove('disabled');
         document.querySelector(ccpUserInput.iptCcpTableWidth).classList.add('disabled');
       }

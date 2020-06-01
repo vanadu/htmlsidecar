@@ -259,7 +259,6 @@ button:disabled  {
     font-size: 20px;
     text-align: left;
     text-transform: uppercase;
-    // border: 1px solid red;
   }
 }
 
@@ -267,7 +266,6 @@ button:disabled  {
   color: $logo-color;
   font-size: 110%;
   font-weight: 800;
-  // border: 1px solid red;
 }
 
 // APP-CONTAINER
@@ -295,12 +293,6 @@ button:disabled  {
 }
 
 // TOOLS
-
-
-
-
-
-
 // VA! Reboot 
 #toolbar-container {
   display: block;
@@ -513,21 +505,16 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 // VA! Labels, inputs
 .disabled {
   color: #959595 !important;
+  font-style: italic;
 }
 // VA! Radio buttons
 .disabled-radio {
   opacity: .4 !important;
 }
 
-// #ccp-table-include-wrapper-container {
-//   pointer-events: none;
-//   border: 1px solid red;
-// }
-
-
-.testme {
-  pointer-events: none;
+.disable-checkbox {
   color: #959595 !important;
+  pointer-events: none;
 }
 
 .inspector-content, .inspector-label, .inspector-x, .no-image  {
@@ -567,10 +554,6 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   color: $inspector-pop-font-color !important;
 }
 
-
-
-
-
 // APP ERROR DISPLAY
 #app-message-container {
   display: flex;
@@ -601,7 +584,6 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   }
 }
 
-
 #tip-content {
   color: #04508e;
 }
@@ -611,8 +593,6 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 #msg-content {
   color: #959595;
 }
-
-
 
 // MAIN IMAGE VIEWER
 #main-image-viewer {
@@ -642,9 +622,8 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
     display: flex;
     position: relative;
     flex-direction: column;
-    // align-content: center;
-    justify-content: flex-start;
     align-items: flex-start;
+    justify-content: flex-start;
     width: 600px;
     min-height: 400px;
     border: 2px dashed #bbb;
@@ -659,8 +638,8 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 .drop-callout {
   display: block;
   position: relative;
-  height: 70px;
   width: 100%;
+  height: 70px;
   margin-top: 0;
   padding: 15px 25px;
   color: #959595;
@@ -707,9 +686,9 @@ output {
   border: 1px solid #161616;
   border-radius: 10px;
   background: #000000;
+  cursor: default;
   opacity: .91;
   z-index: 100;
-  cursor: default;
   // -webkit-transform: scaleX(0);
   // -webkit-transition: -webkit-transform 500ms;
   // Animation
@@ -744,7 +723,7 @@ output {
   height: 500px;
   // margin: 0 auto;
   padding: 0 10px;
-  // Character styles for CCP user input elements
+  // Character styles for CCP user text input elements
   input, label {
     display: inline-block;
     max-width: 100%;
@@ -753,7 +732,7 @@ output {
     font-weight: 300;
   }
   select {
-    width: 60px;
+    width: 70px;
     font-size: 14px;
   }
   input {
@@ -761,14 +740,15 @@ output {
     border: 1px solid #616161;
     background: #000000;
     color: #FFFFFF;
-    &.disabled {
-      color: #666666;
-      font-style: italic;
-    }
+  }
+
+  input[type='radio'] {
+    position: relative;
+    margin-top: 6px;
+    border: 1px solid blue;
   }
 
 }
-
 
 
 // VA! Set the width of the 4 options columns in each fieldset
@@ -888,16 +868,19 @@ fieldset {
     }
   }
   .ccp-img-type-container {
-    display: flex;
-    width: 80%;
+    width: 100%;
+    margin-top: 6px;
   }
   .ccp-img-type {
-    display: flex;
-    width: 50%;
+    display: inline-block;
+    width: 49%;
     #rdo-ccp-img-fixed, #rdo-ccp-img-fluid {
       width: 15%;
       margin: -3px 0 0 -3px;
     }
+  }
+  .rdo-ccp-img-fluid-label, .rdo-ccp-img-fixed-label {
+    padding-left: 7px;
   }
   // VA! branch: makeFluidOption Just removing this from the DOM for now, but the functionality will have to be removed as well
   #ccp-img-include-width-height {
@@ -1064,7 +1047,6 @@ fieldset {
 // VA! Hide the real checkbox input element so that it doesn't obscure the imgtype radio buttons below.
 #chk-ccp-img-include-anchor-checkbox {
   display: none !important;
-  border: 1px solid magenta;
 }
 
 
@@ -1101,7 +1083,6 @@ fieldset {
 #ccp-table-include-wrapper-label {
   margin: 0;
   // padding: 0 0 0 34px;
-  // border: 1px solid red;
   font-weight: bold !important;
 }
 
@@ -1183,22 +1164,6 @@ fieldset {
     background-image:  url('../img/table-sphone-css-to-clipboard-icon-hover.png');
   }
 }
-
-
-#chk-ccp-table-include-wrapper-checkbox {
-  border: 1px solid red;
-}
-
-
-
-// VA! 03.26.18
-#table-max-width {
-  display: none;
-}
-
-
-// Stopping here 12/6/17
-
 
 /* Input placeholder */
 //Get rid of these vendor prefixes
