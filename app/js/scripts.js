@@ -12,11 +12,11 @@ TO FIX:
 DONE: TDoptions don't display on reload
 DONE: Include Wrapper checkbox doesn't display by default if fluid - fixed.
 
-TODO: Implement toggleIncludeAnchor
+DONE: Implement toggleIncludeAnchor
 TODO: Ccp doesn't update if Toolbar value is changed unless it's closed and reopened
 
 
-TODO: Remove all writing of values from initUI and put them in getAttributes. initUI should only be for turning display amd disabling on and off
+TODO: Remove all writing of values from initUI and put them in getAttributes. initUI should only be for turning display amd disabling on and off. 
 TODO: Make the filename div wider
 TODO: No tooltip available for posswitch and imgswap
 TODO: Tooltips don't appear on checkboxes
@@ -612,6 +612,8 @@ var Witty = (function () {
         for (let i = 0; i < document.getElementsByClassName('inspector-x').length; i++) {
           document.getElementsByClassName('inspector-x')[i].style.display = 'inline';
         }
+
+        // !VA NOTE: This can all be moved to a UIController public funciton like handleCcpActions
         // !VA Display the respective Appdata value in the respective inspector value span 
         document.querySelector(inspectorValues.insDisplaySizeWidthValue).innerHTML = Appdata.imgW;
         document.querySelector(inspectorValues.insDisplaySizeHeightValue).innerHTML = Appdata.imgH;
@@ -662,20 +664,12 @@ var Witty = (function () {
     // !VA CBController private functions
     // !VA NOTE: If we want to access any of the DOM IDs we have to call them from UIController where they're defined.
     var inspectorElements = UIController.getInspectorElementIDs();
-    var inspectorValues = UIController.getInspectorValuesIDs();
-    var inspectorLabels = UIController.getInspectorLabelsIDs();
     var ccpUserInput = UIController.getCcpUserInputIDs();
     var btnCcpMakeClips = UIController.getBtnCcpMakeClips();
 
-    // !VA TODO: Appears to be deprecated, remove
-    // !VA CBController private
-    function getKeyByValue(object, value) {
-      return Object.keys(object).find(key => object[key] === value);
-    }
-
     // !VA ATTRIBUTE FUNCTIONS
     // !VA CBController private
-    // !VA Each attribute is either get-only or settable. If it is get-only, then the user-defined value is accessed directly from the DOM element. If it is a preset, then the value is defined programmatically based on a condition. For instance, the class name 'img-fluid' is a preset that becomes active when the user selects the Fluid image option. In this case, the CCP element ID corresponding to the attribute is written to the ccpElementId variable. Otherwise, ccpElement takes the false flag.
+    // !VA Set values for all the Attributes of the individual ccpUserInput elements. Each attribute is either get-only or settable. If it is get-only, then the user-defined value is accessed directly from the DOM element. If it is a preset, then the value is defined programmatically based on a condition. For instance, the class name 'img-fluid' is a preset that becomes active when the user selects the Fluid image option. In this case, the CCP element ID corresponding to the attribute is written to the ccpElementId variable. Otherwise, ccpElement takes the false flag.
     // !VA NOTE: Could probably make all the retObject arguments ccpElementId, str and consolidate this function somehow -- think about it.
     function getAttributes() {
       console.log('getAttributes running');
@@ -957,7 +951,7 @@ var Witty = (function () {
 
     // !VA CBController private
     function ccpGetAttValue(att, value) {
-      // !VA We need get the insFilename from Appdata in case the user leaves 'path' empty
+      // !VA Gets the insFilename from Appdata in case the user leaves 'path' empty
       var Appdata = appController.initGetAppdata();
       var str;
       // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
@@ -971,7 +965,7 @@ var Witty = (function () {
         }
 
       } else {
-        // !VA If the path field is empty, we need to return the insFilename without the path.
+        // !VA If the path field is empty, return the insFilename without the path.
         if (att === 'src' && value === '' ) {
           str = `${att}="${Appdata.fname}" `;
         } else if ( att === '#' || att === '') {
@@ -985,6 +979,7 @@ var Witty = (function () {
     }
 
     // !VA CBController private
+    // !VA Gets the selected align option from its CCP dropdown box
     function getAlignAttribute(selectid, options) {
       var str, selInd;
       selInd = document.querySelector(selectid).selectedIndex;
@@ -1007,40 +1002,33 @@ var Witty = (function () {
 
     // !VA CBController private
     // !VA TODO: Change target here to alias
+    // !VA Get the checked/unchecked status of a CCP mock checkbox. Note that the element alias refers to the checkmark element, which isn't the actual checkbox input element. Consequently, the checkmark element id has to be converted to its corresponding input element id in order to toggle it.
     function getCheckboxSelection(target) {
-      
       let chkboxid, checked;
       chkboxid = document.querySelector(target).id;
       chkboxid = chkboxid.replace('mrk', 'box');
       chkboxid = chkboxid.replace('spn', 'chk');
       if (document.querySelector('#' + chkboxid).checked === false) {
-        // !VA WRAPPER TABLE NOT CHECKED
         checked = false;
       } else {
-      // !VA WRAPPER TABLE IS CHECKED
         checked = true;
       }
       return checked;
     }
 
     // !VA CBController private
+    // !VA Gets the state of a radio button element.
     function getRadioState(ccpElementId) {
       // !VA Passing in the ID, not the alias
       let checked;
-      // !VA IMPORTANT: Replace with ternary
-      if (document.querySelector(ccpElementId).checked === false) {
-        // !VA Radio button is NOT SELECTED
-        checked = false;
-      } else {
-        // !VA Radio button IS SELECTED
-        checked = true;
-      }
+      !document.querySelector(ccpElementId).checked ? checked = false : checked = true;
       return checked;
     }
 
     // clipboardController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
     // !VA TODO: This should be in handleUserInput
     // !VA CBController private
+    // !VA If is an input in the field, include the input in the clipboard output for the respective attribute. If there is no input, exclude the attribute itself from the clipboard output. For instance, if the user doesn't enter a class name, then the class attribute itself is excluded from the clipboard output at all. 
     function ccpIfNoUserInput(att, value) {
       // !VA We need get the insFilename from Appdata in case the user leaves 'path' empty
       var Appdata = appController.initGetAppdata();
@@ -1048,6 +1036,10 @@ var Witty = (function () {
       // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
       if (value && att) {
         // !VA I might want to change this to include the # in the string itself.
+        
+
+
+
         if (value === '#') {
           str = '';
         } else {
