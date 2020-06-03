@@ -8,12 +8,37 @@
 // !VA 05.30.20 
 Milestone reached: imgType fluid/fixed implemented, mostly. I'm pausing here to clean up all console calls and old comments. Branching to milestoneCleanup053020
 
+Mobile Swap Testing:
+--------------------
+NOTE: The mobile image swap option only works for full width, i.e. hero. Ain't gonna change for the time being -- not possible. 
+To Disable:
+Wrapper table: devicewidth, width = viewerW, align=Center
+Parent table has to be locked at devicewidth, width = imgW, td align = center, align = center,
+TD: Class = remove, align = center;
+Img: Class = mobileshow, disabled.  
+
+
 TO FIX:
 DONE: TDoptions don't display on reload
 DONE: Include Wrapper checkbox doesn't display by default if fluid - fixed.
-
 DONE: Implement toggleIncludeAnchor
-TODO: Ccp doesn't update if Toolbar value is changed unless it's closed and reopened
+DONE: Ccp doesn't update if Toolbar value is changed unless it's closed and reopened. I think this is fixed.
+
+
+Imgtype Options
+----------------
+To Disable:
+Parent table: devicewidth needs to be cleared, can't be devicewidth. the Attribute is set to user hte userInpt. I dohn't know where the dcurrent devault comes from.
+
+
+
+
+
+TODO: Change the default parent class on 
+TODO: Have a bit problem with td options height and width fields. Currently these fields are available when the 'basic' option is selected, but there is no case when they would ever write the values the user might enter here to the clipboard. Beccause, what happens when the user enters values that are smaller than the current image resolution. That can't be possible. The TD can't be smaller than its child. The height should never be available when the child is an image and the width should either be preset to the image width or unavailable. Or it should be allowed to be larger than the child, for instance if padding is desired, but never smaller. And if you add padding, you'd add it to the img, not to the TD, right? Have to check that out before resolving this. 
+NOTE: It's important to remember that handleCcpActions handles the display of elements whose state or value in the CCP is changed by OTHER CCP elements. For example, the imgType radio buttons trigger value changes in OTHER elements. So handleCcpActions handles the display of the CCP UI. In contrast, the Attributes control only the Clipboard output. For instance, the class attribute only writes to the Clipboard if there is an entry in the input field. That's why it's handled in getAttributes - it doesn't result in a change to the CCP UI.
+
+
 
 
 TODO: Remove all writing of values from initUI and put them in getAttributes. initUI should only be for turning display amd disabling on and off. 
@@ -489,37 +514,35 @@ var Witty = (function () {
 
       // !VA UIController public
       queryDOMElements: function() {
-        // !VA NEW This needs to ONLY return the non-calculated DOM elements and data properties: curImg.imgW, curImg.imgW, curImg.imgNW, curImg.NH and viewerW. Aspect is calculated so we don't need to get that here, leave that to appController.
-        // !VA NEW We will get the individual properties and return them as an ES6 array.
-        // !VA Declare the local vars
-        // !VA Reboot - should these vars be renamed according to the new scheme? I am going to use the convention fname - insFilename when used in variable name.
-        var fname, viewerW, viewerH, imgW, imgH, imgNW, imgNH, sPhonesW, lPhonesW;
-        var els = {fname, viewerW, viewerH, imgW, imgH, imgNW, imgNH, sPhonesW, lPhonesW};
+        // !VA Return the non-calculated DOM elements and data properties, i.e. the properties that are retrieved from the DOM or from data properties: curImg.imgW, curImg.imgW, curImg.imgNW, curImg.NH and viewerW. These are passed to getAppdata, which then creates the Appdata object. Aspect is calculated from imgNW and imgNH - that calculation is done in appController, so it will be added to Appdata there.
+        // !VA Declare the local variables and populate the elements array
+        let fname, viewerW, viewerH, imgW, imgH, imgNW, imgNH, sPhonesW, lPhonesW;
+        let domElements = {};
+        domElements = {fname, viewerW, viewerH, imgW, imgH, imgNW, imgNH, sPhonesW, lPhonesW};
+        let curImg, imgViewer, cStyles;
 
         // !VA Get the insFilename from the Inspector
-        els.fname = document.querySelector(inspectorElements.insFilename).textContent;
+        domElements.fname = document.querySelector(inspectorElements.insFilename).textContent;
         // !VA Get the curImg and imgViewer
-        var curImg = document.querySelector(dynamicRegions.curImg);
-        var imgViewer = document.querySelector(dynamicRegions.imgViewer);
+        curImg = document.querySelector(dynamicRegions.curImg);
+        imgViewer = document.querySelector(dynamicRegions.imgViewer);
         // !VA Get the computed width and height of imgViewer
-        var cStyles = window.getComputedStyle(imgViewer);
-        els.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
-        els.viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
+        cStyles = window.getComputedStyle(imgViewer);
+        domElements.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
+        domElements.viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
         // !VA Get the dimensions of curImg
-        els.imgW = curImg.width;
-        els.imgH = curImg.height;
-        els.imgNW = curImg.naturalWidth;
-        els.imgNH = curImg.naturalHeight;
-
+        domElements.imgW = curImg.width;
+        domElements.imgH = curImg.height;
+        domElements.imgNW = curImg.naturalWidth;
+        domElements.imgNH = curImg.naturalHeight;
         
         // !VA Get the data properties for iptTbrSmallPhonesW and sPhonesH
-        // !VA This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
-
-        els.sPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).getAttribute('data-sphonesw'), 10);
-        els.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
-        els.iptTbrSPhonesWidth ? els.iptTbrSPhonesWidth : Appdata.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
-        els.iptTbrLPhonesWidth ? els.iptTbrLPhonesWidth : Appdata.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
-        return els;
+        // !VA NOTE: This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
+        domElements.sPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).getAttribute('data-sphonesw'), 10);
+        domElements.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
+        domElements.iptTbrSPhonesWidth ? domElements.iptTbrSPhonesWidth : Appdata.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
+        domElements.iptTbrLPhonesWidth ? domElements.iptTbrLPhonesWidth : Appdata.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
+        return domElements;
       },
 
       // !VA UIController public
@@ -615,6 +638,7 @@ var Witty = (function () {
 
         // !VA NOTE: This can all be moved to a UIController public funciton like handleCcpActions
         // !VA Display the respective Appdata value in the respective inspector value span 
+        // !VA TODO: DRYify this.
         document.querySelector(inspectorValues.insDisplaySizeWidthValue).innerHTML = Appdata.imgW;
         document.querySelector(inspectorValues.insDisplaySizeHeightValue).innerHTML = Appdata.imgH;
         document.querySelector(inspectorValues.insDiskSizeWidthValue).innerHTML = Appdata.imgNW;
@@ -698,7 +722,10 @@ var Witty = (function () {
           return retObj;
         })(),
         imgClass: (function() {
-          // !VA For fixed images, if there's a class name entered into the class input, return the input value, or if the class input is empty, don't include the class attribute. For fluid images, return the class name 'img-fluid'.
+          // !VA For fixed images, if there's a class name entered into the class input: return the input value, or if the class input is empty, don't include the class attribute. For fluid images, return the class name 'img-fluid'.
+
+
+          
           // !VA This value is written to CCP so use ccpElementId
           ccpElementId = ccpUserInput.iptCcpImgClass;
           imgType === 'fixed' ? str = ccpGetAttValue('class',document.querySelector(ccpElementId).value) : str = 'img-fluid';
@@ -802,8 +829,17 @@ var Witty = (function () {
         })(),
         tdImgswap: (function() {
           // !VA This is a tdoptions selection radio - use ccpElementId
+          // !VA !VA  If the imgswap radio is selected, overwrite whatever is in the imgClass input with 'hide', set parent table class to 'devicewidth' and display it, set wrapper table class to 'devicewidth' and display it. Displaying/undisplaying and disabling/enabling is handled in handleCcpActions. 
           ccpElementId = ccpUserInput.rdoCcpTdImgswap;
           checked = getRadioState(ccpElementId);
+          if (checked) {
+            // document.querySelector(ccpUserInput.iptCcpImgClass).style.display = 'inline-block';
+            document.querySelector(ccpUserInput.iptCcpImgClass).value = 'hide';
+            // document.querySelector(ccpUserInput.iptCcpTableClass).style.display = 'inline-block';
+            document.querySelector(ccpUserInput.iptCcpTableClass).value = 'devicewidth';
+            document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
+            document.querySelector(ccpUserInput.iptCcpTableWidth).value = Appdata.imgW;
+          }
           retObj = returnObject( ccpElementId, checked );
           return retObj;
         })(),
@@ -1028,7 +1064,7 @@ var Witty = (function () {
     // clipboardController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
     // !VA TODO: This should be in handleUserInput
     // !VA CBController private
-    // !VA If is an input in the field, include the input in the clipboard output for the respective attribute. If there is no input, exclude the attribute itself from the clipboard output. For instance, if the user doesn't enter a class name, then the class attribute itself is excluded from the clipboard output at all. 
+    // !VA Called from getAttributes when an attribute should be included in the Clipboard output ONLY if there is a user input for that attribute If there is no input, exclude the attribute itself from the clipboard output. For instance, if the user doesn't enter a class name, then the class attribute itself is excluded from the clipboard output at all. 
     function ccpIfNoUserInput(att, value) {
       // !VA We need get the insFilename from Appdata in case the user leaves 'path' empty
       var Appdata = appController.initGetAppdata();
@@ -1036,16 +1072,7 @@ var Witty = (function () {
       // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
       if (value && att) {
         // !VA I might want to change this to include the # in the string itself.
-        
-
-
-
-        if (value === '#') {
-          str = '';
-        } else {
-          // !VA Include the space here to ensure no duplicate spaces slip in when the clip is built
-          str = value;
-        }
+        value === '#' ? str = '' : str = value;
 
       } else {
         // !VA If the path field is empty, we need to return the insFilename without the path.
@@ -2982,20 +3009,27 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Contains the logic for displaying/undisplaying, disabling/enabling, setting/deleting values from the tdoptions radio input group. 
     function showTdOptions(evt) {
       // !VA Array including all the defined options for each tdoption radio
-      let allTdOptions = [], optionsToShow = [], valuesToSet = [], values = [], targetalias;
+      let allTdOptions = [], optionsToEnable = [], optionsToShow = [], valuesToSet = [], optionsToDisable = [], values = [], targetalias;
       let Appdata;
+      let Attributes;
       Appdata = appController.initGetAppdata();
+      Attributes = CBController.initGetAttributes();
       // !VA Add the hash to the target id to match it with the alias
       // !VA DEVMODE: If dev mode, then false is passed in instead of an event, so just put in a dummy id to get it running
       if (evt) { targetalias = '#' + evt.target.id; 
       } else {
         targetalias = ccpUserInput.rdoCcpTdBasic;
       }
-      // !VA Populate allTdOptions with all the defined Td options
-      allTdOptions = [ ccpUserInput.iptCcpTdClass,  ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor, ccpUserInput.iptCcpTdFontColor, ccpUserInput.iptCcpTdBorderColor, ccpUserInput.iptCcpTdBorderRadius  ];
 
+
+      // !VA Stopped here: Now I have to assign all the attributes for each of these CCP elements? This is very convuluted but I'm not rewriting it now.
+      // !VA Reset all CCP elements to the default CCP options, enabled state and value. This is the state the options all have with imgType = fixed; tdoptions = basic; includeWrapper = unchecked. 
+      allTdOptions = [ ccpUserInput.iptCcpTdClass,  ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor, ccpUserInput.iptCcpTdFontColor, ccpUserInput.iptCcpTdBorderColor, ccpUserInput.iptCcpTdBorderRadius  ];
       // !VA Cycle through all the parent divs of each of the TD options and remove the active class to hide them all. This needs to be done before showing the specific options for the selected TD option radio
       UIController.handleCcpActions( 'setactiveparent', allTdOptions, false);
+
+      optionsToEnable = [ ccpUserInput.iptCcpTdClass,  ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor, ccpUserInput.iptCcpTdFontColor, ccpUserInput.iptCcpTdBorderColor, ccpUserInput.iptCcpTdBorderRadius, ccpUserInput.iptCcpTableClass, ccpUserInput.iptCcpTableWidth, ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth];
+      UIController.handleCcpActions( 'setdisabledtextinput', optionsToEnable, false);
 
       // !VA Reset the height, width and bgcolor fields to '', otherwise the vmlbutton defaults will persist if the user selects the vmlbutton radio button. Pass false for the option argument to set the value to ''.
       valuesToSet = [ ccpUserInput.iptCcpTdHeight, ccpUserInput.iptCcpTdWidth, ccpUserInput.iptCcpTdBgColor ];
@@ -3018,10 +3052,43 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         UIController.handleCcpActions( 'setactiveparent', optionsToShow, true);
         break;
         // !VA tdoption imgswap
+
+
+
+
+
       case targetalias === ccpUserInput.rdoCcpTdImgswap:
-        optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign ];
+        /* !VA  
+        Wrapper table: devicewidth, width = viewerW, align=Center
+        Parent table has to be locked at devicewidth, width = imgW, td align = center, align = center,
+        TD: Class = remove, align = center;
+        Img: Class = mobileshow, disabled.
+        
+        */
+
+
+
+
+
+
+
+        // !VA Show options
+        optionsToShow = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth, ccpUserInput.iptCcpTableWrapperBgColor, ccpUserInput.selCcpTableWrapperAlign ];
         UIController.handleCcpActions( 'setactiveparent', optionsToShow, true);
+
+        toggleIncludeWrapper(true); 
+        document.querySelector('#ccp-table-include-wrapper').classList.add('disable-checkbox');
+        document.querySelector('#ccp-table-include-wrapper-label').classList.add('disabled');
+
+        // !VA Disable options
+        optionsToDisable = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass, ccpUserInput.iptCcpTableWidth, ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth ];
+        UIController.handleCcpActions( 'setdisabledtextinput', optionsToDisable, true);
         break;
+
+
+
+
+
         // !VA tdoption bgimage
       case targetalias === ccpUserInput.rdoCcpTdBgimage:
         // !VA bgcolor, width, height, valign
@@ -3062,13 +3129,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA For the fluid imgType options, make sure Include wrapper table is checked, disable all the tdoptions except 'basic' then disable the checkbox, table wrapper class and width and parent table width options.
       // !VA Array of radio input elements to disable
       const tdOptionsDisable = [ ccpUserInput.rdoCcpTdExcludeimg, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdBgimage, ccpUserInput.rdoCcpTdPosswitch, ccpUserInput.rdoCcpTdVmlbutton ];
-      const includeWrapperOptionsToDisable = [ ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth ];
+      const fluidInputOptionsToDisable = [ ccpUserInput.iptCcpTableClass, ccpUserInput.iptCcpTableWidth,ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth ];
       if (Attributes.imgType.str === 'fluid') { 
         // !VA Preselect the option 'basic'. The other td options won't work with or aren't applicable for fluid because fluid is only for images. 
         document.querySelector(ccpUserInput.rdoCcpTdBasic).checked = true;
         toggleIncludeWrapper(true); 
         UIController.handleCcpActions( 'setdisabledradio', tdOptionsDisable, true );
-        UIController.handleCcpActions( 'setdisabledtextinput', includeWrapperOptionsToDisable, true );
+        UIController.handleCcpActions( 'setdisabledtextinput', fluidInputOptionsToDisable, true );
         document.querySelector('#ccp-table-include-wrapper').classList.add('disable-checkbox');
         document.querySelector('#ccp-table-include-wrapper-label').classList.add('disabled');
         document.querySelector(ccpUserInput.iptCcpTableWidth).classList.add('disabled');
@@ -3077,7 +3144,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       } else {
         UIController.handleCcpActions( 'setdisabledradio', tdOptionsDisable, false);
-        UIController.handleCcpActions( 'setdisabledtextinput', includeWrapperOptionsToDisable, false );
+        UIController.handleCcpActions( 'setdisabledtextinput', fluidInputOptionsToDisable, false );
         document.querySelector('#ccp-table-include-wrapper').classList.remove('disable-checkbox');
         document.querySelector('#ccp-table-include-wrapper-label').classList.remove('disabled');
         document.querySelector(ccpUserInput.iptCcpTableWidth).classList.add('disabled');
@@ -3091,6 +3158,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     function showElementOnInput(event) {
       // !VA Here we catch the event handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
       var elems = [];
+      // !VA TODO: DRYify this. 
       elems[0] = document.querySelector(btnCcpMakeClips.btnCcpMakeImgDsktpCssRule);
       elems[1] = document.querySelector(btnCcpMakeClips.btnCcpMakeImgSmphnCssRule);
       elems[2] = document.querySelector(btnCcpMakeClips.btnCcpMakeImgLgphnCssRule);
