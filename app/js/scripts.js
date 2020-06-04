@@ -8,6 +8,16 @@
 // !VA Branch: reviewCcpOnchange (060420)
 I'm still unclear on the relationship between the setting of Clipboard output values and  the reflection of those values in the Ccp UI. That's all clear for IMG. All I know today is that I cannot maintain and do error handling for two sets of values, one for CCP attributes and another for CCP UI. Hate to say it, but I need to rethink this whole thing YET AGAIN!
 
+
+Program flow notes:
+Inspector values have to update CCP UI whenever an event is triggered. That means both Appdata and Attributes have to be updated. Then, the update has to apply to the Clipboard output AND the CCP UI.
+CCP UI.
+CCP UI 
+
+
+
+
+
 TD Options
 -----------
 
@@ -134,9 +144,13 @@ var Witty = (function () {
   foo = true;
 
   testbut.onclick = function() {
-    foo = !foo;
-    console.log('foo is: ' + foo);
-    foo ?  testbut2.addEventListener('click', addMe, false) : testbut2.removeEventListener('click', addMe, false);
+    // foo = !foo;
+    // console.log('foo is: ' + foo);
+    // foo ?  testbut2.addEventListener('click', addMe, false) : testbut2.removeEventListener('click', addMe, false);
+    var Attributes = CBController.initGetAttributes();
+    const getImgType = Attributes.imgType;
+    console.log('getImgType is: ' + getImgType);
+    
   };
 
   // !VA GLOBAL
@@ -726,9 +740,15 @@ var Witty = (function () {
         obj.str = str;
         return obj;
       }
+
+
+
+
       Attributes = {
+
+
         // !VA IMG attributes
-        imgType: (function() {
+        imgType:  (function() {
           // !VA This value is written to CCP so we can pre-select the tdoption 'basic' if the imgType 'fluid' is selected. 
           // !VA If the fixed radio button is checked, set ccpElementId to the fixed element id. Otherwise, set ccpElementId to the fluid element id. 
           document.querySelector(ccpUserInput.rdoCcpImgFixed).checked ? ccpElementId = ccpUserInput.rdoCcpImgFixed : ccpElementId = ccpUserInput.rdoCcpImgFluid;
@@ -738,7 +758,10 @@ var Witty = (function () {
           imgType = str;
 
 
+          
+
           retObj = returnObject(ccpElementId, str);
+
           return retObj;
         })(),
         imgClass: (function() {
@@ -2288,6 +2311,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       addEventHandler(includeAnchorCheckbox,'click',toggleIncludeAnchor,false);
 
 
+      handleChange(evt) {
+        let ccpUIElement;
+
+      }
+
+
+
+
+
+
 
       // !VA Misc Unused Handlers for review
       // =============================
@@ -3417,9 +3450,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       return Appdata;
     }
 
+    let Appobj;
+
     // !VA appController public functions
     return {
       // !VA Dev Mode pass-thru public functions to expose calcViewerSize and initCcp to UIController.initUI
+      // !VA DEV MODE
+      // !VA ------------------------------
       // !VA appController public: DEVMODE
       initCalcViewerSize: function() {
         calcViewerSize();
@@ -3436,6 +3473,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       initShowTdOptions: function () {
         showTdOptions(false);
       },
+      // !VA DEV MODE END
+     
+      Appobj = UIController.queryDOMElements( toolbarElements, ccpUserInputs )
 
       // !VA appController public
       // !VA APP MESSAGES START
