@@ -3,10 +3,30 @@
 // See C:\Users\VANA\OneDrive\WhittyReview_12.30.19.docx
 
 // !VA GENERAL NOTES
-/* !VA  - May Reboot Notes
+/* !VA  - June Reboot Notes
 =========================================================
-// !VA 05.30.20 
-Milestone reached: imgType fluid/fixed implemented, mostly. I'm pausing here to clean up all console calls and old comments. Branching to milestoneCleanup053020
+// !VA Branch: reviewCcpOnchange (060420)
+I'm still unclear on the relationship between the setting of Clipboard output values and  the reflection of those values in the Ccp UI. That's all clear for IMG. All I know today is that I cannot maintain and do error handling for two sets of values, one for CCP attributes and another for CCP UI. Hate to say it, but I need to rethink this whole thing YET AGAIN!
+
+TD Options
+-----------
+
+Setting W and H on the TD does work, so that option has to be enabled and working for Basic. Only restriction w and h cannot be less than the currently loaded imgW and imgH! And can't be less than the current value in Parent Table or Wrapper Table.
+
+Basic: height   No matter what's entered, height = Appdata.imgW. THIS IS A BUG! This should be undisplayed for Basic. Height is set by the image. But it should be user-settable here. So, 
+
+
+
+
+Basic: width    No effect on CB output. If any value is entered, CB output width is Appdata.imgW. This should be undisplayed for basic, width should default to Appdata.imgW.
+
+
+Parent Table
+------------
+width: Removing the width attribute does nothing - the attribute writes to CB still as Appdata.imgW
+
+
+
 
 Mobile Swap Testing:
 --------------------
@@ -2946,6 +2966,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CCP FUNCTIONS
     // !VA appController private 
     function initCcp() {
+
+      // !VA Branch: reviewCcpOnchange (060420)
+      showTdOptions();
+
       // !VA Initialize the fixed/fluid imgType buttons - call getAttributes and populate the CCP elements with values based on whether fixed or fluid is selected.
       toggleImgType();
       // !VA Initialize the Include wrapper checkboxes. Pass in false for the evt argument for initialization so that the function skips over the button click condition and just executes the display/undisplay functionality.
