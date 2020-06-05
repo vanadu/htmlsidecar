@@ -12,7 +12,7 @@ I'm still unclear on the relationship between the setting of Clipboard output va
 Program flow notes:
 Inspector values have to update CCP UI whenever an event is triggered. That means both Appdata and Attributes have to be updated. Then, the update has to apply to the Clipboard output AND the CCP UI.
 CCP UI.
-CCP UI 
+
 
 
 
@@ -390,6 +390,45 @@ var Witty = (function () {
 
     // !VA UIController public functions
     return {
+
+
+
+      getDOM: function () {
+        // !VA Return the non-calculated DOM elements and data properties, i.e. the properties that are retrieved from the DOM or from data properties: curImg.imgW, curImg.imgW, curImg.imgNW, curImg.NH and viewerW. These are passed to getAppdata, which then creates the Appdata object. Aspect is calculated from imgNW and imgNH - that calculation is done in appController, so it will be added to Appdata there.
+        // !VA Declare the local variables and populate the elements array
+        let fname, viewerW, viewerH, imgW, imgH, imgNW, imgNH, sPhonesW, lPhonesW;
+        let domElements = {};
+        domElements = {fname, viewerW, viewerH, imgW, imgH, imgNW, imgNH, sPhonesW, lPhonesW};
+        let curImg, imgViewer, cStyles;
+
+        // !VA Get the insFilename from the Inspector
+        domElements.fname = document.querySelector(inspectorElements.insFilename).textContent;
+        // !VA Get the curImg and imgViewer
+        curImg = document.querySelector(dynamicRegions.curImg);
+        imgViewer = document.querySelector(dynamicRegions.imgViewer);
+        // !VA Get the computed width and height of imgViewer
+        cStyles = window.getComputedStyle(imgViewer);
+        domElements.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
+        domElements.viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
+        // !VA Get the dimensions of curImg
+        domElements.imgW = curImg.width;
+        domElements.imgH = curImg.height;
+        domElements.imgNW = curImg.naturalWidth;
+        domElements.imgNH = curImg.naturalHeight;
+        
+        // !VA Get the data properties for iptTbrSmallPhonesW and sPhonesH
+        // !VA NOTE: This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
+        domElements.sPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).getAttribute('data-sphonesw'), 10);
+        domElements.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
+        domElements.iptTbrSPhonesWidth ? domElements.iptTbrSPhonesWidth : Appdata.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
+        domElements.iptTbrLPhonesWidth ? domElements.iptTbrLPhonesWidth : Appdata.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
+        return domElements;
+        
+      },
+
+
+
+
       // !VA Catch-all function for displaying/undisplaying, disabling/enabling and adding/removing classes to CCP elements. action is the action to execute, elemArray is the array of elements the action is to apply to and state is the toggle state whereby true turns the action on and false turns it off.
       handleCcpActions: function (action, elemArray, option ) {
         // console.clear();
@@ -569,6 +608,9 @@ var Witty = (function () {
         domElements.imgH = curImg.height;
         domElements.imgNW = curImg.naturalWidth;
         domElements.imgNH = curImg.naturalHeight;
+        // console.log('queryDomelements: this is: ');
+        // console.log(this);
+        
         
         // !VA Get the data properties for iptTbrSmallPhonesW and sPhonesH
         // !VA NOTE: This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
@@ -646,6 +688,7 @@ var Witty = (function () {
         document.querySelector(inspectorElements.btnToggleCcp).style.display = 'none';
 
         // !VA Inspector initialization comes now from the HTML file. The default 'No Image' is display: inline in CSS. When an image is loaded, inspectors are populated with values in UIController.writeInspectors.
+
       },
 
       // !VA UIController public
@@ -750,7 +793,7 @@ var Witty = (function () {
         // !VA IMG attributes
         imgType:  (function() {
           // !VA This value is written to CCP so we can pre-select the tdoption 'basic' if the imgType 'fluid' is selected. 
-          // !VA If the fixed radio button is checked, set ccpElementId to the fixed element id. Otherwise, set ccpElementId to the fluid element id. 
+          // !VA If the fixed radio button is checked, set ccpElementId to the fixed element id. Otherwise, set ccpEcurvcurlementId to the fluid element id. 
           document.querySelector(ccpUserInput.rdoCcpImgFixed).checked ? ccpElementId = ccpUserInput.rdoCcpImgFixed : ccpElementId = ccpUserInput.rdoCcpImgFluid;
           // !VA Now get the str based on the above
           ccpElementId === ccpUserInput.rdoCcpImgFixed ? str = 'fixed' : str = 'fluid';
@@ -2311,17 +2354,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       addEventHandler(includeAnchorCheckbox,'click',toggleIncludeAnchor,false);
 
 
-      handleChange(evt) {
-        let ccpUIElement;
-
-      }
-
-
-
-
-
-
-
       // !VA Misc Unused Handlers for review
       // =============================
       // !VA This was moved to initCcp I think
@@ -2880,9 +2912,17 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH. I'm not sure what that means anymore 05.11.20
     function calcViewerSize() {
       let Appdata = {};
+      let Appobj = {};
       let viewerW, viewerH, compStyles; 
       let curLocalStorage;
       Appdata = appController.initGetAppdata(false);
+
+      // !VA Branch: implementAppobj01 (060420)
+      // !VA init Appobj
+      Appobj = appController.initBuildAppobj(false);
+
+
+
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
       // !VA  Get the actual viewerW and viewerH CSS values from getComputedStyle
       compStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
@@ -3450,10 +3490,39 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       return Appdata;
     }
 
-    let Appobj;
+    function buildAppobj() {
+      console.log('getAppobj running');
+      let DOMElements = UIController.getDOM();
+      console.dir(DOMElements);
+      Appobj = {};
+
+
+
+
+
+    }
+
+
+
+
 
     // !VA appController public functions
     return {
+
+      // !VA This is a pass-thru to access queryDOMElements (public UIController)  to get the current dimensions of the dynamic DOM elements and data attributes, and getAppdata (private appController) to calculate the non-DOM Appdata properties. We do this here because Appdata has to be queried in all three modules, so it has to be accessible in all of them, and because getAppdata needs getAspectRatio which belongs in appController.
+      // !VA appController public
+      initGetAppdata: function() {
+        var Appdata = getAppdata();
+        return Appdata;
+      },
+
+      // !VA Branch: implementAppobj01 (060420)
+      // !VA Called from calcViewerSize after all image initialization is done and the app containers have been created and sized.
+      initBuildAppobj: function() {
+        var Appobj = buildAppobj();
+        return Appobj;
+      },
+
       // !VA Dev Mode pass-thru public functions to expose calcViewerSize and initCcp to UIController.initUI
       // !VA DEV MODE
       // !VA ------------------------------
@@ -3475,7 +3544,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       },
       // !VA DEV MODE END
      
-      Appobj = UIController.queryDOMElements( toolbarElements, ccpUserInputs )
+
 
       // !VA appController public
       // !VA APP MESSAGES START
@@ -3528,12 +3597,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         }
       },
 
-      // !VA This is a pass-thru to access queryDOMElements (public UIController)  to get the current dimensions of the dynamic DOM elements and data attributes, and getAppdata (private appController) to calculate the non-DOM Appdata properties. We do this here because Appdata has to be queried in all three modules, so it has to be accessible in all of them, and because getAppdata needs getAspectRatio which belongs in appController.
-      // !VA appController public
-      initGetAppdata: function() {
-        var Appdata = getAppdata();
-        return Appdata;
-      },
+
 
       // !VA Query whether localStorage is currently set for viewerW, sPhonesW and lPhonesW
       // !VA appController public
@@ -3574,12 +3638,18 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         if (curImgExists) {
           initMode = 'devmode';
           UICtrl.initUI();
+
+
+
+
+
         } else {
           initMode = 'prdmode';
           // !VA  - Initialize the app UI and wait for input
         }
 
         UICtrl.initUI(initMode);
+
       }
     };
 
