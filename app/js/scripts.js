@@ -5,8 +5,8 @@
 // !VA GENERAL NOTES
 /* !VA  - June Reboot Notes
 =========================================================
-// !VA Branch: reviewCcpOnchange (060420)
-I'm still unclear on the relationship between the setting of Clipboard output values and  the reflection of those values in the Ccp UI. That's all clear for IMG. All I know today is that I cannot maintain and do error handling for two sets of values, one for CCP attributes and another for CCP UI. Hate to say it, but I need to rethink this whole thing YET AGAIN!
+// !VA Branch: implementAppobj01 (060420)
+I'm still unclear on the relationship between the setting of Clipboard output values and  the reflection of those values in the Ccp UI. That's all clear for IMG. All I know today is that I cannot maintain and do error handling for two sets of values, one for CCP attributes and another for CCP UI. Hate to say it, but I need to rethink this whole thing YET AGAIN! See WittyStatus_06.05.20.
 
 
 Program flow notes:
@@ -672,6 +672,11 @@ var Witty = (function () {
         }
 
         // !VA If there's a localStorage for viewerW, put that value into the viewerW field of the toolbar, otherwise use the default. NOTE: The default is set ONLY in the HTML element's placeholder. The advantage of this is that we can get it anytime without having to set a global variable or localStorage for the default.
+        // !VA Branch: implementAppobj01 (060420)
+
+
+
+
         curDeviceWidths[0] ?  document.querySelector(toolbarElements.iptTbrViewerW).value = curDeviceWidths[0] : document.querySelector(toolbarElements.iptTbrViewerW).value = document.querySelector(toolbarElements.iptTbrViewerW).placeholder;
         // !VA If there's a localStorage for sPhonesW, get it, otherwise set the default to the placeholder in the HTML element on index.html. Then set the toolbar input field AND the sphonesw data attribute to this value. NOTE: The default is set ONLY in the HTML element's placeholder!
         curDeviceWidths[1] ? curDeviceWidths[1] : curDeviceWidths[1] = document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder;
@@ -1943,6 +1948,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       writeClipboard(id, clipboardStr);
     }
 
+    // !VA CBController private
     function handleInspectorClicks(targetid, modifierKey) {
       let Appdata, clipboardStr, widthval, heightval;
       var el = document.querySelector('#' + targetid);
@@ -2080,6 +2086,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
   // GLOBAL APP MODULE
   var appController = (function(CBCtrl, UICtrl) {
+
+    function appObj( fileName, imgW, imgH, imgNW, imgNH, viewerW, viewerH, sPhonesW, lPhonesW) {
+      return { fileName, imgW, imgH, imgNW, imgNH, viewerW, viewerH, sPhonesW, lPhonesW };
+    }
+
+
+
 
     // !VA Getting DOM ID strings from UIController
     const inspectorElements = UICtrl.getInspectorElementIDs();
