@@ -478,6 +478,9 @@ var Witty = (function () {
 
       },
   
+
+
+
       // !VA UIController public
       queryDOMElements: function() {
         // !VA Branch: implementAppobj01 (060420)
@@ -655,7 +658,7 @@ var Witty = (function () {
         // !VA TODO: Make function
         document.querySelector(staticRegions.dropArea).style.display = 'none';
         // Write the inspectorElements
-        document.querySelector(inspectorElements.insFilename).innerHTML = `<span class='pop-font'>${Appdata.fname}</span>`;
+        document.querySelector(inspectorElements.insFilename).innerHTML = `<span class='pop-font'>${Appobj.fileName}</span>`;
         // !VA Inspectors: Hide all the P elements with the class 'no-image' that contain the default 'No Image' text 
         for (let i = 0; i < document.getElementsByClassName('no-image').length; i++) {
           document.getElementsByClassName('no-image')[i].style.display = 'none';
@@ -671,22 +674,22 @@ var Witty = (function () {
         // !VA NOTE: This can all be moved to a UIController public funciton like handleCcpActions
         // !VA Display the respective Appdata value in the respective inspector value span 
         // !VA TODO: DRYify this.
-        document.querySelector(inspectorValues.insDisplaySizeWidthValue).innerHTML = Appdata.imgW;
-        document.querySelector(inspectorValues.insDisplaySizeHeightValue).innerHTML = Appdata.imgH;
-        document.querySelector(inspectorValues.insDiskSizeWidthValue).innerHTML = Appdata.imgNW;
-        document.querySelector(inspectorValues.insDiskSizeHeightValue).innerHTML = Appdata.imgNH;
-        document.querySelector(inspectorValues.insSmallPhonesWidthValue).innerHTML = Appdata.sPhonesW;
-        document.querySelector(inspectorValues.insSmallPhonesHeightValue).innerHTML = Appdata.sPhonesH;
-        document.querySelector(inspectorValues.insLargePhonesWidthValue).innerHTML = Appdata.lPhonesW;
-        document.querySelector(inspectorValues.insLargePhonesHeightValue).innerHTML = Appdata.lPhonesH;
-        document.querySelector(inspectorValues.insAspectValue).innerHTML = Appdata.aspect[1];
-        document.querySelector(inspectorValues.insRetinaWidthValue).innerHTML = (Appdata.imgW * 2);
-        document.querySelector(inspectorValues.insRetinaHeightValue).innerHTML = (Appdata.imgH * 2);
+        document.querySelector(inspectorValues.insDisplaySizeWidthValue).innerHTML = Appobj.imgW;
+        document.querySelector(inspectorValues.insDisplaySizeHeightValue).innerHTML = Appobj.imgH;
+        document.querySelector(inspectorValues.insDiskSizeWidthValue).innerHTML = Appobj.imgNW;
+        document.querySelector(inspectorValues.insDiskSizeHeightValue).innerHTML = Appobj.imgNH;
+        document.querySelector(inspectorValues.insSmallPhonesWidthValue).innerHTML = Appobj.sPhonesW;
+        document.querySelector(inspectorValues.insSmallPhonesHeightValue).innerHTML = Appobj.sPhonesH;
+        document.querySelector(inspectorValues.insLargePhonesWidthValue).innerHTML = Appobj.lPhonesW;
+        document.querySelector(inspectorValues.insLargePhonesHeightValue).innerHTML = Appobj.lPhonesH;
+        document.querySelector(inspectorValues.insAspectValue).innerHTML = Appobj.aspect[1];
+        document.querySelector(inspectorValues.insRetinaWidthValue).innerHTML = (Appobj.imgW * 2);
+        document.querySelector(inspectorValues.insRetinaHeightValue).innerHTML = (Appobj.imgH * 2);
         // // !VA  Display the clipboard button
         document.querySelector(inspectorElements.btnToggleCcp).style.display = 'block';
         // !VA Call evalInspectorAlerts to calculate which Inspector values don't meet HTML email specs.
         // !VA Reboot: nothing is passed here, although evalInspectorAlerts expects an argument. So lets' try to pass Appdata
-        evalInspectorAlerts(Appdata);
+        evalInspectorAlerts(Appobj);
 
 
 
@@ -2876,23 +2879,18 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
     }
     
-    // !VA appController private
-    // !VA Populate Appobj, which is currently a global object in appController. It might be better to just pass it around as a parameter, but currently we're maintaining it in appController and only passing it to other modules as an argument.
-
 
 
     // !VA  appController private 
     // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH. I'm not sure what that means anymore 05.11.20
     function calcViewerSize() {
-      let Appdata = {};
-      let curImg, imgViewer, cStyles, viewerW, viewerH, compStyles; 
+
+      let  viewerW, viewerH, compStyles; 
       let curLocalStorage;
-      Appdata = appController.initGetAppdata(false);
-      console.log(' Appdata:');
-      console.dir(Appdata);
+
       // !VA Branch: implementAppobj01 (060420)\
       // !VA At this point, curImg is loaded but the viewer is still the default size and needs to be calculated here. Appdata gets the current dynamic region values. So let's put a function to add those values here. Appobj has to be populated here, not in a private external function because calcViewerSize doesn't run until the setTimeOut callback is run and the image is loaded in handleFileSelect. If populateAppobj were a public function, it would be querying a DOM element that doesn't yet exists and would fail. 
-      // !VA TODO: Probably better to put it in a private function with a callback...for later.
+      // !VA TODO: Appobj still doesn't have all the CCP elements so it's a temporary solution. I don't understand why queryDOMElements can work as a standalone function but populateAppobj doesn't. Maybe if I put it in a private function with a callback...for later.
 
       (function populateAppobj() {
         // !VA IIFE for populating 
@@ -2918,10 +2916,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA NOTE: This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
         Appobj.sPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).getAttribute('data-sphonesw'), 10);
         Appobj.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
-        Appobj.iptTbrSPhonesWidth ? Appobj.iptTbrSPhonesWidth : Appdata.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
-        Appobj.iptTbrLPhonesWidth ? Appobj.iptTbrLPhonesWidth : Appdata.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
+        Appobj.iptTbrSPhonesWidth ? Appobj.iptTbrSPhonesWidth : Appobj.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
+        Appobj.iptTbrLPhonesWidth ? Appobj.iptTbrLPhonesWidth : Appobj.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
         // !VA Now compute the rest of Appobj
-        Appobj.aspect = getAspectRatio(Appobj.imgNW,  Appdata.imgNH);
+        Appobj.aspect = getAspectRatio(Appobj.imgNW,  Appobj.imgNH);
         Appobj.sPhonesH = Math.round(Appobj.sPhonesW * (1 / Appobj.aspect[0]));
         Appobj.lPhonesH = Math.round(Appobj.lPhonesW * (1 / Appobj.aspect[0]));
         console.log('populatAppobj Appobj:');
@@ -2929,7 +2927,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // return Appobj;
 
       })();
-
 
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
       // !VA  Get the actual viewerW and viewerH CSS values from getComputedStyle
@@ -2949,82 +2946,62 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
       // !VA In either case, use the CSS value for height, unless the height of the loaded image is greater than the CSS value.
       viewerH = parseInt(compStyles.getPropertyValue('height'), 10);
-      // !VA If we're initializing a new image, use the naturalWidth and naturalHeight. If we're updating via user input, we need to use the display image and height, imgW and imgH. If we're initializing, then Appdata.imgW and Appdata.imgH will be 0 or falsy because it hasn't been resized yet. So we need to make the following decision based on the _actual_ image width and height, which will be different based on whether we're initializing or updating.
-      // !VA I thought I fixed this...it appears to only apply to dev mode.
+      // !VA If initializing a new image, use the naturalWidth and naturalHeight. If updating via user input, use the display image and height, imgW and imgH. If initializing, then Appobj.imgW and Appobj.imgH will be 0 or falsy because it hasn't been resized yet. So the _actual_ image width and height will be different for initializing and updating.
+      // !VA REVIEW: I thought I fixed this...it appears to only apply to dev mode.
       var actualW, actualH;
-      if (Appdata.imgW === 0) {
-        actualW = Appdata.imgNW;
-        actualH = Appdata.imgNH;
+      if (Appobj.imgW === 0) {
+        actualW = Appobj.imgNW;
+        actualH = Appobj.imgNH;
       } else {
-        actualW = Appdata.imgW;
-        actualH = Appdata.imgH; 
+        actualW = Appobj.imgW;
+        actualH = Appobj.imgH; 
       }
-
       switch(true) {
       // The image falls within the default viewer dimensions set in initApp, so do nothing.
-      // !VA This case is irrelevant since we're now comparing everything to maxViewerWidth not the  init values. Change accordingly...
-      // !VA  NOT SO...now we're trying to restore the previous functionality so...
-      case (actualW <= viewerW) && (Appdata.imgNH < viewerH) :
-        actualW = Appdata.imgNW;
-        actualH = Appdata.imgNH;
-        // !VA viewerH is set in initApp, so no change to it here
-        // !VA viewerH is set in initapp, so no change to that here either.
-        // !VA We don't need to adjust height...but maybe we do for consistency's sake
-        // this.adjustContainerHeights(Appdata);
+      case (actualW <= viewerW) && (Appobj.imgNH < viewerH) :
+        actualW = Appobj.imgNW;
+        actualH = Appobj.imgNH;
         break;
-
       // The image is wider than the current viewer width but shorter than current viewer height, so resize the image based on the viewer width
-      
       case (actualW > viewerW) && (actualH < viewerH) :
         // Set the image width to the current viewer
-        Appdata.imgW = viewerW;
+        Appobj.imgW = viewerW;
         // Get the image height from the aspect ration function
-        Appdata.imgH = Math.round((1/Appdata.aspect[0]) * Appdata.imgW);
+        Appobj.imgH = Math.round((1/Appobj.aspect[0]) * Appobj.imgW);
         // Set the viewerH to the imgH
-        viewerH = Appdata.imgH;
-        // this.adjustContainerHeights(Appdata);
+        viewerH = Appobj.imgH;
         break;
-
       // The image is not as wide as the current viewer width, but is taller than the viewer height. Keep the image width but resize the viewer in order to display the full image height
       // !VA This might be a problem with consecutive images without page refresh
       case (actualW <= viewerW) && (actualH > viewerH) :
         // Set the viewer height and the image height to the image natural height
-        viewerH = Appdata.imgH = Appdata.imgNH;
+        viewerH = Appobj.imgH = Appobj.imgNH;
         // Set the image width to the natural image width
-        Appdata.imgW = Appdata.imgNW;
-
-        // !VA  Use adjustContainerHeights to get the Appdata height
-        // !VA  Note the dependency with initAppdata, see 'Dependency with adjustContainerHeights'
-        // this.adjustContainerHeights(Appdata);
+        Appobj.imgW = Appobj.imgNW;
         break;
-
       // The image is wider and taller than the current viewer height and width so we have to resize the image and the viewport based on the current viewport width
       case (actualW > viewerW) && (actualH > viewerH) :
         // Set the image Width to the current  viewer width 
-        Appdata.imgW = viewerW;
+        Appobj.imgW = viewerW;
         // Set the image height proportional to the new image width using the aspect ratio function
-        Appdata.imgH = Math.round((1/Appdata.aspect[0]) * Appdata.imgW);
+        Appobj.imgH = Math.round((1/Appobj.aspect[0]) * Appobj.imgW);
         // Set the viewer height to the image height
-        viewerH = Appdata.imgH;
-        // Get the viewport and Appdata height from adjustContainerHeights
-
+        viewerH = Appobj.imgH;
         // !VA TODO: Check this out, doesn't seem to be a problem anymore: BUG Problem with the 800X550, 800X600 -- no top/bottom gutter on viewport
         break;
       }
       // !VA Transfer control to UIController to print Inspector to the UI
-      resizeContainers(viewerH, Appdata.imgW, Appdata.imgH );
+      resizeContainers(viewerH, Appobj.imgW, Appobj.imgH );
     }
 
     // !VA appController private
     function resizeContainers(viewerH, imgW, imgH)  {
-      // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appdata values which are passed in from resizeContainers.
+      // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values which are passed in from resizeContainers.
       // !VA Initial height is 450, as it is defined in the CSS. TOo much hassle to try and get the value as defined in the CSS programmatically.
-      // const initViewerH= parseInt(document.querySelector(dynamicRegions.imgViewer).height, 10);
       const initViewerH = 450;
       let viewportH;
       let appH; 
 
-      // !VA I'm not even sure this is necessary since we're getting the viewerW from maxViewerHeight now -- but we'll leave it in here for the time being. 
       // !VA The viewport is 145px taller than the imgViewer. 
       if (imgH <= initViewerH) {
         viewerH = initViewerH;
@@ -3042,7 +3019,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       document.querySelector(dynamicRegions.imgViewport).style.height = viewportH + 'px';
       document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';
       // !VA Now that the image and its containers are written to the DOM, go ahead and write the Inspectors.
-      UICtrl.writeInspectors(Appdata);
+      UICtrl.writeInspectors(Appobj);
     }
 
 
