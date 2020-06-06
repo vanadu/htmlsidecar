@@ -613,19 +613,19 @@ var Witty = (function () {
         switch(true) {
         // !VA In showTdOptions: Active class must be applied to the parent div of the target in order to display/undisplay the container including input and label. 
         case action === 'setactiveparent':
-          console.log('setactiveparent...');
+          // console.log('setactiveparent...');
           setActiveClass(elemArray, option);
           break;
         case action === 'setdisabledradio':
-          console.log('setdisabledradio...');
+          // console.log('setdisabledradio...');
           setDisabledRadio(elemArray, option);
           break;
         case action === 'setdisabledtextinput':
-          console.log('setdisabledtextinput...');
+          // console.log('setdisabledtextinput...');
           setDisabledTextInput(elemArray, option);
           break;
         case action === 'setvalue':
-          console.log('setvalue');
+          // console.log('setvalue');
           setValue(elemArray, option);
           break;
         default:
@@ -651,9 +651,7 @@ var Witty = (function () {
       // !VA UIController public
       writeInspectors: function(Appobj) {
         // !VA Hide  the default 'No Image' value displayed when the app is opened with no image and display the Inspector values for the current image, show the Clipboard button and call evalInspectorAlerts to determine which Inspector labels should get dimension alerts (red font applied). 
-        var Appdata = {};
-        // !VA Get the current Appdata
-        Appdata = appController.initGetAppdata();
+
         // !VA Hide the dropArea
         // !VA TODO: Make function
         document.querySelector(staticRegions.dropArea).style.display = 'none';
@@ -731,7 +729,7 @@ var Witty = (function () {
     // !VA Set values for all the Attributes of the individual ccpUserInput elements. Each attribute is either get-only or settable. If it is get-only, then the user-defined value is accessed directly from the DOM element. If it is a preset, then the value is defined programmatically based on a condition. For instance, the class name 'img-fluid' is a preset that becomes active when the user selects the Fluid image option. In this case, the CCP element ID corresponding to the attribute is written to the ccpElementId variable. Otherwise, ccpElement takes the false flag.
     // !VA NOTE: Could probably make all the retObject arguments ccpElementId, str and consolidate this function somehow -- think about it.
     function getAttributes() {
-      console.log('getAttributes running');
+      // console.log('getAttributes running');
       var Appdata = appController.initGetAppdata();
       let checked, str, options, selectid, ccpElementId, imgType, Attributes, retObj;
       // !VA Create the array to return. First value is the id of the CCP element, second value is the string to write to the CCP element.
@@ -2045,9 +2043,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       return { fileName, imgW, imgH, imgNW, imgNH, viewerW, viewerH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, aspect, iptCcpImgClass, iptCcpImgAlt, rdoCcpImgFixed, rdoCcpImgFluid, selCcpImgAlign, iptCcpImgRelPath, spnCcpImgIncludeAnchorCheckmrk, iptCcpTdClass, selCcpTdAlign, selCcpTdValign, iptCcpTdHeight, iptCcpTdWidth, iptCcpTdBgColor, iptCcpTdFontColor, iptCcpTdBorderColor, iptCcpTdBorderRadius, rdoCcpTdBasic, rdoCcpTdExcludeimg, rdoCcpTdImgswap, rdoCcpTdPosswitch, rdoCcpTdBgimage, iptCcpTableClass, selCcpTableAlign, iptCcpTableWidth, iptCcpTableBgColor, spnCcpTableIncludeWrapperCheckmrk, iptCcpTableWrapperClass, iptCcpTableWrapperWidth, selCcpTableWrapperAlign, iptCcpTableWrapperBgColor };
     }
 
-
-
-
     // !VA Getting DOM ID strings from UIController
     const inspectorElements = UICtrl.getInspectorElementIDs();
     const inspectorValues = UICtrl.getInspectorValuesIDs();
@@ -2060,6 +2055,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // const ccpUserInputLabels = UICtrl.getCcpUserInputLabelIds();
     const btnCcpMakeClips =  UICtrl.getBtnCcpMakeClips();
     const appMessageElements =  UICtrl.getAppMessageElements();
+
+    // !VA Branch: implementAppobj02 (060620)
+    // !VA Get CCP DOM element values into Appobj. We need to initialize Appobj with the CCP defaults as set in the HTML file. Do this in populateAppobj in calcViewerSize for now.
+
+
+
+
+
+
     
     //EVENT HANDLING START 
     // !VA appController private
@@ -2301,24 +2305,37 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         }
       }
       
-      // !VA eventListeners for the imgType radio buttons for showing/hiding options based on CCP fixed/fluid radio buttons
+
+
       for(let i in ccpUserInput) {
         let selectedImgType;
-        // !VA Target only those ccpUserInput elements whose first 12 characters are #rdo-ccp-img. This identifies them as the fluid/fixed radio button options.
-        if (ccpUserInput[i].substring(0, 12) === '#rdo-ccp-img') {
-          selectedImgType = document.querySelector(ccpUserInput[i]);
-          // !VA Add an event handler to trap clicks to the tdoptions radio button
-          addEventHandler(selectedImgType,'click',toggleImgType,false);
-        }
+        // !VA Catch-all event listener for all ccpUserInput elements.
+        selectedImgType = document.querySelector(ccpUserInput[i]);
+        // !VA Add an event handler to trap clicks to the tdoptions radio button
+        addEventHandler(selectedImgType,'click',handleCcpInput,false);
+
       }
 
-      // !VA eventListener for the Include Wrapper checkbox. Checkboxes need to have separate event handlers because their functions are too different to consolidate into a single one.
-      let includeWrapperCheckbox = document.querySelector(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk);
-      addEventHandler(includeWrapperCheckbox,'click',toggleIncludeWrapper,false);
 
-      // !VA eventListener for the Include Anchor checkbox. Checkboxes need to have separate event handlers because their functions are too different to consolidate into a single one.
-      let includeAnchorCheckbox = document.querySelector(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk);
-      addEventHandler(includeAnchorCheckbox,'click',toggleIncludeAnchor,false);
+
+      // // !VA eventListeners for the imgType radio buttons for showing/hiding options based on CCP fixed/fluid radio buttons
+      // for(let i in ccpUserInput) {
+      //   let selectedImgType;
+      //   // !VA Target only those ccpUserInput elements whose first 12 characters are #rdo-ccp-img. This identifies them as the fluid/fixed radio button options.
+      //   if (ccpUserInput[i].substring(0, 12) === '#rdo-ccp-img') {
+      //     selectedImgType = document.querySelector(ccpUserInput[i]);
+      //     // !VA Add an event handler to trap clicks to the tdoptions radio button
+      //     addEventHandler(selectedImgType,'click',toggleImgType,false);
+      //   }
+      // }
+
+      // // !VA eventListener for the Include Wrapper checkbox. Checkboxes need to have separate event handlers because their functions are too different to consolidate into a single one.
+      // let includeWrapperCheckbox = document.querySelector(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk);
+      // addEventHandler(includeWrapperCheckbox,'click',toggleIncludeWrapper,false);
+
+      // // !VA eventListener for the Include Anchor checkbox. Checkboxes need to have separate event handlers because their functions are too different to consolidate into a single one.
+      // let includeAnchorCheckbox = document.querySelector(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk);
+      // addEventHandler(includeAnchorCheckbox,'click',toggleIncludeAnchor,false);
 
 
       // !VA Misc Unused Handlers for review
@@ -2404,9 +2421,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           fileName = theFile.name;
           // !VA Write the insFilename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
           // !VA Branch: implementAppobj01 (060420)
-          Appobj.fileName = fileName;
-          console.log('Appobj.fileName is: ' + Appobj.fileName);
-          document.querySelector(inspectorElements.insFilename).textContent = fileName;
+          document.querySelector(inspectorElements.insFilename).textContent = Appobj.fileName = fileName;
+          // console.log('handleFileSelect Appobj.fileName is: ' + Appobj.fileName);
 
           // !VA Hide the dropArea - not sure if this is the right place for this.
           // !VA TODO: Make function
@@ -2883,11 +2899,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA  appController private 
     // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH. I'm not sure what that means anymore 05.11.20
+    // !VA Branch: implementAppobj01 (060420) - Removed Appdata from Toolbar and Inspector functions.
     function calcViewerSize() {
-
       let  viewerW, viewerH, compStyles; 
       let curLocalStorage;
-
       // !VA Branch: implementAppobj01 (060420)\
       // !VA At this point, curImg is loaded but the viewer is still the default size and needs to be calculated here. Appdata gets the current dynamic region values. So let's put a function to add those values here. Appobj has to be populated here, not in a private external function because calcViewerSize doesn't run until the setTimeOut callback is run and the image is loaded in handleFileSelect. If populateAppobj were a public function, it would be querying a DOM element that doesn't yet exists and would fail. 
       // !VA TODO: Appobj still doesn't have all the CCP elements so it's a temporary solution. I don't understand why queryDOMElements can work as a standalone function but populateAppobj doesn't. Maybe if I put it in a private function with a callback...for later.
@@ -2922,9 +2937,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         Appobj.aspect = getAspectRatio(Appobj.imgNW,  Appobj.imgNH);
         Appobj.sPhonesH = Math.round(Appobj.sPhonesW * (1 / Appobj.aspect[0]));
         Appobj.lPhonesH = Math.round(Appobj.lPhonesW * (1 / Appobj.aspect[0]));
-        console.log('populatAppobj Appobj:');
-        console.dir(Appobj);
-        // return Appobj;
+
 
       })();
 
@@ -3022,28 +3035,102 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       UICtrl.writeInspectors(Appobj);
     }
 
+    // !VA appController private
+    // !VA Identify the click and assign it an action
+    function handleCcpInput(evt) {
+      let Appobj = appController.getAppobj();
+      console.clear();
+      console.log('handleCcpInput running');
+      console.log('evt.target.id is: ' + evt.target.id);
+      let alias;
+      alias = '#' + evt.target.id;
+      console.log('alias is: ' + alias);
+      switch(true) {
+      case alias === ccpUserInput.rdoCcpImgFixed:
+        Appobj.rdoCcpImgFixed = true, Appobj.rdoCcpImgFluid = false;
+        console.log('fixed clicked');
+        break;
+      case alias === ccpUserInput.rdoCcpImgFluid:
+        Appobj.rdoCcpImgFixed = false, Appobj.rdoCcpImgFluid = true;
+        console.log('fluid clicked');
+        break;
+      default:
+        // code block
+      } 
+
+
+
+
+
+      console.log('Appobj is: ');
+      console.dir(Appobj);
+
+
+      
+    }
 
     // !VA CCP FUNCTIONS
     // !VA appController private 
     function initCcp() {
+      console.clear();
 
-      // !VA Branch: reviewCcpOnchange (060420)
-      showTdOptions();
+      // let Appobj = {};
+      // Appobj = appController.getAppobj();
+      // console.log('initCCP - Appobj: ');
+      // console.dir(Appobj);
+      // !VA Branch: implementAppobj02 (060620)
+      /* !VA   This is where we write the Appobj properties somehow. But no - because the values aren't written to the input elements yet. Where is that done? In toggleImgType, then handleCcpActions. What's happening is that handleCcpActions gets the values from the Attributes, where the values are defined. That's ass-backwards. The values should be defined in Appobj and then written to the Attributes. So let's try that. 
+    */ 
+
+      // !VA Now initialize Appobj with the CCP element values. This includes ALL CCP elements, including those that are displayed/undisplayed depending on which TDOption or imgType radio is selected. 
+      // !VA Don't forget to use bracket notation to add properties to an object: https://stackoverflow.com/questions/1184123/is-it-possible-to-add-dynamically-named-properties-to-javascript-object
+      // !VA  for loop: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
+
+      let val;
+      function chkmrkToChkbox(val) {
+        val = val.replace('mrk', 'box');
+        val = val.replace('spn', 'chk');
+        return val;
+      }
+      // !VA Loop through all the ccpUserInput properties. If the property is NOT a span (i.e. a mock checkbox) add an Appobj property that corresponds to the key of the respective ccpUserInput property. Otherwise, convert the span ID to the input ID, then add the Appobj property that corresponds to the key of the respective ID.
+      // !VA For instance, if the ccpUserInput value starts with '#ipt', create an Appobject property whose key is 'iptCCP...' and assign it the value of the CCP element with the corresponding ccpUserInput alias.
+      for (const [key, value] of Object.entries(ccpUserInput)) {
+        if (value.substring( 0, 4) === '#ipt' || value.substring( 0, 4) === '#sel' ) {
+          Appobj[key] = document.querySelector(value).value;
+        }
+        if (value.substring( 0, 4) === '#rdo' ) {
+          Appobj[key] = document.querySelector(value).checked;
+        }
+        if (value.substring( 0, 4) === '#spn' ) {
+          val = chkmrkToChkbox(value);
+          Appobj[key] = document.querySelector(val).value;
+        }
+      }
+
+
+
+
+
+
+
+
+
+      // showTdOptions();
 
       // !VA Initialize the fixed/fluid imgType buttons - call getAttributes and populate the CCP elements with values based on whether fixed or fluid is selected.
-      toggleImgType();
+      // toggleImgType();
       // !VA Initialize the Include wrapper checkboxes. Pass in false for the evt argument for initialization so that the function skips over the button click condition and just executes the display/undisplay functionality.
-      toggleIncludeWrapper('init');
+      // toggleIncludeWrapper('init');
       // !VA Initialize the tdoptions radio group to 'basic' if the 'fluid' imgType is selected
       // !VA NOTE: This would be better as a loop
-      if (document.querySelector(ccpUserInput.rdoCcpImgFluid).checked === true) {
-        document.querySelector(ccpUserInput.rdoCcpTdBasic).checked = true;
-        document.querySelector(ccpUserInput.rdoCcpTdExcludeimg).disabled = true;
-      } 
+      // if (document.querySelector(ccpUserInput.rdoCcpImgFluid).checked === true) {
+      //   document.querySelector(ccpUserInput.rdoCcpTdBasic).checked = true;
+      //   document.querySelector(ccpUserInput.rdoCcpTdExcludeimg).disabled = true;
+      // } 
       // !VA IMPORTANT: Isn't this done somewhere else too? The app initializes with the CCP closed, so toggle it on and off here.
       document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
       // !VA IMPORTANT: Determine if this initGetAttribute call is necessary since updateCcp is deprecated
-      CBController.initGetAttributes();
+      // CBController.initGetAttributes();
     }
 
     function toggleIncludeAnchor(evt) {
@@ -3206,6 +3293,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       let Attributes;
       // !VA This is the other place where getAttributes is accessed besides buildOutputNodeList and maybe initCcp.
       Attributes = CBController.initGetAttributes();
+
       // !VA Loop through Attributes and assign values to corresponding elements. The logic is included in the Attribute, so just assign the values here.
       const sourceAttributes = [ Attributes.tableTagWrapperClass.str, Attributes.tableWidth.str, Attributes.tableTagWrapperWidth.str];
       const targetCcpElement = [ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWidth, ccpUserInput.iptCcpTableWrapperWidth ];
@@ -3479,6 +3567,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA appController public functions
     return {
+
+
+      getAppobj: function() {
+        return Appobj;
+      },
+
+
 
       // !VA This is a pass-thru to access queryDOMElements (public UIController)  to get the current dimensions of the dynamic DOM elements and data attributes, and getAppdata (private appController) to calculate the non-DOM Appdata properties. We do this here because Appdata has to be queried in all three modules, so it has to be accessible in all of them, and because getAppdata needs getAspectRatio which belongs in appController.
       // !VA appController public
