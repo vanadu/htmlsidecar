@@ -2425,6 +2425,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
                 // !VA TODO: Make function
                 curImg.style.display = 'block';
                 // !VA Calculate the viewer size based on the loaded image
+
+
                 calcViewerSize(false);
               })();
               
@@ -2873,43 +2875,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         }
       }
     }
-
+    
     // !VA appController private
     // !VA Populate Appobj, which is currently a global object in appController. It might be better to just pass it around as a parameter, but currently we're maintaining it in appController and only passing it to other modules as an argument.
-    function populateAppobj() {
-      let curImg, imgViewer, cStyles;
-      // !VA Get the values for the dynamicRegions
-      // !VA Get the curImg and imgViewer
-      curImg = document.querySelector(dynamicRegions.curImg);
-      imgViewer = document.querySelector(dynamicRegions.imgViewer);
-      // !VA Get the computed width and height of imgViewer
-      cStyles = window.getComputedStyle(imgViewer);
-      Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
-      // !VA Branch: implementAppobj01 (060420)
-      // Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
 
-      Appobj.viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
-      // !VA Get the dimensions of curImg
-      Appobj.imgW = curImg.width;
-      Appobj.imgH = curImg.height;
-      Appobj.imgNW = curImg.naturalWidth;
-      Appobj.imgNH = curImg.naturalHeight;
-      
-      // !VA Get the data properties for iptTbrSmallPhonesW and sPhonesH
-      // !VA NOTE: This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
-      Appobj.sPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).getAttribute('data-sphonesw'), 10);
-      Appobj.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
-      Appobj.iptTbrSPhonesWidth ? Appobj.iptTbrSPhonesWidth : Appdata.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
-      Appobj.iptTbrLPhonesWidth ? Appobj.iptTbrLPhonesWidth : Appdata.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
-      
-      // !VA Now compute the rest of Appobj
-      Appobj.aspect = getAspectRatio(Appobj.imgNW,  Appdata.imgNH);
-      Appobj.sPhonesH = Math.round(Appobj.sPhonesW * (1 / Appobj.aspect[0]));
-      Appobj.lPhonesH = Math.round(Appobj.lPhonesW * (1 / Appobj.aspect[0]));
-      
-      console.log('populatAppobj Appobj:');
-      console.dir(Appobj);
-    }
 
 
     // !VA  appController private 
@@ -2922,10 +2891,45 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       console.log(' Appdata:');
       console.dir(Appdata);
       // !VA Branch: implementAppobj01 (060420)\
-      // !VA At this point, curImg is loaded but the viewer is still the default size and needs to be calculated here. Appdata gets the current dynamic region values. So let's put a function to add those values here:
+      // !VA At this point, curImg is loaded but the viewer is still the default size and needs to be calculated here. Appdata gets the current dynamic region values. So let's put a function to add those values here. Appobj has to be populated here, not in a private external function because calcViewerSize doesn't run until the setTimeOut callback is run and the image is loaded in handleFileSelect. If populateAppobj were a public function, it would be querying a DOM element that doesn't yet exists and would fail. 
+      // !VA TODO: Probably better to put it in a private function with a callback...for later.
 
+      (function populateAppobj() {
+        // !VA IIFE for populating 
+        let curImg, imgViewer, cStyles;
+        // !VA Get the values for the dynamicRegions
+        // !VA Get the curImg and imgViewer
+        curImg = document.querySelector(dynamicRegions.curImg);
+        imgViewer = document.querySelector(dynamicRegions.imgViewer);
+        // !VA Get the computed width and height of imgViewer
+        cStyles = window.getComputedStyle(imgViewer);
+        Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
+        // !VA Branch: implementAppobj01 (060420)
+        // Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
+  
+        Appobj.viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
+        // !VA Get the dimensions of curImg
+        Appobj.imgW = curImg.width;
+        Appobj.imgH = curImg.height;
+        Appobj.imgNW = curImg.naturalWidth;
+        Appobj.imgNH = curImg.naturalHeight;
+        
+        // !VA Get the data properties for iptTbrSmallPhonesW and sPhonesH
+        // !VA NOTE: This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
+        Appobj.sPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).getAttribute('data-sphonesw'), 10);
+        Appobj.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
+        Appobj.iptTbrSPhonesWidth ? Appobj.iptTbrSPhonesWidth : Appdata.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
+        Appobj.iptTbrLPhonesWidth ? Appobj.iptTbrLPhonesWidth : Appdata.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
+        // !VA Now compute the rest of Appobj
+        Appobj.aspect = getAspectRatio(Appobj.imgNW,  Appdata.imgNH);
+        Appobj.sPhonesH = Math.round(Appobj.sPhonesW * (1 / Appobj.aspect[0]));
+        Appobj.lPhonesH = Math.round(Appobj.lPhonesW * (1 / Appobj.aspect[0]));
+        console.log('populatAppobj Appobj:');
+        console.dir(Appobj);
+        // return Appobj;
 
-      // populateAppobj();
+      })();
+
 
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
       // !VA  Get the actual viewerW and viewerH CSS values from getComputedStyle
