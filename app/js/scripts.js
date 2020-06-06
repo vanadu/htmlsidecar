@@ -6,13 +6,6 @@
 /* !VA  - June Reboot Notes
 =========================================================
 // !VA Branch: implementAppobj01 (060420)
-I'm still unclear on the relationship between the setting of Clipboard output values and  the reflection of those values in the Ccp UI. That's all clear for IMG. All I know today is that I cannot maintain and do error handling for two sets of values, one for CCP attributes and another for CCP UI. Hate to say it, but I need to rethink this whole thing YET AGAIN! See WittyStatus_06.05.20.
-
-
-Program flow notes:
-Inspector values have to update CCP UI whenever an event is triggered. That means both Appdata and Attributes have to be updated. Then, the update has to apply to the Clipboard output AND the CCP UI.
-CCP UI.
-
 
 
 
@@ -63,7 +56,7 @@ Parent table: devicewidth needs to be cleared, can't be devicewidth. the Attribu
 
 
 
-
+TODO: BUG! Load 625X525 with viewerW set to 600 - loads without resizing to container size
 TODO: Change the default parent class on 
 TODO: Have a bit problem with td options height and width fields. Currently these fields are available when the 'basic' option is selected, but there is no case when they would ever write the values the user might enter here to the clipboard. Beccause, what happens when the user enters values that are smaller than the current image resolution. That can't be possible. The TD can't be smaller than its child. The height should never be available when the child is an image and the width should either be preset to the image width or unavailable. Or it should be allowed to be larger than the child, for instance if padding is desired, but never smaller. And if you add padding, you'd add it to the img, not to the TD, right? Have to check that out before resolving this. 
 NOTE: It's important to remember that handleCcpActions handles the display of elements whose state or value in the CCP is changed by OTHER CCP elements. For example, the imgType radio buttons trigger value changes in OTHER elements. So handleCcpActions handles the display of the CCP UI. In contrast, the Attributes control only the Clipboard output. For instance, the class attribute only writes to the Clipboard if there is an entry in the input field. That's why it's handled in getAttributes - it doesn't result in a change to the CCP UI.
@@ -327,24 +320,10 @@ var Witty = (function () {
 
 
 
-    // !VA Run test function on page load
-    // document.addEventListener('DOMContentLoaded', function() {
-    //   setTimeout(function(){ 
-    //     // var fug = document.querySelector(btnCcpMakeClips.btnCcpMakeTdTag);
-    //     // fug.click();
-
-
-
-    //   }, 500);
-    // });
-
-
-  
-
 
     // !VA UIController private
     // !VA Reboot: passing in Appdata from 
-    function evalInspectorAlerts(Appdata) {
+    function evalInspectorAlerts(Appobj) {
       // !VA init inspector and flagged inspector lists
       let allInspectors = [];
       // !VA Array to hold the flagged inspector labels
@@ -355,15 +334,15 @@ var Witty = (function () {
       // let Appdata = {};
       // Appdata = appController.initGetAppdata(false);
       // !VA Size On Disk is NOT 2X the Display Size: flag Size on Disk and Retina
-      if (Appdata.imgNW < (Appdata.imgW * 2) ) {
+      if (Appobj.imgNW < (Appobj.imgW * 2) ) {
         flaggedInspectors.push(allInspectors.insDiskSizeLabel);
       } 
       // !VA Small phones isn't at least 2X size on Disk and Retina
-      if (Appdata.imgNW < (Appdata.sPhonesW * 2) ) {
+      if (Appobj.imgNW < (Appobj.sPhonesW * 2) ) {
         flaggedInspectors.push(allInspectors.insSmallPhonesLabel);
       }
       // !VA Large phones isn't at least 2X Size on Disk and Retina
-      if (Appdata.imgNW < (Appdata.lPhonesW * 2) ) {
+      if (Appobj.imgNW < (Appobj.lPhonesW * 2) ) {
         flaggedInspectors.push(allInspectors.insLargePhonesLabel);
       } 
       // !VA Reset all the dim viewer alerts by passing in the entire Inspector array. We're running this function twice here, each time with different parameters -- could be DRYer but it works and 
@@ -391,9 +370,119 @@ var Witty = (function () {
     // !VA UIController public functions
     return {
 
+      // !VA V2 Return all the strings for the UI element's IDs
+      getInspectorElementIDs: function() {
+        return inspectorElements;
+      },
+      getInspectorValuesIDs: function() {
+        return inspectorValues;
+      },
+      getInspectorLabelsIDs: function() {
+        return inspectorLabels;
+      },
+      // !VA Reboot: This is wrong now after renaming
+      getToolButtonIDs: function() {
+        return toolbarElements;
+      },
+      getDynamicRegionIDs: function() {
+        return dynamicRegions;
+      },
+      getStaticRegionIDs: function() {
+        return staticRegions;
+      },
+      getCcpUserInputIDs: function() {
+        return ccpUserInput;
+      },
+      getCcpUserInputLabelIds: function() {
+        return ccpUserInputLabels;
+      },
+      getBtnCcpMakeClips: function() {
+        return btnCcpMakeClips;
+      },
+      getAppMessageElements: function() {
+        return appMessageElements;
+      },
 
+      // !VA UIController public
+      initUI: function(initMode) {
 
-      getDOM: function () {
+        const delayInMilliseconds = 10;
+        // !VA Here we initialze DEV mode, i.e. reading a hardcoded image from the HTML file instead of loading one manually in production mode
+        // !VA Branch: implementAppobj01 (060420) Adding nothing to Appobj here since this is only devmode
+        if (initMode === 'devmode') {
+
+          // !VA The app initializes with the CCP closed, so toggle it on and off here.
+          // document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
+
+          // !VA Set a timeout to give the image time to load
+          setTimeout(function() {
+            // !VA Show the toolbar and curImg region
+            // !VA TODO: Make function
+            document.querySelector(staticRegions.tbrContainer).style.display = 'block';
+            document.querySelector(dynamicRegions.curImg).style.display = 'block';
+            // !VA  Get the insFilename of the devImg in the HTML. This is the only time we'll have an actual source file -- in user mode all the images are blobs -- so we can do this as a one-off.
+            var fname = document.querySelector(dynamicRegions.curImg).src;
+            fname = fname.split('/');
+            fname = fname[fname.length - 1];
+            // !VA Write the insFilename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
+            document.querySelector(inspectorElements.insFilename).textContent = fname;
+            // !VA Initialze calcViewerSize to size the image to the app container areas
+            appController.initCalcViewerSize();
+            // !VA Open the CCP by default in dev mode
+            // !VA First, set it to the opposite of how you want to start it.
+            document.querySelector(staticRegions.ccpContainer).classList.add('active');
+
+            // !VA NOW: The toggle Ccp element functions are all in appController either I have to replicated them here or find another solution or live with the fact that they don't initialize. Or run initUI from here...
+            // toggleIncludeWrapper(false);
+            appController.initToggleImgType();
+            appController.initToggleIncludeWrapper();
+            appController.initShowTdOptions();
+
+            // updateCcp(Attributes);
+          }, delayInMilliseconds);
+        }
+        // !VA The rest of the routine applies to DEV and PROD modes
+        // !VA Initialize the input fields for the pertinent device widths: viewerW, sPhonesW and lPhonesW. Also initialize the data attributes for sphonesw and lphonesw - we only want to access the localStorage once and the rest we do using data-attributes
+        let arr = [], curDeviceWidths = [];
+        // !VA Clear localStorage for testing only.
+        // localStorage.clear();
+        // !VA If localStorage is set for viewerW, sPhonesW or lgPhones, add the localStorage value to curDeviceWidths, otherwise set the defaults used when the app is used for the first time or no user-values are entered.
+        
+
+        arr = [ 'viewerW', 'sPhonesW', 'lPhonesW' ];
+        // !VA If there's localStorage, push it to the curDeviceWidths array. Otherwise, push false.
+        for (let i = 0; i < arr.length; i++) {
+          localStorage.getItem(arr[i]) ? curDeviceWidths.push(localStorage.getItem(arr[i])) : curDeviceWidths.push(false);
+        }
+
+        // !VA TODO: Shouldn't all localStorage operations be in one place?
+        // !VA If there's a localStorage for viewerW, put that value into the viewerW field of the toolbar, otherwise use the default. NOTE: The default is set ONLY in the HTML element's placeholder. The advantage of this is that we can get it anytime without having to set a global variable or localStorage for the default.
+        // !VA Branch: implementAppobj01 (060420): Not adding this to Appobj yet because we're still in appController.
+        curDeviceWidths[0] ?  document.querySelector(toolbarElements.iptTbrViewerW).value = curDeviceWidths[0] : document.querySelector(toolbarElements.iptTbrViewerW).value = document.querySelector(toolbarElements.iptTbrViewerW).placeholder;
+        // !VA If there's a localStorage for sPhonesW, get it, otherwise set the default to the placeholder in the HTML element on index.html. Then set the toolbar input field AND the sphonesw data attribute to this value. NOTE: The default is set ONLY in the HTML element's placeholder!
+        curDeviceWidths[1] ? curDeviceWidths[1] : curDeviceWidths[1] = document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder;
+        document.querySelector(toolbarElements.iptTbrSPhonesWidth).value = curDeviceWidths[1];
+        document.querySelector(toolbarElements.iptTbrSPhonesWidth).setAttribute('data-sphonesw', curDeviceWidths[1]);
+        // !VA If there's a localStorage for lPhonesW, get it, otherwise set the default to the placeholdere in the HTML element in index.html. Then set the toolbar input field AND the lphonesw data attribute to this value. NOTE: The default is set ONLY in the HTML element's placeholder!
+        curDeviceWidths[2] ? curDeviceWidths[2] : curDeviceWidths[2] = document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder;
+        document.querySelector(toolbarElements.iptTbrLPhonesWidth).value = curDeviceWidths[2];
+        document.querySelector(toolbarElements.iptTbrLPhonesWidth).setAttribute('data-lphonesw', curDeviceWidths[2]);
+
+        // !VA Make sure the tbrContainer is off and the dropArea is on.
+        // !VA TODO: Make function
+        document.querySelector(staticRegions.dropArea).style.display = 'flex';
+        document.querySelector(staticRegions.tbrContainer).style.display = 'none';
+        document.querySelector(inspectorElements.btnToggleCcp).style.display = 'none';
+
+        // !VA Inspector initialization comes now from the HTML file. The default 'No Image' is display: inline in CSS. When an image is loaded, inspectors are populated with values in UIController.writeInspectors.
+
+      },
+  
+      // !VA UIController public
+      queryDOMElements: function() {
+        // !VA Branch: implementAppobj01 (060420)
+        // !VA Add all these values to Appobj in addition to creating the domelements return array. There's no reason to do this in UICtrl though since we're not writing anything TO the UI, we're just getting values from it to populate Appobj. At this point curImg is already loaded and the 
+
         // !VA Return the non-calculated DOM elements and data properties, i.e. the properties that are retrieved from the DOM or from data properties: curImg.imgW, curImg.imgW, curImg.imgNW, curImg.NH and viewerW. These are passed to getAppdata, which then creates the Appdata object. Aspect is calculated from imgNW and imgNH - that calculation is done in appController, so it will be added to Appdata there.
         // !VA Declare the local variables and populate the elements array
         let fname, viewerW, viewerH, imgW, imgH, imgNW, imgNH, sPhonesW, lPhonesW;
@@ -402,19 +491,27 @@ var Witty = (function () {
         let curImg, imgViewer, cStyles;
 
         // !VA Get the insFilename from the Inspector
+        // !VA Branch: implementAppobj01 (060420): This has already been added to Appobj in handleFileSelect so need to do it again
         domElements.fname = document.querySelector(inspectorElements.insFilename).textContent;
+
         // !VA Get the curImg and imgViewer
         curImg = document.querySelector(dynamicRegions.curImg);
         imgViewer = document.querySelector(dynamicRegions.imgViewer);
         // !VA Get the computed width and height of imgViewer
         cStyles = window.getComputedStyle(imgViewer);
         domElements.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
+        // !VA Branch: implementAppobj01 (060420)
+        // Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
+
         domElements.viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
         // !VA Get the dimensions of curImg
         domElements.imgW = curImg.width;
         domElements.imgH = curImg.height;
         domElements.imgNW = curImg.naturalWidth;
         domElements.imgNH = curImg.naturalHeight;
+        // console.log('queryDomelements: this is: ');
+        // console.log(this);
+        
         
         // !VA Get the data properties for iptTbrSmallPhonesW and sPhonesH
         // !VA NOTE: This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
@@ -423,10 +520,7 @@ var Witty = (function () {
         domElements.iptTbrSPhonesWidth ? domElements.iptTbrSPhonesWidth : Appdata.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
         domElements.iptTbrLPhonesWidth ? domElements.iptTbrLPhonesWidth : Appdata.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
         return domElements;
-        
       },
-
-
 
 
       // !VA Catch-all function for displaying/undisplaying, disabling/enabling and adding/removing classes to CCP elements. action is the action to execute, elemArray is the array of elements the action is to apply to and state is the toggle state whereby true turns the action on and false turns it off.
@@ -544,165 +638,21 @@ var Witty = (function () {
       },
 
 
-      // !VA V2 Return all the strings for the UI element's IDs
-      getInspectorElementIDs: function() {
-        return inspectorElements;
-      },
-      getInspectorValuesIDs: function() {
-        return inspectorValues;
-      },
-      getInspectorLabelsIDs: function() {
-        return inspectorLabels;
-      },
-      // !VA Reboot: This is wrong now after renaming
-      getToolButtonIDs: function() {
-        return toolbarElements;
-      },
-      getDynamicRegionIDs: function() {
-        return dynamicRegions;
-      },
-      getStaticRegionIDs: function() {
-        return staticRegions;
-      },
-      getCcpUserInputIDs: function() {
-        return ccpUserInput;
-      },
-      getCcpUserInputLabelIds: function() {
-        return ccpUserInputLabels;
-      },
-      getBtnCcpMakeClips: function() {
-        return btnCcpMakeClips;
-      },
-      getAppMessageElements: function() {
-        return appMessageElements;
-      },
-
-      // !VA UIController public
-      initToolbarInputs: function() {
-        // !VA This is called from init (? ) and initializes the values of the toolbar viewerW, sPhonesW and lPhonesW values from either a default value or the localStorage values. Check if there are localStorage values, if not, initialize viewerW = 650, sPhonesW = 320, lPhonesW = 414 and write those to the toolbarUI. 
-      },
-
+     
       // !VA UIController public getAppdata
       // !VA Moved getAppdata from appController to UIController because Appdata is derived from the DOM elements and data properties that reside in the DOM. 
 
+
+
+   
       // !VA UIController public
-      queryDOMElements: function() {
-        // !VA Return the non-calculated DOM elements and data properties, i.e. the properties that are retrieved from the DOM or from data properties: curImg.imgW, curImg.imgW, curImg.imgNW, curImg.NH and viewerW. These are passed to getAppdata, which then creates the Appdata object. Aspect is calculated from imgNW and imgNH - that calculation is done in appController, so it will be added to Appdata there.
-        // !VA Declare the local variables and populate the elements array
-        let fname, viewerW, viewerH, imgW, imgH, imgNW, imgNH, sPhonesW, lPhonesW;
-        let domElements = {};
-        domElements = {fname, viewerW, viewerH, imgW, imgH, imgNW, imgNH, sPhonesW, lPhonesW};
-        let curImg, imgViewer, cStyles;
-
-        // !VA Get the insFilename from the Inspector
-        domElements.fname = document.querySelector(inspectorElements.insFilename).textContent;
-        // !VA Get the curImg and imgViewer
-        curImg = document.querySelector(dynamicRegions.curImg);
-        imgViewer = document.querySelector(dynamicRegions.imgViewer);
-        // !VA Get the computed width and height of imgViewer
-        cStyles = window.getComputedStyle(imgViewer);
-        domElements.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
-        domElements.viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
-        // !VA Get the dimensions of curImg
-        domElements.imgW = curImg.width;
-        domElements.imgH = curImg.height;
-        domElements.imgNW = curImg.naturalWidth;
-        domElements.imgNH = curImg.naturalHeight;
-        // console.log('queryDomelements: this is: ');
-        // console.log(this);
-        
-        
-        // !VA Get the data properties for iptTbrSmallPhonesW and sPhonesH
-        // !VA NOTE: This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
-        domElements.sPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).getAttribute('data-sphonesw'), 10);
-        domElements.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
-        domElements.iptTbrSPhonesWidth ? domElements.iptTbrSPhonesWidth : Appdata.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
-        domElements.iptTbrLPhonesWidth ? domElements.iptTbrLPhonesWidth : Appdata.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
-        return domElements;
-      },
-
-      // !VA UIController public
-      initUI: function(initMode) {
-
-        const delayInMilliseconds = 10;
-        // !VA Here we initialze DEV mode, i.e. reading a hardcoded image from the HTML file instead of loading one manually in production mode
-        if (initMode === 'devmode') {
-
-          // !VA The app initializes with the CCP closed, so toggle it on and off here.
-          // document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
-
-          // !VA Set a timeout to give the image time to load
-          setTimeout(function() {
-            // !VA Show the toolbar and curImg region
-            document.querySelector(staticRegions.tbrContainer).style.display = 'block';
-            document.querySelector(dynamicRegions.curImg).style.display = 'block';
-            // !VA  Get the insFilename of the devImg in the HTML. This is the only time we'll have an actual source file -- in user mode all the images are blobs -- so we can do this as a one-off.
-            var fname = document.querySelector(dynamicRegions.curImg).src;
-            fname = fname.split('/');
-            fname = fname[fname.length - 1];
-            // !VA Write the insFilename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
-            document.querySelector(inspectorElements.insFilename).textContent = fname;
-            // !VA Initialze calcViewerSize to size the image to the app container areas
-            appController.initCalcViewerSize();
-            // !VA Open the CCP by default in dev mode
-            // !VA First, set it to the opposite of how you want to start it.
-            document.querySelector(staticRegions.ccpContainer).classList.add('active');
-
-            // !VA NOW: The toggle Ccp element functions are all in appController either I have to replicated them here or find another solution or live with the fact that they don't initialize. Or run initUI from here...
-            // toggleIncludeWrapper(false);
-            appController.initToggleImgType();
-            appController.initToggleIncludeWrapper();
-            appController.initShowTdOptions();
-
-            // updateCcp(Attributes);
-          }, delayInMilliseconds);
-        }
-        // !VA The rest of the routine applies to DEV and PROD modes
-        // !VA Initialize the input fields for the pertinent device widths: viewerW, sPhonesW and lPhonesW. Also initialize the data attributes for sphonesw and lphonesw - we only want to access the localStorage once and the rest we do using data-attributes
-        let arr = [], curDeviceWidths = [];
-        // !VA Clear localStorage for testing only.
-        // localStorage.clear();
-        // !VA If localStorage is set for viewerW, sPhonesW or lgPhones, add the localStorage value to curDeviceWidths, otherwise set the defaults used when the app is used for the first time or no user-values are entered.
-        
-
-        arr = [ 'viewerW', 'sPhonesW', 'lPhonesW' ];
-        // !VA If there's localStorage, push it to the curDeviceWidths array. Otherwise, push false.
-        for (let i = 0; i < arr.length; i++) {
-          localStorage.getItem(arr[i]) ? curDeviceWidths.push(localStorage.getItem(arr[i])) : curDeviceWidths.push(false);
-        }
-
-        // !VA If there's a localStorage for viewerW, put that value into the viewerW field of the toolbar, otherwise use the default. NOTE: The default is set ONLY in the HTML element's placeholder. The advantage of this is that we can get it anytime without having to set a global variable or localStorage for the default.
-        // !VA Branch: implementAppobj01 (060420)
-
-
-
-
-        curDeviceWidths[0] ?  document.querySelector(toolbarElements.iptTbrViewerW).value = curDeviceWidths[0] : document.querySelector(toolbarElements.iptTbrViewerW).value = document.querySelector(toolbarElements.iptTbrViewerW).placeholder;
-        // !VA If there's a localStorage for sPhonesW, get it, otherwise set the default to the placeholder in the HTML element on index.html. Then set the toolbar input field AND the sphonesw data attribute to this value. NOTE: The default is set ONLY in the HTML element's placeholder!
-        curDeviceWidths[1] ? curDeviceWidths[1] : curDeviceWidths[1] = document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder;
-        document.querySelector(toolbarElements.iptTbrSPhonesWidth).value = curDeviceWidths[1];
-        document.querySelector(toolbarElements.iptTbrSPhonesWidth).setAttribute('data-sphonesw', curDeviceWidths[1]);
-        // !VA If there's a localStorage for lPhonesW, get it, otherwise set the default to the placeholdere in the HTML element in index.html. Then set the toolbar input field AND the lphonesw data attribute to this value. NOTE: The default is set ONLY in the HTML element's placeholder!
-        curDeviceWidths[2] ? curDeviceWidths[2] : curDeviceWidths[2] = document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder;
-        document.querySelector(toolbarElements.iptTbrLPhonesWidth).value = curDeviceWidths[2];
-        document.querySelector(toolbarElements.iptTbrLPhonesWidth).setAttribute('data-lphonesw', curDeviceWidths[2]);
-
-        // !VA Make sure the tbrContainer is off and the dropArea is on.
-        document.querySelector(staticRegions.dropArea).style.display = 'flex';
-        document.querySelector(staticRegions.tbrContainer).style.display = 'none';
-        document.querySelector(inspectorElements.btnToggleCcp).style.display = 'none';
-
-        // !VA Inspector initialization comes now from the HTML file. The default 'No Image' is display: inline in CSS. When an image is loaded, inspectors are populated with values in UIController.writeInspectors.
-
-      },
-
-      // !VA UIController public
-      writeInspectors: function() {
+      writeInspectors: function(Appobj) {
         // !VA Hide  the default 'No Image' value displayed when the app is opened with no image and display the Inspector values for the current image, show the Clipboard button and call evalInspectorAlerts to determine which Inspector labels should get dimension alerts (red font applied). 
         var Appdata = {};
         // !VA Get the current Appdata
         Appdata = appController.initGetAppdata();
         // !VA Hide the dropArea
+        // !VA TODO: Make function
         document.querySelector(staticRegions.dropArea).style.display = 'none';
         // Write the inspectorElements
         document.querySelector(inspectorElements.insFilename).innerHTML = `<span class='pop-font'>${Appdata.fname}</span>`;
@@ -2087,8 +2037,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
   // GLOBAL APP MODULE
   var appController = (function(CBCtrl, UICtrl) {
 
-    function appObj( fileName, imgW, imgH, imgNW, imgNH, viewerW, viewerH, sPhonesW, lPhonesW) {
-      return { fileName, imgW, imgH, imgNW, imgNH, viewerW, viewerH, sPhonesW, lPhonesW };
+    // !VA Initialize appObj
+    function Appobj( fileName, imgW, imgH, imgNW, imgNH, viewerW, viewerH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, aspect, iptCcpImgClass, iptCcpImgAlt, rdoCcpImgFixed, rdoCcpImgFluid, selCcpImgAlign, iptCcpImgRelPath, spnCcpImgIncludeAnchorCheckmrk, iptCcpTdClass, selCcpTdAlign, selCcpTdValign, iptCcpTdHeight, iptCcpTdWidth, iptCcpTdBgColor, iptCcpTdFontColor, iptCcpTdBorderColor, iptCcpTdBorderRadius, rdoCcpTdBasic, rdoCcpTdExcludeimg, rdoCcpTdImgswap, rdoCcpTdPosswitch, rdoCcpTdBgimage, iptCcpTableClass, selCcpTableAlign, iptCcpTableWidth, iptCcpTableBgColor, spnCcpTableIncludeWrapperCheckmrk, iptCcpTableWrapperClass, iptCcpTableWrapperWidth, selCcpTableWrapperAlign, iptCcpTableWrapperBgColor ) {
+      return { fileName, imgW, imgH, imgNW, imgNH, viewerW, viewerH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, aspect, iptCcpImgClass, iptCcpImgAlt, rdoCcpImgFixed, rdoCcpImgFluid, selCcpImgAlign, iptCcpImgRelPath, spnCcpImgIncludeAnchorCheckmrk, iptCcpTdClass, selCcpTdAlign, selCcpTdValign, iptCcpTdHeight, iptCcpTdWidth, iptCcpTdBgColor, iptCcpTdFontColor, iptCcpTdBorderColor, iptCcpTdBorderRadius, rdoCcpTdBasic, rdoCcpTdExcludeimg, rdoCcpTdImgswap, rdoCcpTdPosswitch, rdoCcpTdBgimage, iptCcpTableClass, selCcpTableAlign, iptCcpTableWidth, iptCcpTableBgColor, spnCcpTableIncludeWrapperCheckmrk, iptCcpTableWrapperClass, iptCcpTableWrapperWidth, selCcpTableWrapperAlign, iptCcpTableWrapperBgColor };
     }
 
 
@@ -2449,28 +2400,30 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           // Read the insFilename of the FileReader object into a variable to pass to the getAppData function, otherwise the blob has no name
           fileName = theFile.name;
           // !VA Write the insFilename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
+          // !VA Branch: implementAppobj01 (060420)
+          Appobj.fileName = fileName;
+          console.log('Appobj.fileName is: ' + Appobj.fileName);
           document.querySelector(inspectorElements.insFilename).textContent = fileName;
-          
+
           // !VA Hide the dropArea - not sure if this is the right place for this.
+          // !VA TODO: Make function
           document.querySelector(staticRegions.dropArea).style.display = 'none';
           // !VA  Once the current image has loaded, initialize the dinViewers by querying the current image properties from UICtrl and passing them to writeInspectors.
           function initInspectors() { 
             // !VA  Initialize the variable that will contain the new image's height, width, naturalHeight and naturalWidth
-            var curImgDimensions;
-            // !VA Review
             // !VA Set a short timeout while the blob loads, then run the onload function before displaying the image and getting its properties. This is probably overkill, but noone will notice the 250ms anyway and better safe then no-workie. But now that the image is loaded, we can display it and get its properties.
             setTimeout(() => {
               // Once the blob is loaded, show it and get its data
               curImg.onload = (function() {
               // !VA Hide the drop area.
+              // !VA TODO: Make function
                 document.querySelector(staticRegions.dropArea).style.display = 'none';
                 // !VA  Show the toolbar
-                // !VA Reboot: block => flex
+                // !VA TODO: Make function
                 document.querySelector(staticRegions.tbrContainer).style.display = 'flex';
-
                 // !VA Display the current image
+                // !VA TODO: Make function
                 curImg.style.display = 'block';
-
                 // !VA Calculate the viewer size based on the loaded image
                 calcViewerSize(false);
               })();
@@ -2921,23 +2874,63 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
     }
 
+    // !VA appController private
+    // !VA Populate Appobj, which is currently a global object in appController. It might be better to just pass it around as a parameter, but currently we're maintaining it in appController and only passing it to other modules as an argument.
+    function populateAppobj() {
+      let curImg, imgViewer, cStyles;
+      // !VA Get the values for the dynamicRegions
+      // !VA Get the curImg and imgViewer
+      curImg = document.querySelector(dynamicRegions.curImg);
+      imgViewer = document.querySelector(dynamicRegions.imgViewer);
+      // !VA Get the computed width and height of imgViewer
+      cStyles = window.getComputedStyle(imgViewer);
+      Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
+      // !VA Branch: implementAppobj01 (060420)
+      // Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
+
+      Appobj.viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
+      // !VA Get the dimensions of curImg
+      Appobj.imgW = curImg.width;
+      Appobj.imgH = curImg.height;
+      Appobj.imgNW = curImg.naturalWidth;
+      Appobj.imgNH = curImg.naturalHeight;
+      
+      // !VA Get the data properties for iptTbrSmallPhonesW and sPhonesH
+      // !VA NOTE: This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
+      Appobj.sPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).getAttribute('data-sphonesw'), 10);
+      Appobj.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
+      Appobj.iptTbrSPhonesWidth ? Appobj.iptTbrSPhonesWidth : Appdata.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
+      Appobj.iptTbrLPhonesWidth ? Appobj.iptTbrLPhonesWidth : Appdata.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
+      
+      // !VA Now compute the rest of Appobj
+      Appobj.aspect = getAspectRatio(Appobj.imgNW,  Appdata.imgNH);
+      Appobj.sPhonesH = Math.round(Appobj.sPhonesW * (1 / Appobj.aspect[0]));
+      Appobj.lPhonesH = Math.round(Appobj.lPhonesW * (1 / Appobj.aspect[0]));
+      
+      console.log('populatAppobj Appobj:');
+      console.dir(Appobj);
+    }
+
+
     // !VA  appController private 
     // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH. I'm not sure what that means anymore 05.11.20
     function calcViewerSize() {
       let Appdata = {};
-      let Appobj = {};
-      let viewerW, viewerH, compStyles; 
+      let curImg, imgViewer, cStyles, viewerW, viewerH, compStyles; 
       let curLocalStorage;
       Appdata = appController.initGetAppdata(false);
+      console.log(' Appdata:');
+      console.dir(Appdata);
+      // !VA Branch: implementAppobj01 (060420)\
+      // !VA At this point, curImg is loaded but the viewer is still the default size and needs to be calculated here. Appdata gets the current dynamic region values. So let's put a function to add those values here:
 
-      // !VA Branch: implementAppobj01 (060420)
-      // !VA init Appobj
-      Appobj = appController.initBuildAppobj(false);
 
-
+      // populateAppobj();
 
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
       // !VA  Get the actual viewerW and viewerH CSS values from getComputedStyle
+      // !VA Branch: implementAppobj01 (060420)
+      // !VA To what extent is this a copy of what's been done in populateAppobj? For now, we're just going to leave everything as is and just use Appobj where Appdata previously was used.
       compStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
 
       // !VA Set the viewerW value based on localStorage  If the user has set this value in the toolbar before, then queried from localStorage. That value persists between sessions. If this is the initial use of the app, then viewerW is queried from the CSS value. 
@@ -3038,14 +3031,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         viewportH = imgH + 145;
       } 
       appH = viewportH;
-      // !VA NOTE: This would be better as a loop
+      // !VA TODO: Make function
       document.querySelector(dynamicRegions.curImg).style.width = imgW + 'px';
       document.querySelector(dynamicRegions.curImg).style.height =imgH + 'px';
       document.querySelector(dynamicRegions.imgViewer).style.height = viewerH + 'px';
       document.querySelector(dynamicRegions.imgViewport).style.height = viewportH + 'px';
       document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';
       // !VA Now that the image and its containers are written to the DOM, go ahead and write the Inspectors.
-      UICtrl.writeInspectors();
+      UICtrl.writeInspectors(Appdata);
     }
 
 
@@ -3503,22 +3496,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       return Appdata;
     }
 
-    function buildAppobj() {
-      console.log('getAppobj running');
-      let DOMElements = UIController.getDOM();
-      console.dir(DOMElements);
-      Appobj = {};
-
-
-
-
-
-    }
-
-
-
-
-
     // !VA appController public functions
     return {
 
@@ -3527,13 +3504,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       initGetAppdata: function() {
         var Appdata = getAppdata();
         return Appdata;
-      },
-
-      // !VA Branch: implementAppobj01 (060420)
-      // !VA Called from calcViewerSize after all image initialization is done and the app containers have been created and sized.
-      initBuildAppobj: function() {
-        var Appobj = buildAppobj();
-        return Appobj;
       },
 
       // !VA Dev Mode pass-thru public functions to expose calcViewerSize and initCcp to UIController.initUI
@@ -3636,33 +3606,21 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         curUrl = window.location.href;
 
         if (curUrl.substring(curUrl.length - 4) === 'true')  {
+          // !VA TODO: Make function
           document.querySelector('.header-container').style.display = 'none';
           document.querySelector('.header-isolate-app').style.display = 'none';
           document.querySelector('.content-section').style.display = 'none';
         } 
 
         // !VA Hide the CCP
+        // !VA TODO: Make function
         document.querySelector(staticRegions.ccpContainer).classList.remove('active');
         setupEventListeners();
         
         // !VA  Test if there is currently #cur-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
-        var curImgExists = document.querySelector(dynamicRegions.curImg);
-
-        if (curImgExists) {
-          initMode = 'devmode';
-          UICtrl.initUI();
-
-
-
-
-
-        } else {
-          initMode = 'prdmode';
-          // !VA  - Initialize the app UI and wait for input
-        }
-
+        document.querySelector(dynamicRegions.curImg) ? initMode = 'devmode' : initMode = 'prod';
+        // !VA Initialize the UI
         UICtrl.initUI(initMode);
-
       }
     };
 
