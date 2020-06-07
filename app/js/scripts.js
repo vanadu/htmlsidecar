@@ -366,6 +366,35 @@ var Witty = (function () {
       document.querySelector(appMessContainerId).classList.remove('active');
     }
 
+    // !VA Calc the apsect ratio - putting this here for now until it's decided where it needs to live. It's currently needed in appController for Appdata but can live in UIController private once Appdata is deprecated.
+    function getAspectRatio (var1, var2) {
+      var aspectReal = (var1 / var2);
+      var aspectInt = function() {
+        //get the aspect ratio by getting the gcd (greatest common denominator) and dividing W and H by it
+        //This is a single line function that wraps over two lines 
+        function gcd(var1,var2) {if ( var2 > var1 ) { 
+          // !VA Added variable declaration
+          var temp = var1; 
+          var1 = var2; 
+          var2 = temp; } while(var2!= 0) { 
+          // !VA Added variable declaration
+          var m = var1%var2; 
+          var1 = var2;
+          var2 = m; } 
+        return var1;}
+        var gcdVal = gcd( var1 , var2 );
+        //divide the W and H by the gcd
+        var w = (var1 / gcdVal);
+        var h = (var2 / gcdVal);
+        //Express and return the aspect ratio as an integer pair
+        aspectInt = (w + ' : ' + h);
+        return aspectInt;
+      }();
+      return [aspectReal, aspectInt];  
+    }
+
+    // !VA CCP FUNCTIONS
+
 
     // !VA UIController public functions
     return {
@@ -434,9 +463,10 @@ var Witty = (function () {
 
             // !VA NOW: The toggle Ccp element functions are all in appController either I have to replicated them here or find another solution or live with the fact that they don't initialize. Or run initUI from here...
             // toggleIncludeWrapper(false);
-            appController.initToggleImgType();
-            appController.initToggleIncludeWrapper();
-            appController.initShowTdOptions();
+            // appController.initToggleImgType();
+            // appController.initToggleIncludeWrapper();
+            // appController.initShowTdOptions();
+
 
             // updateCcp(Attributes);
           }, delayInMilliseconds);
@@ -474,11 +504,110 @@ var Witty = (function () {
         document.querySelector(staticRegions.tbrContainer).style.display = 'none';
         document.querySelector(inspectorElements.btnToggleCcp).style.display = 'none';
 
+        // !VA Set this to the opposite of what you want
+        document.querySelector(staticRegions.ccpContainer).classList.add('active');
         // !VA Inspector initialization comes now from the HTML file. The default 'No Image' is display: inline in CSS. When an image is loaded, inspectors are populated with values in UIController.writeInspectors.
-
+        // !VA Branch: implementAppobj02 (060620)
+        // !VA INitialize the CCP
+        UIController.initCcp();
       },
-  
 
+      populateAppobj: function (Appobj, access) {
+        // !VA IIFE for populating 
+        // let Appobj = {};
+        let curImg, imgViewer, cStyles;
+        // !VA Get the values for the dynamicRegions
+        // !VA Get the curImg and imgViewer
+        // !VA Branch: implementAppobj02 (060620)
+
+
+        console.log('access is: ' + access);
+
+        curImg = document.querySelector(dynamicRegions.curImg);
+        imgViewer = document.querySelector(dynamicRegions.imgViewer);
+        // !VA Get the computed width and height of imgViewer
+        cStyles = window.getComputedStyle(imgViewer);
+        Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
+        // !VA Branch: implementAppobj01 (060420)
+        // Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
+  
+        Appobj.viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
+        // !VA Get the dimensions of curImg
+        Appobj.imgW = curImg.width;
+        Appobj.imgH = curImg.height;
+        Appobj.imgNW = curImg.naturalWidth;
+        Appobj.imgNH = curImg.naturalHeight;
+        
+        // !VA Get the data properties for iptTbrSmallPhonesW and sPhonesH
+        // !VA NOTE: This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
+        Appobj.sPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).getAttribute('data-sphonesw'), 10);
+        Appobj.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
+        Appobj.iptTbrSPhonesWidth ? Appobj.iptTbrSPhonesWidth : Appobj.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
+        Appobj.iptTbrLPhonesWidth ? Appobj.iptTbrLPhonesWidth : Appobj.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
+        // !VA Now compute the rest of Appobj
+        Appobj.aspect = getAspectRatio(Appobj.imgNW,  Appobj.imgNH);
+        Appobj.sPhonesH = Math.round(Appobj.sPhonesW * (1 / Appobj.aspect[0]));
+        Appobj.lPhonesH = Math.round(Appobj.lPhonesW * (1 / Appobj.aspect[0]));
+
+        // !VA Now initialize Appobj with the CCP element values. This includes ALL CCP elements, including those that are displayed/undisplayed depending on which TDOption or imgType radio is selected. 
+        // !VA Don't forget to use bracket notation to add properties to an object: https://stackoverflow.com/questions/1184123/is-it-possible-to-add-dynamically-named-properties-to-javascript-object
+        // !VA  for loop: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
+
+        let val;
+        function chkmrkToChkbox(val) {
+          val = val.replace('mrk', 'box');
+          val = val.replace('spn', 'chk');
+          return val;
+        }
+        // !VA Loop through all the ccpUserInput properties. If the property is NOT a span (i.e. a mock checkbox) add an Appobj property that corresponds to the key of the respective ccpUserInput property. Otherwise, convert the span ID to the input ID, then add the Appobj property that corresponds to the key of the respective ID.
+        // !VA For instance, if the ccpUserInput value starts with '#ipt', create an Appobject property whose key is 'iptCCP...' and assign it the value of the CCP element with the corresponding ccpUserInput alias.
+        for (const [key, value] of Object.entries(ccpUserInput)) {
+          if (value.substring( 0, 4) === '#ipt' || value.substring( 0, 4) === '#sel' ) {
+            Appobj[key] = document.querySelector(value).value;
+          }
+          if (value.substring( 0, 4) === '#rdo' ) {
+            Appobj[key] = document.querySelector(value).checked;
+          }
+          if (value.substring( 0, 4) === '#spn' ) {
+            val = chkmrkToChkbox(value);
+            Appobj[key] = document.querySelector(val).value;
+          }
+        }
+        return Appobj;
+      },
+
+
+  
+      // !VA UIController public 
+      initCcp: function() {
+        console.clear();
+        let Appobj;
+        // let Appobj = {};
+        Appobj = appController.getAppobj();
+        console.log('initCCP - Appobj: ');
+        console.dir(Appobj);
+        // !VA Branch: implementAppobj02 (060620)
+        /* !VA   This is where we write the Appobj properties somehow. But no - because the values aren't written to the input elements yet. Where is that done? In toggleImgType, then handleCcpActions. What's happening is that handleCcpActions gets the values from the Attributes, where the values are defined. That's ass-backwards. The values should be defined in Appobj and then written to the Attributes. So let's try that. 
+      */ 
+
+      
+        // showTdOptions();
+
+        // !VA Initialize the fixed/fluid imgType buttons - call getAttributes and populate the CCP elements with values based on whether fixed or fluid is selected.
+        // toggleImgType();
+        // !VA Initialize the Include wrapper checkboxes. Pass in false for the evt argument for initialization so that the function skips over the button click condition and just executes the display/undisplay functionality.
+        // toggleIncludeWrapper('init');
+        // !VA Initialize the tdoptions radio group to 'basic' if the 'fluid' imgType is selected
+        // !VA NOTE: This would be better as a loop
+        // if (document.querySelector(ccpUserInput.rdoCcpImgFluid).checked === true) {
+        //   document.querySelector(ccpUserInput.rdoCcpTdBasic).checked = true;
+        //   document.querySelector(ccpUserInput.rdoCcpTdExcludeimg).disabled = true;
+        // } 
+        // !VA IMPORTANT: Isn't this done somewhere else too? The app initializes with the CCP closed, so toggle it on and off here.
+        document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
+        // !VA IMPORTANT: Determine if this initGetAttribute call is necessary since updateCcp is deprecated
+        // CBController.initGetAttributes();
+      },
 
 
       // !VA UIController public
@@ -2039,9 +2168,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
   var appController = (function(CBCtrl, UICtrl) {
 
     // !VA Initialize appObj
-    function Appobj( fileName, imgW, imgH, imgNW, imgNH, viewerW, viewerH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, aspect, iptCcpImgClass, iptCcpImgAlt, rdoCcpImgFixed, rdoCcpImgFluid, selCcpImgAlign, iptCcpImgRelPath, spnCcpImgIncludeAnchorCheckmrk, iptCcpTdClass, selCcpTdAlign, selCcpTdValign, iptCcpTdHeight, iptCcpTdWidth, iptCcpTdBgColor, iptCcpTdFontColor, iptCcpTdBorderColor, iptCcpTdBorderRadius, rdoCcpTdBasic, rdoCcpTdExcludeimg, rdoCcpTdImgswap, rdoCcpTdPosswitch, rdoCcpTdBgimage, iptCcpTableClass, selCcpTableAlign, iptCcpTableWidth, iptCcpTableBgColor, spnCcpTableIncludeWrapperCheckmrk, iptCcpTableWrapperClass, iptCcpTableWrapperWidth, selCcpTableWrapperAlign, iptCcpTableWrapperBgColor ) {
-      return { fileName, imgW, imgH, imgNW, imgNH, viewerW, viewerH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, aspect, iptCcpImgClass, iptCcpImgAlt, rdoCcpImgFixed, rdoCcpImgFluid, selCcpImgAlign, iptCcpImgRelPath, spnCcpImgIncludeAnchorCheckmrk, iptCcpTdClass, selCcpTdAlign, selCcpTdValign, iptCcpTdHeight, iptCcpTdWidth, iptCcpTdBgColor, iptCcpTdFontColor, iptCcpTdBorderColor, iptCcpTdBorderRadius, rdoCcpTdBasic, rdoCcpTdExcludeimg, rdoCcpTdImgswap, rdoCcpTdPosswitch, rdoCcpTdBgimage, iptCcpTableClass, selCcpTableAlign, iptCcpTableWidth, iptCcpTableBgColor, spnCcpTableIncludeWrapperCheckmrk, iptCcpTableWrapperClass, iptCcpTableWrapperWidth, selCcpTableWrapperAlign, iptCcpTableWrapperBgColor };
-    }
+    // function Appobj( fileName, imgW, imgH, imgNW, imgNH, viewerW, viewerH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, aspect, iptCcpImgClass, iptCcpImgAlt, rdoCcpImgFixed, rdoCcpImgFluid, selCcpImgAlign, iptCcpImgRelPath, spnCcpImgIncludeAnchorCheckmrk, iptCcpTdClass, selCcpTdAlign, selCcpTdValign, iptCcpTdHeight, iptCcpTdWidth, iptCcpTdBgColor, iptCcpTdFontColor, iptCcpTdBorderColor, iptCcpTdBorderRadius, rdoCcpTdBasic, rdoCcpTdExcludeimg, rdoCcpTdImgswap, rdoCcpTdPosswitch, rdoCcpTdBgimage, iptCcpTableClass, selCcpTableAlign, iptCcpTableWidth, iptCcpTableBgColor, spnCcpTableIncludeWrapperCheckmrk, iptCcpTableWrapperClass, iptCcpTableWrapperWidth, selCcpTableWrapperAlign, iptCcpTableWrapperBgColor ) {
+    //   return { fileName, imgW, imgH, imgNW, imgNH, viewerW, viewerH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, aspect, iptCcpImgClass, iptCcpImgAlt, rdoCcpImgFixed, rdoCcpImgFluid, selCcpImgAlign, iptCcpImgRelPath, spnCcpImgIncludeAnchorCheckmrk, iptCcpTdClass, selCcpTdAlign, selCcpTdValign, iptCcpTdHeight, iptCcpTdWidth, iptCcpTdBgColor, iptCcpTdFontColor, iptCcpTdBorderColor, iptCcpTdBorderRadius, rdoCcpTdBasic, rdoCcpTdExcludeimg, rdoCcpTdImgswap, rdoCcpTdPosswitch, rdoCcpTdBgimage, iptCcpTableClass, selCcpTableAlign, iptCcpTableWidth, iptCcpTableBgColor, spnCcpTableIncludeWrapperCheckmrk, iptCcpTableWrapperClass, iptCcpTableWrapperWidth, selCcpTableWrapperAlign, iptCcpTableWrapperBgColor };
+    // }
+    let Appobj = {};
 
     // !VA Getting DOM ID strings from UIController
     const inspectorElements = UICtrl.getInspectorElementIDs();
@@ -2281,7 +2411,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       for (let i = 0; i < dvClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         dvClickables[i] = document.querySelector(dvClickables[i]);
-        addEventHandler((dvClickables[i]),'click',initCcp,false);
+        addEventHandler((dvClickables[i]),'click',UIController.initCcp,false);
       }
 
       // !VA We need eventListeners for ALL the clipboard buttons so make an eventListener for each value in the btnCcpMakeClips object. We need a for in loop for objects
@@ -2907,39 +3037,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA At this point, curImg is loaded but the viewer is still the default size and needs to be calculated here. Appdata gets the current dynamic region values. So let's put a function to add those values here. Appobj has to be populated here, not in a private external function because calcViewerSize doesn't run until the setTimeOut callback is run and the image is loaded in handleFileSelect. If populateAppobj were a public function, it would be querying a DOM element that doesn't yet exists and would fail. 
       // !VA TODO: Appobj still doesn't have all the CCP elements so it's a temporary solution. I don't understand why queryDOMElements can work as a standalone function but populateAppobj doesn't. Maybe if I put it in a private function with a callback...for later.
 
-      (function populateAppobj() {
-        // !VA IIFE for populating 
-        let curImg, imgViewer, cStyles;
-        // !VA Get the values for the dynamicRegions
-        // !VA Get the curImg and imgViewer
-        curImg = document.querySelector(dynamicRegions.curImg);
-        imgViewer = document.querySelector(dynamicRegions.imgViewer);
-        // !VA Get the computed width and height of imgViewer
-        cStyles = window.getComputedStyle(imgViewer);
-        Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
-        // !VA Branch: implementAppobj01 (060420)
-        // Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
-  
-        Appobj.viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
-        // !VA Get the dimensions of curImg
-        Appobj.imgW = curImg.width;
-        Appobj.imgH = curImg.height;
-        Appobj.imgNW = curImg.naturalWidth;
-        Appobj.imgNH = curImg.naturalHeight;
-        
-        // !VA Get the data properties for iptTbrSmallPhonesW and sPhonesH
-        // !VA NOTE: This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
-        Appobj.sPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).getAttribute('data-sphonesw'), 10);
-        Appobj.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
-        Appobj.iptTbrSPhonesWidth ? Appobj.iptTbrSPhonesWidth : Appobj.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
-        Appobj.iptTbrLPhonesWidth ? Appobj.iptTbrLPhonesWidth : Appobj.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
-        // !VA Now compute the rest of Appobj
-        Appobj.aspect = getAspectRatio(Appobj.imgNW,  Appobj.imgNH);
-        Appobj.sPhonesH = Math.round(Appobj.sPhonesW * (1 / Appobj.aspect[0]));
-        Appobj.lPhonesH = Math.round(Appobj.lPhonesW * (1 / Appobj.aspect[0]));
 
-
-      })();
+      let Appobj = {};
+      Appobj = UIController.populateAppobj(Appobj, 'all');
+      console.log('calcViewerSize Appobj is: ');
+      console.log(Appobj);
 
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
       // !VA  Get the actual viewerW and viewerH CSS values from getComputedStyle
@@ -3069,69 +3171,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       
     }
 
-    // !VA CCP FUNCTIONS
-    // !VA appController private 
-    function initCcp() {
-      console.clear();
 
-      // let Appobj = {};
-      // Appobj = appController.getAppobj();
-      // console.log('initCCP - Appobj: ');
-      // console.dir(Appobj);
-      // !VA Branch: implementAppobj02 (060620)
-      /* !VA   This is where we write the Appobj properties somehow. But no - because the values aren't written to the input elements yet. Where is that done? In toggleImgType, then handleCcpActions. What's happening is that handleCcpActions gets the values from the Attributes, where the values are defined. That's ass-backwards. The values should be defined in Appobj and then written to the Attributes. So let's try that. 
-    */ 
-
-      // !VA Now initialize Appobj with the CCP element values. This includes ALL CCP elements, including those that are displayed/undisplayed depending on which TDOption or imgType radio is selected. 
-      // !VA Don't forget to use bracket notation to add properties to an object: https://stackoverflow.com/questions/1184123/is-it-possible-to-add-dynamically-named-properties-to-javascript-object
-      // !VA  for loop: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
-
-      let val;
-      function chkmrkToChkbox(val) {
-        val = val.replace('mrk', 'box');
-        val = val.replace('spn', 'chk');
-        return val;
-      }
-      // !VA Loop through all the ccpUserInput properties. If the property is NOT a span (i.e. a mock checkbox) add an Appobj property that corresponds to the key of the respective ccpUserInput property. Otherwise, convert the span ID to the input ID, then add the Appobj property that corresponds to the key of the respective ID.
-      // !VA For instance, if the ccpUserInput value starts with '#ipt', create an Appobject property whose key is 'iptCCP...' and assign it the value of the CCP element with the corresponding ccpUserInput alias.
-      for (const [key, value] of Object.entries(ccpUserInput)) {
-        if (value.substring( 0, 4) === '#ipt' || value.substring( 0, 4) === '#sel' ) {
-          Appobj[key] = document.querySelector(value).value;
-        }
-        if (value.substring( 0, 4) === '#rdo' ) {
-          Appobj[key] = document.querySelector(value).checked;
-        }
-        if (value.substring( 0, 4) === '#spn' ) {
-          val = chkmrkToChkbox(value);
-          Appobj[key] = document.querySelector(val).value;
-        }
-      }
-
-
-
-
-
-
-
-
-
-      // showTdOptions();
-
-      // !VA Initialize the fixed/fluid imgType buttons - call getAttributes and populate the CCP elements with values based on whether fixed or fluid is selected.
-      // toggleImgType();
-      // !VA Initialize the Include wrapper checkboxes. Pass in false for the evt argument for initialization so that the function skips over the button click condition and just executes the display/undisplay functionality.
-      // toggleIncludeWrapper('init');
-      // !VA Initialize the tdoptions radio group to 'basic' if the 'fluid' imgType is selected
-      // !VA NOTE: This would be better as a loop
-      // if (document.querySelector(ccpUserInput.rdoCcpImgFluid).checked === true) {
-      //   document.querySelector(ccpUserInput.rdoCcpTdBasic).checked = true;
-      //   document.querySelector(ccpUserInput.rdoCcpTdExcludeimg).disabled = true;
-      // } 
-      // !VA IMPORTANT: Isn't this done somewhere else too? The app initializes with the CCP closed, so toggle it on and off here.
-      document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
-      // !VA IMPORTANT: Determine if this initGetAttribute call is necessary since updateCcp is deprecated
-      // CBController.initGetAttributes();
-    }
 
     function toggleIncludeAnchor(evt) {
       console.log('toggleIncludeAnchor running: ');
