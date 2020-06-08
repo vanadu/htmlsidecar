@@ -552,11 +552,17 @@ var Witty = (function () {
           imgViewer = document.querySelector(dynamicRegions.imgViewer);
           // !VA Get the computed width and height of imgViewer
           cStyles = window.getComputedStyle(imgViewer);
+
+          // !VA Branch: implementAppobj03 (060820)
+          // !VA Get the computed width in case there is no value from localStorage. In that case, the value is coming from the CSS file. 
           Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
+          console.log('Appobj.viewerW is: ' + Appobj.viewerW);
+
           // !VA Branch: implementAppobj01 (060420)
           // Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
     
           Appobj.viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
+
           // !VA Get the dimensions of curImg
           Appobj.imgW = curImg.width;
           Appobj.imgH = curImg.height;
@@ -3068,27 +3074,31 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA At this point, curImg is loaded but the viewer is still the default size and needs to be calculated here. Appdata gets the current dynamic region values. So let's put a function to add those values here. Appobj has to be populated here, not in a private external function because calcViewerSize doesn't run until the setTimeOut callback is run and the image is loaded in handleFileSelect. If populateAppobj were a public function, it would be querying a DOM element that doesn't yet exists and would fail. 
 
 
-      // !VA Branch: implementAppobj02 (060620)
-      // !VA Populate just the dynamic regions of Appobj
-      UIController.populateAppobj(Appobj, 'app');
-
-
+      
+      
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
       // !VA  Get the actual viewerW and viewerH CSS values from getComputedStyle
       // !VA Branch: implementAppobj01 (060420)
       // !VA To what extent is this a copy of what's been done in populateAppobj? For now, we're just going to leave everything as is and just use Appobj where Appdata previously was used.
       compStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
-
+      
       // !VA Set the viewerW value based on localStorage  If the user has set this value in the toolbar before, then queried from localStorage. That value persists between sessions. If this is the initial use of the app, then viewerW is queried from the CSS value. 
       curLocalStorage = appController.getLocalStorage();
       if (curLocalStorage[0]) {
         // !VA Set imgViewer and viewerW to the localStorage value
         viewerW = curLocalStorage[0];
+        
         document.querySelector(dynamicRegions.imgViewer).style.width = curLocalStorage[0] + 'px';
       } else {
         // !VA If no localStorage is set, use the CSS value.
         viewerW = parseInt(compStyles.getPropertyValue('width'), 10);
       }
+      
+      // !VA Branch: implementAppobj03 (060620)
+      // !VA Populate just the dynamic regions of Appobj. This is done after viewerW is retrieved from localStorage, otherwise Appobj.viewerW will be the computed CSS value for the element as set in CSS, i.e. 650. 
+      UIController.populateAppobj(Appobj, 'app');
+
+
       // !VA In either case, use the CSS value for height, unless the height of the loaded image is greater than the CSS value.
       viewerH = parseInt(compStyles.getPropertyValue('height'), 10);
       // !VA If initializing a new image, use the naturalWidth and naturalHeight. If updating via user input, use the display image and height, imgW and imgH. If initializing, then Appobj.imgW and Appobj.imgH will be 0 or falsy because it hasn't been resized yet. So the _actual_ image width and height will be different for initializing and updating.
@@ -3135,12 +3145,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA TODO: Check this out, doesn't seem to be a problem anymore: BUG Problem with the 800X550, 800X600 -- no top/bottom gutter on viewport
         break;
       }
+
+      console.log('viewerW is: ' + viewerW);
+      console.log('viewerH is: ' + viewerH);
+
       // !VA Transfer control to UIController to print Inspector to the UI
-      resizeContainers(viewerH );
+      resizeContainers(viewerW, viewerH );
     }
 
     // !VA appController private
-    function resizeContainers( viewerH )  {
+    function resizeContainers( viewerW, viewerH )  {
       // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values which are passed in from resizeContainers.
       // !VA Initial height is 450, as it is defined in the CSS. TOo much hassle to try and get the value as defined in the CSS programmatically.
       // !VA TODO: Review this - it has very little purpose except DOM access which should be done in UIController. 
