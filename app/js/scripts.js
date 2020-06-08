@@ -522,6 +522,16 @@ var Witty = (function () {
         UIController.initCcp();
       },
 
+      writeDOMElementValues: function (...args) {
+        console.log('args is: ');
+        console.log(args);
+        for (let i = 0; i < args.length; i++) {
+          document.querySelector(args[i][0]).value = args[i][1];
+          console.log('args[i] is: ' +  args[i]);
+        }
+
+      },
+
       populateAppobj: function (Appobj, access) {
         // !VA IIFE for populating 
         // let Appobj = {};
@@ -586,12 +596,7 @@ var Witty = (function () {
               Appobj[key] = document.querySelector(val).value;
             }
           }
-
-          // !VA 
-
-
         }
-
 
         if ( access === 'app') {
           // !VA Branch: implementAppobj02 (060620)
@@ -3131,48 +3136,53 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         break;
       }
       // !VA Transfer control to UIController to print Inspector to the UI
-      resizeContainers(viewerH, Appobj.imgW, Appobj.imgH );
+      resizeContainers(viewerH );
     }
 
     // !VA appController private
-    function resizeContainers( viewerH, imgW, imgH)  {
-      // !VA TODO: Review this - it has very little purpose except DOM access which should be done in UIController.
+    function resizeContainers( viewerH )  {
       // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values which are passed in from resizeContainers.
       // !VA Initial height is 450, as it is defined in the CSS. TOo much hassle to try and get the value as defined in the CSS programmatically.
+      // !VA TODO: Review this - it has very little purpose except DOM access which should be done in UIController. 
+      // !VA Branch: implementAppobj02 (060620) - This has dynamicRegion values that are not written back to Appobj after recalculation, this may be a problem at some point.
       const initViewerH = 450;
       let viewportH;
       let appH; 
 
       // !VA The viewport is 145px taller than the imgViewer. 
-      if (imgH <= initViewerH) {
+      if (Appobj.imgH <= initViewerH) {
         viewerH = initViewerH;
         viewportH = viewerH + 145;
       } else {
         // Need a little buffer in the viewport
-        viewerH = imgH;
-        viewportH = imgH + 145;
+        viewerH = Appobj.imgH;
+        viewportH = Appobj.imgH + 145;
       } 
       appH = viewportH;
-      // !VA TODO: Make function
-      document.querySelector(dynamicRegions.curImg).style.width = imgW + 'px';
-      document.querySelector(dynamicRegions.curImg).style.height =imgH + 'px';
+
+      // !VA TODO: Make function - writeDOMElements won't work because the element aliases for the dynamicRegion values aren't specific enough and there's no point in adding them to Appobj because they're only accessed in one place, i.e. here. 
+      document.querySelector(dynamicRegions.curImg).style.width = Appobj.imgW + 'px';
+      document.querySelector(dynamicRegions.curImg).style.height = Appobj.imgH + 'px';
       document.querySelector(dynamicRegions.imgViewer).style.height = viewerH + 'px';
       document.querySelector(dynamicRegions.imgViewport).style.height = viewportH + 'px';
       document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';
       // !VA Now that the image and its containers are written to the DOM, go ahead and write the Inspectors.
+
       // !VA Branch: implementAppobj02 (060620)
-      // !VA And write CCP property values to Appobj...
-      /* !VA  
-      table width = 
-      
-      
-      
-      */
+      // !VA Now update the CCP UI with the most recent changes to dynamicRegion values, then populateAppobj with CCP values last. Elements to update are: tableWidth and tableWrapperWidth.
+      var tableWidth = [];
+      var tableWrapperWidth = [];
+      tableWidth = [ccpUserInput.iptCcpTableWidth, Appobj.imgW ];
+      tableWrapperWidth = [ccpUserInput.iptCcpTableWrapperWidth, Appobj.viewerW];
+      // !VA writeElementValue takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the element alias as key and the Appobj value as value.
+      UICtrl.writeDOMElementValues(tableWidth, tableWrapperWidth);
+      // !VA Now that the tableWidth and tableWrapperWidth contain the default values, write all the CCP values to Appobj
+      UIController.populateAppobj(Appobj, 'ccp');
+
+      // !VA Write the inspectors based on Appobj values
+      UICtrl.writeInspectors(Appobj);
       console.log('resizeContainers Appobj: ');
       console.dir(Appobj);
-      // !VA Branch: implementAppobj02 (060620)
-      // !VA Now update the CCP UI with the most recent changes to dynamicRegion values, then populateAppobj with CCP values last. You could actually integrate the CCP DOM write into writeInspectors, since the two are actually part of the same operation - the final DOM access operation before WAIT FOR INPUT state.
-      UICtrl.writeInspectors(Appobj);
     }
 
     // !VA appController private
