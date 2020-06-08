@@ -351,7 +351,7 @@ var Witty = (function () {
       UIController.writeInspectorAlerts(flaggedInspectors);
     }
 
-
+    // !VA UIController private
     function showAppMessages(appMessContainerId, tooltipTarget) {
       // !VA Show the current appMessage. If the current appMessage is a tooltip, then show the help cursor while the mouse is in the tooltip element.
       document.querySelector(appMessContainerId).classList.add('active');
@@ -360,12 +360,14 @@ var Witty = (function () {
       } 
     }
 
+    // !VA UIController private
     function hideAppMessages(appMessContainerId, tooltipTarget) {
       // !VA Hide current app message
       document.querySelector(staticRegions.appBlocker).classList.remove('active');
       document.querySelector(appMessContainerId).classList.remove('active');
     }
 
+    // !VA UIController private
     // !VA Calc the apsect ratio - putting this here for now until it's decided where it needs to live. It's currently needed in appController for Appdata but can live in UIController private once Appdata is deprecated.
     function getAspectRatio (var1, var2) {
       var aspectReal = (var1 / var2);
@@ -453,6 +455,13 @@ var Witty = (function () {
             var fname = document.querySelector(dynamicRegions.curImg).src;
             fname = fname.split('/');
             fname = fname[fname.length - 1];
+            // !VA Branch: implementAppobj02 (060420)
+            // !VA Call Appobj and add filename to it here for dev mode
+            var Appobj = appController.getAppobj();
+            document.querySelector(inspectorElements.insFilename).textContent = Appobj.fileName = fname;
+
+
+
             // !VA Write the insFilename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
             document.querySelector(inspectorElements.insFilename).textContent = fname;
             // !VA Initialze calcViewerSize to size the image to the app container areas
@@ -466,6 +475,7 @@ var Witty = (function () {
             // appController.initToggleImgType();
             // appController.initToggleIncludeWrapper();
             // appController.initShowTdOptions();
+
 
 
             // updateCcp(Attributes);
@@ -519,80 +529,94 @@ var Witty = (function () {
         // !VA Get the values for the dynamicRegions
         // !VA Get the curImg and imgViewer
         // !VA Branch: implementAppobj02 (060620)
-
-
         console.log('access is: ' + access);
-
-        curImg = document.querySelector(dynamicRegions.curImg);
-        imgViewer = document.querySelector(dynamicRegions.imgViewer);
-        // !VA Get the computed width and height of imgViewer
-        cStyles = window.getComputedStyle(imgViewer);
-        Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
-        // !VA Branch: implementAppobj01 (060420)
-        // Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
-  
-        Appobj.viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
-        // !VA Get the dimensions of curImg
-        Appobj.imgW = curImg.width;
-        Appobj.imgH = curImg.height;
-        Appobj.imgNW = curImg.naturalWidth;
-        Appobj.imgNH = curImg.naturalHeight;
-        
-        // !VA Get the data properties for iptTbrSmallPhonesW and sPhonesH
-        // !VA NOTE: This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
-        Appobj.sPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).getAttribute('data-sphonesw'), 10);
-        Appobj.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
-        Appobj.iptTbrSPhonesWidth ? Appobj.iptTbrSPhonesWidth : Appobj.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
-        Appobj.iptTbrLPhonesWidth ? Appobj.iptTbrLPhonesWidth : Appobj.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
-        // !VA Now compute the rest of Appobj
-        Appobj.aspect = getAspectRatio(Appobj.imgNW,  Appobj.imgNH);
-        Appobj.sPhonesH = Math.round(Appobj.sPhonesW * (1 / Appobj.aspect[0]));
-        Appobj.lPhonesH = Math.round(Appobj.lPhonesW * (1 / Appobj.aspect[0]));
-
-        // !VA Now initialize Appobj with the CCP element values. This includes ALL CCP elements, including those that are displayed/undisplayed depending on which TDOption or imgType radio is selected. 
-        // !VA Don't forget to use bracket notation to add properties to an object: https://stackoverflow.com/questions/1184123/is-it-possible-to-add-dynamically-named-properties-to-javascript-object
-        // !VA  for loop: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
-
-        let val;
+        // !VA TODO: Move to external if appropriate
         function chkmrkToChkbox(val) {
           val = val.replace('mrk', 'box');
           val = val.replace('spn', 'chk');
           return val;
         }
-        // !VA Loop through all the ccpUserInput properties. If the property is NOT a span (i.e. a mock checkbox) add an Appobj property that corresponds to the key of the respective ccpUserInput property. Otherwise, convert the span ID to the input ID, then add the Appobj property that corresponds to the key of the respective ID.
-        // !VA For instance, if the ccpUserInput value starts with '#ipt', create an Appobject property whose key is 'iptCCP...' and assign it the value of the CCP element with the corresponding ccpUserInput alias.
-        for (const [key, value] of Object.entries(ccpUserInput)) {
-          if (value.substring( 0, 4) === '#ipt' || value.substring( 0, 4) === '#sel' ) {
-            Appobj[key] = document.querySelector(value).value;
+        function populateAppProperties(Appobj) {
+
+          curImg = document.querySelector(dynamicRegions.curImg);
+          imgViewer = document.querySelector(dynamicRegions.imgViewer);
+          // !VA Get the computed width and height of imgViewer
+          cStyles = window.getComputedStyle(imgViewer);
+          Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
+          // !VA Branch: implementAppobj01 (060420)
+          // Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
+    
+          Appobj.viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
+          // !VA Get the dimensions of curImg
+          Appobj.imgW = curImg.width;
+          Appobj.imgH = curImg.height;
+          Appobj.imgNW = curImg.naturalWidth;
+          Appobj.imgNH = curImg.naturalHeight;
+          
+          // !VA Get the data properties for iptTbrSmallPhonesW and sPhonesH
+          // !VA NOTE: This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
+          Appobj.sPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).getAttribute('data-sphonesw'), 10);
+          Appobj.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
+          Appobj.iptTbrSPhonesWidth ? Appobj.iptTbrSPhonesWidth : Appobj.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
+          Appobj.iptTbrLPhonesWidth ? Appobj.iptTbrLPhonesWidth : Appobj.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
+          // !VA Now compute the rest of Appobj
+          Appobj.aspect = getAspectRatio(Appobj.imgNW,  Appobj.imgNH);
+          console.log('Appobj.aspect is: ' + Appobj.aspect);
+          Appobj.sPhonesH = Math.round(Appobj.sPhonesW * (1 / Appobj.aspect[0]));
+          Appobj.lPhonesH = Math.round(Appobj.lPhonesW * (1 / Appobj.aspect[0]));
+
+        }
+        function populateCcpProperties(Appobj) {
+          // !VA Update CCP properties
+          // !VA Now initialize Appobj with the CCP element values. This includes ALL CCP elements, including those that are displayed/undisplayed depending on which TDOption or imgType radio is selected. 
+          // !VA Don't forget to use bracket notation to add properties to an object: https://stackoverflow.com/questions/1184123/is-it-possible-to-add-dynamically-named-properties-to-javascript-object
+          // !VA  for loop: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
+          let val;
+          // !VA Loop through all the ccpUserInput properties. If the property is NOT a span (i.e. a mock checkbox) add an Appobj property that corresponds to the key of the respective ccpUserInput property. Otherwise, convert the span ID to the input ID, then add the Appobj property that corresponds to the key of the respective ID.
+          // !VA For instance, if the ccpUserInput value starts with '#ipt', create an Appobject property whose key is 'iptCCP...' and assign it the value of the CCP element with the corresponding ccpUserInput alias.
+          for (const [key, value] of Object.entries(ccpUserInput)) {
+            if (value.substring( 0, 4) === '#ipt' || value.substring( 0, 4) === '#sel' ) {
+              Appobj[key] = document.querySelector(value).value;
+            }
+            if (value.substring( 0, 4) === '#rdo' ) {
+              Appobj[key] = document.querySelector(value).checked;
+            }
+            if (value.substring( 0, 4) === '#spn' ) {
+              val = chkmrkToChkbox(value);
+              Appobj[key] = document.querySelector(val).value;
+            }
           }
-          if (value.substring( 0, 4) === '#rdo' ) {
-            Appobj[key] = document.querySelector(value).checked;
-          }
-          if (value.substring( 0, 4) === '#spn' ) {
-            val = chkmrkToChkbox(value);
-            Appobj[key] = document.querySelector(val).value;
-          }
+
+          // !VA 
+
+
+        }
+
+
+        if ( access === 'app') {
+          // !VA Branch: implementAppobj02 (060620)
+          // !VA Write dynamic region values 
+          populateAppProperties(Appobj);
+          
+        } else if ( access === 'ccp') {
+          populateCcpProperties(Appobj);
+        } else if ( access === 'all' ) {
+          populateAppProperties(Appobj);
+          populateCcpProperties(Appobj);
+        } else {
+          console.log('Error in populateAppobj: unknown argument - access');
         }
         return Appobj;
       },
 
-
-  
       // !VA UIController public 
       initCcp: function() {
-        console.clear();
-        let Appobj;
-        // let Appobj = {};
-        Appobj = appController.getAppobj();
-        console.log('initCCP - Appobj: ');
-        console.dir(Appobj);
         // !VA Branch: implementAppobj02 (060620)
+        // !VA NOTE: All this does now is toggle the CCP on and off.
+
         /* !VA   This is where we write the Appobj properties somehow. But no - because the values aren't written to the input elements yet. Where is that done? In toggleImgType, then handleCcpActions. What's happening is that handleCcpActions gets the values from the Attributes, where the values are defined. That's ass-backwards. The values should be defined in Appobj and then written to the Attributes. So let's try that. 
       */ 
-
-      
         // showTdOptions();
-
         // !VA Initialize the fixed/fluid imgType buttons - call getAttributes and populate the CCP elements with values based on whether fixed or fluid is selected.
         // toggleImgType();
         // !VA Initialize the Include wrapper checkboxes. Pass in false for the evt argument for initialization so that the function skips over the button click condition and just executes the display/undisplay functionality.
@@ -608,7 +632,6 @@ var Witty = (function () {
         // !VA IMPORTANT: Determine if this initGetAttribute call is necessary since updateCcp is deprecated
         // CBController.initGetAttributes();
       },
-
 
       // !VA UIController public
       queryDOMElements: function() {
@@ -2171,8 +2194,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // function Appobj( fileName, imgW, imgH, imgNW, imgNH, viewerW, viewerH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, aspect, iptCcpImgClass, iptCcpImgAlt, rdoCcpImgFixed, rdoCcpImgFluid, selCcpImgAlign, iptCcpImgRelPath, spnCcpImgIncludeAnchorCheckmrk, iptCcpTdClass, selCcpTdAlign, selCcpTdValign, iptCcpTdHeight, iptCcpTdWidth, iptCcpTdBgColor, iptCcpTdFontColor, iptCcpTdBorderColor, iptCcpTdBorderRadius, rdoCcpTdBasic, rdoCcpTdExcludeimg, rdoCcpTdImgswap, rdoCcpTdPosswitch, rdoCcpTdBgimage, iptCcpTableClass, selCcpTableAlign, iptCcpTableWidth, iptCcpTableBgColor, spnCcpTableIncludeWrapperCheckmrk, iptCcpTableWrapperClass, iptCcpTableWrapperWidth, selCcpTableWrapperAlign, iptCcpTableWrapperBgColor ) {
     //   return { fileName, imgW, imgH, imgNW, imgNH, viewerW, viewerH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, aspect, iptCcpImgClass, iptCcpImgAlt, rdoCcpImgFixed, rdoCcpImgFluid, selCcpImgAlign, iptCcpImgRelPath, spnCcpImgIncludeAnchorCheckmrk, iptCcpTdClass, selCcpTdAlign, selCcpTdValign, iptCcpTdHeight, iptCcpTdWidth, iptCcpTdBgColor, iptCcpTdFontColor, iptCcpTdBorderColor, iptCcpTdBorderRadius, rdoCcpTdBasic, rdoCcpTdExcludeimg, rdoCcpTdImgswap, rdoCcpTdPosswitch, rdoCcpTdBgimage, iptCcpTableClass, selCcpTableAlign, iptCcpTableWidth, iptCcpTableBgColor, spnCcpTableIncludeWrapperCheckmrk, iptCcpTableWrapperClass, iptCcpTableWrapperWidth, selCcpTableWrapperAlign, iptCcpTableWrapperBgColor };
     // }
-    let Appobj = {};
 
+    let Appobj = {};
+    // console.log('init Appobj: ');
+    // console.dir(Appobj);
     // !VA Getting DOM ID strings from UIController
     const inspectorElements = UICtrl.getInspectorElementIDs();
     const inspectorValues = UICtrl.getInspectorValuesIDs();
@@ -2552,7 +2577,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           // !VA Write the insFilename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
           // !VA Branch: implementAppobj01 (060420)
           document.querySelector(inspectorElements.insFilename).textContent = Appobj.fileName = fileName;
-          // console.log('handleFileSelect Appobj.fileName is: ' + Appobj.fileName);
+          console.log('handleFileSelect Appobj.fileName is: ' + Appobj.fileName);
+
 
           // !VA Hide the dropArea - not sure if this is the right place for this.
           // !VA TODO: Make function
@@ -3035,13 +3061,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       let curLocalStorage;
       // !VA Branch: implementAppobj01 (060420)\
       // !VA At this point, curImg is loaded but the viewer is still the default size and needs to be calculated here. Appdata gets the current dynamic region values. So let's put a function to add those values here. Appobj has to be populated here, not in a private external function because calcViewerSize doesn't run until the setTimeOut callback is run and the image is loaded in handleFileSelect. If populateAppobj were a public function, it would be querying a DOM element that doesn't yet exists and would fail. 
-      // !VA TODO: Appobj still doesn't have all the CCP elements so it's a temporary solution. I don't understand why queryDOMElements can work as a standalone function but populateAppobj doesn't. Maybe if I put it in a private function with a callback...for later.
 
 
-      let Appobj = {};
-      Appobj = UIController.populateAppobj(Appobj, 'all');
-      console.log('calcViewerSize Appobj is: ');
-      console.log(Appobj);
+      // !VA Branch: implementAppobj02 (060620)
+      // !VA Populate just the dynamic regions of Appobj
+      UIController.populateAppobj(Appobj, 'app');
+
 
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
       // !VA  Get the actual viewerW and viewerH CSS values from getComputedStyle
@@ -3110,7 +3135,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController private
-    function resizeContainers(viewerH, imgW, imgH)  {
+    function resizeContainers( viewerH, imgW, imgH)  {
+      // !VA TODO: Review this - it has very little purpose except DOM access which should be done in UIController.
       // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values which are passed in from resizeContainers.
       // !VA Initial height is 450, as it is defined in the CSS. TOo much hassle to try and get the value as defined in the CSS programmatically.
       const initViewerH = 450;
@@ -3134,6 +3160,18 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       document.querySelector(dynamicRegions.imgViewport).style.height = viewportH + 'px';
       document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';
       // !VA Now that the image and its containers are written to the DOM, go ahead and write the Inspectors.
+      // !VA Branch: implementAppobj02 (060620)
+      // !VA And write CCP property values to Appobj...
+      /* !VA  
+      table width = 
+      
+      
+      
+      */
+      console.log('resizeContainers Appobj: ');
+      console.dir(Appobj);
+      // !VA Branch: implementAppobj02 (060620)
+      // !VA Now update the CCP UI with the most recent changes to dynamicRegion values, then populateAppobj with CCP values last. You could actually integrate the CCP DOM write into writeInspectors, since the two are actually part of the same operation - the final DOM access operation before WAIT FOR INPUT state.
       UICtrl.writeInspectors(Appobj);
     }
 
