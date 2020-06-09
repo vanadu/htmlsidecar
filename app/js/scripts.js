@@ -689,6 +689,11 @@ var Witty = (function () {
       },
 
 
+
+
+
+
+
       // !VA Catch-all function for displaying/undisplaying, disabling/enabling and adding/removing classes to CCP elements. action is the action to execute, elemArray is the array of elements the action is to apply to and state is the toggle state whereby true turns the action on and false turns it off.
       handleCcpActions: function (action, elemArray, option ) {
         // console.clear();
@@ -722,7 +727,7 @@ var Witty = (function () {
           }
         }
 
-        // !VA Loop through and apply values to elements. The option paremeter contains and array of values or false, in which case an empty string is appled to every element.
+        // !VA Loop through and apply values to elements. The option parameter contains an array of values or false, in which case an empty string is appled to every element.
         function setValue(elemArray, option) {
           for (let i = 0; i < elemArray.length; i++) {
             if (option) {
@@ -773,6 +778,12 @@ var Witty = (function () {
           }
         }
 
+        function selectRadioButton(elemArray, option) {
+          for (let i = 0; i < elemArray.length; i++) {
+            document.querySelector(elemArray).checked = option;
+          }
+        }
+
         switch(true) {
         // !VA In showTdOptions: Active class must be applied to the parent div of the target in order to display/undisplay the container including input and label. 
         case action === 'setactiveparent':
@@ -790,6 +801,10 @@ var Witty = (function () {
         case action === 'setvalue':
           // console.log('setvalue');
           setValue(elemArray, option);
+          break;
+        case action === 'selectradiobutton':
+          // console.log('setvalue');
+          selectRadioButton(elemArray, option)
           break;
         default:
           console.log('handleCcpActions: no action defined');
@@ -2478,7 +2493,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA Catch-all event listener for all ccpUserInput elements.
         selectedImgType = document.querySelector(ccpUserInput[i]);
         // !VA Add an event handler to trap clicks to the tdoptions radio button
-        addEventHandler(selectedImgType,'click',handleCcpInput,false);
+        addEventHandler(selectedImgType,'click',handleCcpUserInput,false);
 
       }
 
@@ -3145,12 +3160,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA TODO: Check this out, doesn't seem to be a problem anymore: BUG Problem with the 800X550, 800X600 -- no top/bottom gutter on viewport
         break;
       }
-
       console.log('viewerW is: ' + viewerW);
       console.log('viewerH is: ' + viewerH);
-
       // !VA Transfer control to UIController to print Inspector to the UI
       resizeContainers(viewerW, viewerH );
+
     }
 
     // !VA appController private
@@ -3200,10 +3214,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController private
-    // !VA Identify the click and assign it an action
-    function handleCcpInput(evt) {
-      let Appobj = appController.getAppobj();
+    // !VA Branch: implementAppobj03 (060820)
+    // !VA Handle CCP User Input
+    function handleCcpUserInput(evt) {
       console.clear();
+      let Appobj = appController.getAppobj();
+      let imgType;
       console.log('handleCcpInput running');
       console.log('evt.target.id is: ' + evt.target.id);
       let alias;
@@ -3212,28 +3228,117 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       switch(true) {
       case alias === ccpUserInput.rdoCcpImgFixed:
         Appobj.rdoCcpImgFixed = true, Appobj.rdoCcpImgFluid = false;
+        imgType = 'fixed';
+        handleImgType(imgType);
         console.log('fixed clicked');
         break;
       case alias === ccpUserInput.rdoCcpImgFluid:
+        imgType = 'fluid';
         Appobj.rdoCcpImgFixed = false, Appobj.rdoCcpImgFluid = true;
+        handleImgType(imgType);
         console.log('fluid clicked');
+        break;
+      case alias.includes('rdo-ccp-td') :
+        console.log('TDOptions alias is: ' + alias);
+        handleTdOptions(alias);
         break;
       default:
         // code block
       } 
-
-
-
-
-
       console.log('Appobj is: ');
       console.dir(Appobj);
-
-
-      
     }
 
+    function handleTdOptions(alias) {
+      console.log('handleTdOptions running');
+      console.log('alias is: ' + alias);
+      // !VA Loop through all Appobj entries whose first 8 chars is rdoCcpTd, i.e. all the tdOption entries.
+      for (const [key, value] of Object.entries(Appobj)) {
+        if (key.substring( 0, 8) === 'rdoCcpTd') {
+          // !VA If the Appobj key string === the element alias of the click target, then set that Appobj property to true, otherwise set it to false. This mimics the behavior of a single-select radion button group.
+          ccpUserInput[key] === alias ? Appobj[key] = true : Appobj[key] = false;
+        }
+      }
+    }
 
+    function handleImgType(imgType) {
+      console.log('handleImgType running');
+      // !VA NOTE
+      let disable;
+
+      // !VA If the 'fixed' img option is selected
+      if (imgType === 'fixed') {
+        // !VA Set the disable flag for the handleCcpActions call
+        disable = false;
+        // !VA Set the default values for tableWidth, tableClass, tableWrapperWidth and tableWrapperClass. These are user-editable.
+        Appobj.iptCcpTableWidth = Appobj.imgW;
+        Appobj.iptCcpTableClass = '';
+        Appobj.iptCcpTableWrapperWidth = Appobj.viewerW;
+        Appobj.iptCcpTableWrapperClass = 'devicewidth';
+
+        // !VA TODO Integrate into handleCcpActions - doesn't work
+        document.querySelector('#ccp-table-include-wrapper').classList.remove('disable-checkbox');
+        document.querySelector('#ccp-table-include-wrapper-label').classList.remove('disabled');
+
+
+      } else if (imgType === 'fluid') {
+        // !VA Set the disable flag for the handleCcpActions call
+        disable = true;
+        // !VA Appboj properties - these will be batch-appied to both UI and Attributes based on the Appobj property. They are disabled and non-editable by the user and are based on CSS definitions in the template.
+        Appobj.iptCcpTableWidth = '100%';
+        Appobj.iptCcpTableWrapperWidth = '100%';
+        Appobj.iptCcpTableClass = 'devicewidth';
+        Appobj.iptCcpTableWrapperClass = 'devicewidth';
+
+        Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
+
+        // !VA TODO Integrate into handleCcpActions - doesn't work
+        document.querySelector('#ccp-table-include-wrapper').classList.add('disable-checkbox');
+        document.querySelector('#ccp-table-include-wrapper-label').classList.add('disabled');
+
+
+      } else {
+        console.log('ERROR in handleImgType - unknown imgType');
+      }
+
+      // !VA Preselect the option 'basic' for the tdoptions radio group. The other td options won't work with or aren't applicable for fluid because fluid is only for images. 
+      Appobj.rdoCcpTdBasic = true;
+      // !VA Set all the other TD Option radio buttons to false
+      Appobj.rdoCcpTdExcludeimg = Appobj.rdoCcpTdPosswitch = Appobj.rdoCcpTdImgswap = Appobj.rdoCcpTdBgimage = Appobj.rdoCcpTdVmlbutton = false;
+      // !VA DOM Access via UIController.handleCcpActions
+
+      // !VA Branch: implementAppobj03 (060820)
+      // !VA ALL THIS SHOULD BE BATCH-RUN to display Ccp elements based on Appobj properties:
+      /* !VA  
+      
+      for (const [key, value] of Object.entries(Appobj)) {
+        if (key.substring( 0, 8) === 'rdoCcpTd') {
+
+        }
+      }
+
+      
+      
+      
+      
+      */
+
+
+
+
+
+      // !VA Select the 'basic' Ccp radio button element
+      const selectedTdOption = [ ccpUserInput.rdoCcpTdBasic ];
+      UIController.handleCcpActions( 'selectradiobutton', selectedTdOption, true);
+      // !VA Disable/Enable CCP Input Elements
+      const inputElementsToDisable = [ ccpUserInput.iptCcpTableClass, ccpUserInput.iptCcpTableWidth,ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth ];
+      UIController.handleCcpActions( 'setdisabledtextinput', inputElementsToDisable, disable);
+      // !VA Disable/Enable CCP Radio Select Elements
+      const radioElementsDisable = [ ccpUserInput.rdoCcpTdExcludeimg, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdBgimage, ccpUserInput.rdoCcpTdPosswitch, ccpUserInput.rdoCcpTdVmlbutton ];
+      UIController.handleCcpActions( 'setdisabledradio', radioElementsDisable, disable);
+      toggleIncludeWrapper(true); 
+
+    }
 
     function toggleIncludeAnchor(evt) {
       console.log('toggleIncludeAnchor running: ');
