@@ -523,11 +523,11 @@ var Witty = (function () {
       },
 
       writeDOMElementValues: function (...args) {
-        console.log('args is: ');
-        console.log(args);
+        // console.log('args is: ');
+        // console.log(args);
         for (let i = 0; i < args.length; i++) {
           document.querySelector(args[i][0]).value = args[i][1];
-          console.log('args[i] is: ' +  args[i]);
+          // console.log('args[i] is: ' +  args[i]);
         }
 
       },
@@ -539,7 +539,7 @@ var Witty = (function () {
         // !VA Get the values for the dynamicRegions
         // !VA Get the curImg and imgViewer
         // !VA Branch: implementAppobj02 (060620)
-        console.log('access is: ' + access);
+        // console.log('access is: ' + access);
         // !VA TODO: Move to external if appropriate
         function chkmrkToChkbox(val) {
           val = val.replace('mrk', 'box');
@@ -556,7 +556,7 @@ var Witty = (function () {
           // !VA Branch: implementAppobj03 (060820)
           // !VA Get the computed width in case there is no value from localStorage. In that case, the value is coming from the CSS file. 
           Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
-          console.log('Appobj.viewerW is: ' + Appobj.viewerW);
+          // console.log('Appobj.viewerW is: ' + Appobj.viewerW);
 
           // !VA Branch: implementAppobj01 (060420)
           // Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
@@ -577,7 +577,6 @@ var Witty = (function () {
           Appobj.iptTbrLPhonesWidth ? Appobj.iptTbrLPhonesWidth : Appobj.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
           // !VA Now compute the rest of Appobj
           Appobj.aspect = getAspectRatio(Appobj.imgNW,  Appobj.imgNH);
-          console.log('Appobj.aspect is: ' + Appobj.aspect);
           Appobj.sPhonesH = Math.round(Appobj.sPhonesW * (1 / Appobj.aspect[0]));
           Appobj.lPhonesH = Math.round(Appobj.lPhonesW * (1 / Appobj.aspect[0]));
 
@@ -2449,13 +2448,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         addEventHandler(inspectorHoverables[i],'mouseenter',CBController.enteredMe,false);
       }
 
+      // !VA Branch: implementAppobj03 (060820)
+      // !VA Disabling this for now
       // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. These are the class input elements for ccp Img, Td and Table options
-      const ccpKeypresses = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass ];
-      for (let i = 0; i < ccpKeypresses.length; i++) {
-        // !VA convert the ID string to the object inside the loop
-        ccpKeypresses[i] = document.querySelector(ccpKeypresses[i]);
-        addEventHandler((ccpKeypresses[i]),'input',showElementOnInput,false);
-      }
+      // const ccpKeypresses = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass ];
+      // for (let i = 0; i < ccpKeypresses.length; i++) {
+      //   // !VA convert the ID string to the object inside the loop
+      //   ccpKeypresses[i] = document.querySelector(ccpKeypresses[i]);
+      //   addEventHandler((ccpKeypresses[i]),'input',showElementOnInput,false);
+      // }
 
       // !VA Add click handlers for Inspector - there's only the clipboard button now but there could be more. 
       var dvClickables = [ inspectorElements.btnToggleCcp ];
@@ -2487,15 +2488,30 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
       
 
-
+      // !VA Add event handlers for input toolbarElements
+      let ccpKeypresses;
       for(let i in ccpUserInput) {
-        let selectedImgType;
-        // !VA Catch-all event listener for all ccpUserInput elements.
-        selectedImgType = document.querySelector(ccpUserInput[i]);
-        // !VA Add an event handler to trap clicks to the tdoptions radio button
-        addEventHandler(selectedImgType,'click',handleCcpUserInput,false);
+        if (ccpUserInput[i].substring(0,4) === '#ipt') {
 
+          ccpKeypresses = document.querySelector(ccpUserInput[i]);
+          addEventHandler(ccpKeypresses,'keydown',handleKeydown,false);
+          addEventHandler(ccpKeypresses,'keyup',handleKeyup,false);
+          addEventHandler(ccpKeypresses,'focus',handleFocus,false);
+          addEventHandler(ccpKeypresses,'blur',handleBlur,false);
+
+        }
       }
+
+
+      // !VA Branch: implementAppobj03 (060820) This was the catch-all event handler prior to this branch but it doesn't work because it doesn't trap keyboard input. 
+      // for(let i in ccpUserInput) {
+      //   let selectedImgType;
+      //   // !VA Catch-all event listener for all ccpUserInput elements.
+      //   selectedImgType = document.querySelector(ccpUserInput[i]);
+      //   // !VA Add an event handler to trap clicks to the tdoptions radio button
+      //   addEventHandler(selectedImgType,'click',handleCcpUserInput,false);
+
+      // }
 
 
 
@@ -2821,6 +2837,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
     // !VA TODO: Why are there unused elements and what is actually happening here?
     function handleKeydown(evt) {
+      console.log('handleKeyDown running');
+      console.log('evt.target.id is: ' + evt.target.id);
+
       try {
         // console.log('handleKeyDown try: ');
         var vals = [], msgElement;
@@ -2833,37 +2852,58 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           }
         }
       } catch (error) {
-        console.log('handleMouseEvents catch:');
+        // !VA Branch: implementAppobj03 (060820)
+        // !VA Disabling for now
+        // console.log('handleKeydown catch:');
       }
+
       // !VA Get the keypress
       keydown = evt.which || evt.keyCode || evt.key;
+
       // !VA Only set vars and get values if Tab and Enter keys were pressed
       if (keydown == 9 || keydown == 13 ) {
+
+        console.log('handleKeyDown running');
+        console.log('evt.target.id is: ' + evt.target.id);
+
+
+
         var el, isErr, isEnter, isTab
-        var args = { }, Appdata = { };
+        var inputArray = { }, Appdata = { };
         // !VA We need Appdata to restore fields to previous values on error or tabbing through fields without changing their values.
         Appdata = appController.initGetAppdata();
+        // !VA Branch: implementAppobj03 (060820)
+        Appobj = appController.getAppobj();
+
+
         // !VA Get the target element
-        el = document.getElementById(this.id);
-        // !VA Args is target, prop, val
-        args.target = el.id;
-        args.val = this.value;
-        args.prop = elementIdToAppdataProp(this.id);
+        // el = document.getElementById(this.id);
+        // // !VA 
+        // console.log('this.id is: ' + this.id);
+
+        // !VA inputArray is the array containing the values needed to check input, evaluate the Toolbar input, and update Appdata prior to writing dynamicRegions to the DOM after user input in the Toolbar input fields.
+        // !VA evtTargetId is the ID of the element into which the user entered a change
+        inputArray.evtTargetId = this.id;
+        // !VA evtTargetVal is the value the user entered into the input element as integer.
+        inputArray.evtTargetVal = parseInt(this.value);
+
         // !VA Set a flag if the the Enter key was pressed, for readability
         (keydown == 13) ? isEnter = true : isEnter = false;
         // !VA Set a flag if the the Tab key was pressed, for readability
         (keydown == 9) ? isTab = true : isTab = false;
-        // !VA If Tab was pressed and this.value is either empty or equals the Appdata value, then there's been no change to the field, so let Tab just cycle through the fields as per its default.
-        if ((isTab) && ((this.value === '' || this.value == Appdata[args.prop]))) {
+        // !VA elementIdToAppobjProp gets the Appobj key that corresponds to a given element ID. We need the Appobj key to get the Appobj value to compare to the user-entered value in the respective Toolbar input field. 
+        inputArray.appObjProp = elementIdToAppobjProp(this.id);
+        // !VA If Tab was pressed and this.value is either empty or equals the Appobj value, then there's been no change to the field, so let Tab just cycle through the fields as per its default.
+        if ((isTab) && ((this.value === '' || this.value == Appobj[inputArray.appObjProp]))) {
           // !VA Only if imgW or imgH, delete the existing value to display the placeholders. Otherwise, tab through and leave the existing value from Appdata
-          if (args.prop === 'imgW' || args.prop === 'imgH') {
+          if (inputArray.prop === 'imgW' || inputArray.prop === 'imgH') {
             this.onblur = function() {
               this.value = '';
             };
           }
         } else {
           // !VA Field value was changed, so first, pass the args to checkUserInput for errors.
-          isErr = checkUserInput(args);
+          isErr = checkUserInput(inputArray);
           if (isErr) {
             // !VA If it returns an error, select the input and show the error message so the user can correct it or ESC out of the field. If Tab, prevent advancing to the next field until the error is corrected or ESC is pressed.
             isEnter ? isEnter : evt.preventDefault(); 
@@ -2871,7 +2911,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             this.select();
           } else {
             // !VA If the value was entered in the imgW or imgH field, show the value selected first so the user can view and change it before implementing. Only on Tab can the value be implemented and advance to the next field.
-            if (args.prop === 'imgW' || args.prop === 'imgH') {
+            if (inputArray.prop === 'imgW' || inputArray.prop === 'imgH') {
               if (isEnter) {
                 this.select();
               } else {
@@ -2879,8 +2919,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
                 this.blur();
               }
             }
-            // !VA Pass the target, prop and value to evalToolbarInput.
-            evalToolbarInput(args);
+            // !VA Pass the inputArray to evalToolbarInput.
+            evalToolbarInput(inputArray);
           }
         } 
       }
@@ -2923,30 +2963,38 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA TODO: rename to checkUserInput and include parsing of the toolbutton mouseclicks from handleToolbarClicks.
     // !VA TODO: Why are there unused variables and what is actually happening here?
     // !VA appController private
-    function checkUserInput(args) {
-      // !VA Destructure args
-      const { target, prop, val } = args;
+    function checkUserInput(inputArray) {
+      // !VA Destructure inputArray
+      console.log('checkUserInput inputArray is: ');
+      console.log(inputArray);
+      const { evtTargetId, appObjProp, evtTargetVal } = inputArray;
       let appMessCode;
       var isErr;
       isErr = false;
       var Appdata= {};
       Appdata = appController.initGetAppdata();
+
+
+
+
+
+
       // !VA TODO: Setting maxViewerWidth just for now
       var maxViewerWidth = 800;
       // !VA First, check if there's a message running
       // !VA First, we validate that the user-entered value is an integer and if so, set the error variables.
-      if (validateInteger(val)) {
+      if (validateInteger(evtTargetVal)) {
         // !VA NOTE: This is where we could easily trap the negative button increment if it falls below 0 to send a different message than just the standard 'not_Integer' message. Revisit.
         appMessCode = 'err_not_Integer';
         isErr = true;
       } else {
         // !VA Now, we handle the error cases if user has entered a value in the imgViewer field 
         switch (true) {
-        case (prop === 'viewerW') :
+        case (appObjProp === 'viewerW') :
           // !VA The user has selected a viewerW that's smaller than the currently displayed image. Undetermined how to deal with this but for now the current image is shrunk to the selected viewerW. But Appdata is not updated accordingly, needs to be fixed.
-          if (val < Appdata.imgW ) {
+          if (evtTargetVal < Appdata.imgW ) {
             // !VA Do nothing for now, see above.
-          } else if (val > maxViewerWidth ) {
+          } else if (evtTargetVal > maxViewerWidth ) {
             // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px - and the user-entered value exceeds this, so error.
             isErr = true;
             appMessCode = 'err_viewerW_GT_maxViewerWidth';
@@ -2958,26 +3006,26 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           }
           break;
           // !VA Handle the imagewidth toolButton input
-        case (prop === 'imgW') :
+        case (appObjProp === 'imgW') :
           // !VA If the new image width is greater than the viewer width, then show message. 
-          if (val > Appdata.viewerW ) {
+          if (evtTargetVal > Appdata.viewerW ) {
             // !VA errorHandler!
             isErr = true;
             appMessCode = 'err_imgW_GT_viewerW';
           }
           break;
         // !VA TODO: Handle the imageheight toolButton input
-        case (prop === 'imgH') :
+        case (appObjProp === 'imgH') :
           console.log('Error handling for imageheight input not implemented!');
           break;
 
           // !VA TODO: Handle the small phone input
-        case (prop === 'sPhoneW') :
+        case (appObjProp === 'sPhoneW') :
           console.log('Error handling for iptTbrSmallPhonesW input not implemented!');
           break;
         
         // !VA Handle the large phone input
-        case (prop === 'lPhoneW') :
+        case (appObjProp === 'lPhoneW') :
           console.log('Error handling for imagewidth input not implemented!');
           break;
         }
@@ -2996,7 +3044,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private
     // !VA TODO: Why are there unused variables and what is actually happening here?
     // !VA args is the target, prop and val passed in from handleKeyUp and handleMouseEvents. 
-    function evalToolbarInput(args) {
+    function evalToolbarInput(inputArray) {
+
+
+
+
+
       // !VA Here we get the toolbar input from handleKeyDown, determine which input field it was entered in, and pass the value to the updateAppdata. Note that until updateAppdata is called, Appdata still retains the values prior to the user input in the fields that initiated this action.
       // !VA Initialize vars for imgH and imgW since we need to calculate one based on the value of the other and Appdata.aspect. Also initialize arg1 and arg2 which will be passed to updateAppdata
       let imgH, imgW, arg1, arg2;
@@ -3005,44 +3058,116 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       Appdata = appController.initGetAppdata();
       // !VA TODO: Target isn't read in this function. Evaluate whether it needs to be passed in  from the caller (handleKeyDown, handleMouseEvents)
       // !VA ES6 Destructure args into constants.
-      const { target, prop, val } = args;
+      const { evtTargetId, appObjProp, evtTargetVal } = inputArray;
 
       switch(true) {
       // !VA If the value was entered in the imgViewer field, just pass prop and val through to updateAppdata.
-      case (prop === 'viewerW') :
-        arg1 = [ prop, val ];
+      case (appObjProp === 'viewerW') :
+        arg1 = [ appObjProp, evtTargetVal ];
         arg2 = '';
         break;          
-      case (prop === 'imgW') :
+      case (appObjProp === 'imgW') :
         // !VA If the value was entered in imgwidth, calc imgH based on val and aspect. Then put prop and val in arg1, and put the imgH property name and the calculated imgH into arg2. These will be passed on avia the spread operator to updateAppdata. 
-        imgH =  val * (1 / Appdata.aspect[0]);
+        imgH =  evtTargetVal * (1 / Appdata.aspect[0]);
         // updateAppdata(prop, val); 
-        arg1 = [ prop, val ];
+        arg1 = [ appObjProp, evtTargetVal ];
         arg2 = [ 'imgH', imgH ];
         // updateAppdata('imgH', imgH); 
         break;
-      case (prop === 'imgH') :
+      case (appObjProp === 'imgH') :
         // !VA If the value was entered in imgheight, calc imgW based on val and aspect. Then put prop and val in arg1, and put the imgW property name and the calculated imgW into arg2. These will be passed on via the ES6 spread operator to updateAppdata.
-        imgW =  val * (Appdata.aspect[0]);
-        arg1 = [ prop, val ]
-        arg2 = [ 'imgW', imgW ] 
+        imgW =  evtTargetVal * (Appdata.aspect[0]);
+        arg1 = [ appObjProp, evtTargetVal ];
+        arg2 = [ 'imgW', imgW ];
         break;
-      case (prop === 'sPhonesW' || prop === 'lPhonesW') :
+      case (appObjProp === 'sPhonesW' || appObjProp === 'lPhonesW') :
         // sPhonesH =  val * (1 / Appdata.aspect[0]);
-        arg1 = [prop, val];
+        arg1 = [appObjProp, evtTargetVal];
         arg2 = '';
         break;
       }
       
+      console.log('evalToolbarInput Appobj: ');
+      console.log(Appobj);
+
+
       // !VA Call updateAppdata to resize the DOM elements and data properties that correspond to the Appdata properties above.
       // !VA IMPORTANT -- these args aren't used...???
-      updateAppdata( arg1, arg2 );
+      var isUpdate = updateAppdata( arg1, arg2 );
       // !VA Once those DOM properties and data properties have been updated, recalculate the image's containers.
-      calcViewerSize();
+      calcViewerSize(isUpdate);
     }
 
     // !VA appController private
     function updateAppdata( ...params ) {
+
+
+      let prop, val;
+      // !VA Each param pair is a property name prop and a value val. evalToolbarInput passes in one or more such pairs whose corresponding Appdata DOM element/data attribute has to be updated. So, loop through the argument arrays and update the corresponding DOM elements
+
+      // !VA Branch: implementAppobj03 (060820)
+      // !VA This is where everything goes wrong, where Appdata uses the DOM to store information instead of using Appobj. There should be no DOM access here. All the dynamicRegions are already populated in Appobj. Let's just not call updateAppdata and see what happens. 
+      // !VA OK, so update Appdata does something. Let's call it without params...
+      // !VA OK, so params is needed, otherwise Appobj doesn't update. 
+      // !VA OK, so even after updating the DOM here and even though Appobj is fully populated already in evalToobarInput, appObj doesn't get updated until populateAppobj in resizeContainers. That's because on initialization, populateAppobj runs with the 'app' argument in calcViewerSize, and it runs there again every time dynamicRegions are updated. After updateAppdata updates the DOM with the user input change in evalToolbarInput, it then calls calcViewerSize to recalc the containers based on that user input change. So what we need to do here is update Apobj here and instead of having calcViewerSize respond to the DOM change, have it respond to the Appobj change. We are not adding the px here, we do that when we then update the DOM after calcViewerSize.
+
+      for (let i = 0; i < params.length; i++) {
+        prop = params[i][0];
+        val = params[i][1];
+        switch(true) {
+        case (!prop) :
+          console.log('no prop');
+          break;
+        case prop === 'viewerW' :
+          document.querySelector(dynamicRegions.imgViewer).style.width = val + 'px'; 
+          // !VA Branch: implementAppobj03 (060820)
+          Appobj.viewerW = val;
+          // !VA Write the imgViewer value to localStorage. 
+          localStorage.setItem('viewerW', val);
+          break;
+        case prop === 'imgW' :
+          // document.querySelector(dynamicRegions.curImg).style.width = val + 'px';
+          console.log('val is: ' + val);
+          // !VA Branch: implementAppobj03 (060820)
+          Appobj.imgW = val;
+          break;
+        case prop === 'imgH' :
+          document.querySelector(dynamicRegions.curImg).style.height = val + 'px';
+          Appobj.imgH = val;
+          break;
+        case prop === 'sPhonesW' :
+          document.querySelector(toolbarElements.iptTbrSPhonesWidth).setAttribute('data-sphonesw', val);
+          Appobj.sPhonesW = val;
+          // !VA Write the sPhonesW value to localStorage. 
+          localStorage.setItem('sPhonesW', val);
+          break;
+        case prop === 'lPhonesW' :
+          document.querySelector(toolbarElements.iptTbrLPhonesWidth).setAttribute('data-lphonesw', val);
+          Appobj.lPhonesW;
+          // !VA Write the lPhonesW value to localStorage. 
+          localStorage.setItem('lPhonesW', val);
+          break;
+        }
+      }
+
+      console.log('updateAppdata  params: ');
+      console.dir(params);
+      console.log('updateAppdata Appobj is: ');
+      console.log(Appobj);
+      // !VA Return true to set flag to tell calcViewerSize not to run populateAppobj, otherwise calcViewerSize would initialize Appobj and overwrite these update values
+      return true;
+
+    }
+
+    // !VA appController private
+    function updateAppobj( ...params ) {
+
+      console.log('updateAppdata  params: ');
+      console.dir(params);
+
+
+
+
       let prop, val;
       // !VA Each param pair is a property name prop and a value val. evalToolbarInput passes in one or more such pairs whose corresponding Appdata DOM element/data attribute has to be updated. So, loop through the argument arrays and update the corresponding DOM elements
       for (let i = 0; i < params.length; i++) {
@@ -3076,15 +3201,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         }
       }
     }
-    
+  
 
 
     // !VA  appController private 
     // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH. I'm not sure what that means anymore 05.11.20
     // !VA Branch: implementAppobj01 (060420) - Removed Appdata from Toolbar and Inspector functions.
-    function calcViewerSize() {
+    function calcViewerSize(isUpdate) {
       let  viewerW, viewerH, compStyles; 
       let curLocalStorage;
+
       // !VA Branch: implementAppobj01 (060420)\
       // !VA At this point, curImg is loaded but the viewer is still the default size and needs to be calculated here. Appdata gets the current dynamic region values. So let's put a function to add those values here. Appobj has to be populated here, not in a private external function because calcViewerSize doesn't run until the setTimeOut callback is run and the image is loaded in handleFileSelect. If populateAppobj were a public function, it would be querying a DOM element that doesn't yet exists and would fail. 
 
@@ -3095,15 +3221,24 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA  Get the actual viewerW and viewerH CSS values from getComputedStyle
       // !VA Branch: implementAppobj01 (060420)
       // !VA To what extent is this a copy of what's been done in populateAppobj? For now, we're just going to leave everything as is and just use Appobj where Appdata previously was used.
+
+      // !VA Branch: implementAppobj03 (060820)
+      // !VA Lets try it without compStyles
       compStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
+
+
+
       
       // !VA Set the viewerW value based on localStorage  If the user has set this value in the toolbar before, then queried from localStorage. That value persists between sessions. If this is the initial use of the app, then viewerW is queried from the CSS value. 
       curLocalStorage = appController.getLocalStorage();
       if (curLocalStorage[0]) {
         // !VA Set imgViewer and viewerW to the localStorage value
         viewerW = curLocalStorage[0];
-        
+        // !VA Branch: implementAppobj03 (060820)
+        // !VA NO DOM ACCESS HERE
         document.querySelector(dynamicRegions.imgViewer).style.width = curLocalStorage[0] + 'px';
+
+
       } else {
         // !VA If no localStorage is set, use the CSS value.
         viewerW = parseInt(compStyles.getPropertyValue('width'), 10);
@@ -3111,8 +3246,17 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       
       // !VA Branch: implementAppobj03 (060620)
       // !VA Populate just the dynamic regions of Appobj. This is done after viewerW is retrieved from localStorage, otherwise Appobj.viewerW will be the computed CSS value for the element as set in CSS, i.e. 650. 
-      UIController.populateAppobj(Appobj, 'app');
 
+      // !VA Branch: implementAppobj03 (060820)
+      // !VA If isUpdate is not true, then initialize Appobj by running populateAppobj. Otherwise, use updated Appobj values from updateAppobj.
+      if (isUpdate !== true ) {
+        // !VA Branch: implementAppobj03 (060820)
+        // !VA Rename this to initializeAppobj?
+        UIController.populateAppobj(Appobj, 'app');
+      }
+      console.log('calcViewerSize Appobj is: ');
+      console.log(Appobj);
+      // !VA Stopped here - reconfiguring calcViewerSize to work with Appobj values instead of values returned by acessing the DOM.
 
       // !VA In either case, use the CSS value for height, unless the height of the loaded image is greater than the CSS value.
       viewerH = parseInt(compStyles.getPropertyValue('height'), 10);
@@ -3126,6 +3270,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         actualW = Appobj.imgW;
         actualH = Appobj.imgH; 
       }
+
+
+
       switch(true) {
       // The image falls within the default viewer dimensions set in initApp, so do nothing.
       case (actualW <= viewerW) && (Appobj.imgNH < viewerH) :
@@ -3160,9 +3307,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA TODO: Check this out, doesn't seem to be a problem anymore: BUG Problem with the 800X550, 800X600 -- no top/bottom gutter on viewport
         break;
       }
-      console.log('viewerW is: ' + viewerW);
-      console.log('viewerH is: ' + viewerH);
+      // console.log('viewerW is: ' + viewerW);
+      // console.log('viewerH is: ' + viewerH);
       // !VA Transfer control to UIController to print Inspector to the UI
+
+
+
       resizeContainers(viewerW, viewerH );
 
     }
@@ -3205,19 +3355,21 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA writeElementValue takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the element alias as key and the Appobj value as value.
       UICtrl.writeDOMElementValues(tableWidth, tableWrapperWidth);
       // !VA Now that the tableWidth and tableWrapperWidth contain the default values, write all the CCP values to Appobj
-      UIController.populateAppobj(Appobj, 'ccp');
+      // UIController.populateAppobj(Appobj, 'ccp');
+
+      console.log('resizeContainers Appobj is: ');
+      console.log(Appobj);
 
       // !VA Write the inspectors based on Appobj values
       UICtrl.writeInspectors(Appobj);
-      console.log('resizeContainers Appobj: ');
-      console.dir(Appobj);
+      // console.log('resizeContainers Appobj: ');
+      // console.dir(Appobj);
     }
 
     // !VA appController private
     // !VA Branch: implementAppobj03 (060820)
     // !VA Handle CCP User Input
     function handleCcpUserInput(evt) {
-      console.clear();
       let Appobj = appController.getAppobj();
       let imgType;
       console.log('handleCcpInput running');
@@ -3249,6 +3401,30 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       console.dir(Appobj);
     }
 
+    function writeAppobjToDOM() {
+      console.log('writeAppobjToDOM running');
+      // !VA Branch: implementAppobj03 (060820)
+      // !VA This is where we batch-update the DOM based on Appobj
+      for (const [key, value] of Object.entries(Appobj)) {
+
+
+        
+        if (key.substring( 3, 6) === 'Ccp') {
+          
+          console.log('key is: ' + key);
+          console.log('HIT');
+
+
+          
+        }
+      }
+
+      
+    }
+
+
+
+
     function handleTdOptions(alias) {
       console.log('handleTdOptions running');
       console.log('alias is: ' + alias);
@@ -3259,6 +3435,35 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           ccpUserInput[key] === alias ? Appobj[key] = true : Appobj[key] = false;
         }
       }
+
+      switch(true) {
+      case alias.includes('basic'):
+        // !VA Branch: implementAppobj03 (060820)
+        // !VA Add default 'basic' options to Appobj here.
+
+
+        break;
+      case alias.includes('excludeimg'):
+        // !VA Add default 'excludeimg' options to Appobj here.
+        break;
+      case alias.includes('posswitch'):
+        // code block
+        break;
+      case alias.includes('imgswap'):
+        // code block
+        break;
+      case alias.includes('bgimage'):
+        // code block
+        break;
+      case alias.includes('vmlbutton'):
+        // code block
+        break;
+      default:
+        // code block
+      } 
+
+      writeAppobjToDOM();
+
     }
 
     function handleImgType(imgType) {
@@ -3270,6 +3475,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       if (imgType === 'fixed') {
         // !VA Set the disable flag for the handleCcpActions call
         disable = false;
+
+        // !VA Branch: implementAppobj03 (060820)
+        // !VA This should pass to handleTdOptions for default Appobj properties. 
+
+
+
         // !VA Set the default values for tableWidth, tableClass, tableWrapperWidth and tableWrapperClass. These are user-editable.
         Appobj.iptCcpTableWidth = Appobj.imgW;
         Appobj.iptCcpTableClass = '';
@@ -3308,20 +3519,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA DOM Access via UIController.handleCcpActions
 
       // !VA Branch: implementAppobj03 (060820)
-      // !VA ALL THIS SHOULD BE BATCH-RUN to display Ccp elements based on Appobj properties:
-      /* !VA  
-      
-      for (const [key, value] of Object.entries(Appobj)) {
-        if (key.substring( 0, 8) === 'rdoCcpTd') {
 
-        }
-      }
 
-      
-      
-      
-      
-      */
 
 
 
@@ -3732,6 +3931,22 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // alert(ret);
       return ret;
     }
+
+    function elementIdToAppobjProp(str) {
+      var IDtoProp = {
+        viewerW:  'ipt-tbr-viewerw',
+        imgW: 'ipt-tbr-imgwidth',
+        imgH: 'ipt-tbr-imgheight',
+        sPhonesW: 'ipt-tbr-sphones-width',
+        lPhonesW: 'ipt-tbr-lphones-width'
+      };
+      // !VA This should return directly wihout a ret variable as tmp storage.
+      var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
+      // alert(ret);
+      return ret;
+    }
+
+
 
     // !VA appController private
     function getAspectRatio (var1, var2) {
