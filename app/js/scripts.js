@@ -3232,16 +3232,24 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Set the viewerW value based on localStorage  If the user has set this value in the toolbar before, then queried from localStorage. That value persists between sessions. If this is the initial use of the app, then viewerW is queried from the CSS value. 
       curLocalStorage = appController.getLocalStorage();
       if (curLocalStorage[0]) {
-        // !VA Set imgViewer and viewerW to the localStorage value
-        viewerW = curLocalStorage[0];
+
         // !VA Branch: implementAppobj03 (060820)
         // !VA NO DOM ACCESS HERE
-        document.querySelector(dynamicRegions.imgViewer).style.width = curLocalStorage[0] + 'px';
+        // !VA I think I was using the CSS value because I was looking for a way to persist that value as a default. Using localStorage now so it should be fine to set it as default in Appobj
+        // !VA Set imgViewer and viewerW to the localStorage value
+        Appobj.viewerW = viewerW = curLocalStorage [0]; 
+
+        // !VA Deprecating...
+        // document.querySelector(dynamicRegions.imgViewer).style.width = Appobj.viewerW + 'px';
 
 
       } else {
         // !VA If no localStorage is set, use the CSS value.
-        viewerW = parseInt(compStyles.getPropertyValue('width'), 10);
+        // !VA Branch: implementAppobj03 (060820)
+        // !VA I think I was using the CSS value because I was looking for a way to persist that value as a default. Using localStorage now so it should be fine to set it as default in Appobj
+        Appobj.viewerW = viewerW = 650;
+        // !VA Deprecating...
+        // viewerW = parseInt(compStyles.getPropertyValue('width'), 10);
       }
       
       // !VA Branch: implementAppobj03 (060620)
@@ -3259,9 +3267,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Stopped here - reconfiguring calcViewerSize to work with Appobj values instead of values returned by acessing the DOM.
 
       // !VA In either case, use the CSS value for height, unless the height of the loaded image is greater than the CSS value.
-      viewerH = parseInt(compStyles.getPropertyValue('height'), 10);
+      // !VA I think I was using the CSS value because I was looking for a way to persist that value as a default. Using localStorage now so it should be fine to set it as default in Appobj
+      Appobj.viewerH = viewerH = 450;
+      // !VA Deprecating...
+      // viewerH = parseInt(compStyles.getPropertyValue('height'), 10);
       // !VA If initializing a new image, use the naturalWidth and naturalHeight. If updating via user input, use the display image and height, imgW and imgH. If initializing, then Appobj.imgW and Appobj.imgH will be 0 or falsy because it hasn't been resized yet. So the _actual_ image width and height will be different for initializing and updating.
+
+
       // !VA REVIEW: I thought I fixed this...it appears to only apply to dev mode.
+      // !VA This will be a problem for dev mode
       var actualW, actualH;
       if (Appobj.imgW === 0) {
         actualW = Appobj.imgNW;
@@ -3339,6 +3353,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       appH = viewportH;
 
       // !VA TODO: Make function - writeDOMElements won't work because the element aliases for the dynamicRegion values aren't specific enough and there's no point in adding them to Appobj because they're only accessed in one place, i.e. here. 
+      // !VA Branch: implementAppobj03 (060820)
+      // !VA Moved from calcViewerSize
+
+      // !VA DOM Access
+      document.querySelector(dynamicRegions.imgViewer).style.width = Appobj.viewerW + 'px';
+
       document.querySelector(dynamicRegions.curImg).style.width = Appobj.imgW + 'px';
       document.querySelector(dynamicRegions.curImg).style.height = Appobj.imgH + 'px';
       document.querySelector(dynamicRegions.imgViewer).style.height = viewerH + 'px';
