@@ -5,63 +5,13 @@
 // !VA GENERAL NOTES
 /* !VA  - June Reboot Notes
 =========================================================
-// !VA Branch: implementAppobj01 (060420)
-
-
-
-
-
-TD Options
------------
-
-Setting W and H on the TD does work, so that option has to be enabled and working for Basic. Only restriction w and h cannot be less than the currently loaded imgW and imgH! And can't be less than the current value in Parent Table or Wrapper Table.
-
-Basic: height   No matter what's entered, height = Appdata.imgW. THIS IS A BUG! This should be undisplayed for Basic. Height is set by the image. But it should be user-settable here. So, 
-
-
-
-
-Basic: width    No effect on CB output. If any value is entered, CB output width is Appdata.imgW. This should be undisplayed for basic, width should default to Appdata.imgW.
-
-
-Parent Table
-------------
-width: Removing the width attribute does nothing - the attribute writes to CB still as Appdata.imgW
-
-
-
-
-Mobile Swap Testing:
---------------------
-NOTE: The mobile image swap option only works for full width, i.e. hero. Ain't gonna change for the time being -- not possible. 
-To Disable:
-Wrapper table: devicewidth, width = viewerW, align=Center
-Parent table has to be locked at devicewidth, width = imgW, td align = center, align = center,
-TD: Class = remove, align = center;
-Img: Class = mobileshow, disabled.  
-
-
-TO FIX:
-DONE: TDoptions don't display on reload
-DONE: Include Wrapper checkbox doesn't display by default if fluid - fixed.
-DONE: Implement toggleIncludeAnchor
-DONE: Ccp doesn't update if Toolbar value is changed unless it's closed and reopened. I think this is fixed.
-
-
-Imgtype Options
-----------------
-To Disable:
-Parent table: devicewidth needs to be cleared, can't be devicewidth. the Attribute is set to user hte userInpt. I dohn't know where the dcurrent devault comes from.
-
-
-
+// !VA Branch: implementAppobj03 (060920)
+Cleaning up - to read all the notes so far check out the last commit in implementAppobj03 
 
 TODO: BUG! Load 625X525 with viewerW set to 600 - loads without resizing to container size
 TODO: Change the default parent class on 
 TODO: Have a bit problem with td options height and width fields. Currently these fields are available when the 'basic' option is selected, but there is no case when they would ever write the values the user might enter here to the clipboard. Beccause, what happens when the user enters values that are smaller than the current image resolution. That can't be possible. The TD can't be smaller than its child. The height should never be available when the child is an image and the width should either be preset to the image width or unavailable. Or it should be allowed to be larger than the child, for instance if padding is desired, but never smaller. And if you add padding, you'd add it to the img, not to the TD, right? Have to check that out before resolving this. 
 NOTE: It's important to remember that handleCcpActions handles the display of elements whose state or value in the CCP is changed by OTHER CCP elements. For example, the imgType radio buttons trigger value changes in OTHER elements. So handleCcpActions handles the display of the CCP UI. In contrast, the Attributes control only the Clipboard output. For instance, the class attribute only writes to the Clipboard if there is an entry in the input field. That's why it's handled in getAttributes - it doesn't result in a change to the CCP UI.
-
-
 
 
 TODO: Remove all writing of values from initUI and put them in getAttributes. initUI should only be for turning display amd disabling on and off. 
@@ -217,7 +167,6 @@ var Witty = (function () {
       iptTbrLPhonesWidth: '#ipt-tbr-lphones-width',
     };
 
-    //!VA If we separate this out into UI objects that correspond to the objects we want to create, then we can just loop through them rather than define each property separately. So, dynamicElements are those that resize based on the current image... but I haven't figured out how to loop through them yet.
     // !VA UIController: dynamicRegions
     const dynamicRegions = {
       curImg: '#cur-img',
@@ -285,7 +234,6 @@ var Witty = (function () {
       iptCcpImgRelpathLabel: '#ipt-ccp-img-relpath-label',
       iptCcpImgAltLabel: '#ipt-ccp-img-alt-label',
       iptCcpImgIncludeWidthHeightLabel: '#ccp-img-include-width-height-label',
-      
     };
       
     const btnCcpMakeClips = {
@@ -317,9 +265,6 @@ var Witty = (function () {
       msgContent: '#msg-content',
       errContent: '#err-content'
     };
-
-
-
 
     // !VA UIController private
     // !VA Reboot: passing in Appdata from 
@@ -396,7 +341,6 @@ var Witty = (function () {
     }
 
     // !VA CCP FUNCTIONS
-
 
     // !VA UIController public functions
     return {
@@ -512,22 +456,26 @@ var Witty = (function () {
         UIController.initCcp();
       },
 
+
+      // !VA UIController public
+      // !VA Writes the dynamicRegion elements to the DOM based on Appobj and the height of the viewerW containers. Called from resizeContainers
+      // !VA TODO: resizeContainers doesn't really have much left in it - consider splitting calcViewerSize or integrating resizeContainers into it since it now doesn't have any DOM access either
       writeDynamicRegions: function(Appobj, viewportH, appH) {
         console.log('writeDynamicRegions running');
         console.log('writeDynamicRegions Appobj is: ');
         console.log(Appobj);
 
+        // !VA TODO: Make function
         document.querySelector(dynamicRegions.imgViewer).style.width = Appobj.viewerW + 'px';
-
         document.querySelector(dynamicRegions.curImg).style.width = Appobj.imgW + 'px';
         document.querySelector(dynamicRegions.curImg).style.height = Appobj.imgH + 'px';
         document.querySelector(dynamicRegions.imgViewer).style.height = Appobj.viewerH + 'px';
         document.querySelector(dynamicRegions.imgViewport).style.height = viewportH + 'px';
         document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';
 
-
       }, 
 
+      // !VA TODO: Figure out what this is.
       writeDOMElementValues: function (...args) {
         // console.log('args is: ');
         // console.log(args);
@@ -535,7 +483,6 @@ var Witty = (function () {
           document.querySelector(args[i][0]).value = args[i][1];
           // console.log('args[i] is: ' +  args[i]);
         }
-
       },
 
       populateAppobj: function (Appobj, access) {
@@ -561,13 +508,16 @@ var Witty = (function () {
 
           // !VA Branch: implementAppobj03 (060820)
           // !VA Get the computed width in case there is no value from localStorage. In that case, the value is coming from the CSS file. 
-          Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
+          // !VA If there's no local storage, then just default to 650 rather than getting it from the CSS file - but leave it in here commented out just in case that causes problems later.
+          // Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
+          Appobj.viewerW = 650;
           // console.log('Appobj.viewerW is: ' + Appobj.viewerW);
 
           // !VA Branch: implementAppobj01 (060420)
+          // !VA Get the computed height in case there is no value from localStorage. In that case, the value is coming from the CSS file. 
+          // !VA If there's no local storage, then just default to 450 rather than getting it from the CSS file - but leave it in here commented out just in case that causes problems later.
           // Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
-    
-          Appobj.viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
+          Appobj.viewerH = 450;
 
           // !VA Get the dimensions of curImg
           Appobj.imgW = curImg.width;
@@ -577,6 +527,7 @@ var Witty = (function () {
           
           // !VA Get the data properties for iptTbrSmallPhonesW and sPhonesH
           // !VA NOTE: This is no good. Can't query Appdata when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
+          // !VA It appears the default is coming from the placeholder now rather than the data attribute - 
           Appobj.sPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).getAttribute('data-sphonesw'), 10);
           Appobj.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
           Appobj.iptTbrSPhonesWidth ? Appobj.iptTbrSPhonesWidth : Appobj.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
@@ -2602,6 +2553,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       //about SVG and VML, they're not in the big list of MIME types I found 
       // !VA Need to handle this error
       if (!f.type.match('image.*')) {
+        // !VA TODO: try catch here
         var target = "notimage";
         // !VA Below is the error handler - skipping for now
         // var isErr = errorHandler(target, 0, 0);
@@ -2624,7 +2576,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           // !VA Write the insFilename to the DOM so we can add it later to Appdata. It's not completely DRY because it's added to the DOM here and later to Appdata, and then queried in the CCP from Appdata, but it's better than having to query it from the DOM every time it's used in a separate function call. This way, we can loop through Appdata to get it if we need to.
           // !VA Branch: implementAppobj01 (060420)
           document.querySelector(inspectorElements.insFilename).textContent = Appobj.fileName = fileName;
-          console.log('handleFileSelect Appobj.fileName is: ' + Appobj.fileName);
+          // console.log('handleFileSelect Appobj.fileName is: ' + Appobj.fileName);
 
 
           // !VA Hide the dropArea - not sure if this is the right place for this.
@@ -2647,8 +2599,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
                 // !VA TODO: Make function
                 curImg.style.display = 'block';
                 // !VA Calculate the viewer size based on the loaded image
-
-
+                // !VA TODO: Remove the false argument if it has no purpose
                 calcViewerSize(false);
               })();
               
@@ -2738,34 +2689,34 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA TODO: Why is the argument  unused, why are there unused elements and what is actually happening here?
     function handleFocus(evt) {
       // !VA Get the target element of the click
-      el = document.getElementById(this.id);
+      // el = document.getElementById(this.id);
       // !VA Select the clicked element's value, or if there's no value, set it to empty with a cursor, which is the default select behavior for empty fields.
       this.select();
     }
 
     // !VA TODO: Why is the argument unused, why are there unused elements and what is actually happening here?
     // !VA appController private
+    // !VA TODO: This could use some commenting
     function handleBlur(evt) {
       // !VA Handle blur
-      var Appdata = {};
-      Appdata = appController.initGetAppdata();
-      prop = elementIdToAppdataProp(this.id);
+      // var Appdata = {};
+      // Appdata = appController.initGetAppdata();
+      let prop;
+      prop = elementIdToAppobjProp(this.id);
       // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appdata property.
       // !VA NOTE: This can probably replace the blur statements in handleKeydown
       if (prop === 'imgW' || prop === 'imgH') {
         this.value = '';
       } else {
-
         this.value = Appdata[prop];
       }
     }
 
-    // !VA NOTE: Needs to be commented
+    // !VA TODO: Needs to be commented or removed if it does nothing
     function handleOnfocus(evt) {
       let targ = evt.target;
       let val = targ.value;
     }
-
 
     // !VA appController private 
     // !VA Preprocess mouse events and route them to respective eval handler.
@@ -2855,8 +2806,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           }
         }
       } catch (error) {
-        // !VA Branch: implementAppobj03 (060820)
-        // !VA Disabling for now
+
+        // !VA TODO: Why is this firing on every keypress
         // console.log('handleKeydown catch:');
       }
 
@@ -2866,12 +2817,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Only set vars and get values if Tab and Enter keys were pressed
       if (keydown == 9 || keydown == 13 ) {
 
-        var el, isErr, isEnter, isTab
-        var inputArray = { }, Appdata = { };
-        // !VA We need Appdata to restore fields to previous values on error or tabbing through fields without changing their values.
-        Appdata = appController.initGetAppdata();
-        // !VA Branch: implementAppobj03 (060820)
-        Appobj = appController.getAppobj();
+        var isErr, isEnter, isTab;
+        var inputArray = { };
 
 
         // !VA Get the target element
@@ -2927,10 +2874,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private
     // !VA TODO: Why are there unused elements and what is actually happening here?
     // !VA keyPress handler for the ESC key.  This has to be handled on keyup, so we need a separate handler for it.
+    // !VA TODO: 
     function handleKeyup(evt) {
       let prop, curLocalStorage;
       // !VA We only need the property here, so no need to create an args object. We could actually just use the target but since we're standardizing on property names, let's stick with that. Get the property name from the id of this, i.e. the event target
-      prop = elementIdToAppdataProp(this.id);
+      prop = elementIdToAppobjProp(this.id);
       // !VA Find out which key was struck
       keyup = evt.which || evt.keyCode || evt.key;
       // var Appdata = appController.initGetAppdata();
@@ -2963,16 +2911,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private
     function checkUserInput(inputArray) {
       // !VA Destructure inputArray
+      // !VA TODO: I don't think evtTargetId is ever used...remove?
       const { evtTargetId, appObjProp, evtTargetVal } = inputArray;
       let appMessCode;
       var isErr;
       isErr = false;
       var Appdata= {};
       Appdata = appController.initGetAppdata();
-
-
-
-
 
 
       // !VA TODO: Setting maxViewerWidth just for now
@@ -3045,9 +2990,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Here we get the toolbar input from handleKeyDown, determine which input field it was entered in, and pass the value to the updateAppobj. Note that until updateAppobj is called, Appdata still retains the values prior to the user input in the fields that initiated this action.
       // !VA Initialize vars for imgH and imgW since we need to calculate one based on the value of the other and Appdata.aspect. Also initialize arg1 and arg2 which will be passed to updateAppobj
       let imgH, imgW, arg1, arg2;
-      // !VA Get Appdata properties. All we really need here is Appdata.aspect. Everything else is calculated based on the user's input.
-      // let Appdata = {};
-      // Appdata = appController.initGetAppdata();
+
       // !VA TODO: Target isn't read in this function. Evaluate whether it needs to be passed in  from the caller (handleKeyDown, handleMouseEvents)
       // !VA ES6 Destructure args into constants.
       const { evtTargetId, appObjProp, evtTargetVal } = inputArray;
@@ -3091,13 +3034,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       let prop, val;
       // !VA Each param pair is a property name prop and a value val. evalToolbarInput passes in one or more such pairs whose corresponding Appdata DOM element/data attribute has to be updated. So, loop through the argument arrays and update the corresponding DOM elements
-
-      // !VA Branch: implementAppobj03 (060820)
-      // !VA This is where everything goes wrong, where Appdata uses the DOM to store information instead of using Appobj. There should be no DOM access here. All the dynamicRegions are already populated in Appobj. Let's just not call updateAppobj and see what happens. 
-      // !VA OK, so update Appdata does something. Let's call it without params...
-      // !VA OK, so params is needed, otherwise Appobj doesn't update. 
-      // !VA OK, so even after updating the DOM here and even though Appobj is fully populated already in evalToobarInput, appObj doesn't get updated until populateAppobj in resizeContainers. That's because on initialization, populateAppobj runs with the 'app' argument in calcViewerSize, and it runs there again every time dynamicRegions are updated. After updateAppobj updates the DOM with the user input change in evalToolbarInput, it then calls calcViewerSize to recalc the containers based on that user input change. So what we need to do here is update Apobj here and instead of having calcViewerSize respond to the DOM change, have it respond to the Appobj change. We are not adding the px here, we do that when we then update the DOM after calcViewerSize.
-
       for (let i = 0; i < params.length; i++) {
         prop = params[i][0];
         val = params[i][1];
@@ -3123,90 +3059,61 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           Appobj.imgH = val;
           break;
         case prop === 'sPhonesW' :
-          document.querySelector(toolbarElements.iptTbrSPhonesWidth).setAttribute('data-sphonesw', val);
+          // !VA TODO: Get rid of the data attribute - using localStorage now.
+          // document.querySelector(toolbarElements.iptTbrSPhonesWidth).setAttribute('data-sphonesw', val);
           Appobj.sPhonesW = val;
           // !VA Write the sPhonesW value to localStorage. 
           localStorage.setItem('sPhonesW', val);
           break;
         case prop === 'lPhonesW' :
-          document.querySelector(toolbarElements.iptTbrLPhonesWidth).setAttribute('data-lphonesw', val);
+          // !VA TODO: Get rid of the data attribute - using localStorage now.
+          // document.querySelector(toolbarElements.iptTbrLPhonesWidth).setAttribute('data-lphonesw', val);
           Appobj.lPhonesW;
           // !VA Write the lPhonesW value to localStorage. 
           localStorage.setItem('lPhonesW', val);
           break;
         }
       }
-
-      // console.log('updateAppobj  params: ');
-      // console.dir(params);
-      // console.log('updateAppobj Appobj is: ');
-      // console.log(Appobj);
       // !VA Return true to set flag to tell calcViewerSize not to run populateAppobj, otherwise calcViewerSize would initialize Appobj and overwrite these update values
       return true;
-
     }
 
-
-  
-
-
-    // !VA  appController private 
-    // !VA PROBLEM: this is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH. I'm not sure what that means anymore 05.11.20
-    // !VA Branch: implementAppobj01 (060420) - Removed Appdata from Toolbar and Inspector functions.
+    // !VA  appController private s
+    // !VA This is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH. I'm not sure what that means anymore 05.11.20
     function calcViewerSize(isUpdate) {
-      let  viewerW, viewerH, compStyles; 
+      // !VA Deprecated...
+      // let  viewerW, viewerH, compStyles; 
+      let  viewerW, viewerH; 
       let curLocalStorage;
 
       // !VA Branch: implementAppobj01 (060420)\
-      // !VA At this point, curImg is loaded but the viewer is still the default size and needs to be calculated here. Appdata gets the current dynamic region values. So let's put a function to add those values here. Appobj has to be populated here, not in a private external function because calcViewerSize doesn't run until the setTimeOut callback is run and the image is loaded in handleFileSelect. If populateAppobj were a public function, it would be querying a DOM element that doesn't yet exists and would fail. 
+      // !VA Appobj has to be populated here, not in a private external function because calcViewerSize doesn't run until the setTimeOut callback is run and the image is loaded in handleFileSelect. If populateAppobj were a private function, it would be querying a DOM element that doesn't yet exists and would fail. 
       
       // !VA Using the current image dimensions in Appdata, calculate the current size of imgViewer so it adjusts to the current image size. 
-      // !VA  Get the actual viewerW and viewerH CSS values from getComputedStyle
-      // !VA Branch: implementAppobj01 (060420)
-      // !VA To what extent is this a copy of what's been done in populateAppobj? For now, we're just going to leave everything as is and just use Appobj where Appdata previously was used.
-
-      // !VA Branch: implementAppobj03 (060820)
-      // !VA Lets try it without compStyles
+      // !VA I think I was using the CSS value because I was looking for a way to persist that value as a default. Using localStorage now so it should be fine to set it as default in Appobj
+      // !VA Deprecating...
       // compStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
       
-      // !VA Set the viewerW value based on localStorage  If the user has set this value in the toolbar before, then queried from localStorage. That value persists between sessions. If this is the initial use of the app, then viewerW is queried from the CSS value. 
+      // !VA Set the viewerW value based on localStorage  If the user has set this value in the toolbar before, then queried from localStorage. That value persists between sessions. If this is the initial use of the app, then viewerW is explitly set to 650. 
       curLocalStorage = appController.getLocalStorage();
       if (curLocalStorage[0]) {
-
-        // !VA Branch: implementAppobj03 (060820)
-        // !VA NO DOM ACCESS HERE
-        // !VA I think I was using the CSS value because I was looking for a way to persist that value as a default. Using localStorage now so it should be fine to set it as default in Appobj
         // !VA Set imgViewer and viewerW to the localStorage value
         // !VA TODO: See why localStorage is stored as string - it's requiring us to convert to integer here.
         Appobj.viewerW = viewerW = parseInt(curLocalStorage[0]); 
-        
         // !VA Deprecating...
         // document.querySelector(dynamicRegions.imgViewer).style.width = Appobj.viewerW + 'px';
-
-
       } else {
-        // !VA If no localStorage is set, use the CSS value.
-        // !VA Branch: implementAppobj03 (060820)
         // !VA I think I was using the CSS value because I was looking for a way to persist that value as a default. Using localStorage now so it should be fine to set it as default in Appobj
         Appobj.viewerW = viewerW = 650;
         // !VA Deprecating...
         // viewerW = parseInt(compStyles.getPropertyValue('width'), 10);
       }
-      
-      // !VA Branch: implementAppobj03 (060620)
-      // !VA Populate just the dynamic regions of Appobj. This is done after viewerW is retrieved from localStorage, otherwise Appobj.viewerW will be the computed CSS value for the element as set in CSS, i.e. 650. 
+      // !VA Populate just the dynamic regions of Appobj. This is done after viewerW is retrieved from localStorage, otherwise Appobj.viewerW is explicitly set to 650.
 
-      // !VA Branch: implementAppobj03 (060820)
       // !VA If isUpdate is not true, then initialize Appobj by running populateAppobj. Otherwise, use updated Appobj values from updateAppobj.
       if (isUpdate !== true ) {
-        // !VA Branch: implementAppobj03 (060820)
-        // !VA Rename this to initializeAppobj?
         UIController.populateAppobj(Appobj, 'app');
       }
-
-      // !VA Stopped here - reconfiguring calcViewerSize to work with Appobj values instead of values returned by acessing the DOM.
-
-      // !VA In either case, use the CSS value for height, unless the height of the loaded image is greater than the CSS value.
       // !VA I think I was using the CSS value because I was looking for a way to persist that value as a default. Using localStorage now so it should be fine to set it as default in Appobj
       Appobj.viewerH = viewerH = 450;
       // !VA Deprecating...
@@ -3214,7 +3121,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA If initializing a new image, use the naturalWidth and naturalHeight. If updating via user input, use the display image and height, imgW and imgH. If initializing, then Appobj.imgW and Appobj.imgH will be 0 or falsy because it hasn't been resized yet. So the _actual_ image width and height will be different for initializing and updating.
 
       // !VA REVIEW: I thought I fixed this...it appears to only apply to dev mode.
-      // !VA This will be a problem for dev mode
+      // !VA TODO: See if the if condition below has any effect, if not, remove
       var actualW, actualH;
       if (Appobj.imgW === 0) {
         actualW = Appobj.imgNW;
@@ -3258,19 +3165,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA TODO: Check this out, doesn't seem to be a problem anymore: BUG Problem with the 800X550, 800X600 -- no top/bottom gutter on viewport
         break;
       }
-
       resizeContainers(viewerW, viewerH );
-
     }
 
     // !VA appController private
     function resizeContainers( viewerW, viewerH )  {
-      console.log('viewerW is: ' + viewerW);
-      console.log('typeof(viewerW) is: ' + typeof(viewerW));
       // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values which are passed in from resizeContainers.
-      // !VA Initial height is 450, as it is defined in the CSS. TOo much hassle to try and get the value as defined in the CSS programmatically.
-      // !VA TODO: Review this - it has very little purpose except DOM access which should be done in UIController. 
-      // !VA Branch: implementAppobj02 (060620) - This has dynamicRegion values that are not written back to Appobj after recalculation, this may be a problem at some point.
+      // !VA Initial height is 450, as explicitly defined in calcViewerSize. TOo much hassle to try and get the value as defined in the CSS programmatically.
+      // !VA Note: This has dynamicRegion values that are not written back to Appobj after recalculation, this may be a problem at some point.
       const initViewerH = 450;
       let viewportH;
       let appH; 
@@ -3285,22 +3187,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         viewportH = Appobj.imgH + 145;
       } 
       appH = viewportH;
-
       Appobj.viewerH = viewerH;
       Appobj.viewerW = viewerW;
-
-      // !VA TODO: Make function - writeDOMElements won't work because the element aliases for the dynamicRegion values aren't specific enough and there's no point in adding them to Appobj because they're only accessed in one place, i.e. here. 
-      // !VA Branch: implementAppobj03 (060820)
-      // !VA Moved from calcViewerSize
 
       // !VA DOM Access
       UIController.writeDynamicRegions(Appobj, viewportH, appH);
 
-
-
-      // !VA Now that the image and its containers are written to the DOM, go ahead and write the Inspectors.
-
-      // !VA Branch: implementAppobj02 (060620)
+      // !VA Pick it up here in implementAppobj04
       // !VA Now update the CCP UI with the most recent changes to dynamicRegion values, then populateAppobj with CCP values last. Elements to update are: tableWidth and tableWrapperWidth.
       var tableWidth = [];
       var tableWrapperWidth = [];
@@ -3309,12 +3202,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA writeElementValue takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the element alias as key and the Appobj value as value.
       UICtrl.writeDOMElementValues(tableWidth, tableWrapperWidth);
 
-
-
       // !VA Write the inspectors based on Appobj values
       UICtrl.writeInspectors(Appobj);
-      // console.log('resizeContainers Appobj: ');
-      // console.dir(Appobj);
     }
 
     // !VA appController private
