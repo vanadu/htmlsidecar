@@ -340,6 +340,17 @@ var Witty = (function () {
       return [aspectReal, aspectInt];  
     }
 
+    // !VA UIController private
+    function handleCcpInput(arg) {
+      console.log('handleCcpInput running');
+      console.log('arg is: ');
+      console.dir(arg);
+      document.querySelector(arg[0]).value = arg[1];
+    }
+
+
+
+
     // !VA CCP FUNCTIONS
 
     // !VA UIController public functions
@@ -453,16 +464,16 @@ var Witty = (function () {
         // !VA Inspector initialization comes now from the HTML file. The default 'No Image' is display: inline in CSS. When an image is loaded, inspectors are populated with values in UIController.writeInspectors.
         // !VA Branch: implementAppobj02 (060620)
         // !VA INitialize the CCP
-        UIController.initCcp();
+        appController.initCcp();
       },
 
 
       // !VA UIController public
       // !VA Writes the dynamicRegion elements to the DOM based on Appobj and the height of the viewerW containers. Called from resizeContainers
       // !VA TODO: resizeContainers doesn't really have much left in it - consider splitting calcViewerSize or integrating resizeContainers into it since it now doesn't have any DOM access either
-      writeDynamicRegions: function(Appobj, viewportH, appH) {
-        console.log('writeDynamicRegions running');
-        console.log('writeDynamicRegions Appobj is: ');
+      writeDynamicRegionsDOM: function(Appobj, viewportH, appH) {
+        console.log('writeDynamicRegionsDOM running');
+        console.log('writeDynamicRegionsDOM Appobj is: ');
         console.log(Appobj);
 
         // !VA TODO: Make function
@@ -475,13 +486,26 @@ var Witty = (function () {
 
       }, 
 
-      // !VA TODO: Figure out what this is.
-      writeDOMElementValues: function (...args) {
-        // console.log('args is: ');
-        // console.log(args);
+      // !VA Branch: implementAppobj04 (061020)
+      // !VA Write specific CCP DOM element values based one or more arguments consisting of key/value array where the key is the element alias and the value is the value. 
+      // !VA Let's try to derive the type of write action, i.e. value, disable, active class, from the ID argument. 
+      writeCcpDOM: function (...args) {
+        console.log('writeCcpDOM running');
+        console.log('args is: ');
+        console.log(args);
         for (let i = 0; i < args.length; i++) {
-          document.querySelector(args[i][0]).value = args[i][1];
-          // console.log('args[i] is: ' +  args[i]);
+          // document.querySelector(args[i][0]).value = args[i][1];
+          console.log('args[i] is: ' +  args[i]);
+          if (args[i][0].substring( 0 , 4) === '#ipt') {
+            console.log('This is an input element');
+            handleCcpInput(args[i]);
+          } else if (args[i][0].substring( 0 , 4) === '#rdo') {
+            console.log('This is a radio button');
+          } else if (args[i][0].substring( 0 , 4) === '#sel') {
+            console.log('This is a select dropdown');
+          } else if (args[i][0].substring( 0 , 4) === '#spn') {
+            console.log('This is a mock checkbox');
+          }
         }
       },
 
@@ -539,6 +563,8 @@ var Witty = (function () {
 
         }
         function populateCcpProperties(Appobj) {
+          // console.log('initCCP Appobj is: ');
+          // console.log(Appobj);
           // !VA Update CCP properties
           // !VA Now initialize Appobj with the CCP element values. This includes ALL CCP elements, including those that are displayed/undisplayed depending on which TDOption or imgType radio is selected. 
           // !VA Don't forget to use bracket notation to add properties to an object: https://stackoverflow.com/questions/1184123/is-it-possible-to-add-dynamically-named-properties-to-javascript-object
@@ -564,7 +590,6 @@ var Witty = (function () {
           // !VA Branch: implementAppobj02 (060620)
           // !VA Write dynamic region values 
           populateAppProperties(Appobj);
-          
         } else if ( access === 'ccp') {
           populateCcpProperties(Appobj);
         } else if ( access === 'all' ) {
@@ -577,10 +602,10 @@ var Witty = (function () {
       },
 
       // !VA UIController public 
-      initCcp: function() {
+      toggleCcp: function() {
         // !VA Branch: implementAppobj02 (060620)
         // !VA NOTE: All this does now is toggle the CCP on and off.
-
+        let isActive;
         /* !VA   This is where we write the Appobj properties somehow. But no - because the values aren't written to the input elements yet. Where is that done? In toggleImgType, then handleCcpActions. What's happening is that handleCcpActions gets the values from the Attributes, where the values are defined. That's ass-backwards. The values should be defined in Appobj and then written to the Attributes. So let's try that. 
       */ 
         // showTdOptions();
@@ -595,9 +620,16 @@ var Witty = (function () {
         //   document.querySelector(ccpUserInput.rdoCcpTdExcludeimg).disabled = true;
         // } 
         // !VA IMPORTANT: Isn't this done somewhere else too? The app initializes with the CCP closed, so toggle it on and off here.
+
+
+
+
+        // !VA Toggle the CCP on and off
         document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
-        // !VA IMPORTANT: Determine if this initGetAttribute call is necessary since updateCcp is deprecated
-        // CBController.initGetAttributes();
+
+        // !VA If the CCP is displayed, return true, otherwise false
+        document.querySelector(staticRegions.ccpContainer).classList.contains('active') ? isActive = true : isActive = false;
+        return isActive;
       },
 
       // !VA UIController public
@@ -643,12 +675,6 @@ var Witty = (function () {
         domElements.iptTbrLPhonesWidth ? domElements.iptTbrLPhonesWidth : Appdata.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
         return domElements;
       },
-
-
-
-
-
-
 
       // !VA Catch-all function for displaying/undisplaying, disabling/enabling and adding/removing classes to CCP elements. action is the action to execute, elemArray is the array of elements the action is to apply to and state is the toggle state whereby true turns the action on and false turns it off.
       handleCcpActions: function (action, elemArray, option ) {
@@ -2419,7 +2445,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       for (let i = 0; i < dvClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         dvClickables[i] = document.querySelector(dvClickables[i]);
-        addEventHandler((dvClickables[i]),'click',UIController.initCcp,false);
+        addEventHandler((dvClickables[i]),'click',appController.initCcp,false);
       }
 
       // !VA We need eventListeners for ALL the clipboard buttons so make an eventListener for each value in the btnCcpMakeClips object. We need a for in loop for objects
@@ -2460,14 +2486,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
       // !VA Branch: implementAppobj03 (060820) This was the catch-all event handler prior to this branch but it doesn't work because it doesn't trap keyboard input. 
-      // for(let i in ccpUserInput) {
-      //   let selectedImgType;
-      //   // !VA Catch-all event listener for all ccpUserInput elements.
-      //   selectedImgType = document.querySelector(ccpUserInput[i]);
-      //   // !VA Add an event handler to trap clicks to the tdoptions radio button
-      //   addEventHandler(selectedImgType,'click',handleCcpUserInput,false);
-
-      // }
+      let ccpRadioClicks;
+      for(let i in ccpUserInput) {
+        if (ccpUserInput[i].substring(0,4) === '#rdo') {
+          ccpRadioClicks = document.querySelector(ccpUserInput[i]);
+          addEventHandler(ccpRadioClicks,'click',handleCcpRadioSelection,false);
+        }
+      }
 
 
 
@@ -2816,9 +2841,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA Only set vars and get values if Tab and Enter keys were pressed
       if (keydown == 9 || keydown == 13 ) {
-
+        console.log('Tab or Enterr pressed');
         var isErr, isEnter, isTab;
         var inputArray = { };
+
+        console.log('evt.target.id is: ' + evt.target.id);
+        if (evt.target.id.substring(0,7) === 'ipt-ccp') {
+          handleCcpUserInput(evt);
+        }
+
 
 
         // !VA Get the target element
@@ -3191,28 +3222,44 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       Appobj.viewerW = viewerW;
 
       // !VA DOM Access
-      UIController.writeDynamicRegions(Appobj, viewportH, appH);
+      UIController.writeDynamicRegionsDOM(Appobj, viewportH, appH);
 
       // !VA Pick it up here in implementAppobj04
-      // !VA Now update the CCP UI with the most recent changes to dynamicRegion values, then populateAppobj with CCP values last. Elements to update are: tableWidth and tableWrapperWidth.
+      // !VA Now update the CCP UI with the most recent changes to dynamicRegion values, then populateAppobj with CCP values last. writeCcpDOM takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the element alias as key and the Appobj value as value. Elements to update here are: tableWidth and tableWrapperWidth.
+
+
+
       var tableWidth = [];
       var tableWrapperWidth = [];
       tableWidth = [ccpUserInput.iptCcpTableWidth, Appobj.imgW ];
       tableWrapperWidth = [ccpUserInput.iptCcpTableWrapperWidth, Appobj.viewerW];
-      // !VA writeElementValue takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the element alias as key and the Appobj value as value.
-      UICtrl.writeDOMElementValues(tableWidth, tableWrapperWidth);
+      // !VA This works, but it shouldn't be done here because it overwrites fixed/fluid.
+      UICtrl.writeCcpDOM(tableWidth, tableWrapperWidth);
 
       // !VA Write the inspectors based on Appobj values
       UICtrl.writeInspectors(Appobj);
     }
 
+    function handleCcpUserInput(params) {
+      console.log('handleCcpUserInput running');
+
+    }
+
+    // function initUI() {
+    //   UIController.toggleCCP()
+    // }
+
     // !VA appController private
     // !VA Branch: implementAppobj03 (060820)
     // !VA Handle CCP User Input
-    function handleCcpUserInput(evt) {
+    function handleCcpRadioSelection(evt) {
+
+
+
+      console.clear();
+      console.log('handleCcpRadioSelection running');
       let Appobj = appController.getAppobj();
       let imgType;
-      console.log('handleCcpInput running');
       console.log('evt.target.id is: ' + evt.target.id);
       let alias;
       alias = '#' + evt.target.id;
@@ -3241,25 +3288,27 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       console.dir(Appobj);
     }
 
+    // !VA appController private
+    // !VA Called in handleTdOptions
     function writeAppobjToDOM() {
+
       console.log('writeAppobjToDOM running');
-      // !VA Branch: implementAppobj03 (060820)
+      // !VA Branch: implementAppobj04 (060820)
       // !VA This is where we batch-update the DOM based on Appobj
+
+      // !VA First, this should be handled in populateAppobj
+
+      // !VA NOW Problem here is that at this point, we still don't have CCP properties in Appobj, and the Appobj generated in initCCP doesn't include the dynamicRegions. The event handler calls handleCcpRadioSelection or handleCcpUserInput, but these handlers don't populate Appobj with the current Ccp state, and populateAppobj call in initCcp doesn't carry over to appController.  I don't want to be calling populateAppobj every time I make a CCp selection, that defeats the whole purpose of having an Appobj. What I need to do is populate Appobj whenever the CCP is opened and have that Appobj be scoped to appController and persist for as long as the CCP is open. Then I can updateAppobj individually for any changed CCP element. So, what should happen is the clipboard button event should point to initCcp in appController, which makes a DOM call to get the active status of CCP so it can populateAppdata('ccp') in the appController scope. Then, it calls displayCcp in UIController public to toggle the CCP. That should expose Ccp properties Appobj in appController so they persist as long as the CCP is open. Let's try that.
+      
+      
       for (const [key, value] of Object.entries(Appobj)) {
-
-
-        
+        console.log('key is: ' + key);
+        console.log('key.substring( 3, 6) is: ' + key.substring( 3, 6));
         if (key.substring( 3, 6) === 'Ccp') {
-          
           console.log('key is: ' + key);
           console.log('HIT');
-
-
-          
         }
       }
-
-      
     }
 
 
@@ -3280,8 +3329,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       case alias.includes('basic'):
         // !VA Branch: implementAppobj03 (060820)
         // !VA Add default 'basic' options to Appobj here.
-
-
         break;
       case alias.includes('excludeimg'):
         // !VA Add default 'excludeimg' options to Appobj here.
@@ -3302,10 +3349,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // code block
       } 
 
-      writeAppobjToDOM();
+      // writeAppobjToDOM();
 
     }
 
+    // !VA Branch: implementAppobj04 (061020)
     function handleImgType(imgType) {
       console.log('handleImgType running');
       // !VA NOTE
@@ -3315,14 +3363,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       if (imgType === 'fixed') {
         // !VA Set the disable flag for the handleCcpActions call
         disable = false;
-
         // !VA Branch: implementAppobj03 (060820)
         // !VA This should pass to handleTdOptions for default Appobj properties. 
 
-
-
-        // !VA Set the default values for tableWidth, tableClass, tableWrapperWidth and tableWrapperClass. These are user-editable.
+        // !VA Set the default Appobj values for tableWidth, tableClass, tableWrapperWidth and tableWrapperClass. These are user-editable.
         Appobj.iptCcpTableWidth = Appobj.imgW;
+        // !VA TODO: Write class to placeholder in order to keep the user-defined value here.
         Appobj.iptCcpTableClass = '';
         Appobj.iptCcpTableWrapperWidth = Appobj.viewerW;
         Appobj.iptCcpTableWrapperClass = 'devicewidth';
@@ -3348,6 +3394,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         document.querySelector('#ccp-table-include-wrapper-label').classList.add('disabled');
 
 
+
+
+
+
+
       } else {
         console.log('ERROR in handleImgType - unknown imgType');
       }
@@ -3371,7 +3422,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       UIController.handleCcpActions( 'selectradiobutton', selectedTdOption, true);
       // !VA Disable/Enable CCP Input Elements
       const inputElementsToDisable = [ ccpUserInput.iptCcpTableClass, ccpUserInput.iptCcpTableWidth,ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth ];
+
+
       UIController.handleCcpActions( 'setdisabledtextinput', inputElementsToDisable, disable);
+
+
       // !VA Disable/Enable CCP Radio Select Elements
       const radioElementsDisable = [ ccpUserInput.rdoCcpTdExcludeimg, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdBgimage, ccpUserInput.rdoCcpTdPosswitch, ccpUserInput.rdoCcpTdVmlbutton ];
       UIController.handleCcpActions( 'setdisabledradio', radioElementsDisable, disable);
@@ -3835,7 +3890,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         return Appobj;
       },
 
-
+      initCcp: function () {
+        let isActive;
+        isActive = UIController.toggleCcp();
+        // console.log('isActive is: ' + isActive);
+        if (isActive) {
+          UIController.populateAppobj(Appobj, 'ccp');
+        }
+        // console.log('initCCP Appobj is: ');
+        // console.log(Appobj);
+      },
 
       // !VA This is a pass-thru to access queryDOMElements (public UIController)  to get the current dimensions of the dynamic DOM elements and data attributes, and getAppdata (private appController) to calculate the non-DOM Appdata properties. We do this here because Appdata has to be queried in all three modules, so it has to be accessible in all of them, and because getAppdata needs getAspectRatio which belongs in appController.
       // !VA appController public
