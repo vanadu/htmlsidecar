@@ -348,7 +348,30 @@ var Witty = (function () {
       document.querySelector(arg[0]).value = arg[1];
     }
 
+    function handleCcpInput2(arg) {
+      console.log('handleCcpInput2 running');
+      console.log('arg is: ');
+      console.dir(arg);
+      // !VA This is where we'd call getAppobj to get the value corresponding to Appobj[arg].
+      // !VA Appobj OK, so now modify getAppobj to return individual properties.
 
+      var foo = appController.getAppobj2(arg);
+      console.log('foo: ');
+      console.dir(foo);
+
+      // if (Appobj.substring( 0 , 3) === 'ipt') {
+      //   console.log('HIT');
+      //   var baz = Appobj[arg];
+      //   console.log('baz is: ' + baz);
+      // }
+      
+
+
+
+
+
+      // document.querySelector(arg[0]).value = arg[1];
+    }
 
 
     // !VA CCP FUNCTIONS
@@ -426,7 +449,7 @@ var Witty = (function () {
             document.querySelector(staticRegions.ccpContainer).classList.remove('active');
 
             var ccpState = UIController.toggleCcp();
-            console.log('ccpState devmode is: ' + ccpState);
+            // console.log('ccpState devmode is: ' + ccpState);
             appController.initCcp();
             // console.log('devmode Appobj is: ');
             // console.log(Appobj);
@@ -477,9 +500,9 @@ var Witty = (function () {
       // !VA Writes the dynamicRegion elements to the DOM based on Appobj and the height of the viewerW containers. Called from resizeContainers
       // !VA TODO: resizeContainers doesn't really have much left in it - consider splitting calcViewerSize or integrating resizeContainers into it since it now doesn't have any DOM access either
       writeDynamicRegionsDOM: function(Appobj, viewportH, appH) {
-        console.log('writeDynamicRegionsDOM running');
-        console.log('writeDynamicRegionsDOM Appobj is: ');
-        console.log(Appobj);
+        // console.log('writeDynamicRegionsDOM running');
+        // console.log('writeDynamicRegionsDOM Appobj is: ');
+        // console.log(Appobj);
 
         // !VA TODO: Make function
         document.querySelector(dynamicRegions.imgViewer).style.width = Appobj.viewerW + 'px';
@@ -494,16 +517,37 @@ var Witty = (function () {
       // !VA Branch: implementAppobj04 (061020)
       // !VA Write specific CCP DOM element values based one or more arguments consisting of key/value array where the key is the element alias and the value is the value. 
       // !VA Let's try to derive the type of write action, i.e. value, disable, active class, from the ID argument. 
-      writeCcpDOM: function (...args) {
-        console.log('writeCcpDOM running');
+      // writeCcpDOM: function (...args) {
+      //   console.log('writeCcpDOM running');
+      //   console.log('args is: ');
+      //   console.log(args);
+      //   for (let i = 0; i < args.length; i++) {
+      //     // document.querySelector(args[i][0]).value = args[i][1];
+      //     console.log('args[i] is: ' +  args[i]);
+      //     if (args[i][0].substring( 0 , 4) === '#ipt') {
+      //       console.log('This is an input element');
+      //       handleCcpInput(args[i]);
+      //     } else if (args[i][0].substring( 0 , 4) === '#rdo') {
+      //       console.log('This is a radio button');
+      //     } else if (args[i][0].substring( 0 , 4) === '#sel') {
+      //       console.log('This is a select dropdown');
+      //     } else if (args[i][0].substring( 0 , 4) === '#spn') {
+      //       console.log('This is a mock checkbox');
+      //     }
+      //   }
+      // },
+
+      writeCcpDOM2: function (...args) {
+        console.log('writeCcpDOM2 running');
         console.log('args is: ');
         console.log(args);
         for (let i = 0; i < args.length; i++) {
           // document.querySelector(args[i][0]).value = args[i][1];
           console.log('args[i] is: ' +  args[i]);
-          if (args[i][0].substring( 0 , 4) === '#ipt') {
+          if (args[i].substring( 0 , 3) === 'ipt') {
             console.log('This is an input element');
-            handleCcpInput(args[i]);
+            // handleCcpInput(args[i]);
+            handleCcpInput2(args[i]);
           } else if (args[i][0].substring( 0 , 4) === '#rdo') {
             console.log('This is a radio button');
           } else if (args[i][0].substring( 0 , 4) === '#sel') {
@@ -513,6 +557,7 @@ var Witty = (function () {
           }
         }
       },
+
 
       populateAppobj: function (Appobj, access) {
         // !VA IIFE for populating 
@@ -2849,7 +2894,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA Only set vars and get values if Tab and Enter keys were pressed
       if (keydown == 9 || keydown == 13 ) {
-        console.log('Tab or Enterr pressed');
+        // console.log('Tab or Enterr pressed');
         var isErr, isEnter, isTab;
         var inputArray = { };
 
@@ -3237,7 +3282,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA This works, but it shouldn't be done here because it overwrites fixed/fluid.
       // !VA Also, this should only be done if the CCP is open. To do that,  put a flag in toggleCCP:
 
-      // !VA If CCP is open, write the above to 
+      // !VA If CCP is open, write tableWidth and tableWrapperWidth to the DOM elements. 
+      // !VA TODO: Determine if this is the right place for this. It ovewrites the fluid/fixed values and probably shouldn't.  
       var ccpState = UICtrl.toggleCcp(false);
       if (ccpState) { 
 
@@ -3247,7 +3293,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         tableWidth = [ccpUserInput.iptCcpTableWidth, Appobj.imgW ];
         tableWrapperWidth = [ccpUserInput.iptCcpTableWrapperWidth, Appobj.viewerW];
         // !VA Write the values to the CCP DOM
-        UICtrl.writeCcpDOM(tableWidth, tableWrapperWidth);
+        // UICtrl.writeCcpDOM(tableWidth, tableWrapperWidth);
+
+
+        // !VA Passing just the Appobj key
+        UICtrl.writeCcpDOM2('iptCcpTableWidth', 'iptCcpTableWrapperWidth');
+
+
+
 
         console.log('resizeContainers Appobj is: ');
         console.log(Appobj);
@@ -3903,15 +3956,31 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController public functions
     return {
 
-
+      // !VA 
       getAppobj: function() {
         return Appobj;
+      },
+
+      getAppobj2: function(arg) {
+        let retval;
+        
+        if (arg !== false) {
+          // !VA If arg is not false, process the input as an Appobj key
+          retval = arg;
+          retval = Appobj[arg];
+        } else if (arg === false) {
+          // Return the entire Appobj
+          retval = Appobj;
+        } else {
+          console.log('ERROR in getAppobj2 - unknown arg');
+        }
+        return retval;
       },
 
       initCcp: function () {
         let ccpState;
         ccpState = UIController.toggleCcp(true);
-        console.log('ccpState is: ' + ccpState);
+        // console.log('ccpState is: ' + ccpState);
         if (ccpState) {
           UIController.populateAppobj(Appobj, 'ccp');
           console.log('initCCP Appobj is: ');
