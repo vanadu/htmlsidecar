@@ -3911,12 +3911,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       initCcp: function () {
         let ccpState;
         ccpState = UIController.toggleCcp(true);
-        // console.log('isActive is: ' + isActive);
+        console.log('ccpState is: ' + ccpState);
         if (ccpState) {
           UIController.populateAppobj(Appobj, 'ccp');
+          console.log('initCCP Appobj is: ');
+          console.log(Appobj);
         }
-        console.log('initCCP Appobj is: ');
-        console.log(Appobj);
       },
 
       // !VA This is a pass-thru to access queryDOMElements (public UIController)  to get the current dimensions of the dynamic DOM elements and data attributes, and getAppdata (private appController) to calculate the non-DOM Appdata properties. We do this here because Appdata has to be queried in all three modules, so it has to be accessible in all of them, and because getAppdata needs getAspectRatio which belongs in appController.
