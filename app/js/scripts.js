@@ -423,8 +423,13 @@ var Witty = (function () {
             appController.initCalcViewerSize();
             // !VA Open the CCP by default in dev mode
             // !VA First, set it to the opposite of how you want to start it.
-            document.querySelector(staticRegions.ccpContainer).classList.add('active');
+            document.querySelector(staticRegions.ccpContainer).classList.remove('active');
 
+            var ccpState = UIController.toggleCcp();
+            console.log('ccpState devmode is: ' + ccpState);
+            appController.initCcp();
+            // console.log('devmode Appobj is: ');
+            // console.log(Appobj);
             // !VA NOW: The toggle Ccp element functions are all in appController either I have to replicated them here or find another solution or live with the fact that they don't initialize. Or run initUI from here...
 
           }, delayInMilliseconds);
@@ -602,7 +607,7 @@ var Witty = (function () {
       },
 
       // !VA UIController public
-      // !VA The toggle argument is a boolean flag to indicate whether to actually toggle the CCP on and off or just to return the state
+      // !VA The toggle argument is a boolean flag to indicate whether to actually toggle the CCP on and off or just to return the state. Don't forget that Appobj doesn't exist here, so don't try to log it.
       toggleCcp: function(toggle) {
         // !VA Branch: implementAppobj02 (060620)
         // !VA NOTE: All this does now is toggle the CCP on and off or return the toggle state
@@ -629,6 +634,9 @@ var Witty = (function () {
 
         // !VA If the CCP is displayed, return true, otherwise false
         document.querySelector(staticRegions.ccpContainer).classList.contains('active') ? ccpState = true : ccpState = false;
+        
+
+
         return ccpState;
       },
 
@@ -3240,6 +3248,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         tableWrapperWidth = [ccpUserInput.iptCcpTableWrapperWidth, Appobj.viewerW];
         // !VA Write the values to the CCP DOM
         UICtrl.writeCcpDOM(tableWidth, tableWrapperWidth);
+
+        console.log('resizeContainers Appobj is: ');
+        console.log(Appobj);
+
       }
 
       // !VA Write the inspectors based on Appobj values
@@ -3903,8 +3915,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         if (ccpState) {
           UIController.populateAppobj(Appobj, 'ccp');
         }
-        // console.log('initCCP Appobj is: ');
-        // console.log(Appobj);
+        console.log('initCCP Appobj is: ');
+        console.log(Appobj);
       },
 
       // !VA This is a pass-thru to access queryDOMElements (public UIController)  to get the current dimensions of the dynamic DOM elements and data attributes, and getAppdata (private appController) to calculate the non-DOM Appdata properties. We do this here because Appdata has to be queried in all three modules, so it has to be accessible in all of them, and because getAppdata needs getAspectRatio which belongs in appController.
