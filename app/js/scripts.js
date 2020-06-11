@@ -601,11 +601,12 @@ var Witty = (function () {
         return Appobj;
       },
 
-      // !VA UIController public 
-      toggleCcp: function() {
+      // !VA UIController public
+      // !VA The toggle argument is a boolean flag to indicate whether to actually toggle the CCP on and off or just to return the state
+      toggleCcp: function(toggle) {
         // !VA Branch: implementAppobj02 (060620)
-        // !VA NOTE: All this does now is toggle the CCP on and off.
-        let isActive;
+        // !VA NOTE: All this does now is toggle the CCP on and off or return the toggle state
+        let ccpState;
         /* !VA   This is where we write the Appobj properties somehow. But no - because the values aren't written to the input elements yet. Where is that done? In toggleImgType, then handleCcpActions. What's happening is that handleCcpActions gets the values from the Attributes, where the values are defined. That's ass-backwards. The values should be defined in Appobj and then written to the Attributes. So let's try that. 
       */ 
         // showTdOptions();
@@ -621,15 +622,14 @@ var Witty = (function () {
         // } 
         // !VA IMPORTANT: Isn't this done somewhere else too? The app initializes with the CCP closed, so toggle it on and off here.
 
-
-
-
-        // !VA Toggle the CCP on and off
-        document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
+        // !VA If the toggle argument is true, toggle the CCP on and off
+        if (toggle) {
+          document.querySelector(staticRegions.ccpContainer).classList.toggle('active');
+        }
 
         // !VA If the CCP is displayed, return true, otherwise false
-        document.querySelector(staticRegions.ccpContainer).classList.contains('active') ? isActive = true : isActive = false;
-        return isActive;
+        document.querySelector(staticRegions.ccpContainer).classList.contains('active') ? ccpState = true : ccpState = false;
+        return ccpState;
       },
 
       // !VA UIController public
@@ -3225,16 +3225,22 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       UIController.writeDynamicRegionsDOM(Appobj, viewportH, appH);
 
       // !VA Pick it up here in implementAppobj04
-      // !VA Now update the CCP UI with the most recent changes to dynamicRegion values, then populateAppobj with CCP values last. writeCcpDOM takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the element alias as key and the Appobj value as value. Elements to update here are: tableWidth and tableWrapperWidth.
 
-
-
-      var tableWidth = [];
-      var tableWrapperWidth = [];
-      tableWidth = [ccpUserInput.iptCcpTableWidth, Appobj.imgW ];
-      tableWrapperWidth = [ccpUserInput.iptCcpTableWrapperWidth, Appobj.viewerW];
       // !VA This works, but it shouldn't be done here because it overwrites fixed/fluid.
-      UICtrl.writeCcpDOM(tableWidth, tableWrapperWidth);
+      // !VA Also, this should only be done if the CCP is open. To do that,  put a flag in toggleCCP:
+
+      // !VA If CCP is open, write the above to 
+      var ccpState = UICtrl.toggleCcp(false);
+      if (ccpState) { 
+
+        // !VA If the CCP is open, update the CCP UI with the most recent changes to dynamicRegion values, then populateAppobj with CCP values last. writeCcpDOM takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the element alias as key and the Appobj value as value. Elements to update here are: tableWidth and tableWrapperWidth. If the CCP is not open, don't update its values.
+        var tableWidth = [];
+        var tableWrapperWidth = [];
+        tableWidth = [ccpUserInput.iptCcpTableWidth, Appobj.imgW ];
+        tableWrapperWidth = [ccpUserInput.iptCcpTableWrapperWidth, Appobj.viewerW];
+        // !VA Write the values to the CCP DOM
+        UICtrl.writeCcpDOM(tableWidth, tableWrapperWidth);
+      }
 
       // !VA Write the inspectors based on Appobj values
       UICtrl.writeInspectors(Appobj);
@@ -3891,10 +3897,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       },
 
       initCcp: function () {
-        let isActive;
-        isActive = UIController.toggleCcp();
+        let ccpState;
+        ccpState = UIController.toggleCcp(true);
         // console.log('isActive is: ' + isActive);
-        if (isActive) {
+        if (ccpState) {
           UIController.populateAppobj(Appobj, 'ccp');
         }
         // console.log('initCCP Appobj is: ');
