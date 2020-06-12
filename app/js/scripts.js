@@ -226,6 +226,24 @@ var Witty = (function () {
       selCcpTableWrapperAlign: '#sel-ccp-table-wrapper-align',
       iptCcpTableWrapperBgColor: '#ipt-ccp-table-wrapper-bgcolor',
     };
+
+    
+    // !VA Parent elements of elements to be displayed/undisplayed with active class based on tdoptions selections
+    const ccpParentElement = {
+      ccpTdAlign: '#ccp-td-align', 
+      ccpTdValign: '#ccp-td-valign', 
+      ccpTdClass: '#ccp-td-class', 
+      ccpTdHeight: '#ccp-td-height', 
+      ccpTdWidth: '#ccp-td-width', 
+      ccpTdBgColor: '#ccp-td-bgcolor', 
+      ccpTdFontColor: '#ccp-td-fontcolor', 
+      ccpTdBorderColor: '#ccp-td-bordercolor',
+      ccpTdBorderRadius: '#ccp-td-borderradius', 
+      ccpTableWrapperClass: '#ccp-table-wrapper-class', 
+      ccpTableWrapperWidth: '#ccp-table-wrapper-width', 
+      ccpTableWrapperAlign: '#ccp-table-wrapper-align', 
+      ccpTableWrapperBgColor: '#ccp-table-wrapper-bgcolor'
+    };
     
     // !VA CCP Elements used for tooltips. This is a different list than the CCPUserInput elements although some are duplicated. The element that triggers the tooltip has to be the parent element of the input or checkbox element, otherwise if the user hovers over a label instead of the actual input element, nothing happens.
     const ccpUserInputLabels = {
@@ -350,6 +368,46 @@ var Witty = (function () {
 
 
     // !VA CCP FUNCTIONS
+    // !VA AppobjMap is a map generated from Appobjh in handleCCpActions. args is an array of strings corresponding to Appobj/ccpUserElement properties passed in from handleCCpActions, originating from handleImgType
+    // !VA TODO: see if handleImgType can be consolidated with other similar Appobj handlers.
+    function setCcpValues(AppobjMap, args) {
+      console.log('setCcpValue2 running');
+      console.clear();
+      for (let i = 0; i < args.length; i++) {
+        document.querySelector(ccpUserInput[args[i]]).value = AppobjMap.get(args[i]);
+      }
+    }
+
+
+    // !VA Branch: implementAppobj04 (061020)
+    // !VA Loop through and apply values to elements. The option parameter contains an array of values or false, in which case an empty string is appled to every element.
+    function setCcpValueOLD(args) {
+      for (let i = 0; i < args.length; i++) {
+        if (args[1]) {
+          document.querySelector(args[0]).value = args[1];
+        } else {
+          document.querySelector(args[0]).value = '';
+        }
+      }
+    }
+
+    // !VA Branch: implementAppobj04 (061020)
+    // !VA Function to show the specific options available for the selected TD options radio
+    function setActiveCcpClass(args) {
+      for (let i = 0; i < elemArray.length; i++) {
+        // !VA If the action parameter contains the string 'parent' then apply/remove the active class to/from the parent of the target rather than the target itself.
+        if (action.includes('parent')) {
+          elem = getParentDiv(elemArray[i]);
+        }
+        // !VA If the option parameter is true, add the active class, otherwise remove it.
+        if (option) {
+          document.querySelector(elem).classList.add('active');
+        } else {
+          document.querySelector(elem).classList.remove('active');
+        }
+      }
+    }
+
 
     // !VA UIController public functions
     return {
@@ -488,6 +546,74 @@ var Witty = (function () {
         document.querySelector(dynamicRegions.appContainer).style.height = appH + 'px';
 
       }, 
+
+
+
+      // !VA Branch: implementAppobj04 (061020)
+      // !VA UIController public 
+      // !VA Writes Appobj values to the CCP DOM based on parameters: Appobj, the action identifier string and an array of rest parameters from the appController Appobj handler. 
+      handleCcpActions: function (Appobj, action, ...args) {
+        // console.log('handleCcpActions running');
+        // console.log('handleCcpActions Appobj: ');
+        // console.dir(Appobj);
+        // console.log('action is: ' + action);
+        // console.log('args is: ');
+        // console.log(args);
+        // !VA Create a map of Appobj entries
+        const AppobjMap = new Map(Object.entries(Appobj));
+        console.log('AppobjMap: ');
+        console.dir(AppobjMap);
+        switch(true) {
+        // !VA If the action identifier is 'setvalue' pass the map of Appobj key/value entries and the argument array to setCcpValues.
+        case action === 'setvalue':
+          setCcpValues(AppobjMap, args);
+          break;
+        // case :
+        //   // code block
+        //   break;
+        default:
+          // code block
+          console.log('ERROR in handleCcpActions3 - case not defined');
+        } 
+
+
+
+        for (let i = 0; i < args.length; i++) {
+          console.log('args[i] is: ' +  args[i]);
+          var baz = AppobjMap.get(args[i]);
+          console.log('baz is: ' + baz);
+          document.querySelector(ccpUserInput[args[i]]).value = AppobjMap.get(args[i]);
+        }
+
+
+
+      },
+
+
+      handleCcpActions2: function (action, ...args) {
+        console.log('handleCcpActions2 running');
+        console.log('args is: ');
+        console.log(args);
+
+        for (let i = 0; i < args.length; i++) {
+          // document.querySelector(args[i][0]).value = args[i][1];
+          console.log('action is: ' + action);
+          console.log('args[i] is: ' +  args[i]);
+          if (args[i][0].substring( 0 , 4) === '#ipt' || action === 'setvalue') {
+            console.log('Input: setvalue');
+            setCcpValue(args[i]);
+
+
+          } else if (args[i][0].substring( 0 , 4) === '#rdo') {
+            console.log('This is a radio button');
+          } else if (args[i][0].substring( 0 , 4) === '#sel') {
+            console.log('This is a select dropdown');
+          } else if (args[i][0].substring( 0 , 4) === '#spn') {
+            console.log('This is a mock checkbox');
+          }
+        }
+
+      },
 
       // !VA Branch: implementAppobj04 (061020)
       // !VA Write specific CCP DOM element values based one or more arguments consisting of key/value array where the key is the element alias and the value is the value. 
@@ -696,8 +822,10 @@ var Witty = (function () {
         return domElements;
       },
 
+
+
       // !VA Catch-all function for displaying/undisplaying, disabling/enabling and adding/removing classes to CCP elements. action is the action to execute, elemArray is the array of elements the action is to apply to and state is the toggle state whereby true turns the action on and false turns it off.
-      handleCcpActions: function (action, elemArray, option ) {
+      handleCcpActionsOLD: function (action, elemArray, option ) {
         // console.clear();
         // console.log('handleCcpDisplay running');
         // console.log('action');
@@ -729,6 +857,7 @@ var Witty = (function () {
           }
         }
 
+        // !VA Branch: implementAppobj04 (061020)
         // !VA Loop through and apply values to elements. The option parameter contains an array of values or false, in which case an empty string is appled to every element.
         function setValue(elemArray, option) {
           for (let i = 0; i < elemArray.length; i++) {
@@ -3313,13 +3442,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       case alias === ccpUserInput.rdoCcpImgFixed:
         Appobj.rdoCcpImgFixed = true, Appobj.rdoCcpImgFluid = false;
         imgType = 'fixed';
-        handleImgType(imgType);
+        handleImgType2(imgType);
         console.log('fixed clicked');
         break;
       case alias === ccpUserInput.rdoCcpImgFluid:
         imgType = 'fluid';
         Appobj.rdoCcpImgFixed = false, Appobj.rdoCcpImgFluid = true;
-        handleImgType(imgType);
+        handleImgType2(imgType);
         console.log('fluid clicked');
         break;
       case alias.includes('rdo-ccp-td') :
@@ -3329,8 +3458,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       default:
         // code block
       } 
-      console.log('Appobj is: ');
-      console.dir(Appobj);
+      // console.log('Appobj is: ');
+      // console.dir(Appobj);
     }
 
     // !VA appController private
@@ -3399,24 +3528,23 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA Branch: implementAppobj04 (061020)
-    // !VA 
-    function handleImgType(imgType) {
-      console.log('handleImgType running');
-      // !VA NOTE
-      let disable;
-      let tableWidth, tableClass, tableWrapperWidth, tableWrapperClass, tdOption, includeWrapper, excludeImg, posSwitch, imgSwap, bgImage, vmlButton;
+    // !VA Now we need a function that will run the appropriate display routine based on the 4-char ID prefix
+    function handleImgType2(imgType) {
+      console.log('handleImgType2 running');
+
       // !VA If the 'fixed' img option is selected
       if (imgType === 'fixed') {
-        // !VA Set the disable flag for the handleCcpActions call
-        disable = false;
-        // !VA Branch: implementAppobj03 (060820)
-        // !VA This should pass to handleTdOptions for default Appobj properties. 
+        // !VA Set Appobj values
+        Appobj.iptCcpTableWidth = Appobj.imgW;
+        Appobj.iptCcpTableClass = '';
+        Appobj.iptCcpTableWrapperWidth = Appobj.viewerW;
+        Appobj.iptCcpTableWrapperClass = 'devicewidth';
+
+
 
         // !VA Set the default Appobj values for tableWidth, tableClass, tableWrapperWidth and tableWrapperClass. These are user-editable.
-        tableWidth =        [Appobj.iptCcpTableWidth, Appobj.imgW];
         // !VA TODO: Write class to placeholder in order to keep the user-defined value here.
-        tableClass =        [Appobj.iptCcpTableClass, ''];
-        tableWrapperWidth = [Appobj.iptCcpTableWrapperWidth, Appobj.viewerW];
+        // tableWrapperWidth = [ccpUserInput.iptCcpTableWrapperWidth, Appobj.viewerW];
         // !VA tableWrapperClass is devicewidth in both cases
         // tableWrapperClass = [Appobj.iptCcpTableWrapperClass,'devicewidth'];
 
@@ -3425,29 +3553,31 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // document.querySelector('#ccp-table-include-wrapper-label').classList.remove('disabled');
 
 
+
+        // !VA Set values for fixed option
+
+
+
+
       } else if (imgType === 'fluid') {
-        // !VA Set the disable flag for the handleCcpActions call
-        disable = true;
-        // !VA Appboj properties - these will be batch-appied to both UI and Attributes based on the Appobj property. They are disabled and non-editable by the user and are based on CSS definitions in the template.
-        tableWidth =        [Appobj.iptCcpTableWidth, '100%'];
-        tableClass =        [Appobj.iptCcpTableClass, 'devicewidth'];
-        tableWrapperWidth = [Appobj.iptCcpTableWrapperWidth, '100%'];
-        // !VA tableWrapperClass is devicewidth in both cases
-        // tableWrapperClass = [Appobj.iptCcpTableWrapperClass,''];
-        
-        // !VA Preselect the option 'basic' for the tdoptions radio group. The other td options won't work with or aren't applicable for fluid because fluid is only for images. 
-        tdOption = [Appobj.rdoCcpTdBasic, true];
-        // !VA Check includeWrapper by default
-        includeWrapper = [Appobj.spnCcpTableIncludeWrapperCheckmrk, 'on'];
-
-        // !VA Set all the other TD Option radio buttons to false
-        [Appobj.rdoCcpTdExcludeimg, false], [Appobj.rdoCcpTdPosswitch, false], [Appobj.rdoCcpTdImgswap, false], [Appobj.rdoCcpTdBgimage, false],  [Appobj.rdoCcpTdVmlbutton, false];
-
+        Appobj.iptCcpTableWidth = '100%';
+        Appobj.iptCcpTableClass = 'devicewidth';
+        Appobj.iptCcpTableWrapperWidth = '100%';
+        Appobj.iptCcpTableWrapperClass = 'devicewidth';
+        Appobj.rdoCcpTdBasic = true;
+        Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
+        Appobj.rdoCcpTdExcludeimg = false;
+        Appobj.rdoCcpTdPosswitch = false;
+        Appobj.rdoCcpTdImgswap = false;
+        Appobj.rdoCcpTdBgimage = false;
+        Appobj.rdoCcpTdVmlbutton = false;
         // !VA TODO Integrate into handleCcpActions - doesn't work
         // document.querySelector('#ccp-table-include-wrapper').classList.add('disable-checkbox');
         // document.querySelector('#ccp-table-include-wrapper-label').classList.add('disabled');
 
-
+        // !VA Pass the action 'setvalue' in the first parameter; the following rest parameters is the list of ID/value arrays.
+        // UIController.handleCcpActions2( 'setvalue', tableWidth, tableClass, tableWrapperWidth );
+        // !VA Disable inapplicable td radio buttons
 
 
 
@@ -3456,9 +3586,111 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
 
 
-      // !VA DOM Access via UIController.handleCcpActions
 
-      // !VA Branch: implementAppobj03 (060820)
+      UIController.handleCcpActions3( Appobj, 'setvalue', 'iptCcpTableWidth', 'iptCcpTableClass', 'iptCcpTableWrapperWidth' );
+
+
+
+
+
+      // const myMap = new Map(Object.entries(Appobj));
+      // console.log('myMap: ');
+      // console.dir(myMap);
+      // var blob = myMap.get('iptCcpTableWidth');
+      // console.log('blob is: ' + blob);
+
+      // var foo = [ 'iptCcpTableWidth', 'iptCcpTableWrapperWidth'];
+      // for (let i = 0; i < foo.length; i++) {
+      //   console.log('foo[i] is: ' +  foo[i]);
+      //   var baz = myMap.get(foo[i]);
+      //   console.log('baz is: ' + baz);
+      //   document.querySelector(ccpUserInput[foo[i]]).value = myMap.get(foo[i]);
+      // }
+    }
+
+
+      
+
+
+
+
+
+    // !VA Branch: implementAppobj04 (061020)
+    // !VA Now we need a function that will run the appropriate display routine based on the 4-char ID prefix
+    function handleImgType(imgType) {
+      console.log('handleImgType running');
+      // !VA NOTE
+      // !VA Initialize arrays with the ID alias in [0]
+      let 
+        tableWidth = [ccpUserInput.iptCcpTableWidth, ''],
+        tableClass = [ccpUserInput.iptCcpTableClass, ''], 
+        tableWrapperWidth = [ccpUserInput.iptCcpTableWrapperWidth, ''], 
+        tableWrapperClass = [ccpUserInput.iptCcpTableWrapperClass, ''], 
+        tdBasic = [ccpUserInput.rdoCcpTdBasic, ''],
+        tdExcludeimg = [ccpUserInput.rdoCcpTdExcludeimg, ''],
+        tdPosswitch = [ccpUserInput.rdoCcpTdPosswitch, ''],
+        tdImgswap = [ccpUserInput.rdoCcpTdImgswap, ''],
+        tdBgimage = [ccpUserInput.rdoCcpTdBgimage, ''],
+        tdVmlButton = [ ccpUserInput.rdoCcpTdVmlbutton, ''],
+        includeWrapper = [ccpUserInput.spnCcpTableIncludeWrapperCheckmrk, '']
+      ;
+      // !VA If the 'fixed' img option is selected
+      if (imgType === 'fixed') {
+        // !VA Set the default Appobj values for tableWidth, tableClass, tableWrapperWidth and tableWrapperClass. These are user-editable.
+        tableWidth[1] = Appobj.imgW;
+        tableClass[1] = '';
+        tableWrapperWidth[1] = Appobj.viewerW;
+        tableWrapperClass[1] = 'devicewidth';
+        // !VA TODO: Write class to placeholder in order to keep the user-defined value here.
+        tableWrapperWidth = [ccpUserInput.iptCcpTableWrapperWidth, Appobj.viewerW];
+
+        // !VA TODO Integrate into handleCcpActions - doesn't work
+        // document.querySelector('#ccp-table-include-wrapper').classList.remove('disable-checkbox');
+        // document.querySelector('#ccp-table-include-wrapper-label').classList.remove('disabled');
+
+        // !VA Set values for fixed option
+        UIController.handleCcpActions3( 'setvalue', tableWidth, tableClass, tableWrapperWidth, tableWrapperClass );
+
+      } else if (imgType === 'fluid') {
+
+        tableWidth[1] = '100%';
+        tableClass[1] = 'devicewidth';
+        tableWrapperWidth[1] = '100%';
+        tableWrapperClass[1] = 'devicewidth';
+        // !VA Preselect the option 'basic' for the tdoptions radio group. The other td options won't work with or aren't applicable for fluid because fluid is only for images. 
+        tdBasic[1] = true;
+        tdExcludeimg[1] = false;
+        tdPosswitch[1] = false;
+        tdImgswap[1] = false;
+        tdBgimage[1] = false;
+        tdVmlButton[1] = false;
+        includeWrapper[1] = 'on';
+
+        UIController.handleCcpActions3( 'setvalue', tableWidth, tableClass, tableWrapperWidth, tableWrapperClass );
+
+        
+
+        // !VA Check includeWrapper by default
+        includeWrapper = [ccpUserInput.spnCcpTableIncludeWrapperCheckmrk, 'on'];
+
+        // !VA Set all the other TD Option radio buttons to false
+        [ccpUserInput.rdoCcpTdExcludeimg, false], [ccpUserInput.rdoCcpTdPosswitch, false], [ccpUserInput.rdoCcpTdImgswap, false], [ccpUserInput.rdoCcpTdBgimage, false],  [ccpUserInput.rdoCcpTdVmlbutton, false];
+
+        // !VA TODO Integrate into handleCcpActions - doesn't work
+        // document.querySelector('#ccp-table-include-wrapper').classList.add('disable-checkbox');
+        // document.querySelector('#ccp-table-include-wrapper-label').classList.add('disabled');
+
+        // !VA Pass the action 'setvalue' in the first parameter; the following rest parameters is the list of ID/value arrays.
+        UIController.handleCcpActions2( 'setvalue', tableWidth, tableClass, tableWrapperWidth );
+        // !VA Disable inapplicable td radio buttons
+
+
+
+      } else {
+        console.log('ERROR in handleImgType - unknown imgType');
+      }
+
+
 
 
 
@@ -3467,19 +3699,19 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
       // !VA Select the 'basic' Ccp radio button element
-      const selectedTdOption = [ ccpUserInput.rdoCcpTdBasic ];
-      UIController.handleCcpActions( 'selectradiobutton', selectedTdOption, true);
+      // const selectedTdOption = [ ccpUserInput.rdoCcpTdBasic ];
+      // UIController.handleCcpActions( 'selectradiobutton', selectedTdOption, true);
       // !VA Disable/Enable CCP Input Elements
-      const inputElementsToDisable = [ ccpUserInput.iptCcpTableClass, ccpUserInput.iptCcpTableWidth,ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth ];
+      // const inputElementsToDisable = [ ccpUserInput.iptCcpTableClass, ccpUserInput.iptCcpTableWidth,ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth ];
 
 
-      UIController.handleCcpActions( 'setdisabledtextinput', inputElementsToDisable, disable);
+      // UIController.handleCcpActions( 'setdisabledtextinput', inputElementsToDisable, disable);
 
 
       // !VA Disable/Enable CCP Radio Select Elements
-      const radioElementsDisable = [ ccpUserInput.rdoCcpTdExcludeimg, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdBgimage, ccpUserInput.rdoCcpTdPosswitch, ccpUserInput.rdoCcpTdVmlbutton ];
-      UIController.handleCcpActions( 'setdisabledradio', radioElementsDisable, disable);
-      toggleIncludeWrapper(true); 
+      // const radioElementsDisable = [ ccpUserInput.rdoCcpTdExcludeimg, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdBgimage, ccpUserInput.rdoCcpTdPosswitch, ccpUserInput.rdoCcpTdVmlbutton ];
+      // UIController.handleCcpActions( 'setdisabledradio', radioElementsDisable, disable);
+      // toggleIncludeWrapper(true); 
 
     }
 
