@@ -196,7 +196,7 @@ var Witty = (function () {
       rdoCcpImgFluid: '#rdo-ccp-img-fluid',
       selCcpImgAlign: '#sel-ccp-img-align',
       iptCcpImgRelPath: '#ipt-ccp-img-relpath',
-      spnCcpImgIncludeAnchorCheckmrk: '#spn-ccp-img-include-anchor-checkmrk',
+      chkCcpImgIncludeAnchorCheckbox: '#chk-ccp-img-include-anchor-checkbox',
       // !VA TD tag user input
       iptCcpTdClass: '#ipt-ccp-td-class',
       selCcpTdAlign: '#sel-ccp-td-align',
@@ -220,7 +220,7 @@ var Witty = (function () {
       // !VA Not in use yet
       // tableMaxWidth: '#ipt-ccp-table-max-width',
       iptCcpTableBgColor: '#ipt-ccp-table-bgcolor',
-      spnCcpTableIncludeWrapperCheckmrk: '#spn-ccp-table-include-wrapper-checkmrk',
+      chkCcpTableIncludeWrapperCheckbox: '#chk-ccp-table-include-wrapper-checkbox',
       iptCcpTableWrapperClass: '#ipt-ccp-table-wrapper-class',
       iptCcpTableWrapperWidth: '#ipt-ccp-table-wrapper-width',
       selCcpTableWrapperAlign: '#sel-ccp-table-wrapper-align',
@@ -370,43 +370,103 @@ var Witty = (function () {
     // !VA CCP FUNCTIONS
     // !VA AppobjMap is a map generated from Appobjh in handleCCpActions. args is an array of strings corresponding to Appobj/ccpUserElement properties passed in from handleCCpActions, originating from handleImgType
     // !VA TODO: see if handleImgType can be consolidated with other similar Appobj handlers.
-    function setCcpValues(AppobjMap, args) {
-      console.log('setCcpValue2 running');
-      console.clear();
-      for (let i = 0; i < args.length; i++) {
-        document.querySelector(ccpUserInput[args[i]]).value = AppobjMap.get(args[i]);
+    function setCcpValues(AppobjMap, elementAlias) {
+      // console.clear();
+      // console.log('setCcpValue2 running');
+      // console.log('elementAlias is: ' + elementAlias);
+      document.querySelector(ccpUserInput[elementAlias]).value = AppobjMap.get(elementAlias);
+    }
+
+    function setCcpDisabledRadio(AppobjMap, elementAlias) {
+      // console.clear();
+      // console.log('setCcpDisabledRadio running');
+      // console.log('AppobjMap: ');
+      // console.dir(AppobjMap);
+      // console.log('AppobjMap.get(elementAlias) is: ' + AppobjMap.get(elementAlias));
+      let elementLabel;
+      // !VA The element label must have a disabled style too, so append -label to the alias to select it.
+      elementLabel = ccpUserInput[elementAlias] +  '-label';
+      // !VA If the Appobj property rdoCcpImgFluid is true, then the rdoCcpImgFluid radio is selected, so apply the disabled styles and disabled attribute
+      if (AppobjMap.get('rdoCcpImgFluid' )) {
+        // !VA Apply the disabled styles to the elements
+        document.querySelector(ccpUserInput[elementAlias]).disabled = true;
+        // !VA 
+        document.querySelector(elementLabel).classList.add('disabled');
+        document.querySelector(ccpUserInput[elementAlias]).classList.add('disabled-radio');
+      } else {
+        // !VA The fluid radio button is not selected, so remove the disabled styles and the disabled attribute
+        document.querySelector(ccpUserInput[elementAlias]).disabled = false;
+        document.querySelector(elementLabel).classList.remove('disabled');
+        document.querySelector(ccpUserInput[elementAlias]).classList.remove('disabled-radio');
       }
     }
 
-
-    // !VA Branch: implementAppobj04 (061020)
-    // !VA Loop through and apply values to elements. The option parameter contains an array of values or false, in which case an empty string is appled to every element.
-    function setCcpValueOLD(args) {
-      for (let i = 0; i < args.length; i++) {
-        if (args[1]) {
-          document.querySelector(args[0]).value = args[1];
-        } else {
-          document.querySelector(args[0]).value = '';
-        }
+    function setCcpActiveParentClass(elementAlias) {
+      // console.log('setActiveClass running');
+      // !VA Build the parent div id from the elementAlias
+      let parentDivId;
+      function getParentDiv(elementAlias) {
+        parentDivId = '#' + ccpUserInput[elementAlias].substring( 5 );
+        // console.log('parentDivId is: ' + parentDivId);
+        return parentDivId;
+      }
+      getParentDiv(elementAlias);
+      if (!document.querySelector(parentDivId).classList.contains('active')) {
+        document.querySelector(parentDivId).classList.add('active');
+      } else {
+        document.querySelector(parentDivId).classList.remove('active');
       }
     }
 
-    // !VA Branch: implementAppobj04 (061020)
-    // !VA Function to show the specific options available for the selected TD options radio
-    function setActiveCcpClass(args) {
+    function setCcpActiveClass(elementAlias) {
+
+      console.log('setCcpActiveClass running');
+      console.log('ccpUserInput[elementAlias] is: ' + ccpUserInput[elementAlias]);
+
+      // if (!document.querySelector(ccpUserInput[elementAlias]).classList.contains('active')) {
+        document.querySelector(ccpUserInput[elementAlias]).classList.add('active');
+      // } else {
+      //   document.querySelector(ccpUserInput[elementAlias]).classList.remove('active');
+      // }
+    }
+
+
+    function setDisabledTextInput(elemArray, option) {
+      console.log('setDisabledTextInput running');
       for (let i = 0; i < elemArray.length; i++) {
-        // !VA If the action parameter contains the string 'parent' then apply/remove the active class to/from the parent of the target rather than the target itself.
-        if (action.includes('parent')) {
-          elem = getParentDiv(elemArray[i]);
-        }
-        // !VA If the option parameter is true, add the active class, otherwise remove it.
         if (option) {
-          document.querySelector(elem).classList.add('active');
+          str = elemArray[i];
+          elementLabel = str + '-label';
+          document.querySelector(elementLabel).classList.add('disabled');
+          document.querySelector(elemArray[i]).disabled = true;
+          document.querySelector(elemArray[i]).classList.add('disabled');
         } else {
-          document.querySelector(elem).classList.remove('active');
+          str = elemArray[i];
+          elementLabel = str + '-label';
+          document.querySelector(elementLabel).classList.remove('disabled');
+          document.querySelector(elemArray[i]).disabled = false;
+          document.querySelector(elemArray[i]).classList.remove('disabled');
         }
       }
     }
+
+
+
+
+    function setCcpCheckbox(elementAlias) {
+      console.log('setCcpCheckbox running');
+      console.log('elementAlias is: ' + elementAlias);
+      let chkId, checkbox;
+      chkId = ccpUserInput[elementAlias];
+      chkId = chkId.replace('mrk', 'box');
+      chkId = chkId.replace('spn', 'chk');
+      checkbox = document.querySelector(chkId);
+      checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
+      console.log('checkbox.checked is: ' + checkbox.checked);
+      
+    }
+
+
 
 
     // !VA UIController public functions
@@ -547,72 +607,48 @@ var Witty = (function () {
 
       }, 
 
-
-
-      // !VA Branch: implementAppobj04 (061020)
       // !VA UIController public 
-      // !VA Writes Appobj values to the CCP DOM based on parameters: Appobj, the action identifier string and an array of rest parameters from the appController Appobj handler. 
-      handleCcpActions: function (Appobj, action, ...args) {
-        // console.log('handleCcpActions running');
-        // console.log('handleCcpActions Appobj: ');
-        // console.dir(Appobj);
-        // console.log('action is: ' + action);
-        // console.log('args is: ');
-        // console.log(args);
-        // !VA Create a map of Appobj entries
-        const AppobjMap = new Map(Object.entries(Appobj));
-        console.log('AppobjMap: ');
-        console.dir(AppobjMap);
-        switch(true) {
-        // !VA If the action identifier is 'setvalue' pass the map of Appobj key/value entries and the argument array to setCcpValues.
-        case action === 'setvalue':
-          setCcpValues(AppobjMap, args);
-          break;
-        // case :
-        //   // code block
-        //   break;
-        default:
-          // code block
-          console.log('ERROR in handleCcpActions3 - case not defined');
-        } 
-
-
-
-        for (let i = 0; i < args.length; i++) {
-          console.log('args[i] is: ' +  args[i]);
-          var baz = AppobjMap.get(args[i]);
-          console.log('baz is: ' + baz);
-          document.querySelector(ccpUserInput[args[i]]).value = AppobjMap.get(args[i]);
-        }
-
-
-
-      },
-
-
-      handleCcpActions2: function (action, ...args) {
-        console.log('handleCcpActions2 running');
+      // !VA Writes Appobj values to the CCP DOM based on parameters: Appobj, and an array of rest parameters from the appController Appobj handler. The rest parameter arrays contain key/value arrays with the identifier corresponding to the appObj/ccpUserInput key and a string identifying the action to perform. This facilitates making multiple DOM accesses based on only one cross-module call to Appobj.
+      // !VA NOTE: I don't like that AppobjMap is passed as a parameter with every loop iteration. I need to think about whether that is fixable, but it works and is pretty fast for now.
+      handleCcpActions3: function (Appobj, ...args) {
+        console.log('handleCcpActions3 running');
+        console.log('handleCcpActions3 Appobj: ');
+        console.dir(Appobj);
         console.log('args is: ');
         console.log(args);
-
+        // !VA Create a map of Appobj entries
+        const AppobjMap = new Map(Object.entries(Appobj));
+        // console.log('AppobjMap: ');
+        // console.dir(AppobjMap);
+        // !VA Loop through all the rest parameter arrays. [1] is the string identifying the action to perform. [0] is the appObj/ccpUserInput key. Based on the condition defined by the action identifier, executed the appropriate function for each of the items in the rest parameter array. 
         for (let i = 0; i < args.length; i++) {
-          // document.querySelector(args[i][0]).value = args[i][1];
-          console.log('action is: ' + action);
-          console.log('args[i] is: ' +  args[i]);
-          if (args[i][0].substring( 0 , 4) === '#ipt' || action === 'setvalue') {
-            console.log('Input: setvalue');
-            setCcpValue(args[i]);
-
-
-          } else if (args[i][0].substring( 0 , 4) === '#rdo') {
-            console.log('This is a radio button');
-          } else if (args[i][0].substring( 0 , 4) === '#sel') {
-            console.log('This is a select dropdown');
-          } else if (args[i][0].substring( 0 , 4) === '#spn') {
-            console.log('This is a mock checkbox');
-          }
+          // console.log('args[i] is: ' +  args[i]);
+          switch(true) {
+          // !VA If the action identifier is 'setvalue' pass the map of Appobj key/value entries and the argument array to setCcpValues.
+          case args[i][1] === 'setvalue':
+            setCcpValues(AppobjMap, args[i][0]);
+            break;
+          case args[i][1] === 'setdisabledradio':
+            setCcpDisabledRadio(AppobjMap, args[i][0]);
+            break;
+          case args[i][1] === 'setactiveparent':
+            setCcpActiveParentClass(args[i][0]);
+            break;
+          case args[i][1] === 'setactiveclass':
+            console.log('args[i][0] is: ' + args[i][0]);
+            setCcpActiveClass(args[i][0]);
+            break;
+          case args[i][1] === 'setcheckbox':
+            setCcpCheckbox( args[i][0]);
+            break;
+          case args[i][1] === 'setdisabledtextinput':
+            setDisabledTextInput(AppobjMap, args[i][0]);
+            break;
+          default:
+            // code block
+            console.log('ERROR in handleCcpActions3 - case not defined');
+          } 
         }
-
       },
 
       // !VA Branch: implementAppobj04 (061020)
@@ -660,7 +696,7 @@ var Witty = (function () {
         // !VA Get the curImg and imgViewer
         // !VA Branch: implementAppobj02 (060620)
         // console.log('access is: ' + access);
-        // !VA TODO: Move to external if appropriate
+        // !VA TODO: Move to external if appropriate or delete if unneeded 
         function chkmrkToChkbox(val) {
           val = val.replace('mrk', 'box');
           val = val.replace('spn', 'chk');
@@ -706,13 +742,17 @@ var Witty = (function () {
 
         }
         function populateCcpProperties(Appobj) {
-          // console.log('initCCP Appobj is: ');
+          console.log('initCCP Appobj is: ');
           // console.log(Appobj);
           // !VA Update CCP properties
           // !VA Now initialize Appobj with the CCP element values. This includes ALL CCP elements, including those that are displayed/undisplayed depending on which TDOption or imgType radio is selected. 
           // !VA Don't forget to use bracket notation to add properties to an object: https://stackoverflow.com/questions/1184123/is-it-possible-to-add-dynamically-named-properties-to-javascript-object
           // !VA  for loop: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
           let val;
+
+          var foo = document.querySelector(ccpUserInput.chkCcpImgIncludeAnchorCheckbox).value;
+          console.log('foo is: ' + foo);
+
           // !VA Loop through all the ccpUserInput properties. If the property is NOT a span (i.e. a mock checkbox) add an Appobj property that corresponds to the key of the respective ccpUserInput property. Otherwise, convert the span ID to the input ID, then add the Appobj property that corresponds to the key of the respective ID.
           // !VA For instance, if the ccpUserInput value starts with '#ipt', create an Appobject property whose key is 'iptCCP...' and assign it the value of the CCP element with the corresponding ccpUserInput alias.
           for (const [key, value] of Object.entries(ccpUserInput)) {
@@ -722,9 +762,9 @@ var Witty = (function () {
             if (value.substring( 0, 4) === '#rdo' ) {
               Appobj[key] = document.querySelector(value).checked;
             }
-            if (value.substring( 0, 4) === '#spn' ) {
-              val = chkmrkToChkbox(value);
-              Appobj[key] = document.querySelector(val).value;
+            if (value.substring( 0, 4) === '#chk' ) {
+              // val = chkmrkToChkbox(value);
+              Appobj[key] = document.querySelector(value).value;
             }
           }
         }
@@ -1132,7 +1172,7 @@ var Witty = (function () {
           // !VA This value is get-only.
           ccpElementId = false;
           let target, checked;
-          target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
+          target = ccpUserInput.chkCcpImgIncludeAnchorCheckbox;
           checked = getCheckboxSelection(target);
           retObj = returnObject( ccpElementId, checked );
           return retObj;
@@ -1286,7 +1326,7 @@ var Witty = (function () {
         })(),
         tableIncludeWrapper: (function() {
           // !VA Changing this to CCP-write to clean up updateCcp
-          ccpElementId = ccpUserInput.spnCcpTableIncludeWrapperCheckmrk;
+          ccpElementId = ccpUserInput.chkCcpTableIncludeWrapperCheckbox;
           checked = getCheckboxSelection(ccpElementId);
           retObj = returnObject( ccpElementId, checked );
           return retObj;
@@ -1455,8 +1495,8 @@ var Witty = (function () {
       // !VA Initialize uSels
       uSels = {
         buttonClicked: '',
-        hasAnchor: getCheckboxSelection(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk),
-        hasWrapper: getCheckboxSelection(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk),
+        hasAnchor: getCheckboxSelection(ccpUserInput.chkCcpImgIncludeAnchorCheckbox),
+        hasWrapper: getCheckboxSelection(ccpUserInput.chkCcpTableIncludeWrapperCheckbox),
         selectedTdOption: selectedTdOption
       };
       if (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)) { 
@@ -1625,7 +1665,7 @@ var Witty = (function () {
       sibling2Elements = [ 'div', 'td', 'table', 'tr', 'td'];
       // !VA We have to handle the Include anchor tag case here because once the nodeList is created, it's a hack to modify it. So we remove the a tag from the arrays before creating the nodeList and setting the node attributes. We'll have to remove the corresponding a tag index from the nodeAttributes array as well otherwise the loop assigning the attributes to the nodeList will break. Note: this is a HACK! But this whole makePosSwitchNodes thing is a hack anyway so lets' make it simple human-readable.
       // !VA Get the checkmark target
-      var target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
+      var target = ccpUserInput.chkCcpImgIncludeAnchorCheckbox;
       // !VA If Include anchor is NOT checked, remove the anchor item from both sibling1 arrays and 
       if (!getCheckboxSelection(target) ) {
         index = 5;
@@ -1769,7 +1809,7 @@ var Witty = (function () {
       nodeAttributes = [ td_switchcontainerAttr, table_switchparentAttr,  tr_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr,  tr_switchchild1Attr, td_switchcontent1Attr, a_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, tr_switchchild2Attr, td_switchcontent2Attr ];
 
       // !VA Remove the anchor attributes from the array if the Include anchor checkbox is checked. The a tag is at position 7 in the attributes array.
-      var target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
+      var target = ccpUserInput.chkCcpImgIncludeAnchorCheckbox;
       if (!getCheckboxSelection(target)) {
         index = 7;
         nodeAttributes.splice(index, 1);
@@ -2348,8 +2388,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
   var appController = (function(CBCtrl, UICtrl) {
 
     // !VA Initialize appObj
-    // function Appobj( fileName, imgW, imgH, imgNW, imgNH, viewerW, viewerH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, aspect, iptCcpImgClass, iptCcpImgAlt, rdoCcpImgFixed, rdoCcpImgFluid, selCcpImgAlign, iptCcpImgRelPath, spnCcpImgIncludeAnchorCheckmrk, iptCcpTdClass, selCcpTdAlign, selCcpTdValign, iptCcpTdHeight, iptCcpTdWidth, iptCcpTdBgColor, iptCcpTdFontColor, iptCcpTdBorderColor, iptCcpTdBorderRadius, rdoCcpTdBasic, rdoCcpTdExcludeimg, rdoCcpTdImgswap, rdoCcpTdPosswitch, rdoCcpTdBgimage, iptCcpTableClass, selCcpTableAlign, iptCcpTableWidth, iptCcpTableBgColor, spnCcpTableIncludeWrapperCheckmrk, iptCcpTableWrapperClass, iptCcpTableWrapperWidth, selCcpTableWrapperAlign, iptCcpTableWrapperBgColor ) {
-    //   return { fileName, imgW, imgH, imgNW, imgNH, viewerW, viewerH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, aspect, iptCcpImgClass, iptCcpImgAlt, rdoCcpImgFixed, rdoCcpImgFluid, selCcpImgAlign, iptCcpImgRelPath, spnCcpImgIncludeAnchorCheckmrk, iptCcpTdClass, selCcpTdAlign, selCcpTdValign, iptCcpTdHeight, iptCcpTdWidth, iptCcpTdBgColor, iptCcpTdFontColor, iptCcpTdBorderColor, iptCcpTdBorderRadius, rdoCcpTdBasic, rdoCcpTdExcludeimg, rdoCcpTdImgswap, rdoCcpTdPosswitch, rdoCcpTdBgimage, iptCcpTableClass, selCcpTableAlign, iptCcpTableWidth, iptCcpTableBgColor, spnCcpTableIncludeWrapperCheckmrk, iptCcpTableWrapperClass, iptCcpTableWrapperWidth, selCcpTableWrapperAlign, iptCcpTableWrapperBgColor };
+    // function Appobj( fileName, imgW, imgH, imgNW, imgNH, viewerW, viewerH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, aspect, iptCcpImgClass, iptCcpImgAlt, rdoCcpImgFixed, rdoCcpImgFluid, selCcpImgAlign, iptCcpImgRelPath, chkCcpImgIncludeAnchorCheckbox, iptCcpTdClass, selCcpTdAlign, selCcpTdValign, iptCcpTdHeight, iptCcpTdWidth, iptCcpTdBgColor, iptCcpTdFontColor, iptCcpTdBorderColor, iptCcpTdBorderRadius, rdoCcpTdBasic, rdoCcpTdExcludeimg, rdoCcpTdImgswap, rdoCcpTdPosswitch, rdoCcpTdBgimage, iptCcpTableClass, selCcpTableAlign, iptCcpTableWidth, iptCcpTableBgColor, chkCcpTableIncludeWrapperCheckbox, iptCcpTableWrapperClass, iptCcpTableWrapperWidth, selCcpTableWrapperAlign, iptCcpTableWrapperBgColor ) {
+    //   return { fileName, imgW, imgH, imgNW, imgNH, viewerW, viewerH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, aspect, iptCcpImgClass, iptCcpImgAlt, rdoCcpImgFixed, rdoCcpImgFluid, selCcpImgAlign, iptCcpImgRelPath, chkCcpImgIncludeAnchorCheckbox, iptCcpTdClass, selCcpTdAlign, selCcpTdValign, iptCcpTdHeight, iptCcpTdWidth, iptCcpTdBgColor, iptCcpTdFontColor, iptCcpTdBorderColor, iptCcpTdBorderRadius, rdoCcpTdBasic, rdoCcpTdExcludeimg, rdoCcpTdImgswap, rdoCcpTdPosswitch, rdoCcpTdBgimage, iptCcpTableClass, selCcpTableAlign, iptCcpTableWidth, iptCcpTableBgColor, chkCcpTableIncludeWrapperCheckbox, iptCcpTableWrapperClass, iptCcpTableWrapperWidth, selCcpTableWrapperAlign, iptCcpTableWrapperBgColor };
     // }
 
     let Appobj = {};
@@ -2656,13 +2696,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       //   }
       // }
 
-      // // !VA eventListener for the Include Wrapper checkbox. Checkboxes need to have separate event handlers because their functions are too different to consolidate into a single one.
-      // let includeWrapperCheckbox = document.querySelector(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk);
-      // addEventHandler(includeWrapperCheckbox,'click',toggleIncludeWrapper,false);
+      // !VA eventListener for the Include Wrapper checkbox. Checkboxes need to have separate event handlers because their functions are too different to consolidate into a single one.
+      let includeWrapperCheckbox = document.querySelector('#ccp-table-include-wrapper-label');
+      addEventHandler(includeWrapperCheckbox,'click',toggleIncludeWrapper,false);
 
-      // // !VA eventListener for the Include Anchor checkbox. Checkboxes need to have separate event handlers because their functions are too different to consolidate into a single one.
-      // let includeAnchorCheckbox = document.querySelector(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk);
-      // addEventHandler(includeAnchorCheckbox,'click',toggleIncludeAnchor,false);
+      // !VA eventListener for the Include Anchor checkbox. Checkboxes need to have separate event handlers because their functions are too different to consolidate into a single one.
+      let includeAnchorCheckbox = document.querySelector('#ccp-img-include-anchor-label');
+      addEventHandler(includeAnchorCheckbox,'click',toggleIncludeAnchor,false);
 
 
       // !VA Misc Unused Handlers for review
@@ -3442,13 +3482,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       case alias === ccpUserInput.rdoCcpImgFixed:
         Appobj.rdoCcpImgFixed = true, Appobj.rdoCcpImgFluid = false;
         imgType = 'fixed';
-        handleImgType2(imgType);
+        handleImgType3(imgType);
         console.log('fixed clicked');
         break;
       case alias === ccpUserInput.rdoCcpImgFluid:
         imgType = 'fluid';
         Appobj.rdoCcpImgFixed = false, Appobj.rdoCcpImgFluid = true;
-        handleImgType2(imgType);
+        handleImgType3(imgType);
         console.log('fluid clicked');
         break;
       case alias.includes('rdo-ccp-td') :
@@ -3529,8 +3569,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA Branch: implementAppobj04 (061020)
     // !VA Now we need a function that will run the appropriate display routine based on the 4-char ID prefix
-    function handleImgType2(imgType) {
-      console.log('handleImgType2 running');
+
+    function handleImgType3(imgType) {
 
       // !VA If the 'fixed' img option is selected
       if (imgType === 'fixed') {
@@ -3541,31 +3581,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         Appobj.iptCcpTableWrapperClass = 'devicewidth';
 
 
-
-        // !VA Set the default Appobj values for tableWidth, tableClass, tableWrapperWidth and tableWrapperClass. These are user-editable.
-        // !VA TODO: Write class to placeholder in order to keep the user-defined value here.
-        // tableWrapperWidth = [ccpUserInput.iptCcpTableWrapperWidth, Appobj.viewerW];
-        // !VA tableWrapperClass is devicewidth in both cases
-        // tableWrapperClass = [Appobj.iptCcpTableWrapperClass,'devicewidth'];
-
-        // !VA TODO Integrate into handleCcpActions - doesn't work
-        // document.querySelector('#ccp-table-include-wrapper').classList.remove('disable-checkbox');
-        // document.querySelector('#ccp-table-include-wrapper-label').classList.remove('disabled');
-
-
-
-        // !VA Set values for fixed option
-
-
-
-
       } else if (imgType === 'fluid') {
         Appobj.iptCcpTableWidth = '100%';
         Appobj.iptCcpTableClass = 'devicewidth';
         Appobj.iptCcpTableWrapperWidth = '100%';
         Appobj.iptCcpTableWrapperClass = 'devicewidth';
         Appobj.rdoCcpTdBasic = true;
-        Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
+        Appobj.chkCcpTableIncludeWrapperCheckbox = 'on';
         Appobj.rdoCcpTdExcludeimg = false;
         Appobj.rdoCcpTdPosswitch = false;
         Appobj.rdoCcpTdImgswap = false;
@@ -3587,7 +3609,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
 
-      UIController.handleCcpActions3( Appobj, 'setvalue', 'iptCcpTableWidth', 'iptCcpTableClass', 'iptCcpTableWrapperWidth' );
+      UIController.handleCcpActions3( Appobj, [ 'iptCcpTableWidth', 'setvalue'], ['iptCcpTableClass', 'setvalue'], ['iptCcpTableWrapperWidth', 'setvalue'], ['rdoCcpTdExcludeimg', 'setdisabledradio'], ['rdoCcpTdPosswitch', 'setdisabledradio'],['rdoCcpTdImgswap', 'setdisabledradio'], ['rdoCcpTdBgimage', 'setdisabledradio'], ['rdoCcpTdBgimage', 'setdisabledradio'], ['rdoCcpTdVmlbutton', 'setdisabledradio'], ['iptCcpTableWrapperWidth', 'setactiveparent'], ['iptCcpTableWrapperClass', 'setactiveparent'], ['selCcpTableWrapperAlign', 'setactiveparent'], ['iptCcpTableWrapperBgColor', 'setactiveparent'], [ 'chkCcpTableIncludeWrapperCheckbox', 'setcheckbox']  );
 
 
 
@@ -3609,7 +3631,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
 
-      
 
 
 
@@ -3632,7 +3653,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         tdImgswap = [ccpUserInput.rdoCcpTdImgswap, ''],
         tdBgimage = [ccpUserInput.rdoCcpTdBgimage, ''],
         tdVmlButton = [ ccpUserInput.rdoCcpTdVmlbutton, ''],
-        includeWrapper = [ccpUserInput.spnCcpTableIncludeWrapperCheckmrk, '']
+        includeWrapper = [ccpUserInput.chkCcpTableIncludeWrapperCheckbox, '']
       ;
       // !VA If the 'fixed' img option is selected
       if (imgType === 'fixed') {
@@ -3671,7 +3692,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         
 
         // !VA Check includeWrapper by default
-        includeWrapper = [ccpUserInput.spnCcpTableIncludeWrapperCheckmrk, 'on'];
+        includeWrapper = [ccpUserInput.chkCcpTableIncludeWrapperCheckbox, 'on'];
 
         // !VA Set all the other TD Option radio buttons to false
         [ccpUserInput.rdoCcpTdExcludeimg, false], [ccpUserInput.rdoCcpTdPosswitch, false], [ccpUserInput.rdoCcpTdImgswap, false], [ccpUserInput.rdoCcpTdBgimage, false],  [ccpUserInput.rdoCcpTdVmlbutton, false];
@@ -3689,14 +3710,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       } else {
         console.log('ERROR in handleImgType - unknown imgType');
       }
-
-
-
-
-
-
-
-
 
       // !VA Select the 'basic' Ccp radio button element
       // const selectedTdOption = [ ccpUserInput.rdoCcpTdBasic ];
@@ -3717,45 +3730,64 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     function toggleIncludeAnchor(evt) {
       console.log('toggleIncludeAnchor running: ');
-      let chkId, checkbox;
-      chkId = '#' + evt.target.id;
-      chkId = chkId.replace('mrk', 'box');
-      chkId = chkId.replace('spn', 'chk');
-      checkbox = document.querySelector(chkId);
-      // !VA NOTE: This should be a try/catch
-      if (checkbox) {
-        // !VA If option is a click event, toggle the checkmark on click
-        checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
-      // !VA Display/undisplay wrapper table options when checkbox is toggled
-      } else {
-        console.log('ERROR in toggleIncludeWrapper: unkknown argument');
-      }
+      // !VA Branch: implementAppobj04 (061020)
+      // !VA Changed the event target from the span to the label, #ccp-img-include-anchor-label, same as the include Wrapper checkbox, which is probably the way it should have been the whole time. So there's no need at this point for the checkmrk/checkbox conversion. BUT DON'T FORGET THAT THE EVENT LISTENER IS THE HARD-CODED ELEMENT ID FOR THE LABEL, AND IS NO LONGER AN ALIAS! THE ALIAS NOW REFERS TO THE CHECKBOX!!!
+      // let chkId, checkbox;
+      let checkbox;
+      // chkId = '#' + evt.target.id;
+      // chkId = chkId.replace('mrk', 'box');
+      // chkId = chkId.replace('spn', 'chk');
+
+      checkbox = document.querySelector(ccpUserInput.chkCcpImgIncludeAnchorCheckbox);
+      // checkbox.checked === true ? checkbox.checked = true : checkbox.checked = false;
+      // !VA For some reason I don't understand, the checked attribute of the checkbox is actually the opposite of the visual state of the checkbox, so swap the true and false assignment.
+      checkbox.checked  ? Appobj.chkCcpImgIncludeAnchorCheckbox = 'off' : Appobj.chkCcpImgIncludeAnchorCheckbox = 'on';
+      console.log('Appobj: ');
+      console.dir(Appobj);
+
     }
 
+    // !VA appController private 
     function toggleIncludeWrapper(option) {
-      var chkId, checkbox;
-      let wrapperItems = [];
-      wrapperItems = [ ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth, ccpUserInput.selCcpTableWrapperAlign,  ccpUserInput.iptCcpTableWrapperBgColor ];
-      UIController.handleCcpActions( 'setactiveparent', wrapperItems, true);
-      // !VA chkId will always be ccpUserInput.spnCcpTableIncludeWrapperCheckmrk here because that's what the event listener was defined on. But this is a mock checkbox, so convert the ccpUserInput alias to the id of the actual checkbox element in order to toggle it 
-      chkId = ccpUserInput.spnCcpTableIncludeWrapperCheckmrk;
-      chkId = chkId.replace('mrk', 'box');
-      chkId = chkId.replace('spn', 'chk');
-      checkbox = document.querySelector(chkId);
-      // !VA There are four possible parameters for 'option': 1) 'init' = passed from initToggleIncludeWrapper, initialization on page reload 2) evt = click event passed from event handler when the checkbox is checked/unchecked 3) true, checks the checkbox programmatically and displays the options, called from toggleImgType and 4) false, currently no use case.
-      if (option.target) {
-        // !VA If option is a click event, toggle the checkmark on click
-        checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
-        checkbox.checked ? UIController.handleCcpActions( 'setactiveparent', wrapperItems, true) : UIController.handleCcpActions( 'setactiveparent', wrapperItems, false);
-      } else if (option === true ) {
-        checkbox.checked = true;
-        UIController.handleCcpActions( 'setactiveparent', wrapperItems, true);
-      } else if (option === 'init') {
-      // !VA Display/undisplay wrapper table options when checkbox is toggled
-        checkbox.checked ? UIController.handleCcpActions( 'setactiveparent', wrapperItems, true) : UIController.handleCcpActions( 'setactiveparent', wrapperItems, false);
+      console.log('toggleIncludeWrapper running');
+      // !VA Deprecating...
+      // var chkId, checkbox;
+      var checkbox;
+      // !VA chkId will always be ccpUserInput.chkCcpTableIncludeWrapperCheckbox here because that's what the event listener was defined on. But this is a mock checkbox, so convert the ccpUserInput alias to the id of the actual checkbox element in order to toggle it 
+      // chkId = ccpUserInput.chkCcpTableIncludeWrapperCheckbox;
+      // chkId = chkId.replace('mrk', 'box');
+      // chkId = chkId.replace('spn', 'chk');
+      // console.log('chkId is: ' + chkId);
+      // !VA Branch: implementAppobj04 (061020)
+      // !VA We don't need to do that checkbox/checkmark conversion anymore because I changed the checkbox toggle element to the label which is probably the way it should have been all along.
+      checkbox = document.querySelector(ccpUserInput.chkCcpTableIncludeWrapperCheckbox);
+      if (checkbox.checked === false) {
+        Appobj.chkCcpTableIncludeWrapperCheckbox = 'on';
+      } else if (checkbox.checked === true ) {
+        Appobj.chkCcpTableIncludeWrapperCheckbox = 'off';
       } else {
-        console.log('ERROR in toggleIncludeWrapper: unkknown option argument');
+        console.log('ERROR in toggleIncludeWrapper - unrecognized state');
       }
+
+      UIController.handleCcpActions3( Appobj, [ 'iptCcpTableWrapperClass', 'setactiveparent' ], [ 'iptCcpTableWrapperWidth', 'setactiveparent' ], [ 'selCcpTableWrapperAlign', 'setactiveparent' ], [ 'iptCcpTableWrapperBgColor', 'setactiveparent' ]);
+
+      // !VA Branch: implementAppobj04 (061020)
+      // !VA I don't know how much if any of the below still applies.
+
+      // !VA There are four possible parameters for 'option': 1) 'init' = passed from initToggleIncludeWrapper, initialization on page reload 2) evt = click event passed from event handler when the checkbox is checked/unchecked 3) true, checks the checkbox programmatically and displays the options, called from toggleImgType and 4) false, currently no use case.
+      // if (option.target) {
+      //   // !VA If option is a click event, toggle the checkmark on click
+      //   checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
+      //   checkbox.checked ? UIController.handleCcpActions3(Appobj, wrapperItems, true) : UIController.handleCcpActions( 'setactiveparent', wrapperItems, false);
+      // } else if (option === true ) {
+      //   checkbox.checked = true;
+      //   UIController.handleCcpActions( 'setactiveparent', wrapperItems, true);
+      // } else if (option === 'init') {
+      // // !VA Display/undisplay wrapper table options when checkbox is toggled
+      //   checkbox.checked ? UIController.handleCcpActions( 'setactiveparent', wrapperItems, true) : UIController.handleCcpActions( 'setactiveparent', wrapperItems, false);
+      // } else {
+      //   console.log('ERROR in toggleIncludeWrapper: unkknown option argument');
+      // }
     }
 
     // !VA appController private 

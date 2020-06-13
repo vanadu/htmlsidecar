@@ -945,12 +945,17 @@ fieldset {
   -ms-user-select: none;
   user-select: none;
   z-index: 100;
-
   a {
     font-weight: bold;
     text-decoration: underline;
   }
 }
+
+#ccp-table-include-wrapper-label, #ccp-img-include-anchor-label {
+  border: 1px solid green;
+  z-index: 100;
+}
+
 // VA! Individual Styling for the Mock Checkboxes
 /* These are the hidden browser's default checkboxes. VA! It appears they are attached to the first label element in the parent container */
 .ccp-img-include-width-height-container input, 
@@ -961,7 +966,7 @@ fieldset {
   cursor: pointer;
   height: 0;
   width: 0;
-
+  border: 1px solid blue;
 }
 
 /* Create a custom checkbox -- this is the span after the checkbox input element. */
@@ -976,7 +981,8 @@ fieldset {
   background-color: #eee;
   display: block;
   z-index: 100;
-
+  border: 1px solid red;
+  z-index: -1;
 }
 
 /* On mouse-over, add a grey background color */
