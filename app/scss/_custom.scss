@@ -731,6 +731,9 @@ output {
     font-size: 14px;
     font-weight: 300;
   }
+  .ccp-table-include-wrapper-container {
+    font-weight: 700;
+  }
   select {
     width: 70px;
     font-size: 14px;
@@ -957,10 +960,11 @@ fieldset {
 
 
 
-.ccp-img-include-anchor-container {
-  border: 1px solid blue;
+.ccp-img-include-anchor-container, .ccp-table-include-wrapper-container {
   margin-left: 30px;
 }
+
+
 
 // VA! Individual Styling for the Mock Checkboxes
 /* These are the hidden browser's default checkboxes. VA! It appears they are attached to the first label element in the parent container */
@@ -987,7 +991,6 @@ fieldset {
   z-index: 100;
   z-index: -1;
   margin-left: -30px;
-  border: 1px solid red;
 }
 
 /* On mouse-over, add a grey background color */
