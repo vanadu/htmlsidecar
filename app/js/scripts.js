@@ -5,7 +5,7 @@
 // !VA GENERAL NOTES
 /* !VA  - June Reboot Notes
 =========================================================
-// !VA Branch: implementAppobj03 (060920)
+// !VA Branch: implementAppobj05 (061220)
 Cleaning up - to read all the notes so far check out the last commit in implementAppobj03 
 
 TODO: BUG! Load 625X525 with viewerW set to 600 - loads without resizing to container size
@@ -748,11 +748,7 @@ var Witty = (function () {
           // !VA Now initialize Appobj with the CCP element values. This includes ALL CCP elements, including those that are displayed/undisplayed depending on which TDOption or imgType radio is selected. 
           // !VA Don't forget to use bracket notation to add properties to an object: https://stackoverflow.com/questions/1184123/is-it-possible-to-add-dynamically-named-properties-to-javascript-object
           // !VA  for loop: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
-          let val;
-
-          var foo = document.querySelector(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk).value;
-          console.log('foo is: ' + foo);
-
+          let checkboxId;
           // !VA Loop through all the ccpUserInput properties. If the property is NOT a span (i.e. a mock checkbox) add an Appobj property that corresponds to the key of the respective ccpUserInput property. Otherwise, convert the span ID to the input ID, then add the Appobj property that corresponds to the key of the respective ID.
           // !VA For instance, if the ccpUserInput value starts with '#ipt', create an Appobject property whose key is 'iptCCP...' and assign it the value of the CCP element with the corresponding ccpUserInput alias.
           for (const [key, value] of Object.entries(ccpUserInput)) {
@@ -762,9 +758,11 @@ var Witty = (function () {
             if (value.substring( 0, 4) === '#rdo' ) {
               Appobj[key] = document.querySelector(value).checked;
             }
-            if (value.substring( 0, 4) === '#chk' ) {
-              val = chkmrkToChkbox(value);
-              Appobj[key] = document.querySelector(val).value;
+            if (value.substring( 0, 4) === '#spn' ) {
+              // !VA For mock checkboxes, first get the actual HTML checkbox into checkboxId. 'value' is the mock checkbox span id
+              checkboxId = chkmrkToChkbox(value);
+              // !VA The actual HTML checkbox input will return a checked attribute of true or false. Convert that to 'on' or 'off' for the Appobj mock checkbox span property.
+              document.querySelector(checkboxId).checked ? Appobj[key] = 'on' : Appobj[key] = 'off';
             }
           }
         }
@@ -3604,6 +3602,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA Pass the action 'setvalue' in the first parameter; the following rest parameters is the list of ID/value arrays.
         // UIController.handleCcpActions2( 'setvalue', tableWidth, tableClass, tableWrapperWidth );
         // !VA Disable inapplicable td radio buttons
+        if (Appobj.spnCcpTableIncludeWrapperCheckmrk === 'off') {
+          console.log('HIT');
+          toggleCheckbox( ccpUserInput.spnCcpTableIncludeWrapperCheckmrk );
+
+        }
 
 
 
@@ -3716,15 +3719,25 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
     
     // !VA appController private 
-    // !VA Contains logic for checkboxes. 
-    function toggleCheckbox(evt) {
+    // !VA Contains logic for checkboxes. Arg is either the mouse Event, or 
+    function toggleCheckbox(arg) {
       console.clear();
       console.log('toggleIncludeAnchor running: ');
-      console.log('evt.target.id is: ' + evt.target.id);
+
+      console.log('arg is: ' + arg);
+      console.log('typeof(arg) is: ' + typeof(arg));
+      console.log('arg.target is: ' + arg.target);
+      if (typeof(arg) === 'string') {
+        console.log('string');
+        return;
+      }
+
+
+
       // !VA Branch: implementAppobj04 (061020)
       let chkId, checkbox;
       // !VA Convert the 'mock' checkbox, which is the event target, to the actual HTML checkbox input so it can be processed.
-      chkId = '#' + evt.target.id;
+      chkId = '#' + arg.target.id;
       // !VA Replace the mock checkbox indicator strings in the indicator strings in the actual HTML checkbox element.
       chkId = chkId.replace('mrk', 'box');
       chkId = chkId.replace('spn', 'chk');
@@ -3743,10 +3756,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         if (checkbox.checked) {
           checkbox.checked = false;
           console.log('checkbox.checked is: ' + checkbox.checked);
-          if ( '#' + evt.target.id  === ccpUserInput.spnCcpImgIncludeAnchorCheckmrk) {
+          if ( '#' + arg.target.id  === ccpUserInput.spnCcpImgIncludeAnchorCheckmrk) {
             Appobj.spnCcpImgIncludeAnchorCheckmrk = 'off';
             console.log('Appobj.spnCcpImgIncludeAnchorCheckmrk is: ' + Appobj.spnCcpImgIncludeAnchorCheckmrk);
-          } else if ( '#' + evt.target.id  === ccpUserInput.spnCcpTableIncludeWrapperCheckmrk) {
+          } else if ( '#' + arg.target.id  === ccpUserInput.spnCcpTableIncludeWrapperCheckmrk) {
             Appobj.spnCcpTableIncludeWrapperCheckmrk = 'off';
             console.log('Appobj.spnCcpTableIncludeWrapperCheckmrk is: ' + Appobj.spnCcpTableIncludeWrapperCheckmrk);
             showIncludeWrapperOptions();
@@ -3755,10 +3768,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         } else {
           checkbox.checked = true;
           console.log('checkbox.checked is: ' + checkbox.checked);
-          if ( '#' + evt.target.id  === ccpUserInput.spnCcpImgIncludeAnchorCheckmrk) {
+          if ( '#' + arg.target.id  === ccpUserInput.spnCcpImgIncludeAnchorCheckmrk) {
             Appobj.spnCcpImgIncludeAnchorCheckmrk = 'on';
             console.log('Appobj.spnCcpImgIncludeAnchorCheckmrk is: ' + Appobj.spnCcpImgIncludeAnchorCheckmrk);
-          } else if ( '#' + evt.target.id  === ccpUserInput.spnCcpTableIncludeWrapperCheckmrk) {
+          } else if ( '#' + arg.target.id  === ccpUserInput.spnCcpTableIncludeWrapperCheckmrk) {
             Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
             console.log('Appobj.spnCcpTableIncludeWrapperCheckmrk is: ' + Appobj.spnCcpTableIncludeWrapperCheckmrk);
             showIncludeWrapperOptions();
@@ -3810,16 +3823,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       } else {
         console.log('ERROR in toggleIncludeWrapper: unkknown checkbox state');
       }
-
-      // !VA For some reason I don't understand, the checked attribute of the checkbox is actually the opposite of the visual state of the checkbox, so swap the true and false assignment. It's because of the fixed/fluid option - it's toggling the checkbox without updating Appobj, I think.
-
-
-      // checkbox.checked === true ? checkbox.checked = true : checkbox.checked = false;
-
-      // checkbox.checked  ? Appobj.spnCcpImgIncludeAnchorCheckmrk = 'off' : Appobj.spnCcpImgIncludeAnchorCheckmrk = 'on';
-      // console.log('Appobj: ');
-      // console.dir(Appobj);
-
     }
 
     // !VA appController private 
