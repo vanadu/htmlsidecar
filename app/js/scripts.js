@@ -410,20 +410,14 @@ var Witty = (function () {
       let parentDivId;
       function getParentDiv(elementAlias) {
         parentDivId = '#' + ccpUserInput[elementAlias].substring( 5 );
-        console.log('parentDivId is: ' + parentDivId);
         return parentDivId;
       }
       getParentDiv(elementAlias);
-
-      var foo = document.querySelector(parentDivId).classList.contains('active');
-      console.log('foo is: ' + foo);
-
       if (flag === true ) {
-        console.log('Removing active');
         document.querySelector(parentDivId).classList.add('active');
       }   else if (flag === false ) {
-        console.log('Adding active');
         document.querySelector(parentDivId).classList.remove('active');
+        console.log('removing...');
       } else {
         console.log('ERROR in setCcpActiveParentClass: unknown condition');
       }
@@ -623,11 +617,11 @@ var Witty = (function () {
       // !VA NOTE: I don't like that AppobjMap is passed as a parameter with every loop iteration. I need to think about whether that is fixable, but it works and is pretty fast for now.
       handleCcpActions3: function (Appobj, flag, ...args) {
         // console.log('handleCcpActions3 running');
-        console.log('handleCcpActions3 Appobj: ');
-        console.dir(Appobj);
+        // console.log('handleCcpActions3 Appobj: ');
+        // console.dir(Appobj);
         // console.log('args is: ');
         // console.log(args);
-        console.log('flag is: ' + flag);
+        // console.log('flag is: ' + flag);
         // !VA Create a map of Appobj entries
         const AppobjMap = new Map(Object.entries(Appobj));
         // console.log('AppobjMap: ');
@@ -644,8 +638,6 @@ var Witty = (function () {
             setCcpDisabledRadio(AppobjMap, args[i][0]);
             break;
           case args[i][1] === 'setactiveparent':
-            console.log('HERE');
-            console.log('args[i][0] is: ' + args[i][0]);
             setCcpActiveParentClass(AppobjMap, flag, args[i][0]);
             break;
           case args[i][1] === 'setactiveclass':
@@ -675,8 +667,8 @@ var Witty = (function () {
         for (let i = 0; i < args.length; i++) {
           // document.querySelector(args[i][0]).value = args[i][1];
           console.log('args[i] is: ' +  args[i]);
-          if (args[i][0].substring( 0 , 4) === '#ipt') {
-            console.log('This is an input element');
+          console.log('This is an input element');
+            if (args[i][0].substring( 0 , 4) === '#ipt') {
             handleCcpInput(args[i]);
           } else if (args[i][0].substring( 0 , 4) === '#rdo') {
             console.log('This is a radio button');
@@ -3447,18 +3439,17 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         var tableWrapperWidth = [];
         tableWidth = [ccpUserInput.iptCcpTableWidth, Appobj.imgW ];
         tableWrapperWidth = [ccpUserInput.iptCcpTableWrapperWidth, Appobj.viewerW];
-        // !VA Write the values to the CCP DOM
-        UICtrl.writeCcpDOM(tableWidth, tableWrapperWidth);
-
+        
         // !VA Branch: implementAppobj05 (061020)
         // UIController.stashAppobjProperties(true, tableWidth, tableWrapperWidth);
         
         // !VA True is the flag to stash instead of retrieve, tableWidth and tableWrapper are the rest parameters containing the key/value pairs to stash.;
-
-          
+        // !VA Branch: implementAppobj05 (061320)
+        // !VA Not implementing this yet
         // UIController.stashAppobjProperties(true, tableWidth, tableWrapperWidth);
         
-        UICtrl.writeCcpDOM( ...tableWidth, tableWrapperWidth);
+        // !VA Write the values to the CCP DOM
+        UICtrl.writeCcpDOM( tableWidth, tableWrapperWidth);
     
 
 
@@ -3515,31 +3506,38 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private
     // !VA Called in handleTdOptions
     function batchAppobjToDOM() {
-
       console.log('batchAppobjToDOM running');
+      console.log('batchAppobjToDOM Appobj: ');
+      console.log(Appobj);
+      let flag;
       // !VA Branch: implementAppobj04 (060820)
       // !VA This is where we batch-update the DOM based on Appobj
 
-      // !VA First, this should be handled in populateAppobj
-
-      // !VA NOW Problem here is that at this point, we still don't have CCP properties in Appobj, and the Appobj generated in initCCP doesn't include the dynamicRegions. The event handler calls handleCcpRadioSelection or handleCcpUserInput, but these handlers don't populate Appobj with the current Ccp state, and populateAppobj call in initCcp doesn't carry over to appController.  I don't want to be calling populateAppobj every time I make a CCp selection, that defeats the whole purpose of having an Appobj. What I need to do is populate Appobj whenever the CCP is opened and have that Appobj be scoped to appController and persist for as long as the CCP is open. Then I can updateAppobj individually for any changed CCP element. So, what should happen is the clipboard button event should point to initCcp in appController, which makes a DOM call to get the active status of CCP so it can populateAppdata('ccp') in the appController scope. Then, it calls displayCcp in UIController public to toggle the CCP. That should expose Ccp properties Appobj in appController so they persist as long as the CCP is open. Let's try that.
-      
-      
-      for (const [key, value] of Object.entries(Appobj)) {
-        // console.log('key is: ' + key);
-        // console.log('key.substring( 3, 6) is: ' + key.substring( 3, 6));
-        // !VA Logic for opening the CCP with the current state of the selected options reflected. 
-        if (key.substring( 3, 6) === 'Ccp') {
-          // console.log('key is: ' + key);
-          if (key === 'spnCcpTableIncludeWrapperCheckmrk' && Appobj.spnCcpTableIncludeWrapperCheckmrk === 'on' ) {
-          // !VA Show the Include wrapper options if the checkmark is checked.
-            console.log('key is: ' + key);
-            console.log('HIT');
-            // !VA Shows the includeWrapperOptions checkbox is 
-            showIncludeWrapperOptions(true);
-          }
-        }
+      // console.log('Appobj.spnCcpTableIncludeWrapperCheckmrk is: ' + Appobj.spnCcpTableIncludeWrapperCheckmrk);
+      if (Appobj.spnCcpTableIncludeWrapperCheckmrk === 'on') {
+        flag === true;
+      } else if (Appobj.spnCcpTableIncludeWrapperCheckmrk === 'off'){
+        flag === false;
       }
+      showIncludeWrapperOptions(flag);
+       // !VA This is where we loop through the TD radio options, determine which is checked and show the respective td options for it. That should be already doable in handleTdOptions, but it has to be able to accept the selected option as an external argument rather than just responding to a click event.
+      // !VA Branch: implementAppobj05 (061320)
+      // !VA I don't know why looping through Appobj would be necessary, but look below if it is.
+      // for (const [key, value] of Object.entries(Appobj)) {
+      //   // console.log('key is: ' + key);
+      //   // console.log('key.substring( 3, 6) is: ' + key.substring( 3, 6));
+      //   // !VA Logic for opening the CCP with the current state of the selected options reflected. 
+      //   if (key.substring( 3, 6) === 'Ccp') {
+      //     // console.log('key is: ' + key);
+      //     if (key === 'spnCcpTableIncludeWrapperCheckmrk' && Appobj.spnCcpTableIncludeWrapperCheckmrk === 'on' ) {
+      //     // !VA Show the Include wrapper options if the checkmark is checked.
+      //       // console.log('key is: ' + key);
+      //       // console.log('HIT');
+      //       // !VA Shows the includeWrapperOptions checkbox is 
+      //       showIncludeWrapperOptions(true);
+      //     }
+      //   }
+      // }
     }
 
     function handleTdOptions(alias) {
@@ -3552,19 +3550,50 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           ccpUserInput[key] === alias ? Appobj[key] = true : Appobj[key] = false;
         }
       }
+
+      // !VA Loop through all the CCP Td options and undisplay them, to prepare for displaying them per radio button selection
+      var arr = [];
+      // !VA Get ccpUserInput aliases into an array
+      var aliasArray = Object.entries(ccpUserInput);
+      for (let i = 0; i < foo.length; i++) {
+        // !VA For all the input and select dropdown elements...
+        if (aliasArray[i][1].substring( 0 , 11) === '#ipt-ccp-td' || aliasArray[i][1].substring( 0 , 11) === '#sel-ccp-td'  ) {
+          // !VA Create an array of the alias and the action to send to handleCcpActions to apply the active class to the parent of the respective element.
+          arr = [ aliasArray[i][0], 'setactiveparent'];
+          // !VA False is the flag to remove the active class
+          UIController.handleCcpActions3(Appobj, false, arr);
+        }
+      }
+
       switch(true) {
-      case alias.includes('basic'):
+      case alias.includes('basic') || alias.includes('excludeimg'):
         // !VA Branch: implementAppobj05 (061320)
-        // !VA Add default 'basic' options to Appobj here.
-        break;
-      case alias.includes('excludeimg'):
-        // !VA Add default 'excludeimg' options to Appobj here.
+        // !VA Add default 'basic' options to Appobj here: class, height, width, bgcolor, align, valign
+        UIController.handleCcpActions3(Appobj, true, [ 'iptCcpTdClass', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent'], [ 'selCcpTdValign', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent']);
         break;
       case alias.includes('posswitch'):
-        // code block
+        UIController.handleCcpActions3(Appobj, true, [ 'iptCcpTdClass', 'setactiveparent'], [ 'selCcpTdValign', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']);
         break;
       case alias.includes('imgswap'):
-        // code block
+        /* !VA  
+
+                Wrapper table: devicewidth, width = viewerW, align=Center
+        Parent table has to be locked at devicewidth, width = imgW, td align = center, align = center,
+        TD: Class = remove, align = center;
+        Img: Class = mobileshow, disabled.
+
+                optionsToShow = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth, ccpUserInput.iptCcpTableWrapperBgColor, ccpUserInput.selCcpTableWrapperAlign ];
+        
+        // !VA Disable options
+        optionsToDisable = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass, ccpUserInput.iptCcpTableWidth, ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth ];
+
+        */
+        // if (Appobj.spnCcpTableIncludeWrapperCheckmrk === 'off') {
+          // !VA Stopping here -- need a function in handleCcpActions to turn a checkbox on and off.
+          showIncludeWrapperOptions(true);
+        // }
+
+        UIController.handleCcpActions3(Appobj, true, [ 'iptCcpTdClass', 'setactiveparent'], [ 'selCcpTdValign', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']);
         break;
       case alias.includes('bgimage'):
         // code block
@@ -3582,7 +3611,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private 
     // !VA Function to display/undisplay the CCP wrapper table options if the checkbox is checked. If Appobj.spnCcpTableIncludeWrapperCheckmrk === 'off', run this to turn it on.
     function showIncludeWrapperOptions(flag) {
-      console.log('showIncludeWrapperOptions running');
+      // console.log('showIncludeWrapperOptions running');
 
       if (Appobj.spnCcpTableIncludeWrapperCheckmrk === 'on') {
         flag = true;
@@ -3648,118 +3677,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
 
     }
-
-
-    // !VA appController private 
-    // !VA Contains the logic for displaying/undisplaying, disabling/enabling, setting/deleting values from the tdoptions radio input group. 
-    function showTdOptions(evt) {
-      // !VA Array including all the defined options for each tdoption radio
-      let allTdOptions = [], optionsToEnable = [], optionsToShow = [], valuesToSet = [], optionsToDisable = [], values = [], targetalias;
-      let Appdata;
-      let Attributes;
-      Appdata = appController.initGetAppdata();
-      Attributes = CBController.initGetAttributes();
-      // !VA Add the hash to the target id to match it with the alias
-      // !VA DEVMODE: If dev mode, then false is passed in instead of an event, so just put in a dummy id to get it running
-      if (evt) { targetalias = '#' + evt.target.id; 
-      } else {
-        targetalias = ccpUserInput.rdoCcpTdBasic;
-      }
-
-
-      // !VA Stopped here: Now I have to assign all the attributes for each of these CCP elements? This is very convuluted but I'm not rewriting it now.
-      // !VA Reset all CCP elements to the default CCP options, enabled state and value. This is the state the options all have with imgType = fixed; tdoptions = basic; includeWrapper = unchecked. 
-      allTdOptions = [ ccpUserInput.iptCcpTdClass,  ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor, ccpUserInput.iptCcpTdFontColor, ccpUserInput.iptCcpTdBorderColor, ccpUserInput.iptCcpTdBorderRadius  ];
-      // !VA Cycle through all the parent divs of each of the TD options and remove the active class to hide them all. This needs to be done before showing the specific options for the selected TD option radio
-      UIController.handleCcpActions( 'setactiveparent', allTdOptions, false);
-
-      optionsToEnable = [ ccpUserInput.iptCcpTdClass,  ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor, ccpUserInput.iptCcpTdFontColor, ccpUserInput.iptCcpTdBorderColor, ccpUserInput.iptCcpTdBorderRadius, ccpUserInput.iptCcpTableClass, ccpUserInput.iptCcpTableWidth, ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth];
-      UIController.handleCcpActions( 'setdisabledtextinput', optionsToEnable, false);
-
-      // !VA Reset the height, width and bgcolor fields to '', otherwise the vmlbutton defaults will persist if the user selects the vmlbutton radio button. Pass false for the option argument to set the value to ''.
-      valuesToSet = [ ccpUserInput.iptCcpTdHeight, ccpUserInput.iptCcpTdWidth, ccpUserInput.iptCcpTdBgColor ];
-      for (let i = 0; i < valuesToSet.length; i++) {
-        UIController.handleCcpActions( 'setvalue', valuesToSet, false);
-      }
-
-      // !VA Determine which tdoptions radio button is selected based on the click event and run handleCcpActions for the selected TD radio option. If the action parameter contains the string 'parent' then the active class is applied to/removed from to/from the parent of the target rather than the target itself so that both the input and the label are included
-      switch(true) {
-      // !VA td options basic and excludeimg
-      case targetalias === ccpUserInput.rdoCcpTdBasic || targetalias === ccpUserInput.rdoCcpTdExcludeimg:
-        optionsToShow = [ ccpUserInput.iptCcpTdClass,  ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor ];
-        // !VA Run showOptions to get the 
-        UIController.handleCcpActions( 'setactiveparent', optionsToShow, true);
-        break;
-        // !VA tdoption posswitch
-      case targetalias === ccpUserInput.rdoCcpTdPosswitch:
-        // !VA TODO: Cerebrus has NO td options except width: 100% - let's add 'class' andleave it like that for the time being and see if there's a case where any other options are useful. 
-        optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTdBgColor ];
-        UIController.handleCcpActions( 'setactiveparent', optionsToShow, true);
-        break;
-        // !VA tdoption imgswap
-
-
-
-
-
-      case targetalias === ccpUserInput.rdoCcpTdImgswap:
-        /* !VA  
-        Wrapper table: devicewidth, width = viewerW, align=Center
-        Parent table has to be locked at devicewidth, width = imgW, td align = center, align = center,
-        TD: Class = remove, align = center;
-        Img: Class = mobileshow, disabled.
-        
-        */
-
-
-
-
-
-
-
-        // !VA Show options
-        optionsToShow = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth, ccpUserInput.iptCcpTableWrapperBgColor, ccpUserInput.selCcpTableWrapperAlign ];
-        UIController.handleCcpActions( 'setactiveparent', optionsToShow, true);
-
-        toggleIncludeWrapper(true); 
-        document.querySelector('#ccp-table-include-wrapper').classList.add('disable-checkbox');
-        document.querySelector('#ccp-table-include-wrapper-label').classList.add('disabled');
-
-        // !VA Disable options
-        optionsToDisable = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass, ccpUserInput.iptCcpTableWidth, ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth ];
-        UIController.handleCcpActions( 'setdisabledtextinput', optionsToDisable, true);
-        break;
-
-
-
-
-
-        // !VA tdoption bgimage
-      case targetalias === ccpUserInput.rdoCcpTdBgimage:
-        // !VA bgcolor, width, height, valign
-        optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor ];
-        UIController.handleCcpActions( 'setactiveparent', optionsToShow, true);
-        // !VA Get the default height and width from Appdata and apply
-        valuesToSet = [ ccpUserInput.iptCcpTdHeight, ccpUserInput.iptCcpTdWidth, ccpUserInput.iptCcpTdBgColor ];
-        // !VA Don't forget values is an array and has to be handled as such in 
-        values = [ Appdata.imgH, Appdata.imgW, '#7bceeb' ];
-        UIController.handleCcpActions( 'setvalue', valuesToSet, values);
-        break;
-        // !VA tdoption vmlbutton
-      case targetalias === ccpUserInput.rdoCcpTdVmlbutton:
-        optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor, ccpUserInput.iptCcpTdFontColor, ccpUserInput.iptCcpTdBorderColor, ccpUserInput.iptCcpTdBorderRadius ];
-        UIController.handleCcpActions( 'setactiveparent', optionsToShow, true);
-        // !VA The height and width field require an entry otherwise the button can't be built, that's why Stig has default values of 40/200 in his code. So we include the defaults here when the inputs are displayed and include error handling if the user omits one
-        // !VA Include the default bgcolor as per Stig
-        valuesToSet = [ ccpUserInput.iptCcpTdHeight, ccpUserInput.iptCcpTdWidth, ccpUserInput.iptCcpTdBgColor, ccpUserInput.iptCcpTdFontColor, ccpUserInput.iptCcpTdBorderColor, ccpUserInput.iptCcpTdBorderRadius ];
-        values = [ '40', '200', '#556270', '#FFFFFF', '#1e3650', '4' ];
-        UIController.handleCcpActions( 'setvalue', valuesToSet, values);
-        break;
-      default:
-        console.log('ERROR: UIController.showTdOptions public');
-      } 
-    }
-
 
     // !VA Handles the CCP displau logic for the imgType fixed/fluid buttons. The Clipboard output logic is handled in getAttributes - this routine handles primarily the conditions for manipulating the CCP elements based on the logic defined in Attributes.
     function toggleImgType() {
