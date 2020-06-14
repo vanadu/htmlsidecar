@@ -401,20 +401,28 @@ var Witty = (function () {
       }
     }
 
-    function setCcpActiveParentClass(elementAlias) {
-      // console.log('setActiveClass running');
+    function setCcpActiveParentClass(AppobjMap, elementAlias) {
+      console.log('setActiveParentClass running');
+      console.log('elementAlias is: ' + elementAlias);
+      console.log('foo: ' + AppobjMap.get(elementAlias));
       // !VA Build the parent div id from the elementAlias
       let parentDivId;
       function getParentDiv(elementAlias) {
         parentDivId = '#' + ccpUserInput[elementAlias].substring( 5 );
-        // console.log('parentDivId is: ' + parentDivId);
+        console.log('parentDivId is: ' + parentDivId);
         return parentDivId;
       }
       getParentDiv(elementAlias);
-      if (!document.querySelector(parentDivId).classList.contains('active')) {
-        document.querySelector(parentDivId).classList.add('active');
-      } else {
+
+      var foo = document.querySelector(parentDivId).classList.contains('active');
+      console.log('foo is: ' + foo);
+
+      if (document.querySelector(parentDivId).classList.contains('active') === true ) {
+        console.log('Removing active');
         document.querySelector(parentDivId).classList.remove('active');
+      } else {
+        console.log('Adding active');
+        document.querySelector(parentDivId).classList.add('active');
       }
     }
 
@@ -537,10 +545,10 @@ var Witty = (function () {
             document.querySelector(inspectorElements.insFilename).textContent = fname;
             // !VA Initialze calcViewerSize to size the image to the app container areas
             appController.initCalcViewerSize();
+
             // !VA Open the CCP by default in dev mode
             // !VA First, set it to the opposite of how you want to start it.
             document.querySelector(staticRegions.ccpContainer).classList.remove('active');
-
             var ccpState = UIController.toggleCcp();
             // console.log('ccpState devmode is: ' + ccpState);
             appController.initCcp();
@@ -611,11 +619,11 @@ var Witty = (function () {
       // !VA Writes Appobj values to the CCP DOM based on parameters: Appobj, and an array of rest parameters from the appController Appobj handler. The rest parameter arrays contain key/value arrays with the identifier corresponding to the appObj/ccpUserInput key and a string identifying the action to perform. This facilitates making multiple DOM accesses based on only one cross-module call to Appobj.
       // !VA NOTE: I don't like that AppobjMap is passed as a parameter with every loop iteration. I need to think about whether that is fixable, but it works and is pretty fast for now.
       handleCcpActions3: function (Appobj, ...args) {
-        console.log('handleCcpActions3 running');
+        // console.log('handleCcpActions3 running');
         console.log('handleCcpActions3 Appobj: ');
         console.dir(Appobj);
-        console.log('args is: ');
-        console.log(args);
+        // console.log('args is: ');
+        // console.log(args);
         // !VA Create a map of Appobj entries
         const AppobjMap = new Map(Object.entries(Appobj));
         // console.log('AppobjMap: ');
@@ -632,7 +640,9 @@ var Witty = (function () {
             setCcpDisabledRadio(AppobjMap, args[i][0]);
             break;
           case args[i][1] === 'setactiveparent':
-            setCcpActiveParentClass(args[i][0]);
+            console.log('HERE');
+            console.log('args[i][0] is: ' + args[i][0]);
+            setCcpActiveParentClass(AppobjMap, args[i][0]);
             break;
           case args[i][1] === 'setactiveclass':
             console.log('args[i][0] is: ' + args[i][0]);
@@ -976,7 +986,7 @@ var Witty = (function () {
           selectRadioButton(elemArray, option)
           break;
         default:
-          console.log('handleCcpActions: no action defined');
+          console.log('handleCcpActionsOLD: no action defined');
         } 
       },
 
@@ -3434,18 +3444,17 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         tableWidth = [ccpUserInput.iptCcpTableWidth, Appobj.imgW ];
         tableWrapperWidth = [ccpUserInput.iptCcpTableWrapperWidth, Appobj.viewerW];
         // !VA Write the values to the CCP DOM
-        // UICtrl.writeCcpDOM(tableWidth, tableWrapperWidth);
+        UICtrl.writeCcpDOM(tableWidth, tableWrapperWidth);
 
-        console.log('Appobj.rdoCcpImgFluid is: ' + Appobj.rdoCcpImgFluid);
-        UIController.stashAppobjProperties(true, tableWidth, tableWrapperWidth);
-        // if (Appobj.rdoCcpImgFluid) {
-        // } else {
-        //   UICtrl.writeCcpDOM( ...tableWidth, tableWrapperWidth);
-        // }
-
-        // !VA True is the flag to stash instead of retrieve, tableWidth and tableWrapper are the rest parameters containing the key/value pairs to stash.
+        // !VA Branch: implementAppobj05 (061020)
         // UIController.stashAppobjProperties(true, tableWidth, tableWrapperWidth);
+        
+        // !VA True is the flag to stash instead of retrieve, tableWidth and tableWrapper are the rest parameters containing the key/value pairs to stash.;
 
+          
+        // UIController.stashAppobjProperties(true, tableWidth, tableWrapperWidth);
+        
+        UICtrl.writeCcpDOM( ...tableWidth, tableWrapperWidth);
     
 
 
@@ -3468,10 +3477,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Branch: implementAppobj03 (060820)
     // !VA Handle CCP User Input
     function handleCcpRadioSelection(evt) {
-
-
-
-      console.clear();
       console.log('handleCcpRadioSelection running');
       let Appobj = appController.getAppobj();
       let imgType;
@@ -3483,13 +3488,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       case alias === ccpUserInput.rdoCcpImgFixed:
         Appobj.rdoCcpImgFixed = true, Appobj.rdoCcpImgFluid = false;
         imgType = 'fixed';
-        handleImgType(imgType);
+        // handleImgType(imgType);
         console.log('fixed clicked');
         break;
       case alias === ccpUserInput.rdoCcpImgFluid:
         imgType = 'fluid';
         Appobj.rdoCcpImgFixed = false, Appobj.rdoCcpImgFluid = true;
-        handleImgType(imgType);
+        // handleImgType(imgType);
         console.log('fluid clicked');
         break;
       case alias.includes('rdo-ccp-td') :
@@ -3505,9 +3510,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA appController private
     // !VA Called in handleTdOptions
-    function writeAppobjToDOM() {
+    function batchAppobjToDOM() {
 
-      console.log('writeAppobjToDOM running');
+      console.log('batchAppobjToDOM running');
       // !VA Branch: implementAppobj04 (060820)
       // !VA This is where we batch-update the DOM based on Appobj
 
@@ -3517,17 +3522,21 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       
       
       for (const [key, value] of Object.entries(Appobj)) {
-        console.log('key is: ' + key);
-        console.log('key.substring( 3, 6) is: ' + key.substring( 3, 6));
+        // console.log('key is: ' + key);
+        // console.log('key.substring( 3, 6) is: ' + key.substring( 3, 6));
+        // !VA Logic for opening the CCP with the current state of the selected options reflected. 
         if (key.substring( 3, 6) === 'Ccp') {
-          console.log('key is: ' + key);
-          console.log('HIT');
+          // console.log('key is: ' + key);
+          if (key === 'spnCcpTableIncludeWrapperCheckmrk' && Appobj.spnCcpTableIncludeWrapperCheckmrk === 'on' ) {
+          // !VA Show the Include wrapper options if the checkmark is checked.
+            console.log('key is: ' + key);
+            console.log('HIT');
+            // !VA Reads the state of Appobj.spnCcpTableIncludeWrapperCheckmrk to display/undisplay the Include wrapper options
+            showIncludeWrapperOptions();
+          }
         }
       }
     }
-
-
-
 
     function handleTdOptions(alias) {
       console.log('handleTdOptions running');
@@ -3539,10 +3548,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           ccpUserInput[key] === alias ? Appobj[key] = true : Appobj[key] = false;
         }
       }
-
       switch(true) {
       case alias.includes('basic'):
-        // !VA Branch: implementAppobj03 (060820)
+        // !VA Branch: implementAppobj05 (061320)
         // !VA Add default 'basic' options to Appobj here.
         break;
       case alias.includes('excludeimg'):
@@ -3563,24 +3571,28 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       default:
         // code block
       } 
-
-      // writeAppobjToDOM();
-
+      // batchAppobjToDOM();
     }
 
     // !VA Branch: implementAppobj04 (061020)
     // !VA Now we need a function that will run the appropriate display routine based on the 4-char ID prefix
 
     function handleImgType(imgType) {
-
-      // !VA If the 'fixed' img option is selected
+      console.log('handleImgType running');
+      console.log('imgType is: ' + imgType);      // !VA If the 'fixed' img option is selected
       if (imgType === 'fixed') {
         // !VA Set Appobj values
         Appobj.iptCcpTableWidth = Appobj.imgW;
         Appobj.iptCcpTableClass = '';
         Appobj.iptCcpTableWrapperWidth = Appobj.viewerW;
         Appobj.iptCcpTableWrapperClass = 'devicewidth';
+        Appobj.rdoCcpTdBasic = true;
 
+        Appobj.rdoCcpTdExcludeimg = false;
+        Appobj.rdoCcpTdPosswitch = false;
+        Appobj.rdoCcpTdImgswap = false;
+        Appobj.rdoCcpTdBgimage = false;
+        Appobj.rdoCcpTdVmlbutton = false;
 
       } else if (imgType === 'fluid') {
         Appobj.iptCcpTableWidth = '100%';
@@ -3588,7 +3600,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         Appobj.iptCcpTableWrapperWidth = '100%';
         Appobj.iptCcpTableWrapperClass = 'devicewidth';
         Appobj.rdoCcpTdBasic = true;
-        Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
+
         Appobj.rdoCcpTdExcludeimg = false;
         Appobj.rdoCcpTdPosswitch = false;
         Appobj.rdoCcpTdImgswap = false;
@@ -3603,28 +3615,19 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // UIController.handleCcpActions2( 'setvalue', tableWidth, tableClass, tableWrapperWidth );
         // !VA Disable inapplicable td radio buttons
         if (Appobj.spnCcpTableIncludeWrapperCheckmrk === 'off') {
-          console.log('HIT');
-          toggleCheckbox( ccpUserInput.spnCcpTableIncludeWrapperCheckmrk );
-
+          console.log('OFF');
+        } else if (Appobj.spnCcpTableIncludeWrapperCheckmrk === 'on') {
+          console.log('ON');
         }
-
-
-
       } else {
         console.log('ERROR in handleImgType - unknown imgType');
       }
 
-
-
       UIController.handleCcpActions3( Appobj, [ 'iptCcpTableWidth', 'setvalue'], ['iptCcpTableClass', 'setvalue'], ['iptCcpTableWrapperWidth', 'setvalue'], ['rdoCcpTdExcludeimg', 'setdisabledradio'], ['rdoCcpTdPosswitch', 'setdisabledradio'],['rdoCcpTdImgswap', 'setdisabledradio'], ['rdoCcpTdBgimage', 'setdisabledradio'], ['rdoCcpTdBgimage', 'setdisabledradio'], ['rdoCcpTdVmlbutton', 'setdisabledradio'], ['iptCcpTableWrapperWidth', 'setactiveparent'], ['iptCcpTableWrapperClass', 'setactiveparent'], ['selCcpTableWrapperAlign', 'setactiveparent'], ['iptCcpTableWrapperBgColor', 'setactiveparent']  );
 
+      console.log('handleImgType Appobj: ');
+      console.log(Appobj);
     }
-
-
-
-
-
-
 
     // !VA Branch: implementAppobj04 (061020)
     // !VA Now we need a function that will run the appropriate display routine based on the 4-char ID prefix
@@ -3695,71 +3698,60 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         UIController.handleCcpActions2( 'setvalue', tableWidth, tableClass, tableWrapperWidth );
         // !VA Disable inapplicable td radio buttons
 
-
-
       } else {
         console.log('ERROR in handleImgType - unknown imgType');
       }
-
       // !VA Select the 'basic' Ccp radio button element
       // const selectedTdOption = [ ccpUserInput.rdoCcpTdBasic ];
       // UIController.handleCcpActions( 'selectradiobutton', selectedTdOption, true);
       // !VA Disable/Enable CCP Input Elements
       // const inputElementsToDisable = [ ccpUserInput.iptCcpTableClass, ccpUserInput.iptCcpTableWidth,ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth ];
-
-
       // UIController.handleCcpActions( 'setdisabledtextinput', inputElementsToDisable, disable);
-
-
       // !VA Disable/Enable CCP Radio Select Elements
       // const radioElementsDisable = [ ccpUserInput.rdoCcpTdExcludeimg, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdBgimage, ccpUserInput.rdoCcpTdPosswitch, ccpUserInput.rdoCcpTdVmlbutton ];
       // UIController.handleCcpActions( 'setdisabledradio', radioElementsDisable, disable);
-      // toggleIncludeWrapper(true); 
+
+    }
+
+    // !VA appController private 
+    // !VA Function to display/undisplay the CCP wrapper table options if the checkbox is checked. If Appobj.spnCcpTableIncludeWrapperCheckmrk === 'off', run this to turn it on.
+    function showIncludeWrapperOptions() {
+      console.log('showIncludeWrapperOptions running');
+
+      UIController.handleCcpActions3( Appobj, [ 'iptCcpTableWrapperClass', 'setactiveparent' ], [ 'iptCcpTableWrapperWidth', 'setactiveparent' ], [ 'selCcpTableWrapperAlign', 'setactiveparent' ], [ 'iptCcpTableWrapperBgColor', 'setactiveparent' ]);
 
     }
     
     // !VA appController private 
     // !VA Contains logic for checkboxes. Arg is either the mouse Event, or 
-    function toggleCheckbox(arg) {
-      console.clear();
-      console.log('toggleIncludeAnchor running: ');
+    function toggleCheckbox(evt) {
 
-      console.log('arg is: ' + arg);
-      console.log('typeof(arg) is: ' + typeof(arg));
-      console.log('arg.target is: ' + arg.target);
-      if (typeof(arg) === 'string') {
-        console.log('string');
-        return;
-      }
-
-
-
-      // !VA Branch: implementAppobj04 (061020)
+      console.log('toggleCheckbox running: ');
       let chkId, checkbox;
+      chkId = '#' + evt.target.id;
+ 
+      // !VA Branch: implementAppobj04 (061020)
       // !VA Convert the 'mock' checkbox, which is the event target, to the actual HTML checkbox input so it can be processed.
-      chkId = '#' + arg.target.id;
+
       // !VA Replace the mock checkbox indicator strings in the indicator strings in the actual HTML checkbox element.
       chkId = chkId.replace('mrk', 'box');
       chkId = chkId.replace('spn', 'chk');
-      checkbox = chkId;
+
       // !VA Select the actual HTML checkbox element
       checkbox = document.querySelector(chkId);
+      console.log('chkId is: ' + chkId);
 
 
-      // !VA Function to display/undisplay the CCP wrapper table options if the checkbox is checked
-      function showIncludeWrapperOptions() {
-        UIController.handleCcpActions3( Appobj, [ 'iptCcpTableWrapperClass', 'setactiveparent' ], [ 'iptCcpTableWrapperWidth', 'setactiveparent' ], [ 'selCcpTableWrapperAlign', 'setactiveparent' ], [ 'iptCcpTableWrapperBgColor', 'setactiveparent' ]);
-      }
 
       if (checkbox) {
         // !VA If option is a click event, toggle the checkmark on click and write the checked value to Appobj
         if (checkbox.checked) {
           checkbox.checked = false;
           console.log('checkbox.checked is: ' + checkbox.checked);
-          if ( '#' + arg.target.id  === ccpUserInput.spnCcpImgIncludeAnchorCheckmrk) {
+          if ( '#' + evt.target.id   === ccpUserInput.spnCcpImgIncludeAnchorCheckmrk) {
             Appobj.spnCcpImgIncludeAnchorCheckmrk = 'off';
             console.log('Appobj.spnCcpImgIncludeAnchorCheckmrk is: ' + Appobj.spnCcpImgIncludeAnchorCheckmrk);
-          } else if ( '#' + arg.target.id  === ccpUserInput.spnCcpTableIncludeWrapperCheckmrk) {
+          } else if ( '#' + evt.target.id   === ccpUserInput.spnCcpTableIncludeWrapperCheckmrk) {
             Appobj.spnCcpTableIncludeWrapperCheckmrk = 'off';
             console.log('Appobj.spnCcpTableIncludeWrapperCheckmrk is: ' + Appobj.spnCcpTableIncludeWrapperCheckmrk);
             showIncludeWrapperOptions();
@@ -3768,16 +3760,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         } else {
           checkbox.checked = true;
           console.log('checkbox.checked is: ' + checkbox.checked);
-          if ( '#' + arg.target.id  === ccpUserInput.spnCcpImgIncludeAnchorCheckmrk) {
+          if ( '#' + evt.target.id   === ccpUserInput.spnCcpImgIncludeAnchorCheckmrk) {
             Appobj.spnCcpImgIncludeAnchorCheckmrk = 'on';
             console.log('Appobj.spnCcpImgIncludeAnchorCheckmrk is: ' + Appobj.spnCcpImgIncludeAnchorCheckmrk);
-          } else if ( '#' + arg.target.id  === ccpUserInput.spnCcpTableIncludeWrapperCheckmrk) {
+          } else if ( '#' + evt.target.id   === ccpUserInput.spnCcpTableIncludeWrapperCheckmrk) {
             Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
             console.log('Appobj.spnCcpTableIncludeWrapperCheckmrk is: ' + Appobj.spnCcpTableIncludeWrapperCheckmrk);
             showIncludeWrapperOptions();
           }
         }
-        // checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
       // !VA Display/undisplay wrapper table options when checkbox is toggled
       } else {
         console.log('ERROR in toggleCheckbox: unkknown checkbox state');
@@ -3785,114 +3776,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     }
 
-
-
-
-
-    function toggleIncludeAnchor(evt) {
-      console.clear();
-      console.log('toggleIncludeAnchor running: ');
-      // !VA Branch: implementAppobj04 (061020)
-      let chkId, checkbox;
-      // let checkbox;
-      chkId = '#' + evt.target.id;
-      chkId = chkId.replace('mrk', 'box');
-      chkId = chkId.replace('spn', 'chk');
-      checkbox = chkId;
-      console.log('chkId is: ' + chkId);
-      checkbox = document.querySelector(chkId);
-
-
-
-
-      if (checkbox) {
-        // !VA If option is a click event, toggle the checkmark on click and write the checked value to Appobj
-        if (checkbox.checked) {
-          checkbox.checked = false;
-          console.log('checkbox.checked is: ' + checkbox.checked);
-          Appobj.spnCcpTableIncludeWrapperCheckmrk = 'off';
-          console.log('Appobj.spnCcpImgIncludeAnchorCheckmrk is: ' + Appobj.spnCcpTableIncludeWrapperCheckmrk);
-        } else {
-          checkbox.checked = true;
-          console.log('checkbox.checked is: ' + checkbox.checked);
-          Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
-          console.log('Appobj.spnCcpImgIncludeAnchorCheckmrk is: ' + Appobj.spnCcpTableIncludeWrapperCheckmrk);
-        }
-        // checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
-      // !VA Display/undisplay wrapper table options when checkbox is toggled
-      } else {
-        console.log('ERROR in toggleIncludeWrapper: unkknown checkbox state');
-      }
-    }
-
-    // !VA appController private 
-    function toggleIncludeWrapper(option) {
-      console.clear();
-      console.log('toggleIncludeWrapper running');
-      console.log('option is: ' + option);
-      // !VA Deprecating...
-      // var chkId, checkbox;
-      let checkbox;
-      // !VA chkId will always be ccpUserInput.spnCcpTableIncludeWrapperCheckmrk here because that's what the event listener was defined on. But this is a mock checkbox, so convert the ccpUserInput alias to the id of the actual checkbox element in order to toggle it 
-      // chkId = ccpUserInput.spnCcpTableIncludeWrapperCheckmrk;
-      // chkId = chkId.replace('mrk', 'box');
-      // chkId = chkId.replace('spn', 'chk');
-      // console.log('chkId is: ' + chkId);
-      // !VA Branch: implementAppobj04 (061020)
-      // !VA We don't need to do that checkbox/checkmark conversion anymore because I changed the checkbox toggle element to the label which is probably the way it should have been all along.
-      checkbox = document.querySelector(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk);
-      // !VA There are four possible parameters for 'option': 1) 'init' = passed from initToggleIncludeWrapper, initialization on page reload 2) evt = click event passed from event handler when the checkbox is checked/unchecked 3) true, checks the checkbox programmatically and displays the options, called from toggleImgType and 4) false, currently no use case.
-      // !VA If option has a target property, then it's a click event
-      if (option.target) {
-        console.log('checkbox.checked is: ' + checkbox.checked);
-
-
-        checkbox.checked  === true ? Appobj.spnCcpTableIncludeWrapperCheckmrk = 'off' : Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
-        UIController.handleCcpActions3( Appobj, [ 'iptCcpTableWrapperClass', 'setactiveparent' ], [ 'iptCcpTableWrapperWidth', 'setactiveparent' ], [ 'selCcpTableWrapperAlign', 'setactiveparent' ], [ 'iptCcpTableWrapperBgColor', 'setactiveparent' ]);
-
-
-      } else if (option === true ) {
-
-        checkbox.checked = true;
-        UIController.handleCcpActions3( Appobj, [ 'iptCcpTableWrapperClass', 'setactiveparent' ], [ 'iptCcpTableWrapperWidth', 'setactiveparent' ], [ 'selCcpTableWrapperAlign', 'setactiveparent' ], [ 'iptCcpTableWrapperBgColor', 'setactiveparent' ]);
-
-      } else if (option === 'init') {
-      // !VA Display/undisplay wrapper table options when checkbox is toggled
-
-
-      checkbox.checked  ? Appobj.spnCcpTableIncludeWrapperCheckmrk = 'off' : Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
-      UIController.handleCcpActions3( Appobj, [ 'iptCcpTableWrapperClass', 'setactiveparent' ], [ 'iptCcpTableWrapperWidth', 'setactiveparent' ], [ 'selCcpTableWrapperAlign', 'setactiveparent' ], [ 'iptCcpTableWrapperBgColor', 'setactiveparent' ]);
-
-
-      } else {
-        console.log('ERROR in toggleIncludeWrapper: unkknown option argument');
-      }
-
-      if (option === 'init') {
-
-      }
-
-
-
-     
-      checkbox.checked  ? Appobj.spnCcpTableIncludeWrapperCheckmrk = 'off' : Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
-
-
-      // if (checkbox.checked === false) {
-      //   Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
-      // } else if (checkbox.checked === true ) {
-      //   Appobj.spnCcpTableIncludeWrapperCheckmrk = 'off';
-      // } else {
-      //   console.log('ERROR in toggleIncludeWrapper - unrecognized state');
-      // }
-
-
-
-      // !VA Branch: implementAppobj04 (061020)
-      // !VA I don't know how much if any of the below still applies.
-
-
-    }
 
     // !VA appController private 
     // !VA Contains the logic for displaying/undisplaying, disabling/enabling, setting/deleting values from the tdoptions radio input group. 
@@ -4323,14 +4206,18 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         return retval;
       },
 
+      // !VA appController public 
+      // !VA Called from UIController.toggleCcp in initUI devMode where you can init with CCP open or closed. Otherwise, UIController.toggleCcp is called from the click handler. 
       initCcp: function () {
         let ccpState;
+        // !VA Get the current open/closed state of the CCP
         ccpState = UIController.toggleCcp(true);
-        // console.log('ccpState is: ' + ccpState);
         if (ccpState) {
           UIController.populateAppobj(Appobj, 'ccp');
           console.log('initCCP Appobj is: ');
           console.log(Appobj);
+          // !VA Do logic for opening the CCP with the current state of the selected options reflected. batchAppobjToDOM is in appController private.
+          batchAppobjToDOM();
         }
       },
 
