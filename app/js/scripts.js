@@ -372,11 +372,11 @@ var Witty = (function () {
     // !VA TODO: see if handleImgType can be consolidated with other similar Appobj handlers.
     function setCcpValues(AppobjMap, elementAlias) {
       // console.clear();
-      console.log('AppobjMap: ');
-      console.dir(AppobjMap);
-      console.log('AppobjMap.get(elementAlias) is: ' + AppobjMap.get(elementAlias));
-      console.log('setCcpValue2 running');
-      console.log('elementAlias is: ' + elementAlias);
+      // console.log('AppobjMap: ');
+      // console.dir(AppobjMap);
+      // console.log('AppobjMap.get(elementAlias) is: ' + AppobjMap.get(elementAlias));
+      // console.log('setCcpValue2 running');
+      // console.log('elementAlias is: ' + elementAlias);
       document.querySelector(ccpUserInput[elementAlias]).value = AppobjMap.get(elementAlias);
     }
 
@@ -438,22 +438,21 @@ var Witty = (function () {
     }
 
 
-    function setDisabledTextInput(elemArray, option) {
+    function setDisabledTextInput(elementAlias, flag ) {
       console.log('setDisabledTextInput running');
-      for (let i = 0; i < elemArray.length; i++) {
-        if (option) {
-          str = elemArray[i];
-          elementLabel = str + '-label';
-          document.querySelector(elementLabel).classList.add('disabled');
-          document.querySelector(elemArray[i]).disabled = true;
-          document.querySelector(elemArray[i]).classList.add('disabled');
-        } else {
-          str = elemArray[i];
-          elementLabel = str + '-label';
-          document.querySelector(elementLabel).classList.remove('disabled');
-          document.querySelector(elemArray[i]).disabled = false;
-          document.querySelector(elemArray[i]).classList.remove('disabled');
-        }
+      console.log('elementAlias is: ' + elementAlias);
+      // console.dir(elemArray);
+      let elementLabel;
+      elementLabel = ccpUserInput[elementAlias] + '-label';
+      console.log('elementLabel is: ' + elementLabel);
+      if (flag) {
+        document.querySelector(elementLabel).classList.add('disabled');
+        document.querySelector(ccpUserInput[elementAlias]).disabled = true;
+        document.querySelector(ccpUserInput[elementAlias]).classList.add('disabled');
+      } else {
+        document.querySelector(elementLabel).classList.remove('disabled');
+        document.querySelector(ccpUserInput[elementAlias]).disabled = false;
+        document.querySelector(ccpUserInput[elementAlias]).classList.remove('disabled');
       }
     }
 
@@ -619,11 +618,11 @@ var Witty = (function () {
       // !VA NOTE: I don't like that AppobjMap is passed as a parameter with every loop iteration. I need to think about whether that is fixable, but it works and is pretty fast for now.
       handleCcpActions: function (Appobj, flag, ...args) {
         // console.log('handleCcpActions running');
-        console.log('handleCcpActions Appobj: ');
-        console.dir(Appobj);
-        console.log('args is: ');
-        console.log(args);
-        console.log('flag is: ' + flag);
+        // console.log('handleCcpActions Appobj: ');
+        // console.dir(Appobj);
+        // console.log('args is: ');
+        // console.log(args);
+        // console.log('flag is: ' + flag);
         // !VA Create a map of Appobj entries
         const AppobjMap = new Map(Object.entries(Appobj));
         // console.log('AppobjMap: ');
@@ -643,14 +642,14 @@ var Witty = (function () {
             setCcpActiveParentClass(AppobjMap, flag, args[i][0]);
             break;
           case args[i][1] === 'setactiveclass':
-            console.log('args[i][0] is: ' + args[i][0]);
+            // console.log('args[i][0] is: ' + args[i][0]);
             setCcpActiveClass(args[i][0]);
             break;
           case args[i][1] === 'setcheckbox':
             setCcpCheckbox( args[i][0], flag);
             break;
           case args[i][1] === 'setdisabledtextinput':
-            setDisabledTextInput(AppobjMap, args[i][0]);
+            setDisabledTextInput(args[i][0], flag);
             break;
           default:
             // code block
@@ -877,123 +876,7 @@ var Witty = (function () {
 
 
 
-      // !VA Catch-all function for displaying/undisplaying, disabling/enabling and adding/removing classes to CCP elements. action is the action to execute, elemArray is the array of elements the action is to apply to and state is the toggle state whereby true turns the action on and false turns it off.
-      handleCcpActionsOLD: function (action, elemArray, option ) {
-        // console.clear();
-        // console.log('handleCcpDisplay running');
-        // console.log('action');
-        // console.dir(action);
-        // console.log('elemArray:');
-        // console.dir(elemArray);
-        // console.log('option');
-        // console.dir(option);
-        let elem, str, elementLabel;
-        // !VA This function gets the id of the parent div of the td option to be displayed/hidden. We need the parent div because it contains label and input of the element, not just the input field or dropdown list itself.
-        function getParentDiv(parentDivId) {
-          parentDivId = '#' + parentDivId.substring( 5 );
-          return parentDivId;
-        }
 
-        // !VA Function to show the specific options available for the selected TD options radio
-        function setActiveClass(elemArray, option) {
-          for (let i = 0; i < elemArray.length; i++) {
-            // !VA If the action parameter contains the string 'parent' then apply/remove the active class to/from the parent of the target rather than the target itself.
-            if (action.includes('parent')) {
-              elem = getParentDiv(elemArray[i]);
-            }
-            // !VA If the option parameter is true, add the active class, otherwise remove it.
-            if (option) {
-              document.querySelector(elem).classList.add('active');
-            } else {
-              document.querySelector(elem).classList.remove('active');
-            }
-          }
-        }
-
-        // !VA Branch: implementAppobj04 (061020)
-        // !VA Loop through and apply values to elements. The option parameter contains an array of values or false, in which case an empty string is appled to every element.
-        function setValue(elemArray, option) {
-          for (let i = 0; i < elemArray.length; i++) {
-            if (option) {
-              document.querySelector(elemArray[i]).value = option[i];
-            } else {
-              document.querySelector(elemArray[i]).value = '';
-            }
-          }
-        }
-
-
-        // !VA Disables/enables an radio button element, applies/removes the disabled-radio class to the input element, and applies the disabled class to the input element's label. NOTE: Currently need a separate function to disable text input elements but that can probably be folded into this.
-        elementLabel;
-        function setDisabledRadio(elemArray, option) {
-          for (let i = 0; i < elemArray.length; i++) {
-            if (option) {
-              str = elemArray[i];
-              elementLabel = str + '-label';
-              document.querySelector(elementLabel).classList.add('disabled');
-              document.querySelector(elemArray[i]).disabled = true;
-              document.querySelector(elemArray[i]).classList.add('disabled-radio');
-            } else {
-              str = elemArray[i];
-              elementLabel = str + '-label';
-              document.querySelector(elementLabel).classList.remove('disabled');
-              document.querySelector(elemArray[i]).disabled = false;
-              document.querySelector(elemArray[i]).classList.remove('disabled-radio');
-            }
-          }
-        }
-
-        // !VA Disables/enables a text input field, applies/removes the disabled-input class to the input element, and applies the disabled class to the input element's label. NOTE: Currently need a separate function to disable radio button elements but that can probably be folded into this.
-        function setDisabledTextInput(elemArray, option) {
-          for (let i = 0; i < elemArray.length; i++) {
-            if (option) {
-              str = elemArray[i];
-              elementLabel = str + '-label';
-              document.querySelector(elementLabel).classList.add('disabled');
-              document.querySelector(elemArray[i]).disabled = true;
-              document.querySelector(elemArray[i]).classList.add('disabled');
-            } else {
-              str = elemArray[i];
-              elementLabel = str + '-label';
-              document.querySelector(elementLabel).classList.remove('disabled');
-              document.querySelector(elemArray[i]).disabled = false;
-              document.querySelector(elemArray[i]).classList.remove('disabled');
-            }
-          }
-        }
-
-        function selectRadioButton(elemArray, option) {
-          for (let i = 0; i < elemArray.length; i++) {
-            document.querySelector(elemArray).checked = option;
-          }
-        }
-
-        switch(true) {
-        // !VA In showTdOptions: Active class must be applied to the parent div of the target in order to display/undisplay the container including input and label. 
-        case action === 'setactiveparent':
-          // console.log('setactiveparent...');
-          setActiveClass(elemArray, option);
-          break;
-        case action === 'setdisabledradio':
-          // console.log('setdisabledradio...');
-          setDisabledRadio(elemArray, option);
-          break;
-        case action === 'setdisabledtextinput':
-          // console.log('setdisabledtextinput...');
-          setDisabledTextInput(elemArray, option);
-          break;
-        case action === 'setvalue':
-          // console.log('setvalue');
-          setValue(elemArray, option);
-          break;
-        case action === 'selectradiobutton':
-          // console.log('setvalue');
-          selectRadioButton(elemArray, option)
-          break;
-        default:
-          console.log('handleCcpActionsOLD: no action defined');
-        } 
-      },
 
       // !VA UIController public
       // !VA This has to cancel the timeouts for the runmn
@@ -3503,13 +3386,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Branch: implementAppobj03 (060820)
     // !VA Handle CCP User Input
     function handleCcpRadioSelection(evt) {
-      console.log('handleCcpRadioSelection running');
+      // console.log('handleCcpRadioSelection running');
       let Appobj = appController.getAppobj();
       let imgType;
-      console.log('evt.target.id is: ' + evt.target.id);
+      // console.log('evt.target.id is: ' + evt.target.id);
       let alias;
       alias = '#' + evt.target.id;
-      console.log('alias is: ' + alias);
+      // console.log('alias is: ' + alias);
       switch(true) {
       case alias === ccpUserInput.rdoCcpImgFixed:
         Appobj.rdoCcpImgFixed = true, Appobj.rdoCcpImgFluid = false;
@@ -3578,17 +3461,17 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     function handleTdOptions(alias) {
-      console.log('handleTdOptions running');
-      console.log('alias is: ' + alias);
+      // console.log('handleTdOptions running');
+      // console.log('alias is: ' + alias);
       // !VA Loop through all Appobj entries whose first 8 chars is rdoCcpTd, i.e. all the tdOption entries.
       for (const [key, value] of Object.entries(Appobj)) {
         if (key.substring( 0, 8) === 'rdoCcpTd') {
-          // !VA If the Appobj key string === the element alias of the click target, then set that Appobj property to true, otherwise set it to false. This mimics the behavior of a single-select radion button group.
+          // !VA If the Appobj key string === the element alias of the click target, then set that Appobj property to true, otherwise set it to false. This replicates the behavior of a single-select radion button group for the Appobj properties of the radio buttons.
           ccpUserInput[key] === alias ? Appobj[key] = true : Appobj[key] = false;
         }
       }
 
-      // !VA Loop through all the CCP Td options and undisplay them, to prepare for displaying them per radio button selection
+      // !VA Loop through all the CCP Td options undisplay them, to prepare for displaying them per radio button selection
       var arr = [];
       // !VA Get ccpUserInput aliases into an array
       var aliasArray = Object.entries(ccpUserInput);
@@ -3602,10 +3485,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         }
       }
 
+      // !VA Stopping here: need to finish resetting all the TD options, i.e. removing any disabled classes or disabled attributes on input elements, and removing any disabling on radio buttons. This should be a separate function.
+
+      // !VA Handle the option states for the respective radio button.
       switch(true) {
       case alias.includes('basic') || alias.includes('excludeimg'):
         // !VA Branch: implementAppobj05 (061320)
-        // !VA Add default 'basic' options to Appobj here: class, height, width, bgcolor, align, valign
+        // !VA Handle the td options for the 'basic' and 'excludeimg' options: class, height, width, bgcolor, align, valign
         UIController.handleCcpActions(Appobj, true, [ 'iptCcpTdClass', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent'], [ 'selCcpTdValign', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent']);
         break;
       case alias.includes('posswitch'):
@@ -3629,9 +3515,29 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
         UIController.handleCcpActions(Appobj, true, [ 'spnCcpTableIncludeWrapperCheckmrk', 'setcheckbox']);
         showIncludeWrapperOptions(true);
-        // }
+        // !VA Display the appropriate TD options
+        UIController.handleCcpActions(Appobj, true,  [ 'selCcpTdValign', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']);
 
-        UIController.handleCcpActions(Appobj, true, [ 'iptCcpTdClass', 'setactiveparent'], [ 'selCcpTdValign', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']);
+        // !VA Preset the options:
+        Appobj = {
+          // !VA img class
+          iptCcpImgClass: 'mobileshow',
+          // !VA Parent table: class = devicewidth, width = imgW, td align = center, align = center,
+          iptCcpTableClass: 'devicewidth',
+          iptCcpTableWidth: Appobj.imgW,
+          selCcpTableAlign: 'center',
+          // !VA Wrapper table: class='devicewidth', width = viewerW, align=Center
+          iptCcpTableWrapperClass: 'devicewidth',
+          iptCcpTableWrapperWidth: Appobj.viewerW,
+          selCcpTableWrapperAlign: 'center',
+        };
+        // !VA Write the preset values to CCP DOM
+        UIController.handleCcpActions(Appobj, true,  [ 'iptCcpImgClass', 'setvalue'], [ 'iptCcpTableClass', 'setvalue'], [ 'iptCcpTableWidth', 'setvalue'], [ 'selCcpTableAlign', 'setvalue'], [ 'iptCcpTableWrapperClass', 'setvalue'], [ 'iptCcpTableWrapperWidth', 'setvalue'], [ 'selCcpTableWrapperAlign', 'setvalue'] );
+        // !VA Disable the appropriate presets
+        UIController.handleCcpActions(Appobj, true,  [ 'iptCcpImgClass', 'setdisabledtextinput'], [ 'iptCcpTableClass', 'setdisabledtextinput'], [ 'iptCcpTableWidth', 'setdisabledtextinput'], [ 'selCcpTableAlign', 'setdisabledtextinput'], [ 'iptCcpTableWrapperClass', 'setdisabledtextinput'], [ 'iptCcpTableWrapperWidth', 'setdisabledtextinput'], [ 'selCcpTableWrapperAlign', 'setdisabledtextinput'] );
+
+
+
         break;
       case alias.includes('bgimage'):
         // code block
