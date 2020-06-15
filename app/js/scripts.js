@@ -372,8 +372,11 @@ var Witty = (function () {
     // !VA TODO: see if handleImgType can be consolidated with other similar Appobj handlers.
     function setCcpValues(AppobjMap, elementAlias) {
       // console.clear();
-      // console.log('setCcpValue2 running');
-      // console.log('elementAlias is: ' + elementAlias);
+      console.log('AppobjMap: ');
+      console.dir(AppobjMap);
+      console.log('AppobjMap.get(elementAlias) is: ' + AppobjMap.get(elementAlias));
+      console.log('setCcpValue2 running');
+      console.log('elementAlias is: ' + elementAlias);
       document.querySelector(ccpUserInput[elementAlias]).value = AppobjMap.get(elementAlias);
     }
 
@@ -402,10 +405,10 @@ var Witty = (function () {
     }
 
     function setCcpActiveParentClass(AppobjMap, flag, elementAlias) {
-      console.log('setActiveParentClass running');
-      console.log('flag is: ' + flag);
-      console.log('elementAlias is: ' + elementAlias);
-      console.log('foo: ' + AppobjMap.get(elementAlias));
+      // console.log('setActiveParentClass running');
+      // console.log('flag is: ' + flag);
+      // console.log('elementAlias is: ' + elementAlias);
+      // console.log('foo: ' + AppobjMap.get(elementAlias));
       // !VA Build the parent div id from the elementAlias
       let parentDivId;
       function getParentDiv(elementAlias) {
@@ -417,7 +420,6 @@ var Witty = (function () {
         document.querySelector(parentDivId).classList.add('active');
       }   else if (flag === false ) {
         document.querySelector(parentDivId).classList.remove('active');
-        console.log('removing...');
       } else {
         console.log('ERROR in setCcpActiveParentClass: unknown condition');
       }
@@ -458,7 +460,7 @@ var Witty = (function () {
 
 
 
-    function setCcpCheckbox(elementAlias) {
+    function setCcpCheckbox(elementAlias, flag) {
       console.log('setCcpCheckbox running');
       console.log('elementAlias is: ' + elementAlias);
       let chkId, checkbox;
@@ -615,13 +617,13 @@ var Witty = (function () {
       // !VA UIController public 
       // !VA Writes Appobj values to the CCP DOM based on parameters: Appobj, and an array of rest parameters from the appController Appobj handler. The rest parameter arrays contain key/value arrays with the identifier corresponding to the appObj/ccpUserInput key and a string identifying the action to perform. This facilitates making multiple DOM accesses based on only one cross-module call to Appobj.
       // !VA NOTE: I don't like that AppobjMap is passed as a parameter with every loop iteration. I need to think about whether that is fixable, but it works and is pretty fast for now.
-      handleCcpActions3: function (Appobj, flag, ...args) {
-        // console.log('handleCcpActions3 running');
-        // console.log('handleCcpActions3 Appobj: ');
-        // console.dir(Appobj);
-        // console.log('args is: ');
-        // console.log(args);
-        // console.log('flag is: ' + flag);
+      handleCcpActions: function (Appobj, flag, ...args) {
+        // console.log('handleCcpActions running');
+        console.log('handleCcpActions Appobj: ');
+        console.dir(Appobj);
+        console.log('args is: ');
+        console.log(args);
+        console.log('flag is: ' + flag);
         // !VA Create a map of Appobj entries
         const AppobjMap = new Map(Object.entries(Appobj));
         // console.log('AppobjMap: ');
@@ -645,14 +647,14 @@ var Witty = (function () {
             setCcpActiveClass(args[i][0]);
             break;
           case args[i][1] === 'setcheckbox':
-            setCcpCheckbox( args[i][0]);
+            setCcpCheckbox( args[i][0], flag);
             break;
           case args[i][1] === 'setdisabledtextinput':
             setDisabledTextInput(AppobjMap, args[i][0]);
             break;
           default:
             // code block
-            console.log('ERROR in handleCcpActions3 - case not defined');
+            console.log('ERROR in handleCcpActions - case not defined');
           } 
         }
       },
@@ -660,16 +662,23 @@ var Witty = (function () {
       // !VA Branch: implementAppobj04 (061020)
       // !VA Write specific CCP DOM element values based one or more arguments consisting of key/value array where the key is the element alias and the value is the value. 
       // !VA Let's try to derive the type of write action, i.e. value, disable, active class, from the ID argument. 
-      writeCcpDOM: function (...args) {
-        console.log('writeCcpDOM running');
 
-        
+
+
+      // !VA UIController public 
+      // !VA Branch: implementAppobj05 (061320)
+      // !VA This function writes values directly to the DOM, bypassing handleCcpActions, since the actions here arent initiated by a CCP event, but rather from a user input in the toolbar. 
+      // !VA TODO: Find a more descriptive name for this.
+      // !VA args is a rest parameter list of key/value arrays, whereby the key is the alias of the element to write to and value value to write. 
+      writeCcpDOM: function (...args) {
+        // console.log('writeCcpDOM running');
+        // console.log('args is: ');
+        // console.log(args); 
+        // !VA Loop throught the list of args, determine what type of element it is from the three-character element prefix and perform the appropriate action.    
         for (let i = 0; i < args.length; i++) {
-          // document.querySelector(args[i][0]).value = args[i][1];
-          console.log('args[i] is: ' +  args[i]);
-          console.log('This is an input element');
-            if (args[i][0].substring( 0 , 4) === '#ipt') {
-            handleCcpInput(args[i]);
+          if (args[i][0].substring( 0 , 4) === '#ipt') {
+            // !VA Write the values for the input elements. [0] is the element ID and [1] is the element value.
+            document.querySelector(args[i][0]).value = args[i][1];
           } else if (args[i][0].substring( 0 , 4) === '#rdo') {
             console.log('This is a radio button');
           } else if (args[i][0].substring( 0 , 4) === '#sel') {
@@ -3339,7 +3348,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA If isUpdate is not true, then initialize Appobj by running populateAppobj. Otherwise, use updated Appobj values from updateAppobj.
       if (isUpdate !== true ) {
+
         UIController.populateAppobj(Appobj, 'app');
+
       }
       // !VA I think I was using the CSS value because I was looking for a way to persist that value as a default. Using localStorage now so it should be fine to set it as default in Appobj
       Appobj.viewerH = viewerH = 450;
@@ -3422,6 +3433,27 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA DOM Access
       UIController.writeDynamicRegionsDOM(Appobj, viewportH, appH);
 
+
+      // !VA Branch: implementAppobj05 (061320)
+      // !VA Set Appobj table width and wrapper table width now. Can't do that because the CCP values in Appobj haven't been initialized yet in populateAppobj
+
+
+      var tableWidth = [];
+      var tableWrapperWidth = [];
+      tableWidth = [ccpUserInput.iptCcpTableWidth, Appobj.imgW ];
+      tableWrapperWidth = [ccpUserInput.iptCcpTableWrapperWidth, Appobj.viewerW];
+      
+      // !VA Branch: implementAppobj05 (061020)
+      // UIController.stashAppobjProperties(true, tableWidth, tableWrapperWidth);
+      
+      // !VA True is the flag to stash instead of retrieve, tableWidth and tableWrapper are the rest parameters containing the key/value pairs to stash.;
+      // !VA Branch: implementAppobj05 (061320)
+      // !VA Not implementing this yet
+      // UIController.stashAppobjProperties(true, tableWidth, tableWrapperWidth);
+      
+      // !VA Write the values to the CCP DOM. This needs to bypass handleCcpActions, since it's not a result of any ccpAction but rather a direct write through the user input in the dynamicRegions. It also has to happen before initCCP, othewise Appobj won't initialize with values for table width and table wrapper width. 
+      UICtrl.writeCcpDOM( tableWidth, tableWrapperWidth);
+
       // !VA Pick it up here in implementAppobj04
 
       // !VA This works, but it shouldn't be done here because it overwrites fixed/fluid.
@@ -3435,21 +3467,20 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA Dont forget that this is the result of a dynamicRegions update which can happen at any time, whether the CCP is open or closed. If it is open, it can happen regardless of whether fluid or fixed or whatever other tdoption is checked. That means that this can't overwrite the Appobj values that are active when fluid is checked but it does have to replace the values that are active when fixed is checked and has to revert back to those values if fluid is checked and then fixed is checked again. This is where things get VERY confusing. 
 
         // !VA If the CCP is open, update the CCP UI with the most recent changes to dynamicRegion values, then populateAppobj with CCP values last. writeCcpDOM takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the element alias as key and the Appobj value as value. Elements to update here are: tableWidth and tableWrapperWidth. If the CCP is not open, don't update its values.
-        var tableWidth = [];
-        var tableWrapperWidth = [];
-        tableWidth = [ccpUserInput.iptCcpTableWidth, Appobj.imgW ];
-        tableWrapperWidth = [ccpUserInput.iptCcpTableWrapperWidth, Appobj.viewerW];
-        
-        // !VA Branch: implementAppobj05 (061020)
-        // UIController.stashAppobjProperties(true, tableWidth, tableWrapperWidth);
-        
-        // !VA True is the flag to stash instead of retrieve, tableWidth and tableWrapper are the rest parameters containing the key/value pairs to stash.;
+
+        // !VA This is deprecated, I think. 
         // !VA Branch: implementAppobj05 (061320)
-        // !VA Not implementing this yet
-        // UIController.stashAppobjProperties(true, tableWidth, tableWrapperWidth);
+        // !VA No, this was working properly before the Appboj update. This is where we need to write the table width and table wrapper width to the DOM. But it has to be regardless of whether the CCP is open and after populateAppobj overwrites the values. 
         
-        // !VA Write the values to the CCP DOM
-        UICtrl.writeCcpDOM( tableWidth, tableWrapperWidth);
+
+
+
+        // !VA This won't work of course, because at this point, iptCcpTableWidth and spnCcpTableIncludeWrapperCheckmrk have no value -- that's what were doing here, is populating them. So, set Appobj.iptCcpTableWidth and Appobj.iptCcpTableWrapperWidth and try again.
+        // !VA And it still won't work because the Ccp isn't even open now so this doesn't run.
+        // Appobj.iptCcpTableWidth = Appobj.imgW, Appobj.iptCcpTableWrapperWidth = Appobj.viewerW;
+        // console.log('resizeContainers Appboj: ');
+        // console.dir(Appobj);
+        // UICtrl.handleCcpActions( Appobj, true, [ 'iptCcpTableWidth', 'setvalue']), [ 'spnCcpTableIncludeWrapperCheckmrk', 'setvalue'];
     
 
 
@@ -3513,6 +3544,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Branch: implementAppobj04 (060820)
       // !VA This is where we batch-update the DOM based on Appobj
 
+
+      // !VA Branch: implementAppobj05 (061320) 
+      // !VA NO GOOD: Too late. See 
+      // Appobj.iptCcpTableWidth = Appobj.imgW, Appobj.iptCcpTableWrapperWidth = Appobj.viewerW;
+      // UICtrl.handleCcpActions( Appobj, true, [ 'iptCcpTableWidth', 'setvalue'], [ 'iptCcpTableWrapperWidth', 'setvalue']);
+
       // console.log('Appobj.spnCcpTableIncludeWrapperCheckmrk is: ' + Appobj.spnCcpTableIncludeWrapperCheckmrk);
       if (Appobj.spnCcpTableIncludeWrapperCheckmrk === 'on') {
         flag === true;
@@ -3561,7 +3598,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           // !VA Create an array of the alias and the action to send to handleCcpActions to apply the active class to the parent of the respective element.
           arr = [ aliasArray[i][0], 'setactiveparent'];
           // !VA False is the flag to remove the active class
-          UIController.handleCcpActions3(Appobj, false, arr);
+          UIController.handleCcpActions(Appobj, false, arr);
         }
       }
 
@@ -3569,10 +3606,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       case alias.includes('basic') || alias.includes('excludeimg'):
         // !VA Branch: implementAppobj05 (061320)
         // !VA Add default 'basic' options to Appobj here: class, height, width, bgcolor, align, valign
-        UIController.handleCcpActions3(Appobj, true, [ 'iptCcpTdClass', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent'], [ 'selCcpTdValign', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent']);
+        UIController.handleCcpActions(Appobj, true, [ 'iptCcpTdClass', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent'], [ 'selCcpTdValign', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent']);
         break;
       case alias.includes('posswitch'):
-        UIController.handleCcpActions3(Appobj, true, [ 'iptCcpTdClass', 'setactiveparent'], [ 'selCcpTdValign', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']);
+        UIController.handleCcpActions(Appobj, true, [ 'iptCcpTdClass', 'setactiveparent'], [ 'selCcpTdValign', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']);
         break;
       case alias.includes('imgswap'):
         /* !VA  
@@ -3588,12 +3625,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         optionsToDisable = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass, ccpUserInput.iptCcpTableWidth, ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth ];
 
         */
-        // if (Appobj.spnCcpTableIncludeWrapperCheckmrk === 'off') {
-          // !VA Stopping here -- need a function in handleCcpActions to turn a checkbox on and off.
-          showIncludeWrapperOptions(true);
+        // !VA Make sure the Include wrapper checkbox is on and the options are displayed.
+        Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
+        UIController.handleCcpActions(Appobj, true, [ 'spnCcpTableIncludeWrapperCheckmrk', 'setcheckbox']);
+        showIncludeWrapperOptions(true);
         // }
 
-        UIController.handleCcpActions3(Appobj, true, [ 'iptCcpTdClass', 'setactiveparent'], [ 'selCcpTdValign', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']);
+        UIController.handleCcpActions(Appobj, true, [ 'iptCcpTdClass', 'setactiveparent'], [ 'selCcpTdValign', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']);
         break;
       case alias.includes('bgimage'):
         // code block
@@ -3620,7 +3658,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       } else {
         console.log('ERROR in showIncludeWrapperOptions: unknown condition');
       }
-      UIController.handleCcpActions3( Appobj, flag, [ 'iptCcpTableWrapperClass', 'setactiveparent' ], [ 'iptCcpTableWrapperWidth', 'setactiveparent' ], [ 'selCcpTableWrapperAlign', 'setactiveparent' ], [ 'iptCcpTableWrapperBgColor', 'setactiveparent' ]);
+      UIController.handleCcpActions( Appobj, flag, [ 'iptCcpTableWrapperClass', 'setactiveparent' ], [ 'iptCcpTableWrapperWidth', 'setactiveparent' ], [ 'selCcpTableWrapperAlign', 'setactiveparent' ], [ 'iptCcpTableWrapperBgColor', 'setactiveparent' ]);
 
     }
     
