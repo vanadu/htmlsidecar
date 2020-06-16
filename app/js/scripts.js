@@ -372,10 +372,10 @@ var Witty = (function () {
     // !VA TODO: see if handleImgType can be consolidated with other similar Appobj handlers.
     function setCcpValues(AppobjMap, elementAlias) {
       // console.clear();
+      // console.log('setCcpValue running');
       // console.log('AppobjMap: ');
       // console.dir(AppobjMap);
       // console.log('AppobjMap.get(elementAlias) is: ' + AppobjMap.get(elementAlias));
-      // console.log('setCcpValue2 running');
       // console.log('elementAlias is: ' + elementAlias);
       document.querySelector(ccpUserInput[elementAlias]).value = AppobjMap.get(elementAlias);
     }
@@ -439,12 +439,13 @@ var Witty = (function () {
 
 
     function setDisabledTextInput(elementAlias, flag ) {
-      console.log('setDisabledTextInput running');
-      console.log('elementAlias is: ' + elementAlias);
+      // console.log('setDisabledTextInput running');
+      // console.log('elementAlias is: ' + elementAlias);
+      // console.log('flag is: ' + flag );
       // console.dir(elemArray);
       let elementLabel;
       elementLabel = ccpUserInput[elementAlias] + '-label';
-      console.log('elementLabel is: ' + elementLabel);
+      // console.log('elementLabel is: ' + elementLabel);
       if (flag) {
         document.querySelector(elementLabel).classList.add('disabled');
         document.querySelector(ccpUserInput[elementAlias]).disabled = true;
@@ -457,18 +458,20 @@ var Witty = (function () {
     }
 
 
-
-
+    // !VA UIController private
+    // !VA Set a checkbox based on the true/false flag argument
     function setCcpCheckbox(elementAlias, flag) {
       console.log('setCcpCheckbox running');
       console.log('elementAlias is: ' + elementAlias);
+      console.log('flag is: ' + flag);
       let chkId, checkbox;
       chkId = ccpUserInput[elementAlias];
       chkId = chkId.replace('mrk', 'box');
       chkId = chkId.replace('spn', 'chk');
       checkbox = document.querySelector(chkId);
-      checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
-      console.log('checkbox.checked is: ' + checkbox.checked);
+      flag === true ? checkbox.checked = true : checkbox.checked = false;
+      // checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
+      // console.log('checkbox.checked is: ' + checkbox.checked);
       
     }
 
@@ -3386,8 +3389,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Branch: implementAppobj03 (060820)
     // !VA Handle CCP User Input
     function handleCcpRadioSelection(evt) {
-      // console.log('handleCcpRadioSelection running');
-      let Appobj = appController.getAppobj();
+      console.log('handleCcpRadioSelection running');
+      // let Appobj = appController.getAppobj();
+
       let imgType;
       // console.log('evt.target.id is: ' + evt.target.id);
       let alias;
@@ -3460,8 +3464,76 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // }
     }
 
+    // !VA appController private 
+    // !VA TODO: Allow for an init called from initUI
+
+    function resetTdOptions() {
+      console.log('resetTdOptions running');
+      // !VA Loop through all the CCP Td options, undisplay them, remove any disablingto prepare for displaying them per radio button selection
+      var arr = [];
+      // !VA Get ccpUserInput aliases into an array
+      var aliasArray = Object.entries(ccpUserInput);
+      // console.log('aliasArray is: ');
+      // console.log(aliasArray);
+
+      // !VA Reset values
+      Appobj.iptCcpImgClass = '';
+      Appobj.iptCcpTdClass = '';
+      Appobj.iptCcpTdHeight = '';
+      Appobj.iptCcpTdWidth = '';
+      Appobj.iptCcpTableClass = '';
+      Appobj.iptCcpTableWidth = Appobj.imgW;
+      Appobj.iptCcpTableWrapperWidth = Appobj.viewerW;
+      Appobj.iptCcpTdBgColor = '';
+
+      
+      Appobj.iptCcpTableWrapperClass = 'devicewidth';
+      // Appobj.iptCcpTableWrapperWidth = Appobj.viewerW;
+      // debugger;
+      UIController.handleCcpActions(Appobj, false, ['iptCcpImgClass', 'setvalue'], ['iptCcpTableClass', 'setvalue'],  ['iptCcpTableWrapperClass', 'setvalue'], ['iptCcpTdWidth', 'setvalue'], ['iptCcpTdHeight', 'setvalue'], ['iptCcpTableWidth', 'setvalue'], ['iptCcpTableWrapperWidth', 'setvalue'],  ['iptCcpTdBgColor', 'setvalue'] );
+
+
+
+      for (let i = 0; i < aliasArray.length; i++) {
+        // console.log('aliasArray[i] is: ' + aliasArray[i]);
+        // !VA For ONLY the TD OPTIONS input and select dropdown elements, remove the active class of the parent element to undisplay them.
+        // console.log('aliasArray[i][1].substring( 0 , 11) is: ' + aliasArray[i][1].substring( 0 , 11 ));
+        if (aliasArray[i][1].substring( 0 , 11 ) === '#ipt-ccp-td' || aliasArray[i][1].substring( 0 , 11 ) === '#sel-ccp-td'  ) {
+          // console.log('HIT1');
+          // !VA Create an array of the alias and the action to send to handleCcpActions to apply the active class to the parent of the respective element.
+          arr = [ aliasArray[i][0], 'setactiveparent'];
+          // !VA False is the flag to remove the active class
+          UIController.handleCcpActions(Appobj, false, arr);
+        }
+        // !VA Remove the disabled class and disabled attribute from all text input elements and select dropdown input elements.
+        if (aliasArray[i][1].substring( 0 ,8) === '#ipt-ccp' || aliasArray[i][1].substring( 0 ,8) === '#sel-ccp') {
+          // console.log('HIT2');
+          arr = [ aliasArray[i][0], 'setdisabledtextinput'];
+          // !VA False is the flag to remove the active class
+          UIController.handleCcpActions(Appobj, false, arr);
+        }
+
+        // !VA Branch: implementAppobj05 (061320)
+        // !VA FOR FLUID IMGTYPE: Remove the disabled class and disabled attribute from all radio button elements. 
+        if (aliasArray[i][1].substring( 0 ,11) === '#rdo-ccp-td') {
+          // console.log('HIT3');
+          arr = [ aliasArray[i][0], 'setdisabledradio'];
+          // !VA False is the flag to remove the active class
+          UIController.handleCcpActions(Appobj, false, arr);
+        }
+
+        // if ( document.querySelector(ccpUserInput.iptCcpTableWidth).value === undefined ) {
+        //   console.log('HIT!!!');
+        //   debugger;
+        // }
+
+      }
+
+    }
+
+    // !VA appController private 
     function handleTdOptions(alias) {
-      // console.log('handleTdOptions running');
+      console.log('handleTdOptions running');
       // console.log('alias is: ' + alias);
       // !VA Loop through all Appobj entries whose first 8 chars is rdoCcpTd, i.e. all the tdOption entries.
       for (const [key, value] of Object.entries(Appobj)) {
@@ -3470,20 +3542,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           ccpUserInput[key] === alias ? Appobj[key] = true : Appobj[key] = false;
         }
       }
-
-      // !VA Loop through all the CCP Td options undisplay them, to prepare for displaying them per radio button selection
-      var arr = [];
-      // !VA Get ccpUserInput aliases into an array
-      var aliasArray = Object.entries(ccpUserInput);
-      for (let i = 0; i < foo.length; i++) {
-        // !VA For all the input and select dropdown elements...
-        if (aliasArray[i][1].substring( 0 , 11) === '#ipt-ccp-td' || aliasArray[i][1].substring( 0 , 11) === '#sel-ccp-td'  ) {
-          // !VA Create an array of the alias and the action to send to handleCcpActions to apply the active class to the parent of the respective element.
-          arr = [ aliasArray[i][0], 'setactiveparent'];
-          // !VA False is the flag to remove the active class
-          UIController.handleCcpActions(Appobj, false, arr);
-        }
-      }
+      // !VA Reset all Ccp element i.e. undisplay them and remove any disabled styles and attributes.
+      resetTdOptions();
 
       // !VA Stopping here: need to finish resetting all the TD options, i.e. removing any disabled classes or disabled attributes on input elements, and removing any disabling on radio buttons. This should be a separate function.
 
@@ -3498,52 +3558,56 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         UIController.handleCcpActions(Appobj, true, [ 'iptCcpTdClass', 'setactiveparent'], [ 'selCcpTdValign', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']);
         break;
       case alias.includes('imgswap'):
-        /* !VA  
-
-                Wrapper table: devicewidth, width = viewerW, align=Center
-        Parent table has to be locked at devicewidth, width = imgW, td align = center, align = center,
-        TD: Class = remove, align = center;
-        Img: Class = mobileshow, disabled.
-
-                optionsToShow = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.selCcpTdAlign, ccpUserInput.selCcpTdValign, ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth, ccpUserInput.iptCcpTableWrapperBgColor, ccpUserInput.selCcpTableWrapperAlign ];
-        
-        // !VA Disable options
-        optionsToDisable = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass, ccpUserInput.iptCcpTableWidth, ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth ];
-
-        */
         // !VA Make sure the Include wrapper checkbox is on and the options are displayed.
         Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
         UIController.handleCcpActions(Appobj, true, [ 'spnCcpTableIncludeWrapperCheckmrk', 'setcheckbox']);
         showIncludeWrapperOptions(true);
         // !VA Display the appropriate TD options
         UIController.handleCcpActions(Appobj, true,  [ 'selCcpTdValign', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']);
-
         // !VA Preset the options:
-        Appobj = {
-          // !VA img class
-          iptCcpImgClass: 'mobileshow',
-          // !VA Parent table: class = devicewidth, width = imgW, td align = center, align = center,
-          iptCcpTableClass: 'devicewidth',
-          iptCcpTableWidth: Appobj.imgW,
-          selCcpTableAlign: 'center',
-          // !VA Wrapper table: class='devicewidth', width = viewerW, align=Center
-          iptCcpTableWrapperClass: 'devicewidth',
-          iptCcpTableWrapperWidth: Appobj.viewerW,
-          selCcpTableWrapperAlign: 'center',
-        };
+        // !VA img class
+        Appobj.iptCcpImgClass =  'mobileshow', 
+        // !VA Parent table: class = devicewidth, width = imgW, td align = center, align = center,
+        Appobj.iptCcpTableClass = 'devicewidth', Appobj.iptCcpTableWidth = Appobj.imgW, Appobj.selCcpTableAlign = 'center',
+        // !VA Wrapper table: class='devicewidth', width = viewerW, align=Center
+        Appobj.iptCcpTableWrapperClass = 'devicewidth', Appobj.iptCcpTableWrapperWidth = Appobj.viewerW, Appobj.selCcpTableWrapperAlign = 'center';
+
         // !VA Write the preset values to CCP DOM
         UIController.handleCcpActions(Appobj, true,  [ 'iptCcpImgClass', 'setvalue'], [ 'iptCcpTableClass', 'setvalue'], [ 'iptCcpTableWidth', 'setvalue'], [ 'selCcpTableAlign', 'setvalue'], [ 'iptCcpTableWrapperClass', 'setvalue'], [ 'iptCcpTableWrapperWidth', 'setvalue'], [ 'selCcpTableWrapperAlign', 'setvalue'] );
         // !VA Disable the appropriate presets
         UIController.handleCcpActions(Appobj, true,  [ 'iptCcpImgClass', 'setdisabledtextinput'], [ 'iptCcpTableClass', 'setdisabledtextinput'], [ 'iptCcpTableWidth', 'setdisabledtextinput'], [ 'selCcpTableAlign', 'setdisabledtextinput'], [ 'iptCcpTableWrapperClass', 'setdisabledtextinput'], [ 'iptCcpTableWrapperWidth', 'setdisabledtextinput'], [ 'selCcpTableWrapperAlign', 'setdisabledtextinput'] );
-
-
-
         break;
       case alias.includes('bgimage'):
-        // code block
+        // !VA Bgimage presets
+        Appobj.iptCcpTdHeight = Appobj.imgH, Appobj.iptCcpTdWidth = Appobj.imgW, Appobj.iptCcpTdBgColor = '#7bceeb';
+        // !VA Display applicable elements and preset values
+        UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdClass', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']) ;
+        UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdHeight', 'setvalue'], [ 'iptCcpTdWidth', 'setvalue'], [ 'iptCcpTdBgColor', 'setvalue'], [ 'iptCcpTdWidth', 'setactiveparent']) ;
         break;
       case alias.includes('vmlbutton'):
-        // code block
+
+        /* !VA  
+        optionsToShow = [ ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTdHeight,  ccpUserInput.iptCcpTdWidth,  ccpUserInput.iptCcpTdBgColor, ccpUserInput.iptCcpTdFontColor, ccpUserInput.iptCcpTdBorderColor, ccpUserInput.iptCcpTdBorderRadius ];
+        UIController.handleCcpActions( 'setactiveparent', optionsToShow, true);
+        // !VA The height and width field require an entry otherwise the button can't be built, that's why Stig has default values of 40/200 in his code. So we include the defaults here when the inputs are displayed and include error handling if the user omits one
+        // !VA Include the default bgcolor as per Stig
+        valuesToSet = [ ccpUserInput.iptCcpTdHeight, ccpUserInput.iptCcpTdWidth, ccpUserInput.iptCcpTdBgColor, ccpUserInput.iptCcpTdFontColor, ccpUserInput.iptCcpTdBorderColor, ccpUserInput.iptCcpTdBorderRadius ];
+        values = [ '40', '200', '#556270', '#FFFFFF', '#1e3650', '4' ];
+        UIController.handleCcpActions( 'setvalue', valuesToSet, values);
+        */
+
+        // !VA Appobj presets:
+        Appobj.iptCcpTdHeight = Appobj.imgH;
+        Appobj.iptCcpTdWidth = Appobj.imgW;
+        Appobj.iptCcpTdBgColor = '#556270';
+        Appobj.iptCcpTdBorderRadius = '4';
+        Appobj.iptCcpTdBorderColor= '#1e3650';
+        Appobj.iptCcpTdFontColor= '#FFFFFF';
+
+        UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdClass', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent'], [ 'iptCcpTdFontColor', 'setactiveparent'], [ 'iptCcpTdBorderColor', 'setactiveparent'], ['iptCcpTdBorderRadius', 'setactiveparent']) ;
+        UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdClass', 'setvalue'], [ 'iptCcpTdHeight', 'setvalue'], [ 'iptCcpTdWidth', 'setvalue'], [ 'iptCcpTdBgColor', 'setvalue'], [ 'iptCcpTdFontColor', 'setvalue'], [ 'iptCcpTdBorderColor', 'setvalue'], ['iptCcpTdBorderRadius', 'setvalue'], [ 'iptCcpTdFontColor', 'setvalue']) ;
+
+
         break;
       default:
         // code block
