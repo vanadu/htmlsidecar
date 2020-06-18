@@ -368,17 +368,18 @@ var Witty = (function () {
       document.querySelector(ccpUserInput[elementAlias]).value = AppobjMap.get(elementAlias);
     }
 
-    function setCcpDisabledRadio(AppobjMap, elementAlias) {
+    function setCcpDisabledRadio(flag, elementAlias ) {
       // console.clear();
       // console.log('setCcpDisabledRadio running');
       // console.log('AppobjMap: ');
       // console.dir(AppobjMap);
       // console.log('AppobjMap.get(elementAlias) is: ' + AppobjMap.get(elementAlias));
+      
       let elementLabel;
       // !VA The element label must have a disabled style too, so append -label to the alias to select it.
       elementLabel = ccpUserInput[elementAlias] +  '-label';
       // !VA If the Appobj property rdoCcpImgFluid is true, then the rdoCcpImgFluid radio is selected, so apply the disabled styles and disabled attribute
-      if (AppobjMap.get('rdoCcpImgFluid' )) {
+      if (flag ) {
         // !VA Apply the disabled styles to the elements
         document.querySelector(ccpUserInput[elementAlias]).disabled = true;
         // !VA 
@@ -464,7 +465,19 @@ var Witty = (function () {
       
     }
 
+    // !VA UIController private
+    // !VA Select a radio button based on the true/false flag argument
+    function selectCcpRadio(flag, elementAlias) {
+      console.log('selectCcpRadio running');
+      console.log('flag is: ' + flag);
+      console.log('elementAlias is: ' + elementAlias);
+      let radio;
+      radio = document.querySelector(ccpUserInput[elementAlias]);
 
+      flag === true ? radio.checked = true : radio.checked = false;
+
+      
+    }
 
 
     // !VA UIController public functions
@@ -616,8 +629,11 @@ var Witty = (function () {
           case args[i][1] === 'setvalue':
             setCcpValues(AppobjMap, args[i][0]);
             break;
+          case args[i][1] === 'selectradio':
+            selectCcpRadio(flag, args[i][0]);
+            break;
           case args[i][1] === 'setdisabledradio':
-            setCcpDisabledRadio(AppobjMap, args[i][0]);
+            setCcpDisabledRadio(flag, args[i][0] );
             break;
           case args[i][1] === 'setactiveparent':
             setCcpActiveParentClass(AppobjMap, flag, args[i][0]);
@@ -3271,25 +3287,22 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     function handleCcpRadioSelection(evt) {
       console.log('handleCcpRadioSelection running');
       // let Appobj = appController.getAppobj();
-
-      let imgType;
       // console.log('evt.target.id is: ' + evt.target.id);
       let id;
       id = '#' + evt.target.id;
       // console.log('alias is: ' + alias);
       switch(true) {
-      case id === ccpUserInput.rdoCcpImgFixed:
-        Appobj.rdoCcpImgFixed = true, Appobj.rdoCcpImgFluid = false;
-        imgType = 'fixed';
-        // handleImgType(imgType);
-        console.log('fixed clicked');
+      case id === ccpUserInput.rdoCcpImgFixed || id === ccpUserInput.rdoCcpImgFluid:
+        console.log('evt.target.id is: ' + evt.target.id);
+        console.log('id is: ' + id);
+        handleImgType(id);
         break;
-      case id === ccpUserInput.rdoCcpImgFluid:
-        imgType = 'fluid';
-        Appobj.rdoCcpImgFixed = false, Appobj.rdoCcpImgFluid = true;
-        // handleImgType(imgType);
-        console.log('fluid clicked');
-        break;
+      // case id === ccpUserInput.rdoCcpImgFluid:
+      //   imgType = 'fluid';
+      //   Appobj.rdoCcpImgFixed = false, Appobj.rdoCcpImgFluid = true;
+      //   // handleImgType(imgType);
+      //   console.log('fluid clicked');
+      //   break;
       case id.includes('rdo-ccp-td') :
         console.log('TDOptions id is: ' + id);
         handleTdOptions(id);
@@ -3322,11 +3335,24 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         if (key.substring( 0, 8) === 'rdoCcpTd') {
           // !VA If the Appobj key string === true, then that is the selected radio button
           if (Appobj[key] === true ) {
+            console.log('batchAppobjToDOM key is: ' + key);
             // !VA Pass the element ID of the selected radio button determined above to handleTdOptions to show the appropriate TD options for the selected radio button.
             handleTdOptions( ccpUserInput[key]);
           }
         }
       }
+
+
+
+      if (Appobj.rdoCcpImgFluid === true ) {
+        handleImgType(ccpUserInput.rdoCcpImgFluid);
+
+      } 
+      // else if (Appobj.rdoCcpImgFluid === true ) {
+      //   handleImgType(ccpUserInput.rdoCcpImgFluid);
+      // }
+
+
     }
 
     // !VA appController private 
@@ -3377,19 +3403,40 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController private 
+    // !VA The id argument selects the corresponding radio button element.
     function handleTdOptions(id) {
       console.log('handleTdOptions running');
       console.log('id is: ' + id);
       // !VA Loop through all Appobj entries whose first 8 chars is rdoCcpTd, i.e. all the tdOption entries and select the option identified in the id argument. NOTE: This could be separated out into a new function.
-      // !VA Value isn't accessed, but when I tried to just use Object.keys, something broke.
+      // !VA NOTE: Value isn't accessed, but when I tried to just use Object.keys, something broke.
       for (const [key, value] of Object.entries(Appobj)) {
         if (key.substring( 0, 8) === 'rdoCcpTd') {
-          // !VA If the Appobj key string === the element id of the click target, then set that Appobj property to true, otherwise set it to false. This replicates the behavior of a single-select radion button group for the Appobj properties of the radio buttons.
-          ccpUserInput[key] === id ? Appobj[key] = true : Appobj[key] = false;
+          // !VA If the Appobj key string === the element id of the click target, then set that Appobj property to true, otherwise set it to false. This replicates the behavior of a single-select radion button group for the Appobj properties of the radio buttons. If true, set that radio button's checked property to true;
+
+
+          if (ccpUserInput[key] === id) {
+            Appobj[key] = true;
+            UIController.handleCcpActions(Appobj, true, [ key, 'selectradio' ]);
+            console.log('HIT: ' + key);
+          } else {
+            Appobj[key] = false;
+          }
         }
       }
+      // debugger;
+
+      // console.log('handleTdOptions Appobj: ');
+      // console.dir(Appobj);
+
+
+      // let prop = elementIdToAppobjProp(id);
+      // console.log('prop is: ' + prop);
+      // UIController.handleCcpActions(Appobj, true, [ prop, 'selectradio' ]);
+
+
       // !VA Reset all Ccp element i.e. undisplay them and remove any disabled styles and attributes. The elements need to be reset before new options can be applied.
       resetTdOptions();
+
 
       // !VA Handle the option states for the respective radio button.
       switch(true) {
@@ -3405,8 +3452,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       case id.includes('imgswap'):
         // !VA Make sure the Include wrapper checkbox is on and the options are displayed.
         Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
-        UIController.handleCcpActions(Appobj, true, [ 'spnCcpTableIncludeWrapperCheckmrk', 'setcheckbox']);
         showIncludeWrapperOptions(true);
+        UIController.handleCcpActions(Appobj, true, [ 'spnCcpTableIncludeWrapperCheckmrk', 'setcheckbox']);
+        // !VA NOTE: These options can be merged with the above function call
         // !VA Display the appropriate TD options
         UIController.handleCcpActions(Appobj, true,  [ 'selCcpTdValign', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']);
         // !VA Preset the options:
@@ -3419,6 +3467,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA Write the preset values to CCP DOM
         UIController.handleCcpActions(Appobj, true,  [ 'iptCcpImgClass', 'setvalue'], [ 'iptCcpTableClass', 'setvalue'], [ 'iptCcpTableWidth', 'setvalue'], [ 'selCcpTableAlign', 'setvalue'], [ 'iptCcpTableWrapperClass', 'setvalue'], [ 'iptCcpTableWrapperWidth', 'setvalue'], [ 'selCcpTableWrapperAlign', 'setvalue'] );
         // !VA Disable the appropriate presets
+        // !VA NOTE: These options can be merged with the above function call
         UIController.handleCcpActions(Appobj, true,  [ 'iptCcpImgClass', 'setdisabledtextinput'], [ 'iptCcpTableClass', 'setdisabledtextinput'], [ 'iptCcpTableWidth', 'setdisabledtextinput'], [ 'selCcpTableAlign', 'setdisabledtextinput'], [ 'iptCcpTableWrapperClass', 'setdisabledtextinput'], [ 'iptCcpTableWrapperWidth', 'setdisabledtextinput'], [ 'selCcpTableWrapperAlign', 'setdisabledtextinput'] );
         break;
       case id.includes('bgimage'):
@@ -3426,6 +3475,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         Appobj.iptCcpTdHeight = Appobj.imgH, Appobj.iptCcpTdWidth = Appobj.imgW, Appobj.iptCcpTdBgColor = '#7bceeb';
         // !VA Display applicable elements and preset values
         UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdClass', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']) ;
+        // !VA NOTE: These options can be merged with the above function call
         UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdHeight', 'setvalue'], [ 'iptCcpTdWidth', 'setvalue'], [ 'iptCcpTdBgColor', 'setvalue'], [ 'iptCcpTdWidth', 'setactiveparent']) ;
         break;
       case id.includes('vmlbutton'):
@@ -3439,6 +3489,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         Appobj.iptCcpTdFontColor= '#FFFFFF';
         // !VA Apply active class to parent element and set preset values from Appobj 
         UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdClass', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent'], [ 'iptCcpTdFontColor', 'setactiveparent'], [ 'iptCcpTdBorderColor', 'setactiveparent'], ['iptCcpTdBorderRadius', 'setactiveparent']) ;
+        // !VA NOTE: These options can be merged with the above function call
         UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdClass', 'setvalue'], [ 'iptCcpTdHeight', 'setvalue'], [ 'iptCcpTdWidth', 'setvalue'], [ 'iptCcpTdBgColor', 'setvalue'], [ 'iptCcpTdFontColor', 'setvalue'], [ 'iptCcpTdBorderColor', 'setvalue'], ['iptCcpTdBorderRadius', 'setvalue'], [ 'iptCcpTdFontColor', 'setvalue']) ;
         break;
       default:
@@ -3449,6 +3500,71 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // batchAppobjToDOM();
     }
 
+    // !VA appController private
+    function handleImgType(id) {
+      console.log('handleImgType running');
+      console.log('id is: ' + id);
+
+      // !VA Branch: implementAppobj06 (061320)
+      /* !VA  
+      
+      Checkmark not disabled in fluid
+      
+      
+      */
+
+
+      resetTdOptions();
+      
+      if (id === ccpUserInput.rdoCcpImgFixed) {
+        Appobj.rdoCcpImgFixed = true, Appobj.rdoCcpImgFluid = false;
+        handleTdOptions(ccpUserInput.rdoCcpTdBasic);
+        
+        
+      } else if ( id === ccpUserInput.rdoCcpImgFluid) {
+        Appobj.rdoCcpImgFixed = false, Appobj.rdoCcpImgFluid = true;
+        Appobj.iptCcpTableWidth = '100%';
+        Appobj.iptCcpTableClass = 'devicewidth';
+        Appobj.iptCcpTableWrapperWidth = '100%';
+        Appobj.iptTableWrapperClass = 'devicewidth';
+
+        // !VA Branch: implementAppobj06 (061320)
+        // !VA Cannot run handleTdOptions here because it resets all the TD options to the defaults for tdbasic
+        // handleTdOptions(ccpUserInput.rdoCcpTdBasic);
+        
+        
+
+        UIController.handleCcpActions( Appobj, true, 
+          [ 'rdoCcpTdBasic', 'selectradio'], 
+          [ 'iptCcpTableWidth', 'setvalue'], 
+          ['iptCcpTableClass', 'setvalue'], 
+          ['iptCcpTableWrapperWidth', 'setvalue'], 
+          ['rdoCcpTdExcludeimg', 'setdisabledradio'], 
+          ['rdoCcpTdPosswitch', 'setdisabledradio'],
+          ['rdoCcpTdImgswap', 'setdisabledradio'], 
+          ['rdoCcpTdBgimage', 'setdisabledradio'], 
+          ['rdoCcpTdBgimage', 'setdisabledradio'], 
+          ['rdoCcpTdVmlbutton', 'setdisabledradio'], 
+          ['iptCcpTableWrapperWidth', 'setactiveparent'], 
+          ['iptCcpTableWrapperClass', 'setactiveparent'], 
+          ['selCcpTableWrapperAlign', 'setactiveparent'], 
+          ['iptCcpTableWrapperBgColor', 'setactiveparent'],
+          ['iptCcpTableWidth', 'setdisabledtextinput'], 
+          ['iptCcpTableClass', 'setdisabledtextinput'], 
+          ['iptCcpTableWrapperWidth', 'setdisabledtextinput'], 
+          ['iptCcpTableWrapperClass', 'setdisabledtextinput']
+        );
+
+
+
+        
+      }
+
+      console.log('handleImgType Appobj: ');
+      console.dir(Appobj);
+
+
+    }
 
     // !VA appController private 
     // !VA Function to display/undisplay the CCP wrapper table options if the checkbox is checked. If Appobj.spnCcpTableIncludeWrapperCheckmrk === 'off', run this to turn it on.
