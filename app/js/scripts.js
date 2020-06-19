@@ -687,20 +687,29 @@ var Witty = (function () {
       // !VA This function writes values directly to the DOM, bypassing handleCcpActions, since the actions here arent initiated by a CCP event, but rather from a user input in the toolbar. 
       // !VA TODO: Find a more descriptive name for this.
       // !VA args is a rest parameter list of key/value arrays, whereby the key is the alias of the element to write to and value value to write. 
-      writeCcpDOM: function (...args) {
-        // console.log('writeCcpDOM running');
-        // console.log('args is: ');
-        // console.log(args); 
+      // !VA Branch: implementAppobj07 (061920)
+      // !VA Trying to use this to remove the setvalue action from handleCcpActions. 
+      writeAppobjToDOM: function (...args) {
+        console.log('writeAppobjToDOM running');
+        console.log('args is: ');
+        console.log(args); 
+        let el;
         // !VA Loop throught the list of args, determine what type of element it is from the three-character element prefix and perform the appropriate action.    
         for (let i = 0; i < args.length; i++) {
-          if (args[i][0].substring( 0 , 4) === '#ipt') {
-            // !VA Write the values for the input elements. [0] is the element ID and [1] is the element value.
-            document.querySelector(args[i][0]).value = args[i][1];
-          } else if (args[i][0].substring( 0 , 4) === '#rdo') {
+          if (args[i][0].substring( 0 , 3) === 'ipt') {
+            // !VA Write the values for the input elements. [0] is the element ID and [1] is the element value. 
+            // !VA NOTE: Separate conditions for different element types here - need to prune the ones that aren't necessary
+            document.querySelector(ccpUserInput[args[i][0]]).value = args[i][1];
+            console.log('This is an input element');
+          } else if (args[i][0].substring( 0 , 3) === 'rdo') {
             console.log('This is a radio button');
-          } else if (args[i][0].substring( 0 , 4) === '#sel') {
+          } else if (args[i][0].substring( 0 , 3) === 'sel') {
             console.log('This is a select dropdown');
-          } else if (args[i][0].substring( 0 , 4) === '#spn') {
+            document.querySelector(ccpUserInput[args[i][0]]).value = args[i][1];
+            // var foo = document.querySelector(ccpUserInput[args[i][0]]).value;
+            // console.log('foo is: ' + foo);
+            
+          } else if (args[i][0].substring( 0 , 3) === 'spn') {
             console.log('This is a mock checkbox');
           }
         }
@@ -3287,8 +3296,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Set Appobj table width and wrapper table width now.
       var tableWidth = [];
       var tableWrapperWidth = [];
-      tableWidth = [ccpUserInput.iptCcpTableWidth, Appobj.imgW ];
-      tableWrapperWidth = [ccpUserInput.iptCcpTableWrapperWidth, Appobj.viewerW];
+      // !VA Use the cross-object identifier instead of the ccp element alias here, that's what writeAppobjToDOM expects.
+      tableWidth = ['iptCcpTableWidth', Appobj.imgW ];
+      tableWrapperWidth = ['iptCcpTableWrapperWidth', Appobj.viewerW];
       
       // !VA Branch: implementAppobj05 (061020)
       // UIController.stashAppobjProperties(true, tableWidth, tableWrapperWidth);
@@ -3298,7 +3308,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // UIController.stashAppobjProperties(true, tableWidth, tableWrapperWidth);
       
       // !VA Write the values to the CCP DOM. This needs to bypass handleCcpActions, since it's not a result of any ccpAction but rather a direct write through the user input in the dynamicRegions. It also has to happen before initCCP, othewise Appobj won't initialize with values for table width and table wrapper width. 
-      UICtrl.writeCcpDOM( tableWidth, tableWrapperWidth);
+      UICtrl.writeAppobjToDOM( tableWidth, tableWrapperWidth);
 
       // !VA If CCP is open, write tableWidth and tableWrapperWidth to the DOM elements. 
       var ccpState = UICtrl.toggleCcp(false);
@@ -3306,7 +3316,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
         // !VA Dont forget that this is the result of a dynamicRegions update which can happen at any time, whether the CCP is open or closed. If it is open, it can happen regardless of whether fluid or fixed or whatever other tdoption is checked. That means that this can't overwrite the Appobj values that are active when fluid is checked but it does have to replace the values that are active when fixed is checked and has to revert back to those values if fluid is checked and then fixed is checked again. This is where things get VERY confusing. 
 
-        // !VA If the CCP is open, update the CCP UI with the most recent changes to dynamicRegion values, then populateAppobj with CCP values last. writeCcpDOM takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the element alias as key and the Appobj value as value. Elements to update here are: tableWidth and tableWrapperWidth. If the CCP is not open, don't update its values.
+        // !VA If the CCP is open, update the CCP UI with the most recent changes to dynamicRegion values, then populateAppobj with CCP values last. writeAppobjToDOM takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the element alias as key and the Appobj value as value. Elements to update here are: tableWidth and tableWrapperWidth. If the CCP is not open, don't update its values.
       }
 
       // !VA Write the inspectors based on Appobj values
@@ -3406,7 +3416,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       Appobj.iptCcpTdBgColor = '';
       Appobj.iptCcpTableWrapperClass = 'devicewidth';
       // !VA Write the defaults to the CCP DOM elements.
-      UIController.handleCcpActions(Appobj, false, ['iptCcpImgClass', 'setvalue'], ['iptCcpTableClass', 'setvalue'],  ['iptCcpTableWrapperClass', 'setvalue'], ['iptCcpTdWidth', 'setvalue'], ['iptCcpTdHeight', 'setvalue'], ['iptCcpTableWidth', 'setvalue'], ['iptCcpTableWrapperWidth', 'setvalue'],  ['iptCcpTdBgColor', 'setvalue'] );
+
+      // !VA Branch: implementAppobj07 (061920)
+      // !VA changing setvalue from handleCcpActions to writeAppobjToDOM
+      UIController.writeAppobjToDOM( [ 'iptCcpImgClass', Appobj.iptCcpImgClass ], [ 'iptCcpTableClass', Appobj.iptCcpTableClass ],  [ 'iptCcpTableWrapperClass', Appobj.iptCcpTableWrapperClass ], ['iptCcpTdWidth', Appobj.iptCcpTdWidth ], [ 'iptCcpTdHeight', Appobj.iptCcpTdHeight ], ['iptCcpTableWidth', Appobj.iptCcpTableWidth ], ['iptCcpTableWrapperWidth', Appobj.iptCcpTableWrapperWidth ],  ['iptCcpTdBgColor', Appobj.iptCcpTdBgColor ] );
+
+      // !VA Deprecated...
+      // UIController.handleCcpActions(Appobj, false, ['iptCcpImgClass', 'setvalue'], ['iptCcpTableClass', 'setvalue'],  ['iptCcpTableWrapperClass', 'setvalue'], ['iptCcpTdWidth', 'setvalue'], ['iptCcpTdHeight', 'setvalue'], ['iptCcpTableWidth', 'setvalue'], ['iptCcpTableWrapperWidth', 'setvalue'],  ['iptCcpTdBgColor', 'setvalue'] );
       // !VA Loop through the ccpUserInput elements and undisplay/un-disable them
       for (let i = 0; i < aliasArray.length; i++) {
         // !VA For ONLY the TD OPTIONS input and select dropdown elements, remove the active class of the parent element to undisplay them.
@@ -3495,7 +3511,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA Wrapper table presets: class='devicewidth', width = viewerW, align=Center
         Appobj.iptCcpTableWrapperClass = 'devicewidth', Appobj.iptCcpTableWrapperWidth = Appobj.viewerW, Appobj.selCcpTableWrapperAlign = 'center';
         // !VA Write the preset values to CCP DOM
-        UIController.handleCcpActions(Appobj, true,  [ 'iptCcpImgClass', 'setvalue'], [ 'iptCcpTableClass', 'setvalue'], [ 'iptCcpTableWidth', 'setvalue'], [ 'selCcpTableAlign', 'setvalue'], [ 'iptCcpTableWrapperClass', 'setvalue'], [ 'iptCcpTableWrapperWidth', 'setvalue'], [ 'selCcpTableWrapperAlign', 'setvalue'] );
+
+        // !VA Branch: implementAppobj07 (061920)
+        // !VA Replacing setvalue action in handleCcpActions with writeAppobjToDOM
+
+        UIController.writeAppobjToDOM( [ 'iptCcpImgClass', Appobj.iptCcpImgClass ], [ 'iptCcpTableClass', Appobj.iptCcpTableClass ], [ 'iptCcpTableWidth', Appobj.iptCcpTableWidth ], [ 'selCcpTableAlign', Appobj.selCcpTableAlign ], [ 'iptCcpTableWrapperClass', Appobj.iptCcpTableWrapperClass ], [ 'iptCcpTableWrapperWidth', Appobj.iptCcpTableWrapperWidth ], [ 'selCcpTableWrapperAlign', Appobj.selCcpTableWrapperAlign] );
+
+        // !VA Deprecated...
+        // UIController.handleCcpActions(Appobj, true,  [ 'iptCcpImgClass', 'setvalue'], [ 'iptCcpTableClass', 'setvalue'], [ 'iptCcpTableWidth', 'setvalue'], [ 'selCcpTableAlign', 'setvalue'], [ 'iptCcpTableWrapperClass', 'setvalue'], [ 'iptCcpTableWrapperWidth', 'setvalue'], [ 'selCcpTableWrapperAlign', 'setvalue'] );
+
         // !VA Disable the appropriate presets
         // !VA NOTE: These options can be merged with the above function call
         UIController.handleCcpActions(Appobj, true,  [ 'iptCcpImgClass', 'setdisabledtextinput'], [ 'iptCcpTableClass', 'setdisabledtextinput'], [ 'iptCcpTableWidth', 'setdisabledtextinput'], [ 'selCcpTableAlign', 'setdisabledtextinput'], [ 'iptCcpTableWrapperClass', 'setdisabledtextinput'], [ 'iptCcpTableWrapperWidth', 'setdisabledtextinput'], [ 'selCcpTableWrapperAlign', 'setdisabledtextinput'] );
@@ -3505,8 +3529,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         Appobj.iptCcpTdHeight = Appobj.imgH, Appobj.iptCcpTdWidth = Appobj.imgW, Appobj.iptCcpTdBgColor = '#7bceeb';
         // !VA Display applicable elements and preset values
         UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdClass', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']) ;
+
+        // !VA Branch: implementAppobj07 (061920)
+        // !VA Replacing setvalue with writeAppobjToDOM
+        UIController.writeAppobjToDOM( [ 'iptCcpTdHeight', Appobj.iptCcpTdHeight ], [ 'iptCcpTdWidth', Appobj.iptCcpTdWidth ], [ 'iptCcpTdBgColor', Appobj.iptCcpTdBgColor ], [ 'iptCcpTdWidth', Appobj.iptCcpTdWidth ]) ;
+
         // !VA NOTE: These options can be merged with the above function call
-        UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdHeight', 'setvalue'], [ 'iptCcpTdWidth', 'setvalue'], [ 'iptCcpTdBgColor', 'setvalue'], [ 'iptCcpTdWidth', 'setactiveparent']) ;
+        // UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdHeight', 'setvalue'], [ 'iptCcpTdWidth', 'setvalue'], [ 'iptCcpTdBgColor', 'setvalue'], [ 'iptCcpTdWidth', 'setactiveparent']) ;
         break;
       case id.includes('vmlbutton'):
         // !VA VML button presets
@@ -3519,8 +3548,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         Appobj.iptCcpTdFontColor= '#FFFFFF';
         // !VA Apply active class to parent element and set preset values from Appobj 
         UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdClass', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent'], [ 'iptCcpTdFontColor', 'setactiveparent'], [ 'iptCcpTdBorderColor', 'setactiveparent'], ['iptCcpTdBorderRadius', 'setactiveparent']) ;
+
+        // !VA Branch: implementAppobj07 (061920)
+        // !VA Replacing setvalue with writeAppobjToDOM
+
+        UIController.handleCcpActions( [ 'iptCcpTdClass', Appobj.iptCcpTdClass ], [ 'iptCcpTdHeight', Appobj.iptCcpTdHeight ], [ 'iptCcpTdWidth', Appobj.iptCcpTdWidth], [ 'iptCcpTdBgColor', Appobj.iptCcpTdBgColor], [ 'iptCcpTdFontColor', Appobj.iptCcpTdFontColor], [ 'iptCcpTdBorderColor', Appobj.iptCcpTdBorderColor ], ['iptCcpTdBorderRadius', Appobj.iptCcpTdBorderRadius ], [ 'iptCcpTdFontColor', Appobj.iptCcpTdFontColor ]) ;
+
+        // !VA Deprecated...
         // !VA NOTE: These options can be merged with the above function call
-        UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdClass', 'setvalue'], [ 'iptCcpTdHeight', 'setvalue'], [ 'iptCcpTdWidth', 'setvalue'], [ 'iptCcpTdBgColor', 'setvalue'], [ 'iptCcpTdFontColor', 'setvalue'], [ 'iptCcpTdBorderColor', 'setvalue'], ['iptCcpTdBorderRadius', 'setvalue'], [ 'iptCcpTdFontColor', 'setvalue']) ;
+        // UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdClass', 'setvalue'], [ 'iptCcpTdHeight', 'setvalue'], [ 'iptCcpTdWidth', 'setvalue'], [ 'iptCcpTdBgColor', 'setvalue'], [ 'iptCcpTdFontColor', 'setvalue'], [ 'iptCcpTdBorderColor', 'setvalue'], ['iptCcpTdBorderRadius', 'setvalue'], [ 'iptCcpTdFontColor', 'setvalue']) ;
         break;
       default:
         console.log('Error in handleTdOptions: unknown condition');
@@ -3553,6 +3589,17 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA IMPORTANT: Not sure if it's best to put this here or only in Attributes, since it only affects the Clipboard output. Leaving it here for now since it doesn't hurt anything
         Appobj.styCcpTableWrapperStyle = '';
         // !VA These options will be set whenever the user clicks the fixed option, even if they weren't selected before choosing the fluid option. That is a minor annoyance for the user probably.
+        // !VA Write the presets in Appobj to the CCP DOM
+        UIController.writeAppobjToDOM( 
+          [ 'iptCcpImgClass', Appobj.iptCcpImgClass ], 
+          [ 'iptCcpTableWidth', Appobj.iptCcpTableWidth ], 
+          ['iptCcpTableClass', Appobj.iptCcpTableClass ], 
+          ['iptCcpTableWrapperWidth', Appobj.iptCcpTableWrapperWidth ],
+          ['iptCcpTableWrapperClass', Appobj.iptCcpTableWrapperClass ],  
+          [ 'iptCcpTdClass', Appobj.iptCcpTdClass ],
+          [ 'iptCcpTdBgColor', Appobj.iptCcpTdBgColor ]
+        );
+        // !VA Set the checkbox and applicable display parent elements 
         UIController.handleCcpActions( Appobj, true, 
           [ 'spnCcpTableIncludeWrapperCheckmrk', 'setcheckbox'], 
           ['iptCcpTableWrapperWidth', 'setactiveparent'], 
@@ -3565,13 +3612,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA Reset the disabling and fluid options to the fixed defaults.
         UIController.handleCcpActions( Appobj, false, 
           // !VA NOTE: The false flag is ignored for setvalue but the AppobjMap is passed repeatedly here. That's not very DRY, look at it again.
-          [ 'iptCcpImgClass', 'setvalue'], 
-          [ 'iptCcpTableWidth', 'setvalue'], 
-          ['iptCcpTableClass', 'setvalue'], 
-          ['iptCcpTableWrapperWidth', 'setvalue'],
-          ['iptCcpTableWrapperClass', 'setvalue'],  
-          [ 'iptCcpTdClass', 'setvalue'],
-          [ 'iptCcpTdBgColor', 'setvalue'],
           // !VA Remove the disabled class from the radio buttons
           ['rdoCcpTdExcludeimg', 'setdisabledradio'], 
           ['rdoCcpTdPosswitch', 'setdisabledradio'],
@@ -3605,20 +3645,24 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA IMPORTANT: Not sure if it's best to put this here or only in Attributes, since it only affects the Clipboard output. Leaving it here for now since it doesn't hurt anything
         Appobj.styCcpTableWrapperStyle = 'style = "max-width: ' + Appobj.imgW + ';"';
         
+        // !VA Write the Appobj presets to the CCP DOM. Some of these existing values should be copied to the element's placeholder attribute
+        UIController.writeAppobjToDOM(
+          // !VA Preset values for the fluid imgType option
+          [ 'iptCcpImgClass', Appobj.iptCcpImgClass ], 
+          [ 'iptCcpTableWidth', Appobj.iptCcpTableWidth ], 
+          ['iptCcpTableClass', Appobj.iptCcpTableClass ], 
+          ['iptCcpTableWrapperWidth', Appobj.iptCcpTableWrapperWidth ],
+          ['iptCcpTableWrapperClass', Appobj.iptCcpTableWrapperClass ],  
+          [ 'iptCcpTdClass', Appobj.iptCcpTdClass ],
+          [ 'iptCcpTdBgColor', Appobj.iptCcpTdClass ]
+        );
+
         // !VA Some of these existing values should be copied to the element's placeholder attribute
         UIController.handleCcpActions( Appobj, true, 
           // !VA Set the 'basic' td option
           [ 'rdoCcpTdBasic', 'selectradio'],
           // !VA Make sure the Include wrapper checkbox is selected 
           [ 'spnCcpTableIncludeWrapperCheckmrk', 'setcheckbox'], 
-          // !VA Preset values for the fluid imgType option
-          [ 'iptCcpImgClass', 'setvalue'], 
-          [ 'iptCcpTableWidth', 'setvalue'], 
-          ['iptCcpTableClass', 'setvalue'], 
-          ['iptCcpTableWrapperWidth', 'setvalue'],
-          ['iptCcpTableWrapperClass', 'setvalue'],  
-          [ 'iptCcpTdClass', 'setvalue'],
-          [ 'iptCcpTdBgColor', 'setvalue'],
           // !VA Disable all td radio buttons except the 'basic' option
           ['rdoCcpTdExcludeimg', 'setdisabledradio'], 
           ['rdoCcpTdPosswitch', 'setdisabledradio'],
@@ -3706,41 +3750,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     }
 
-    // !VA Handles the CCP display logic for the imgType fixed/fluid buttons. The Clipboard output logic is handled in getAttributes - this routine handles primarily the conditions for manipulating the CCP elements based on the logic defined in Attributes.
-    function toggleImgType() {
-      // !VA Get Attributes so we can assign them to the Ccp elements 
-      let Attributes;
-      // !VA This is the other place where getAttributes is accessed besides buildOutputNodeList and maybe initCcp.
-      Attributes = CBController.initGetAttributes();
-
-      // !VA Loop through Attributes and assign values to corresponding elements. The logic is included in the Attribute, so just assign the values here.
-      const sourceAttributes = [ Attributes.tableTagWrapperClass.str, Attributes.tableWidth.str, Attributes.tableTagWrapperWidth.str];
-      const targetCcpElement = [ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWidth, ccpUserInput.iptCcpTableWrapperWidth ];
-      UIController.handleCcpActions( 'setvalue', targetCcpElement, sourceAttributes );
-      // !VA For the fluid imgType options, make sure Include wrapper table is checked, disable all the tdoptions except 'basic' then disable the checkbox, table wrapper class and width and parent table width options.
-      // !VA Array of radio input elements to disable
-      const tdOptionsDisable = [ ccpUserInput.rdoCcpTdExcludeimg, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdImgswap, ccpUserInput.rdoCcpTdBgimage, ccpUserInput.rdoCcpTdPosswitch, ccpUserInput.rdoCcpTdVmlbutton ];
-      const fluidInputOptionsToDisable = [ ccpUserInput.iptCcpTableClass, ccpUserInput.iptCcpTableWidth,ccpUserInput.iptCcpTableWrapperClass, ccpUserInput.iptCcpTableWrapperWidth ];
-      if (Attributes.imgType.str === 'fluid') { 
-        // !VA Preselect the option 'basic'. The other td options won't work with or aren't applicable for fluid because fluid is only for images. 
-        document.querySelector(ccpUserInput.rdoCcpTdBasic).checked = true;
-        toggleIncludeWrapper(true); 
-        UIController.handleCcpActions( 'setdisabledradio', tdOptionsDisable, true );
-        UIController.handleCcpActions( 'setdisabledtextinput', fluidInputOptionsToDisable, true );
-        document.querySelector('#ccp-table-include-wrapper').classList.add('disable-checkbox');
-        document.querySelector('#ccp-table-include-wrapper-label').classList.add('disabled');
-        document.querySelector(ccpUserInput.iptCcpTableWidth).classList.add('disabled');
-
-
-
-      } else {
-        UIController.handleCcpActions( 'setdisabledradio', tdOptionsDisable, false);
-        UIController.handleCcpActions( 'setdisabledtextinput', fluidInputOptionsToDisable, false );
-        document.querySelector('#ccp-table-include-wrapper').classList.remove('disable-checkbox');
-        document.querySelector('#ccp-table-include-wrapper-label').classList.remove('disabled');
-        document.querySelector(ccpUserInput.iptCcpTableWidth).classList.add('disabled');
-      }
-    }
     // !VA END CCP FUNCTIONS
       
     // !VA  appController private

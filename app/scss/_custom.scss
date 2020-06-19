@@ -962,8 +962,6 @@ fieldset {
   margin-left: 30px;
 }
 
-
-
 // VA! Individual Styling for the Mock Checkboxes
 /* These are the hidden browser's default checkboxes. VA! It appears they are attached to the first label element in the parent container */
 .ccp-img-include-anchor-container input, 
@@ -1022,36 +1020,18 @@ fieldset {
   display: block;
 }
 
-// VA! TEST
-// .ccp-img-include-anchor-container input:disabled ~ #spn-ccp-img-include-anchor-checkmrk, 
-// .ccp-table-include-wrapper-container input:disabled ~ #spn-ccp-table-include-wrapper-checkmrk  {
-//   display: block;
-//   pointer-events: none;
-// }
-
 /* Style the checkmrk/indicator */
 .ccp-img-include-anchor-container #spn-ccp-img-include-anchor-checkmrk:after, 
 .ccp-table-include-wrapper-container #spn-ccp-table-include-wrapper-checkmrk:after {
-  left: 5px;
   top: 2px;
+  left: 5px;
   width: 5px;
   height: 10px;
+  transform: rotate(45deg);
   border: solid white;
   border-width: 0 3px 3px 0;
-  -webkit-transform: rotate(45deg);
-  -ms-transform: rotate(45deg);
-  transform: rotate(45deg);
 
 }
-
-// VA! Deprecated...
-// VA! This is the extra label I added because the prodecure I used for the mock checkbox didn't include a label. 
-// #ccp-img-include-anchor-label, 
-// #ccp-table-include-wrapper-label  {
-//   width: 100%;
-//   padding: 0 0 0 25px;
-//   text-align: left;
-// }
 
 .ccp-img-include-anchor-label {
   z-index: 111;
@@ -1061,7 +1041,6 @@ fieldset {
 #chk-ccp-img-include-anchor-checkbox {
   display: none !important;
 }
-
 
 // VA! TD Radio buttons
 #ccp-td-basictd, #ccp-td-basictd-excludeimg, #ccp-td-imgswap, #ccp-td-posswitch, #ccp-td-bgimage, #ccp-td-vmlbutton {
