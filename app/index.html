@@ -243,7 +243,7 @@
                   <!-- VA! Removed ccp-img-include-width-height element -->
                   <div id="ccp-img-include-anchor" > 
                     <!-- VA! Reboot: This is the label that goes with the fake checkbox hack -->
-                    <label class="ccp-img-include-anchor-container mock-checkbox-container" id="ccp-img-include-anchor-container" for="img-include-anchor">
+                    <label class="ccp-img-include-anchor-container mock-checkbox-container" id="chk-ccp-img-include-anchor-checkbox-label" for="img-include-anchor">
                       Wrap &lt;img&gt; with anchor tag
                       <!-- VA! Reboot: This is the label I added to allow positioning of the text label  -->
                       <!-- <label class="ccp-img-include-anchor-label mock-checkbox" id="ccp-img-include-anchor-label" for="chk-ccp-img-include-anchor-checkbox"></label>
@@ -437,20 +437,20 @@
                     <!-- VA! Reboot: This is still wrong...see how it renders-->
                     <!-- VA! Reboot: Removing this outer header text, it's not necessary. In Arnie the checkbox label itself serves as the header.-->
                     <!-- <p class="ccp-heading">Wrapper Table</p> -->
-                      <label class="ccp-table-include-wrapper-container mock-checkbox-container" id="ccp-table-include-wrapper-container" for="ccp-table-include-wrapper">
+                      <label class="ccp-table-include-wrapper-container mock-checkbox-container" id="chk-ccp-table-include-wrapper-checkbox-label" for="ccp-table-include-wrapper">
                         Include wrapper table
                         <!-- VA! This is the inner label - the click area for the checkbox-->
                         <!-- <label class="ccp-table-include-wrapper-label mock-checkbox" id="ccp-table-include-wrapper-label" for="chk-ccp-table-include-wrapper-checkbox">Include wrapper table
                         </label> -->
                       <!-- The default checkbox is hidden -->
-                      <input type="checkbox" id="chk-ccp-table-include-wrapper-checkbox">
+                      <input type="checkbox" disabled id="chk-ccp-table-include-wrapper-checkbox">
                       <span id="spn-ccp-table-include-wrapper-checkmrk"></span>
                       <!-- VA! These options are set in handleTableWidth -->
                     </label> 
                   </div> 
                   <div id="ccp-table-wrapper-class"> 
                       <label class="col-3-label" id="ipt-ccp-table-wrapper-class-label" for="ipt-ccp-table-wrapper-class">class=</label>
-                      <input id="ipt-ccp-table-wrapper-class" placeholder="none" />  
+                      <input id="ipt-ccp-table-wrapper-class" disabled placeholder="none" />  
                   </div> 
                   <div id="ccp-table-wrapper-width"> 
                       <label id="ipt-ccp-table-wrapper-width-label" class="col-3-label" for="ipt-ccp-table-wrapper-width">width=</label>
