@@ -633,26 +633,18 @@ var Witty = (function () {
       // !VA UIController public 
       // !VA Writes Appobj values to the CCP DOM based on parameters: Appobj, and an array of rest parameters from the appController Appobj handler. The rest parameter arrays contain key/value arrays with the identifier corresponding to the appObj/ccpUserInput key and a string identifying the action to perform. This facilitates making multiple DOM accesses based on only one cross-module call to Appobj.
       // !VA NOTE: I don't like that AppobjMap is passed as a parameter with every loop iteration. I need to think about whether that is fixable, but it works and is pretty fast for now.
-      handleCcpActions: function (Appobj, flag, ...args) {
+      handleCcpActions: function (flag, ...args) {
         // console.log('handleCcpActions running');
         // console.log('handleCcpActions Appobj: ');
         // console.dir(Appobj);
         // console.log('args is: ');
         // console.log(args);
         // console.log('flag is: ' + flag);
-        // !VA Create a map of Appobj entries
-        const AppobjMap = new Map(Object.entries(Appobj));
-        // console.log('AppobjMap: ');
-        // console.dir(AppobjMap);
         // !VA Loop through all the rest parameter arrays. [1] is the string identifying the action to perform. [0] is the appObj/ccpUserInput key. Based on the condition defined by the action identifier, executed the appropriate function for each of the items in the rest parameter array. 
         for (let i = 0; i < args.length; i++) {
           // console.log('args[i] is: ' +  args[i]);
           switch(true) {
           // !VA Route the arguments to the function indicated in the action identifier, i.e. the second item in the args array.
-          case args[i][1] === 'setvalue':
-            // !VA NOTE: setvalue requires AppobjMap to get imgW and viewerW and any other properties cross-referenced in Appobj. This requires passing the entire AppobjMap array multiple times. There might be a DRYer way to do this.
-            setCcpValues(AppobjMap, args[i][0]);
-            break;
           case args[i][1] === 'selectradio':
             selectCcpRadio(flag, args[i][0]);
             break;
@@ -3430,20 +3422,20 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           // !VA Create an array of the alias and the action to send to handleCcpActions to apply the active class to the parent of the respective element.
           arr = [ aliasArray[i][0], 'setactiveparent'];
           // !VA False is the flag to remove the active class
-          UIController.handleCcpActions(Appobj, false, arr);
+          UIController.handleCcpActions( false, arr);
         }
         // !VA Remove the disabled class and disabled attribute from all text input elements and select dropdown input elements.
         if (aliasArray[i][1].substring( 0 ,8) === '#ipt-ccp' || aliasArray[i][1].substring( 0 ,8) === '#sel-ccp') {
           arr = [ aliasArray[i][0], 'setdisabledtextinput'];
           // !VA False is the flag to remove the active class
-          UIController.handleCcpActions(Appobj, false, arr);
+          UIController.handleCcpActions( false, arr);
         }
         // !VA Branch: implementAppobj05 (061320)
         // !VA FOR FLUID IMGTYPE: Remove the disabled class and disabled attribute from all radio button elements. 
         if (aliasArray[i][1].substring( 0 ,11) === '#rdo-ccp-td') {
           arr = [ aliasArray[i][0], 'setdisabledradio'];
           // !VA False is the flag to remove the active class
-          UIController.handleCcpActions(Appobj, false, arr);
+          UIController.handleCcpActions( false, arr);
         }
       }
     }
@@ -3462,7 +3454,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
           if (ccpUserInput[key] === id) {
             Appobj[key] = true;
-            UIController.handleCcpActions(Appobj, true, [ key, 'selectradio' ]);
+            UIController.handleCcpActions( true, [ key, 'selectradio' ]);
             // console.log('HIT: ' + key);
           } else {
             Appobj[key] = false;
@@ -3488,21 +3480,21 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       switch(true) {
       case id.includes('basic') || id.includes('excludeimg'):
         // !VA Handle the td options for the 'basic' and 'excludeimg' options: class, height, width, bgcolor, align, valign
-        UIController.handleCcpActions(Appobj, true, [ 'iptCcpTdClass', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent'], [ 'selCcpTdValign', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent']);
+        UIController.handleCcpActions( true, [ 'iptCcpTdClass', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent'], [ 'selCcpTdValign', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent']);
         break;
       case id.includes('posswitch'):
         // !VA Handle the 'posswitch' option
-        UIController.handleCcpActions(Appobj, true, [ 'iptCcpTdClass', 'setactiveparent'], [ 'selCcpTdValign', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']);
+        UIController.handleCcpActions( true, [ 'iptCcpTdClass', 'setactiveparent'], [ 'selCcpTdValign', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']);
         break;
       // !VA Handle the 'imgswap' option
       case id.includes('imgswap'):
         // !VA Make sure the Include wrapper checkbox is on and the options are displayed.
         Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
         showIncludeWrapperOptions(true);
-        UIController.handleCcpActions(Appobj, true, [ 'spnCcpTableIncludeWrapperCheckmrk', 'setcheckbox']);
+        UIController.handleCcpActions( true, [ 'spnCcpTableIncludeWrapperCheckmrk', 'setcheckbox']);
         // !VA NOTE: These options can be merged with the above function call
         // !VA Display the appropriate TD options
-        UIController.handleCcpActions(Appobj, true,  [ 'selCcpTdValign', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']);
+        UIController.handleCcpActions( true,  [ 'selCcpTdValign', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']);
         // !VA Preset the options:
         // !VA img class presets
         Appobj.iptCcpImgClass =  'mobileshow', 
@@ -3522,13 +3514,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
         // !VA Disable the appropriate presets
         // !VA NOTE: These options can be merged with the above function call
-        UIController.handleCcpActions(Appobj, true,  [ 'iptCcpImgClass', 'setdisabledtextinput'], [ 'iptCcpTableClass', 'setdisabledtextinput'], [ 'iptCcpTableWidth', 'setdisabledtextinput'], [ 'selCcpTableAlign', 'setdisabledtextinput'], [ 'iptCcpTableWrapperClass', 'setdisabledtextinput'], [ 'iptCcpTableWrapperWidth', 'setdisabledtextinput'], [ 'selCcpTableWrapperAlign', 'setdisabledtextinput'] );
+        UIController.handleCcpActions( true,  [ 'iptCcpImgClass', 'setdisabledtextinput'], [ 'iptCcpTableClass', 'setdisabledtextinput'], [ 'iptCcpTableWidth', 'setdisabledtextinput'], [ 'selCcpTableAlign', 'setdisabledtextinput'], [ 'iptCcpTableWrapperClass', 'setdisabledtextinput'], [ 'iptCcpTableWrapperWidth', 'setdisabledtextinput'], [ 'selCcpTableWrapperAlign', 'setdisabledtextinput'] );
         break;
       case id.includes('bgimage'):
         // !VA Bgimage presets
         Appobj.iptCcpTdHeight = Appobj.imgH, Appobj.iptCcpTdWidth = Appobj.imgW, Appobj.iptCcpTdBgColor = '#7bceeb';
         // !VA Display applicable elements and preset values
-        UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdClass', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']) ;
+        UIController.handleCcpActions( true,  [ 'iptCcpTdClass', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']) ;
 
         // !VA Branch: implementAppobj07 (061920)
         // !VA Replacing setvalue with writeAppobjToDOM
@@ -3546,17 +3538,17 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         Appobj.iptCcpTdBorderRadius = '4';
         Appobj.iptCcpTdBorderColor= '#1e3650';
         Appobj.iptCcpTdFontColor= '#FFFFFF';
-        // !VA Apply active class to parent element and set preset values from Appobj 
-        UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdClass', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent'], [ 'iptCcpTdFontColor', 'setactiveparent'], [ 'iptCcpTdBorderColor', 'setactiveparent'], ['iptCcpTdBorderRadius', 'setactiveparent']) ;
 
         // !VA Branch: implementAppobj07 (061920)
         // !VA Replacing setvalue with writeAppobjToDOM
-
-        UIController.handleCcpActions( [ 'iptCcpTdClass', Appobj.iptCcpTdClass ], [ 'iptCcpTdHeight', Appobj.iptCcpTdHeight ], [ 'iptCcpTdWidth', Appobj.iptCcpTdWidth], [ 'iptCcpTdBgColor', Appobj.iptCcpTdBgColor], [ 'iptCcpTdFontColor', Appobj.iptCcpTdFontColor], [ 'iptCcpTdBorderColor', Appobj.iptCcpTdBorderColor ], ['iptCcpTdBorderRadius', Appobj.iptCcpTdBorderRadius ], [ 'iptCcpTdFontColor', Appobj.iptCcpTdFontColor ]) ;
+        UIController.writeAppobjToDOM( [ 'iptCcpTdClass', Appobj.iptCcpTdClass ], [ 'iptCcpTdHeight', Appobj.iptCcpTdHeight ], [ 'iptCcpTdWidth', Appobj.iptCcpTdWidth], [ 'iptCcpTdBgColor', Appobj.iptCcpTdBgColor], [ 'iptCcpTdFontColor', Appobj.iptCcpTdFontColor], [ 'iptCcpTdBorderColor', Appobj.iptCcpTdBorderColor ], ['iptCcpTdBorderRadius', Appobj.iptCcpTdBorderRadius ], [ 'iptCcpTdFontColor', Appobj.iptCcpTdFontColor ]);
 
         // !VA Deprecated...
         // !VA NOTE: These options can be merged with the above function call
         // UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdClass', 'setvalue'], [ 'iptCcpTdHeight', 'setvalue'], [ 'iptCcpTdWidth', 'setvalue'], [ 'iptCcpTdBgColor', 'setvalue'], [ 'iptCcpTdFontColor', 'setvalue'], [ 'iptCcpTdBorderColor', 'setvalue'], ['iptCcpTdBorderRadius', 'setvalue'], [ 'iptCcpTdFontColor', 'setvalue']) ;
+
+        UIController.handleCcpActions( true,  [ 'iptCcpTdClass', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent'], [ 'iptCcpTdFontColor', 'setactiveparent'], [ 'iptCcpTdBorderColor', 'setactiveparent'], ['iptCcpTdBorderRadius', 'setactiveparent'], [ 'iptCcpTdFontColor', 'setactiveparent']) ;
+
         break;
       default:
         console.log('Error in handleTdOptions: unknown condition');
@@ -3600,7 +3592,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           [ 'iptCcpTdBgColor', Appobj.iptCcpTdBgColor ]
         );
         // !VA Set the checkbox and applicable display parent elements 
-        UIController.handleCcpActions( Appobj, true, 
+        UIController.handleCcpActions( true, 
           [ 'spnCcpTableIncludeWrapperCheckmrk', 'setcheckbox'], 
           ['iptCcpTableWrapperWidth', 'setactiveparent'], 
           ['iptCcpTableWrapperClass', 'setactiveparent'], 
@@ -3610,7 +3602,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           [ 'iptCcpTdBgColor', 'setactiveparent']
         );
         // !VA Reset the disabling and fluid options to the fixed defaults.
-        UIController.handleCcpActions( Appobj, false, 
+        UIController.handleCcpActions( false, 
           // !VA NOTE: The false flag is ignored for setvalue but the AppobjMap is passed repeatedly here. That's not very DRY, look at it again.
           // !VA Remove the disabled class from the radio buttons
           ['rdoCcpTdExcludeimg', 'setdisabledradio'], 
@@ -3658,7 +3650,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         );
 
         // !VA Some of these existing values should be copied to the element's placeholder attribute
-        UIController.handleCcpActions( Appobj, true, 
+        UIController.handleCcpActions( true, 
           // !VA Set the 'basic' td option
           [ 'rdoCcpTdBasic', 'selectradio'],
           // !VA Make sure the Include wrapper checkbox is selected 
@@ -3705,7 +3697,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       } else {
         console.log('ERROR in showIncludeWrapperOptions: unknown condition');
       }
-      UIController.handleCcpActions( Appobj, flag, [ 'iptCcpTableWrapperClass', 'setactiveparent' ], [ 'iptCcpTableWrapperWidth', 'setactiveparent' ], [ 'selCcpTableWrapperAlign', 'setactiveparent' ], [ 'iptCcpTableWrapperBgColor', 'setactiveparent' ]);
+      UIController.handleCcpActions( flag, [ 'iptCcpTableWrapperClass', 'setactiveparent' ], [ 'iptCcpTableWrapperWidth', 'setactiveparent' ], [ 'selCcpTableWrapperAlign', 'setactiveparent' ], [ 'iptCcpTableWrapperBgColor', 'setactiveparent' ]);
 
     }
     
