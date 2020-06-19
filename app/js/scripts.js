@@ -393,7 +393,7 @@ var Witty = (function () {
       }
     }
 
-    function setCcpActiveParentClass(AppobjMap, flag, elementAlias) {
+    function setCcpActiveParentClass(flag, elementAlias) {
       // console.log('setActiveParentClass running');
       // console.log('flag is: ' + flag);
       // console.log('elementAlias is: ' + elementAlias);
@@ -428,7 +428,7 @@ var Witty = (function () {
     }
 
 
-    function setDisabledTextInput(elementAlias, flag ) {
+    function setDisabledTextInput( flag, elementAlias ) {
       // console.log('setDisabledTextInput running');
       // console.log('elementAlias is: ' + elementAlias);
       // console.log('flag is: ' + flag );
@@ -450,7 +450,7 @@ var Witty = (function () {
 
     // !VA UIController private
     // !VA Set a checkbox based on the true/false flag argument
-    function setCcpCheckbox(elementAlias, flag) {
+    function setCcpCheckbox( flag, elementAlias ) {
       console.log('setCcpCheckbox running');
       console.log('elementAlias is: ' + elementAlias);
       console.log('flag is: ' + flag);
@@ -460,42 +460,36 @@ var Witty = (function () {
       chkId = chkId.replace('spn', 'chk');
       checkbox = document.querySelector(chkId);
       flag === true ? checkbox.checked = true : checkbox.checked = false;
-      // checkbox.checked ? checkbox.checked = false : checkbox.checked = true;
-      // console.log('checkbox.checked is: ' + checkbox.checked);
       
     }
 
     // !VA UIController private
     // !VA Set a checkbox based on the true/false flag argument
-    function setCcpDisabledCheckbox(elementAlias, flag) {
-      console.log('setCcpDisabledCheckbox running');
-      console.log('elementAlias is: ' + elementAlias);
-      console.log('flag is: ' + flag);
+    function setCcpDisabledCheckbox( flag, elementAlias ) {
+      // console.log('setCcpDisabledCheckbox running');
+      // console.log('elementAlias is: ' + elementAlias);
+      // console.log('flag is: ' + flag);
       let chkId, chkIdLabel, checkbox, checkboxLabel;
+      // !VA Convert the mrk identifier string in the span element to chk
       chkId = ccpUserInput[elementAlias];
       chkId = chkId.replace('mrk', 'box');
       chkId = chkId.replace('spn', 'chk');
+      // !VA Add the -label suffix to the converted id string to get the id of the label element
       chkIdLabel = chkId + '-label';
-      console.log('chkIdLabel is: ' + chkIdLabel);
+      // console.log('chkIdLabel is: ' + chkIdLabel);
+      // !VA checkbox is the mock checkbox - the actual HTML checkbox is hidden.
       checkbox = document.querySelector(ccpUserInput[elementAlias]);
       checkboxLabel = document.querySelector(chkIdLabel);
-      console.log('checkbox is: ');
-      console.log(checkbox);
-      console.log('checkboxLabel is: ');
-      console.log(checkboxLabel);
       if (flag) {
+        // !VA Add the disabled class to the checkbox label and turn off pointer-events for the mock checkbox. Pointer-events is set in the CSS
         checkboxLabel.classList.add('disabled');
-        // document.querySelector('#chk-ccp-table-include-wrapper-checkbox').disabled = 'disabled';
-        // checkbox.disabled = true;
         checkbox.classList.add('disable-checkbox');
       } else {
+        // !VA Remove the disabled class from the checkbox label and turn on pointer-events for the mock checkbox. Pointer-events is set in the CSS
         checkboxLabel.classList.remove('disabled');
-        // document.querySelector('#chk-ccp-table-include-wrapper-checkbox').disabled = false;
         checkbox.classList.remove('disable-checkbox');
       }
-      
     }
-    // chk-ccp-table-include-wrapper-checkbox
 
     // !VA UIController private
     // !VA Select a radio button based on the true/false flag argument
@@ -505,10 +499,7 @@ var Witty = (function () {
       // console.log('elementAlias is: ' + elementAlias);
       let radio;
       radio = document.querySelector(ccpUserInput[elementAlias]);
-
       flag === true ? radio.checked = true : radio.checked = false;
-
-      
     }
 
 
@@ -657,8 +648,9 @@ var Witty = (function () {
         for (let i = 0; i < args.length; i++) {
           // console.log('args[i] is: ' +  args[i]);
           switch(true) {
-          // !VA If the action identifier is 'setvalue' pass the map of Appobj key/value entries and the argument array to setCcpValues.
+          // !VA Route the arguments to the function indicated in the action identifier, i.e. the second item in the args array.
           case args[i][1] === 'setvalue':
+            // !VA NOTE: setvalue requires AppobjMap to get imgW and viewerW and any other properties cross-referenced in Appobj. This requires passing the entire AppobjMap array multiple times. There might be a DRYer way to do this.
             setCcpValues(AppobjMap, args[i][0]);
             break;
           case args[i][1] === 'selectradio':
@@ -668,25 +660,21 @@ var Witty = (function () {
             setCcpDisabledRadio(flag, args[i][0] );
             break;
           case args[i][1] === 'setactiveparent':
-            setCcpActiveParentClass(AppobjMap, flag, args[i][0]);
+            setCcpActiveParentClass(flag, args[i][0]);
             break;
           case args[i][1] === 'setactiveclass':
-            // console.log('args[i][0] is: ' + args[i][0]);
             setCcpActiveClass(args[i][0]);
             break;
           case args[i][1] === 'setcheckbox':
-            setCcpCheckbox( args[i][0], flag);
+            setCcpCheckbox( flag, args[i][0] );
             break;
           case args[i][1] === 'setdisabledtextinput':
-            setDisabledTextInput(args[i][0], flag);
+            setDisabledTextInput( flag, args[i][0] );
             break;
           case args[i][1] === 'setdisabledcheckbox':
-            console.log('Appobj.rdoCcpImgFluid is: ' + Appobj.rdoCcpImgFluid);
-
-            flag = Appobj.rdoCcpImgFluid;
-
-
-            setCcpDisabledCheckbox(args[i][0], flag);
+            // !VA The flag here relates to the fluid/fixed Appobj property, not the property of the element in args[i][1], so get the state of the fluid radio button from the DOM
+            flag = document.querySelector(ccpUserInput.rdoCcpImgFluid).checked;
+            setCcpDisabledCheckbox( flag, args[i][0] );
             break;
           default:
             // code block
@@ -3546,22 +3534,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     function handleImgType(id) {
       console.log('handleImgType running');
       console.log('id is: ' + id);
-
-      // !VA Branch: implementAppobj06 (061320)
-      /* !VA  
-      
-      Checkmark not disabled in fluid
-      
-      
-      */
-
-
+      // !VA Reset all the td options to prepare for processing
       resetTdOptions();
-      
+      // !VA Set the fixed options, or reset them after switching back from fluid
       if (id === ccpUserInput.rdoCcpImgFixed) {
         Appobj.rdoCcpImgFixed = true, Appobj.rdoCcpImgFluid = false;
+        // !VA Run handleTdOptions with the 'basic' option as argument to preselect the basic option
         handleTdOptions(ccpUserInput.rdoCcpTdBasic);
-        // !VA NOTE: This is where the placeholder value would be swapped
+        // !VA NOTE: This is where the placeholder value would be swapped. But for now, use these presets - any existing user selections will be lost until saving them to the placeholder is implemented.
         Appobj.iptCcpImgClass = '';
         Appobj.iptCcpTableWidth = Appobj.imgW;
         Appobj.iptCcpTableClass = '';
@@ -3572,8 +3552,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA Branch: implementAppobj06 (061820)
         // !VA IMPORTANT: Not sure if it's best to put this here or only in Attributes, since it only affects the Clipboard output. Leaving it here for now since it doesn't hurt anything
         Appobj.styCcpTableWrapperStyle = '';
-
-
+        // !VA These options will be set whenever the user clicks the fixed option, even if they weren't selected before choosing the fluid option. That is a minor annoyance for the user probably.
         UIController.handleCcpActions( Appobj, true, 
           [ 'spnCcpTableIncludeWrapperCheckmrk', 'setcheckbox'], 
           ['iptCcpTableWrapperWidth', 'setactiveparent'], 
@@ -3583,14 +3562,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           [ 'iptCcpTdClass', 'setactiveparent'],
           [ 'iptCcpTdBgColor', 'setactiveparent']
         );
-
-
-
+        // !VA Reset the disabling and fluid options to the fixed defaults.
         UIController.handleCcpActions( Appobj, false, 
-          // [ 'rdoCcpTdBasic', 'selectradio'], 
-
-
-          // !VA What does the false flag do for setvalue?
+          // !VA NOTE: The false flag is ignored for setvalue but the AppobjMap is passed repeatedly here. That's not very DRY, look at it again.
           [ 'iptCcpImgClass', 'setvalue'], 
           [ 'iptCcpTableWidth', 'setvalue'], 
           ['iptCcpTableClass', 'setvalue'], 
@@ -3598,16 +3572,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           ['iptCcpTableWrapperClass', 'setvalue'],  
           [ 'iptCcpTdClass', 'setvalue'],
           [ 'iptCcpTdBgColor', 'setvalue'],
-
-
+          // !VA Remove the disabled class from the radio buttons
           ['rdoCcpTdExcludeimg', 'setdisabledradio'], 
           ['rdoCcpTdPosswitch', 'setdisabledradio'],
           ['rdoCcpTdImgswap', 'setdisabledradio'], 
           ['rdoCcpTdBgimage', 'setdisabledradio'], 
           ['rdoCcpTdVmlbutton', 'setdisabledradio'], 
-
-          // !VA Disabled mock checkbox is set in CSS with the pointer-events property
+          // !VA Remove the pointer-events property from the mock checkbox and remove the disabled class from the label element
           [ 'spnCcpTableIncludeWrapperCheckmrk', 'setdisabledcheckbox'], 
+          // !VA Remove the disabled class from the text input elements.
           ['iptCcpImgClass', 'setdisabledtextinput'], 
           ['iptCcpTableWidth', 'setdisabledtextinput'], 
           ['iptCcpTableClass', 'setdisabledtextinput'], 
@@ -3631,17 +3604,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA Branch: implementAppobj06 (061820)
         // !VA IMPORTANT: Not sure if it's best to put this here or only in Attributes, since it only affects the Clipboard output. Leaving it here for now since it doesn't hurt anything
         Appobj.styCcpTableWrapperStyle = 'style = "max-width: ' + Appobj.imgW + ';"';
-        // !VA User-definable TD properties
-
-        // !VA Branch: implementAppobj06 (061320)
-        // !VA Cannot run handleTdOptions here because it resets all the TD options to the defaults for tdbasic
-        // handleTdOptions(ccpUserInput.rdoCcpTdBasic);
         
-        
-        // !VA Some of these existing values should be copied to the element's placeholder
+        // !VA Some of these existing values should be copied to the element's placeholder attribute
         UIController.handleCcpActions( Appobj, true, 
-          [ 'rdoCcpTdBasic', 'selectradio'], 
+          // !VA Set the 'basic' td option
+          [ 'rdoCcpTdBasic', 'selectradio'],
+          // !VA Make sure the Include wrapper checkbox is selected 
           [ 'spnCcpTableIncludeWrapperCheckmrk', 'setcheckbox'], 
+          // !VA Preset values for the fluid imgType option
           [ 'iptCcpImgClass', 'setvalue'], 
           [ 'iptCcpTableWidth', 'setvalue'], 
           ['iptCcpTableClass', 'setvalue'], 
@@ -3649,39 +3619,34 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           ['iptCcpTableWrapperClass', 'setvalue'],  
           [ 'iptCcpTdClass', 'setvalue'],
           [ 'iptCcpTdBgColor', 'setvalue'],
-
-
+          // !VA Disable all td radio buttons except the 'basic' option
           ['rdoCcpTdExcludeimg', 'setdisabledradio'], 
           ['rdoCcpTdPosswitch', 'setdisabledradio'],
           ['rdoCcpTdImgswap', 'setdisabledradio'], 
           ['rdoCcpTdBgimage', 'setdisabledradio'], 
           ['rdoCcpTdVmlbutton', 'setdisabledradio'], 
-
+          // !VA Make sure the Include wrapper table options are displayed
           ['iptCcpTableWrapperWidth', 'setactiveparent'], 
           ['iptCcpTableWrapperClass', 'setactiveparent'], 
           ['selCcpTableWrapperAlign', 'setactiveparent'], 
           ['iptCcpTableWrapperBgColor', 'setactiveparent'],
+          // !VA Display the allowable TD options for the fluid imgtype
           [ 'iptCcpTdClass', 'setactiveparent'],
           [ 'iptCcpTdBgColor', 'setactiveparent'],
-
-          // !VA Disabled mock checkbox is set in CSS - 
+          // !VA Turn off pointer-events (set in CSS) and apply the disabled class to the label
           [ 'spnCcpTableIncludeWrapperCheckmrk', 'setdisabledcheckbox'], 
+          // !VA Disable all the fluid-specific options so the user cannot change them
           ['iptCcpImgClass', 'setdisabledtextinput'], 
           ['iptCcpTableWidth', 'setdisabledtextinput'], 
           ['iptCcpTableClass', 'setdisabledtextinput'], 
           ['iptCcpTableWrapperWidth', 'setdisabledtextinput'], 
           ['iptCcpTableWrapperClass', 'setdisabledtextinput']
         );
-
-
-
-        
+      } else {
+        console.log('ERROR in handleImgType - unknown condition');
       }
-
-      console.log('handleImgType Appobj: ');
-      console.dir(Appobj);
-
-
+      // console.log('handleImgType Appobj: ');
+      // console.dir(Appobj);
     }
 
     // !VA appController private 
