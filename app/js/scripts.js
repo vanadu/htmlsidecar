@@ -5,8 +5,7 @@
 // !VA GENERAL NOTES
 /* !VA  - June Reboot Notes
 =========================================================
-// !VA Branch: implementAppobj05 (061220)
-Cleaning up - to read all the notes so far check out the last commit in implementAppobj03 
+// !VA Branch: implementAppobj08 (062020)
 
 TODO: BUG! Load 625X525 with viewerW set to 600 - loads without resizing to container size
 TODO: Change the default parent class on 
@@ -98,9 +97,6 @@ var Witty = (function () {
   // !VA GLOBAL
   let myObject = {};
   myObject.variable = 'This is a string';
-
-  // !VA Branch: implementAppobj08 (062020)
-  // !VA Deprecate
 
   var UIController = (function() {
 
@@ -308,7 +304,6 @@ var Witty = (function () {
     }
 
     // !VA UIController private
-    // !VA Branch: implementAppobj08 (062020)
     // !VA TODO: Determine final location for getAspectRatio
     // !VA Calc the apsect ratio - putting this here for now until it's decided where it needs to live. It's currently needed in appController for Appd... but can live in UIController private once Appd... is deprecated.
     function getAspectRatio (var1, var2) {
@@ -338,27 +333,11 @@ var Witty = (function () {
     }
 
     // !VA CCP FUNCTIONS
-    // !VA AppobjMap is a map generated from Appobjh in handleCCpActions. args is an array of strings corresponding to Appobj/ccpUserElement properties passed in from handleCCpActions, originating from handleImgType
-    // !VA TODO: see if handleImgType can be consolidated with other similar Appobj handlers.
-    // !VA Branch: implementAppobj08 (062020)
-    // !VA Deprecating...
-    // function setCcpValues(AppobjMap, elementAlias) {
-    // console.clear();
-    // console.log('setCcpValue running');
-    // console.log('AppobjMap: ');
-    // console.dir(AppobjMap);
-    // console.log('AppobjMap.get(elementAlias) is: ' + AppobjMap.get(elementAlias));
-    // console.log('elementAlias is: ' + elementAlias);
-    //   document.querySelector(ccpUserInput[elementAlias]).value = AppobjMap.get(elementAlias);
-    // }
-
+    // !VA --------------------
+    // !VA UIController private
+    // !VA Apply/remove disabled-radio and disabled style to radio button element and its label. Called from UIController public handleCcpActions. Flag is the boolean indicating whether to apply or remove the styles. Called from handleCcpActions (UIController public).
     function setCcpDisabledRadio(flag, elementAlias ) {
-      // console.clear();
       // console.log('setCcpDisabledRadio running');
-      // console.log('AppobjMap: ');
-      // console.dir(AppobjMap);
-      // console.log('AppobjMap.get(elementAlias) is: ' + AppobjMap.get(elementAlias));
-      
       let elementLabel;
       // !VA The element label must have a disabled style too, so append -label to the alias to select it.
       elementLabel = ccpUserInput[elementAlias] +  '-label';
@@ -366,7 +345,6 @@ var Witty = (function () {
       if (flag ) {
         // !VA Apply the disabled styles to the elements
         document.querySelector(ccpUserInput[elementAlias]).disabled = true;
-        // !VA 
         document.querySelector(elementLabel).classList.add('disabled');
         document.querySelector(ccpUserInput[elementAlias]).classList.add('disabled-radio');
       } else {
@@ -377,18 +355,22 @@ var Witty = (function () {
       }
     }
 
+    // !VA UIController private
+    // !VA Apply the active class to the parent element of the element with the passed identifier. The identifier corresponds to the Appobj property name. Called from handleCcpActions (UIController public).
     function setCcpActiveParentClass(flag, elementAlias) {
       // console.log('setActiveParentClass running');
       // console.log('flag is: ' + flag);
       // console.log('elementAlias is: ' + elementAlias);
-      // console.log('foo: ' + AppobjMap.get(elementAlias));
       // !VA Build the parent div id from the elementAlias
       let parentDivId;
+      // !VA Get the ID of the parent div of the target element.
       function getParentDiv(elementAlias) {
         parentDivId = '#' + ccpUserInput[elementAlias].substring( 5 );
-        return parentDivId;
+        // !VA Not necessary to return it since it's scoped to the parent function.
+        // return parentDivId;
       }
       getParentDiv(elementAlias);
+      // !VA Add or remove the active class based on the flag value
       if (flag === true ) {
         document.querySelector(parentDivId).classList.add('active');
       }   else if (flag === false ) {
@@ -398,11 +380,11 @@ var Witty = (function () {
       }
     }
 
+    // !VA UIController private
+    // !VA Apply the active class to an element. elementAlias is the identifier corresponding to Appobj/ccpUserInput property name. Called from handleCcpActions (UIController public).
     function setCcpActiveClass(elementAlias) {
-
-      console.log('setCcpActiveClass running');
-      console.log('ccpUserInput[elementAlias] is: ' + ccpUserInput[elementAlias]);
-
+      // console.log('setCcpActiveClass running');
+      // console.log('ccpUserInput[elementAlias] is: ' + ccpUserInput[elementAlias]);
       // !VA NOTE: Not sure why I removed this if condition and not sure if I should restore it
       // if (!document.querySelector(ccpUserInput[elementAlias]).classList.contains('active')) {
       document.querySelector(ccpUserInput[elementAlias]).classList.add('active');
@@ -411,15 +393,16 @@ var Witty = (function () {
       // }
     }
 
-
+    // !VA UIController private
+    // !VA Add/remove the disabled class to a text input element and its label, and set/unset the disabled attribute of the input element. elementAlias is the identifier corresponding to Appobj/ccpUserInput property name. Called from handleCcpActions (UIController public).
     function setDisabledTextInput( flag, elementAlias ) {
       // console.log('setDisabledTextInput running');
       // console.log('elementAlias is: ' + elementAlias);
       // console.log('flag is: ' + flag );
-      // console.dir(elemArray);
       let elementLabel;
       elementLabel = ccpUserInput[elementAlias] + '-label';
       // console.log('elementLabel is: ' + elementLabel);
+      // !VA Add/remove the disabled class and set/unset the disabled attribute based on the flag value
       if (flag) {
         document.querySelector(elementLabel).classList.add('disabled');
         document.querySelector(ccpUserInput[elementAlias]).disabled = true;
@@ -433,22 +416,21 @@ var Witty = (function () {
 
 
     // !VA UIController private
-    // !VA Set a checkbox based on the true/false flag argument
+    // !VA Check/uncheck a checkbox based on the true/false flag argument.  elementAlias is the identifier corresponding to Appobj/ccpUserInput property name. Called from handleCcpActions (UIController public). IMPORTANT: This function applies/removes the checked property to the actual DOM HTML input checkbox element. The corresponding Appobj property is set in appController handleTdOptions, and handleImgType
     function setCcpCheckbox( flag, elementAlias ) {
-      console.log('setCcpCheckbox running');
-      console.log('elementAlias is: ' + elementAlias);
-      console.log('flag is: ' + flag);
+      // console.log('setCcpCheckbox running');
+      // console.log('elementAlias is: ' + elementAlias);
+      // console.log('flag is: ' + flag);
       let chkId, checkbox;
       chkId = ccpUserInput[elementAlias];
       chkId = chkId.replace('mrk', 'box');
       chkId = chkId.replace('spn', 'chk');
       checkbox = document.querySelector(chkId);
       flag === true ? checkbox.checked = true : checkbox.checked = false;
-      
     }
 
     // !VA UIController private
-    // !VA Set a checkbox based on the true/false flag argument
+    // !VA Disable/enable a mock checkbox based on the true/false flag argument. elementAlias is the identifier corresponding to Appobj/ccpUserInput property name. Called from handleCcpActions. IMPORTANT: This function applies/removes the disabled and disable-checkbox class to the SPAN mock checkbox only based on the flag switch. The actual DOM HTML checkbox input element never receives the disabled attribute. Instead, the mock checkbox is enabled/disabled by applying/removing the pointer-events CSS style. Since the actual HTML input element is hidden, applying the disabled attribute to it is irrelevant. However, the the pointer-events might not affect keyboard input, so it might still be possible to enable/disable the mock checkbox via the keyboard, that needs to be tested.
     function setCcpDisabledCheckbox( flag, elementAlias ) {
       // console.log('setCcpDisabledCheckbox running');
       // console.log('elementAlias is: ' + elementAlias);
@@ -476,7 +458,7 @@ var Witty = (function () {
     }
 
     // !VA UIController private
-    // !VA Select a radio button based on the true/false flag argument
+    // !VA Select a radio button based on the true/false flag argument. elementAlias is the identifier corresponding to Appobj/ccpUserInput property name. Called from handleCcpActions. 
     function selectCcpRadio(flag, elementAlias) {
       // console.log('selectCcpRadio running');
       // console.log('flag is: ' + flag);
@@ -485,7 +467,7 @@ var Witty = (function () {
       radio = document.querySelector(ccpUserInput[elementAlias]);
       flag === true ? radio.checked = true : radio.checked = false;
     }
-
+    // !VA END CCP FUNCTIONS
 
     // !VA UIController public functions
     return {
@@ -539,11 +521,10 @@ var Witty = (function () {
             var fname = document.querySelector(dynamicRegions.curImg).src;
             fname = fname.split('/');
             fname = fname[fname.length - 1];
-            // !VA Branch: implementAppobj02 (060420)
             // !VA Call Appobj and add filename to it here for dev mode
             var Appobj = appController.getAppobj();
             // !VA Write fname both to the DOM here and to Appobj. 
-            // !VA Branch: implementAppobj08 (062020)
+            // !VA TODO
             // !VA Need a function that writes a specific Appobj property to Appobj - not sure getAppobj is the DRYest option for this.
             document.querySelector(inspectorElements.insFilename).textContent = Appobj.fileName = fname;
 
@@ -662,11 +643,8 @@ var Witty = (function () {
       },
 
       // !VA UIController public 
-      // !VA This function writes values directly to the DOM, bypassing handleCcpActions, since the actions here arent initiated by a CCP event, but rather from a user input in the toolbar. 
+      // !VA This function writes individual values directly to the DOM. Called by resizeContainers to set dynamicRegions DOM values on initialization and toolbar input. Called by resetTdOptions, handleTdOptions, handleImgType to set CCP DOM element values. args is a rest parameter list of key/value arrays, whereby the key is the alias of the element to write to and value value to write. 
       // !VA TODO: Find a more descriptive name for this.
-      // !VA args is a rest parameter list of key/value arrays, whereby the key is the alias of the element to write to and value value to write. 
-      // !VA Branch: implementAppobj07 (061920)
-      // !VA Trying to use this to remove the setvalue action from handleCcpActions. 
       writeAppobjToDOM: function (...args) {
         // console.log('writeAppobjToDOM running');
         // console.log('args is: ');
@@ -682,8 +660,6 @@ var Witty = (function () {
           } else if (args[i][0].substring( 0 , 3) === 'sel') {
             // !VA NOTE: THis is the same as the 'ipt' condition
             document.querySelector(ccpUserInput[args[i][0]]).value = args[i][1];
-            // var foo = document.querySelector(ccpUserInput[args[i][0]]).value;
-            // console.log('foo is: ' + foo);
           } else if (args[i][0].substring( 0 , 3) === 'spn') {
             console.log('ERROR in writeAppobjToDOM - span mock checkbox not handled');
           }
@@ -691,7 +667,8 @@ var Witty = (function () {
       },
 
       // !VA UIController public
-      // !VA Stash arrays of key/value pairs
+      // !VA Stash arrays of key/value pairs.
+      // !VA TODO: This is not yet implemented and may never be, but leaving it here for now.
       stashAppobjProperties: function(flag, ...args) {
         console.log('stashAppobjProperties');
         console.log('flag is: ' + flag);
@@ -705,7 +682,9 @@ var Witty = (function () {
       },
 
       // !VA UIController public
+      // !VA Takes one of three parameters: 'app', 'ccp' and 'all'. Called from calcViewerSize and initCcp. When called from calcViewerSize, the isUpdate condition determines whether populateAppobj is run - if isUpdate is not true, then there are no existing Appobj values for dynamicRegions, so populateAppobj with the app parameter initializes Appobj values by running populateAppProperties. When the CCP is opened, populateAppobj reads CCP DOM values into Appobj so that Appobj always reflects the current state of the CCP DOM when the CCP is opened. 
       populateAppobj: function (Appobj, access) {
+        console.log('access is: ' + access);        
         // !VA IIFE for populating 
         // let Appobj = {};
         // !VA cStyles is deprecated because we're using literal values instead of getting the computed CSS values stored in CSS, but keeping for reference. Using localStorage now, so don't need to get hard values from CSS.
@@ -722,44 +701,28 @@ var Witty = (function () {
           return val;
         }
         function populateAppProperties(Appobj) {
-
+          // !VA Get the current image
           curImg = document.querySelector(dynamicRegions.curImg);
-          // !VA Get the computed width and height of imgViewer
-          // !VA Deprecating...
-          // imgViewer = document.querySelector(dynamicRegions.imgViewer);
-          // cStyles = window.getComputedStyle(imgViewer);
-
-          // !VA Get the computed width in case there is no value from localStorage. In that case, the value is coming from the CSS file. 
-          // !VA If there's no local storage, then just default to 650 rather than getting it from the CSS file - but leave it in here commented out just in case that causes problems later.
-          // !VA Deprecated...
-          // Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
+          // !VA Set the default viewerW and viewerH in Appobj
           Appobj.viewerW = 650;
-          // console.log('Appobj.viewerW is: ' + Appobj.viewerW);
-
-          // !VA Get the computed height in case there is no value from localStorage. In that case, the value is coming from the CSS file. 
-          // !VA If there's no local storage, then just default to 450 rather than getting it from the CSS file - but leave it in here commented out just in case that causes problems later.
-          // !VA Deprecated...
-          // Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
           Appobj.viewerH = 450;
-
-          // !VA Get the dimensions of curImg
+          // !VA Get the dimensions of curImg and write them to Appobj
           Appobj.imgW = curImg.width;
           Appobj.imgH = curImg.height;
           Appobj.imgNW = curImg.naturalWidth;
           Appobj.imgNH = curImg.naturalHeight;
           
           // !VA Get the Appobj properties for iptTbrSmallPhonesW and sPhonesH
-          // !VA Branch: implementAppobj08 (062020)
-          // !VA It appears the default is coming from the placeholder now rather than the data attribute - so there's probably no point in writing data attributes at all. Get rid of it completely in the next implementation. It appears here that Appobj.sPhonesW still accesses the data-attribute when it should be accessing the placeholder. This might be a problem.
+          // !VA TODO: The default here is still coming from the data- attribute. It should be either the default, which comes from the placeholder in the HTML DOM element, or from localStorage. This needs to be addressed - there's no need to get the default from the data attribute, and I'm It appears the default is coming from the placeholder now rather than the data attribute - so there's probably no point in writing data attributes at all. Get rid of it completely in the next implementation. It appears here that Appobj.sPhonesW still accesses the data-attribute when it should be accessing the placeholder. This is actually a problem in initUI: there the viewerW, sPhoneW and lPhoneW values are writting from localStorage of from the placeholder default to the data-... attributes, which is not necessary. Data attributes were only used because I didn't have a localStorage solution, but now that I do, the data-... attributes are unnecessary. They all need to be deprecated. For later...
           Appobj.sPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).getAttribute('data-sphonesw'), 10);
           Appobj.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
           Appobj.iptTbrSPhonesWidth ? Appobj.iptTbrSPhonesWidth : Appobj.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
           Appobj.iptTbrLPhonesWidth ? Appobj.iptTbrLPhonesWidth : Appobj.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
           // !VA Now compute the rest of Appobj
+          // !VA TODO: Determine the final location of getAspectRatio - it is now duplicated here and in appController.
           Appobj.aspect = getAspectRatio(Appobj.imgNW,  Appobj.imgNH);
           Appobj.sPhonesH = Math.round(Appobj.sPhonesW * (1 / Appobj.aspect[0]));
           Appobj.lPhonesH = Math.round(Appobj.lPhonesW * (1 / Appobj.aspect[0]));
-
         }
         function populateCcpProperties(Appobj) {
           console.log('populateCcpProperties Appobj is: ');
@@ -767,10 +730,8 @@ var Witty = (function () {
           // !VA Don't forget to use bracket notation to add properties to an object: https://stackoverflow.com/questions/1184123/is-it-possible-to-add-dynamically-named-properties-to-javascript-object
           // !VA  for loop: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
           let checkboxId;
-          // !VA Branch: implementAppobj06 (061820)
-          // !VA First, create an styCcpTableWrapperStyle property with the value ''. This is a placeholder for the max-width style property which is only used in handleImgType if the image type is fluid. There is no correspondent for this in the CCP DOM. 
+          // !VA TODO:  Created an styCcpTableWrapperStyle property with the value ''. This is a placeholder for the max-width style property which is only used in handleImgType if the image type is fluid. There is no correspondent for this in the CCP DOM - need to determine if this extra Appobj property is necessary.
           Appobj.styCcpTableWrapperStyle = '';
-          // !VA 
           // !VA Loop through all the ccpUserInput properties. If the property is NOT a span (i.e. a mock checkbox) add an Appobj property that corresponds to the key of the respective ccpUserInput property. Otherwise, convert the span ID to the input ID, then add the Appobj property that corresponds to the key of the respective ID.
           // !VA For instance, if the ccpUserInput value starts with '#ipt', create an Appobject property whose key is 'iptCCP...' and assign it the value of the CCP element with the corresponding ccpUserInput alias.
           for (const [key, value] of Object.entries(ccpUserInput)) {
@@ -1352,6 +1313,7 @@ var Witty = (function () {
           }
         }
       }
+
       selectedTdOption =  getSelectedTdOptionFromAppobj();
 
       // !VA Branch: implementAppobj08 (062020)
@@ -2896,8 +2858,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Only set vars and get values if Tab and Enter keys were pressed
       if (keydown == 9 || keydown == 13 ) {
         // console.log('Tab or Enterr pressed');
-        var isErr, isEnter, isTab;
-        var inputArray = { };
+        let isErr, isEnter, isTab;
+        // !VA Initialize the object to store the user input data: evtTargetId, evtTargetVal and appObjProp. appObjProp is returned from elementIdToAppobjPropm which I really need to get rid of.
+        const userInputObj = { };
 
         // !VA Branch: implementAppobj05 (061320)
         // !VA NOTE: I think this did something at some point but I'm not sure why this call to a handler would be useful. Commenting out for now.
@@ -2908,36 +2871,36 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
         // !VA Branch: implementAppobj08 (062020)
         // !VA NOTE: Does the below make any sense at all?
-        // !VA inputArray is the array containing the values needed to check input, evaluate the Toolbar input, and update Appobj prior to writing dynamicRegions to the DOM after user input in the Toolbar input fields.
+        // !VA userInputObj is the array containing the values needed to check input, evaluate the Toolbar input, and update Appobj prior to writing dynamicRegions to the DOM after user input in the Toolbar input fields.
         // !VA evtTargetId is the ID of the element into which the user entered a change
-        inputArray.evtTargetId = this.id;
+        userInputObj.evtTargetId = this.id;
         // !VA evtTargetVal is the value the user entered into the input element as integer.
-        inputArray.evtTargetVal = parseInt(this.value);
+        userInputObj.evtTargetVal = parseInt(this.value);
 
         // !VA Set a flag if the the Enter key was pressed, for readability
         (keydown == 13) ? isEnter = true : isEnter = false;
         // !VA Set a flag if the the Tab key was pressed, for readability
         (keydown == 9) ? isTab = true : isTab = false;
         // !VA elementIdToAppobjProp gets the Appobj key that corresponds to a given element ID. We need the Appobj key to get the Appobj value to compare to the user-entered value in the respective Toolbar input field. 
-        inputArray.appObjProp = elementIdToAppobjProp(this.id);
+        userInputObj.appObjProp = elementIdToAppobjProp(this.id);
 
         // !VA Branch: implementAppobj08 (062020)
         // !VA This is where we need to fork the logic for CCP inputs vs Toolbar inputs. Also need to consider an alternative to elementIdToAppobjProp, since elementIdToAppobjProp so far only contains a list of Toolbar input IDs that doesn't incude CCP. Why can't I get it from the element alias? 
-        console.log('inputArray: ');
-        console.dir(inputArray);
+        console.log('handleKeydown userInputObj: ');
+        console.dir(userInputObj);
 
 
         // !VA If Tab was pressed and this.value is either empty or equals the Appobj value, then there's been no change to the field, so let Tab just cycle through the fields as per its default.
-        if ((isTab) && ((this.value === '' || this.value == Appobj[inputArray.appObjProp]))) {
+        if ((isTab) && ((this.value === '' || this.value == Appobj[userInputObj.appObjProp]))) {
           // !VA Only if imgW or imgH, delete the existing value to display the placeholders. Otherwise, tab through and leave the existing value from Appobj
-          if (inputArray.prop === 'imgW' || inputArray.prop === 'imgH') {
+          if (userInputObj.prop === 'imgW' || userInputObj.prop === 'imgH') {
             this.onblur = function() {
               this.value = '';
             };
           }
         } else {
           // !VA Field value was changed, so first, pass the args to checkUserInput for errors.
-          isErr = checkUserInput(inputArray);
+          isErr = checkUserInput(userInputObj);
           if (isErr) {
             // !VA If it returns an error, select the input and show the error message so the user can correct it or ESC out of the field. If Tab, prevent advancing to the next field until the error is corrected or ESC is pressed.
             isEnter ? isEnter : evt.preventDefault(); 
@@ -2945,7 +2908,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             this.select();
           } else {
             // !VA If the value was entered in the imgW or imgH field, show the value selected first so the user can view and change it before implementing. Only on Tab can the value be implemented and advance to the next field.
-            if (inputArray.prop === 'imgW' || inputArray.prop === 'imgH') {
+            if (userInputObj.prop === 'imgW' || userInputObj.prop === 'imgH') {
               if (isEnter) {
                 this.select();
               } else {
@@ -2953,8 +2916,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
                 this.blur();
               }
             }
-            // !VA Pass the inputArray to evalToolbarInput.
-            evalToolbarInput(inputArray);
+            // !VA Pass the userInputObj to evalToolbarInput.
+            evalToolbarInput(userInputObj);
           }
         } 
       }
@@ -2999,11 +2962,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA TODO: rename to checkUserInput and include parsing of the toolbutton mouseclicks from handleToolbarClicks.
     // !VA TODO: Why are there unused variables and what is actually happening here?
     // !VA appController private
-    function checkUserInput(inputArray) {
-      // !VA Destructure inputArray
+    function checkUserInput(userInputObj) {
+      // !VA Destructure userInputObj
       // !VA TODO: I don't think evtTargetId is ever used...remove?
-      // const { evtTargetId, appObjProp, evtTargetVal } = inputArray;
-      const { appObjProp, evtTargetVal } = inputArray;
+      // const { evtTargetId, appObjProp, evtTargetVal } = userInputObj;
+      const { appObjProp, evtTargetVal } = userInputObj;
       let appMessCode;
       var isErr;
       isErr = false;
@@ -3073,7 +3036,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private
     // !VA TODO: Why are there unused variables and what is actually happening here?
     // !VA args is the target, prop and val passed in from handleKeyUp and handleMouseEvents. 
-    function evalToolbarInput(inputArray) {
+    function evalToolbarInput(userInputObj) {
+      console.log('evalToolbarInput userInputObj: ');
+      console.dir(userInputObj);
+
       console.log('evalToolbarInput running');
       // !VA Branch: implementAppobj08 (062020)
       // !VA NOTE: Review the comment below to ensure that it makes sense
@@ -3085,10 +3051,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA ES6 Destructure args into constants.
       // !VA Branch: implementAppobj05 (061320)
       // !VA evtTargetId appears to be unused
-      // const { evtTargetId, appObjProp, evtTargetVal } = inputArray;
+      const { evtTargetId, appObjProp, evtTargetVal } = userInputObj;
       // !VA Branch: implementAppobj08 (062020)
-      // !VA Where are appObjProp and evtTargetVal declared?
-      const { appObjProp, evtTargetVal } = inputArray;
+      // !VA ES6 Destructure args into constants. userInputObj is passed in from the mouse/keyboard event handlers.
+      // const { appObjProp, evtTargetVal } = userInputObj;
+
+
 
       switch(true) {
       // !VA If the value was entered in the imgViewer field, just pass appObjProp and evtTargetVal through to updateAppobj.
@@ -3116,7 +3084,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         arg2 = '';
         break;
       }
-      
+
       // !VA Call updateAppobj to resize the DOM elements and data properties that correspond to the Appobj properties above.
       var isUpdate = updateAppobj( arg1, arg2 );
       // !VA Once those DOM properties and data properties have been updated, recalculate the image's containers.
@@ -3944,18 +3912,35 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Need to get the Appobj property that corresponds to the ID of the DOM input element that sets it. It's easier to just create a list of these correspondences than to rename the whole UI elements and Appobj properties so they correspond, or to create functions that use string methods to extract them from each other.
     // !VA Branch: implementAppobj08 (062020)
     // !VA NOTE: Isn't there a way to do this without a separate function? It only is required for the dynamicRegion properties.
-    function elementIdToAppobjProp(str) {
-      var IDtoProp = {
-        viewerW:  'ipt-tbr-viewerw',
-        imgW: 'ipt-tbr-imgwidth',
-        imgH: 'ipt-tbr-imgheight',
-        sPhonesW: 'ipt-tbr-sphones-width',
-        lPhonesW: 'ipt-tbr-lphones-width'
-      };
+    function elementIdToAppobjProp(id) {
+      console.log('elementIdToAppobjProp running');
+      let idStr, appobjProp;
+      idStr = id;
+      // !VA Strip all the hypens out of the ID (str)
+      idStr = idStr.replace(/-/g,'');
+      // !VA Loop through the Object.keys array and 
+      var appobjArray = Object.keys(Appobj);
+      for (let i = 0; i < appobjArray.length; i++) {
+        // !VA If the lowercase Appobj property name is contained in the id, then put the original Appobj property name match into appobjProp.
+        // !VA TODO: Make this an arrow function with find, like below
+        // var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
+        if (idStr.includes(appobjArray[i].toLowerCase())) {
+          appobjProp = appobjArray[i];
+        }
+      }
+      console.log('appobjProp is: ' + appobjProp);
+      // !VA Branch: implementAppobj08 (062020)
+      // !VA Deprecating...
+      // var IDtoProp = {
+      //   viewerW:  'ipt-tbr-viewerw',
+      //   imgW: 'ipt-tbr-imgwidth',
+      //   imgH: 'ipt-tbr-imgheight',
+      //   sPhonesW: 'ipt-tbr-sphones-width',
+      //   lPhonesW: 'ipt-tbr-lphones-width'
+      // };
       // !VA This should return directly wihout a ret variable as tmp storage.
-      var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
-      // console.log(ret);
-      return ret;
+      // var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
+      return appobjProp;
     }
 
 
