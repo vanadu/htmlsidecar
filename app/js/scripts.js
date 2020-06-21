@@ -917,6 +917,8 @@ var Witty = (function () {
       }
       Attributes = {
         // !VA IMG attributes
+        // !VA Branch: implementAppobj08 (062020)
+        // !VA imgType is now integrated into Appobj, so this logic is deprecated here. Leaving it for the time being but pretty sure this entire Attribute is no longer pertinent.
         imgType:  (function() {
           // !VA This value is written to CCP so we can pre-select the tdoption 'basic' if the imgType 'fluid' is selected. 
           // !VA If the fixed radio button is checked, set ccpElementId to the fixed element id. Otherwise, set ccpEcurvcurlementId to the fluid element id. 
@@ -925,12 +927,7 @@ var Witty = (function () {
           ccpElementId === ccpUserInput.rdoCcpImgFixed ? str = 'fixed' : str = 'fluid';
           // !VA Locally, we need a variable for the imgType, so create one.
           imgType = str;
-
-
-          
-
           retObj = returnObject(ccpElementId, str);
-
           return retObj;
         })(),
         imgClass: (function() {
@@ -940,7 +937,11 @@ var Witty = (function () {
           
           // !VA This value is written to CCP so use ccpElementId
           ccpElementId = ccpUserInput.iptCcpImgClass;
-          imgType === 'fixed' ? str = ccpGetAttValue('class',document.querySelector(ccpElementId).value) : str = 'img-fluid';
+          // !VA Branch: implementAppobj08 (062020)
+          // !VA Just get the Appobj value here now.
+          // imgType === 'fixed' ? str = ccpGetAttValue('class',document.querySelector(ccpElementId).value) : str = 'img-fluid';
+          str = Appobj.iptCcpImgClass;
+          console.log('getAttributes imgClass str is: ' + str);
           retObj = returnObject(ccpElementId, str);
           return retObj;
         })(),
@@ -1310,19 +1311,68 @@ var Witty = (function () {
     
     function getUserSelections( id ) {
       // !VA Initialize the clipboard-building process by getting those user selections in the CCP that determine the structure of the clipboard output and put those selections into the uSels object. The elements that determine the nodeList structure and thus the Clipboard output are: the makeTag buttons and the imgType radio buttons. The imgType (fluid or fixed) determines which td option is selected and has to be processed independently of the other uSels. The fluid imgType is a preset that always has to have the tdopton 'basic'. So first, preselect the tdoption 'basic' if the imgType is fluid, then proceed.
-      let imgType, selectedTdOption;
+      // !VA Branch: implementAppobj08 (062020)
+      // !VA Reevaluating...
+      // !VA uSels is now rewritten to access Appobj instead of DOM elements. The imgType logic is now integrated into Appobj, so no need now to confuse the issue by including any of that logic here.
+
+      let Appobj = {};
+      Appobj = appController.getAppobj();
+      console.clear();
+      console.log('getUserSelections Appobj: ');
+      console.dir(Appobj);
+
+
+      // !VA Branch: implementAppobj08 (062020)
+      // !VA imgType is deprecated because that logic is now is integrated into Appobj.
+      // let imgType, selectedTdOption;
+      let selectedTdOption;
+
+
       let uSels = {};
+      // !VA Branch: implementAppobj08 (062020)
+      // !VA The imgType logic is now integrated into Appobj, so this whole section is deprecated.
       // !VA Get the selected imgType regardless of which button was clicked to trigger this function. 
-      getRadioState(ccpUserInput.rdoCcpImgFixed) ? imgType = 'fixed' : imgType = 'fluid';
+      // getRadioState(ccpUserInput.rdoCcpImgFixed) ? imgType = 'fixed' : imgType = 'fluid';
       // !VA If imgType is fluid, set selectedTdOption to 'basic', otherwise set the selectedTd option to whichever option is selected. This logic is actually reflected in getAttributes. 
-      imgType === 'fluid' ? selectedTdOption = 'basic' : selectedTdOption = document.querySelector('input[name="tdoptions"]:checked').value;
+      // imgType === 'fluid' ? selectedTdOption = 'basic' : selectedTdOption = document.querySelector('input[name="tdoptions"]:checked').value;
       // !VA Initialize uSels
+
+      // !VA Branch: implementAppobj08 (062020)
+      // !VA Getting the selected TD option from Appobj should be an external function, since this logic is repeated in batchAppobjToDOM and possibly elsewhere.
+      // !VA Loop through the Appobj rdoCcpTd properties and get the selected radio button
+      function getSelectedTdOptionFromAppobj() {
+        for (const [key] of Object.entries(Appobj)) {
+          if (key.substring( 0, 8) === 'rdoCcpTd') {
+            // !VA If the Appobj key string === true, then that is the selected radio button
+            if (Appobj[key] === true ) {
+              // console.log('batchAppobjToDOM key is: ' + key);
+              // !VA Pass the element ID of the selected radio button determined above to handleTdOptions to show the appropriate TD options for the selected radio button.
+              return ccpUserInput[key];
+            }
+          }
+        }
+      }
+      selectedTdOption =  getSelectedTdOptionFromAppobj();
+
+      // !VA Branch: implementAppobj08 (062020)
+      // !VA This might be better as an external function
+      // !VA Get a checkbox state from the Appobj property for the mock checkbox.
+      function getCheckboxState(identifier) {
+        let bool;
+        // !VA If the Appobj property for the mock checkbox span is 'on', return true, otherwise false
+        Appobj[identifier] === 'on' ? bool = true : bool = false;
+        return bool;
+      }
+      
       uSels = {
         buttonClicked: '',
-        hasAnchor: getCheckboxSelection(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk),
-        hasWrapper: getCheckboxSelection(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk),
+        hasAnchor: getCheckboxState('spnCcpImgIncludeAnchorCheckmrk'),
+        hasWrapper: getCheckboxState('spnCcpTableIncludeWrapperCheckmrk'),
         selectedTdOption: selectedTdOption
       };
+      console.log('uSels.hasAnchor is: ' + uSels.hasAnchor);
+      console.log('uSels.hasWrapper is: ' + uSels.hasWrapper);
+      console.log('uSels.selectedTdOption is: ' + uSels.selectedTdOption);
       if (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)) { 
         uSels.buttonClicked = 'imgbut';
         // !VA Override the selectedTdOption value for the IMG button - the IMG button will ALWAYS output img/anchor tags to the clipboard no matter which tdoptions radio button is selected.
@@ -2202,7 +2252,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           getAttributes();
         }
         // !VA Determine which element is clicked -- imgType (fluid or fixed), makeTag button, makeCSSRule button or Inspector element and run getUserSelections, makeCSSRule or handleInspectorClicks respectively. If an imgType button is clicked, we need to rebuild the nodeList because changing to fluid from fixed might result in a change to the tdoptions, plus we  need to rebuilt the Attributes object because the attributes have changed, which requires a CCP update. Changing the selected td option if fluid is selected also has to be done in getUserSelections, because the fluid option will only work with tdbasic,  so let's call getUserSelections for 'tag', 'fluid' and 'fixed'.
+        // !VA Branch: implementAppobj08 (062020)
+        // !VA Reevaluating...
+
         switch(true) {
+          
+
         case targetid.includes('tag') || targetid.includes('fluid') || targetid.includes('fixed') :
           getUserSelections(targetid);
           break;
@@ -2450,13 +2505,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
 
 
+      // !VA Branch: implementAppobj08 (062020)
+      // !VA Commenting out these event handlers for now until I deal with getting the values
       // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. These are the class input elements for ccp Img, Td and Table options
-      const ccpClassInputs = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass ];
-      for (let i = 0; i < ccpClassInputs.length; i++) {
-        // !VA convert the ID string to the object inside the loop
-        ccpClassInputs[i] = document.querySelector(ccpClassInputs[i]);
-        addEventHandler((ccpClassInputs[i]),'input',showElementOnInput,false);
-      }
+      // const ccpClassInputs = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass ];
+      // for (let i = 0; i < ccpClassInputs.length; i++) {
+      //   // !VA convert the ID string to the object inside the loop
+      //   ccpClassInputs[i] = document.querySelector(ccpClassInputs[i]);
+      //   addEventHandler((ccpClassInputs[i]),'input',showElementOnInput,false);
+      // }
 
       // !VA Add click handlers for Inspector - there's only the clipboard button now but there could be more. 
       var dvClickables = [ inspectorElements.btnToggleCcp ];
@@ -2805,6 +2862,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA Branch: implementAppobj08 (062020)
     // !VA NOTE: There is NO REFERENCE to Appd... here although it is referenced in the comments below. It looks like I already replaced Appd... with Appobj. But we do have an 'undefined' error when CCP inputs are made, this might be the cause of it.
+    // !VA It's because this calls evalToolbarInput - there's no handler yet for CCP input, so any text triggers an error condition. 
 
     /* !VA This is a bit complicated but it expresses non-default field behavior:
       --imgW and imgH fields should never show entereed values but rather only placeholders. This is because they actual values are reflected upon entering in the DISPLAY SIZE inspectorElements and because any value entered in one of the fields would require an aspect ratio calculation to display in the other one. So one of the field values would have to update automatically which is distracting and confusing IMO especially since the values are presented clearly elsewhere.
@@ -2814,7 +2872,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
     // !VA TODO: Why are there unused elements and what is actually happening here?
     function handleKeydown(evt) {
-
+      console.log('handleKeydown running');
       try {
         // console.log('handleKeyDown try: ');
         var vals = [], msgElement, keydown;
@@ -2862,6 +2920,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         (keydown == 9) ? isTab = true : isTab = false;
         // !VA elementIdToAppobjProp gets the Appobj key that corresponds to a given element ID. We need the Appobj key to get the Appobj value to compare to the user-entered value in the respective Toolbar input field. 
         inputArray.appObjProp = elementIdToAppobjProp(this.id);
+
+        // !VA Branch: implementAppobj08 (062020)
+        // !VA This is where we need to fork the logic for CCP inputs vs Toolbar inputs. Also need to consider an alternative to elementIdToAppobjProp, since elementIdToAppobjProp so far only contains a list of Toolbar input IDs that doesn't incude CCP. Why can't I get it from the element alias? 
+        console.log('inputArray: ');
+        console.dir(inputArray);
+
+
         // !VA If Tab was pressed and this.value is either empty or equals the Appobj value, then there's been no change to the field, so let Tab just cycle through the fields as per its default.
         if ((isTab) && ((this.value === '' || this.value == Appobj[inputArray.appObjProp]))) {
           // !VA Only if imgW or imgH, delete the existing value to display the placeholders. Otherwise, tab through and leave the existing value from Appobj
@@ -2901,6 +2966,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Branch: implementAppobj08 (062020)
     // !VA NOTE: Appd... already replaced with Appobj here. Could be a source of error.
     function handleKeyup(evt) {
+      console.log('handleKeyup running');
       let prop, curLocalStorage, keyup;
       // !VA We only need the property here, so no need to create an args object. We could actually just use the target but since we're standardizing on property names, let's stick with that. Get the property name from the id of this, i.e. the event target
       prop = elementIdToAppobjProp(this.id);
@@ -3008,7 +3074,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA TODO: Why are there unused variables and what is actually happening here?
     // !VA args is the target, prop and val passed in from handleKeyUp and handleMouseEvents. 
     function evalToolbarInput(inputArray) {
-
+      console.log('evalToolbarInput running');
       // !VA Branch: implementAppobj08 (062020)
       // !VA NOTE: Review the comment below to ensure that it makes sense
       // !VA Here we get the toolbar input from handleKeyDown, determine which input field it was entered in, and pass the value to the updateAppobj. Note that until updateAppobj is called, Appobj still retains the values prior to the user input in the fields that initiated this action.
@@ -3302,6 +3368,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Show the Include wrapper options if the Include wrapper checkbox is checked.
       showIncludeWrapperOptions(flag);
       // !VA Loop through all Appobj entries whose first 8 chars is rdoCcpTd, i.e. all the tdOption radio buttons, and get the selected radio button. Then pass the ID of that button to handleTdOptions to show the appropriate Td options for the selected radio button.
+
+
+      // !VA Branch: implementAppobj08 (062020)
+      // !VA This should be an external function, since this logic is repeated in getUserSelections and possibly elsewhere
       for (const [key] of Object.entries(Appobj)) {
         if (key.substring( 0, 8) === 'rdoCcpTd') {
           // !VA If the Appobj key string === true, then that is the selected radio button
@@ -3681,10 +3751,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA END CCP FUNCTIONS
       
-    // !VA  appController private
     // !VA Show element when input in another element is made 
     // !VA appController private
+    // !VA Branch: implementAppobj08 (062020)
+    // !VA This needs to be integrated into one of the keyboard event handlers. Can't have two event handlers for the same event. Right now, let's focus on getting values from the keyboard input and deal with this later. - commenting out the event handler in setupEventListeners
     function showElementOnInput(event) {
+      console.log('showElementOnInput running');
       // !VA Here we catch the event handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
       var elems = [];
       // !VA TODO: DRYify this. 
