@@ -101,7 +101,6 @@ var Witty = (function () {
 
   // !VA Branch: implementAppobj08 (062020)
   // !VA Deprecate
-  let Appdata = {};
 
   var UIController = (function() {
 
@@ -820,58 +819,6 @@ var Witty = (function () {
         return ccpState;
       },
 
-
-      // !VA UIController public
-      // !VA Branch: implementAppobj08 (062020)]
-      // !VA queryDOMElements is only accessed by getAppd... at this point. But getAppd... is still accessed all over the place, so leave it for now.
-      queryDOMElements: function() {
-        // !VA Add all these values to Appobj in addition to creating the domelements return array. There's no reason to do this in UICtrl though since we're not writing anything TO the UI, we're just getting values from it to populate Appobj. At this point curImg is already loaded and the 
-
-        // !VA Return the non-calculated DOM elements and data properties, i.e. the properties that are retrieved from the DOM or from data properties: curImg.imgW, curImg.imgW, curImg.imgNW, curImg.NH and viewerW. These are passed to getAppd..., which then creates the getAppd... object. Aspect is calculated from imgNW and imgNH - that calculation is done in appController, so it will be added to getAppd... there.
-        // !VA Declare the local variables and populate the elements array
-        let fname, viewerW, viewerH, imgW, imgH, imgNW, imgNH, sPhonesW, lPhonesW;
-        let domElements = {};
-        domElements = {fname, viewerW, viewerH, imgW, imgH, imgNW, imgNH, sPhonesW, lPhonesW};
-        let curImg, imgViewer, cStyles;
-
-        // !VA Get the insFilename from the Inspector
-        // !VA Branch: implementAppobj01 (060420): This has already been added to Appobj in handleFileSelect so need to do it again
-        domElements.fname = document.querySelector(inspectorElements.insFilename).textContent;
-
-        // !VA Get the curImg and imgViewer
-        curImg = document.querySelector(dynamicRegions.curImg);
-        imgViewer = document.querySelector(dynamicRegions.imgViewer);
-        // !VA Get the computed width and height of imgViewer
-        cStyles = window.getComputedStyle(imgViewer);
-        domElements.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
-        // !VA Branch: implementAppobj01 (060420)
-        // Appobj.viewerW = parseInt(cStyles.getPropertyValue('width'), 10);
-
-        domElements.viewerH = parseInt(cStyles.getPropertyValue('height'), 10);
-        // !VA Get the dimensions of curImg
-        domElements.imgW = curImg.width;
-        domElements.imgH = curImg.height;
-        domElements.imgNW = curImg.naturalWidth;
-        domElements.imgNH = curImg.naturalHeight;
-        // console.log('queryDomelements: this is: ');
-        // console.log(this);
-        
-        
-        // !VA Get the data properties for iptTbrSmallPhonesW and sPhonesH
-        // !VA NOTE: This is no good. Can't query getAppd... when it doesn't exist. Try this: if the current value doesn't equal the placeholder value...let's leave this for later and hope there's no catastrophe!
-        // !VA Branch: implementAppobj08 (062020)
-        // !VA References to Appd... here need to be chanced to Appobj or deleted - i.e. they will be deleted when the parent function is deprecated
-        domElements.sPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).getAttribute('data-sphonesw'), 10);
-        domElements.lPhonesW = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).getAttribute('data-lphonesw'), 10);
-        domElements.iptTbrSPhonesWidth ? domElements.iptTbrSPhonesWidth : Appdata.iptTbrSPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder, 10);
-        domElements.iptTbrLPhonesWidth ? domElements.iptTbrLPhonesWidth : Appdata.iptTbrLPhonesWidth = parseInt(document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder, 10);
-        return domElements;
-      },
-
-
-
-
-
       // !VA UIController public
       // !VA This has to cancel the timeouts for the runmn
       displayAppMessages: function (isShow, appMessContainerId, tooltipTarget) {
@@ -958,15 +905,8 @@ var Witty = (function () {
     // !VA Set values for all the Attributes of the individual ccpUserInput elements. Each attribute is either get-only or settable. If it is get-only, then the user-defined value is accessed directly from the DOM element. If it is a preset, then the value is defined programmatically based on a condition. For instance, the class name 'img-fluid' is a preset that becomes active when the user selects the Fluid image option. In this case, the CCP element ID corresponding to the attribute is written to the ccpElementId variable. Otherwise, ccpElement takes the false flag.
     // !VA NOTE: Could probably make all the retObject arguments ccpElementId, str and consolidate this function somehow -- think about it.
     function getAttributes() {
-      // !VA Branch: implementAppobj08 (062020)
-      // !VA Deprecating...
-      // var Appdata = appController.initGetAppdata();
-      // console.log('getAttributes Appdata: ');
-      // console.dir(Appdata);
       var Appobj = {};
       Appobj = appController.getAppobj();
-      // console.log('getAttributes Appobj: ');
-      // console.dir(Appobj);
       let checked, str, options, selectid, ccpElementId, imgType, Attributes, retObj;
       // !VA Create the array to return. First value is the id of the CCP element, second value is the string to write to the CCP element.
       function returnObject(ccpElementId, str ) {
@@ -1253,6 +1193,8 @@ var Witty = (function () {
           return retObj;
         })(),
       };
+      console.log('getAttributes Attributes: ');
+      console.dir(Attributes);
       // !VA Return the Attributes defined above. 
       return Attributes;
     }
@@ -1260,9 +1202,6 @@ var Witty = (function () {
     // !VA CBController private
     function ccpGetAttValue(att, value) {
       // !VA Gets the insFilename from Appobj in case the user leaves 'path' empty
-      // !VA Branch: implementAppobj08 (062020)
-      // !VA Deprecating...
-      // var Appdata = appController.initGetAppdata();
       var Appobj = appController.getAppobj();
       var str;
       // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
@@ -1341,9 +1280,6 @@ var Witty = (function () {
     // !VA CBController private
     // !VA Called from getAttributes when an attribute should be included in the Clipboard output ONLY if there is a user input for that attribute If there is no input, exclude the attribute itself from the clipboard output. For instance, if the user doesn't enter a class name, then the class attribute itself is excluded from the clipboard output at all. 
     function ccpIfNoUserInput(att, value) {
-      // !VA Branch: implementAppobj08 (062020)
-      // !VA Deprecating...
-      // var Appdata = appController.initGetAppdata();
       // !VA We need get the insFilename from Appobj in case the user leaves 'path' empty
       let Appobj = {};
       Appobj = appController.getAppobj();
@@ -1921,9 +1857,6 @@ var Witty = (function () {
     // !VA UIController private
     function getImgSwapBlock( id, indentLevel, Attributes ) {
       let Appobj, linebreak;
-      // !VA Branch: implementAppobj08 (062020)
-      // !VA Deprecating...
-      // Appdata = appController.initGetAppdata();
       Appobj = appController.getAppobj();
       linebreak = '\n';
       let mobileFilename, mobileSwapStr;
@@ -2075,7 +2008,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       let clipboardStr;
       // !VA clipboardStr is returned to clipboard.js
       clipboardStr = str;
-      console.clear();
+      // console.clear();
       console.log('clipboardStr is: ');
       console.log(clipboardStr);
       // clipboardStr = tag.outerHTML;
@@ -2106,12 +2039,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       let Attributes = [];
       // !VA Branch: implementAppobj08 (062020)
-      // !VA Deprecating...
-      // Attributes = getAttributes();
-      // let Appdata = [];
-      // Appdata = appController.initGetAppdata();
+      Attributes = getAttributes();
       let Appobj = {};
       Appobj = appController.getAppobj();
+
       let clipboardStr;
       // !VA TODO: isErr is passed to Clipboard object to indicate whether to flash the success message or an alert message
       // let isErr;
@@ -2153,7 +2084,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA CBController private
     function handleInspectorClicks(targetid, modifierKey) {
-      let Appdata;
       let Appobj = {};
       let clipboardStr, widthval, heightval;
       var el = document.querySelector('#' + targetid);
@@ -2162,9 +2092,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         console.log('isOver running');
       }
       widthval = heightval = '';
-      // !VA Branch: implementAppobj08 (062020)
-      // !VA Deprecating...
-      // Appdata = appController.initGetAppdata(false);
       // !VA Get Appobj
       Appobj = appController.getAppobj();
       // !VA Get the value to output to Clipboard based on whether shift or ctrl is pressed
@@ -2784,24 +2711,17 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA TODO: Why is the argument unused, why are there unused elements and what is actually happening here?
     // !VA appController private
-    // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appdata property. Takes no argument because we're using this instead of the event.
+    // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appobj property. Takes no argument because we're using this instead of the event.
     function handleBlur() {
       // !VA Handle blur
-      // !VA Branch: implementAppobj08 (062020)
-      // !VA Deprecating...
-      // var Appdata = {};
-      // Appdata = appController.initGetAppdata();
       let prop;
       // !VA Get the Appobj property name that corresponds to the ID of the event target
       prop = elementIdToAppobjProp(this.id);
-      // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appdata property.
+      // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appobj property.
       // !VA NOTE: This can probably replace the blur statements in handleKeydown
       if (prop === 'imgW' || prop === 'imgH') {
         this.value = '';
       } else {
-        // !VA Branch: implementAppobj08 (062020)
-        // !VA CAUTION: This could generate an error, Appd... replaced with Appobj here
-        // this.value = Appdata[prop];
         this.value = Appobj[prop];
       }
     }
@@ -2841,22 +2761,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       if (event.type === 'click') {
         switch (true) {
         case ( el.id.includes('tbr')) :
-          // !VA Variable to hold the name of the Appdata property the event corresponds to
+          // !VA Variable to hold the name of the Appobj property the event corresponds to
           // !VA prop not defined
           //var prop, val, isErr; 
           var val, isErr;
-          // !VA Branch: implementAppobj08 (062020)
-          // !VA Deprecating...
-          // !VA We need to query Appdata properties to get the current value of imgW so we can add the toolbutton increments to id
-          // var Appdata = {};
-          // !VA Cancel any running appmessage timeouts and animations
-          // Appdata = appController.initGetAppdata();
-
-          // !VA Branch: implementAppobj08 (062020)
+          // !VA We need to query Appobj properties to get the current value of imgW so we can add the toolbutton increments to id
           // !VA Appobj is already accessible, it's global in appController
           // console.log('handleMouseEvents Appobj: ');
           // console.dir(Appobj);
-
 
           // !VA This is a click on one of the toolbutton increment buttons, so we're dealing with the Appobj.imgW property.
           args.prop = 'imgW';
@@ -2896,7 +2808,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     /* !VA This is a bit complicated but it expresses non-default field behavior:
       --imgW and imgH fields should never show entereed values but rather only placeholders. This is because they actual values are reflected upon entering in the DISPLAY SIZE inspectorElements and because any value entered in one of the fields would require an aspect ratio calculation to display in the other one. So one of the field values would have to update automatically which is distracting and confusing IMO especially since the values are presented clearly elsewhere.
-      --The other fields should show the current Appdata value, i.e. the actual DOM element dimensions or data property value, because these values are NOT reflected anywhere in a Inspector. So when they are changed, they need to be updated and when a user makes a bad entry, they have to be restored to what they were previously.
+      --The other fields should show the current Appd... value, i.e. the actual DOM element dimensions or data property value, because these values are NOT reflected anywhere in a Inspector. So when they are changed, they need to be updated and when a user makes a bad entry, they have to be restored to what they were previously.
       --Default Tab behavior, i.e. cycling through the tab order, has to be maintained under consideration of the above 2 points.
     */
     // !VA Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
@@ -2994,9 +2906,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       prop = elementIdToAppobjProp(this.id);
       // !VA Find out which key was struck
       keyup = evt.which || evt.keyCode || evt.key;
-      // !VA Branch: implementAppobj08 (062020)
-      // !VA Deprecating...
-      // var Appdata = appController.initGetAppdata();
       // !VA  On ESC, we want imgW and imgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the inspectorElements and there's no need to recalc the W and H each time the user makes and entry - that would just be confusing. For viewerW, sSphonesW and lPhonesW, revert to the previously displayed value if the user escapes out of the input field. The previously displayed value will be either 1) the default in the HTML placeholder attribute or 2) the localStorage value. So, the localStorage value is false, get the placeholder, otherwise get the localStorage value.
       // !VA Esc key
       if (keyup == 27 ) {
@@ -3020,7 +2929,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
     }
 
-    // !VA  Parsing keyboard input based on Appdata property passed in from handleKeyup.
+    // !VA  Parsing keyboard input based on Appobj property passed in from handleKeyup.
     // !VA TODO: rename to checkUserInput and include parsing of the toolbutton mouseclicks from handleToolbarClicks.
     // !VA TODO: Why are there unused variables and what is actually happening here?
     // !VA appController private
@@ -3032,11 +2941,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       let appMessCode;
       var isErr;
       isErr = false;
-      // !VA Branch: implementAppobj08 (062020)
-      // !VA Deprecating...
-      // var Appdata= {};
-      // Appdata = appController.initGetAppdata();
-
 
       // !VA TODO: Setting maxViewerWidth just for now
       var maxViewerWidth = 800;
@@ -3817,10 +3721,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private
     // !VA Key/value pairs containing the unique tooltip ID generate from target ID of the mouseenter event and the corresponding tooltip content.
     function getAppMessageStrings( appMessCode) {
-      // !VA Branch: implementAppobj08 (062020)
-      // !VA Deprecating...
-      // let Appdata;
-      // Appdata = appController.initGetAppdata();
       // console.log('getAppMessageStrings Appobj: ');
       // console.dir(Appobj);
       let appMessContent;
@@ -4015,18 +3915,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       return [aspectReal, aspectInt];  
     }
 
-    // !VA appController private
-    function getAppdata() {
-      var Appdata = {};
-      Appdata = UIController.queryDOMElements();
-
-      // !VA Now compute the rest of Appdat
-      Appdata.aspect = getAspectRatio(Appdata.imgNW,  Appdata.imgNH);
-      Appdata.sPhonesH = Math.round(Appdata.sPhonesW * (1 / Appdata.aspect[0]));
-      Appdata.lPhonesH = Math.round(Appdata.lPhonesW * (1 / Appdata.aspect[0]));
-      return Appdata;
-    }
-
     // !VA appController public functions
     return {
 
@@ -4066,12 +3954,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         }
       },
 
-      // !VA This is a pass-thru to access queryDOMElements (public UIController)  to get the current dimensions of the dynamic DOM elements and data attributes, and getAppdata (private appController) to calculate the non-DOM Appdata properties. We do this here because Appdata has to be queried in all three modules, so it has to be accessible in all of them, and because getAppdata needs getAspectRatio which belongs in appController.
-      // !VA appController public
-      initGetAppdata: function() {
-        var Appdata = getAppdata();
-        return Appdata;
-      },
 
       // !VA Dev Mode pass-thru public functions to expose calcViewerSize and initCcp to UIController.initUI
       // !VA DEV MODE
