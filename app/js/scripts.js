@@ -2807,6 +2807,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             // !VA NOTE: We might have to include the target ID in the error handling because this button should trigger a different message than the keyboard message. Revisit.
             // !VA Passing arguments as object
             evalToolbarInput(args);
+            writeToolbarInputToAppobj(args);
           } 
           break;
         }
@@ -2918,6 +2919,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             }
             // !VA Pass the userInputObj to evalToolbarInput.
             evalToolbarInput(userInputObj);
+            writeToolbarInputToAppobj(userInputObj);
           }
         } 
       }
@@ -3033,14 +3035,50 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       return isErr;
     }
 
+    // !VA Branch: implementCcpInput01 (062120)
+    // !VA NEW, derived from evalToolbarInput
+    function writeToolbarInputToAppobj(userInputObj) {
+      console.log('writeToolbarInputToAppobj');
+      // !VA Initialize vars for imgH and imgW in order to calculate one based on the value of the other * Appobj.aspect.
+      let imgH, imgW, adjacentDimension;
+      // !VA ES6 Destructure args into constants. userInputObj is passed in from the mouse/keyboard event handlers.
+      const { appObjProp, evtTargetVal } = userInputObj;
+      console.log('appObjProp is: ' + appObjProp);
+      console.log('evtTargetVal is: ' + evtTargetVal);
+      // !VA Handle the two cases: 1) appObjProp and evtTargetVal are used to write to Appobj, localStorage and the DOM. This applies to viewerW, sPhonesW and lPhonesH. 2) appObjProp and evtTargetVal are used to calculate the img's adacent dimension, then both the images' dimensions are written to Appobj. This applies to imgW and imgH. NOTE: For some reason, updateAppobj wrote imgH to the DOM here - I'm not sure why that was done, but it shouldn't be. 
+      // !VA appObjProp = viewerW, sPhonesW or lPhonesW
+      if ( appObjProp === 'viewerW' || appObjProp === 'sPhonesW' || appObjProp === 'sPhonesW') {
+        // !VA Set the Appobj property corresponding to the appObjProp identifier to its respective value
+        Appobj[appObjProp] = evtTargetVal;
+        // !VA Set the localStorage for the respective Appobj property to the respective value
+        localStorage.setItem(appObjProp, evtTargetVal);
+      // !VA appObjProp is imgW or imgH
+      } else if ( appObjProp === 'imgW' || appObjProp === 'imgH') {
+        // !VA Calculate the adjacent dimension of appObjProp based on the aspect ratio, then set the Appobj property of the dimension and its adjacent dimension
+        if ( appObjProp === 'imgW') {
+          Appobj.imgH = imgH =  evtTargetVal * (1 / Appobj.aspect[0]);
+          Appobj.imgW = imgW = evtTargetVal;
+        } else if ( appObjProp === 'imgH') {
+          Appobj.imgW  = imgW =  evtTargetVal * (Appobj.aspect[0]);
+          Appobj.imgH = imgH = evtTargetVal;
+        }
+        console.log('imgW is: ' + imgW);
+        console.log('imgH is: ' + imgH);
+      }
+
+      // !VA Branch: implementCcpInput01 (062120)
+      // !VA Stopping here...
+
+    }
+
     // !VA appController private
     // !VA TODO: Why are there unused variables and what is actually happening here?
-    // !VA args is the target, prop and val passed in from handleKeyUp and handleMouseEvents. 
+    // !VA userInputObj is the target, prop and val passed in from handleKeyUp and handleMouseEvents. 
     function evalToolbarInput(userInputObj) {
-      console.log('evalToolbarInput userInputObj: ');
+      // console.log('evalToolbarInput userInputObj: ');
       console.dir(userInputObj);
 
-      console.log('evalToolbarInput running');
+      // console.log('evalToolbarInput running');
       // !VA Branch: implementAppobj08 (062020)
       // !VA NOTE: Review the comment below to ensure that it makes sense
       // !VA Here we get the toolbar input from handleKeyDown, determine which input field it was entered in, and pass the value to the updateAppobj. Note that until updateAppobj is called, Appobj still retains the values prior to the user input in the fields that initiated this action.
@@ -3051,10 +3089,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA ES6 Destructure args into constants.
       // !VA Branch: implementAppobj05 (061320)
       // !VA evtTargetId appears to be unused
-      const { evtTargetId, appObjProp, evtTargetVal } = userInputObj;
+      // const { evtTargetId, appObjProp, evtTargetVal } = userInputObj;
       // !VA Branch: implementAppobj08 (062020)
       // !VA ES6 Destructure args into constants. userInputObj is passed in from the mouse/keyboard event handlers.
-      // const { appObjProp, evtTargetVal } = userInputObj;
+      const { appObjProp, evtTargetVal } = userInputObj;
+
+      // !VA There are actually only 2 cases here:
+      // !VA 1) appObjProp and evtTargetVal are used to write to Appobj, localStorage and the DOM. This applies to viewerW, sPhonesW and lPhonesH. 
+      // !VA 2) appObjProp and evtTargetVal are used to calculate the img's adacent dimension, then both the images' dimensions are written to Appobj. This applies to imgW and imgH. NOTE: For some reason, updateAppobj wrote imgH to the DOM here - I'm not sure why that was done, but it shouldn't be. 
 
 
 
@@ -3063,29 +3105,86 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       case (appObjProp === 'viewerW') :
         arg1 = [ appObjProp, evtTargetVal ];
         arg2 = '';
+        // !VA Branch: implementCcpInput01 (062120)
+        // !VA updateAppobj:
+        // document.querySelector(dynamicRegions.imgViewer).style.width = val + 'px'; 
+        // Appobj.viewerW = val;
+        // !VA Write the imgViewer value to localStorage. 
+        // localStorage.setItem('viewerW', val);
+        document.querySelector(dynamicRegions.imgViewer).style.width = evtTargetVal + 'px'; 
+        Appobj.viewerW = evtTargetVal;
+        localStorage.setItem('viewerW', evtTargetVal);
+        // console.log('evtTargetVal viewerW is: ' + evtTargetVal);
+        // !VA Now we need to update the DOM
+        
         break;          
       case (appObjProp === 'imgW') :
         // !VA If the value was entered in imgwidth, calc imgH based on evtTargetVal and aspect. Then put appObjProp and evtTargetVal in arg1, and put the imgH property name and the calculated imgH into arg2. These will be passed on avia the spread operator to updateAppobj. 
         imgH =  evtTargetVal * (1 / Appobj.aspect[0]);
         // updateAppobj(prop, val); 
+        // !VA arg1 is the imgW value
+        // console.log('appObjProp is: ' + appObjProp);
         arg1 = [ appObjProp, evtTargetVal ];
+        // !VA arg2 is the above calculated imgH value
         arg2 = [ 'imgH', imgH ];
-        // updateAppobj('imgH', imgH); 
+        // !VA Branch: implementCcpInput01 (062120)
+        // !VA updateAppobj:
+        Appobj.imgW = evtTargetVal;
+        // console.log('evtTargetVal imgW is: ' + evtTargetVal);
+        // !VA New - Need to add imgH to Appobj as well.
+        Appobj.imgH = imgH;
+        // !VA Now we need to update the DOM
+
+
+
         break;
       case (appObjProp === 'imgH') :
         // !VA If the value was entered in imgheight, calc imgW based on evtTargetVal and aspect. Then put appObjProp and evtTargetVal in arg1, and put the imgW property name and the calculated imgW into arg2. These will be passed on via the ES6 spread operator to updateAppobj.
+        // !VA Calculate imgW from the user-input imgH
         imgW =  evtTargetVal * (Appobj.aspect[0]);
         arg1 = [ appObjProp, evtTargetVal ];
         arg2 = [ 'imgW', imgW ];
+        Appobj.imgH = evtTargetVal;
+        Appobj.imgW = imgW;
+        // !VA Now we need to update the DOM
+
+
+
+
+
         break;
-      case (appObjProp === 'sPhonesW' || appObjProp === 'lPhonesW') :
-        // sPhonesH =  val * (1 / Appobj.aspect[0]);
+      case (appObjProp === 'sPhonesW') :
+        // !VA Branch: implementCcpInput01 (062120)
+        // !VA sPhonesH and lPhonesH aren't needed now - where are they calculated?
         arg1 = [appObjProp, evtTargetVal];
         arg2 = '';
+
+        Appobj.sPhonesW = evtTargetVal;
+        // !VA Write the sPhonesW value to localStorage. 
+        localStorage.setItem('sPhonesW', evtTargetVal);
+        // !VA Now we need to update the DOM
+        
+        break;
+      case (appObjProp === 'lPhonesW') :
+        // !VA Branch: implementCcpInput01 (062120)
+        // !VA sPhonesH and lPhonesH aren't needed now - where are they calculated?
+        arg1 = [appObjProp, evtTargetVal];
+        arg2 = '';
+        
+        Appobj.lPhonesW = evtTargetVal;
+        // !VA Write the lPhonesW value to localStorage. 
+        localStorage.setItem('lPhonesW', evtTargetVal);
+        // !VA Now we need to update the DOM
+
         break;
       }
 
+      // !VA Update the DOM. There are two cases: 1) only the 
+
+
       // !VA Call updateAppobj to resize the DOM elements and data properties that correspond to the Appobj properties above.
+      // !VA Branch: implementAppobj08 (062020)
+
       var isUpdate = updateAppobj( arg1, arg2 );
       // !VA Once those DOM properties and data properties have been updated, recalculate the image's containers.
       calcViewerSize(isUpdate);
