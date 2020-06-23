@@ -529,6 +529,8 @@ var Witty = (function () {
             document.querySelector(inspectorElements.insFilename).textContent = Appobj.fileName = fname;
 
             // !VA Initialze calcViewerSize to size the image to the app container areas
+            // !VA Branch: implementCcpInput01 (062120)
+            // !VA The true flag indicates that this is an image initialization action, not a user-initiated Toolbar input
             appController.initCalcViewerSize();
 
             // !VA Open the CCP by default in dev mode
@@ -689,7 +691,7 @@ var Witty = (function () {
         // let Appobj = {};
         // !VA cStyles is deprecated because we're using literal values instead of getting the computed CSS values stored in CSS, but keeping for reference. Using localStorage now, so don't need to get hard values from CSS.
         // let curImg, imgViewer, cStyles;
-        let curImg;
+        let curImg, curLocalStorage;
         // !VA Get the values for the dynamicRegions
         // !VA Get the curImg and imgViewer
         // !VA Branch: implementAppobj02 (060620)
@@ -703,9 +705,21 @@ var Witty = (function () {
         function populateAppProperties(Appobj) {
           // !VA Get the current image
           curImg = document.querySelector(dynamicRegions.curImg);
-          // !VA Set the default viewerW and viewerH in Appobj
-          Appobj.viewerW = 650;
-          Appobj.viewerH = 450;
+          // !VA Branch: implementCcpInput01 (062120)
+          // !VA Set the viewerW value based on localStorage  If the user has set this value in the toolbar before, then queried from localStorage. That value persists between sessions. If this is the initial use of the app, then viewerW is explitly set to 650. 
+          curLocalStorage = appController.getLocalStorage();
+          console.log('curLocalStorage) ');
+          console.dir(curLocalStorage);
+          if (curLocalStorage[0]) {
+            // !VA Set Appobj.viewerW to the localStorage value
+            // !VA TODO: See why localStorage is stored as string - it's requiring us to convert to integer here.
+            Appobj.viewerW = parseInt(curLocalStorage[0]); 
+          } else {
+            // !VA If no localStorage for viewerW exists, use this default
+            // !VA NOTE: Isn't this supposed to be set in the placeholder value toolbarElements.iptTbrViewerW?
+            Appobj.viewerW = 650;
+          }
+
           // !VA Get the dimensions of curImg and write them to Appobj
           Appobj.imgW = curImg.width;
           Appobj.imgH = curImg.height;
@@ -723,6 +737,7 @@ var Witty = (function () {
           Appobj.aspect = getAspectRatio(Appobj.imgNW,  Appobj.imgNH);
           Appobj.sPhonesH = Math.round(Appobj.sPhonesW * (1 / Appobj.aspect[0]));
           Appobj.lPhonesH = Math.round(Appobj.lPhonesW * (1 / Appobj.aspect[0]));
+
         }
         function populateCcpProperties(Appobj) {
           console.log('populateCcpProperties Appobj is: ');
@@ -2634,8 +2649,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
                 // !VA TODO: Make function
                 curImg.style.display = 'block';
                 // !VA Calculate the viewer size based on the loaded image
-                // !VA TODO: Remove the false argument if it has no purpose
-                calcViewerSize(false);
+                // !VA Branch: implementCcpInput01 (062120)
+                // !VA The true parameter indicates that a new image is being initialized
+                calcViewerSize(true);
               })();
               
               // !VA Timeout of 250 ms while the blob loads.
@@ -3070,103 +3086,61 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         console.log('imgH is: ' + imgH);
       }
 
+      console.log('writeToolbarInputToAppobj Appobj: ');
+      console.dir(Appobj);
+
+
       // !VA Branch: implementCcpInput01 (062120)
-      // !VA Stopping here...
+      // !VA The false flag indicates that this is a user-initiated Toolbar input action, not an image initialization action.
+      calcViewerSize(false);
 
     }
 
 
-    // !VA appController private
-    // !VA Receives two arguments that contain the values needed to update Appobj with the respective user-entered input field values. Returns true, the flag that tells calcViewerSize not to run populateAppobj. NOTE: This shouldn’t be doing any DOM access from appController, needs to be reevaluated
-    function updateAppobj( ...params ) {
-
-      let prop, val;
-      // !VA Each param pair is a property name prop and a value val. evalToolbarInput passes in one or more such pairs whose corresponding Appobj DOM element/data attribute has to be updated. So, loop through the argument arrays and update the corresponding DOM elements
-      for (let i = 0; i < params.length; i++) {
-        prop = params[i][0];
-        val = params[i][1];
-        switch(true) {
-        case (!prop) :
-          console.log('no prop');
-          break;
-        case prop === 'viewerW' :
-          document.querySelector(dynamicRegions.imgViewer).style.width = val + 'px'; 
-          Appobj.viewerW = val;
-          // !VA Write the imgViewer value to localStorage. 
-          localStorage.setItem('viewerW', val);
-          break;
-        case prop === 'imgW' :
-          console.log('val is: ' + val);
-          Appobj.imgW = val;
-          break;
-        case prop === 'imgH' :
-          document.querySelector(dynamicRegions.curImg).style.height = val + 'px';
-          Appobj.imgH = val;
-          break;
-        case prop === 'sPhonesW' :
-          // !VA TODO: Get rid of the data attribute - using localStorage now.
-          // document.querySelector(toolbarElements.iptTbrSPhonesWidth).setAttribute('data-sphonesw', val);
-          Appobj.sPhonesW = val;
-          // !VA Write the sPhonesW value to localStorage. 
-          localStorage.setItem('sPhonesW', val);
-          break;
-        case prop === 'lPhonesW' :
-          // !VA TODO: Get rid of the data attribute - using localStorage now.
-          // document.querySelector(toolbarElements.iptTbrLPhonesWidth).setAttribute('data-lphonesw', val);
-          Appobj.lPhonesW;
-          // !VA Write the lPhonesW value to localStorage. 
-          localStorage.setItem('lPhonesW', val);
-          break;
-        }
-      }
-      // !VA Return true to set flag to tell calcViewerSize not to run populateAppobj, otherwise calcViewerSize would initialize Appobj and overwrite these update values
-      return true;
-    }
 
     // !VA  appController private
-    // !VA This is only good for initializing because it calculates the viewer size based on NW and NH. On user input, it has to calculate based on imgW and imgH. I'm not sure what that means anymore 05.11.20
-    function calcViewerSize(isUpdate) {
+    // !VA Branch: implementCcpInput01 (062120)
+    // !VA Rewriting this. 
+    function calcViewerSize(flag) {
+      console.log('calcViewerSize running');
+
+
+
       // !VA Deprecated...
       // let  viewerW, viewerH, compStyles; 
-      let  viewerW, viewerH; 
-      let curLocalStorage;
+      // !VA Deprecated...
+      // let  viewerW, viewerH; 
+      // let curLocalStorage;
 
-      // !VA Appobj has to be populated here, not in a private external function because calcViewerSize doesn't run until the setTimeOut callback is run and the image is loaded in handleFileSelect. If populateAppobj were a private function, it would be querying a DOM element that doesn't yet exists and would fail. 
+      // !VA calcViewerSize is called 1) in initUI (devmode) after the devimg is loaded from the HTML file 2) in handleFileSelect after setTimeOut callback is run and the image is loaded 3) in evalToolbarInput/ after a user-initiated Toolbar input. 
+      // !VA Branch: implementCcpInput01 (062120)
+      // !VA Replaced evalToolbarInput with writeToolbarInputToAppobj so there is currently no call to calcViewerSize after user-initiated Toolbar input.
+      // !VA calcViewerSize calculates the current size of dynamicRegions.imgViewer based on Appobj values written either at initialization or on user-initiated Toolbar input. 
       // !VA Using the current image dimensions in Appobj, calculate the current size of imgViewer so it adjusts to the current image size. 
-      // !VA I think I was using the CSS value because I was looking for a way to persist that value as a default. Using localStorage now so it should be fine to set it as default in Appobj
-      // !VA Deprecating...
-      // compStyles = window.getComputedStyle(document.querySelector(dynamicRegions.imgViewer));
       
-      // !VA Set the viewerW value based on localStorage  If the user has set this value in the toolbar before, then queried from localStorage. That value persists between sessions. If this is the initial use of the app, then viewerW is explitly set to 650. 
-      curLocalStorage = appController.getLocalStorage();
-      if (curLocalStorage[0]) {
-        // !VA Set imgViewer and viewerW to the localStorage value
-        // !VA TODO: See why localStorage is stored as string - it's requiring us to convert to integer here.
-        Appobj.viewerW = viewerW = parseInt(curLocalStorage[0]); 
-        // !VA Deprecating...
-        // document.querySelector(dynamicRegions.imgViewer).style.width = Appobj.viewerW + 'px';
-      } else {
-        // !VA I think I was using the CSS value because I was looking for a way to persist that value as a default. Using localStorage now so it should be fine to set it as default in Appobj
-        Appobj.viewerW = viewerW = 650;
-        // !VA Deprecating...
-        // viewerW = parseInt(compStyles.getPropertyValue('width'), 10);
-      }
+      
       // !VA Populate just the dynamic regions of Appobj. This is done after viewerW is retrieved from localStorage, otherwise Appobj.viewerW is explicitly set to 650.
 
-      // !VA If isUpdate is not true, then initialize Appobj by running populateAppobj. Otherwise, use updated Appobj values from updateAppobj.
-      if (isUpdate !== true ) {
-
+      // !VA Branch: implementCcpInput01 (062120)
+      // !VA If flag is true, then calcViewerSize was called writeToolbarInputToAppobj, so this is a user-initiated Toolbar input action. If false, it's an image initialization action called from initUI (devmode) or handleFileSelect.
+      if (flag === true ) {
+        // !VA Populate the dynamicRegions properties in Appobj on user-initiated Toolbar input
         UIController.populateAppobj(Appobj, 'app');
-
       }
-      // !VA I think I was using the CSS value because I was looking for a way to persist that value as a default. Using localStorage now so it should be fine to set it as default in Appobj
-      Appobj.viewerH = viewerH = 450;
-      // !VA Deprecating...
-      // viewerH = parseInt(compStyles.getPropertyValue('height'), 10);
-      // !VA If initializing a new image, use the naturalWidth and naturalHeight. If updating via user input, use the display image and height, imgW and imgH. If initializing, then Appobj.imgW and Appobj.imgH will be 0 or falsy because it hasn't been resized yet. So the _actual_ image width and height will be different for initializing and updating.
-
-      // !VA REVIEW: I thought I fixed this...it appears to only apply to dev mode.
+      // !VA Set the default dynamicRegions.imgViewer height to 450. This default container height will be kept or overwritten in resizeContainers based on the calculations below.
+      // !VA There should be no reason to use viewerH as local variable anymore since it equals Appobj.viewerH here.
+      // !VA Branch: implementCcpInput01 (062120)
+      // !VA And Appobj.viewerH should already be set as default in populateAppobj, so deprecated this for now.
+      // Appobj.viewerH = 450;
+      // !VA If initializing a new image, use the naturalWidth and naturalHeight. If updating via user input, use the display image and height, imgW and imgH. 
       // !VA TODO: See if the if condition below has any effect, if not, remove
+      // !VA Branch: implementCcpInput01 (062120)
+      // !VA TODO: actualW and actualH should be replaced globally with imgW and imgH - the actualW/actualH condition isn't relevant anymore. Test first.
+
+
+
+
+
       var actualW, actualH;
       if (Appobj.imgW === 0) {
         actualW = Appobj.imgNW;
@@ -3178,66 +3152,75 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       switch(true) {
       // The image falls within the default viewer dimensions set in initApp, so do nothing.
-      case (actualW <= viewerW) && (Appobj.imgNH < viewerH) :
+      case (actualW <= Appobj.viewerW) && (Appobj.imgNH < Appobj.viewerW) :
         actualW = Appobj.imgNW;
         actualH = Appobj.imgNH;
         break;
       // The image is wider than the current viewer width but shorter than current viewer height, so resize the image based on the viewer width
-      case (actualW > viewerW) && (actualH < viewerH) :
+      case (actualW > Appobj.viewerW) && (actualH < Appobj.viewerW) :
         // Set the image width to the current viewer
-        Appobj.imgW = viewerW;
+        Appobj.imgW = Appobj.viewerW;
         // Get the image height from the aspect ration function
         Appobj.imgH = Math.round((1/Appobj.aspect[0]) * Appobj.imgW);
         // Set the viewerH to the imgH
-        viewerH = Appobj.imgH;
+        Appobj.viewerH = Appobj.imgH;
         break;
       // The image is not as wide as the current viewer width, but is taller than the viewer height. Keep the image width but resize the viewer in order to display the full image height
       // !VA This might be a problem with consecutive images without page refresh
-      case (actualW <= viewerW) && (actualH > viewerH) :
+      case (actualW <= Appobj.viewerW) && (actualH > Appobj.viewerW) :
         // Set the viewer height and the image height to the image natural height
-        viewerH = Appobj.imgH = Appobj.imgNH;
+        Appobj.viewerH = Appobj.imgH = Appobj.imgNH;
         // Set the image width to the natural image width
         Appobj.imgW = Appobj.imgNW;
         break;
       // The image is wider and taller than the current viewer height and width so we have to resize the image and the viewport based on the current viewport width
-      case (actualW > viewerW) && (actualH > viewerH) :
+      case (actualW > Appobj.viewerW) && (actualH > Appobj.viewerW) :
         // Set the image Width to the current  viewer width 
-        Appobj.imgW = viewerW;
+        Appobj.imgW = Appobj.viewerW;
         // Set the image height proportional to the new image width using the aspect ratio function
         Appobj.imgH = Math.round((1/Appobj.aspect[0]) * Appobj.imgW);
         // Set the viewer height to the image height
-        viewerH = Appobj.imgH;
+        Appobj.viewerH = Appobj.imgH;
         // !VA TODO: Check this out, doesn't seem to be a problem anymore: BUG Problem with the 800X550, 800X600 -- no top/bottom gutter on viewport
         break;
       }
-      resizeContainers(viewerW, viewerH );
+      // !VA Branch: implementCcpInput01 (062120)
+      // !VA There should be no reason to pass values any more, Appobj is global in appController
+      resizeContainers( );
     }
 
 
 
     // !VA appController private
-    function resizeContainers( viewerW, viewerH )  {
+    function resizeContainers( )  {
       // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values which are passed in from resizeContainers.
       // !VA Initial height is 450, as explicitly defined in calcViewerSize. TOo much hassle to try and get the value as defined in the CSS programmatically.
       // !VA Note: This has dynamicRegion values that are not written back to Appobj after recalculation, this may be a problem at some point.
+      console.log('resizeContainers Appobj: ');
+      console.dir(Appobj);
+      // !VA initViewerH is the same default value set in populateAppobj. That needs to be reset as default here since Appobj values at this point no longer correspond to the initialization defaults, but may also have changed due to user-initiated Toolbar input. 
+      // !VA TODO:That's why this value should be pulled from the placeholder value of dynamicRegions.iptTbrViewerW, not set as a literal here.
       const initViewerH = 450;
       let viewportH;
       let appH; 
 
+      // !VA Branch: implementCcpInput01 (062120)
+      // !VA If Appobj.imgH is less than the default viewer height as set in populateAppobj (450) then make the viewport 145px taller than the current viewer height, i.e. Appobj.viewerH.
       // !VA The viewport is 145px taller than the imgViewer. 
       if (Appobj.imgH <= initViewerH) {
-        viewerH = initViewerH;
-        viewportH = viewerH + 145;
+        Appobj.viewerH = initViewerH;
+        viewportH = Appobj.viewerH + 145;
       } else {
+        // !VA NOTE: Not sure why this is needed
         // Need a little buffer in the viewport
-        viewerH = Appobj.imgH;
+        Appobj.viewerH = Appobj.imgH;
         viewportH = Appobj.imgH + 145;
       } 
       appH = viewportH;
-      Appobj.viewerH = viewerH;
-      Appobj.viewerW = viewerW;
 
-      // !VA DOM Access
+      // !VA DOM Access to apply dimensions for the dynamicRegions elements, i.e. the current image and its containers. 
+      // !VA Branch: implementCcpInput01 (062120)
+      // !VA This is where the DOM write in evalToolbarInputs and updateAppObj used to happen
       UIController.writeDynamicRegionsDOM(Appobj, viewportH, appH);
 
 
@@ -3306,6 +3289,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA appController private
     // !VA Called in handleTdOptions
+    // !VA TODO: Needs to be commented
     function batchAppobjToDOM() {
       // console.log('batchAppobjToDOM running');
       // console.log('batchAppobjToDOM Appobj: ');
@@ -3338,13 +3322,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       if (Appobj.rdoCcpImgFluid === true ) {
         handleImgType(ccpUserInput.rdoCcpImgFluid);
-
       } 
       // else if (Appobj.rdoCcpImgFluid === true ) {
       //   handleImgType(ccpUserInput.rdoCcpImgFluid);
       // }
-
-
     }
 
     // !VA appController private 
@@ -4002,7 +3983,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA ------------------------------
       // !VA appController public: DEVMODE
       initCalcViewerSize: function() {
-        calcViewerSize();
+        calcViewerSize(true);
       },
       // !VA appController public: DEVMODE
       // initToggleImgType: function () {
