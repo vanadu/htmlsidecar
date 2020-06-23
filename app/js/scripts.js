@@ -686,7 +686,6 @@ var Witty = (function () {
       // !VA UIController public
       // !VA Takes one of three parameters: 'app', 'ccp' and 'all'. Called from calcViewerSize and initCcp. When called from calcViewerSize, the isUpdate condition determines whether populateAppobj is run - if isUpdate is not true, then there are no existing Appobj values for dynamicRegions, so populateAppobj with the app parameter initializes Appobj values by running populateAppProperties. When the CCP is opened, populateAppobj reads CCP DOM values into Appobj so that Appobj always reflects the current state of the CCP DOM when the CCP is opened. 
       populateAppobj: function (Appobj, access) {
-        console.log('access is: ' + access);        
         // !VA IIFE for populating 
         // let Appobj = {};
         // !VA cStyles is deprecated because we're using literal values instead of getting the computed CSS values stored in CSS, but keeping for reference. Using localStorage now, so don't need to get hard values from CSS.
@@ -708,8 +707,6 @@ var Witty = (function () {
           // !VA Branch: implementCcpInput01 (062120)
           // !VA Set the viewerW value based on localStorage  If the user has set this value in the toolbar before, then queried from localStorage. That value persists between sessions. If this is the initial use of the app, then viewerW is explitly set to 650. 
           curLocalStorage = appController.getLocalStorage();
-          console.log('curLocalStorage) ');
-          console.dir(curLocalStorage);
           if (curLocalStorage[0]) {
             // !VA Set Appobj.viewerW to the localStorage value
             // !VA TODO: See why localStorage is stored as string - it's requiring us to convert to integer here.
@@ -740,7 +737,6 @@ var Witty = (function () {
 
         }
         function populateCcpProperties(Appobj) {
-          console.log('populateCcpProperties Appobj is: ');
           // !VA Now initialize Appobj with the CCP element values. This includes ALL CCP elements, including those that are displayed/undisplayed depending on which TDOption or imgType radio is selected. 
           // !VA Don't forget to use bracket notation to add properties to an object: https://stackoverflow.com/questions/1184123/is-it-possible-to-add-dynamically-named-properties-to-javascript-object
           // !VA  for loop: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
@@ -2853,7 +2849,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
     // !VA TODO: Why are there unused elements and what is actually happening here?
     function handleKeydown(evt) {
-      console.log('handleKeydown running');
+      // console.log('handleKeydown running');
       try {
         // console.log('handleKeyDown try: ');
         var vals = [], msgElement, keydown;
@@ -2951,7 +2947,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Branch: implementAppobj08 (062020)
     // !VA NOTE: Appd... already replaced with Appobj here. Could be a source of error.
     function handleKeyup(evt) {
-      console.log('handleKeyup running');
       let prop, curLocalStorage, keyup;
       // !VA We only need the property here, so no need to create an args object. We could actually just use the target but since we're standardizing on property names, let's stick with that. Get the property name from the id of this, i.e. the event target
       prop = elementIdToAppobjProp(this.id);
@@ -3058,13 +3053,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Branch: implementCcpInput01 (062120)
     // !VA NEW, derived from evalToolbarInput
     function writeToolbarInputToAppobj(userInputObj) {
-      console.log('writeToolbarInputToAppobj');
+      // console.log('writeToolbarInputToAppobj');
       // !VA Initialize vars for imgH and imgW in order to calculate one based on the value of the other * Appobj.aspect.
       let imgH, imgW;
       // !VA ES6 Destructure args into constants. userInputObj is passed in from the mouse/keyboard event handlers.
       const { appObjProp, evtTargetVal } = userInputObj;
-      console.log('appObjProp is: ' + appObjProp);
-      console.log('evtTargetVal is: ' + evtTargetVal);
+      // console.log('appObjProp is: ' + appObjProp);
+      // console.log('evtTargetVal is: ' + evtTargetVal);
       // !VA Handle the two cases: 1) appObjProp and evtTargetVal are used to write to Appobj, localStorage and the DOM. This applies to viewerW, sPhonesW and lPhonesH. 2) appObjProp and evtTargetVal are used to calculate the img's adacent dimension, then both the images' dimensions are written to Appobj. This applies to imgW and imgH. NOTE: For some reason, updateAppobj wrote imgH to the DOM here - I'm not sure why that was done, but it shouldn't be. 
       // !VA appObjProp = viewerW, sPhonesW or lPhonesW
       if ( appObjProp === 'viewerW' || appObjProp === 'sPhonesW' || appObjProp === 'sPhonesW') {
@@ -3082,14 +3077,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           Appobj.imgW  = imgW =  evtTargetVal * (Appobj.aspect[0]);
           Appobj.imgH = imgH = evtTargetVal;
         }
-        console.log('imgW is: ' + imgW);
-        console.log('imgH is: ' + imgH);
       }
-
-      console.log('writeToolbarInputToAppobj Appobj: ');
-      console.dir(Appobj);
-
-
       // !VA Branch: implementCcpInput01 (062120)
       // !VA The false flag indicates that this is a user-initiated Toolbar input action, not an image initialization action.
       calcViewerSize(false);
@@ -3101,46 +3089,22 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA  appController private
     // !VA Branch: implementCcpInput01 (062120)
     // !VA Rewriting this. 
+    // !VA calcViewerSize is called 1) in initUI (devmode) after the devimg is loaded from the HTML file 2) in handleFileSelect after setTimeOut callback is run and the image is loaded 3) in evalToolbarInput/ after a user-initiated Toolbar input. calcViewerSize calculates the current size of dynamicRegions.imgViewer based on Appobj values. 
     function calcViewerSize(flag) {
-      console.log('calcViewerSize running');
-
-
-
-      // !VA Deprecated...
-      // let  viewerW, viewerH, compStyles; 
-      // !VA Deprecated...
-      // let  viewerW, viewerH; 
-      // let curLocalStorage;
-
-      // !VA calcViewerSize is called 1) in initUI (devmode) after the devimg is loaded from the HTML file 2) in handleFileSelect after setTimeOut callback is run and the image is loaded 3) in evalToolbarInput/ after a user-initiated Toolbar input. 
+      // console.log('calcViewerSize running');
       // !VA Branch: implementCcpInput01 (062120)
       // !VA Replaced evalToolbarInput with writeToolbarInputToAppobj so there is currently no call to calcViewerSize after user-initiated Toolbar input.
-      // !VA calcViewerSize calculates the current size of dynamicRegions.imgViewer based on Appobj values written either at initialization or on user-initiated Toolbar input. 
-      // !VA Using the current image dimensions in Appobj, calculate the current size of imgViewer so it adjusts to the current image size. 
       
-      
-      // !VA Populate just the dynamic regions of Appobj. This is done after viewerW is retrieved from localStorage, otherwise Appobj.viewerW is explicitly set to 650.
-
       // !VA Branch: implementCcpInput01 (062120)
-      // !VA If flag is true, then calcViewerSize was called writeToolbarInputToAppobj, so this is a user-initiated Toolbar input action. If false, it's an image initialization action called from initUI (devmode) or handleFileSelect.
+      // !VA Populate just the dynamic regions of Appobj. If flag is true, then calcViewerSize was called writeToolbarInputToAppobj, so this is a user-initiated Toolbar input action. If false, it's an image initialization action called from initUI (devmode) or handleFileSelect.
       if (flag === true ) {
-        // !VA Populate the dynamicRegions properties in Appobj on user-initiated Toolbar input
+        // !VA Populate the dynamicRegions properties in Appobj on new image initialization and get localStorage values if set.
         UIController.populateAppobj(Appobj, 'app');
       }
-      // !VA Set the default dynamicRegions.imgViewer height to 450. This default container height will be kept or overwritten in resizeContainers based on the calculations below.
-      // !VA There should be no reason to use viewerH as local variable anymore since it equals Appobj.viewerH here.
-      // !VA Branch: implementCcpInput01 (062120)
-      // !VA And Appobj.viewerH should already be set as default in populateAppobj, so deprecated this for now.
-      // Appobj.viewerH = 450;
       // !VA If initializing a new image, use the naturalWidth and naturalHeight. If updating via user input, use the display image and height, imgW and imgH. 
       // !VA TODO: See if the if condition below has any effect, if not, remove
       // !VA Branch: implementCcpInput01 (062120)
       // !VA TODO: actualW and actualH should be replaced globally with imgW and imgH - the actualW/actualH condition isn't relevant anymore. Test first.
-
-
-
-
-
       var actualW, actualH;
       if (Appobj.imgW === 0) {
         actualW = Appobj.imgNW;
@@ -3186,18 +3150,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
       // !VA Branch: implementCcpInput01 (062120)
       // !VA There should be no reason to pass values any more, Appobj is global in appController
-      resizeContainers( );
+      resizeContainers();
     }
-
-
 
     // !VA appController private
     function resizeContainers( )  {
       // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values which are passed in from resizeContainers.
       // !VA Initial height is 450, as explicitly defined in calcViewerSize. TOo much hassle to try and get the value as defined in the CSS programmatically.
       // !VA Note: This has dynamicRegion values that are not written back to Appobj after recalculation, this may be a problem at some point.
-      console.log('resizeContainers Appobj: ');
-      console.dir(Appobj);
       // !VA initViewerH is the same default value set in populateAppobj. That needs to be reset as default here since Appobj values at this point no longer correspond to the initialization defaults, but may also have changed due to user-initiated Toolbar input. 
       // !VA TODO:That's why this value should be pulled from the placeholder value of dynamicRegions.iptTbrViewerW, not set as a literal here.
       const initViewerH = 450;
@@ -3256,7 +3216,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA appController private
     // !VA Branch: implementAppobj03 (060820)
-    // !VA Handle CCP User Input
+    // !VA Handle the tdoptions and imgType radio buttons.
     function handleCcpRadioSelection(evt) {
       // console.log('handleCcpRadioSelection running');
       // let Appobj = appController.getAppobj();
@@ -3265,23 +3225,19 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       id = '#' + evt.target.id;
       // console.log('alias is: ' + alias);
       switch(true) {
+      // !VA handle the fixed/fluid imgType radion buttons
       case id === ccpUserInput.rdoCcpImgFixed || id === ccpUserInput.rdoCcpImgFluid:
         // console.log('evt.target.id is: ' + evt.target.id);
         // console.log('id is: ' + id);
         handleImgType(id);
         break;
-      // case id === ccpUserInput.rdoCcpImgFluid:
-      //   imgType = 'fluid';
-      //   Appobj.rdoCcpImgFixed = false, Appobj.rdoCcpImgFluid = true;
-      //   // handleImgType(imgType);
-      //   console.log('fluid clicked');
-      //   break;
+      // !VA Handle the tdoptions radio button group in TD Options
       case id.includes('rdo-ccp-td') :
         // console.log('TDOptions id is: ' + id);
         handleTdOptions(id);
         break;
       default:
-        // code block
+        console.log('ERROR in handleCcpRadioSelection - unknown condition');
       } 
       // console.log('Appobj is: ');
       // console.dir(Appobj);
@@ -3339,20 +3295,23 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // console.log('aliasArray is: ');
       // console.log(aliasArray);
       // !VA Reset values to defaults
-      Appobj.iptCcpImgClass = '';
-      Appobj.iptCcpTdClass = '';
-      Appobj.iptCcpTdHeight = '';
-      Appobj.iptCcpTdWidth = '';
-      Appobj.iptCcpTableClass = '';
+      Appobj.iptCcpImgClass = Appobj.iptCcpTdClass = Appobj.iptCcpTdHeight = Appobj.iptCcpTdWidth = Appobj.iptCcpTableClass = Appobj.iptCcpTdBgColor = '';
       Appobj.iptCcpTableWidth = Appobj.imgW;
       Appobj.iptCcpTableWrapperWidth = Appobj.viewerW;
-      Appobj.iptCcpTdBgColor = '';
       Appobj.iptCcpTableWrapperClass = 'devicewidth';
       // !VA Write the defaults to the CCP DOM elements.
 
       // !VA Branch: implementAppobj07 (061920)
       // !VA changing setvalue from handleCcpActions to writeAppobjToDOM
-      UIController.writeAppobjToDOM( [ 'iptCcpImgClass', Appobj.iptCcpImgClass ], [ 'iptCcpTableClass', Appobj.iptCcpTableClass ],  [ 'iptCcpTableWrapperClass', Appobj.iptCcpTableWrapperClass ], ['iptCcpTdWidth', Appobj.iptCcpTdWidth ], [ 'iptCcpTdHeight', Appobj.iptCcpTdHeight ], ['iptCcpTableWidth', Appobj.iptCcpTableWidth ], ['iptCcpTableWrapperWidth', Appobj.iptCcpTableWrapperWidth ],  ['iptCcpTdBgColor', Appobj.iptCcpTdBgColor ] );
+      UIController.writeAppobjToDOM( 
+        [ 'iptCcpImgClass', Appobj.iptCcpImgClass ], 
+        [ 'iptCcpTableClass', Appobj.iptCcpTableClass ],  
+        [ 'iptCcpTableWrapperClass', Appobj.iptCcpTableWrapperClass ], 
+        ['iptCcpTdWidth', Appobj.iptCcpTdWidth ], 
+        [ 'iptCcpTdHeight', Appobj.iptCcpTdHeight ], 
+        ['iptCcpTableWidth', Appobj.iptCcpTableWidth ], 
+        ['iptCcpTableWrapperWidth', Appobj.iptCcpTableWrapperWidth ], 
+        ['iptCcpTdBgColor', Appobj.iptCcpTdBgColor ] );
 
       // !VA Deprecated...
       // UIController.handleCcpActions(Appobj, false, ['iptCcpImgClass', 'setvalue'], ['iptCcpTableClass', 'setvalue'],  ['iptCcpTableWrapperClass', 'setvalue'], ['iptCcpTdWidth', 'setvalue'], ['iptCcpTdHeight', 'setvalue'], ['iptCcpTableWidth', 'setvalue'], ['iptCcpTableWrapperWidth', 'setvalue'],  ['iptCcpTdBgColor', 'setvalue'] );
@@ -3387,12 +3346,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // console.log('handleTdOptions running');
       // console.log('id is: ' + id);
       // !VA Loop through all Appobj entries whose first 8 chars is rdoCcpTd, i.e. all the tdOption entries and select the option identified in the id argument. NOTE: This could be separated out into a new function.
-      // !VA NOTE: Value isn't accessed, but when I tried to just use Object.keys, something broke.
+      // !VA NOTE: Value isn't accessed, but when I tried to just use Object.keys, something broke. Fix it, no for loop necessary with Object.keys.
       for (const [key, value] of Object.entries(Appobj)) {
         if (key.substring( 0, 8) === 'rdoCcpTd') {
           // !VA If the Appobj key string === the element id of the click target, then set that Appobj property to true, otherwise set it to false. This replicates the behavior of a single-select radion button group for the Appobj properties of the radio buttons. If true, set that radio button's checked property to true;
-
-
           if (ccpUserInput[key] === id) {
             Appobj[key] = true;
             UIController.handleCcpActions( true, [ key, 'selectradio' ]);
@@ -3402,17 +3359,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           }
         }
       }
-      // debugger;
-
-      // console.log('handleTdOptions Appobj: ');
-      // console.dir(Appobj);
-
-
-      // let prop = elementIdToAppobjProp(id);
-      // console.log('prop is: ' + prop);
-      // UIController.handleCcpActions(Appobj, true, [ prop, 'selectradio' ]);
-
-
       // !VA Reset all Ccp element i.e. undisplay them and remove any disabled styles and attributes. The elements need to be reset before new options can be applied.
       resetTdOptions();
 
@@ -3421,11 +3367,21 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       switch(true) {
       case id.includes('basic') || id.includes('excludeimg'):
         // !VA Handle the td options for the 'basic' and 'excludeimg' options: class, height, width, bgcolor, align, valign
-        UIController.handleCcpActions( true, [ 'iptCcpTdClass', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent'], [ 'selCcpTdValign', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent']);
+        UIController.handleCcpActions( true, 
+          [ 'iptCcpTdClass', 'setactiveparent'], 
+          [ 'selCcpTdAlign', 'setactiveparent'], 
+          [ 'iptCcpTdWidth', 'setactiveparent'], 
+          [ 'iptCcpTdBgColor', 'setactiveparent'], 
+          [ 'selCcpTdValign', 'setactiveparent'], 
+          [ 'iptCcpTdHeight', 'setactiveparent']);
         break;
       case id.includes('posswitch'):
         // !VA Handle the 'posswitch' option
-        UIController.handleCcpActions( true, [ 'iptCcpTdClass', 'setactiveparent'], [ 'selCcpTdValign', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']);
+        UIController.handleCcpActions( true, 
+          [ 'iptCcpTdClass', 'setactiveparent'], 
+          [ 'selCcpTdValign', 'setactiveparent'], 
+          [ 'selCcpTdAlign', 'setactiveparent'], 
+          [ 'iptCcpTdBgColor', 'setactiveparent']);
         break;
       // !VA Handle the 'imgswap' option
       case id.includes('imgswap'):
@@ -3435,7 +3391,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         UIController.handleCcpActions( true, [ 'spnCcpTableIncludeWrapperCheckmrk', 'setcheckbox']);
         // !VA NOTE: These options can be merged with the above function call
         // !VA Display the appropriate TD options
-        UIController.handleCcpActions( true,  [ 'selCcpTdValign', 'setactiveparent'], [ 'selCcpTdAlign', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']);
+        UIController.handleCcpActions( true,  
+          [ 'selCcpTdValign', 'setactiveparent'], 
+          [ 'selCcpTdAlign', 'setactiveparent'], 
+          [ 'iptCcpTdBgColor', 'setactiveparent']);
         // !VA Preset the options:
         // !VA img class presets
         Appobj.iptCcpImgClass =  'mobileshow', 
@@ -3448,24 +3407,47 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA Branch: implementAppobj07 (061920)
         // !VA Replacing setvalue action in handleCcpActions with writeAppobjToDOM
 
-        UIController.writeAppobjToDOM( [ 'iptCcpImgClass', Appobj.iptCcpImgClass ], [ 'iptCcpTableClass', Appobj.iptCcpTableClass ], [ 'iptCcpTableWidth', Appobj.iptCcpTableWidth ], [ 'selCcpTableAlign', Appobj.selCcpTableAlign ], [ 'iptCcpTableWrapperClass', Appobj.iptCcpTableWrapperClass ], [ 'iptCcpTableWrapperWidth', Appobj.iptCcpTableWrapperWidth ], [ 'selCcpTableWrapperAlign', Appobj.selCcpTableWrapperAlign] );
+        UIController.writeAppobjToDOM( 
+          [ 'iptCcpImgClass', Appobj.iptCcpImgClass ], 
+          [ 'iptCcpTableClass', Appobj.iptCcpTableClass ], 
+          [ 'iptCcpTableWidth', Appobj.iptCcpTableWidth ], 
+          [ 'selCcpTableAlign', Appobj.selCcpTableAlign ], 
+          [ 'iptCcpTableWrapperClass', Appobj.iptCcpTableWrapperClass ], 
+          [ 'iptCcpTableWrapperWidth', Appobj.iptCcpTableWrapperWidth ], 
+          [ 'selCcpTableWrapperAlign', Appobj.selCcpTableWrapperAlign] );
 
         // !VA Deprecated...
         // UIController.handleCcpActions(Appobj, true,  [ 'iptCcpImgClass', 'setvalue'], [ 'iptCcpTableClass', 'setvalue'], [ 'iptCcpTableWidth', 'setvalue'], [ 'selCcpTableAlign', 'setvalue'], [ 'iptCcpTableWrapperClass', 'setvalue'], [ 'iptCcpTableWrapperWidth', 'setvalue'], [ 'selCcpTableWrapperAlign', 'setvalue'] );
 
         // !VA Disable the appropriate presets
         // !VA NOTE: These options can be merged with the above function call
-        UIController.handleCcpActions( true,  [ 'iptCcpImgClass', 'setdisabledtextinput'], [ 'iptCcpTableClass', 'setdisabledtextinput'], [ 'iptCcpTableWidth', 'setdisabledtextinput'], [ 'selCcpTableAlign', 'setdisabledtextinput'], [ 'iptCcpTableWrapperClass', 'setdisabledtextinput'], [ 'iptCcpTableWrapperWidth', 'setdisabledtextinput'], [ 'selCcpTableWrapperAlign', 'setdisabledtextinput'] );
+        UIController.handleCcpActions( true,  
+          [ 'iptCcpImgClass', 'setdisabledtextinput'], 
+          [ 'iptCcpTableClass', 'setdisabledtextinput'], 
+          [ 'iptCcpTableWidth', 'setdisabledtextinput'], 
+          [ 'selCcpTableAlign', 'setdisabledtextinput'], 
+          [ 'iptCcpTableWrapperClass', 'setdisabledtextinput'], 
+          [ 'iptCcpTableWrapperWidth', 'setdisabledtextinput'], 
+          [ 'selCcpTableWrapperAlign', 'setdisabledtextinput'] );
         break;
       case id.includes('bgimage'):
         // !VA Bgimage presets
         Appobj.iptCcpTdHeight = Appobj.imgH, Appobj.iptCcpTdWidth = Appobj.imgW, Appobj.iptCcpTdBgColor = '#7bceeb';
         // !VA Display applicable elements and preset values
-        UIController.handleCcpActions( true,  [ 'iptCcpTdClass', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent']) ;
+        UIController.handleCcpActions( true,  
+          [ 'iptCcpTdClass', 'setactiveparent'], 
+          [ 'iptCcpTdHeight', 'setactiveparent'], 
+          [ 'iptCcpTdWidth', 'setactiveparent'], 
+          [ 'iptCcpTdWidth', 'setactiveparent'], 
+          [ 'iptCcpTdBgColor', 'setactiveparent']) ;
 
         // !VA Branch: implementAppobj07 (061920)
         // !VA Replacing setvalue with writeAppobjToDOM
-        UIController.writeAppobjToDOM( [ 'iptCcpTdHeight', Appobj.iptCcpTdHeight ], [ 'iptCcpTdWidth', Appobj.iptCcpTdWidth ], [ 'iptCcpTdBgColor', Appobj.iptCcpTdBgColor ], [ 'iptCcpTdWidth', Appobj.iptCcpTdWidth ]) ;
+        UIController.writeAppobjToDOM( 
+          [ 'iptCcpTdHeight', Appobj.iptCcpTdHeight ], 
+          [ 'iptCcpTdWidth', Appobj.iptCcpTdWidth ], 
+          [ 'iptCcpTdBgColor', Appobj.iptCcpTdBgColor ],
+          [ 'iptCcpTdWidth', Appobj.iptCcpTdWidth ]) ;
 
         // !VA NOTE: These options can be merged with the above function call
         // UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdHeight', 'setvalue'], [ 'iptCcpTdWidth', 'setvalue'], [ 'iptCcpTdBgColor', 'setvalue'], [ 'iptCcpTdWidth', 'setactiveparent']) ;
@@ -3482,13 +3464,29 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
         // !VA Branch: implementAppobj07 (061920)
         // !VA Replacing setvalue with writeAppobjToDOM
-        UIController.writeAppobjToDOM( [ 'iptCcpTdClass', Appobj.iptCcpTdClass ], [ 'iptCcpTdHeight', Appobj.iptCcpTdHeight ], [ 'iptCcpTdWidth', Appobj.iptCcpTdWidth], [ 'iptCcpTdBgColor', Appobj.iptCcpTdBgColor], [ 'iptCcpTdFontColor', Appobj.iptCcpTdFontColor], [ 'iptCcpTdBorderColor', Appobj.iptCcpTdBorderColor ], ['iptCcpTdBorderRadius', Appobj.iptCcpTdBorderRadius ], [ 'iptCcpTdFontColor', Appobj.iptCcpTdFontColor ]);
+        UIController.writeAppobjToDOM( 
+          [ 'iptCcpTdClass', Appobj.iptCcpTdClass ], 
+          [ 'iptCcpTdHeight', Appobj.iptCcpTdHeight ], 
+          [ 'iptCcpTdWidth', Appobj.iptCcpTdWidth], 
+          [ 'iptCcpTdBgColor', Appobj.iptCcpTdBgColor], 
+          [ 'iptCcpTdFontColor', Appobj.iptCcpTdFontColor], 
+          [ 'iptCcpTdBorderColor', Appobj.iptCcpTdBorderColor ], 
+          ['iptCcpTdBorderRadius', Appobj.iptCcpTdBorderRadius ], 
+          [ 'iptCcpTdFontColor', Appobj.iptCcpTdFontColor ]);
 
         // !VA Deprecated...
         // !VA NOTE: These options can be merged with the above function call
         // UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdClass', 'setvalue'], [ 'iptCcpTdHeight', 'setvalue'], [ 'iptCcpTdWidth', 'setvalue'], [ 'iptCcpTdBgColor', 'setvalue'], [ 'iptCcpTdFontColor', 'setvalue'], [ 'iptCcpTdBorderColor', 'setvalue'], ['iptCcpTdBorderRadius', 'setvalue'], [ 'iptCcpTdFontColor', 'setvalue']) ;
 
-        UIController.handleCcpActions( true,  [ 'iptCcpTdClass', 'setactiveparent'], [ 'iptCcpTdHeight', 'setactiveparent'], [ 'iptCcpTdWidth', 'setactiveparent'], [ 'iptCcpTdBgColor', 'setactiveparent'], [ 'iptCcpTdFontColor', 'setactiveparent'], [ 'iptCcpTdBorderColor', 'setactiveparent'], ['iptCcpTdBorderRadius', 'setactiveparent'], [ 'iptCcpTdFontColor', 'setactiveparent']) ;
+        UIController.handleCcpActions( true,  
+          [ 'iptCcpTdClass', 'setactiveparent'], 
+          [ 'iptCcpTdHeight', 'setactiveparent'], 
+          [ 'iptCcpTdWidth', 'setactiveparent'], 
+          [ 'iptCcpTdBgColor', 'setactiveparent'],
+          [ 'iptCcpTdFontColor', 'setactiveparent'], 
+          [ 'iptCcpTdBorderColor', 'setactiveparent'], 
+          ['iptCcpTdBorderRadius', 'setactiveparent'], 
+          [ 'iptCcpTdFontColor', 'setactiveparent']) ;
 
         break;
       default:
@@ -3501,8 +3499,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA appController private
     function handleImgType(id) {
-      console.log('handleImgType running');
-      console.log('id is: ' + id);
       // !VA Reset all the td options to prepare for processing
       resetTdOptions();
       // !VA Set the fixed options, or reset them after switching back from fluid
@@ -3638,7 +3634,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       } else {
         console.log('ERROR in showIncludeWrapperOptions: unknown condition');
       }
-      UIController.handleCcpActions( flag, [ 'iptCcpTableWrapperClass', 'setactiveparent' ], [ 'iptCcpTableWrapperWidth', 'setactiveparent' ], [ 'selCcpTableWrapperAlign', 'setactiveparent' ], [ 'iptCcpTableWrapperBgColor', 'setactiveparent' ]);
+      UIController.handleCcpActions( flag, 
+        [ 'iptCcpTableWrapperClass', 'setactiveparent' ], 
+        [ 'iptCcpTableWrapperWidth', 'setactiveparent' ], 
+        [ 'selCcpTableWrapperAlign', 'setactiveparent' ], 
+        [ 'iptCcpTableWrapperBgColor', 'setactiveparent' ]);
 
     }
     
@@ -3894,23 +3894,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           appobjProp = appobjArray[i];
         }
       }
-      console.log('appobjProp is: ' + appobjProp);
-      // !VA Branch: implementAppobj08 (062020)
-      // !VA Deprecating...
-      // var IDtoProp = {
-      //   viewerW:  'ipt-tbr-viewerw',
-      //   imgW: 'ipt-tbr-imgwidth',
-      //   imgH: 'ipt-tbr-imgheight',
-      //   sPhonesW: 'ipt-tbr-sphones-width',
-      //   lPhonesW: 'ipt-tbr-lphones-width'
-      // };
       // !VA This should return directly wihout a ret variable as tmp storage.
       // var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
       return appobjProp;
     }
 
-
-
+    // !VA Branch: implementCcpInput01 (062120)
+    // !VA This is not accessed in appController now?
     // !VA appController private
     function getAspectRatio (var1, var2) {
       var aspectReal = (var1 / var2);
@@ -3970,8 +3960,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         ccpState = UIController.toggleCcp(true);
         if (ccpState) {
           UIController.populateAppobj(Appobj, 'ccp');
-          console.log('initCCP Appobj is: ');
-          console.log(Appobj);
           // !VA Do logic for opening the CCP with the current state of the selected options reflected. batchAppobjToDOM is in appController private.
           batchAppobjToDOM();
         }
