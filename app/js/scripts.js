@@ -5,7 +5,10 @@
 // !VA GENERAL NOTES
 /* !VA  - June Reboot Notes
 =========================================================
-// !VA Branch: implementAppobj08 (062020)
+// !VA Branch: implementCcpInput01 (062220)
+
+DONE: Inspector values need to be rounded to two digits -- they show the entire floating point value and overflow the container.
+
 
 TODO: BUG! Load 625X525 with viewerW set to 600 - loads without resizing to container size
 TODO: Change the default parent class on 
@@ -17,7 +20,6 @@ TODO: Remove all writing of values from initUI and put them in getAttributes. in
 TODO: Make the filename div wider
 TODO: No tooltip available for posswitch and imgswap
 TODO: Tooltips don't appear on checkboxes
-TODO: Inspector values need to be rounded to two digits -- they show the entire floating point value and overflow the container.
 TODO: Add error to vmlbutton height not matching img height
 TODO: Add error handling and the isErr argument to makeTdNode and makeTableNode so that the Clipboard object can discern between success messages and 'alert' messages, i.e. when the Clipboard output should be reviewed by the user for some reason, i.e. when vmlbutton height doesn't match the height of the loaded image. I don't think this is possible due to Clipboard object constraints
 TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
@@ -1313,13 +1315,14 @@ var Witty = (function () {
       // !VA Getting the selected TD option from Appobj should be an external function, since this logic is repeated in batchAppobjToDOM and possibly elsewhere.
       // !VA Loop through the Appobj rdoCcpTd properties and get the selected radio button
       function getSelectedTdOptionFromAppobj() {
-        for (const [key] of Object.entries(Appobj)) {
+        for (const [key, value] of Object.entries(Appobj)) {
           if (key.substring( 0, 8) === 'rdoCcpTd') {
             // !VA If the Appobj key string === true, then that is the selected radio button
             if (Appobj[key] === true ) {
-              // console.log('batchAppobjToDOM key is: ' + key);
-              // !VA Pass the element ID of the selected radio button determined above to handleTdOptions to show the appropriate TD options for the selected radio button.
-              return ccpUserInput[key];
+              // !VA Now get the value of the radio input DOM element which is the same as the string after the last hyphen in the id, i.e. the string after char 12
+              console.log('HERE');
+              console.log(ccpUserInput[key].slice( 12 ));
+              return ccpUserInput[key].slice( 12 );
             }
           }
         }
@@ -1720,7 +1723,13 @@ var Witty = (function () {
     // !VA Make the TD node
     // !VA CBController private
     function makeTdNode( id, uSels, Attributes ) {
+      console.log('makeTdNode running');
       // !VA Variables for error handling - need to include this in the return value so the Clipboard object can differentiate between alert and success messages. 
+      console.log('id is: ' + id);
+      console.log('uSels: ');
+      console.dir(uSels);
+      console.log('Attributes: ');
+      console.dir(Attributes);
       let isErr;
       // !VA NOTE: No trapped errors here yet that would pass a code, but that will probably come.
       // let errCode;
@@ -2901,8 +2910,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
         // !VA Branch: implementAppobj08 (062020)
         // !VA This is where we need to fork the logic for CCP inputs vs Toolbar inputs. Also need to consider an alternative to elementIdToAppobjProp, since elementIdToAppobjProp so far only contains a list of Toolbar input IDs that doesn't incude CCP. Why can't I get it from the element alias? 
-        console.log('handleKeydown userInputObj: ');
-        console.dir(userInputObj);
+        // console.log('handleKeydown userInputObj: ');
+        // console.dir(userInputObj);
 
 
         // !VA If Tab was pressed and this.value is either empty or equals the Appobj value, then there's been no change to the field, so let Tab just cycle through the fields as per its default.
@@ -3071,15 +3080,19 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       } else if ( appObjProp === 'imgW' || appObjProp === 'imgH') {
         // !VA Calculate the adjacent dimension of appObjProp based on the aspect ratio, then set the Appobj property of the dimension and its adjacent dimension
         if ( appObjProp === 'imgW') {
-          Appobj.imgH = imgH =  evtTargetVal * (1 / Appobj.aspect[0]);
+          Appobj.imgH = imgH =  Math.round(evtTargetVal * (1 / Appobj.aspect[0]));
           Appobj.imgW = imgW = evtTargetVal;
         } else if ( appObjProp === 'imgH') {
-          Appobj.imgW  = imgW =  evtTargetVal * (Appobj.aspect[0]);
+          Appobj.imgW  = imgW =  Math.round(evtTargetVal * (Appobj.aspect[0]));
           Appobj.imgH = imgH = evtTargetVal;
         }
       }
       // !VA Branch: implementCcpInput01 (062120)
       // !VA The false flag indicates that this is a user-initiated Toolbar input action, not an image initialization action.
+      console.log('calcViewerSize Appobj: ');
+      console.dir(Appobj);
+
+
       calcViewerSize(false);
 
     }
@@ -3879,7 +3892,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Branch: implementAppobj08 (062020)
     // !VA NOTE: Isn't there a way to do this without a separate function? It only is required for the dynamicRegion properties.
     function elementIdToAppobjProp(id) {
-      console.log('elementIdToAppobjProp running');
+      // console.log('elementIdToAppobjProp running');
       let idStr, appobjProp;
       idStr = id;
       // !VA Strip all the hypens out of the ID (str)
@@ -3900,33 +3913,33 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA Branch: implementCcpInput01 (062120)
-    // !VA This is not accessed in appController now?
+    // !VA This is not accessed in appController now? Apparently not, it's only used once to populate Appobj.aspect in populateAppobj and never again - all other aspect operations just access the Appobj property, so deprecate this.
     // !VA appController private
-    function getAspectRatio (var1, var2) {
-      var aspectReal = (var1 / var2);
-      var aspectInt = function() {
-        //get the aspect ratio by getting the gcd (greatest common denominator) and dividing W and H by it
-        //This is a single line function that wraps over two lines 
-        function gcd(var1,var2) {if ( var2 > var1 ) { 
-          // !VA Added variable declaration
-          var temp = var1; 
-          var1 = var2; 
-          var2 = temp; } while(var2!= 0) { 
-          // !VA Added variable declaration
-          var m = var1%var2; 
-          var1 = var2;
-          var2 = m; } 
-        return var1;}
-        var gcdVal = gcd( var1 , var2 );
-        //divide the W and H by the gcd
-        var w = (var1 / gcdVal);
-        var h = (var2 / gcdVal);
-        //Express and return the aspect ratio as an integer pair
-        aspectInt = (w + ' : ' + h);
-        return aspectInt;
-      }();
-      return [aspectReal, aspectInt];  
-    }
+    // function getAspectRatio (var1, var2) {
+    //   var aspectReal = (var1 / var2);
+    //   var aspectInt = function() {
+    //     //get the aspect ratio by getting the gcd (greatest common denominator) and dividing W and H by it
+    //     //This is a single line function that wraps over two lines 
+    //     function gcd(var1,var2) {if ( var2 > var1 ) { 
+    //       // !VA Added variable declaration
+    //       var temp = var1; 
+    //       var1 = var2; 
+    //       var2 = temp; } while(var2!= 0) { 
+    //       // !VA Added variable declaration
+    //       var m = var1%var2; 
+    //       var1 = var2;
+    //       var2 = m; } 
+    //     return var1;}
+    //     var gcdVal = gcd( var1 , var2 );
+    //     //divide the W and H by the gcd
+    //     var w = (var1 / gcdVal);
+    //     var h = (var2 / gcdVal);
+    //     //Express and return the aspect ratio as an integer pair
+    //     aspectInt = (w + ' : ' + h);
+    //     return aspectInt;
+    //   }();
+    //   return [aspectReal, aspectInt];  
+    // }
 
     // !VA appController public functions
     return {
