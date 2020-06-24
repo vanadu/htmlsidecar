@@ -584,8 +584,8 @@ var Witty = (function () {
 
 
       // !VA UIController public
-      // !VA Writes the dynamicRegion elements to the DOM based on Appobj and the height of the viewerW containers. Called from resizeContainers
-      // !VA TODO: resizeContainers doesn't really have much left in it - consider splitting calcViewerSize or integrating resizeContainers into it since it now doesn't have any DOM access either
+      // !VA This is where the DOM write in evalToolbarInputs and updateAppObj used to happen
+      // !VA Write dimensions of dynamicRegions.curImg, dynamicRegions.imgViewer and the height of dynamicRegions.imgViewport and dynamicRegions.appContainer. Width of dynamicRegions.imgViewport and dynamicRegions.appContainer is static and is sized to the actual application area width.
       writeDynamicRegionsDOM: function(Appobj, viewportH, appH) {
         // console.log('writeDynamicRegionsDOM running');
         // console.log('writeDynamicRegionsDOM Appobj is: ');
@@ -1284,10 +1284,7 @@ var Witty = (function () {
     // !VA CBController private
     
     function getUserSelections( id ) {
-      // !VA Initialize the clipboard-building process by getting those user selections in the CCP that determine the structure of the clipboard output and put those selections into the uSels object. The elements that determine the nodeList structure and thus the Clipboard output are: the makeTag buttons and the imgType radio buttons. The imgType (fluid or fixed) determines which td option is selected and has to be processed independently of the other uSels. The fluid imgType is a preset that always has to have the tdopton 'basic'. So first, preselect the tdoption 'basic' if the imgType is fluid, then proceed.
-      // !VA Branch: implementAppobj08 (062020)
-      // !VA Reevaluating...
-      // !VA uSels is now rewritten to access Appobj instead of DOM elements. The imgType logic is now integrated into Appobj, so no need now to confuse the issue by including any of that logic here.
+      // !VA Initialize the clipboard-building process by getting those user selections in Appobj that determine the structure of the clipboard output, and put those selections into the uSels object. 
 
       let Appobj = {};
       Appobj = appController.getAppobj();
@@ -2539,6 +2536,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
 
       // !VA eventListener for the Include Wrapper checkbox. Checkboxes need to have separate event handlers because their functions are too different to consolidate into a single one.
+      // !VA Branch: implementCcpInput01 (062120)
+      // !VA Then why are they both driving to the same function i.e. toggleCheckbox?
       let includeWrapperCheckbox = document.querySelector(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk);
       addEventHandler(includeWrapperCheckbox,'click',toggleCheckbox,false);
 
@@ -3100,8 +3099,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
     // !VA  appController private
-    // !VA Branch: implementCcpInput01 (062120)
-    // !VA Rewriting this. 
     // !VA calcViewerSize is called 1) in initUI (devmode) after the devimg is loaded from the HTML file 2) in handleFileSelect after setTimeOut callback is run and the image is loaded 3) in evalToolbarInput/ after a user-initiated Toolbar input. calcViewerSize calculates the current size of dynamicRegions.imgViewer based on Appobj values. 
     function calcViewerSize(flag) {
       // console.log('calcViewerSize running');
@@ -3168,7 +3165,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA appController private
     function resizeContainers( )  {
-      // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values which are passed in from resizeContainers.
+      // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values which are passed in from calcViewerSize.
       // !VA Initial height is 450, as explicitly defined in calcViewerSize. TOo much hassle to try and get the value as defined in the CSS programmatically.
       // !VA Note: This has dynamicRegion values that are not written back to Appobj after recalculation, this may be a problem at some point.
       // !VA initViewerH is the same default value set in populateAppobj. That needs to be reset as default here since Appobj values at this point no longer correspond to the initialization defaults, but may also have changed due to user-initiated Toolbar input. 
@@ -3194,6 +3191,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA DOM Access to apply dimensions for the dynamicRegions elements, i.e. the current image and its containers. 
       // !VA Branch: implementCcpInput01 (062120)
       // !VA This is where the DOM write in evalToolbarInputs and updateAppObj used to happen
+      // !VA Write dimensions of dynamicRegions.curImg, dynamicRegions.imgViewer and the height of dynamicRegions.imgViewport and dynamicRegions.appContainer. Width of dynamicRegions.imgViewport and dynamicRegions.appContainer is static and is sized to the actual application area width.
+      // !VA NOTE: This function only exists because Appobj has no property for viewportH or appH. This is a one-off call, so having a separate function for it is kind of wasteful. See if it can be done another way.
       UIController.writeDynamicRegionsDOM(Appobj, viewportH, appH);
 
 
@@ -3204,16 +3203,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       tableWidth = ['iptCcpTableWidth', Appobj.imgW ];
       tableWrapperWidth = ['iptCcpTableWrapperWidth', Appobj.viewerW];
       
-      // !VA Branch: implementAppobj05 (061020)
-      // UIController.stashAppobjProperties(true, tableWidth, tableWrapperWidth);
       // !VA True is the flag to stash instead of retrieve, tableWidth and tableWrapper are the rest parameters containing the key/value pairs to stash.;
       // !VA Branch: implementAppobj05 (061320)
       // !VA Not implementing this yet
       // UIController.stashAppobjProperties(true, tableWidth, tableWrapperWidth);
       
-      // !VA Write the values to the CCP DOM. This needs to bypass handleCcpActions, since it's not a result of any ccpAction but rather a direct write through the user input in the dynamicRegions. It also has to happen before initCCP, othewise Appobj won't initialize with values for table width and table wrapper width. 
+      // !VA Called in resizeContainers after writeDynamicRegions, takes parameter list of CCP ID/value pairs, and updates the DOM with the passed parameters. It is the CCP DOM counterpart to updateAppobj, I think, since it only updates those DOM elements whose ID/Value passed in, rather than a blanket DOM update of all DOM. Renamed from writeDOMElementValues. writeCcpDOM takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the cross-object identifier (the value in the ccpUserInput object) as key and the Appobj value as value. 
+      // !VA NOTE: This needs to bypass handleCcpActions, since it's not a result of any ccpAction but rather a direct write through the user input in the dynamicRegions. It also has to happen before initCCP, othewise Appobj won't initialize with values for table width and table wrapper width. 
       UICtrl.writeAppobjToDOM( tableWidth, tableWrapperWidth);
-
+      // !VA Branch: implementCcpInput01 (062120)
+      // !VA Why does this condition have no actions? Shouldn't write AppbojToDOM be called conditionally below?
       // !VA If CCP is open, write tableWidth and tableWrapperWidth to the DOM elements. 
       var ccpState = UICtrl.toggleCcp(false);
       if (ccpState) { 
@@ -3229,10 +3228,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA appController private
     // !VA Branch: implementAppobj03 (060820)
-    // !VA Handle the tdoptions and imgType radio buttons.
+    // !VA Handle the tdoptions and imgType radio buttons. I'm not sure why there is a separate handler for this that doesn't encompass all the CCP UI elements. 
     function handleCcpRadioSelection(evt) {
       // console.log('handleCcpRadioSelection running');
-      // let Appobj = appController.getAppobj();
       // console.log('evt.target.id is: ' + evt.target.id);
       let id;
       id = '#' + evt.target.id;
@@ -3259,9 +3257,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private
     // !VA Called in handleTdOptions
     // !VA TODO: Needs to be commented
+    // !VA Reads Appobj every time the CCP is opened and writes CCP options to the CCP DOM based on Appobj presets: 1) If the Include wrapper checkbox is checked/unchecked, runs showIncludeWrapperOptions to display/undisplay the Include wrapper-dependent options. 2) Determines which rdoCcpTd option is selected and runs handleTdOptions with the selected ID. 3) Determines the fluid/fixed option and runs handleImgType with the selected option.  
     function batchAppobjToDOM() {
-      // console.log('batchAppobjToDOM running');
-      // console.log('batchAppobjToDOM Appobj: ');
       // console.log(Appobj);
       // !VA Flag is set based on Include wrapper checkbox status below.
       let flag;
@@ -3888,9 +3885,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     //  !VA END ERROR HANDLING
 
     // !VA appController private
-    // !VA Need to get the Appobj property that corresponds to the ID of the DOM input element that sets it. It's easier to just create a list of these correspondences than to rename the whole UI elements and Appobj properties so they correspond, or to create functions that use string methods to extract them from each other.
-    // !VA Branch: implementAppobj08 (062020)
-    // !VA NOTE: Isn't there a way to do this without a separate function? It only is required for the dynamicRegion properties.
+    // !VA Get the Appobj property that corresponds to the ID of the DOM input element that sets it. 1) Removes the hypens in the ID string, converts the identifier string (the Appobj/ccpUserInput property name string) to lowercase, finds the match, and returns the aforementioned Appobj/ccpUserInput property name string.
     function elementIdToAppobjProp(id) {
       // console.log('elementIdToAppobjProp running');
       let idStr, appobjProp;
@@ -3912,34 +3907,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       return appobjProp;
     }
 
-    // !VA Branch: implementCcpInput01 (062120)
-    // !VA This is not accessed in appController now? Apparently not, it's only used once to populate Appobj.aspect in populateAppobj and never again - all other aspect operations just access the Appobj property, so deprecate this.
-    // !VA appController private
-    // function getAspectRatio (var1, var2) {
-    //   var aspectReal = (var1 / var2);
-    //   var aspectInt = function() {
-    //     //get the aspect ratio by getting the gcd (greatest common denominator) and dividing W and H by it
-    //     //This is a single line function that wraps over two lines 
-    //     function gcd(var1,var2) {if ( var2 > var1 ) { 
-    //       // !VA Added variable declaration
-    //       var temp = var1; 
-    //       var1 = var2; 
-    //       var2 = temp; } while(var2!= 0) { 
-    //       // !VA Added variable declaration
-    //       var m = var1%var2; 
-    //       var1 = var2;
-    //       var2 = m; } 
-    //     return var1;}
-    //     var gcdVal = gcd( var1 , var2 );
-    //     //divide the W and H by the gcd
-    //     var w = (var1 / gcdVal);
-    //     var h = (var2 / gcdVal);
-    //     //Express and return the aspect ratio as an integer pair
-    //     aspectInt = (w + ' : ' + h);
-    //     return aspectInt;
-    //   }();
-    //   return [aspectReal, aspectInt];  
-    // }
 
     // !VA appController public functions
     return {
