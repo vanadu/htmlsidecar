@@ -1297,7 +1297,7 @@ var Witty = (function () {
     // !VA CBController private
     // !VA Getting the selected TD option from Appobj should be an external function, since this logic is repeated in batchAppobjToDOM and possibly elsewhere. No, because 1) batchAppobjToDOM is in appController and would require crossing modules and 2) batchAppobjToDOM returns the ccpUserInput property name corresponding to the selected Td option, not the td option itself.
     // !VA Branch: implementCcpInput02 (062420)
-    // !VA What we really need here is a function that returns what we need from uSels so we can get rid of getUserSelections and call buildOutputNodeList straight from the event handler.
+    // !VA What we really need here is a function that returns what we need so we can get rid of getUserSelections and call buildOutputNodeList straight from the event handler.
     // !VA Returns the selected TD option from Appobj as a element alias string, i.e. rdoCcpTdBasic. 
     function getSelectedTdOptionFromAppobj() {
       let arr, selectedTdOption;
@@ -1318,17 +1318,25 @@ var Witty = (function () {
     }
 
 
+    // !VA Get a checkbox state from the Appobj property for the mock checkbox.
+    function getCheckboxState(identifier) {
+      let bool;
+      // !VA If the Appobj property for the mock checkbox span specified in 'identifier' is 'on', return true, otherwise false
+      appController.getAppobj(identifier) === 'on' ? bool = true : bool = false;
+      return bool;
+    }
+
 
     // !VA Get the user selections that define the clipboard output configuration- the clicked Options button, the Include anchor checkbox and the Include wrapper table checkbox. The nodeList used for the indents as well as the indent implementation will depend on these options -- only the basic TD radio button option generates a simple nodeList structure whose indents can be processed with a simple for loop. The other options generate nodeLists with text nodes and comments that require a custom indent scheme.
     // !VA CBController private
     function getUserSelections( id ) {
-      // !VA Initialize the clipboard-building process by getting those user selections in Appobj that determine the structure of the clipboard output, and put those selections into the uSels object. 
+      // !VA Initialize the clipboard-building process by getting those user selections in Appobj that determine the structure of the clipboard output. 
 
       let Appobj = {};
       // !VA Branch: implementCcpInput02 (062420)
       // !VA Appobj isn't really needed here at all, is it?
       // !VA Call getAppobj without an argument to get the entire Appobj object. B
-      Appobj = appController.getAppobj();
+      // Appobj = appController.getAppobj();
       // console.clear();
       // console.log('getUserSelections Appobj: ');
       // console.dir(Appobj);
@@ -1337,10 +1345,10 @@ var Witty = (function () {
       // !VA Branch: implementAppobj08 (062020)
       // !VA imgType is deprecated because that logic is now is integrated into Appobj.
       // let imgType, selectedTdOption;
-      let selectedTdOption;
+      // let selectedTdOption;
 
 
-      let uSels = {};
+      // let uSels = {};
       // !VA Branch: implementAppobj08 (062020)
       // !VA The imgType logic is now integrated into Appobj, so this whole section is deprecated.
       // !VA Get the selected imgType regardless of which button was clicked to trigger this function. 
@@ -1351,53 +1359,52 @@ var Witty = (function () {
 
       // !VA Branch: implementCcpInput03 (062520)
       // !VA Moved getSelectedTdOptionFromAppobj to CBController private
-      selectedTdOption =  getSelectedTdOptionFromAppobj();
-      console.log('getUserSelections selectedTdOption is: ' + selectedTdOption);
+      // selectedTdOption =  getSelectedTdOptionFromAppobj();
+      // console.log('getUserSelections selectedTdOption is: ' + selectedTdOption);
 
       // !VA Branch: implementAppobj08 (062020)
       // !VA This might be better as an external function
-      // !VA Get a checkbox state from the Appobj property for the mock checkbox.
-      function getCheckboxState(identifier) {
-        let bool;
-        // !VA If the Appobj property for the mock checkbox span is 'on', return true, otherwise false
-        Appobj[identifier] === 'on' ? bool = true : bool = false;
-        return bool;
-      }
+
       
-      uSels = {
-        buttonClicked: '',
-        hasAnchor: getCheckboxState('spnCcpImgIncludeAnchorCheckmrk'),
-        hasWrapper: getCheckboxState('spnCcpTableIncludeWrapperCheckmrk'),
-        selectedTdOption: selectedTdOption
-      };
-      if (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)) { 
-        uSels.buttonClicked = 'btnCcpMakeImgTag';
-        // !VA Override the selectedTdOption value for the IMG button - the IMG button will ALWAYS output img/anchor tags to the clipboard no matter which tdoptions radio button is selected.
-        uSels.selectedTdOption = 'rdoCcpTdBasic';
-      } else if (id === btnCcpMakeClips.btnCcpMakeTdTag.slice(1)) { 
-        uSels.buttonClicked = 'btnCcpMakeTdTag';
-      } else {
-        uSels.buttonClicked = 'btnCcpMakeTableTag';
-      }
+      // uSels = {
+      //   buttonClicked: '',
+      //   hasAnchor: getCheckboxState('spnCcpImgIncludeAnchorCheckmrk'),
+      //   hasWrapper: getCheckboxState('spnCcpTableIncludeWrapperCheckmrk'),
+      //   selectedTdOption: selectedTdOption
+      // };
+      // if (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)) { 
+      //   uSels.buttonClicked = 'btnCcpMakeImgTag';
+      //   // !VA Override the selectedTdOption value for the IMG button - the IMG button will ALWAYS output img/anchor tags to the clipboard no matter which tdoptions radio button is selected.
+      //   uSels.selectedTdOption = 'rdoCcpTdBasic';
+      // } else if (id === btnCcpMakeClips.btnCcpMakeTdTag.slice(1)) { 
+      //   uSels.buttonClicked = 'btnCcpMakeTdTag';
+      // } else {
+      //   uSels.buttonClicked = 'btnCcpMakeTableTag';
+      // }
 
-      console.log('getUserSelections uSels: ');
-      console.dir(uSels);
+      // console.log('getUserSelections uSels: ');
+      // console.dir(uSels);
 
-      buildOutputNodeList( id, uSels );
+      buildOutputNodeList( id );
     }
 
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
     // !VA CBController private
     function buildOutputNodeList( id, uSels ) {
-
-
+      console.clear();
       console.log('buildOutputNodeList id is: ' + id);
-
-      // !VA This and toggleImgType (and possibly initCcp - that needs to be tested) are the only places where getAttributes is called. Everywhere else it is passed as an argument to the called function.
-      let Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
+      // !VA Branch: implementCcpInput03 (062520)
+      let selectedTdOption, hasAnchor, hasWrapper, Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
+      // !VA Get the selected TD option
+      selectedTdOption = getSelectedTdOptionFromAppobj();
+      // !VA Query Appobj for the Include anchor checkbox state: true = checked, false = unchecked
+      hasAnchor = getCheckboxState('spnCcpImgIncludeAnchorCheckmrk');
+      // !VA Query Appobj for the Include wrapper checkbox state: true = checked, false = unchecked
+      hasWrapper = getCheckboxState('spnCcpTableIncludeWrapperCheckmrk');
+      // !VA Get the Attributes from which Clipboard strings are built
       Attributes = getAttributes();
-      // !VA Get the top node, i.e. tableNodeFragment. We need to pass uSels because makeTableNode calls makeTdNode, which uses uSels to get the current tdoptions radio button selection
-      tableNodeFragment = makeTableNode( id, uSels, Attributes );
+      // !VA Get the top node, i.e. tableNodeFragment. 
+      tableNodeFragment = makeTableNode( id, Attributes );
       // !VA Create the full nodeList from the tableNodeFragment. If tableNodeFragment is null, return to abort without creating Clipboard object.
       try {
         nl = tableNodeFragment.querySelectorAll('*');
@@ -1407,13 +1414,8 @@ var Witty = (function () {
       }
       // !VA Create the div container to which the extracted nodeList fragment will be appended
       var container = document.createElement('div');
-
-
-
-      // !VA Branch: implementCcpInput03 (062520)
-      // !VA This could be replaced directly with the getSelectedTdOptionFromAppobj function.
-      // !VA Basic TD Options - This should be extracted to a separate function
-      if (uSels.selectedTdOption === 'rdoCcpTdBasic' || uSels.selectedTdOption === 'rdoCcpTdExcludeimg' || uSels.selectedTdOption === 'rdoCcpTdPosswitch') {
+      // !VA Handle the active tdoptions radio selection for the options that do NOT include an MS conditional code block. These options don't require special indent handling or post-processing of the clipboard output string, so extract the outputNL accordingly
+      if (selectedTdOption === 'rdoCcpTdBasic' || selectedTdOption === 'rdoCcpTdExcludeimg' || selectedTdOption === 'rdoCcpTdPosswitch') {
         // !VA Deterimine which makeNode button was clicked and extract a nodeList fragment with only those nodes that correspond to the clicked button. The index position of the extracted fragments is determined by the length of the tableNodeFragment nodeList minus an integer to compensate for the 0-based nodeList indices.
         let rtlNodePos, extractPos;
         // !VA For the posswitch option: Get the position of the RTL node, if it exists. 
@@ -1425,24 +1427,18 @@ var Witty = (function () {
         // !VA Process the makeNode button clicks
         switch(true) {
         // !VA btnCcpMakeImgTag is clicked. We can hardcode the index where the extraction begins because the imgNode is created in makeTdNode and the btnCcpMakeImgTag button click overrides any other makeNode button actions. 
-
-        // !VA Branch: implementCcpInput03 (062520)
-        // !VA We already have the ID as parameter so we don't need this from uSels
-        case (uSels.buttonClicked === 'btnCcpMakeImgTag'):
-          // !VA If there's an anchor, take the last two nodes, otherwise just take the last node.
-          uSels.hasAnchor ? frag = nl[nl.length - 2] : frag = nl[nl.length - 1]; 
+        case ( '#' + id === btnCcpMakeClips.btnCcpMakeImgTag):
+          // !VA If hasAnchor === true then the checkbox is checked, so take the last two (i.e. A and IMG) nodes, otherwise just take the last (i.e. IMG) node.
+          hasAnchor ? frag = nl[nl.length - 2] : frag = nl[nl.length - 1]; 
           break;
-
-        // !VA Branch: implementCcpInput03 (062520)
-        // !VA We already have the ID as parameter so we don't need this from uSels
         // !VA btnCcpMakeTdTag is clicked. Here we handle the 'rdoCcpTdBasic', 'rdoCcpTdExcludeimg' and 'rdoCcpTdPosswitch' options because they process indents with no modifications. 'rdoCcpTdImgswap', 'rdoCcpTdBgimage' and 'rdoCcpTdVmlbutton' options are handled separately because they import comment nodes with MS conditional code
-        case (uSels.buttonClicked === 'btnCcpMakeTdTag'):
+        case ( '#' + id === btnCcpMakeClips.btnCcpMakeTdTag):
           // !VA basic option is selected 
-          if ( uSels.selectedTdOption === 'rdoCcpTdBasic') { 
+          if ( selectedTdOption === 'rdoCcpTdBasic') { 
             // !VA We can hardcode this for now, but that will be a problem if any other options with other nodes are added.
-            uSels.hasAnchor ? extractPos = nl.length - 3 : extractPos = nl.length - 2;
+            hasAnchor ? extractPos = nl.length - 3 : extractPos = nl.length - 2;
             // frag = nl[extractPos];
-          } else if ( uSels.selectedTdOption === 'rdoCcpTdExcludeimg') {
+          } else if ( selectedTdOption === 'rdoCcpTdExcludeimg') {
             extractPos = 5;
             // !VA posswitch option is selected
           } else {
@@ -1451,13 +1447,11 @@ var Witty = (function () {
           }
           frag = nl[extractPos];
           break;
-
-        // !VA Branch: implementCcpInput03 (062520)
-        // !VA We already have the ID as parameter so we don't need this from uSels
-        case (uSels.buttonClicked === 'btnCcpMakeTableTag'):
+        // !VA Target id is MakeTableTag button
+        case ( '#' + id === btnCcpMakeClips.btnCcpMakeTableTag):
           // !VA basic or excludeimg option is selected 
           // !VA We can hardcode the 'rdoCcpTdBasic' and 'rdoCcpTdPosswitch' positions for now, but these will have to be revisited if any new options are added that change the outputNL indices. 
-          if (uSels.hasWrapper) {
+          if (hasWrapper) {
             // !VA The Include wrapper table option is selected, so the entire nodeList is extracted
             extractPos = 0;
           } else {
@@ -1474,14 +1468,14 @@ var Witty = (function () {
         container.appendChild(frag);
         // !VA Create the outputNL nodeList to pass to the Clipboard object
         outputNL = container.querySelectorAll('*');
-        applyIndents( id, uSels, outputNL );
+        applyIndents( id, outputNL );
         clipboardStr = outputNL[0].outerHTML;
 
-      // !VA imgSwap and bgimage option - includes MS conditional code retrieved by getImgSwapBlock, getBgimageBlock, getVMLBlock which includes getIndent functions. First, run applyIndents on outputNL. applyIndents also inserts tokens at the position where the codeBlock is to be inserted. The parent nodelist is converted to a string, the code blocks are retrieved, indents are inserted, and finally the codeblocks are inserted into the string between the tags of the last node in the outputNL.outerHTML string. 
+      // !VA These options include MS conditional code retrieved by getImgSwapBlock, getBgimageBlock, getVMLBlock which includes getIndent functions. First, run applyIndents on outputNL. applyIndents also inserts tokens at the position where the codeBlock is to be inserted. The parent nodelist is converted to a string, the code blocks are retrieved, indents are inserted, and finally the codeblocks are inserted into the string between the tags of the last node in the outputNL.outerHTML string. 
 
       // !VA Branch: implementCcpInput03 (062520)
-      // !VA We already have the ID as parameter so we don't need this from uSels
-      } else if (uSels.selectedTdOption === 'rdoCcpTdImgswap' || uSels.selectedTdOption  === 'rdoCcpTdBgimage' || uSels.selectedTdOption === 'rdoCcpTdVmlbutton') {
+      // !VA We already have the ID as parameter so we don't need this from getUserSelections
+      } else if (selectedTdOption === 'rdoCcpTdImgswap' || selectedTdOption  === 'rdoCcpTdBgimage' || selectedTdOption === 'rdoCcpTdVmlbutton') {
         // !VA Start with the btnCcpMakeTdTag makeNode button because the img makeNode button isn't referenced in the imgswap option. The A/IMG tags are hard-coded into the MS Conditional code in getImgSwapBlock. Also, there's a switch to include/exclude the A/IMG node in makeTdNode.
         // !VA extractNodeIndex is the nl index position at which the nodes are extracted to build outputNL. It equals the nodeList length minus the indentLevel.
         let extractNodeIndex;
@@ -1493,8 +1487,8 @@ var Witty = (function () {
         // !VA NOTE: This code is repeated above in the if clause and again here in the else
 
         // !VA Branch: implementCcpInput03 (062520)
-        // !VA We already have the ID as parameter so we don't need this from uSels
-        if ( uSels.buttonClicked === 'btnCcpMakeTdTag') {
+        // !VA We already have the ID as parameter so we don't need this from getUserSelections
+        if ( '#' + id === btnCcpMakeClips.btnCcpMakeTdTag) {
           indentLevel = 1;
           extractNodeIndex = nl.length - indentLevel;
         } else {
@@ -1519,39 +1513,22 @@ var Witty = (function () {
 
         // !VA Branch: implementCcpInput03 (062520)
         // !VA Get rid of uSels
-        applyIndents(id, uSels, outputNL);
+        applyIndents(id, outputNL);
         // !VA Convert outputNL to a string (including tokens for inserting MS conditional code) for output to Clipboard object.
         clipboardStr = outputNL[0].outerHTML;
-        
         // !VA Get the codeBlock corresponding to the selected TD option
-
-
-        // !VA Branch: implementCcpInput03 (062520)
-        // !VA We already have the ID as parameter so we don't need this from uSels
-        if ( uSels.selectedTdOption === 'rdoCcpTdImgswap') {
+        if ( selectedTdOption === 'rdoCcpTdImgswap') {
           codeBlock = getImgSwapBlock( id, indentLevel, Attributes);
-        } else if (  uSels.selectedTdOption === 'rdoCcpTdBgimage' ) {
+        } else if (  selectedTdOption === 'rdoCcpTdBgimage' ) {
           codeBlock = getBgimageBlock(id, indentLevel, Attributes);
-        } else if (uSels.selectedTdOption === 'rdoCcpTdVmlbutton') {
+        } else if (selectedTdOption === 'rdoCcpTdVmlbutton') {
           codeBlock = getVmlButtonBlock(id, indentLevel, Attributes);
         }
         // !VA Replace the tokens in clipboardStr that were added in applyIndents with the respective codeBlock
         clipboardStr = clipboardStr.replace('/replacestart//replaceend/', codeBlock + '\n');
       } 
       // !VA Convert the alias of the clicked button to an ID the Clipboard object recognizes and write clipboardStr to the clipboard.
-      writeClipboard( aliasToId(uSels.buttonClicked), clipboardStr );
-    }
-
-    // !VA CBController private
-    // !VA Convert uSels.buttonClicked in buildOutputNodeList back to an id before passing to Clipboard object.
-    // !VA Branch: implementCcpInput03 (062520)
-    // !VA Deprecate this somehow.
-    function aliasToId( alias ) {
-      let id;
-      if (alias === 'btnCcpMakeImgTag') {id = btnCcpMakeClips.btnCcpMakeImgTag.slice(1); }
-      if (alias === 'btnCcpMakeTdTag') {id = btnCcpMakeClips.btnCcpMakeTdTag.slice(1); }
-      if (alias === 'btnCcpMakeTableTag') {id = btnCcpMakeClips.btnCcpMakeTableTag.slice(1); }
-      return id;
+      writeClipboard( id, clipboardStr );
     }
 
     // !VA Make the nodes for the 'posswitch option' using the DIR attribute
@@ -1778,19 +1755,21 @@ var Witty = (function () {
 
     // !VA Make the TD node
     // !VA CBController private
-    function makeTdNode( id, uSels, Attributes ) {
-
-      console.log('makeTdNode uSels is: ');
-      console.log(uSels);
+    function makeTdNode( id, Attributes ) {
 
       console.log('makeTdNode running');
       // !VA Variables for error handling - need to include this in the return value so the Clipboard object can differentiate between alert and success messages. 
       // console.log('id is: ' + id);
-      // console.log('uSels: ');
-      // console.dir(uSels);
       // console.log('Attributes: ');
       // console.dir(Attributes);
       let isErr;
+      // !VA Query Appobj to get the selected TD option
+      let selectedTdOption;
+      selectedTdOption = getSelectedTdOptionFromAppobj();
+
+      // !VA Branch: implementCcpInput03 (062520)
+      // !VA Get the selected TD option from Appobj
+
       // !VA NOTE: No trapped errors here yet that would pass a code, but that will probably come.
       // let errCode;
       let tdInner, imgNode;
@@ -1805,7 +1784,7 @@ var Witty = (function () {
       // !VA Now add the attributes included only with the default Td configuration
       switch(true) {
       // !VA If the 'td with options' or 'td with options (exclude img) radio buttons are checked...
-      case (uSels.selectedTdOption === 'rdoCcpTdBasic' || uSels.selectedTdOption === 'rdoCcpTdExcludeimg'):
+      case (selectedTdOption === 'rdoCcpTdBasic' || selectedTdOption === 'rdoCcpTdExcludeimg'):
         // !VA class attribute
         if (Attributes.tdClass.str) { tdInner.className = Attributes.tdClass.str; }
         // !VA valign attribute
@@ -1814,19 +1793,19 @@ var Witty = (function () {
         if (Attributes.tdHeight.str) { tdInner.height = Attributes.imgWidth.str; }
         if (Attributes.tdWidth.str) { tdInner.width = Attributes.imgHeight.str; }
         // !VA If 'rdoCcpTdBasic' is checked, create imgNode and append it, otherwise exclude the imgNode.
-        if (uSels.selectedTdOption === 'rdoCcpTdBasic') {
+        if (selectedTdOption === 'rdoCcpTdBasic') {
           imgNode = makeImgNode( id, Attributes );
           tdInner.appendChild(imgNode);
         }
         break;
       // !VA (selectedTdOption === 'rdoCcpTdImgswap'):
-      case (uSels.selectedTdOption === 'rdoCcpTdImgswap'):
+      case (selectedTdOption === 'rdoCcpTdImgswap'):
         if (Attributes.tdClass.str) { tdInner.className = Attributes.tdClass.str; }
         if (Attributes.tdValign.str) { tdInner.vAlign = Attributes.tdValign.str; }
         if (Attributes.tdAlign.str) { tdInner.align = Attributes.tdAlign.str; }
         break;
       // !VA (selectedTdOption === 'rdoCcpTdBgimage'):
-      case (uSels.selectedTdOption === 'rdoCcpTdBgimage'):
+      case (selectedTdOption === 'rdoCcpTdBgimage'):
         // !VA Create the parent node to which the bgimage code block will be appended after outputNL is converted to text in buildOutputNodeList.
         // !VA Include width, height and valign as per Stig's version
         tdInner.width = Attributes.tdAppobjWidth.str;
@@ -1838,11 +1817,11 @@ var Witty = (function () {
         // !VA Include fallback color from the default set in showTdOptions
         break;
       // !VA  (selectedTdOption === 'rdoCcpTdPosswitch'):
-      case (uSels.selectedTdOption === 'rdoCcpTdPosswitch'):
+      case (selectedTdOption === 'rdoCcpTdPosswitch'):
         tdInner  = makePosSwitchNodes( id, Attributes );
         break;
       // !VA  (selectedTdOption === 'rdoCcpTdVmlbutton'):
-      case (uSels.selectedTdOption === 'rdoCcpTdVmlbutton'):
+      case (selectedTdOption === 'rdoCcpTdVmlbutton'):
         // !VA IMPORTANT: Height and width fields have to be entered, otherwise the button can't be built. Button width and height are set here in makeTdNode, the rest of the options are set in getVmlCodeBlock in buildOutputNodeList. The defaults of 40/200 as per Stig are set in UIController.showTdOptions. So if there's no value for td height and width, then the user has deleted the default and not replaced it with a valid entry. In this case, throw an ERROR and abort before it gets to the clipboard.
         if (!document.querySelector(ccpUserInput.iptCcpTdHeight).value || !document.querySelector(ccpUserInput.iptCcpTdWidth).value) {
           console.log('ERROR in makeTdNode rdoCcpTdVmlbutton: no value for either height or width');
@@ -1878,7 +1857,7 @@ var Witty = (function () {
 
     // !VA Make the table node, including parent and wrapper table if selected
     // !VA CBController private
-    function makeTableNode( id, uSels, Attributes ) {
+    function makeTableNode( id, Attributes ) {
       // !VA Variables for parent and wrapper table, parent and wrapper tr, and wrapper td. Parent td is called from makeTdNode and is appended to tdNodeFragment. tableNodeFragment is the node that contains the entire nodelist which is returned to buildOutputNodeList
       let tableOuter, trOuter, tdOuter, tableInner, trInner, tdNodeFragment, tableNodeFragment;
       tableNodeFragment = document.createDocumentFragment();
@@ -1902,7 +1881,7 @@ var Witty = (function () {
       // !VA Build the inner tr
       tableInner.appendChild(trInner);
       // !VA Get the inner TD from makeTdNode and append it to the nodeFragment
-      tdNodeFragment = makeTdNode( id, uSels, Attributes );
+      tdNodeFragment = makeTdNode( id, Attributes );
       // !VA If tdNodeFragment is null, then there was an error in makeTdNode, so console the error and return null to buildOutputNodeList to abort.
       try {
         trInner.appendChild(tdNodeFragment);
@@ -2003,8 +1982,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA INDENT FUNCTIONS
     // !VA CBController private
     // !VA NOTE: This routine identifies if the nodes 1) contain the id 'stack-column-center' 2) contain MS conditional code and 2) contain an A tag. It applies indents accordingly to the nodes using insertAdjacentHTML. 1) Is problematic because if that class name is not present in the HTML file, the indent will break. I couldn't figure out a way to do this without the id by looking for sibling nodes, so trying to create options for three or even two column tables will be ridiculous time-consuming - not an option for now.
-    function applyIndents( id, uSels, outputNL ) {
+    function applyIndents( id, outputNL ) {
       console.log('applyIndents id is: ' + id);
+
+      // !VA Query Appobj to get the selected TD option
+      let selectedTdOption;
+      selectedTdOption = getSelectedTdOptionFromAppobj();
 
       // !VA Create array to store indent strings
       let indents = [];
@@ -2016,7 +1999,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       let hasMSConditional;
 
 
-      if ( uSels.selectedTdOption === 'rdoCcpTdImgswap' || uSels.selectedTdOption === 'rdoCcpTdBgimage' || uSels.selectedTdOption === 'rdoCcpTdVmlbutton') {
+      if ( selectedTdOption === 'rdoCcpTdImgswap' || selectedTdOption === 'rdoCcpTdBgimage' || selectedTdOption === 'rdoCcpTdVmlbutton') {
         hasMSConditional = true;
       }
       for (let i = 0; i < outputNL.length; i++) {
@@ -2313,7 +2296,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           
 
         case targetid.includes('tag') || targetid.includes('fluid') || targetid.includes('fixed') :
-          getUserSelections(targetid);
+          buildOutputNodeList(targetid);
           break;
         case targetid.includes('css') :
           makeCssRule(targetid);
