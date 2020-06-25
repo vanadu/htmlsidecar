@@ -9,7 +9,8 @@
 
 DONE: Inspector values need to be rounded to two digits -- they show the entire floating point value and overflow the container.
 
-
+TODO: Add options to anchor tag: color, target="_blank"
+TODO: Change checkbox name from Wrap img... to Include anchor
 TODO: BUG! Load 625X525 with viewerW set to 600 - loads without resizing to container size
 TODO: Change the default parent class on 
 TODO: Have a bit problem with td options height and width fields. Currently these fields are available when the 'basic' option is selected, but there is no case when they would ever write the values the user might enter here to the clipboard. Beccause, what happens when the user enters values that are smaller than the current image resolution. That can't be possible. The TD can't be smaller than its child. The height should never be available when the child is an image and the width should either be preset to the image width or unavailable. Or it should be allowed to be larger than the child, for instance if padding is desired, but never smaller. And if you add padding, you'd add it to the img, not to the TD, right? Have to check that out before resolving this. 
@@ -509,7 +510,7 @@ var Witty = (function () {
 
       // !VA UIController public
       initUI: function(initMode) {
-
+        let fileName;
         const delayInMilliseconds = 10;
         // !VA Here we initialze DEV mode, i.e. reading a hardcoded image from the HTML file instead of loading one manually in production mode
         if (initMode === 'devmode') {
@@ -524,11 +525,11 @@ var Witty = (function () {
             fname = fname.split('/');
             fname = fname[fname.length - 1];
             // !VA Call Appobj and add filename to it here for dev mode
-            var Appobj = appController.getAppobj();
+            fileName = appController.getAppobj('fileName');
             // !VA Write fname both to the DOM here and to Appobj. 
             // !VA TODO
             // !VA Need a function that writes a specific Appobj property to Appobj - not sure getAppobj is the DRYest option for this.
-            document.querySelector(inspectorElements.insFilename).textContent = Appobj.fileName = fname;
+            document.querySelector(inspectorElements.insFilename).textContent = fileName = fname;
 
             // !VA Initialze calcViewerSize to size the image to the app container areas
             // !VA Branch: implementCcpInput01 (062120)
@@ -880,7 +881,11 @@ var Witty = (function () {
     // !VA NOTE: Could probably make all the retObject arguments ccpElementId, str and consolidate this function somehow -- think about it.
     function getAttributes() {
       var Appobj = {};
+      // !VA Branch: implementCcpInput02 (062420)
+      // !VA We don't need the entire Appobj here. What we should do is call rest parameters on what we need and then destructure the return array into separate variables. This needs to be done when getAttributes is reevaluated since there appears to be a lot of unnecessary DOM access here.
       Appobj = appController.getAppobj();
+      console.log('getAttributes Appobj: ');
+      console.log(Appobj);
       let checked, str, options, selectid, ccpElementId, imgType, Attributes, retObj;
       // !VA Create the array to return. First value is the id of the CCP element, second value is the string to write to the CCP element.
       function returnObject(ccpElementId, str ) {
@@ -915,7 +920,6 @@ var Witty = (function () {
           // !VA Just get the Appobj value here now.
           // imgType === 'fixed' ? str = ccpGetAttValue('class',document.querySelector(ccpElementId).value) : str = 'img-fluid';
           str = Appobj.iptCcpImgClass;
-          console.log('getAttributes imgClass str is: ' + str);
           retObj = returnObject(ccpElementId, str);
           return retObj;
         })(),
@@ -1168,16 +1172,25 @@ var Witty = (function () {
           return retObj;
         })(),
       };
-      console.log('getAttributes Attributes: ');
-      console.dir(Attributes);
+      // console.log('getAttributes Attributes: ');
+      // console.dir(Attributes);
       // !VA Return the Attributes defined above. 
       return Attributes;
     }
 
     // !VA CBController private
     function ccpGetAttValue(att, value) {
+
+      // !VA Branch: implementCcpInput02 (062420)
+
       // !VA Gets the insFilename from Appobj in case the user leaves 'path' empty
-      var Appobj = appController.getAppobj();
+      // var Appobj = appController.getAppobj();
+      // !VA Branch: implementCcpInput02 (062420)
+
+      let fileName;
+      fileName = appController.getAppobj('fileName');
+      fileName = appController.getAppobj2('fileName');
+
       var str;
       // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
       if (value && att) {
@@ -1192,7 +1205,7 @@ var Witty = (function () {
       } else {
         // !VA If the path field is empty, return the insFilename without the path.
         if (att === 'src' && value === '' ) {
-          str = `${att}="${Appobj.fname}" `;
+          str = `${att}="${fileName}" `;
         } else if ( att === '#' || att === '') {
           str = '';
         } else {
@@ -1256,8 +1269,8 @@ var Witty = (function () {
     // !VA Called from getAttributes when an attribute should be included in the Clipboard output ONLY if there is a user input for that attribute If there is no input, exclude the attribute itself from the clipboard output. For instance, if the user doesn't enter a class name, then the class attribute itself is excluded from the clipboard output at all. 
     function ccpIfNoUserInput(att, value) {
       // !VA We need get the insFilename from Appobj in case the user leaves 'path' empty
-      let Appobj = {};
-      Appobj = appController.getAppobj();
+      let fileName;
+      fileName = appController.getAppobj('fileName');
       var str;
       // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
       if (value && att) {
@@ -1267,7 +1280,7 @@ var Witty = (function () {
       } else {
         // !VA If the path field is empty, we need to return the insFilename without the path.
         if (att === 'src' && value === '' ) {
-          str = `${att}="${Appobj.fname}" `;
+          str = `${att}="${fileName}" `;
         } else if ( att === '#' || att === '') {
           str = '';
         } else {
@@ -1282,15 +1295,17 @@ var Witty = (function () {
     // !VA NODE FUNCTIONS
     // !VA Get the user selections that define the clipboard output configuration- the clicked Options button, the Include anchor checkbox and the Include wrapper table checkbox. The nodeList used for the indents as well as the indent implementation will depend on these options -- only the basic TD radio button option generates a simple nodeList structure whose indents can be processed with a simple for loop. The other options generate nodeLists with text nodes and comments that require a custom indent scheme.
     // !VA CBController private
-    
     function getUserSelections( id ) {
       // !VA Initialize the clipboard-building process by getting those user selections in Appobj that determine the structure of the clipboard output, and put those selections into the uSels object. 
 
       let Appobj = {};
+      // !VA Branch: implementCcpInput02 (062420)
+      // !VA Appobj isn't really needed here at all, is it?
+      // !VA Call getAppobj without an argument to get the entire Appobj object. B
       Appobj = appController.getAppobj();
-      console.clear();
-      console.log('getUserSelections Appobj: ');
-      console.dir(Appobj);
+      // console.clear();
+      // console.log('getUserSelections Appobj: ');
+      // console.dir(Appobj);
 
 
       // !VA Branch: implementAppobj08 (062020)
@@ -1308,23 +1323,24 @@ var Witty = (function () {
       // imgType === 'fluid' ? selectedTdOption = 'basic' : selectedTdOption = document.querySelector('input[name="tdoptions"]:checked').value;
       // !VA Initialize uSels
 
-      // !VA Branch: implementAppobj08 (062020)
-      // !VA Getting the selected TD option from Appobj should be an external function, since this logic is repeated in batchAppobjToDOM and possibly elsewhere.
-      // !VA Loop through the Appobj rdoCcpTd properties and get the selected radio button
+      // !VA Getting the selected TD option from Appobj should be an external function, since this logic is repeated in batchAppobjToDOM and possibly elsewhere. No, because 1) batchAppobjToDOM is in appController and would require crossing modules and 2) batchAppobjToDOM returns the ccpUserInput property name corresponding to the selected Td option, not the td option itself.
+      // !VA Branch: implementCcpInput02 (062420)
+      // !VA What we really need here is a function that returns what we need from uSels so we can get rid of getUserSelections and call buildOutputNodeList straight from the event handler.
       function getSelectedTdOptionFromAppobj() {
-        for (const [key, value] of Object.entries(Appobj)) {
-          if (key.substring( 0, 8) === 'rdoCcpTd') {
+        let arr, selectedTdOption;
+        // !VA arr is array of Appobj keys
+        arr = Object.keys(Appobj);
+        // !VA If the first 8 characters of the Appobj property name is rdoCcpTd, then loop through the property names and find the one whose value is true. That is the selected tdoptions radio button, so return it.
+        for (let i = 0; i < arr.length; i++) {
+          // !VA TODO: Make this an arrow function with find, like below
+          // var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
+          if (arr[i].substring( 0, 8) === 'rdoCcpTd') {
             // !VA If the Appobj key string === true, then that is the selected radio button
-            if (Appobj[key] === true ) {
-              // !VA Now get the value of the radio input DOM element which is the same as the string after the last hyphen in the id, i.e. the string after char 12
-              console.log('HERE');
-              console.log(ccpUserInput[key].slice( 12 ));
-              return ccpUserInput[key].slice( 12 );
-            }
+            if ( Appobj[arr[i]] === true) { selectedTdOption = arr[i]; }
           }
         }
+        return selectedTdOption;
       }
-
       selectedTdOption =  getSelectedTdOptionFromAppobj();
 
       // !VA Branch: implementAppobj08 (062020)
@@ -1343,9 +1359,6 @@ var Witty = (function () {
         hasWrapper: getCheckboxState('spnCcpTableIncludeWrapperCheckmrk'),
         selectedTdOption: selectedTdOption
       };
-      console.log('uSels.hasAnchor is: ' + uSels.hasAnchor);
-      console.log('uSels.hasWrapper is: ' + uSels.hasWrapper);
-      console.log('uSels.selectedTdOption is: ' + uSels.selectedTdOption);
       if (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)) { 
         uSels.buttonClicked = 'imgbut';
         // !VA Override the selectedTdOption value for the IMG button - the IMG button will ALWAYS output img/anchor tags to the clipboard no matter which tdoptions radio button is selected.
@@ -1355,6 +1368,10 @@ var Witty = (function () {
       } else {
         uSels.buttonClicked = 'tablebut';
       }
+
+      console.log('getUserSelections uSels: ');
+      console.dir(uSels);
+
       buildOutputNodeList( id, uSels );
     }
 
@@ -1722,11 +1739,11 @@ var Witty = (function () {
     function makeTdNode( id, uSels, Attributes ) {
       console.log('makeTdNode running');
       // !VA Variables for error handling - need to include this in the return value so the Clipboard object can differentiate between alert and success messages. 
-      console.log('id is: ' + id);
-      console.log('uSels: ');
-      console.dir(uSels);
-      console.log('Attributes: ');
-      console.dir(Attributes);
+      // console.log('id is: ' + id);
+      // console.log('uSels: ');
+      // console.dir(uSels);
+      // console.log('Attributes: ');
+      // console.dir(Attributes);
       let isErr;
       // !VA NOTE: No trapped errors here yet that would pass a code, but that will probably come.
       // let errCode;
@@ -1886,6 +1903,8 @@ var Witty = (function () {
     // !VA UIController private
     function getImgSwapBlock( id, indentLevel, Attributes ) {
       let Appobj, linebreak;
+      // !VA Branch: implementCcpInput02 (062420)
+      // !VA We don't need the entire Appobj here. What we should do is call rest parameters on what we need and then destructure the return array into separate variables. But for now, this is good enough.
       Appobj = appController.getAppobj();
       linebreak = '\n';
       let mobileFilename, mobileSwapStr;
@@ -2069,22 +2088,25 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       let Attributes = [];
       // !VA Branch: implementAppobj08 (062020)
       Attributes = getAttributes();
-      let Appobj = {};
-      Appobj = appController.getAppobj();
-
+      // !VA Branch: implementCcpInput02 (062420)
+      // !VA Call getAppobj with rest parameters and destructure the return array into separate variables.
+      // !VA props is the array of rest parameters returned from getAppobj
+      let props;
+      props = appController.getAppobj('imgW', 'imgH', 'sPhonesW', 'sPhonesH', 'lPhonesW', 'lPhonesH');
+      const { imgW, imgH, sPhonesW, sPhonesH, lPhonesW, lPhonesH } = props;
       let clipboardStr;
       // !VA TODO: isErr is passed to Clipboard object to indicate whether to flash the success message or an alert message
       // let isErr;
       // isErr = false;
       switch(true) {
       case (id.includes('img-dsktp')):
-        clipboardStr = `img.${Attributes.imgClass.str} { width: ${Appobj.imgW}px !important; height: ${Appobj.imgH}px !important; }`;
+        clipboardStr = `img.${Attributes.imgClass.str} { width: ${imgW}px !important; height: ${imgH}px !important; }`;
         break;
       case (id.includes('img-smphn')):
-        clipboardStr = `img.${Attributes.imgClass.str} { width: ${Appobj.sPhonesW}px !important; height: ${Appobj.sPhonesH}px !important; }`;
+        clipboardStr = `img.${Attributes.imgClass.str} { width: ${sPhonesW}px !important; height: ${sPhonesH}px !important; }`;
         break;
       case (id.includes('img-lgphn')):
-        clipboardStr = `img.${Attributes.imgClass.str} { width: ${Appobj.lPhonesW}px !important; height: ${Appobj.lPhonesH}px !important; }`;
+        clipboardStr = `img.${Attributes.imgClass.str} { width: ${lPhonesW}px !important; height: ${lPhonesH}px !important; }`;
         break;
       case (id.includes('td-dsktp') || id.includes('td-smphn') || id.includes('td-lgphn')) :
         if ( Attributes.tdHeight.str) {
@@ -2097,10 +2119,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         clipboardStr = `table.${Attributes.tableClass.str} { width: ${Attributes.tableWidth.str}px !important; align: ${Attributes.tableAlign.str} !important; }`;
         break;
       case (id.includes('table-smphn')):
-        clipboardStr = `table.${Attributes.tableClass.str} { width: ${Appobj.sPhonesW}px !important; align: ${Attributes.tableAlign.str} !important; }`;
+        clipboardStr = `table.${Attributes.tableClass.str} { width: ${sPhonesW}px !important; align: ${Attributes.tableAlign.str} !important; }`;
         break;
       case (id.includes('table-lgphn')):
-        clipboardStr = `table.${Attributes.tableClass.str} { width: ${Appobj.lPhonesW}px !important; align: ${Attributes.tableAlign.str} !important; }`;
+        clipboardStr = `table.${Attributes.tableClass.str} { width: ${lPhonesW}px !important; align: ${Attributes.tableAlign.str} !important; }`;
         break;
       default:
         console.log('ERROR in makeCssRule: case not');
@@ -2121,8 +2143,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         console.log('isOver running');
       }
       widthval = heightval = '';
-      // !VA Get Appobj
-      Appobj = appController.getAppobj();
+      // !VA Call getAppobj with rest parameters and destructure the return array into separate variables.
+      // !VA props is the array of rest parameters returned from getAppobj
+      let props;
+      props = appController.getAppobj('imgW', 'imgH', 'sPhonesW', 'sPhonesH', 'lPhonesW', 'lPhonesH');
+      const { imgW, imgH, sPhonesW, sPhonesH, lPhonesW, lPhonesH } = props;
       // !VA Get the value to output to Clipboard based on whether shift or ctrl is pressed
       function getVal( widthval, heightval, modifierKey ) {
         let str1, str2, val;
@@ -2156,43 +2181,43 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Inspector Label clicked
       // !VA NOTE: This could probably be DRYified but would sacrifice readability - leave as is for now.
       case targetid === 'ins-display-size-label':
-        widthval = Appobj.imgW;
-        heightval = Appobj.imgH;
+        widthval = imgW;
+        heightval = imgH;
         clipboardStr = getVal( widthval, heightval, modifierKey);
         break;
       case targetid === 'ins-small-phones-label':
-        widthval = Appobj.sPhonesW;
-        heightval = Appobj.sPhonesH;
+        widthval = sPhonesW;
+        heightval = sPhonesH;
         clipboardStr = getVal( widthval, heightval, modifierKey);
         break;
       case targetid === 'ins-large-phones-label':
-        widthval = Appobj.lPhonesW;
-        heightval = Appobj.lPhonesH;
+        widthval = lPhonesW;
+        heightval = lPhonesH;
         clipboardStr = getVal( widthval, heightval, modifierKey);
         break;
       // !VA Inspector Value clicked
       case targetid === 'ins-display-size-width-value':
-        widthval = Appobj.imgW;
+        widthval = imgW;
         clipboardStr = getVal( widthval, heightval, modifierKey);
         break;
       case targetid === 'ins-display-size-height-value':
-        heightval = Appobj.imgH;
+        heightval = imgH;
         clipboardStr = getVal( widthval, heightval, modifierKey);
         break;
       case targetid === 'ins-small-phones-width-value':
-        widthval = Appobj.sPhonesW;
+        widthval = sPhonesW;
         clipboardStr = getVal( widthval, heightval, modifierKey);
         break;
       case targetid === 'ins-small-phones-height-value':
-        heightval = Appobj.sPhonesH;
+        heightval = sPhonesH;
         clipboardStr = getVal( widthval, heightval, modifierKey);
         break;
       case targetid === 'ins-large-phones-width-value':
-        widthval = Appobj.lPhonesW;
+        widthval = lPhonesW;
         clipboardStr = getVal( widthval, heightval, modifierKey);
         break;
       case targetid === 'ins-large-phones-height-value':
-        heightval = Appobj.lPhonesH;
+        heightval = lPhonesH;
         clipboardStr = getVal( widthval, heightval, modifierKey);
         break;
       default:
@@ -3274,17 +3299,34 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
       // !VA Branch: implementAppobj08 (062020)
-      // !VA This should be an external function, since this logic is repeated in getUserSelections and possibly elsewhere
-      for (const [key] of Object.entries(Appobj)) {
-        if (key.substring( 0, 8) === 'rdoCcpTd') {
+      // !VA This should be an external function, since this logic is repeated in getUserSelections and possibly elsewhere. And it should use Object.keys instead of Object.entries.
+      let arr, ccpUserInputKey;
+      // !VA arr is array of Appobj keys
+      arr = Object.keys(Appobj);
+      for (let i = 0; i < arr.length; i++) {
+        // !VA If the first 8 characters of the Appobj property name is rdoCcpTd, then loop through the property names and find the one whose value is true. That is the selected tdoptions radio button. Then loop though the ccpUserInput element alias list and get the element ID of the selected tdoptions radio button, and call handleTdOptions with that ID as parameter.
+        // !VA TODO: Make this an arrow function with find, like below
+        // var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
+        if (arr[i].substring( 0, 8) === 'rdoCcpTd') {
           // !VA If the Appobj key string === true, then that is the selected radio button
-          if (Appobj[key] === true ) {
-            // console.log('batchAppobjToDOM key is: ' + key);
-            // !VA Pass the element ID of the selected radio button determined above to handleTdOptions to show the appropriate TD options for the selected radio button.
-            handleTdOptions( ccpUserInput[key]);
+          if ( Appobj[arr[i]] === true) { 
+            handleTdOptions(ccpUserInput[arr[i]]); 
           }
         }
       }
+
+
+
+      // for (const [key] of Object.entries(Appobj)) {
+      //   if (key.substring( 0, 8) === 'rdoCcpTd') {
+      //     // !VA If the Appobj key string === true, then that is the selected radio button
+      //     if (Appobj[key] === true ) {
+      //       // console.log('batchAppobjToDOM key is: ' + key);
+      //       // !VA Pass the element ID of the selected radio button determined above to handleTdOptions to show the appropriate TD options for the selected radio button.
+      //       handleTdOptions( ccpUserInput[key]);
+      //     }
+      //   }
+      // }
 
       if (Appobj.rdoCcpImgFluid === true ) {
         handleImgType(ccpUserInput.rdoCcpImgFluid);
@@ -3911,23 +3953,54 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController public functions
     return {
 
-      // !VA 
-      getAppobj: function() {
-        return Appobj;
-      },
-
-      getAppobj2: function(arg) {
+      // !VA Access Appobj from outside appController. If identifier is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is a property identifier, i.e. an Appobj property name, return the corresponding property value. If it is neither of the above, erro
+      getAppobj2: function(...identifiers) {
+        console.log('getAppobj2 running');
         let retval;
-        
-        if (arg !== false) {
-          // !VA If arg is not false, process the input as an Appobj key
-          retval = arg;
-          retval = Appobj[arg];
-        } else if (arg === false) {
-          // Return the entire Appobj
+        if (typeof identifiers === 'undefined') {
+          console.log('UNDEFINED2');
           retval = Appobj;
         } else {
-          console.log('ERROR in getAppobj2 - unknown arg');
+          console.log('identifiers: ');
+          console.dir(identifiers);
+          // retarr = identifiers;
+
+          for (let i = 0; i < identifiers.length; i++) {
+            console.log('identifiers[i] is: ' +  identifiers[i]);
+            for (const [key, value] of Object.entries(Appobj)) {
+              if (key === identifiers[i]) {
+                retval = value;
+                console.log('retval is: ' + retval);
+              }
+            }
+          }
+
+
+
+        }
+        // return retval;
+      },
+
+
+
+      // !VA Access Appobj from outside appController. If identifier is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is a property identifier, i.e. an Appobj property name, return the corresponding property value. If it is neither of the above, erro
+      getAppobj: function(identifier) {
+        // console.log('getAppobj running');
+        // console.log('identifier is: ' + identifier);
+        let retval;
+        if (typeof identifier === 'undefined') {
+          // console.log('UNDEFINED');
+          retval = Appobj;
+        } else {
+          // console.log('identifier is: ' + identifier);
+          retval = identifier;
+          for (const [key, value] of Object.entries(Appobj)) {
+            if (key === identifier) {
+              // console.log('HIT');
+              retval = value;
+              // console.log('retval is: ' + retval);
+            }
+          }
         }
         return retval;
       },
