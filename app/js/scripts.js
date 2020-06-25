@@ -1297,7 +1297,6 @@ var Witty = (function () {
     // !VA CBController private
     // !VA Getting the selected TD option from Appobj should be an external function, since this logic is repeated in batchAppobjToDOM and possibly elsewhere. No, because 1) batchAppobjToDOM is in appController and would require crossing modules and 2) batchAppobjToDOM returns the ccpUserInput property name corresponding to the selected Td option, not the td option itself.
     // !VA Branch: implementCcpInput02 (062420)
-    // !VA What we really need here is a function that returns what we need so we can get rid of getUserSelections and call buildOutputNodeList straight from the event handler.
     // !VA Returns the selected TD option from Appobj as a element alias string, i.e. rdoCcpTdBasic. 
     function getSelectedTdOptionFromAppobj() {
       let arr, selectedTdOption;
@@ -1326,71 +1325,9 @@ var Witty = (function () {
       return bool;
     }
 
-
-    // !VA Get the user selections that define the clipboard output configuration- the clicked Options button, the Include anchor checkbox and the Include wrapper table checkbox. The nodeList used for the indents as well as the indent implementation will depend on these options -- only the basic TD radio button option generates a simple nodeList structure whose indents can be processed with a simple for loop. The other options generate nodeLists with text nodes and comments that require a custom indent scheme.
-    // !VA CBController private
-    function getUserSelections( id ) {
-      // !VA Initialize the clipboard-building process by getting those user selections in Appobj that determine the structure of the clipboard output. 
-
-      let Appobj = {};
-      // !VA Branch: implementCcpInput02 (062420)
-      // !VA Appobj isn't really needed here at all, is it?
-      // !VA Call getAppobj without an argument to get the entire Appobj object. B
-      // Appobj = appController.getAppobj();
-      // console.clear();
-      // console.log('getUserSelections Appobj: ');
-      // console.dir(Appobj);
-
-
-      // !VA Branch: implementAppobj08 (062020)
-      // !VA imgType is deprecated because that logic is now is integrated into Appobj.
-      // let imgType, selectedTdOption;
-      // let selectedTdOption;
-
-
-      // let uSels = {};
-      // !VA Branch: implementAppobj08 (062020)
-      // !VA The imgType logic is now integrated into Appobj, so this whole section is deprecated.
-      // !VA Get the selected imgType regardless of which button was clicked to trigger this function. 
-      // getRadioState(ccpUserInput.rdoCcpImgFixed) ? imgType = 'fixed' : imgType = 'fluid';
-      // !VA If imgType is fluid, set selectedTdOption to 'rdoCcpTdBasic', otherwise set the selectedTd option to whichever option is selected. This logic is actually reflected in getAttributes. 
-      // imgType === 'fluid' ? selectedTdOption = 'rdoCcpTdBasic' : selectedTdOption = document.querySelector('input[name="tdoptions"]:checked').value;
-      // !VA Initialize uSels
-
-      // !VA Branch: implementCcpInput03 (062520)
-      // !VA Moved getSelectedTdOptionFromAppobj to CBController private
-      // selectedTdOption =  getSelectedTdOptionFromAppobj();
-      // console.log('getUserSelections selectedTdOption is: ' + selectedTdOption);
-
-      // !VA Branch: implementAppobj08 (062020)
-      // !VA This might be better as an external function
-
-      
-      // uSels = {
-      //   buttonClicked: '',
-      //   hasAnchor: getCheckboxState('spnCcpImgIncludeAnchorCheckmrk'),
-      //   hasWrapper: getCheckboxState('spnCcpTableIncludeWrapperCheckmrk'),
-      //   selectedTdOption: selectedTdOption
-      // };
-      // if (id === btnCcpMakeClips.btnCcpMakeImgTag.slice(1)) { 
-      //   uSels.buttonClicked = 'btnCcpMakeImgTag';
-      //   // !VA Override the selectedTdOption value for the IMG button - the IMG button will ALWAYS output img/anchor tags to the clipboard no matter which tdoptions radio button is selected.
-      //   uSels.selectedTdOption = 'rdoCcpTdBasic';
-      // } else if (id === btnCcpMakeClips.btnCcpMakeTdTag.slice(1)) { 
-      //   uSels.buttonClicked = 'btnCcpMakeTdTag';
-      // } else {
-      //   uSels.buttonClicked = 'btnCcpMakeTableTag';
-      // }
-
-      // console.log('getUserSelections uSels: ');
-      // console.dir(uSels);
-
-      buildOutputNodeList( id );
-    }
-
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
     // !VA CBController private
-    function buildOutputNodeList( id, uSels ) {
+    function buildOutputNodeList( id ) {
       console.clear();
       console.log('buildOutputNodeList id is: ' + id);
       // !VA Branch: implementCcpInput03 (062520)
@@ -1473,8 +1410,6 @@ var Witty = (function () {
 
       // !VA These options include MS conditional code retrieved by getImgSwapBlock, getBgimageBlock, getVMLBlock which includes getIndent functions. First, run applyIndents on outputNL. applyIndents also inserts tokens at the position where the codeBlock is to be inserted. The parent nodelist is converted to a string, the code blocks are retrieved, indents are inserted, and finally the codeblocks are inserted into the string between the tags of the last node in the outputNL.outerHTML string. 
 
-      // !VA Branch: implementCcpInput03 (062520)
-      // !VA We already have the ID as parameter so we don't need this from getUserSelections
       } else if (selectedTdOption === 'rdoCcpTdImgswap' || selectedTdOption  === 'rdoCcpTdBgimage' || selectedTdOption === 'rdoCcpTdVmlbutton') {
         // !VA Start with the btnCcpMakeTdTag makeNode button because the img makeNode button isn't referenced in the imgswap option. The A/IMG tags are hard-coded into the MS Conditional code in getImgSwapBlock. Also, there's a switch to include/exclude the A/IMG node in makeTdNode.
         // !VA extractNodeIndex is the nl index position at which the nodes are extracted to build outputNL. It equals the nodeList length minus the indentLevel.
@@ -1486,13 +1421,11 @@ var Witty = (function () {
         // !VA If the makeTD button is clicked, then only the last node in nl is extracted and the MS conditional comments get one indent level
         // !VA NOTE: This code is repeated above in the if clause and again here in the else
 
-        // !VA Branch: implementCcpInput03 (062520)
-        // !VA We already have the ID as parameter so we don't need this from getUserSelections
         if ( '#' + id === btnCcpMakeClips.btnCcpMakeTdTag) {
           indentLevel = 1;
           extractNodeIndex = nl.length - indentLevel;
         } else {
-          if (uSels.hasWrapper) {
+          if (hasWrapper) {
             // !VA If the makeTable button is clicked and hasWrapper is checked, then all nl nodes are extracted and the MS conditional comments get 6 indents
             indentLevel = 6;
             extractNodeIndex = nl.length - indentLevel;
@@ -1511,8 +1444,6 @@ var Witty = (function () {
         outputNL = container.querySelectorAll('*');
         // !VA Apply the indents and insert the tokens marking the position for inserting the MS conditional code.
 
-        // !VA Branch: implementCcpInput03 (062520)
-        // !VA Get rid of uSels
         applyIndents(id, outputNL);
         // !VA Convert outputNL to a string (including tokens for inserting MS conditional code) for output to Clipboard object.
         clipboardStr = outputNL[0].outerHTML;
@@ -2283,20 +2214,17 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         } else {
           modifierKey = false;
         }
-        // !VA IMPORTANT: Is this still necessary? Attributes don't appear to be passed anywhere here, and the Attributes are called after getUserSelections in the switch statement below. I think this might be deprecated.
+        // !VA IMPORTANT: Is this still necessary? Attributes don't appear to be passed anywhere here, I think this might be deprecated.
         // !VA If the CCP image fluid/fixed radio button is clicked, then 
         if (targetid.includes('fixed') || targetid.includes('fluid')) {
           getAttributes();
         }
-        // !VA Determine which element is clicked -- imgType (fluid or fixed), makeTag button, makeCSSRule button or Inspector element and run getUserSelections, makeCSSRule or handleInspectorClicks respectively. If an imgType button is clicked, we need to rebuild the nodeList because changing to fluid from fixed might result in a change to the tdoptions, plus we  need to rebuilt the Attributes object because the attributes have changed, which requires a CCP update. Changing the selected td option if fluid is selected also has to be done in getUserSelections, because the fluid option will only work with tdbasic,  so let's call getUserSelections for 'tag', 'fluid' and 'fixed'.
-        // !VA Branch: implementAppobj08 (062020)
-        // !VA Reevaluating...
-
+        // !VA Run the Clipboard building routine based on the click target. 
+        // !VA Branch: implementCcpInput03 (062520)
+        // !VA The fluid/fixed condition is probably deprecated but needs to be tested in the next branch
         switch(true) {
-          
-
         case targetid.includes('tag') || targetid.includes('fluid') || targetid.includes('fixed') :
-          buildOutputNodeList(targetid);
+          buildOutputNodeList (targetid);
           break;
         case targetid.includes('css') :
           makeCssRule(targetid);
@@ -3319,7 +3247,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     function batchAppobjToDOM() {
       // console.log(Appobj);
       // !VA Flag is set based on Include wrapper checkbox status below.
-      let flag;
+      let flag, arr;
       // !VA Set the checkmarks as per the current Appobj properties 
       if (Appobj.spnCcpTableIncludeWrapperCheckmrk === 'on') {
         flag === true;
@@ -3331,9 +3259,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Loop through all Appobj entries whose first 8 chars is rdoCcpTd, i.e. all the tdOption radio buttons, and get the selected radio button. Then pass the ID of that button to handleTdOptions to show the appropriate Td options for the selected radio button.
 
 
-      // !VA Branch: implementAppobj08 (062020)
-      // !VA This should be an external function, since this logic is repeated in getUserSelections and possibly elsewhere. And it should use Object.keys instead of Object.entries.
-      let arr, ccpUserInputKey;
+      // !VA Determine which TD options radio is selected in Appobj and pass that element alias to handleTdOptions
       // !VA arr is array of Appobj keys
       arr = Object.keys(Appobj);
       for (let i = 0; i < arr.length; i++) {
@@ -3347,20 +3273,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           }
         }
       }
-
-
-
-      // for (const [key] of Object.entries(Appobj)) {
-      //   if (key.substring( 0, 8) === 'rdoCcpTd') {
-      //     // !VA If the Appobj key string === true, then that is the selected radio button
-      //     if (Appobj[key] === true ) {
-      //       // console.log('batchAppobjToDOM key is: ' + key);
-      //       // !VA Pass the element ID of the selected radio button determined above to handleTdOptions to show the appropriate TD options for the selected radio button.
-      //       handleTdOptions( ccpUserInput[key]);
-      //     }
-      //   }
-      // }
-
+      // !VA Query Appobj to determine which imgType option if the fluid option is selected, and run the handler for it. If fixed is selected then no handler is run because that's the default behavior 
       if (Appobj.rdoCcpImgFluid === true ) {
         handleImgType(ccpUserInput.rdoCcpImgFluid);
       } 
@@ -3398,8 +3311,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         ['iptCcpTableWrapperWidth', Appobj.iptCcpTableWrapperWidth ], 
         ['iptCcpTdBgColor', Appobj.iptCcpTdBgColor ] );
 
-      // !VA Deprecated...
-      // UIController.handleCcpActions(Appobj, false, ['iptCcpImgClass', 'setvalue'], ['iptCcpTableClass', 'setvalue'],  ['iptCcpTableWrapperClass', 'setvalue'], ['iptCcpTdWidth', 'setvalue'], ['iptCcpTdHeight', 'setvalue'], ['iptCcpTableWidth', 'setvalue'], ['iptCcpTableWrapperWidth', 'setvalue'],  ['iptCcpTdBgColor', 'setvalue'] );
       // !VA Loop through the ccpUserInput elements and undisplay/un-disable them
       for (let i = 0; i < aliasArray.length; i++) {
         // !VA For ONLY the TD OPTIONS input and select dropdown elements, remove the active class of the parent element to undisplay them.
@@ -3502,9 +3413,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           [ 'iptCcpTableWrapperWidth', Appobj.iptCcpTableWrapperWidth ], 
           [ 'selCcpTableWrapperAlign', Appobj.selCcpTableWrapperAlign] );
 
-        // !VA Deprecated...
-        // UIController.handleCcpActions(Appobj, true,  [ 'iptCcpImgClass', 'setvalue'], [ 'iptCcpTableClass', 'setvalue'], [ 'iptCcpTableWidth', 'setvalue'], [ 'selCcpTableAlign', 'setvalue'], [ 'iptCcpTableWrapperClass', 'setvalue'], [ 'iptCcpTableWrapperWidth', 'setvalue'], [ 'selCcpTableWrapperAlign', 'setvalue'] );
-
         // !VA Disable the appropriate presets
         // !VA NOTE: These options can be merged with the above function call
         UIController.handleCcpActions( true,  
@@ -3559,10 +3467,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           [ 'iptCcpTdBorderColor', Appobj.iptCcpTdBorderColor ], 
           ['iptCcpTdBorderRadius', Appobj.iptCcpTdBorderRadius ], 
           [ 'iptCcpTdFontColor', Appobj.iptCcpTdFontColor ]);
-
-        // !VA Deprecated...
-        // !VA NOTE: These options can be merged with the above function call
-        // UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdClass', 'setvalue'], [ 'iptCcpTdHeight', 'setvalue'], [ 'iptCcpTdWidth', 'setvalue'], [ 'iptCcpTdBgColor', 'setvalue'], [ 'iptCcpTdFontColor', 'setvalue'], [ 'iptCcpTdBorderColor', 'setvalue'], ['iptCcpTdBorderRadius', 'setvalue'], [ 'iptCcpTdFontColor', 'setvalue']) ;
 
         UIController.handleCcpActions( true,  
           [ 'iptCcpTdClass', 'setactiveparent'], 
