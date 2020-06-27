@@ -739,6 +739,10 @@ var Witty = (function () {
           // !VA Now initialize Appobj with the CCP element values. This includes ALL CCP elements, including those that are displayed/undisplayed depending on which TDOption or imgType radio is selected. 
           // !VA Don't forget to use bracket notation to add properties to an object: https://stackoverflow.com/questions/1184123/is-it-possible-to-add-dynamically-named-properties-to-javascript-object
           // !VA  for loop: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
+
+
+          console.log('populateCcpProperties Appobj  is: ');
+          console.log(Appobj );
           let checkboxId;
           // !VA TODO:  Created an styCcpTableWrapperStyle property with the value ''. This is a placeholder for the max-width style property which is only used in handleImgType if the image type is fluid. There is no correspondent for this in the CCP DOM - need to determine if this extra Appobj property is necessary.
           Appobj.styCcpTableWrapperStyle = '';
@@ -746,6 +750,11 @@ var Witty = (function () {
           // !VA For instance, if the ccpUserInput value starts with '#ipt', create an Appobject property whose key is 'iptCCP...' and assign it the value of the CCP element with the corresponding ccpUserInput alias.
           for (const [key, value] of Object.entries(ccpUserInput)) {
             if (value.substring( 0, 4) === '#ipt' || value.substring( 0, 4) === '#sel' ) {
+              if (key === 'iptCcpImgClass') {
+
+                console.log('populateAppobj key is: ' + key);
+                console.log('populateAppobj value is: ' + value);
+              }
               Appobj[key] = document.querySelector(value).value;
             }
             if (value.substring( 0, 4) === '#rdo' ) {
@@ -2735,21 +2744,52 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       this.select();
     }
 
+    // !VA appController private function
+    function handleCcpInput(prop, value) {
+      console.log('handleCcpInput');
+      console.log('prop is: ' + prop);
+      console.log('value is: ' + value);
+      let arr = [];
+      arr[0] = prop;
+      arr[1] = value;
+      Appobj[prop] = value;
+      UIController.writeAppobjToDOM( arr );
+      console.log('handleCcpInput Appobj: ');
+      console.dir(Appobj);
+      
+    }
+
     // !VA TODO: Why is the argument unused, why are there unused elements and what is actually happening here?
     // !VA appController private
     // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appobj property. Takes no argument because we're using this instead of the event.
     function handleBlur() {
       // !VA Handle blur
+      console.clear();
+      console.log('handleBlur running');
       let prop;
       // !VA Get the Appobj property name that corresponds to the ID of the event target
       prop = elementIdToAppobjProp(this.id);
+      console.log('prop is: ' + prop);
+      // !VA Branch: implementCcpInput05 (062720)
+      if (prop.substr( 3, 3 ) === 'Ccp') { 
+        console.log('HIT');
+        handleCcpInput( prop, this.value);
+      }
+
+
+
+
       // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appobj property.
+
       // !VA NOTE: This can probably replace the blur statements in handleKeydown
       if (prop === 'imgW' || prop === 'imgH') {
         this.value = '';
       } else {
         this.value = Appobj[prop];
       }
+
+
+
     }
 
     // !VA Branch: implementAppobj05 (061320)
@@ -3258,6 +3298,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Show the Include wrapper options if the Include wrapper checkbox is checked.
       showIncludeWrapperOptions(flag);
       // !VA Loop through all Appobj entries whose first 8 chars is rdoCcpTd, i.e. all the tdOption radio buttons, and get the selected radio button. Then pass the ID of that button to handleTdOptions to show the appropriate Td options for the selected radio button.
+
+
+      // !VA Branch: implementCcpInput05 (062720)
+      // !VA This is where we need to write the rest of the Appobj properties to the DOM...
 
 
       // !VA Determine which TD options radio is selected in Appobj and pass that element alias to handleTdOptions
@@ -3990,10 +4034,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         let ccpState;
         // !VA Get the current open/closed state of the CCP
         ccpState = UIController.toggleCcp(true);
+        console.log('ccpState is: ' + ccpState);
         if (ccpState) {
           UIController.populateAppobj(Appobj, 'ccp');
           // !VA Do logic for opening the CCP with the current state of the selected options reflected. batchAppobjToDOM is in appController private.
+        } else if (!ccpState) {
           batchAppobjToDOM();
+        } else {
+          console.log('ERROR in initCCP - unknown ccpState');
         }
       },
 
