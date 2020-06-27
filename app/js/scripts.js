@@ -510,7 +510,7 @@ var Witty = (function () {
 
       // !VA UIController public
       initUI: function(initMode) {
-        let fileName;
+
         const delayInMilliseconds = 10;
         // !VA Here we initialze DEV mode, i.e. reading a hardcoded image from the HTML file instead of loading one manually in production mode
         if (initMode === 'devmode') {
@@ -524,13 +524,9 @@ var Witty = (function () {
             var fname = document.querySelector(dynamicRegions.curImg).src;
             fname = fname.split('/');
             fname = fname[fname.length - 1];
-            // !VA Call Appobj and add filename to it here for dev mode
-            fileName = appController.getAppobj('fileName');
-            // !VA Write fname both to the DOM here and to Appobj. 
-            // !VA TODO
-            // !VA Need a function that writes a specific Appobj property to Appobj - not sure getAppobj is the DRYest option for this.
-            document.querySelector(inspectorElements.insFilename).textContent = fileName = fname;
-
+            // !VA For devmode, we need to write fname to the DOM now and then add it to Appobj at the top of writeInspectors. 
+            document.querySelector(inspectorElements.insFilename).textContent = fname;
+            console.log('fname is: ' + fname);
             // !VA Initialze calcViewerSize to size the image to the app container areas
             // !VA Branch: implementCcpInput01 (062120)
             // !VA The true flag indicates that this is an image initialization action, not a user-initiated Toolbar input
@@ -806,6 +802,10 @@ var Witty = (function () {
       writeInspectors: function(Appobj) {
         // !VA Hide  the default 'No Image' value displayed when the app is opened with no image and display the Inspector values for the current image, show the Clipboard button and call evalInspectorAlerts to determine which Inspector labels should get dimension alerts (red font applied). 
 
+        // !VA IMPORTANT - this is a devmode hack. The fileName has already been written to inspectorElements.insFilename in initUI devmode. So now we have to write it to Appobj, otherwise it will be undefined it gets written to the innerHTML below. This should probably be dependent on whether we're in devmode or not, but this works in any case and can be deleted for production. 
+        Appobj.fileName = document.querySelector(inspectorElements.insFilename).textContent;
+
+
         // !VA Hide the dropArea
         // !VA TODO: Make function
         document.querySelector(staticRegions.dropArea).style.display = 'none';
@@ -907,6 +907,8 @@ var Witty = (function () {
           // !VA Locally, we need a variable for the imgType, so create one.
           imgType = str;
           retObj = returnObject(ccpElementId, str);
+          console.log('imgType retObj: ');
+          console.dir(retObj);
           return retObj;
         })(),
         imgClass: (function() {
@@ -1328,7 +1330,6 @@ var Witty = (function () {
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
     // !VA CBController private
     function buildOutputNodeList( id ) {
-      console.clear();
       console.log('buildOutputNodeList id is: ' + id);
       // !VA Branch: implementCcpInput03 (062520)
       let selectedTdOption, hasAnchor, hasWrapper, Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
@@ -2056,7 +2057,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Call getAppobj with rest parameters and destructure the return array into separate variables.
       // !VA props is the array of rest parameters returned from getAppobj
       let props;
-      props = appController.getAppobj('imgW', 'imgH', 'sPhonesW', 'sPhonesH', 'lPhonesW', 'lPhonesH');
+      props = appController.getAppobj2('imgW', 'imgH', 'sPhonesW', 'sPhonesH', 'lPhonesW', 'lPhonesH');
       const { imgW, imgH, sPhonesW, sPhonesH, lPhonesW, lPhonesH } = props;
       let clipboardStr;
       // !VA TODO: isErr is passed to Clipboard object to indicate whether to flash the success message or an alert message
@@ -2110,7 +2111,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Call getAppobj with rest parameters and destructure the return array into separate variables.
       // !VA props is the array of rest parameters returned from getAppobj
       let props;
-      props = appController.getAppobj('imgW', 'imgH', 'sPhonesW', 'sPhonesH', 'lPhonesW', 'lPhonesH');
+      props = appController.getAppobj2('imgW', 'imgH', 'sPhonesW', 'sPhonesH', 'lPhonesW', 'lPhonesH');
       const { imgW, imgH, sPhonesW, sPhonesH, lPhonesW, lPhonesH } = props;
       // !VA Get the value to output to Clipboard based on whether shift or ctrl is pressed
       function getVal( widthval, heightval, modifierKey ) {
@@ -3341,6 +3342,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     function handleTdOptions(id) {
       // console.log('handleTdOptions running');
       // console.log('id is: ' + id);
+
+
       // !VA Loop through all Appobj entries whose first 8 chars is rdoCcpTd, i.e. all the tdOption entries and select the option identified in the id argument. NOTE: This could be separated out into a new function.
       // !VA NOTE: Value isn't accessed, but when I tried to just use Object.keys, something broke. Fix it, no for loop necessary with Object.keys.
       for (const [key, value] of Object.entries(Appobj)) {
@@ -3349,7 +3352,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           if (ccpUserInput[key] === id) {
             Appobj[key] = true;
             UIController.handleCcpActions( true, [ key, 'selectradio' ]);
-            // console.log('HIT: ' + key);
           } else {
             Appobj[key] = false;
           }
@@ -3360,7 +3362,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
       // !VA Handle the option states for the respective radio button.
-      console.log('handleTdOptions id is: ' + id);
       switch(true) {
       case id === (ccpUserInput.rdoCcpTdBasic) || id === (ccpUserInput.rdoCcpTdExcludeimg):
         // !VA Handle the td options for the 'rdoCcpTdBasic' and 'rdoCcpTdExcludeimg' options: class, height, width, bgcolor, align, valign
@@ -3631,7 +3632,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         [ 'iptCcpTableWrapperBgColor', 'setactiveparent' ]);
 
     }
-    
+
     // !VA appController private 
     // !VA Toggles a mock checkbox. This is only for toggling triggered by an event handler. Switching the checkboxes on and off programatically can be done by calling handleCcpActions.
     function toggleCheckbox(evt) {
@@ -3888,13 +3889,34 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
 
+
     // !VA appController public functions
     return {
 
-      // !VA Access Appobj from outside appController. If identifier is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is a property identifier, i.e. an Appobj property name, return the corresponding property value. If it is neither of the above, erro
+      // !VA Access Appobj from outside appController. If identifier is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is a property identifier, i.e. an Appobj property name, return the corresponding property value. 
+      // !VA Branch: implementCcpInput04 (062520)
+      // !VA getAppobj won't work here. The call comes before Appobj is populated. See https://stackoverflow.com/questions/62585279/javascript-object-both-has-properties-and-is-empty - which cost me about a day.
       getAppobj2: function(...identifiers) {
         console.log('getAppobj2 running');
-        let retval;
+        let retval, arr;
+        // debugger;
+        Appobj = UIController.populateAppobj(Appobj, 'all');
+
+        // for (const property in Appobj) {
+        //   console.log(`for/in ${property}: ${Appobj[property]}`);
+        // }
+
+
+
+        // console.log('getAppobj2 Appobj is: ');
+        // console.dir(Appobj);
+        // if (Object.keys(Appobj).length == 0) { 
+        //   console.log('getAppobj2 NO LENGTH');
+        // } else {
+        //   console.log('getAppobj2 HAS LENGTH');
+        // }
+
+
         if (typeof identifiers === 'undefined') {
           console.log('UNDEFINED2');
           retval = Appobj;
@@ -3903,28 +3925,46 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           console.dir(identifiers);
           // retarr = identifiers;
 
-          for (let i = 0; i < identifiers.length; i++) {
-            console.log('identifiers[i] is: ' +  identifiers[i]);
-            for (const [key, value] of Object.entries(Appobj)) {
-              if (key === identifiers[i]) {
-                retval = value;
-                console.log('retval is: ' + retval);
-              }
+          arr = Object.keys(Appobj);
+          for (let i = 0; i < arr.length; i++) {
+            // !VA If the first 8 characters of the Appobj property name is rdoCcpTd, then loop through the property names and find the one whose value is true. That is the selected tdoptions radio button. Then loop though the ccpUserInput element alias list and get the element ID of the selected tdoptions radio button, and call handleTdOptions with that ID as parameter.
+            // !VA TODO: Make this an arrow function with find, like below
+            // var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
+            if (key === identifiers[i]) {
+              console.log('HIT');
+              retval = value;
+              // console.log('retval is: ' + retval);
             }
           }
 
 
-
+          for (let i = 0; i < identifiers.length; i++) {
+            console.log('identifiers[i] is: ' +  identifiers[i]);
+            for (const [key, value] of Object.entries(Appobj)) {
+              if (key === identifiers[i]) {
+                console.log('HIT');
+                retval = value;
+                // console.log('retval is: ' + retval);
+              }
+            }
+          }
         }
-        // return retval;
+        console.log('retval is: ' + retval );
+
+        return retval;
       },
 
 
 
       // !VA Access Appobj from outside appController. If identifier is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is a property identifier, i.e. an Appobj property name, return the corresponding property value. If it is neither of the above, erro
       getAppobj: function(identifier) {
-        // console.log('getAppobj running');
-        // console.log('identifier is: ' + identifier);
+
+
+
+        console.log('getAppobj running');
+        console.log('identifier is: ' + identifier);
+        console.log('getAppobj Appobj: ');
+        console.dir(Appobj);
         let retval;
         if (typeof identifier === 'undefined') {
           // console.log('UNDEFINED');
@@ -3933,10 +3973,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           // console.log('identifier is: ' + identifier);
           retval = identifier;
           for (const [key, value] of Object.entries(Appobj)) {
+            console.log('key is: ' + key);
             if (key === identifier) {
-              // console.log('HIT');
+              console.log('HIT');
               retval = value;
-              // console.log('retval is: ' + retval);
+              console.log('retval is: ' + retval);
             }
           }
         }
