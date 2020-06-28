@@ -647,9 +647,9 @@ var Witty = (function () {
       // !VA This function writes individual values directly to the DOM. Called by resizeContainers to set dynamicRegions DOM values on initialization and toolbar input. Called by resetTdOptions, handleTdOptions, handleImgType to set CCP DOM element values. args is a rest parameter list of key/value arrays, whereby the key is the alias of the element to write to and value value to write. 
       // !VA TODO: Find a more descriptive name for this.
       writeAppobjToDOM: function (...args) {
-        // console.log('writeAppobjToDOM running');
-        // console.log('args is: ');
-        // console.log(args); 
+        console.log('writeAppobjToDOM running');
+        console.log('args is: ');
+        console.log(args); 
         // !VA Loop throught the list of args, determine what type of element it is from the three-character element prefix and perform the appropriate action.    
         for (let i = 0; i < args.length; i++) {
           if (args[i][0].substring( 0 , 3) === 'ipt') {
@@ -665,6 +665,7 @@ var Witty = (function () {
             console.log('ERROR in writeAppobjToDOM - span mock checkbox not handled');
           }
         }
+        // debugger;
       },
 
       // !VA UIController public
@@ -755,6 +756,7 @@ var Witty = (function () {
                 console.log('populateAppobj key is: ' + key);
                 console.log('populateAppobj value is: ' + value);
               }
+              console.log('Appobj[key] is: ' + Appobj[key]);
               Appobj[key] = document.querySelector(value).value;
             }
             if (value.substring( 0, 4) === '#rdo' ) {
@@ -3286,9 +3288,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA TODO: Needs to be commented
     // !VA Reads Appobj every time the CCP is opened and writes CCP options to the CCP DOM based on Appobj presets: 1) If the Include wrapper checkbox is checked/unchecked, runs showIncludeWrapperOptions to display/undisplay the Include wrapper-dependent options. 2) Determines which rdoCcpTd option is selected and runs handleTdOptions with the selected ID. 3) Determines the fluid/fixed option and runs handleImgType with the selected option.  
     function batchAppobjToDOM() {
+      console.log('batchAppobjToDOM running');
       // console.log(Appobj);
+
       // !VA Flag is set based on Include wrapper checkbox status below.
       let flag, arr;
+      // !VA keyval is the Appobj key/value pair that is passed to writeAppobjToDOM to update the CCP DOM
+      let keyval = [];
       // !VA Set the checkmarks as per the current Appobj properties 
       if (Appobj.spnCcpTableIncludeWrapperCheckmrk === 'on') {
         flag === true;
@@ -3311,6 +3317,17 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA If the first 8 characters of the Appobj property name is rdoCcpTd, then loop through the property names and find the one whose value is true. That is the selected tdoptions radio button. Then loop though the ccpUserInput element alias list and get the element ID of the selected tdoptions radio button, and call handleTdOptions with that ID as parameter.
         // !VA TODO: Make this an arrow function with find, like below
         // var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
+
+        if (arr[i].substring( 0, 6) === 'iptCcp' || (arr[i].substring( 0, 6) === 'selCcp')) {
+          // console.log('arr[i] is: ' + arr[i]);
+          // console.log('Appobj[arr[i]] is: ' + Appobj[arr[i]]);
+          keyval = [ arr[i], Appobj[arr[i]] ];
+          UIController.writeAppobjToDOM( keyval );
+          // console.log('document.querySelector(ccpUserInput[arr[i]]).value is: ' + document.querySelector(ccpUserInput[arr[i]].value));
+
+        }
+
+
         if (arr[i].substring( 0, 8) === 'rdoCcpTd') {
           // !VA If the Appobj key string === true, then that is the selected radio button
           if ( Appobj[arr[i]] === true) { 
@@ -3325,6 +3342,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // else if (Appobj.rdoCcpImgFluid === true ) {
       //   handleImgType(ccpUserInput.rdoCcpImgFluid);
       // }
+
+      console.log('batchAppobjToDOM Appobj is: ');
+      console.log(Appobj);
+
     }
 
     // !VA appController private 
@@ -3338,6 +3359,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // console.log('aliasArray is: ');
       // console.log(aliasArray);
       // !VA Reset values to defaults
+
+      // !VA Branch: implementCcpInput05 (062720)
+      // !VA Why are we resetting values here? This is a huge problem because once they are reset, they are lost every timne you close the CCP. This is called from batchAppobjToDOM, which is run whenever the CCP is closed.
+
       Appobj.iptCcpImgClass = Appobj.iptCcpTdClass = Appobj.iptCcpTdHeight = Appobj.iptCcpTdWidth = Appobj.iptCcpTableClass = Appobj.iptCcpTdBgColor = '';
       Appobj.iptCcpTableWidth = Appobj.imgW;
       Appobj.iptCcpTableWrapperWidth = Appobj.viewerW;
@@ -3346,6 +3371,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA Branch: implementAppobj07 (061920)
       // !VA changing setvalue from handleCcpActions to writeAppobjToDOM
+      // !VA Branch: implementCcpInput05 (062720)
+      // !VA Why is this happening here? 
+
+      console.log('resetTdOptions Appobj is: ');
+      console.log(Appobj);
+      // debugger;
+
       UIController.writeAppobjToDOM( 
         [ 'iptCcpImgClass', Appobj.iptCcpImgClass ], 
         [ 'iptCcpTableClass', Appobj.iptCcpTableClass ],  
@@ -3943,7 +3975,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       getAppobj2: function(...identifiers) {
         console.log('getAppobj2 running');
         let retval, arr;
-        // debugger;
         Appobj = UIController.populateAppobj(Appobj, 'all');
 
         // for (const property in Appobj) {
