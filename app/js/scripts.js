@@ -2924,6 +2924,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Branch: implementCcpInput06 (062820)
     // !VA Handles the TAB and ENTER key. The ENTER key implements the change so the user can see the effects, and sets the cursor in the field so the user can change it if desired, and writes the change to Appobj. The TAB key just blurs the field.  I think this is just the right behavior for CCP too...stopping here.
     function handleKeydown(evt) {
+      console.clear();
+      console.log('handleKeydown evt.target.id is: ' + evt.target.id);
       try {
         // console.log('handleKeyDown try: ');
         var vals = [], msgElement, keydown;
@@ -2971,9 +2973,30 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA elementIdToAppobjProp gets the Appobj key that corresponds to a given element ID. We need the Appobj key to get the Appobj value to compare to the user-entered value in the respective Toolbar input field. 
         userInputObj.appObjProp = elementIdToAppobjProp(this.id);
 
+        // !VA Branch: implementCcpInput06 (062820)
+        // !VA The conditions below are awful. 
+        /* !VA  The TAB KEY
+          * if the value isn't Appobj, write the value to Appobj and blur.
+          * if the value is null, blur
+
+        
+        
+        */ 
+
+        if (isTab) {
+          console.log('Tab key pressed');
+        } else if (isEnter) {
+          console.log('Enter key pressed');
+        } else {
+          console.log('ERROR in handleKeydown - unknown keypress ');
+        }
+
+
+
 
 
         // !VA If Tab was pressed and this.value is either empty or equals the Appobj value, then there's been no change to the field, so let Tab just cycle through the fields as per its default.
+
         if ((isTab) && ((this.value === '' || this.value == Appobj[userInputObj.appObjProp]))) {
           // !VA Only if imgW or imgH, delete the existing value to display the placeholders. Otherwise, tab through and leave the existing value from Appobj
           if (userInputObj.prop === 'imgW' || userInputObj.prop === 'imgH') {
@@ -2992,9 +3015,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             // !VA We have to leave the bad value in the field so the user can correct it or press Esc to blur without change, otherwise it will conflict with the default tab order behavior.
             this.select();
           } else {
+
+
+
             // !VA Branch: implementCcpInput06 (062820)
             // !VA This clause only handles dynamicRegions - it calls writeToolbarInputToAppobj. We need a function that handles CCP input and calls...
-            console.log('Mark1');
+            console.log('handle CCP Input NOW');
+
+
 
             // !VA If the value was entered in the imgW or imgH field, show the value selected first so the user can view and change it before implementing. Only on Tab can the value be implemented and advance to the next field.
             if (userInputObj.prop === 'imgW' || userInputObj.prop === 'imgH') {
