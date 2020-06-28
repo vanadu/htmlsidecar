@@ -534,11 +534,13 @@ var Witty = (function () {
 
             // !VA Open the CCP by default in dev mode
             // !VA First, set it to the opposite of how you want to start it.
-            document.querySelector(staticRegions.ccpContainer).classList.remove('active');
+            // !VA Branch: implementCcpInput05 (062720)
+            document.querySelector(staticRegions.ccpContainer).classList.add('active');
             // !VA The return variable isn't used, but keeping it for reference
-            // var ccpState = UIController.toggleCcp();
-            UIController.toggleCcp();
-            appController.initCcp();
+            // var ccpState = UIController.toggleCcp();'
+            // !VA Branch: implementCcpInput05 (062720)
+            // UIController.toggleCcp();
+            // appController.initCcp();
             // !VA NOW: The toggle Ccp element functions are all in appController either I have to replicated them here or find another solution or live with the fact that they don't initialize. Or run initUI from here...
 
           }, delayInMilliseconds);
@@ -572,11 +574,11 @@ var Witty = (function () {
         document.querySelector(staticRegions.tbrContainer).style.display = 'none';
         document.querySelector(inspectorElements.btnToggleCcp).style.display = 'none';
 
-        // !VA Set this to the opposite of what you want
-        document.querySelector(staticRegions.ccpContainer).classList.add('active');
+
         // !VA Inspector initialization comes now from the HTML file. The default 'No Image' is display: inline in CSS. When an image is loaded, inspectors are populated with values in UIController.writeInspectors.
+        // !VA Branch: implementCcpInput05 (062720)
         // !VA INitialize the CCP
-        appController.initCcp();
+        // appController.initCcp();
       },
 
 
@@ -4183,15 +4185,22 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           document.querySelector('.content-section').style.display = 'none';
         } 
 
-        // !VA Hide the CCP
-        // !VA TODO: Make function
-        document.querySelector(staticRegions.ccpContainer).classList.remove('active');
+        // !VA Branch: implementCcpInput05 (062720)
+        // !VA initialize/populate the CCP
+        UIController.populateAppobj(Appobj, 'ccp');
+        // !VA Initialize the 'basic' tdoption
+        handleTdOptions(ccpUserInput.rdoCcpTdBasic); 
+
         setupEventListeners();
         
         // !VA  Test if there is currently #cur-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
         document.querySelector(dynamicRegions.curImg) ? initMode = 'devmode' : initMode = 'prod';
         // !VA Initialize the UI
         UICtrl.initUI(initMode);
+
+        console.log('init Appobj is: ');
+        console.log(Appobj);
+
       }
     };
 
