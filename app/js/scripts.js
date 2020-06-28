@@ -9,7 +9,8 @@
 
 DONE: Inspector values need to be rounded to two digits -- they show the entire floating point value and overflow the container.
 
-TODO: Add options to anchor tag: color, target="_blank"
+
+DONE: Add options to anchor tag: color, target="_blank" -
 TODO: Change checkbox name from Wrap img... to Include anchor
 TODO: BUG! Load 625X525 with viewerW set to 600 - loads without resizing to container size
 TODO: Change the default parent class on 
@@ -1185,8 +1186,10 @@ var Witty = (function () {
     }
 
     // !VA CBController private
+    // !VA Branch: implementCcpInput05 (062720)
+    // !VA Called multiple times from getAttributes
     function ccpGetAttValue(att, value) {
-
+      console.log('ccpGetAttValue running');
       // !VA Branch: implementCcpInput02 (062420)
 
       // !VA Gets the insFilename from Appobj in case the user leaves 'path' empty
@@ -1194,8 +1197,10 @@ var Witty = (function () {
       // !VA Branch: implementCcpInput02 (062420)
 
       let fileName;
+      // !VA Branch: implementCcpInput05 (062720)
+      // !VA Not sure this call to Appobj is necessary
       fileName = appController.getAppobj('fileName');
-      fileName = appController.getAppobj2('fileName');
+      // fileName = appController.getAppobj2('fileName');
 
       var str;
       // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
@@ -1276,6 +1281,9 @@ var Witty = (function () {
     function ccpIfNoUserInput(att, value) {
       // !VA We need get the insFilename from Appobj in case the user leaves 'path' empty
       let fileName;
+      // !VA Branch: implementCcpInput05 (062720)
+      // !VA Called multiple times from getAttributes because if the filename...why?
+      console.log('ccpIfNoUserInput calling getAppobj');
       fileName = appController.getAppobj('fileName');
       var str;
       // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
@@ -4049,9 +4057,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
         console.log('getAppobj running');
-        console.log('identifier is: ' + identifier);
-        console.log('getAppobj Appobj: ');
-        console.dir(Appobj);
+        // console.log('identifier is: ' + identifier);
+        // console.log('getAppobj Appobj: ');
+        // console.dir(Appobj);
         let retval;
         if (typeof identifier === 'undefined') {
           // console.log('UNDEFINED');
@@ -4064,7 +4072,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             if (key === identifier) {
               console.log('HIT');
               retval = value;
-              console.log('retval is: ' + retval);
+              console.log('getAppobj retval is: ' + retval);
             }
           }
         }
