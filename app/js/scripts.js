@@ -526,7 +526,6 @@ var Witty = (function () {
             fname = fname[fname.length - 1];
             // !VA For devmode, we need to write fname to the DOM now and then add it to Appobj at the top of writeInspectors. 
             document.querySelector(inspectorElements.insFilename).textContent = fname;
-            console.log('fname is: ' + fname);
             // !VA Initialze calcViewerSize to size the image to the app container areas
             // !VA Branch: implementCcpInput01 (062120)
             // !VA The true flag indicates that this is an image initialization action, not a user-initiated Toolbar input
@@ -649,9 +648,7 @@ var Witty = (function () {
       // !VA This function writes individual values directly to the DOM. Called by resizeContainers to set dynamicRegions DOM values on initialization and toolbar input. Called by resetTdOptions, handleTdOptions, handleImgType to set CCP DOM element values. args is a rest parameter list of key/value arrays, whereby the key is the alias of the element to write to and value value to write. 
       // !VA TODO: Find a more descriptive name for this.
       writeAppobjToDOM: function (...args) {
-        console.log('writeAppobjToDOM running');
-        console.log('args is: ');
-        console.log(args); 
+        console.log('writeAppobjToDOM');
         // !VA Loop throught the list of args, determine what type of element it is from the three-character element prefix and perform the appropriate action.    
         for (let i = 0; i < args.length; i++) {
           if (args[i][0].substring( 0 , 3) === 'ipt') {
@@ -667,8 +664,11 @@ var Witty = (function () {
             console.log('ERROR in writeAppobjToDOM - span mock checkbox not handled');
           }
         }
-        // debugger;
+
       },
+
+
+
 
       // !VA UIController public
       // !VA Stash arrays of key/value pairs.
@@ -743,9 +743,6 @@ var Witty = (function () {
           // !VA Don't forget to use bracket notation to add properties to an object: https://stackoverflow.com/questions/1184123/is-it-possible-to-add-dynamically-named-properties-to-javascript-object
           // !VA  for loop: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
 
-
-          console.log('populateCcpProperties Appobj  is: ');
-          console.log(Appobj );
           let checkboxId;
           // !VA TODO:  Created an styCcpTableWrapperStyle property with the value ''. This is a placeholder for the max-width style property which is only used in handleImgType if the image type is fluid. There is no correspondent for this in the CCP DOM - need to determine if this extra Appobj property is necessary.
           Appobj.styCcpTableWrapperStyle = '';
@@ -753,12 +750,6 @@ var Witty = (function () {
           // !VA For instance, if the ccpUserInput value starts with '#ipt', create an Appobject property whose key is 'iptCCP...' and assign it the value of the CCP element with the corresponding ccpUserInput alias.
           for (const [key, value] of Object.entries(ccpUserInput)) {
             if (value.substring( 0, 4) === '#ipt' || value.substring( 0, 4) === '#sel' ) {
-              if (key === 'iptCcpImgClass') {
-
-                console.log('populateAppobj key is: ' + key);
-                console.log('populateAppobj value is: ' + value);
-              }
-              console.log('Appobj[key] is: ' + Appobj[key]);
               Appobj[key] = document.querySelector(value).value;
             }
             if (value.substring( 0, 4) === '#rdo' ) {
@@ -3227,12 +3218,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       UIController.writeDynamicRegionsDOM(Appobj, viewportH, appH);
 
 
+
       // !VA Set Appobj table width and wrapper table width now.
+      Appobj.iptCcpTableWidth = Appobj.imgW;
+      Appobj.iptCcpTableWrapperWidth = Appobj.viewerW;
       var tableWidth = [];
       var tableWrapperWidth = [];
       // !VA Use the cross-object identifier instead of the ccp element alias here, that's what writeAppobjToDOM expects.
       tableWidth = ['iptCcpTableWidth', Appobj.imgW ];
       tableWrapperWidth = ['iptCcpTableWrapperWidth', Appobj.viewerW];
+
       
       // !VA True is the flag to stash instead of retrieve, tableWidth and tableWrapper are the rest parameters containing the key/value pairs to stash.;
       // !VA Branch: implementAppobj05 (061320)
@@ -3242,6 +3237,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Called in resizeContainers after writeDynamicRegions, takes parameter list of CCP ID/value pairs, and updates the DOM with the passed parameters. It is the CCP DOM counterpart to updateAppobj, I think, since it only updates those DOM elements whose ID/Value passed in, rather than a blanket DOM update of all DOM. Renamed from writeDOMElementValues. writeCcpDOM takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the cross-object identifier (the value in the ccpUserInput object) as key and the Appobj value as value. 
       // !VA NOTE: This needs to bypass handleCcpActions, since it's not a result of any ccpAction but rather a direct write through the user input in the dynamicRegions. It also has to happen before initCCP, othewise Appobj won't initialize with values for table width and table wrapper width. 
       UICtrl.writeAppobjToDOM( tableWidth, tableWrapperWidth);
+
+      console.log('here');
+      console.log('Appobj is: ');
+      console.log(Appobj);
       // !VA Branch: implementCcpInput01 (062120)
       // !VA Why does this condition have no actions? Shouldn't write AppbojToDOM be called conditionally below?
       // !VA If CCP is open, write tableWidth and tableWrapperWidth to the DOM elements. 
@@ -3284,6 +3283,19 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // console.log('Appobj is: ');
       // console.dir(Appobj);
     }
+
+    function batchDOMToAppobj() {
+      console.log('batchDOMToAppobj running');
+      let arr = [];
+      arr = Object.entries(Appobj);
+      console.log('batchDOMToAppobj arr: ');
+      console.dir(arr);
+
+
+
+
+    }
+
 
     // !VA appController private
     // !VA Called in handleTdOptions
@@ -3329,8 +3341,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
         }
 
-
-        if (arr[i].substring( 0, 8) === 'rdoCcpTd') {
+        // !VA Branch: implementCcpInput05 (062720)
+        // !VA Here we need to ONLY run handleTdOptions if tdoption is imgswap. 
+        if (arr[i] === 'rdoCcpTdImgswap') {
           // !VA If the Appobj key string === true, then that is the selected radio button
           if ( Appobj[arr[i]] === true) { 
             handleTdOptions(ccpUserInput[arr[i]]); 
@@ -3375,9 +3388,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA changing setvalue from handleCcpActions to writeAppobjToDOM
       // !VA Branch: implementCcpInput05 (062720)
       // !VA Why is this happening here? 
-
-      console.log('resetTdOptions Appobj is: ');
-      console.log(Appobj);
       // debugger;
 
       UIController.writeAppobjToDOM( 
@@ -4050,7 +4060,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           // console.log('identifier is: ' + identifier);
           retval = identifier;
           for (const [key, value] of Object.entries(Appobj)) {
-            console.log('key is: ' + key);
+            // console.log('key is: ' + key);
             if (key === identifier) {
               console.log('HIT');
               retval = value;
@@ -4063,16 +4073,24 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA appController public 
       // !VA Called from UIController.toggleCcp in initUI devMode where you can init with CCP open or closed. Otherwise, UIController.toggleCcp is called from the click handler. 
+      // !VA Branch: implementCcpInput05 (062720)
+      // !VA Create sister function to batchAppobjToDOM - batchDOMToAppobj
       initCcp: function () {
         let ccpState;
         // !VA Get the current open/closed state of the CCP
         ccpState = UIController.toggleCcp(true);
         console.log('ccpState is: ' + ccpState);
         if (ccpState) {
-          UIController.populateAppobj(Appobj, 'ccp');
-          // !VA Do logic for opening the CCP with the current state of the selected options reflected. batchAppobjToDOM is in appController private.
-        } else if (!ccpState) {
+          // !VA Branch: implementCcpInput05 (062720)
+          // UIController.populateAppobj(Appobj, 'ccp');
+
+          // !VA Do logic for opening the CCP with the current state of the selected options reflected. batchAppobjToDOM only runs handleTdOptions for the rdoCcpTdImgswap option. Everything else carries over when the CCP is open and closed.
           batchAppobjToDOM();
+
+        } else if (!ccpState) {
+          // !VA Branch: implementCcpInput05 (062720)
+          // !VA On closing the CCP, this is where we need to save all the DOM settings so they can be restored by batchAppobjToDOM. Not even sure this is necessary now since the problem with the input fields resetting has been dealt with.
+          batchDOMToAppobj();
         } else {
           console.log('ERROR in initCCP - unknown ccpState');
         }
@@ -4186,11 +4204,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         } 
 
         // !VA Branch: implementCcpInput05 (062720)
-        // !VA initialize/populate the CCP
+        // !VA initialize/populate the CCP. tableWidth and tableWrapperWidth are undefined, they don't get written until resizeContainers.
         UIController.populateAppobj(Appobj, 'ccp');
         // !VA Initialize the 'basic' tdoption
         handleTdOptions(ccpUserInput.rdoCcpTdBasic); 
-
+        // !VA Set up event listeners
         setupEventListeners();
         
         // !VA  Test if there is currently #cur-img element with an image.If there is, it's hardcoded in the HTML and we're in DEV MODE. If there's not, the app is being initialized in USER MODE.
