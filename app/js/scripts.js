@@ -587,8 +587,6 @@ var Witty = (function () {
       // !VA Write dimensions of dynamicRegions.curImg, dynamicRegions.imgViewer and the height of dynamicRegions.imgViewport and dynamicRegions.appContainer. Width of dynamicRegions.imgViewport and dynamicRegions.appContainer is static and is sized to the actual application area width.
       writeDynamicRegionsDOM: function(Appobj, viewportH, appH) {
         // console.log('writeDynamicRegionsDOM running');
-        // console.log('writeDynamicRegionsDOM Appobj is: ');
-        // console.log(Appobj);
 
         // !VA TODO: Make function
         document.querySelector(dynamicRegions.imgViewer).style.width = Appobj.viewerW + 'px';
@@ -649,7 +647,7 @@ var Witty = (function () {
       // !VA This function writes individual values directly to the DOM. Called by resizeContainers to set dynamicRegions DOM values on initialization and toolbar input. Called by resetTdOptions, handleTdOptions, handleImgType to set CCP DOM element values. args is a rest parameter list of key/value arrays, whereby the key is the alias of the element to write to and value value to write. 
       // !VA TODO: Find a more descriptive name for this.
       writeAppobjToDOM: function (...args) {
-        console.log('writeAppobjToDOM');
+        console.log('writeAppobjToDOM running');
         // !VA Loop throught the list of args, determine what type of element it is from the three-character element prefix and perform the appropriate action.    
         for (let i = 0; i < args.length; i++) {
           if (args[i][0].substring( 0 , 3) === 'ipt') {
@@ -892,7 +890,9 @@ var Witty = (function () {
       console.log('getAttributes Appobj: ');
       console.log(Appobj);
       let checked, str, options, selectid, ccpElementId, imgType, Attributes, retObj;
-      // !VA Create the array to return. First value is the id of the CCP element, second value is the string to write to the CCP element.
+      // !VA Create the array to return. First value is the id of the CCP element, second value is the string to write to the CCP element. If the first value is false, then the str isn't queried from a Ccp element, but rather is generated in the Attribute based on other conditions. For instance, the img style attribute is conditioned on the fluid/fixed option, but writes to the style attribute of the img tag.
+      // !VA Branch: implementCcpInput06 (062820)
+      // !VA I'm not sure I need to return the elementID at all. Wouldn't the identifier suffice? For later.
       function returnObject(ccpElementId, str ) {
         let obj = {};
         obj.id = ccpElementId;
@@ -901,36 +901,36 @@ var Witty = (function () {
       }
       Attributes = {
         // !VA IMG attributes
-        // !VA Branch: implementAppobj08 (062020)
+        // !VA Branch: implementCcpInput06 (062820)
+        // !VA Deprecating...
         // !VA imgType is now integrated into Appobj, so this logic is deprecated here. Leaving it for the time being but pretty sure this entire Attribute is no longer pertinent.
-        imgType:  (function() {
-          // !VA This value is written to CCP so we can pre-select the tdoption 'rdoCcpTdBasic' if the imgType 'fluid' is selected. 
-          // !VA If the fixed radio button is checked, set ccpElementId to the fixed element id. Otherwise, set ccpEcurvcurlementId to the fluid element id. 
-          document.querySelector(ccpUserInput.rdoCcpImgFixed).checked ? ccpElementId = ccpUserInput.rdoCcpImgFixed : ccpElementId = ccpUserInput.rdoCcpImgFluid;
-          // !VA Now get the str based on the above
-          ccpElementId === ccpUserInput.rdoCcpImgFixed ? str = 'fixed' : str = 'fluid';
-          // !VA Locally, we need a variable for the imgType, so create one.
-          imgType = str;
-          retObj = returnObject(ccpElementId, str);
-          console.log('imgType retObj: ');
-          console.dir(retObj);
-          return retObj;
-        })(),
+        // imgType:  (function() {
+        //   // !VA This value is written to CCP so we can pre-select the tdoption 'rdoCcpTdBasic' if the imgType 'fluid' is selected. 
+        //   // !VA If the fixed radio button is checked, set ccpElementId to the fixed element id. Otherwise, set ccpEcurvcurlementId to the fluid element id. 
+
+        //   Appobj.rdoCcpImgFixed  ? ccpElementId = ccpUserInput.rdoCcpImgFixed : ccpElementId = ccpUserInput.rdoCcpImgFluid;
+        //   // !VA Now get the str based on the above
+        //   // !VA Branch: implementCcpInput06 (062820)
+        //   // !VA What does the str do?
+        //   ccpElementId === ccpUserInput.rdoCcpImgFixed ? str = 'fixed' : str = 'fluid';
+        //   // !VA Locally, we need a variable for the imgType, so create one.
+        //   imgType = str;
+        //   retObj = returnObject(ccpElementId, str);
+
+        //   return retObj;
+        // })(),
         imgClass: (function() {
-          // !VA For fixed images, if there's a class name entered into the class input: return the input value, or if the class input is empty, don't include the class attribute. For fluid images, return the class name 'img-fluid'.
-
-
-          
-          // !VA This value is written to CCP so use ccpElementId
+          // !VA Branch: implementCcpInput06 (062820)
+          // !VA I don't understand why the attribute isn't writing to clipboard without ccpIfNoUserInput
+          // !VA Set the element associated with the string
           ccpElementId = ccpUserInput.iptCcpImgClass;
-          // !VA Branch: implementAppobj08 (062020)
-          // !VA Just get the Appobj value here now.
-          // imgType === 'fixed' ? str = ccpGetAttValue('class',document.querySelector(ccpElementId).value) : str = 'img-fluid';
           str = Appobj.iptCcpImgClass;
           retObj = returnObject(ccpElementId, str);
           return retObj;
         })(),
         imgWidth: (function() {
+          // !VA Branch: implementCcpInput06 (062820)
+          // !VA IMPORTANT: Shouldn't this only be output if imgType = fixed?
           // !VA This value is get-only
           ccpElementId = false;
           retObj = returnObject(ccpElementId, Appobj.imgW);
@@ -938,6 +938,8 @@ var Witty = (function () {
         })(),
         imgHeight: (function() {
           // !VA This value is get-only
+          // !VA Branch: implementCcpInput06 (062820)
+          // !VA IMPORTANT: Shouldn't this only be output if imgType = fixed?
           ccpElementId = false;
           retObj = returnObject(ccpElementId, Appobj.imgH);
           return retObj;
@@ -945,21 +947,32 @@ var Witty = (function () {
         imgAlt: (function() {
           // !VA This value is get-only
           ccpElementId = false;
-          retObj = returnObject(ccpElementId, ccpGetAttValue('alt',document.querySelector(ccpUserInput.iptCcpImgAlt).value));
+          // !VA Branch: implementCcpInput06 (062820)
+          // !VA We get the filename from Appobj now
+          // retObj = returnObject(ccpElementId, ccpGetAttValue('alt',document.querySelector(ccpUserInput.iptCcpImgAlt).value));
+          retObj = returnObject(ccpElementId, Appobj.iptCcpImgAlt);
           return retObj;
         })(),
         imgSrc: (function() {
           // !VA This value is get-only
           ccpElementId = false;
-          if (document.querySelector(ccpUserInput.iptCcpImgRelPath).value) {
-            str =  document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + document.querySelector(inspectorElements.insFilename).textContent;
-          }
+          // !VA Branch: implementCcpInput06 (062820)
+          // !VA If the path input element is not empty, include the Appobj.iptCcpImgRelPath, otherwise just use the filename without the path
+          Appobj.iptCcpImgRelPath !== '' ? str = Appobj.iptCcpImgRelPath + '/' + Appobj.fileName : str = Appobj.fileName;
+          // !VA Branch: implementCcpInput06 (062820)
+          // !VA Deprecating...
+          // if (document.querySelector(ccpUserInput.iptCcpImgRelPath).value) {
+          //   str =  document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + document.querySelector(inspectorElements.insFilename).textContent;
+          // }
           retObj = returnObject( ccpElementId, str);
           return retObj;
         })(),
         imgStyle: (function() {
-          // !VA Get the selected state of the fixed imgType radio. If it is not selected, then the fluid option is selected. If fixed, include the width and height in the style attribute. If fluid, don't include them
-          // !VA This value is never displayed in CCP, only written to Clipboard object, so it's  get-only.
+
+          // !VA Branch: implementCcpInput06 (062820)
+          // !VA Set imgType according to radio button selection. This determines the style attribute that is output to the Clipboard. All the other imgType logic is in appController.
+          Appobj.rdoCcpImgFixed  ? imgType = 'fixed' : imgType = 'fluid';
+          console.log('imgType is: ' + imgType);
           ccpElementId = false;
           imgType === 'fixed' ? str = `display: block; width: ${Appobj.imgW}px; height: ${Appobj.imgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;` : str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;';
           retObj = returnObject(ccpElementId , str);
@@ -968,23 +981,38 @@ var Witty = (function () {
         imgAlign: (function() {  
           // !VA This value is get-only.
           ccpElementId = false;
-          str = '', options = [], selectid = '';
-          selectid = ccpUserInput.selCcpImgAlign;
-          options = [ '', 'left', 'center', 'right'];
-          str = getAlignAttribute( selectid, options );
+          console.log('Appobj.selCcpImgAlign is: ' + Appobj.selCcpImgAlign);
+          Appobj.selCcpImgAlign !== 'none' ? str = Appobj.selCcpImgAlign : str = '';
+
+          // str = '', options = [], selectid = '';
+          // selectid = ccpUserInput.selCcpImgAlign;
+          // options = [ '', 'left', 'center', 'right'];
+          // str = getAlignAttribute( selectid, options );
+
           retObj = returnObject(ccpElementId, str);
+          console.log('retObj: ');
+          console.dir(retObj);
           return retObj;
         })(),
         imgIncludeAnchor: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
-          let target, checked;
-          target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
-          checked = getCheckboxSelection(target);
+          // !VA Branch: implementCcpInput06 (062820)
+          // !VA Deprecating...
+          // let target, checked;
+          let checked;
+          // !VA If Include anchor is checked, return true, else false
+          Appobj.spnCcpImgIncludeAnchorCheckmrk === 'on' ? checked = true : checked = false;
+          // !VA Branch: implementCcpInput06 (062820)
+          // !VA Deprecating...
+          // target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
+          // checked = getCheckboxSelection(target);
           retObj = returnObject( ccpElementId, checked );
           return retObj;
         })(),
         // !VA TD Attributes
+        // !VA Branch: implementCcpInput06 (062820)
+        // !VA Why can't I just access Appobj directly in getBgimageBlock?
         // !VA TD Width and height from Appobj = imgW and imgW -- only used for Stig's BG image
         tdAppobjWidth: (function() {
           // !VA This value is get-only.
@@ -992,6 +1020,8 @@ var Witty = (function () {
           retObj = returnObject( ccpElementId, Appobj.imgW );
           return retObj;
         })(),
+        // !VA Branch: implementCcpInput06 (062820)
+        // !VA Why can't I just access Appobj directly in getBgimageBlock?
         tdAppobjHeight: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
@@ -1001,6 +1031,8 @@ var Witty = (function () {
         tdHeight: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
+          console.log('Appobj.iptCcpTdHeight is: ' + Appobj.iptCcpTdHeight);
+
           retObj = returnObject( ccpElementId, ccpIfNoUserInput('height',document.querySelector(ccpUserInput.iptCcpTdHeight).value));
           return retObj;
         })(),
@@ -1189,7 +1221,6 @@ var Witty = (function () {
     // !VA Branch: implementCcpInput05 (062720)
     // !VA Called multiple times from getAttributes
     function ccpGetAttValue(att, value) {
-      console.log('ccpGetAttValue running');
       // !VA Branch: implementCcpInput02 (062420)
 
       // !VA Gets the insFilename from Appobj in case the user leaves 'path' empty
@@ -1283,7 +1314,6 @@ var Witty = (function () {
       let fileName;
       // !VA Branch: implementCcpInput05 (062720)
       // !VA Called multiple times from getAttributes because if the filename...why?
-      console.log('ccpIfNoUserInput calling getAppobj');
       fileName = appController.getAppobj('fileName');
       var str;
       // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
@@ -2216,7 +2246,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA Called from eventHandler to initialize clipboard functionality
       doClipboard: function(evt) {
-        console.log('doClipboard running');
+        // console.log('doClipboard running');
         let targetid, modifierKey;
         targetid = evt.target.id;
         // !VA Determined if shift or ctrl is pressed while clicked
@@ -2749,34 +2779,37 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA appController private function
     function handleCcpInput(prop, value) {
-      console.log('handleCcpInput');
-      console.log('prop is: ' + prop);
-      console.log('value is: ' + value);
+      // console.log('handleCcpInput');
+      // console.log('prop is: ' + prop);
+      // console.log('value is: ' + value);
       let arr = [];
       arr[0] = prop;
       arr[1] = value;
       Appobj[prop] = value;
       UIController.writeAppobjToDOM( arr );
-      console.log('handleCcpInput Appobj: ');
-      console.dir(Appobj);
+      // console.log('handleCcpInput Appobj: ');
+      // console.dir(Appobj);
       
     }
 
     // !VA TODO: Why is the argument unused, why are there unused elements and what is actually happening here?
     // !VA appController private
     // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appobj property. Takes no argument because we're using this instead of the event.
-    function handleBlur() {
+    function handleBlur(evt) {
       // !VA Handle blur
-      console.clear();
-      console.log('handleBlur running');
+      // console.clear();
+      // console.log('handleBlur running');
+      // console.log('evt.target.id is: ' + evt.target.id);
+      // console.log('this is: ' + this);
       let prop;
       // !VA Get the Appobj property name that corresponds to the ID of the event target
       prop = elementIdToAppobjProp(this.id);
-      console.log('prop is: ' + prop);
+
       // !VA Branch: implementCcpInput05 (062720)
       if (prop.substr( 3, 3 ) === 'Ccp') { 
-        console.log('HIT');
-        handleCcpInput( prop, this.value);
+
+
+        // handleCcpInput( prop, this.value);
       }
 
 
@@ -2886,8 +2919,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     */
     // !VA Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
     // !VA TODO: Why are there unused elements and what is actually happening here?
+
+
+    // !VA Branch: implementCcpInput06 (062820)
+    // !VA Handles the TAB and ENTER key. The ENTER key implements the change so the user can see the effects, and sets the cursor in the field so the user can change it if desired, and writes the change to Appobj. The TAB key just blurs the field.  I think this is just the right behavior for CCP too...stopping here.
     function handleKeydown(evt) {
-      // console.log('handleKeydown running');
       try {
         // console.log('handleKeyDown try: ');
         var vals = [], msgElement, keydown;
@@ -2910,9 +2946,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA Only set vars and get values if Tab and Enter keys were pressed
       if (keydown == 9 || keydown == 13 ) {
-        // console.log('Tab or Enterr pressed');
+        console.log('handleKeydown - Tab or Enter');
         let isErr, isEnter, isTab;
-        // !VA Initialize the object to store the user input data: evtTargetId, evtTargetVal and appObjProp. appObjProp is returned from elementIdToAppobjPropm which I really need to get rid of.
+        // !VA Initialize the object to store the user input data: evtTargetId, evtTargetVal and appObjProp. This object is passed to 
         const userInputObj = { };
 
         // !VA Branch: implementAppobj05 (061320)
@@ -2922,8 +2958,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         //   handleCcpUserInput(evt);
         // }
 
-        // !VA Branch: implementAppobj08 (062020)
-        // !VA NOTE: Does the below make any sense at all?
         // !VA userInputObj is the array containing the values needed to check input, evaluate the Toolbar input, and update Appobj prior to writing dynamicRegions to the DOM after user input in the Toolbar input fields.
         // !VA evtTargetId is the ID of the element into which the user entered a change
         userInputObj.evtTargetId = this.id;
@@ -2937,10 +2971,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA elementIdToAppobjProp gets the Appobj key that corresponds to a given element ID. We need the Appobj key to get the Appobj value to compare to the user-entered value in the respective Toolbar input field. 
         userInputObj.appObjProp = elementIdToAppobjProp(this.id);
 
-        // !VA Branch: implementAppobj08 (062020)
-        // !VA This is where we need to fork the logic for CCP inputs vs Toolbar inputs. Also need to consider an alternative to elementIdToAppobjProp, since elementIdToAppobjProp so far only contains a list of Toolbar input IDs that doesn't incude CCP. Why can't I get it from the element alias? 
-        // console.log('handleKeydown userInputObj: ');
-        // console.dir(userInputObj);
 
 
         // !VA If Tab was pressed and this.value is either empty or equals the Appobj value, then there's been no change to the field, so let Tab just cycle through the fields as per its default.
@@ -2952,6 +2982,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             };
           }
         } else {
+          // !VA Branch: implementCcpInput06 (062820)
+          // !VA All CCP input passed to checkUserInput for errors
           // !VA Field value was changed, so first, pass the args to checkUserInput for errors.
           isErr = checkUserInput(userInputObj);
           if (isErr) {
@@ -2960,6 +2992,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             // !VA We have to leave the bad value in the field so the user can correct it or press Esc to blur without change, otherwise it will conflict with the default tab order behavior.
             this.select();
           } else {
+            // !VA Branch: implementCcpInput06 (062820)
+            // !VA This clause only handles dynamicRegions - it calls writeToolbarInputToAppobj. We need a function that handles CCP input and calls...
+            console.log('Mark1');
+
             // !VA If the value was entered in the imgW or imgH field, show the value selected first so the user can view and change it before implementing. Only on Tab can the value be implemented and advance to the next field.
             if (userInputObj.prop === 'imgW' || userInputObj.prop === 'imgH') {
               if (isEnter) {
@@ -2993,12 +3029,18 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA  On ESC, we want imgW and imgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the inspectorElements and there's no need to recalc the W and H each time the user makes and entry - that would just be confusing. For viewerW, sSphonesW and lPhonesW, revert to the previously displayed value if the user escapes out of the input field. The previously displayed value will be either 1) the default in the HTML placeholder attribute or 2) the localStorage value. So, the localStorage value is false, get the placeholder, otherwise get the localStorage value.
       // !VA Esc key
       if (keyup == 27 ) {
+        console.log('handleKeyUp - ESC key');
         // !VA If the event target is the imgW or imgH input fields, on ESC exit the field and restore the placeholder set in the HTML file.
         if (prop === 'imgW' || prop === 'imgH') {
           this.value = ('');
           this.blur();
-        // !VA If the event target is viewerW, iptTbrSmallPhonesW and iptTbrLargePhonesW, on ESC exit the field and restore the preexisting value localStorage if it exists, if not, restore the default stored in the HTML placeholder.
+        } else if ( prop.substr( 0, 6) === 'iptCcp' ) {
+          // !VA IMPORTANT: DON'T FORGET THIS!!!!!! 
+          // !VA If the event target is a CCP input field, set the input value to the last Appobj value for that property and blur
+          this.value = (Appobj[prop]);
+          this.blur();
         } else {
+          // !VA If the event target is viewerW, iptTbrSmallPhonesW and iptTbrLargePhonesW, on ESC exit the field and restore the preexisting value localStorage if it exists, if not, restore the default stored in the HTML placeholder.
           curLocalStorage = appController.getLocalStorage();
           if (prop === 'viewerW') {
             curLocalStorage[0] ? this.value = curLocalStorage[0] : this.value = document.querySelector(toolbarElements.iptTbrViewerW).placeholder;
@@ -3018,66 +3060,104 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA TODO: Why are there unused variables and what is actually happening here?
     // !VA appController private
     function checkUserInput(userInputObj) {
+      console.log('checkUserInput running');
+      // !VA Branch: implementCcpInput06 (062820)
+
       // !VA Destructure userInputObj
       // !VA TODO: I don't think evtTargetId is ever used...remove?
       // const { evtTargetId, appObjProp, evtTargetVal } = userInputObj;
       const { appObjProp, evtTargetVal } = userInputObj;
+      console.log('appObjProp is: ' + appObjProp);
+      console.log('evtTargetVal is: ' + evtTargetVal);
+      // !VA The code that will be passed to getAppMessageStrings
       let appMessCode;
+      // !VA The flag indicating an error condition,
       var isErr;
       isErr = false;
-
       // !VA TODO: Setting maxViewerWidth just for now
       var maxViewerWidth = 800;
-      // !VA First, check if there's a message running
-      // !VA First, we validate that the user-entered value is an integer and if so, set the error variables.
-      if (validateInteger(evtTargetVal)) {
-        // !VA NOTE: This is where we could easily trap the negative button increment if it falls below 0 to send a different message than just the standard 'not_Integer' message. Revisit.
-        appMessCode = 'err_not_Integer';
-        isErr = true;
-      } else {
-        // !VA Now, we handle the error cases if user has entered a value in the imgViewer field 
-        switch (true) {
-        case (appObjProp === 'viewerW') :
-          // !VA The user has selected a viewerW that's smaller than the currently displayed image. Undetermined how to deal with this but for now the current image is shrunk to the selected viewerW. But Appobj is not updated accordingly, needs to be fixed.
-          if (evtTargetVal < Appobj.imgW ) {
-            // !VA Do nothing for now, see above.
-          } else if (evtTargetVal > maxViewerWidth ) {
-            // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px - and the user-entered value exceeds this, so error.
-            isErr = true;
-            appMessCode = 'err_viewerW_GT_maxViewerWidth';
-          } else {
-            // !VA first write val to the viewerW input's value
-            // document.querySelector(dynamicRegions.imgViewer).value = val;
-            // !VA  The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running calcViewerSize. So, return no error and continue in handleKeyup.
-            isErr = false;
-          }
-          break;
-          // !VA Handle the imagewidth toolButton input
-        case (appObjProp === 'imgW') :
-          // !VA If the new image width is greater than the viewer width, then show message. 
-          if (evtTargetVal > Appobj.viewerW ) {
-            // !VA errorHandler!
-            isErr = true;
-            appMessCode = 'err_imgW_GT_viewerW';
-          }
-          break;
-        // !VA TODO: Handle the imageheight toolButton input
-        case (appObjProp === 'imgH') :
-          console.log('Error handling for imageheight input not implemented!');
-          break;
+      // !VA numericInputs are the Appobj properties that need to be validated for numeric input
+      let numericInputs;
+      numericInputs = [ 'viewerW', 'imgW', 'imgH', 'iptCcpTdHeight', 'iptCcpTdWidth', 'iptCcpTableWidth', 'iptCcpTableWrapperWidth' ];
+      // !VA If appObjProp refers to one of the CCP elements that require numeric input
+      if (numericInputs.includes( appObjProp )) {
+        // !VA First, validate that the user-entered value is an integer and if so, set the error variables.
+        if (validateInteger(evtTargetVal)) {
+          // !VA NOTE: This is where we could easily trap the negative button increment if it falls below 0 to send a different message than just the standard 'not_Integer' message. Revisit.
+          appMessCode = 'err_not_Integer';
+          isErr = true;
+        } else {
+          // !VA The input is an integer, so handle the error cases for the user input
+          switch (true) {
+          case (appObjProp === 'viewerW') :
+            // !VA The user has selected a viewerW that's smaller than the currently displayed image. Undetermined how to deal with this but for now the current image is shrunk to the selected viewerW. But Appobj is not updated accordingly, needs to be fixed.
+            if (evtTargetVal < Appobj.imgW ) {
+              // !VA Do nothing for now, see above.
+            } else if (evtTargetVal > maxViewerWidth ) {
+              // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px - and the user-entered value exceeds this, so error.
+              isErr = true;
+              appMessCode = 'err_viewerW_GT_maxViewerWidth';
+            } else {
+              // !VA first write val to the viewerW input's value
+              // document.querySelector(dynamicRegions.imgViewer).value = val;
+              // !VA  The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running calcViewerSize. So, return no error and continue in handleKeyup.
+              isErr = false;
+            }
+            break;
+            // !VA Handle the imagewidth toolButton input
+          case (appObjProp === 'imgW') :
+            // !VA If the new image width is greater than the viewer width, then show message. 
+            if (evtTargetVal > Appobj.viewerW ) {
+              // !VA errorHandler!
+              isErr = true;
+              appMessCode = 'err_imgW_GT_viewerW';
+            }
+            break;
+          // !VA TODO: Handle the imageheight toolButton input
+          case (appObjProp === 'imgH') :
+            console.log('Error handling for imageheight input not implemented!');
+            break;
 
-          // !VA TODO: Handle the small phone input
-        case (appObjProp === 'sPhoneW') :
-          console.log('Error handling for iptTbrSmallPhonesW input not implemented!');
-          break;
-        
-        // !VA Handle the large phone input
-        case (appObjProp === 'lPhoneW') :
-          console.log('Error handling for imagewidth input not implemented!');
-          break;
+            // !VA TODO: Handle the small phone input
+          case (appObjProp === 'sPhoneW') :
+            console.log('Error handling for iptTbrSmallPhonesW input not implemented!');
+            break;
+          
+          // !VA Handle the large phone input
+          case (appObjProp === 'lPhoneW') :
+            console.log('Error handling for imagewidth input not implemented!');
+            break;
+
+          // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply
+          case (appObjProp === 'iptCcpTdHeight' && !Appobj.rdoCcpTdExcludeimg ) :
+            if (evtTargetVal < Appobj.imgH ) {
+              // !VA errorHandler!
+              isErr = true;
+              appMessCode = 'err_cell_smaller_than_image';
+            }
+            break;
+          
+          // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply
+          case (appObjProp === 'iptCcpTdWidth') :
+            if (evtTargetVal < Appobj.imgW  && !Appobj.rdoCcpTdExcludeimg ) {
+              // !VA errorHandler!
+              isErr = true;
+              appMessCode = 'err_not_yet_implemented';
+              console.log('Error handling for iptCcpTdHeight/iptCcpTdWidth not yet implemented');
+            }
+            break;
+          }
         }
-      } 
+      // !VA appObjProp refers to a non-numeric inut field, i.e. class, alt etc.
+      } else if (!numericInputs.includes( appObjProp )) {
+        // !VA The input is non-numeric, i.e. class, alt, bgcolor, etc
+        console.log('Non-numeric input');
+      } else {
+        // !VA Structural error
+        console.log('ERROR in checkUserInput - unknown condition');
+      }
 
+      // !VA Error condition - pass the appMessCode to handleAppMessages
       if (isErr) {
         // !VA IF Error pass the code to errorHandler to get the error message
         appController.handleAppMessages( appMessCode );
@@ -3245,10 +3325,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Called in resizeContainers after writeDynamicRegions, takes parameter list of CCP ID/value pairs, and updates the DOM with the passed parameters. It is the CCP DOM counterpart to updateAppobj, I think, since it only updates those DOM elements whose ID/Value passed in, rather than a blanket DOM update of all DOM. Renamed from writeDOMElementValues. writeCcpDOM takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the cross-object identifier (the value in the ccpUserInput object) as key and the Appobj value as value. 
       // !VA NOTE: This needs to bypass handleCcpActions, since it's not a result of any ccpAction but rather a direct write through the user input in the dynamicRegions. It also has to happen before initCCP, othewise Appobj won't initialize with values for table width and table wrapper width. 
       UICtrl.writeAppobjToDOM( tableWidth, tableWrapperWidth);
-
-      console.log('here');
-      console.log('Appobj is: ');
-      console.log(Appobj);
       // !VA Branch: implementCcpInput01 (062120)
       // !VA Why does this condition have no actions? Shouldn't write AppbojToDOM be called conditionally below?
       // !VA If CCP is open, write tableWidth and tableWrapperWidth to the DOM elements. 
@@ -3296,8 +3372,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       console.log('batchDOMToAppobj running');
       let arr = [];
       arr = Object.entries(Appobj);
-      console.log('batchDOMToAppobj arr: ');
-      console.dir(arr);
+      // console.log('batchDOMToAppobj arr: ');
+      // console.dir(arr);
 
 
 
@@ -3831,8 +3907,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA maxViewerWidth issue here, see message below;
         err_viewerW_GT_maxViewerWidth: 'Parent table width can\'t exceed can\'t exceed app width: 800px.',
         err_not_an_integer: 'Not an integer: please enter a positive whole number for width.',
+
+        // !VA CCP INPUT ERRORS
         err_vmlbutton_no_value: 'Height and width must be entered to create a VML button.',
         err_vmlbutton_height_mismatch: 'Is the correct image loaded? Img height should match entry. Check the code output. ',
+        err_cell_smaller_than_image: 'Table cell cannot be smaller than the image it contains',
+
+
+        // !VA ERROR MESSAGE NOT YET IMPLEMENTED
+        err_not_yet_implemented: 'This error code is not yet implemented',
 
 
         // !VA TOOLTIPS
@@ -4070,9 +4153,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           for (const [key, value] of Object.entries(Appobj)) {
             // console.log('key is: ' + key);
             if (key === identifier) {
-              console.log('HIT');
               retval = value;
-              console.log('getAppobj retval is: ' + retval);
             }
           }
         }
