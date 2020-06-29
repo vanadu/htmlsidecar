@@ -723,6 +723,8 @@ var Witty = (function () {
           Appobj.imgH = curImg.height;
           Appobj.imgNW = curImg.naturalWidth;
           Appobj.imgNH = curImg.naturalHeight;
+          console.log('Mark1');
+          console.log('typeof(Appobj.imgW) is: ' + typeof(Appobj.imgW));
           
           // !VA Get the Appobj properties for iptTbrSmallPhonesW and sPhonesH
           // !VA TODO: The default here is still coming from the data- attribute. It should be either the default, which comes from the placeholder in the HTML DOM element, or from localStorage. This needs to be addressed - there's no need to get the default from the data attribute, and I'm It appears the default is coming from the placeholder now rather than the data attribute - so there's probably no point in writing data attributes at all. Get rid of it completely in the next implementation. It appears here that Appobj.sPhonesW still accesses the data-attribute when it should be accessing the placeholder. This is actually a problem in initUI: there the viewerW, sPhoneW and lPhoneW values are writting from localStorage of from the placeholder default to the data-... attributes, which is not necessary. Data attributes were only used because I didn't have a localStorage solution, but now that I do, the data-... attributes are unnecessary. They all need to be deprecated. For later...
@@ -2878,10 +2880,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           val = parseInt(el.id.slice(-2));
           // !VA If the target ID includes 'incr' then the image dimension will be incremented, if 'decr' then it will be decremented
           (el.id.includes('incr')) ? val : val = -val;
-          // !VA Add val to the current imgW to get the value to be passed to checkUserInput for error parsing.
+          // !VA Add val to the current imgW to get the value to be passed to checkNumericInput for error parsing.
           val = Appobj.imgW + val;
           args.val = val;
-          isErr = checkUserInput(args);
+          isErr = checkNumericInput(args);
           if (isErr) {
             // !VA If it returns an error, select the input and show the error message so the user can correct it or ESC out of the field.
             // !VA Post-error button handling?
@@ -2922,125 +2924,98 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
     // !VA Branch: implementCcpInput06 (062820)
-    // !VA Handles the TAB and ENTER key. The ENTER key implements the change so the user can see the effects, and sets the cursor in the field so the user can change it if desired, and writes the change to Appobj. The TAB key just blurs the field.  I think this is just the right behavior for CCP too...stopping here.
+    // !VA Handles the TAB and ENTER key. The ENTER key implements the change so the user can see the effects, and sets the cursor in the field so the user can change it if desired, and writes the change to Appobj. The TAB key just blurs the field.  I think this is just the right behavior for CCP too.
     function handleKeydown(evt) {
-      console.clear();
+      // console.clear();
       console.log('handleKeydown evt.target.id is: ' + evt.target.id);
-      try {
-        // console.log('handleKeyDown try: ');
-        var vals = [], msgElement, keydown;
-        vals = (Object.values(appMessageElements));
-        for (let i = 0; i < vals.length; i++) {
-          // console.log('vals[i] is: ' +  vals[i]);
-          msgElement = document.getElementById(vals[i]);
-          if (msgElement.classList.contains('active')) {
-            // console.log('is active');
-          }
-        }
-      } catch (error) {
-
-        // !VA TODO: Why is this firing on every keypress
-        // console.log('handleKeydown catch:');
-      }
-
+      let numericInputs = [], stringInputs = [];
+      let retVal;
       // !VA Get the keypress
-      keydown = evt.which || evt.keyCode || evt.key;
+      let keydown = evt.which || evt.keyCode || evt.key;
+      // !VA Initialize the object to store the user input data: evtTargetId, evtTargetVal and appObjProp. This object is passed to 
+      const userInputObj = { };
+      // !VA userInputObj is the array containing the values needed to check input, evaluate the Toolbar input, and update Appobj prior to writing dynamicRegions to the DOM after user input in the Toolbar input fields.
+      // !VA evtTargetId is the ID of the element into which the user entered a change
+      userInputObj.evtTargetId = this.id;
+      // !VA evtTargetVal is the value the user entered into the input element as integer.
+      // !VA Branch: implementCcpInput06 (062820)
+      // !VA Now we have to already split the input values into those that require integers and those that require strings. So tdwidth, tdheight, tablewidth, tablewrapperwidth have to be converted now.  
+      // userInputObj.evtTargetVal = parseInt(this.value);
+      userInputObj.evtTargetVal = this.value;
+      // !VA elementIdToAppobjProp gets the Appobj key that corresponds to a given element ID. We need the Appobj key to get the Appobj value to compare to the user-entered value in the respective Toolbar input field. 
+      userInputObj.appObjProp = elementIdToAppobjProp(this.id);
 
-      // !VA Only set vars and get values if Tab and Enter keys were pressed
-      if (keydown == 9 || keydown == 13 ) {
-        console.log('handleKeydown - Tab or Enter');
-        let isErr, isEnter, isTab;
-        // !VA Initialize the object to store the user input data: evtTargetId, evtTargetVal and appObjProp. This object is passed to 
-        const userInputObj = { };
-
-        // !VA Branch: implementAppobj05 (061320)
-        // !VA NOTE: I think this did something at some point but I'm not sure why this call to a handler would be useful. Commenting out for now.
-        // console.log('evt.target.id is: ' + evt.target.id);
-        // if (evt.target.id.substring(0,7) === 'ipt-ccp') {
-        //   handleCcpUserInput(evt);
-        // }
-
-        // !VA userInputObj is the array containing the values needed to check input, evaluate the Toolbar input, and update Appobj prior to writing dynamicRegions to the DOM after user input in the Toolbar input fields.
-        // !VA evtTargetId is the ID of the element into which the user entered a change
-        userInputObj.evtTargetId = this.id;
-        // !VA evtTargetVal is the value the user entered into the input element as integer.
-        userInputObj.evtTargetVal = parseInt(this.value);
-
-        // !VA Set a flag if the the Enter key was pressed, for readability
-        (keydown == 13) ? isEnter = true : isEnter = false;
-        // !VA Set a flag if the the Tab key was pressed, for readability
-        (keydown == 9) ? isTab = true : isTab = false;
-        // !VA elementIdToAppobjProp gets the Appobj key that corresponds to a given element ID. We need the Appobj key to get the Appobj value to compare to the user-entered value in the respective Toolbar input field. 
-        userInputObj.appObjProp = elementIdToAppobjProp(this.id);
-
-        // !VA Branch: implementCcpInput06 (062820)
-        // !VA The conditions below are awful. 
-        /* !VA  The TAB KEY
-          * if the value isn't Appobj, write the value to Appobj and blur.
-          * if the value is null, blur
-
-        
-        
-        */ 
-
-        if (isTab) {
-          console.log('Tab key pressed');
-        } else if (isEnter) {
-          console.log('Enter key pressed');
-        } else {
-          console.log('ERROR in handleKeydown - unknown keypress ');
-        }
+      // !VA Branch: implementCcpInput06 (062820)
+      // !VA Handle the numeric inputs 
+      numericInputs = [ 'viewerW', 'imgW', 'imgH', 'iptCcpTdHeight', 'iptCcpTdWidth', 'iptCcpTableWidth', 'iptCcpTableWrapperWidth', 'iptCcpTdBorderRadius' ];
+      stringInputs = ['iptCcpImgClass', 'iptCcpImgAlt', 'iptCcpImgRelPath', 'iptCcpTdClass', 'iptCcpTdBgColor', 'iptCcpTdFontColor', 'iptCcpTdBorderColor', 'iptCcpTableClass', 'iptCcpTableBgColor', 'iptCcpTableWrapperClass', 'iptCcpTableWrapperBgColor' ]
+      // !VA If TAB or ENTER
+      if (keydown == 9 || keydown == 13) {
+        // !VA handleKeydown input error checking on TAB and ENTER
+        // !VA If appObjProp is included in the numericInputs array which includes all of the UI elements that require numeric input, then run checkNumericInput on the contents of userInputObj. Separating out numeric from string inputs. Check numeric input returns false if the integer validation fails, otherwise it returns userInputObj.evtTargetVal as number (instead of string)
+        if (numericInputs.includes( userInputObj.appObjProp )) { 
+          // console.log('NUMBER');
+          retVal = checkNumericInput(userInputObj); } 
+        else if (stringInputs.includes( userInputObj.appObjProp )) {
 
 
-
-
-
-        // !VA If Tab was pressed and this.value is either empty or equals the Appobj value, then there's been no change to the field, so let Tab just cycle through the fields as per its default.
-
-        if ((isTab) && ((this.value === '' || this.value == Appobj[userInputObj.appObjProp]))) {
-          // !VA Only if imgW or imgH, delete the existing value to display the placeholders. Otherwise, tab through and leave the existing value from Appobj
-          if (userInputObj.prop === 'imgW' || userInputObj.prop === 'imgH') {
-            this.onblur = function() {
-              this.value = '';
-            };
-          }
-        } else {
           // !VA Branch: implementCcpInput06 (062820)
-          // !VA All CCP input passed to checkUserInput for errors
-          // !VA Field value was changed, so first, pass the args to checkUserInput for errors.
-          isErr = checkUserInput(userInputObj);
-          if (isErr) {
-            // !VA If it returns an error, select the input and show the error message so the user can correct it or ESC out of the field. If Tab, prevent advancing to the next field until the error is corrected or ESC is pressed.
-            isEnter ? isEnter : evt.preventDefault(); 
-            // !VA We have to leave the bad value in the field so the user can correct it or press Esc to blur without change, otherwise it will conflict with the default tab order behavior.
-            this.select();
-          } else {
+          // !VA Stopping here. String values return undefined - need to be handled in checkTextInput
 
-
-
-            // !VA Branch: implementCcpInput06 (062820)
-            // !VA This clause only handles dynamicRegions - it calls writeToolbarInputToAppobj. We need a function that handles CCP input and calls...
-            console.log('handle CCP Input NOW');
-
-
-
-            // !VA If the value was entered in the imgW or imgH field, show the value selected first so the user can view and change it before implementing. Only on Tab can the value be implemented and advance to the next field.
-            if (userInputObj.prop === 'imgW' || userInputObj.prop === 'imgH') {
-              if (isEnter) {
-                this.select();
-              } else {
-                this.value = '';
-                this.blur();
-              }
-            }
-            // !VA Pass the userInputObj to evalToolbarInput.
-            // !VA Branch: implementCcpInput01 (062120)
-            // !VA Deprecating...
-            // evalToolbarInput(userInputObj);
-            writeToolbarInputToAppobj(userInputObj);
-          }
-        } 
+          // retVal = checkTextInput(userInputObj);
+          console.log('STRING'); } 
+        else {
+          console.log('ERROR in handleKeydown - unknown data type');
+        }
       }
+      // !VA Now that retVal is a number, write it back to userInputObj.evtTargetVal and pass userInputObj to handleTabKey and handleEnterKey
+      if ( retVal !== false ) { userInputObj.evtTargetVal = retVal; }
+
+      // !VA Branch: implementCcpInput06 (062820)
+      // !VA checkNumericInput complete.
+      if (keydown == 9 ) {
+        handleTabKey(userInputObj);
+      } else if ( keydown == 13 ) {
+        handleEnterKey(userInputObj);
+      } else {
+        console.log('ERROR in handleKeydown - unknown keypress');
+      }
+    }
+
+    function handleTabKey(userInputObj) {
+      console.log('handleTabKey running');
+      console.log('userInputObj: ');
+      console.dir(userInputObj);
+      let isErr;
+      // !VA Destructure userInputObj into variables
+      const { appObjProp, evtTargetId, evtTargetVal } = userInputObj;
+
+      // !VA Branch: implementCcpInput06 (062820)
+      // !VA The conditions below are awful. 
+      /* !VA  The TAB KEY
+        * if the value isn't Appobj, write the value to Appobj and blur.
+        * if the value is null, blur
+      */ 
+      console.log('appObjProp is: ' + appObjProp);
+      console.log('evtTargetId is: ' + evtTargetId);
+      console.log('evtTargetVal is: ' + evtTargetVal);
+      console.log('Appobj[appObjProp] is: ' + Appobj[appObjProp]);
+      console.log('typeof(Appobj[appObjProp]) is: ' + typeof(Appobj[appObjProp]));
+      console.log('typeof(evtTargetVal) is: ' + typeof(evtTargetVal));
+      
+      if (evtTargetVal === '' || evtTargetVal === Appobj[appObjProp]) {
+        console.log('empty or Appobj');
+      }
+
+
+
+    }
+
+    function handleEnterKey(userInputObj) {
+      console.log('handleEnterKey running');
+      // !VA elementIdToAppobjProp gets the Appobj key that corresponds to a given element ID. We need the Appobj key to get the Appobj value to compare to the user-entered value in the respective Toolbar input field. 
+      userInputObj.appObjProp = elementIdToAppobjProp(this.id);
+      
     }
 
     // !VA appController private
@@ -3049,6 +3024,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Branch: implementAppobj08 (062020)
     // !VA NOTE: Appd... already replaced with Appobj here. Could be a source of error.
     function handleKeyup(evt) {
+
       let prop, curLocalStorage, keyup;
       // !VA We only need the property here, so no need to create an args object. We could actually just use the target but since we're standardizing on property names, let's stick with that. Get the property name from the id of this, i.e. the event target
       prop = elementIdToAppobjProp(this.id);
@@ -3084,106 +3060,116 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA  Parsing keyboard input based on Appobj property passed in from handleKeyup.
-    // !VA TODO: rename to checkUserInput and include parsing of the toolbutton mouseclicks from handleToolbarClicks.
+    // !VA TODO: rename to checkNumericInput and include parsing of the toolbutton mouseclicks from handleToolbarClicks.
     // !VA TODO: Why are there unused variables and what is actually happening here?
     // !VA appController private
-    function checkUserInput(userInputObj) {
-      console.log('checkUserInput running');
+    function checkNumericInput(userInputObj) {
+      console.log('checkNumericInput running');
       // !VA Branch: implementCcpInput06 (062820)
 
       // !VA Destructure userInputObj
       // !VA TODO: I don't think evtTargetId is ever used...remove?
       // const { evtTargetId, appObjProp, evtTargetVal } = userInputObj;
       const { appObjProp, evtTargetVal } = userInputObj;
-      console.log('appObjProp is: ' + appObjProp);
-      console.log('evtTargetVal is: ' + evtTargetVal);
       // !VA The code that will be passed to getAppMessageStrings
-      let appMessCode;
+      let appMessCode, isErr, retVal;
       // !VA The flag indicating an error condition,
-      var isErr;
       isErr = false;
       // !VA TODO: Setting maxViewerWidth just for now
       var maxViewerWidth = 800;
-      // !VA numericInputs are the Appobj properties that need to be validated for numeric input
-      let numericInputs;
-      numericInputs = [ 'viewerW', 'imgW', 'imgH', 'iptCcpTdHeight', 'iptCcpTdWidth', 'iptCcpTableWidth', 'iptCcpTableWrapperWidth' ];
       // !VA If appObjProp refers to one of the CCP elements that require numeric input
-      if (numericInputs.includes( appObjProp )) {
-        // !VA First, validate that the user-entered value is an integer and if so, set the error variables.
-        if (validateInteger(evtTargetVal)) {
-          // !VA NOTE: This is where we could easily trap the negative button increment if it falls below 0 to send a different message than just the standard 'not_Integer' message. Revisit.
-          appMessCode = 'err_not_Integer';
-          isErr = true;
-        } else {
-          // !VA The input is an integer, so handle the error cases for the user input
-          switch (true) {
-          case (appObjProp === 'viewerW') :
-            // !VA The user has selected a viewerW that's smaller than the currently displayed image. Undetermined how to deal with this but for now the current image is shrunk to the selected viewerW. But Appobj is not updated accordingly, needs to be fixed.
-            if (evtTargetVal < Appobj.imgW ) {
-              // !VA Do nothing for now, see above.
-            } else if (evtTargetVal > maxViewerWidth ) {
-              // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px - and the user-entered value exceeds this, so error.
-              isErr = true;
-              appMessCode = 'err_viewerW_GT_maxViewerWidth';
-            } else {
-              // !VA first write val to the viewerW input's value
-              // document.querySelector(dynamicRegions.imgViewer).value = val;
-              // !VA  The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running calcViewerSize. So, return no error and continue in handleKeyup.
-              isErr = false;
-            }
-            break;
-            // !VA Handle the imagewidth toolButton input
-          case (appObjProp === 'imgW') :
-            // !VA If the new image width is greater than the viewer width, then show message. 
-            if (evtTargetVal > Appobj.viewerW ) {
-              // !VA errorHandler!
-              isErr = true;
-              appMessCode = 'err_imgW_GT_viewerW';
-            }
-            break;
-          // !VA TODO: Handle the imageheight toolButton input
-          case (appObjProp === 'imgH') :
-            console.log('Error handling for imageheight input not implemented!');
-            break;
-
-            // !VA TODO: Handle the small phone input
-          case (appObjProp === 'sPhoneW') :
-            console.log('Error handling for iptTbrSmallPhonesW input not implemented!');
-            break;
-          
-          // !VA Handle the large phone input
-          case (appObjProp === 'lPhoneW') :
-            console.log('Error handling for imagewidth input not implemented!');
-            break;
-
-          // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply
-          case (appObjProp === 'iptCcpTdHeight' && !Appobj.rdoCcpTdExcludeimg ) :
-            if (evtTargetVal < Appobj.imgH ) {
-              // !VA errorHandler!
-              isErr = true;
-              appMessCode = 'err_cell_smaller_than_image';
-            }
-            break;
-          
-          // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply
-          case (appObjProp === 'iptCcpTdWidth') :
-            if (evtTargetVal < Appobj.imgW  && !Appobj.rdoCcpTdExcludeimg ) {
-              // !VA errorHandler!
-              isErr = true;
-              appMessCode = 'err_not_yet_implemented';
-              console.log('Error handling for iptCcpTdHeight/iptCcpTdWidth not yet implemented');
-            }
-            break;
-          }
-        }
-      // !VA appObjProp refers to a non-numeric inut field, i.e. class, alt etc.
-      } else if (!numericInputs.includes( appObjProp )) {
-        // !VA The input is non-numeric, i.e. class, alt, bgcolor, etc
-        console.log('Non-numeric input');
+      // !VA First, validate that the user-entered value is an integer. validateInteger returns false if the input is either not an integer or is not a string that can be converted to an integer. Otherwise, it returns the evtTargetVal as a number.
+      retVal = validateInteger(evtTargetVal);
+      // console.log('retVal is: ' + retVal);
+      // !VA If validateInteger returned false to retVal, then there is an error condition with the input value.
+      if (!retVal) {
+        // !VA Branch: implementCcpInput06 (062820)
+        // console.log('ERROR');
+        // !VA NOTE: This is where we could easily trap the negative button increment if it falls below 0 to send a different message than just the standard 'not_Integer' message. Revisit.
+        appMessCode = 'err_not_Integer';
+        isErr = true;
+      // !VA If retVal is not false then it contains an integer value, so begin the error checking on the numeric input
       } else {
-        // !VA Structural error
-        console.log('ERROR in checkUserInput - unknown condition');
-      }
+        // console.log('NO ERROR');
+        // !VA The input is an integer, so handle the error cases for the user input
+        switch (true) {
+        case (appObjProp === 'viewerW') :
+          // !VA The user has selected a viewerW that's smaller than the currently displayed image. Undetermined how to deal with this but for now the current image is shrunk to the selected viewerW. But Appobj is not updated accordingly, needs to be fixed.
+          if (evtTargetVal < Appobj.imgW ) {
+            // !VA Do nothing for now, see above.
+          } else if (evtTargetVal > maxViewerWidth ) {
+            // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px - and the user-entered value exceeds this, so error.
+            isErr = true;
+            appMessCode = 'err_viewerW_GT_maxViewerWidth';
+          } else {
+            // !VA first write val to the viewerW input's value
+            // document.querySelector(dynamicRegions.imgViewer).value = val;
+            // !VA  The viewerW is greater than the imgW so we can go ahead and widen the viewerW with no affecton the current image and without running calcViewerSize. So, return no error and continue in handleKeyup.
+            isErr = false;
+          }
+          break;
+          // !VA Handle the imagewidth toolButton input
+        case (appObjProp === 'imgW') :
+          // !VA If the new image width is greater than the viewer width, then show message. 
+          if (evtTargetVal > Appobj.viewerW ) {
+            // !VA errorHandler!
+            isErr = true;
+            appMessCode = 'err_imgW_GT_viewerW';
+          }
+          break;
+        // !VA TODO: Handle the imageheight toolButton input
+        case (appObjProp === 'imgH') :
+          console.log('Error handling for imageheight input not implemented!');
+          break;
+
+          // !VA TODO: Handle the small phone input
+        case (appObjProp === 'sPhoneW') :
+          console.log('Error handling for iptTbrSmallPhonesW input not implemented!');
+          break;
+        
+        // !VA Handle the large phone input
+        case (appObjProp === 'lPhoneW') :
+          console.log('Error handling for imagewidth input not implemented!');
+          break;
+
+        // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply - exclude rdoCcpTdExcludeimg from the error condition
+        case (appObjProp === 'iptCcpTdHeight' && !Appobj.rdoCcpTdExcludeimg ) :
+          if (evtTargetVal < Appobj.imgH ) {
+            // !VA errorHandler!
+            isErr = true;
+            appMessCode = 'err_cell_smaller_than_image';
+          }
+          break;
+        
+        // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply - exclude rdoCcpTdExcludeimg from the error condition
+        case (appObjProp === 'iptCcpTdWidth') :
+          if (evtTargetVal < Appobj.imgW  && !Appobj.rdoCcpTdExcludeimg ) {
+            // !VA errorHandler!
+            isErr = true;
+            appMessCode = 'err_not_yet_implemented';
+            console.log('Error handling for iptCcpTdHeight/iptCcpTdWidth not yet implemented');
+          }
+          break;
+        case (appObjProp === 'iptCcpTableWidth') :
+          if (evtTargetVal < Appobj.imgW ) {
+            // !VA errorHandler!
+            isErr = true;
+            appMessCode = 'err_not_yet_implemented';
+            console.log('Error handling for iptCcpTdHeight/iptCcpTdWidth not yet implemented');
+          }
+          break;
+        case (appObjProp === 'iptCcpTableWrapperWidth') :
+          if (evtTargetVal < Appobj.viewerW ) {
+            // !VA errorHandler!
+            isErr = true;
+            appMessCode = 'err_not_yet_implemented';
+            console.log('Error handling for iptCcpTdHeight/iptCcpTdWidth not yet implemented');
+          }
+          break;
+        default:
+          console.log('ERROR in checkNumericInput - unknown condition in case/select');
+        }
+      } 
 
       // !VA Error condition - pass the appMessCode to handleAppMessages
       if (isErr) {
@@ -3193,7 +3179,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA If no error, pass false back to handleKeyup and continue.
         isErr = false;
       }
-      return isErr;
+      // console.log('retVal is: ' + retVal);
+      return retVal;
     }
 
     // !VA Branch: implementCcpInput01 (062120)
@@ -3230,6 +3217,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       console.dir(Appobj);
 
 
+
       calcViewerSize(false);
 
     }
@@ -3261,6 +3249,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         actualW = Appobj.imgW;
         actualH = Appobj.imgH; 
       }
+
+
 
       switch(true) {
       // The image falls within the default viewer dimensions set in initApp, so do nothing.
@@ -4057,18 +4047,21 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // appController private 
     function validateInteger(inputVal) {
-      // !VA Since integer validation is used for all height/width input fields, including those not yet implemented
-      let isErr;
-      // let mess;
+      console.log('validateInteger running');
+      // !VA Integer validation is used for all height/width input fields, including those in CCP
+      let retVal;
+      // !VA Handle the CCP input from the fields that should be returning integers. i.e. the numeric inputs in handleKeydown. If they are type string, then convert them to number. If the conversion fails, then throw an error - that means that the user didn't enter a valid numeric string. This returns false if parseInt fails, i.e. returns NaN. Otherwise, it returns the inputVal as integer.
       if (!parseInt(inputVal, 10) || inputVal % 1 !== 0 || inputVal < 0) {
-        isErr = true;
+        retVal = false;
       } else { 
         // !VA Input fields return strings, so convert to integer
-        inputVal = parseInt(inputVal);
-        isErr = false;
+        if (typeof(inputVal) == 'string' ) { inputVal = parseInt(inputVal); }
+        var foo = typeof(inputVal);
+        console.log('foo is: ' + foo);
+        retVal = inputVal;
       }
       // !VA Just returning true here, the error code is sent by the calling function in handleUserAction
-      return isErr;
+      return retVal;
     }
     //  !VA END ERROR HANDLING
 
