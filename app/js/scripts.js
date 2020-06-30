@@ -723,8 +723,7 @@ var Witty = (function () {
           Appobj.imgH = curImg.height;
           Appobj.imgNW = curImg.naturalWidth;
           Appobj.imgNH = curImg.naturalHeight;
-          console.log('Mark1');
-          console.log('typeof(Appobj.imgW) is: ' + typeof(Appobj.imgW));
+
           
           // !VA Get the Appobj properties for iptTbrSmallPhonesW and sPhonesH
           // !VA TODO: The default here is still coming from the data- attribute. It should be either the default, which comes from the placeholder in the HTML DOM element, or from localStorage. This needs to be addressed - there's no need to get the default from the data attribute, and I'm It appears the default is coming from the placeholder now rather than the data attribute - so there's probably no point in writing data attributes at all. Get rid of it completely in the next implementation. It appears here that Appobj.sPhonesW still accesses the data-attribute when it should be accessing the placeholder. This is actually a problem in initUI: there the viewerW, sPhoneW and lPhoneW values are writting from localStorage of from the placeholder default to the data-... attributes, which is not necessary. Data attributes were only used because I didn't have a localStorage solution, but now that I do, the data-... attributes are unnecessary. They all need to be deprecated. For later...
@@ -2932,18 +2931,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       let retVal;
       // !VA Get the keypress
       let keydown = evt.which || evt.keyCode || evt.key;
-      // !VA Initialize the object to store the user input data: evtTargetId, evtTargetVal and appObjProp. This object is passed to 
-      const userInputObj = { };
       // !VA userInputObj is the array containing the values needed to check input, evaluate the Toolbar input, and update Appobj prior to writing dynamicRegions to the DOM after user input in the Toolbar input fields.
-      // !VA evtTargetId is the ID of the element into which the user entered a change
-      userInputObj.evtTargetId = this.id;
-      // !VA evtTargetVal is the value the user entered into the input element as integer.
+      const userInputObj = { };
       // !VA Branch: implementCcpInput06 (062820)
-      // !VA Now we have to already split the input values into those that require integers and those that require strings. So tdwidth, tdheight, tablewidth, tablewrapperwidth have to be converted now.  
-      // userInputObj.evtTargetVal = parseInt(this.value);
-      userInputObj.evtTargetVal = this.value;
+
+
       // !VA elementIdToAppobjProp gets the Appobj key that corresponds to a given element ID. We need the Appobj key to get the Appobj value to compare to the user-entered value in the respective Toolbar input field. 
-      userInputObj.appObjProp = elementIdToAppobjProp(this.id);
+      userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
 
       // !VA Branch: implementCcpInput06 (062820)
       // !VA Handle the numeric inputs 
@@ -2951,24 +2945,23 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       stringInputs = ['iptCcpImgClass', 'iptCcpImgAlt', 'iptCcpImgRelPath', 'iptCcpTdClass', 'iptCcpTdBgColor', 'iptCcpTdFontColor', 'iptCcpTdBorderColor', 'iptCcpTableClass', 'iptCcpTableBgColor', 'iptCcpTableWrapperClass', 'iptCcpTableWrapperBgColor' ]
       // !VA If TAB or ENTER
       if (keydown == 9 || keydown == 13) {
+
+        // !VA evtTargetVal is the value the user entered into the input element as integer.
+        userInputObj.evtTargetVal = evt.target.value;
         // !VA handleKeydown input error checking on TAB and ENTER
         // !VA If appObjProp is included in the numericInputs array which includes all of the UI elements that require numeric input, then run checkNumericInput on the contents of userInputObj. Separating out numeric from string inputs. Check numeric input returns false if the integer validation fails, otherwise it returns userInputObj.evtTargetVal as number (instead of string)
         if (numericInputs.includes( userInputObj.appObjProp )) { 
-          // console.log('NUMBER');
-          retVal = checkNumericInput(userInputObj); } 
+          retVal = checkNumericInput(userInputObj); 
+        } 
         else if (stringInputs.includes( userInputObj.appObjProp )) {
-
-
           // !VA Branch: implementCcpInput06 (062820)
-          // !VA Stopping here. String values return undefined - need to be handled in checkTextInput
-
-          // retVal = checkTextInput(userInputObj);
-          console.log('STRING'); } 
+          retVal = checkTextInput(userInputObj);
+        }
         else {
           console.log('ERROR in handleKeydown - unknown data type');
         }
       }
-      // !VA Now that retVal is a number, write it back to userInputObj.evtTargetVal and pass userInputObj to handleTabKey and handleEnterKey
+      // !VA Now that retVal is a validated number or string, write it back to userInputObj.evtTargetVal and pass userInputObj to handleTabKey and handleEnterKey
       if ( retVal !== false ) { userInputObj.evtTargetVal = retVal; }
 
       // !VA Branch: implementCcpInput06 (062820)
@@ -2978,17 +2971,18 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       } else if ( keydown == 13 ) {
         handleEnterKey(userInputObj);
       } else {
-        console.log('ERROR in handleKeydown - unknown keypress');
+        // !VA NOTE: Any other key than TAB or ENTER - don't need to trap this I don't think.
+        // console.log('ERROR in handleKeydown - unknown keypress');
       }
     }
 
     function handleTabKey(userInputObj) {
-      console.log('handleTabKey running');
-      console.log('userInputObj: ');
-      console.dir(userInputObj);
+      // console.log('handleTabKey running');
+      // console.log('userInputObj: ');
+      // console.dir(userInputObj);
       let isErr;
       // !VA Destructure userInputObj into variables
-      const { appObjProp, evtTargetId, evtTargetVal } = userInputObj;
+      const { appObjProp, evtTargetVal } = userInputObj;
 
       // !VA Branch: implementCcpInput06 (062820)
       // !VA The conditions below are awful. 
@@ -2996,12 +2990,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         * if the value isn't Appobj, write the value to Appobj and blur.
         * if the value is null, blur
       */ 
-      console.log('appObjProp is: ' + appObjProp);
-      console.log('evtTargetId is: ' + evtTargetId);
-      console.log('evtTargetVal is: ' + evtTargetVal);
-      console.log('Appobj[appObjProp] is: ' + Appobj[appObjProp]);
-      console.log('typeof(Appobj[appObjProp]) is: ' + typeof(Appobj[appObjProp]));
-      console.log('typeof(evtTargetVal) is: ' + typeof(evtTargetVal));
+      // console.log('appObjProp is: ' + appObjProp);
+      // console.log('evtTargetId is: ' + evtTargetId);
+      // console.log('evtTargetVal is: ' + evtTargetVal);
+      // console.log('Appobj[appObjProp] is: ' + Appobj[appObjProp]);
+      // console.log('typeof(Appobj[appObjProp]) is: ' + typeof(Appobj[appObjProp]));
+      // console.log('typeof(evtTargetVal) is: ' + typeof(evtTargetVal));
       
       if (evtTargetVal === '' || evtTargetVal === Appobj[appObjProp]) {
         console.log('empty or Appobj');
@@ -3181,6 +3175,22 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
       // console.log('retVal is: ' + retVal);
       return retVal;
+    }
+
+    // !VA appController private
+    // !VA Include required string validation here. Only applies to CCP input elements that take text input, as defined in handleKeydown. i.e. class, alt, relpath, bgcolor, etc input elements. 
+    function checkTextInput(userInputObj) {
+      // console.log('checkTextInput running');
+      let retVal;
+      // !VA Destructure userInputObj
+      // !VA TODO: I don't think evtTargetId is ever used...remove?
+      // const { evtTargetId, appObjProp, evtTargetVal } = userInputObj;
+      const { appObjProp, evtTargetVal } = userInputObj;
+      // !VA Add string validation here if required
+      retVal = evtTargetVal;
+      return retVal;
+
+
     }
 
     // !VA Branch: implementCcpInput01 (062120)
