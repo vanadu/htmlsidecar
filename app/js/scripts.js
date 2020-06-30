@@ -599,8 +599,7 @@ var Witty = (function () {
       }, 
 
       // !VA UIController public 
-      // !VA Writes Appobj values to the CCP DOM based on parameters: Appobj, and an array of rest parameters from the appController Appobj handler. The rest parameter arrays contain key/value arrays with the identifier corresponding to the appObj/ccpUserInput key and a string identifying the action to perform. This facilitates making multiple DOM accesses based on only one cross-module call to Appobj.
-      // !VA NOTE: I don't like that AppobjMap is passed as a parameter with every loop iteration. I need to think about whether that is fixable, but it works and is pretty fast for now.
+      // !VA Writes Appobj values to the CCP DOM based on parameters: flag and an array of rest parameters from the appController Appobj handler. The rest parameter arrays contain key/value arrays with the identifier corresponding to the appObj/ccpUserInput key and a string identifying the action to perform. This facilitates making multiple DOM accesses based on only one cross-module call to Appobj.
       handleCcpActions: function (flag, ...args) {
         // console.log('handleCcpActions running');
         // console.log('handleCcpActions Appobj: ');
@@ -663,7 +662,6 @@ var Witty = (function () {
             console.log('ERROR in writeAppobjToDOM - span mock checkbox not handled');
           }
         }
-
       },
 
 
@@ -1340,8 +1338,7 @@ var Witty = (function () {
     // !VA NODE FUNCTIONS
 
     // !VA CBController private
-    // !VA Getting the selected TD option from Appobj should be an external function, since this logic is repeated in batchAppobjToDOM and possibly elsewhere. No, because 1) batchAppobjToDOM is in appController and would require crossing modules and 2) batchAppobjToDOM returns the ccpUserInput property name corresponding to the selected Td option, not the td option itself.
-    // !VA Branch: implementCcpInput02 (062420)
+    // !VA Getting the selected TD option from Appobj should be an public function, since this logic is repeated in batchAppobjToDOM and possibly elsewhere. No, because 1) batchAppobjToDOM is in appController and would require crossing modules and 2) batchAppobjToDOM returns the ccpUserInput property name corresponding to the selected Td option, not the td option itself.
     // !VA Returns the selected TD option from Appobj as a element alias string, i.e. rdoCcpTdBasic. 
     function getSelectedTdOptionFromAppobj() {
       let arr, selectedTdOption;
@@ -2778,21 +2775,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       this.select();
     }
 
-    // !VA appController private function
-    function handleCcpInput(prop, value) {
-      // console.log('handleCcpInput');
-      // console.log('prop is: ' + prop);
-      // console.log('value is: ' + value);
-      let arr = [];
-      arr[0] = prop;
-      arr[1] = value;
-      Appobj[prop] = value;
-      UIController.writeAppobjToDOM( arr );
-      // console.log('handleCcpInput Appobj: ');
-      // console.dir(Appobj);
-      
-    }
-
     // !VA TODO: Why is the argument unused, why are there unused elements and what is actually happening here?
     // !VA appController private
     // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appobj property. Takes no argument because we're using this instead of the event.
@@ -2923,10 +2905,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
     // !VA Branch: implementCcpInput06 (062820)
-    // !VA Handles the TAB and ENTER key. The ENTER key implements the change so the user can see the effects, and sets the cursor in the field so the user can change it if desired, and writes the change to Appobj. The TAB key just blurs the field.  I think this is just the right behavior for CCP too.
+    // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Sorts keypresses by data types number and string based on the target input element. Calls checkNumericInput or checkTextInput, which validates the input and returns either an integer or a string and calls handleTabKey or handleEnterKey with the userInputObj { evtTargetVal, appObjProp} argument.
     function handleKeydown(evt) {
       // console.clear();
-      console.log('handleKeydown evt.target.id is: ' + evt.target.id);
       let numericInputs = [], stringInputs = [];
       let retVal;
       // !VA Get the keypress
@@ -2967,8 +2948,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Branch: implementCcpInput06 (062820)
       // !VA checkNumericInput complete.
       if (keydown == 9 ) {
+        // !VA Pass userInputObj to handle the Tab key
         handleTabKey(userInputObj);
       } else if ( keydown == 13 ) {
+        // !VA Pass userInputObj to handle the Enter key
         handleEnterKey(userInputObj);
       } else {
         // !VA NOTE: Any other key than TAB or ENTER - don't need to trap this I don't think.
@@ -2977,7 +2960,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     function handleTabKey(userInputObj) {
-      // console.log('handleTabKey running');
+      console.clear();
+      console.log('handleTabKey running');
       // console.log('userInputObj: ');
       // console.dir(userInputObj);
       let isErr;
@@ -2992,15 +2976,22 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       */ 
       // console.log('appObjProp is: ' + appObjProp);
       // console.log('evtTargetId is: ' + evtTargetId);
-      // console.log('evtTargetVal is: ' + evtTargetVal);
+      console.log('handleTabKey evtTargetVal is: ' + evtTargetVal);
+      console.log('Appobj[appObjProp] is: ' + Appobj[appObjProp]);
       // console.log('Appobj[appObjProp] is: ' + Appobj[appObjProp]);
       // console.log('typeof(Appobj[appObjProp]) is: ' + typeof(Appobj[appObjProp]));
       // console.log('typeof(evtTargetVal) is: ' + typeof(evtTargetVal));
-      
+      console.log('Before: Appobj[appObjProp]: ');
+      console.dir(Appobj[appObjProp]);
       if (evtTargetVal === '' || evtTargetVal === Appobj[appObjProp]) {
         console.log('empty or Appobj');
+      } else if ( evtTargetVal !== Appobj[appObjProp]) {
+        console.log('New value: evtTargetVal is: ' + evtTargetVal);
+        // !VA Write to Appobj and DOM
+        Appobj[appObjProp] = evtTargetVal;
       }
-
+      console.log('After: Appobj[appObjProp]: ');
+      console.dir(Appobj[appObjProp]);
 
 
     }
@@ -3302,7 +3293,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController private
-    function resizeContainers( )  {
+    function resizeContainers()  {
       // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values which are passed in from calcViewerSize.
       // !VA Initial height is 450, as explicitly defined in calcViewerSize. TOo much hassle to try and get the value as defined in the CSS programmatically.
       // !VA Note: This has dynamicRegion values that are not written back to Appobj after recalculation, this may be a problem at some point.
@@ -3396,6 +3387,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // console.dir(Appobj);
     }
 
+    // !VA appController private
     function batchDOMToAppobj() {
       console.log('batchDOMToAppobj running');
       let arr = [];
@@ -3538,7 +3530,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController private 
-    // !VA The id argument selects the corresponding radio button element.
+    // !VA The id argument selects the corresponding radio button element. q
     function handleTdOptions(id) {
       // console.log('handleTdOptions running');
       // console.log('id is: ' + id);
@@ -3689,6 +3681,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController private
+    // !VA Contains the logic for defining the fixed/fluid Appobj properties and calls handleCcpAction to set the appropriate values, display/undisplay and disabled/enabled states for the affected DOM elements. IMPORTANT: Calls resetTdOptions to first reset all the TdOptions to their defaults before setting them. This caused an issue when called from batchAppobjToDOM because the fluid options were being applied where they weren't wanted -- see the if (Appobj.rdoCcpImgFluid === true ) condition in batchAppobjToDOM.
     function handleImgType(id) {
       // !VA Reset all the td options to prepare for processing
       resetTdOptions();
@@ -3814,7 +3807,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController private 
-    // !VA Function to display/undisplay the CCP wrapper table options if the checkbox is checked. If Appobj.spnCcpTableIncludeWrapperCheckmrk === 'off', run this to turn it on.
+    // !VA Function to display/undisplay the CCP wrapper table options if the checkbox is checked. If Appobj.spnCcpTableIncludeWrapperCheckmrk === 'off', run this to turn it on. NOTE: That's not accurate - I don't think the flag parameter actually does anything. This just switches the display of the INclude wrapper options on and off based on the Appobj.spnCcpTableIncludeWrapperCheckmrk property.
     function showIncludeWrapperOptions(flag) {
       // console.log('showIncludeWrapperOptions running');
       // !VA If the Include wrapper checkbox is checked, show the dependent options. Otherwise, undislay them.
@@ -4164,12 +4157,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       },
 
 
-
-      // !VA Access Appobj from outside appController. If identifier is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is a property identifier, i.e. an Appobj property name, return the corresponding property value. If it is neither of the above, erro
+      // !VA appController public
+      // !VA Access Appobj from outside appController. If identifier is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is a property identifier, i.e. an Appobj property name, return the corresponding property value. If it is neither of the above, error condition
       getAppobj: function(identifier) {
-
-
-
         console.log('getAppobj running');
         // console.log('identifier is: ' + identifier);
         // console.log('getAppobj Appobj: ');
