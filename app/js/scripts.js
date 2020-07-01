@@ -647,11 +647,59 @@ var Witty = (function () {
       // !VA TODO: Find a more descriptive name for this.
       writeAppobjToDOM: function (...args) {
         console.log('writeAppobjToDOM running');
-        // !VA Loop throught the list of args, determine what type of element it is from the three-character element prefix and perform the appropriate action.    
+        // !VA Loop throught the list of args, determine what type of element it is from the six-character element prefix and perform the appropriate action.  
+        // console.log('writeAppobjToDOM args[0][0]: ');
+        // console.dir(args[0][0]);
+        console.log('writeAppobjToDOM args[0]: ');
+        console.dir(args[0]);
+
+        // !VA Array including all the Toolbar input elements whose blur need to be handled here. These need to be selected but they don't have a 3-char identifier string in the Appobj property name like the CCP elements. This is because their initial property values are calculated from other Appobj property values or are derived from the dynamicRegions elements, i.e. they are not explicitly user-entered in the CCP.  So first, make an array of the Toolbar elements to search for the current property name.
+        let toolbarAppobjProperties = [];
+        toolbarAppobjProperties = [ 'imgW', 'imgH', 'viewerW', 'iptTbrSPhonesWidth', 'iptTbrLPhonesWidth' ];
+        // !VA Make an array of the toolbarElement object containing the list of Toolbar element aliases
+        let toolbarElementArr = [];
+        toolbarElementArr = Object.entries(toolbarElements);
+        let stringToSearch, searchString, elId;
+
+        // !VA Loop through all the args in the rest parameters passed in. 
         for (let i = 0; i < args.length; i++) {
-          if (args[i][0].substring( 0 , 3) === 'ipt') {
+          // !VA If the property name in the current arg is in toolbarAppobjProperties
+          if (toolbarAppobjProperties.includes(args[i][0])) { 
+            for (let j = 0; j < toolbarElementArr.length; j++) {
+              // !VA stringToSearch is the toolbarElements string, converted to lowercase to match the current Appobj property (args[i][0])
+              stringToSearch = toolbarElementArr[j][0].toLowerCase();
+              // !VA searchString is the current Appobj property (args[i][0]), converted to lowercase to to match the toolbarElement alias (toolbarElementArr[j][0]).
+              searchString = args[i][0].toLowerCase();
+              // !VA If there's a match, set that toolbarElement ID to the current element ID.
+              if (stringToSearch.includes(searchString)) {
+                elId = toolbarElementArr[j][1];
+                if (elId.includes('imgW') || elId.includes('imgH')) {
+                  console.log('elId is: ' + elId);
+                  document.querySelector(elId).value = '';
+                } else {
+                  console.log('elId is: ' + elId);
+                  document.querySelector(elId).value = args[i][1];
+                }
+              }
+            }
+
+
+          
+          }
+
+
+          // !VA Handle input elements, both CCP and Toolbar
+          else if (args[i][0].substring( 0 , 3) === 'ipt') {
             // !VA Write the values for the input elements. [0] is the element ID and [1] is the element value. 
             // !VA NOTE: Separate conditions for different element types here - need to prune the ones that aren't necessary
+            // !VA Branch: implementCcpInput07 (063020)
+            // !VA This is where we need to select the dynamicRegions Appobj properties by finding matching strings in the Appobj property names. 
+
+
+
+
+
+
             document.querySelector(ccpUserInput[args[i][0]]).value = args[i][1];
           } else if (args[i][0].substring( 0 , 3) === 'rdo') {
             console.log('ERROR in writeAppobjToDOM - radio button not handled ');
@@ -2490,7 +2538,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         addEventHandler((tbKeypresses[i]),'keydown',handleKeydown,false);
         addEventHandler((tbKeypresses[i]),'keyup',handleKeyup,false);
         addEventHandler((tbKeypresses[i]),'focus',handleFocus,false);
-        addEventHandler((tbKeypresses[i]),'blur',handleBlur,false);
+        // addEventHandler((tbKeypresses[i]),'blur',handleBlur,false);
       }
 
       // !VA Add click event handlers for Inspector clickable elements: Display Size, Small Phones and Large Phones values in the programmatically created SPAN tags
@@ -2547,7 +2595,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           addEventHandler(ccpKeypresses,'keydown',handleKeydown,false);
           addEventHandler(ccpKeypresses,'keyup',handleKeyup,false);
           addEventHandler(ccpKeypresses,'focus',handleFocus,false);
-          addEventHandler(ccpKeypresses,'blur',handleBlur,false);
+          // addEventHandler(ccpKeypresses,'blur',handleBlur,false);
         }
       }
 
@@ -2778,22 +2826,56 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA TODO: Why is the argument unused, why are there unused elements and what is actually happening here?
     // !VA appController private
     // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appobj property. Takes no argument because we're using this instead of the event.
-    function handleBlur(evt) {
-      // !VA Handle blur
+    // !VA Branch: implementCcpInput07 (063020)
+    // !VA Receives the userInputObj = { evtTargetVal, appObjProp }. Called from handleKeyDown. and ... 
+    function handleBlur(userInputObj) {
       // console.clear();
-      // console.log('handleBlur running');
-      // console.log('evt.target.id is: ' + evt.target.id);
-      // console.log('this is: ' + this);
-      let prop;
-      // !VA Get the Appobj property name that corresponds to the ID of the event target
-      prop = elementIdToAppobjProp(this.id);
+      console.log('handleBlur running');
+      console.log('Appobj is: ');
+      console.log(Appobj);
+      // !VA Branch: implementCcpInput07 (063020)
+      // let userInputObj = {};
+      // !VA Destructure userInputObj into variables
+      let { evtTargetVal, appObjProp, evtTargetId } = userInputObj;
+      console.log('handleBlur evtTargetVal is: ' + evtTargetVal);
+      console.log('handleBlur appObjProp is: ' + appObjProp);
+      console.log('handleBlur evtTargetId is: ' + evtTargetId);
 
-      // !VA Branch: implementCcpInput05 (062720)
-      if (prop.substr( 3, 3 ) === 'Ccp') { 
+      // !VA The conditions below are awful. 
+      /* !VA  The TAB KEY
+        * if the value isn't Appobj, write the value to Appobj and blur.
+        * if the value is null, blur
+      */ 
+      let keyval = [];
 
-
-        // handleCcpInput( prop, this.value);
+      // !VA If appObjProp is imgW or imgH, then set evtTargetVal to an empty string. When the empty string is written to the DOM, it will clear the value attribute so the placeholder will show.
+      if (appObjProp === 'imgW' || appObjProp === 'imgH') {
+        evtTargetVal = '';
       }
+      // !VA If the target element value doesn't equal the existing Appobj value, then a new value was user-entered into the input element, so update Appobj with the new value.
+      else if ( evtTargetVal !== Appobj[appObjProp]) {
+        console.log('New value: evtTargetVal is: ' + evtTargetVal);
+        Appobj[appObjProp] = evtTargetVal;
+      } else {
+        // !VA The evtTargetValue is unchanged, so do nothing.
+        console.log('evtTargetValue is unchanged...');
+      }
+
+      keyval = [ appObjProp, evtTargetVal ];
+
+      UICtrl.writeAppobjToDOM( keyval );
+
+
+      // let prop;
+      // // !VA Get the Appobj property name that corresponds to the ID of the event target
+      // prop = elementIdToAppobjProp(this.id);
+
+      // // !VA Branch: implementCcpInput05 (062720)
+      // if (prop.substr( 3, 3 ) === 'Ccp') { 
+
+
+      //   // handleCcpInput( prop, this.value);
+      // }
 
 
 
@@ -2801,11 +2883,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appobj property.
 
       // !VA NOTE: This can probably replace the blur statements in handleKeydown
-      if (prop === 'imgW' || prop === 'imgH') {
-        this.value = '';
-      } else {
-        this.value = Appobj[prop];
-      }
+      // if (prop === 'imgW' || prop === 'imgH') {
+      //   this.value = '';
+      // } else {
+      //   this.value = Appobj[prop];
+      // }
 
 
 
@@ -2916,17 +2998,24 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       const userInputObj = { };
       // !VA Branch: implementCcpInput06 (062820)
 
+      // !VA Add the event target ID to userInputObj. We will need this later to select toolbarElements since their property names don't correspond to the Toolbar element names. This is a structural issue that I'm not going to deal with now, if ever.
+      userInputObj.evtTargetId = evt.target.id;
+
 
       // !VA elementIdToAppobjProp gets the Appobj key that corresponds to a given element ID. We need the Appobj key to get the Appobj value to compare to the user-entered value in the respective Toolbar input field. 
+      console.log('Mark1');
       userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
+
 
       // !VA Branch: implementCcpInput06 (062820)
       // !VA Handle the numeric inputs 
       numericInputs = [ 'viewerW', 'imgW', 'imgH', 'iptCcpTdHeight', 'iptCcpTdWidth', 'iptCcpTableWidth', 'iptCcpTableWrapperWidth', 'iptCcpTdBorderRadius' ];
-      stringInputs = ['iptCcpImgClass', 'iptCcpImgAlt', 'iptCcpImgRelPath', 'iptCcpTdClass', 'iptCcpTdBgColor', 'iptCcpTdFontColor', 'iptCcpTdBorderColor', 'iptCcpTableClass', 'iptCcpTableBgColor', 'iptCcpTableWrapperClass', 'iptCcpTableWrapperBgColor' ]
+      stringInputs = ['iptCcpImgClass', 'iptCcpImgAlt', 'iptCcpImgRelPath', 'iptCcpTdClass', 'iptCcpTdBgColor', 'iptCcpTdFontColor', 'iptCcpTdBorderColor', 'iptCcpTableClass', 'iptCcpTableBgColor', 'iptCcpTableWrapperClass', 'iptCcpTableWrapperBgColor' ];
       // !VA If TAB or ENTER
       if (keydown == 9 || keydown == 13) {
-
+        console.log('handleKeydown userInputObj.evtTargetId is: ' + userInputObj.evtTargetId);
+        console.log('handleKeydown userInputObj.appObjProp is: ' + userInputObj.appObjProp);
+        console.log('handleKeydown userInputObj.evtTargetVal is: ' + userInputObj.evtTargetVal);
         // !VA evtTargetVal is the value the user entered into the input element as integer.
         userInputObj.evtTargetVal = evt.target.value;
         // !VA handleKeydown input error checking on TAB and ENTER
@@ -2949,7 +3038,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA checkNumericInput complete.
       if (keydown == 9 ) {
         // !VA Pass userInputObj to handle the Tab key
-        handleTabKey(userInputObj);
+        // handleTabKey(userInputObj);
+        // !VA Branch: implementCcpInput07 (063020)
+        // !VA Maybe we don't need handleTabKey...
+        console.log('Mark1 userInputObj is: ');
+        console.log(userInputObj);
+        handleBlur(userInputObj);
       } else if ( keydown == 13 ) {
         // !VA Pass userInputObj to handle the Enter key
         handleEnterKey(userInputObj);
@@ -2959,39 +3053,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
     }
 
+    // !VA appController private
+    // !VA Called from handleKeydown if the TAB key is pressed. 
     function handleTabKey(userInputObj) {
       console.clear();
       console.log('handleTabKey running');
       // console.log('userInputObj: ');
       // console.dir(userInputObj);
       let isErr;
-      // !VA Destructure userInputObj into variables
-      const { appObjProp, evtTargetVal } = userInputObj;
 
-      // !VA Branch: implementCcpInput06 (062820)
-      // !VA The conditions below are awful. 
-      /* !VA  The TAB KEY
-        * if the value isn't Appobj, write the value to Appobj and blur.
-        * if the value is null, blur
-      */ 
-      // console.log('appObjProp is: ' + appObjProp);
-      // console.log('evtTargetId is: ' + evtTargetId);
-      console.log('handleTabKey evtTargetVal is: ' + evtTargetVal);
-      console.log('Appobj[appObjProp] is: ' + Appobj[appObjProp]);
-      // console.log('Appobj[appObjProp] is: ' + Appobj[appObjProp]);
-      // console.log('typeof(Appobj[appObjProp]) is: ' + typeof(Appobj[appObjProp]));
-      // console.log('typeof(evtTargetVal) is: ' + typeof(evtTargetVal));
-      console.log('Before: Appobj[appObjProp]: ');
-      console.dir(Appobj[appObjProp]);
-      if (evtTargetVal === '' || evtTargetVal === Appobj[appObjProp]) {
-        console.log('empty or Appobj');
-      } else if ( evtTargetVal !== Appobj[appObjProp]) {
-        console.log('New value: evtTargetVal is: ' + evtTargetVal);
-        // !VA Write to Appobj and DOM
-        Appobj[appObjProp] = evtTargetVal;
-      }
-      console.log('After: Appobj[appObjProp]: ');
-      console.dir(Appobj[appObjProp]);
 
 
     }
@@ -4059,8 +4129,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       } else { 
         // !VA Input fields return strings, so convert to integer
         if (typeof(inputVal) == 'string' ) { inputVal = parseInt(inputVal); }
-        var foo = typeof(inputVal);
-        console.log('foo is: ' + foo);
         retVal = inputVal;
       }
       // !VA Just returning true here, the error code is sent by the calling function in handleUserAction
@@ -4071,7 +4139,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private
     // !VA Get the Appobj property that corresponds to the ID of the DOM input element that sets it. 1) Removes the hypens in the ID string, converts the identifier string (the Appobj/ccpUserInput property name string) to lowercase, finds the match, and returns the aforementioned Appobj/ccpUserInput property name string.
     function elementIdToAppobjProp(id) {
-      // console.log('elementIdToAppobjProp running');
+
+      console.log('elementIdToAppobjProp running');
+      console.log('id is: ' + id);
       let idStr, appobjProp;
       idStr = id;
       // !VA Strip all the hypens out of the ID (str)
