@@ -535,12 +535,9 @@ var Witty = (function () {
             // !VA Open the CCP by default in dev mode
             // !VA First, set it to the opposite of how you want to start it.
             // !VA Branch: implementCcpInput05 (062720)
-            document.querySelector(staticContainers.ccpContainer).classList.add('active');
+            document.querySelector(staticContainers.ccpContainer).classList.remove('active');
             // !VA The return variable isn't used, but keeping it for reference
-            // var ccpState = UIController.toggleCcp();'
-            // !VA Branch: implementCcpInput05 (062720)
-            // UIController.toggleCcp();
-            // appController.initCcp();
+            // var ccpState = UIController.toggleCcp();
             // !VA NOW: The toggle Ccp element functions are all in appController either I have to replicated them here or find another solution or live with the fact that they don't initialize. Or run initUI from here...
 
           }, delayInMilliseconds);
@@ -579,6 +576,8 @@ var Witty = (function () {
         // !VA Branch: implementCcpInput05 (062720)
         // !VA INitialize the CCP
         // appController.initCcp();
+
+
       },
 
 
@@ -788,6 +787,7 @@ var Witty = (function () {
 
         }
         function populateCcpProperties(Appobj) {
+          console.log('populateCcpProperties running');
           // !VA Now initialize Appobj with the CCP element values. This includes ALL CCP elements, including those that are displayed/undisplayed depending on which TDOption or imgType radio is selected. 
           // !VA Don't forget to use bracket notation to add properties to an object: https://stackoverflow.com/questions/1184123/is-it-possible-to-add-dynamically-named-properties-to-javascript-object
           // !VA  for loop: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
@@ -2878,11 +2878,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
 
       // !VA Branch: implementCcpInput08 (070220)
+      // !VA Now, we route to the appropriate writeAppobj handler. If appObjProp is a toolbar element, write to dynamicElements. If appObjProp is a CCP element, write to...writeAppobjToDOM. 
 
 
 
 
       // !VA Why am I not just passing userInputObj here?
+      // !VA Branch: implementCcpInput08 (070220)
+      // !VA handleBlur only handles individual input elements, so there's no reason to 
       keyval = [ appObjProp, evtTargetVal ];
       UICtrl.writeAppobjToDOM( keyval );
 
@@ -3418,6 +3421,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       
       // !VA Called in resizeContainers after writedynamicElements, takes parameter list of CCP ID/value pairs, and updates the DOM with the passed parameters. It is the CCP DOM counterpart to updateAppobj, I think, since it only updates those DOM elements whose ID/Value passed in, rather than a blanket DOM update of all DOM. Renamed from writeDOMElementValues. writeCcpDOM takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the cross-object identifier (the value in the ccpUserInput object) as key and the Appobj value as value. 
       // !VA NOTE: This needs to bypass handleCcpActions, since it's not a result of any ccpAction but rather a direct write through the user input in the dynamicElements. It also has to happen before initCCP, othewise Appobj won't initialize with values for table width and table wrapper width. 
+      console.log('HERE - resizeContainers');
       UICtrl.writeAppobjToDOM( tableWidth, tableWrapperWidth);
       // !VA Branch: implementCcpInput01 (062120)
       // !VA Why does this condition have no actions? Shouldn't write AppbojToDOM be called conditionally below?
@@ -4384,7 +4388,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
         // !VA Branch: implementCcpInput05 (062720)
         // !VA initialize/populate the CCP. tableWidth and tableWrapperWidth are undefined, they don't get written until resizeContainers.
+
+        // !VA Branch: implementCcpInput09 (070220)
+        // !VA Initialize CCP with HTML defaults
         UIController.populateAppobj(Appobj, 'ccp');
+
         // !VA Initialize the 'basic' tdoption
         handleTdOptions(ccpUserInput.rdoCcpTdBasic); 
         // !VA Set up event listeners
