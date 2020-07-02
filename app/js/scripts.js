@@ -535,7 +535,7 @@ var Witty = (function () {
             // !VA Open the CCP by default in dev mode
             // !VA First, set it to the opposite of how you want to start it.
             // !VA Branch: implementCcpInput05 (062720)
-            document.querySelector(staticContainers.ccpContainer).classList.remove('active');
+            document.querySelector(staticContainers.ccpContainer).classList.add('active');
             // !VA The return variable isn't used, but keeping it for reference
             // var ccpState = UIController.toggleCcp();
             // !VA NOW: The toggle Ccp element functions are all in appController either I have to replicated them here or find another solution or live with the fact that they don't initialize. Or run initUI from here...
@@ -652,56 +652,49 @@ var Witty = (function () {
         console.log('writeAppobjToDOM args[0]: ');
         console.dir(args[0]);
 
-        // !VA Array including all the Toolbar input elements whose blur need to be handled here. These need to be selected but they don't have a 3-char identifier string in the Appobj property name like the CCP elements. This is because their initial property values are calculated from other Appobj property values or are derived from the dynamicElements elements, i.e. they are not explicitly user-entered in the CCP.  So first, make an array of the Toolbar elements to search for the current property name.
+        // !VA Branch: implementCcpInput09 (070220)
+        // !VA Abandoning detection of toolbar input elements here
+        // !VA Array including all the Toolbar input elements whose blur need to be handled here. These need to be selected but they don't have a 3-char identifier string in the Appobj property name like the CCP elements. This is because their initial property values are calculated from other Appobj property values or are derived from the dynamicElements elements, i.e. they are not explicitly user-entered in the CCP.  So first, see if the property name is in the dynamicElements.
+        // !VA Branch: implementCcpInput09 (070220)
+        // !VA It makes no sense to pass the dynamicElements through this. There's never any more than one arg at a time because dynamicElement values only change through user-input elements. So let's just trap them at the event handler instead of running dozens of unnecessary loops here to detect them. 
+        // let toolbarElems = Object.keys(toolbarElements);
 
-        // console.log('toolbarElements: ');
-        // console.dir(toolbarElements);
+        // console.log('toolbarElems: ');
+        // console.dir(toolbarElems);
 
 
-        let toolbarAppobjProperties = [];
-        toolbarAppobjProperties = [ 'curImgW', 'curImgH', 'imgViewerW', 'iptTbrSPhonesWidth', 'iptTbrLPhonesWidth' ];
-        // !VA Make an array of the toolbarElement object containing the list of Toolbar element aliases
-        let toolbarElementArr = [];
-        toolbarElementArr = Object.entries(toolbarElements);
-        let stringToSearch, searchString, elId;
+        // let toolbarAppobjProperties = [];
+        // toolbarAppobjProperties = [ 'curImgW', 'curImgH', 'imgViewerW', 'iptTbrSPhonesWidth', 'iptTbrLPhonesWidth' ];
+        // // !VA Make an array of the toolbarElement object containing the list of Toolbar element aliases
+        // let toolbarElementArr = [];
+        // toolbarElementArr = Object.entries(toolbarElements);
+        // let stringToSearch, searchString, elId;
+
+
+
+
 
         // !VA Loop through all the args in the rest parameters passed in. 
+        // !VA This is the top of the args loop
         for (let i = 0; i < args.length; i++) {
-          // !VA If the property name in the current arg is in toolbarAppobjProperties
-          if (toolbarAppobjProperties.includes(args[i][0])) { 
-            for (let j = 0; j < toolbarElementArr.length; j++) {
-              // !VA stringToSearch is the toolbarElements string, converted to lowercase to match the current Appobj property (args[i][0])
-              stringToSearch = toolbarElementArr[j][0].toLowerCase();
-              // !VA searchString is the current Appobj property (args[i][0]), converted to lowercase to to match the toolbarElement alias (toolbarElementArr[j][0]).
-              searchString = args[i][0].toLowerCase();
-              // !VA If there's a match, set that toolbarElement ID to the current element ID.
-              if (stringToSearch.includes(searchString)) {
-                elId = toolbarElementArr[j][1];
-                if (elId.includes('curImgW') || elId.includes('curImgH')) {
-                  console.log('elId is: ' + elId);
-                  document.querySelector(elId).value = '';
-                } else {
-                  console.log('elId is: ' + elId);
-                  document.querySelector(elId).value = args[i][1];
-                }
-              }
-            }
-          }
+
 
 
           // !VA Handle input elements, both CCP and Toolbar
-          else if (args[i][0].substring( 0 , 3) === 'ipt') {
+          if (args[i][0].substring( 0 , 3) === 'ipt') {
             // !VA Write the values for the input elements. [0] is the element ID and [1] is the element value. 
             // !VA NOTE: Separate conditions for different element types here - need to prune the ones that aren't necessary
-            // !VA Branch: implementCcpInput07 (063020)
-            // !VA This is where we need to select the dynamicElements Appobj properties by finding matching strings in the Appobj property names. 
+            if (args[i][0].substring( 3 , 6) === 'Tbr') { 
+              document.querySelector(toolbarElements[args[i][0]]).value = args[i][1];
+            } else if (args[i][0].substring( 3 , 6) === 'Ccp') {
+              document.querySelector(ccpUserInput[args[i][0]]).value = args[i][1];
+            } else {
+              console.log('ERROR in writeAppobjToDOM - unknown alias');
+            }
 
 
-
-
-
-
-            document.querySelector(ccpUserInput[args[i][0]]).value = args[i][1];
+            // document.querySelector(ccpUserInput[args[i][0]]).value = args[i][1];
+            console.log('writeAppobjToDOM input element - ' + args[i][0]);
           } else if (args[i][0].substring( 0 , 3) === 'rdo') {
             console.log('ERROR in writeAppobjToDOM - radio button not handled ');
           } else if (args[i][0].substring( 0 , 3) === 'sel') {
@@ -709,6 +702,8 @@ var Witty = (function () {
             document.querySelector(ccpUserInput[args[i][0]]).value = args[i][1];
           } else if (args[i][0].substring( 0 , 3) === 'spn') {
             console.log('ERROR in writeAppobjToDOM - span mock checkbox not handled');
+          } else {
+            document.querySelector(ccpUserInput[args[i][0]]).value = args[i][1];
           }
         }
 
@@ -2833,7 +2828,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Branch: implementCcpInput07 (063020)
     // !VA Receives the userInputObj = { evtTargetVal, appObjProp }. Called from handleKeyDown. and ... 
     function handleBlur(userInputObj) {
-      // console.clear();
+      console.clear();
       console.log('handleBlur running');
       console.log('Appobj is: ');
       console.log(Appobj);
@@ -2844,14 +2839,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       console.log('handleBlur evtTargetVal is: ' + evtTargetVal);
       console.log('handleBlur appObjProp is: ' + appObjProp);
       console.log('handleBlur evtTargetId is: ' + evtTargetId);
-
-      // !VA The conditions below are awful. 
-      /* !VA  The TAB KEY
-        * if the value isn't Appobj, write the value to Appobj and blur.
-        * if the value is null, blur
-      */ 
       let keyval = [];
-
+      let inputObj = {};
       // !VA Branch: implementCcpInput08 (070220)
       // !VA This is where we have to distinguish between Toolbar actions that result in a dynamicElements change and those that result ONLY in a Clipboard output change. Toolbar actions go to writeToolbarInputToAppobj(args) which calls calcViewerSize which then calls writedynamicElementsDOM and writeAppobjToDOM. CCP actions go straight to writeAppobjToDOM. But first, we need to update Appobj with these values which happens...where?
       // !VA Branch: implementCcpInput08 (070220)
@@ -2860,34 +2849,60 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
 
-      // !VA If appObjProp is curImgW or curImgH, then set Appobj to an empty string. When the empty string is written to the DOM, it will clear the value attribute so the placeholder will show.
-      if (appObjProp === 'curImgW' || appObjProp === 'curImgH') {
-        // !VA Branch: implementCcpInput08 (070220)
-        // !VA I don't think we'll be even passing this, it will be pulled from Appobj to write to the DOM
-        // evtTargetVal = '';
-        Appobj[appObjProp] = '';
-        console.log('handleBlur HIT1');
-      }
-      // !VA If the target element value doesn't equal the existing Appobj value, then a new value was user-entered into the input element, so update Appobj with the new value.
-      else if ( evtTargetVal !== Appobj[appObjProp]) {
+      // !VA Branch: implementCcpInput08 (070220)
+      // !VA If the target element value doesn't equal the existing Appobj value, then a new value was user-entered into the input element, so update Appobj with the new value. This is done in ALL cases, including curImgW and curImgH. Otherwise, evtTargetValue is unchanged, so do nothing, i.e. blur and leave the input value unchanged. An else clause is not necessary here, but it's included for possible error checking and console logging.
+      if ( evtTargetVal !== Appobj[appObjProp]) {
         Appobj[appObjProp] = evtTargetVal;
-        console.log('handleBlur HIT2');
+        // console.log('handleBlur Input value updated');
       } else {
-        // !VA The evtTargetValue is unchanged, so do nothing.
-        console.log('evtTargetValue is unchanged...');
+        // !VA The 
+        // console.log('evtTargetValue is unchanged...');
+      }
+      
+      // !VA For curImgW and curImgH, overwrite evtTargetVal with an empty string so that the placeholder values show through. This has no effect on Appobj, which has already received the user-entered value in the above if-else.
+      // !VA Branch: implementCcpInput09 (070220)
+      // !VA This is where we need to detect if it's a toolbar element and run calcViewerSize if it is. This is a totally mickey mouse solution and I hate it, but I've been doing this all day and I'm tired...stopping here. Tomorrow - write a function that gets the toolbarElements alias from the fucking Appobj property already. Look in the comments for writeAppobjToDOM for hints.
+
+
+      if (appObjProp === 'curImgW' || appObjProp === 'curImgH') {
+        evtTargetVal = '';
+        if (appObjProp === 'curImgW') { keyval = [ 'iptTbrCurImgW', evtTargetVal];}
+        if (appObjProp === 'curImgH') { keyval = [ 'iptTbrCurImgH', evtTargetVal];}
+        console.log('handleBlur curImgW/curImgH input value set to empty string'); 
+      }  else if (appObjProp === 'imgViewerW' || appObjProp === 'sPhonesW' || appObjProp === 'lPhonesW' ) {
+        if (appObjProp === 'imgViewerW') { keyval = [ 'iptTbrImgViewerW', evtTargetVal];}
+        if (appObjProp === 'sPhonesW') { keyval = [ 'iptTbrSPhonesW', evtTargetVal];}
+        if (appObjProp === 'lPhonesW') { keyval = [ 'iptTbrLPhonesW', evtTargetVal];}
+      } else {
+        keyval = [ appObjProp, evtTargetVal ];
       }
 
+
+      console.log('appObjProp is: ' + appObjProp);
+      console.log('evtTargetVal is: ' + evtTargetVal);
+      console.log('keyval: ');
+      console.dir(keyval);
+      UIController.writeAppobjToDOM(keyval);
+      
       // !VA Branch: implementCcpInput08 (070220)
-      // !VA Now, we route to the appropriate writeAppobj handler. If appObjProp is a toolbar element, write to dynamicElements. If appObjProp is a CCP element, write to...writeAppobjToDOM. 
+      // !VA Now, we route to the appropriate writeAppobj handler. If appObjProp is a toolbar element, call calcViewerSize, which parses Appobj to resize the dynamicElements. If appObjProp is a CCP element, dynamicElements aren't affected, so pass the key/value pair to writeAppobjToDOM. 
+      // !VA Branch: implementCcpInput09 (070220)
+      // !VA No, just pass to writeAppobjToDOM and let that sort the dynamicElements from the ccpUserInput elements.
+      // !VA 
+      console.log('CONTINUING');
+      if (appObjProp === 'curImgW' || appObjProp === 'curImgH' || appObjProp === 'imgViewerW' || appObjProp === 'sPhonesW' || appObjProp === 'lPhonesW' ) {
+        inputObj.evtTargetVal = Appobj[appObjProp];
+        console.log('Appobj[appObjProp] is: ' + Appobj[appObjProp]);
+        inputObj.appObjProp = appObjProp;
+        writeToolbarInputToAppobj(inputObj);
+
+      }
 
 
 
-
-      // !VA Why am I not just passing userInputObj here?
       // !VA Branch: implementCcpInput08 (070220)
-      // !VA handleBlur only handles individual input elements, so there's no reason to 
-      keyval = [ appObjProp, evtTargetVal ];
-      UICtrl.writeAppobjToDOM( keyval );
+      // !VA Set the key/value to pass to writeAppobjToDOM
+
 
     }
 
@@ -3262,7 +3277,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     }
 
+      // !VA appController private
     // !VA Branch: implementCcpInput01 (062120)
+    // !VA Branch: implementCcpInput09 (070220)
+    // !VA Rewriting to accomodate handleBlur
     // !VA NEW, derived from evalToolbarInput
     function writeToolbarInputToAppobj(userInputObj) {
       // console.log('writeToolbarInputToAppobj');
@@ -3298,6 +3316,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
       calcViewerSize(false);
+      return;
 
     }
 
@@ -3421,7 +3440,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       
       // !VA Called in resizeContainers after writedynamicElements, takes parameter list of CCP ID/value pairs, and updates the DOM with the passed parameters. It is the CCP DOM counterpart to updateAppobj, I think, since it only updates those DOM elements whose ID/Value passed in, rather than a blanket DOM update of all DOM. Renamed from writeDOMElementValues. writeCcpDOM takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the cross-object identifier (the value in the ccpUserInput object) as key and the Appobj value as value. 
       // !VA NOTE: This needs to bypass handleCcpActions, since it's not a result of any ccpAction but rather a direct write through the user input in the dynamicElements. It also has to happen before initCCP, othewise Appobj won't initialize with values for table width and table wrapper width. 
-      console.log('HERE - resizeContainers');
       UICtrl.writeAppobjToDOM( tableWidth, tableWrapperWidth);
       // !VA Branch: implementCcpInput01 (062120)
       // !VA Why does this condition have no actions? Shouldn't write AppbojToDOM be called conditionally below?
