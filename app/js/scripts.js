@@ -654,6 +654,11 @@ var Witty = (function () {
         console.dir(args[0]);
 
         // !VA Array including all the Toolbar input elements whose blur need to be handled here. These need to be selected but they don't have a 3-char identifier string in the Appobj property name like the CCP elements. This is because their initial property values are calculated from other Appobj property values or are derived from the dynamicRegions elements, i.e. they are not explicitly user-entered in the CCP.  So first, make an array of the Toolbar elements to search for the current property name.
+
+        console.log('toolbarElements: ');
+        console.dir(toolbarElements);
+
+
         let toolbarAppobjProperties = [];
         toolbarAppobjProperties = [ 'imgW', 'imgH', 'viewerW', 'iptTbrSPhonesWidth', 'iptTbrLPhonesWidth' ];
         // !VA Make an array of the toolbarElement object containing the list of Toolbar element aliases
@@ -682,9 +687,6 @@ var Witty = (function () {
                 }
               }
             }
-
-
-          
           }
 
 
