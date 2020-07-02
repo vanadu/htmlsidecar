@@ -583,8 +583,8 @@ var Witty = (function () {
 
 
       // !VA UIController public
-      // !VA This is where the DOM write in evalToolbarInputs and updateAppObj used to happen
-      // !VA Write dimensions of dynamicElements.curImg, dynamicElements.imgViewer and the height of dynamicElements.imgViewport and dynamicElements.appContainer. Width of dynamicElements.imgViewport and dynamicElements.appContainer is static and is sized to the actual application area width.
+      // !VA  This is where the DOM write in evalToolbarInputs and updateAppObj used to happen
+      // !VA Called from resizeContainers. Write dimensions of dynamicElements.curImg, dynamicElements.imgViewer and the height of dynamicElements.imgViewport and dynamicElements.appContainer. Width of dynamicElements.imgViewport and dynamicElements.appContainer is static and is sized to the actual application area width.
       writedynamicElementsDOM: function(Appobj, viewportH, appH) {
         // console.log('writedynamicElementsDOM running');
 
@@ -2828,7 +2828,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA TODO: Why is the argument unused, why are there unused elements and what is actually happening here?
     // !VA appController private
-    // !VA If blurring from curImgW or curImgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appobj property. Takes no argument because we're using this instead of the event.
+    // !VA Branch: implementCcpInput08 (070220)
+    // !VA Called from handleKeydown and ...? Handle behavior when element loses the focus, i.e. on TAB key. This only has Appobj logic. Display logic, i.e. clearing the input to display the placeholders must happen in a UIController function. Otherwise, restore the field value to the Appobj property. 
     // !VA Branch: implementCcpInput07 (063020)
     // !VA Receives the userInputObj = { evtTargetVal, appObjProp }. Called from handleKeyDown. and ... 
     function handleBlur(userInputObj) {
@@ -2851,20 +2852,37 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       */ 
       let keyval = [];
 
-      // !VA If appObjProp is curImgW or curImgH, then set evtTargetVal to an empty string. When the empty string is written to the DOM, it will clear the value attribute so the placeholder will show.
+      // !VA Branch: implementCcpInput08 (070220)
+      // !VA This is where we have to distinguish between Toolbar actions that result in a dynamicElements change and those that result ONLY in a Clipboard output change. Toolbar actions go to writeToolbarInputToAppobj(args) which calls calcViewerSize which then calls writedynamicElementsDOM and writeAppobjToDOM. CCP actions go straight to writeAppobjToDOM. But first, we need to update Appobj with these values which happens...where?
+      // !VA Branch: implementCcpInput08 (070220)
+      // !VA Ignore the above. This is where we write new values and route them to the appropriate writeDOM handler.
+
+
+
+
+      // !VA If appObjProp is curImgW or curImgH, then set Appobj to an empty string. When the empty string is written to the DOM, it will clear the value attribute so the placeholder will show.
       if (appObjProp === 'curImgW' || appObjProp === 'curImgH') {
-        evtTargetVal = '';
-        console.log('HIT');
+        // !VA Branch: implementCcpInput08 (070220)
+        // !VA I don't think we'll be even passing this, it will be pulled from Appobj to write to the DOM
+        // evtTargetVal = '';
+        Appobj[appObjProp] = '';
+        console.log('handleBlur HIT1');
       }
       // !VA If the target element value doesn't equal the existing Appobj value, then a new value was user-entered into the input element, so update Appobj with the new value.
       else if ( evtTargetVal !== Appobj[appObjProp]) {
-        console.log('New value: evtTargetVal is: ' + evtTargetVal);
         Appobj[appObjProp] = evtTargetVal;
+        console.log('handleBlur HIT2');
       } else {
         // !VA The evtTargetValue is unchanged, so do nothing.
         console.log('evtTargetValue is unchanged...');
       }
 
+      // !VA Branch: implementCcpInput08 (070220)
+
+
+
+
+      // !VA Why am I not just passing userInputObj here?
       keyval = [ appObjProp, evtTargetVal ];
       UICtrl.writeAppobjToDOM( keyval );
 
@@ -2934,6 +2952,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             // !VA Branch: implementCcpInput01 (062120)
             // !VA Deprecating...
             // evalToolbarInput(args);
+
+            // !VA Branch: implementCcpInput08 (070220)
+            // !VA I think we are replacing this with writeAppobjToDOM.
             writeToolbarInputToAppobj(args);
           } 
           break;
@@ -3022,8 +3043,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA Pass userInputObj to handle the Tab key
         // handleTabKey(userInputObj);
         // !VA Branch: implementCcpInput07 (063020)
-        // !VA Maybe we don't need handleTabKey...
-        console.log(userInputObj);
+        // !VA Maybe we don't need handleTabKey...we're calling handleBlur directly here because that's what happens on TAB anyway.
         handleBlur(userInputObj);
       } else if ( keydown == 13 ) {
         // !VA Pass userInputObj to handle the Enter key
@@ -3477,11 +3497,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Show the Include wrapper options if the Include wrapper checkbox is checked.
       showIncludeWrapperOptions(flag);
       // !VA Loop through all Appobj entries whose first 8 chars is rdoCcpTd, i.e. all the tdOption radio buttons, and get the selected radio button. Then pass the ID of that button to handleTdOptions to show the appropriate Td options for the selected radio button.
-
-
-      // !VA Branch: implementCcpInput05 (062720)
-      // !VA This is where we need to write the rest of the Appobj properties to the DOM...
-
 
       // !VA Determine which TD options radio is selected in Appobj and pass that element alias to handleTdOptions
       // !VA arr is array of Appobj keys
@@ -4253,7 +4268,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
         } else if (!ccpState) {
           // !VA Branch: implementCcpInput05 (062720)
-          // !VA On closing the CCP, this is where we need to save all the DOM settings so they can be restored by batchAppobjToDOM. Not even sure this is necessary now since the problem with the input fields resetting has been dealt with.
+          // !VA On closing the CCP, need to save all the DOM settings so they can be restored by batchAppobjToDOM. Not even sure this is necessary now since the problem with the input fields resetting has been dealt with.
           batchDOMToAppobj();
         } else {
           console.log('ERROR in initCCP - unknown ccpState');
