@@ -160,15 +160,15 @@
         <!-- #toolbar-buttons -->
         <ul class="toolbar-buttons btn-group" role="group" aria-label="...">
             <!-- VA! viewerW value is set from localStorage or CSS in calcViewerSize -->
-            <li><input id="ipt-tbr-viewerw" class="ttip toolbar-input btn btn-default" type="text" value="" placeholder="650" tabindex="1"></li>
+            <li><input id="ipt-tbr-imgviewerw" class="ttip toolbar-input btn btn-default" type="text" value="" placeholder="650" tabindex="1"></li>
             <!-- TODO: Replace this image with a SVG or HTML entity -->
             <li role="separator"><img class="divider" src="img/divider.png" alt="witty.JS"></li>
             <li><button id="btn-tbr-incr50" type="button" class="toolbar-but btn btn-default"  tabindex="7"></button></li>
             <li><button id="btn-tbr-incr10" type="button" class="toolbar-but btn btn-default" tabindex="8"></button></li>
             <li><button id="btn-tbr-incr01" type="button" class="toolbar-but btn btn-default" tabindex="9"></button></li>
     
-            <li><input id="ipt-tbr-imgwidth" class="toolbar-input btn btn-default" type="text" placeholder="W (px)" tabindex="2"></li>
-            <li><input id="ipt-tbr-imgheight" class="toolbar-input btn btn-default" type="text" placeholder="H (px)" tabindex="3"></li>
+            <li><input id="ipt-tbr-curimgw" class="toolbar-input btn btn-default" type="text" placeholder="W (px)" tabindex="2"></li>
+            <li><input id="ipt-tbr-curimgh" class="toolbar-input btn btn-default" type="text" placeholder="H (px)" tabindex="3"></li>
     
             <li><button id="btn-tbr-decr01" type="button" class="toolbar-but btn btn-default" tabindex="10"></button></li>
             <li><button id="btn-tbr-decr10" type="button" class="toolbar-but btn btn-default" tabindex="11"></button></li>
@@ -177,8 +177,8 @@
           <li role="separator"><img class="divider" src="img/divider.png" alt="witty.JS"></li>
           <!-- VA! 900 is a dummy value that should be overwritten programmatically by the setAttribute property -->
           <!-- VA! 050920 Changed the values for value, data-sphonesw and data-lphonesw to empty because the dummy value I had in there before was just confusing me  -->
-          <li><input id="ipt-tbr-sphones-width" class="toolbar-input btn btn-default" data-sphonesw="" value="" placeholder="320" type="text" tabindex="4"></li>
-          <li><input id="ipt-tbr-lphones-width" class="toolbar-input btn btn-default" data-lphonesw="" value="" placeholder="414" type="text" tabindex="5"></li>
+          <li><input id="ipt-tbr-sphonesw" class="toolbar-input btn btn-default" data-sphonesw="" value="" placeholder="320" type="text" tabindex="4"></li>
+          <li><input id="ipt-tbr-lphonesw" class="toolbar-input btn btn-default" data-lphonesw="" value="" placeholder="414" type="text" tabindex="5"></li>
         </ul> 
         <!-- /#toolbar-buttons -->
 
