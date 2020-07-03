@@ -652,11 +652,6 @@ var Witty = (function () {
         console.log('writeAppobjToDOM args[0]: ');
         console.dir(args[0]);
 
-        // !VA Branch: implementCcpInput09 (070220)
-        // !VA Abandoning detection of toolbar input elements here
-        // !VA Array including all the Toolbar input elements whose blur need to be handled here. These need to be selected but they don't have a 3-char identifier string in the Appobj property name like the CCP elements. This is because their initial property values are calculated from other Appobj property values or are derived from the dynamicElements elements, i.e. they are not explicitly user-entered in the CCP.  So first, see if the property name is in the dynamicElements.
-        // !VA Branch: implementCcpInput09 (070220)
-        // !VA It makes no sense to pass the dynamicElements through this. There's never any more than one arg at a time because dynamicElement values only change through user-input elements. So let's just trap them at the event handler instead of running dozens of unnecessary loops here to detect them. 
         // let toolbarElems = Object.keys(toolbarElements);
 
         // console.log('toolbarElems: ');
@@ -2821,17 +2816,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       this.select();
     }
 
-    // !VA TODO: Why is the argument unused, why are there unused elements and what is actually happening here?
     // !VA appController private
-    // !VA Branch: implementCcpInput08 (070220)
-    // !VA Called from handleKeydown and ...? Handle behavior when element loses the focus, i.e. on TAB key. This only has Appobj logic. Display logic, i.e. clearing the input to display the placeholders must happen in a UIController function. Otherwise, restore the field value to the Appobj property. 
-    // !VA Branch: implementCcpInput07 (063020)
-    // !VA Receives the userInputObj = { evtTargetVal, appObjProp }. Called from handleKeyDown. and ... 
+    // !VA Called from handleKeydown and ...? Handle behavior when element loses the focus, i.e. on TAB key. This only has Appobj logic. Display logic, i.e. clearing the input to display the placeholders must happen in a UIController function. 
+    // !VA Branch: implementCcpInput09 (070220)
+    // !VA This is more complex than it should be - success depends on the sequence of actions. 1) Determine if the value has changed from its preexisting Appobj value 2) Determine if the input target is curImgW or curImgH, and a) if so, set evtTargetVal to an empty string so that on blur the input element will assume the placeholder value and set the appObjProp in the keyval to the toolbarElement alias/evtTargetVal or b) else if the target input is any of the other toolbarElements then leave evtTargetVal unchanged and set the appObjProp in the keyval to the toolbarElement alias. If none of the above conditions are true, then the input element is a CCP element, so pass the key/value pair unchanged to writeAppobjToDOM. That takes care of the input value handing in the actual input elements. Now, if the target input element was a toolbarElement, that input has to be reflected in the dynamicElements containers. Since Appobj was already updated in Step 1, trap the toolbarElement input elements and create a new object containing the Appobj name and the evtTargetVal and pass it to writeToolbarInputToAppobj, which calculates the adjacent dimension for curImgW/curImgH and runs calcViewerSize. 
     function handleBlur(userInputObj) {
       console.clear();
       console.log('handleBlur running');
-      console.log('Appobj is: ');
-      console.log(Appobj);
+
       // !VA Branch: implementCcpInput07 (063020)
       // let userInputObj = {};
       // !VA Destructure userInputObj into variables
@@ -2841,19 +2833,20 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       console.log('handleBlur evtTargetId is: ' + evtTargetId);
       let keyval = [];
       let inputObj = {};
-      // !VA Branch: implementCcpInput08 (070220)
-      // !VA This is where we have to distinguish between Toolbar actions that result in a dynamicElements change and those that result ONLY in a Clipboard output change. Toolbar actions go to writeToolbarInputToAppobj(args) which calls calcViewerSize which then calls writedynamicElementsDOM and writeAppobjToDOM. CCP actions go straight to writeAppobjToDOM. But first, we need to update Appobj with these values which happens...where?
-      // !VA Branch: implementCcpInput08 (070220)
-      // !VA Ignore the above. This is where we write new values and route them to the appropriate writeDOM handler.
-
-
-
 
       // !VA Branch: implementCcpInput08 (070220)
-      // !VA If the target element value doesn't equal the existing Appobj value, then a new value was user-entered into the input element, so update Appobj with the new value. This is done in ALL cases, including curImgW and curImgH. Otherwise, evtTargetValue is unchanged, so do nothing, i.e. blur and leave the input value unchanged. An else clause is not necessary here, but it's included for possible error checking and console logging.
+      // !VA If the target element value doesn't equal the existing Appobj value, then a new value was user-entered into the input element, so update Appobj with the new value. This is done in ALL cases, including curImgW and curImgH. Otherwise, evtTargetValue is unchanged, so do nothing, i.e. blur and leave the input value unchanged. An else clause is not necessary here, but it's included for possible error checking and console logging. 
       if ( evtTargetVal !== Appobj[appObjProp]) {
         Appobj[appObjProp] = evtTargetVal;
         // console.log('handleBlur Input value updated');
+
+
+
+
+
+
+
+        
       } else {
         // !VA The 
         // console.log('evtTargetValue is unchanged...');
@@ -2861,9 +2854,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       
       // !VA For curImgW and curImgH, overwrite evtTargetVal with an empty string so that the placeholder values show through. This has no effect on Appobj, which has already received the user-entered value in the above if-else.
       // !VA Branch: implementCcpInput09 (070220)
-      // !VA This is where we need to detect if it's a toolbar element and run calcViewerSize if it is. This is a totally mickey mouse solution and I hate it, but I've been doing this all day and I'm tired...stopping here. Tomorrow - write a function that gets the toolbarElements alias from the fucking Appobj property already. Look in the comments for writeAppobjToDOM for hints.
-
-
+      // !VA This is where we need to detect if it's a toolbar element and run calcViewerSize if it is. This is a totally mickey mouse solution and I hate it, but I've been doing this all day and I'm tired...stopping here. Tomorrow - write a function that gets the toolbarElements alias from the Appobj property already. Look in the comments for writeAppobjToDOM for hints.
       if (appObjProp === 'curImgW' || appObjProp === 'curImgH') {
         evtTargetVal = '';
         if (appObjProp === 'curImgW') { keyval = [ 'iptTbrCurImgW', evtTargetVal];}
@@ -2900,8 +2891,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
 
-      // !VA Branch: implementCcpInput08 (070220)
-      // !VA Set the key/value to pass to writeAppobjToDOM
+      console.log('END Appobj is: ');
+      console.log(Appobj);
 
 
     }
