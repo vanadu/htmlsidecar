@@ -632,45 +632,24 @@ var Witty = (function () {
       },
 
       // !VA UIController public 
-      // !VA This function writes individual values directly to the DOM. Called by resizeContainers to set dynamicElements DOM values on initialization and toolbar input. Called by resetTdOptions, handleTdOptions, handleImgType to set CCP DOM element values. args is a rest parameter list of key/value arrays, whereby the key is the alias of the element to write to and value value to write. 
+      // !VA This function writes both rest parameter values from populateAppobj and user-input values to the CCP DOM. Called by resizeContainers to write CCP tableWidth and tableWrapperWidth on initialization and toolbar input. Called by resetTdOptions, handleTdOptions, handleImgType to set CCP DOM element values. args is a rest parameter list of key/value arrays, whereby the key is the alias of the element to write to and value value to write. 
       // !VA TODO: Find a more descriptive name for this.
       writeAppobjToDOM: function (...args) {
         // console.log('writeAppobjToDOM running');
         // !VA Loop throught the list of args, determine what type of element it is from the six-character element prefix and perform the appropriate action.  
         // console.log('writeAppobjToDOM args[0][0]: ');
         // console.dir(args[0][0]);
-        console.log('writeAppobjToDOM args[0]: ');
-        console.dir(args[0]);
-
-        // let toolbarElems = Object.keys(toolbarElements);
-
-        // console.log('toolbarElems: ');
-        // console.dir(toolbarElems);
-
-
-        // let toolbarAppobjProperties = [];
-        // toolbarAppobjProperties = [ 'curImgW', 'curImgH', 'imgViewerW', 'iptTbrSPhonesWidth', 'iptTbrLPhonesWidth' ];
-        // // !VA Make an array of the toolbarElement object containing the list of Toolbar element aliases
-        // let toolbarElementArr = [];
-        // toolbarElementArr = Object.entries(toolbarElements);
-        // let stringToSearch, searchString, elId;
-
-
-
-
-
+        console.log('writeAppobjToDOM - args[0]: ' + args[0] + ', args[1]: ' + args[1]);
         // !VA Loop through all the args in the rest parameters passed in. 
         // !VA This is the top of the args loop
         for (let i = 0; i < args.length; i++) {
-
-
-
           // !VA Handle input elements, both CCP and Toolbar
           if (args[i][0].substring( 0 , 3) === 'ipt') {
             // !VA Write the values for the input elements. [0] is the element ID and [1] is the element value. 
             // !VA NOTE: Separate conditions for different element types here - need to prune the ones that aren't necessary
             if (args[i][0].substring( 3 , 6) === 'Tbr') { 
-              document.querySelector(toolbarElements[args[i][0]]).value = args[i][1];
+              console.log('WHY IS THIS HERE?');
+              // document.querySelector(toolbarElements[args[i][0]]).value = args[i][1];
             } else if (args[i][0].substring( 3 , 6) === 'Ccp') {
               document.querySelector(ccpUserInput[args[i][0]]).value = args[i][1];
             } else {
@@ -2810,12 +2789,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       console.log('handleBlur running');
       // !VA Destructure userInputObj into variables
       let { evtTargetVal, appObjProp } = userInputObj;
-      console.log('handleBlur evtTargetVal is: ' + evtTargetVal);
-      console.log('handleBlur appObjProp is: ' + appObjProp);
       let keyval = [];
       let inputObj = {};
-
-      // !VA Branch: implementCcpInput08 (070220)
+      // !VA 1) Update Appobj
       // !VA If the target element value doesn't equal the existing Appobj value, then a new value was user-entered into the input element, so update Appobj with the new value. This is done in ALL cases, including curImgW and curImgH. Otherwise, evtTargetValue is unchanged, so do nothing, i.e. blur and leave the input value unchanged. An else clause is not necessary here, but it's included for possible error checking and console logging. 
       if ( evtTargetVal !== Appobj[appObjProp]) {
         Appobj[appObjProp] = evtTargetVal;
@@ -2824,20 +2800,28 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // console.log('evtTargetValue is unchanged...');
       }
       
+      // !VA Write values to target input DOM element
       // !VA Run appObjPropToAlias on appObjProp to get the corresponding toolbarElements alias -- writeAppobjToDOM needs the alias to select the element with document.querySelector()
       if (appObjProp === 'curImgW' || appObjProp === 'curImgH') {
-        // !VA For curImgW and curImgH, pass an empty string so that the placeholder values show through. This has no effect on Appobj, which has already received the user-entered value in the above if-else.
+        // !VA For curImgW and curImgH, get the toolbarElements alias via appObjPropToAlias and write an empty string to keyval[1] so that the placeholder values show through. This has no effect on Appobj, which has already received the user-entered value in the above if-else.
         keyval = [ appObjPropToAlias(appObjProp), '' ];
       }  else if (appObjProp === 'imgViewerW' || appObjProp === 'sPhonesW' || appObjProp === 'lPhonesW' ) {
-        // !VA NOTE: We could get rid of this by having appObjPropToAlias support all Appobj properties, not just toolbarElements ones, but this will do for now.
+        // !VA NOTE: We could get rid of this by having appObjPropToAlias support all Appobj properties, not just toolbarElements ones, but this will do for now. Get the toolbarElements alias via appObjPropToAlias and write evtTargetVal to keyval[1].
         keyval = [ appObjPropToAlias(appObjProp), evtTargetVal ];
       } else {
-        // !VA All other, i.e. CCP elements, because their Appobj property names already match the ccpUserInput aliases.
+        // !VA All other, i.e. CCP elements, because their Appobj property names already match the ccpUserInput aliases, just write appObjProp and evtTargetVal to keyval.
         keyval = [ appObjProp, evtTargetVal ];
       }
-      // !VA Write the input element value to the respective DOM input element 
+      // !VA Branch: implementCcpInput09 (070220)
+
+
+
+
+
+
+      // !VA Write the input element key/value to the respective DOM input element 
       UIController.writeAppobjToDOM(keyval);
-      // !VA Now write new values to localStorage and resize the dynamicElements based on the user input. For this, use writeToolbarInputToAppobj only because it contains the aspect ratio logic to get the adjacent dimension from a curImg value. 
+      // !VA 3) For toolbarElements, create a new obj with evtTargetVal and appObjProp to pass to writeToolbarInputToAppobj. writeToolbarInputToAppobj writes new values to localStorage and resizes the dynamicElements based on the user input. writeToolbarInputToAppobj contains the aspect ratio logic to get the adjacent dimension from a curImg value. 
       // !VA IMPORTANT: This works but it sucks. We're only running this now to set the localStorage and to get the adjacent side curImg dimensions. writeToolbarInputToAppobj doesn't reflect what's being done in that function, and it should be reevaluated in any case. Also, the below condition with all the OR conditions isn't good - should call appObjPropToAlias and base the condition on the return value i.e. not undefined. But for now, need to move on.
       if (appObjProp === 'curImgW' || appObjProp === 'curImgH' || appObjProp === 'imgViewerW' || appObjProp === 'sPhonesW' || appObjProp === 'lPhonesW' ) {
         inputObj.evtTargetVal = Appobj[appObjProp];
@@ -2947,30 +2931,47 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
         // !VA evtTargetVal is the value the user entered into the input element as integer.
         userInputObj.evtTargetVal = evt.target.value;
-        // !VA If appObjProp is included in the numericInputs array (which includes all of the UI elements that require numeric input), then run checkNumericInput on the contents of userInputObj. Check numeric input returns false if the integer validation fails, otherwise it converts the numeric string to number where appropriate returns userInputObj.evtTargetVal as integer
-        if (numericInputs.includes( userInputObj.appObjProp )) { 
-          retVal = checkNumericInput(userInputObj); 
-        } 
-        // !VA Currently no string validation implemented, so the function just returns the argument unchanged
-        else if (stringInputs.includes( userInputObj.appObjProp )) {
-          retVal = checkTextInput(userInputObj);
+
+        // !VA Branch: implementCcpInput09 (070220)
+        // !VA Exception: For curImgW and curImgH, if user tabs out of the input field without entering a value, we need to skip the blur handling and error checking completely and just perform the default TAB action, i.e. skip to the next element in the TAB order and leave the input empty so the placeholder shows.
+        if (  userInputObj.appObjProp === 'curImgW' && userInputObj.evtTargetVal === ''  ||   userInputObj.appObjProp === 'curImgH' && userInputObj.evtTargetVal === '' ) {
+          // console.log('EMPTY STRING IN FIELD');
+          return;
+        // !VA For all other cases, do logic:
+        } else {
+          // !VA If appObjProp is included in the numericInputs array (which includes all of the UI elements that require numeric input), then run checkNumericInput on the contents of userInputObj. Check numeric input returns false if the integer validation fails, otherwise it converts the numeric string to number where appropriate returns userInputObj.evtTargetVal as integer
+          if (numericInputs.includes( userInputObj.appObjProp )) { 
+            retVal = checkNumericInput(userInputObj); 
+            console.log('retVal is: ' + retVal);
+          } 
+          // !VA Currently no string validation implemented, so the function just returns the argument unchanged
+          else if (stringInputs.includes( userInputObj.appObjProp )) {
+            retVal = checkTextInput(userInputObj);
+          }
+          else {
+            console.log('ERROR in handleKeydown - unknown data type');
+          }
+          // !VA Now that retVal is a validated number or string or false:
+          // !VA If not false, write it back to userInputObj.evtTargetVal and pass userInputObj to handleBlur/handleEnterKey
+          if ( retVal !== false ) { userInputObj.evtTargetVal = retVal; 
+            // !VA If TAB pressed
+            if (keydown == 9 ) {
+              // !VA Call handleBlur directly here unless there's a reason to handle the TAB key separately.
+  
+              handleBlur(userInputObj);
+            } else if ( keydown == 13 ) {
+              // !VA Pass userInputObj to handle the Enter key
+              handleEnterKey(userInputObj);
+            } else {
+              // !VA NOTE: Any other key than TAB or ENTER - don't need to trap this I don't think.
+              // console.log('ERROR in handleKeydown - unknown keypress');
+            }
+          // !VA If false, that means that the user has deleted the input value and it is now empty, which isn't allowed. So prevent the default TAB behavior, i.e. leave the cursor in the field until the user enters a valid value
+          } else {
+            console.log('Mark1');
+            evt.preventDefault(); 
+          }
         }
-        else {
-          console.log('ERROR in handleKeydown - unknown data type');
-        }
-      }
-      // !VA Now that retVal is a validated number or string, write it back to userInputObj.evtTargetVal and pass userInputObj to handleBlur/handleEnterKey
-      if ( retVal !== false ) { userInputObj.evtTargetVal = retVal; }
-      // !VA If TAB pressed
-      if (keydown == 9 ) {
-        // !VA Call handleBlur directly here unless there's a reason to handle the TAB key separately.
-        handleBlur(userInputObj);
-      } else if ( keydown == 13 ) {
-        // !VA Pass userInputObj to handle the Enter key
-        handleEnterKey(userInputObj);
-      } else {
-        // !VA NOTE: Any other key than TAB or ENTER - don't need to trap this I don't think.
-        // console.log('ERROR in handleKeydown - unknown keypress');
       }
     }
 
@@ -3023,13 +3024,20 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
     }
 
+
     // !VA  Parsing keyboard input based on Appobj property passed in from handleKeyup.
     // !VA TODO: rename to checkNumericInput and include parsing of the toolbutton mouseclicks from handleToolbarClicks.
     // !VA TODO: Why are there unused variables and what is actually happening here?
     // !VA appController private
     function checkNumericInput(userInputObj) {
+      console.log('checkNumericInput running');
       // !VA Destructure userInputObj
       const { appObjProp, evtTargetVal } = userInputObj;
+      console.log('appObjProp is: ' + appObjProp);
+      console.log('evtTargetVal is: ' + evtTargetVal);
+
+
+
       // !VA The code that will be passed to getAppMessageStrings
       let appMessCode, isErr, retVal;
       // !VA The flag indicating an error condition,
@@ -3038,7 +3046,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       var maxViewerWidth = 800;
       // !VA If appObjProp refers to one of the CCP elements that require numeric input
       // !VA First, validate that the user-entered value is an integer. validateInteger returns false if the input is either not an integer or is not a string that can be converted to an integer. Otherwise, it returns the evtTargetVal as a number.
+
+
+      
       retVal = validateInteger(evtTargetVal);
+      console.log('retVal is: ' + retVal);
       // !VA If validateInteger returned false to retVal, then there is an error condition with the input value.
       if (!retVal) {
         // !VA NOTE: This is where we could easily trap the negative button increment if it falls below 0 to send a different message than just the standard 'not_Integer' message. Revisit.
@@ -3134,7 +3146,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA If no error, pass false back to handleKeyup and continue.
         isErr = false;
       }
-      // console.log('retVal is: ' + retVal);
+
+      // !VA Branch: implementCcpInput09 (070220)
+      // !VA If no error was detected, return the original evtTargetVal, otherwise return false to the event handler to determine how the error will be displayed in the input field
+      console.log('checkNumericInput end retVal is: ' + retVal);
+      !isErr ? retVal = evtTargetVal : retVal = false;
       return retVal;
     }
 
@@ -3167,11 +3183,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // console.log('writeToolbarInputToAppobj evtTargetVal is: ' + evtTargetVal);
       // !VA Handle the two cases: 1) appObjProp and evtTargetVal are used to write to Appobj, localStorage and the DOM. This applies to imgViewerW, sPhonesW and lPhonesH. 2) appObjProp and evtTargetVal are used to calculate the img's adacent dimension, then both the images' dimensions are written to Appobj. This applies to curImgW and curImgH. NOTE: For some reason, updateAppobj wrote curImgH to the DOM here - I'm not sure why that was done, but it shouldn't be. 
       // !VA appObjProp = imgViewerW, sPhonesW or lPhonesW
-      if ( appObjProp === 'imgViewerW' || appObjProp === 'sPhonesW' || appObjProp === 'sPhonesW') {
+      if ( appObjProp === 'imgViewerW' || appObjProp === 'sPhonesW' || appObjProp === 'lPhonesW') {
         // !VA Set the Appobj property corresponding to the appObjProp identifier to its respective value
         Appobj[appObjProp] = evtTargetVal;
         // !VA Set the localStorage for the respective Appobj property to the respective value
         localStorage.setItem(appObjProp, evtTargetVal);
+
+        var foo = localStorage.getItem( appObjProp );
+        console.log('foo is: ' + foo);
+
+
       // !VA appObjProp is curImgW or curImgH
       } else if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
         // !VA Calculate the adjacent dimension of appObjProp based on the aspect ratio, then set the Appobj property of the dimension and its adjacent dimension
@@ -4222,6 +4243,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Query whether localStorage is currently set for imgViewerW, sPhonesW and lPhonesW
       // !VA appController public
       getLocalStorage: function() {
+        // !VA Branch: implementCcpInput09 (070220)
+        // !VA Update comment with where localStorage is set - updateAppobj doesn't exist anymore
         // !VA Get localStorage for imgViewerW here. localStorage is set in updateAppobj after the user input has been parsed for errors. 
         let arr = [], curLocalStorage = [];
         // !VA Clear localStorage for testing only.
