@@ -2491,7 +2491,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       //   addEventHandler(toolbarElements[i],'click',handleMouseEvents,false);
       // }
 
-      va
+
       // !VA Add onfocus event handlers globally for input elements 
       // !VA NOTE: This doesn't appear to do anything, so deprecating...
       const tbFocusInputs = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW  ];
@@ -2806,7 +2806,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     function handleMouseUp(evt) {
       console.log('handleMouseUp running');
-      this.selectionStart = this.selectionEnd = this.value.length;
+      // this.selectionStart = this.selectionEnd = this.value.length;
 
 
     }
