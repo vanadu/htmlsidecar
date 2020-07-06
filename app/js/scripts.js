@@ -2467,6 +2467,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA Event handler for initializing event listeners 
       function addEventHandler(oNode, evt, oFunc, bCaptures) {
+        console.log('oNode is: ' + oNode.id);
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
 
@@ -2490,11 +2491,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       //   addEventHandler(toolbarElements[i],'click',handleMouseEvents,false);
       // }
 
+      va
       // !VA Add onfocus event handlers globally for input elements 
       // !VA NOTE: This doesn't appear to do anything, so deprecating...
-      const tbFocusInputs = [ toolbarElements.iptTbrViewerW, toolbarElements.iptTbrSPhonesWidth, toolbarElements.iptTbrLPhonesWidth  ];
+      const tbFocusInputs = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW  ];
       for (let i = 0; i < tbFocusInputs.length; i++) {
         // !VA convert the ID string to the object inside the loop
+        console.log('document.querySelector(tbFocusInputs[i]) is: ' + document.querySelector(tbFocusInputs[i]));
+        console.log('tbFocusInputs[i]) is: ' + tbFocusInputs[i]);
         tbFocusInputs[i] = document.querySelector(tbFocusInputs[i]);
         addEventHandler(tbFocusInputs[i],'click',handleMouseUp,false);
       }
