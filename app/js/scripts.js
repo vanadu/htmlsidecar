@@ -2492,12 +2492,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA Add onfocus event handlers globally for input elements 
       // !VA NOTE: This doesn't appear to do anything, so deprecating...
-      // const tbFocusInputs = [ toolbarElements.iptTbrViewerW, toolbarElements.iptTbrSPhonesWidth, toolbarElements.iptTbrLPhonesWidth  ];
-      // for (let i = 0; i < tbFocusInputs.length; i++) {
-      //   // !VA convert the ID string to the object inside the loop
-      //   tbFocusInputs[i] = document.querySelector(tbFocusInputs[i]);
-      //   addEventHandler(tbFocusInputs[i],'click',handleOnfocus,false);
-      // }
+      const tbFocusInputs = [ toolbarElements.iptTbrViewerW, toolbarElements.iptTbrSPhonesWidth, toolbarElements.iptTbrLPhonesWidth  ];
+      for (let i = 0; i < tbFocusInputs.length; i++) {
+        // !VA convert the ID string to the object inside the loop
+        tbFocusInputs[i] = document.querySelector(tbFocusInputs[i]);
+        addEventHandler(tbFocusInputs[i],'click',handleMouseUp,false);
+      }
       
       // !VA Add event handlers for input toolbarElements
       const tbKeypresses = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrCurImgW, toolbarElements.iptTbrCurImgH, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW ];
@@ -2784,14 +2784,28 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA appController private
     // !VA Handle behavior when an element gets the focus. Pertains only to keyboard input, actually, I'm not sure whether buttons or CCP elements need special handling. Takes no argument because this is used instead of the passed event.
-    function handleFocus() {
+    function handleFocus(evt) {
+      console.log('handleFocus running');
+      console.log('evt is: ');
+      console.log(evt);
+      console.log('evt.target.id is: ' + evt.target.id);
+      console.log('evt.type is: ' + evt.type);
+      // if (evt.type === 'click') {
+      //   console.log('HIT');
+      // }
+
       // !VA Get the target element of the click
       // el = document.getElementById(this.id);
       // !VA Select the clicked element's value, or if there's no value, set it to empty with a cursor, which is the default select behavior for empty fields.
-      console.log('Mark1');
       this.select();
     }
 
+    function handleMouseUp(evt) {
+      console.log('handleMouseUp running');
+      this.selectionStart = this.selectionEnd = this.value.length;
+
+
+    }
 
 
     // !VA appController private function
@@ -2917,20 +2931,25 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA Handle the increment toolbuttons
       if (event.type === 'click') {
-        if (this.id.substring( 0 , 7) === 'ipt-tbr') {
+        console.log('click!');
+        // this.selectionStart = this.selectionEnd = this.value.length;
 
-          if (typeof el.selectionStart == "number") {
-            console.log('NUMBER');
-            el.selectionStart = el.selectionEnd = el.value.length;
-          } else if (typeof el.createTextRange != "undefined") {
-            console.log('NOT UNDEFINED');
-            // el.focus();
-            var range = el.createTextRange();
-            console.log('range is: ' + range);
-            range.collapse(false);
-            range.select();
-          }
-        }
+
+
+        // if (this.id.substring( 0 , 7) === 'ipt-tbr') {
+
+        //   if (typeof el.selectionStart == "number") {
+        //     console.log('NUMBER');
+        //     el.selectionStart = el.selectionEnd = el.value.length;
+        //   } else if (typeof el.createTextRange != "undefined") {
+        //     console.log('NOT UNDEFINED');
+        //     // el.focus();
+        //     var range = el.createTextRange();
+        //     console.log('range is: ' + range);
+        //     range.collapse(false);
+        //     range.select();
+        //   }
+        // }
 
 
         // !VA TODO: Revisit this
