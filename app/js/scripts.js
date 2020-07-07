@@ -2791,14 +2791,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Handle behavior when an element gets the focus. Pertains only to keyboard input, actually, I'm not sure whether buttons or CCP elements need special handling. Takes no argument because this is used instead of the passed event.
     function handleFocus(evt) {
       console.log('handleFocus running');
-      console.log('evt is: ');
-      console.log(evt);
       console.log('evt.target.id is: ' + evt.target.id);
-      console.log('evt.type is: ' + evt.type);
-      // if (evt.type === 'click') {
-      //   console.log('HIT');
-      // }
-
+      let faa;
+      faa = elementIdToAppobjProp(this.id);
+      console.log('faa is: ' + faa);
       // !VA Get the target element of the click
       // el = document.getElementById(this.id);
       // !VA Select the clicked element's value, or if there's no value, set it to empty with a cursor, which is the default select behavior for empty fields.
@@ -2812,7 +2808,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         this.selectionStart = this.selectionEnd = this.value.length;
       } else {
         console.log('CCP input');
-        this.select;
+        console.log('Appobj is: ');
+        console.log(Appobj);
+        console.log('Appobj[faa] is: ' + Appobj[faa]);
+        this.value = Appobj[faa];
       }
 
 
