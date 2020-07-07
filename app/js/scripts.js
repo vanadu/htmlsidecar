@@ -2467,7 +2467,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA Event handler for initializing event listeners 
       function addEventHandler(oNode, evt, oFunc, bCaptures) {
-        console.log('oNode is: ' + oNode.id);
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
 
@@ -2492,16 +2491,18 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // }
 
 
-      // !VA Add onfocus event handlers globally for input elements 
+      // !VA Branch: doEventHandlers01 (070720)
+      // !VA I was trying here to 1) Select the input contents on focus and then 2) replace the selected input contents on the second click but I couldn't get that to work, so we're commenting this out unless I come up with a solution. 
+      // !VA Add onfocus event handlers globally for input elements  
       // !VA NOTE: This doesn't appear to do anything, so deprecating...
-      const tbFocusInputs = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW  ];
-      for (let i = 0; i < tbFocusInputs.length; i++) {
-        // !VA convert the ID string to the object inside the loop
-        console.log('document.querySelector(tbFocusInputs[i]) is: ' + document.querySelector(tbFocusInputs[i]));
-        console.log('tbFocusInputs[i]) is: ' + tbFocusInputs[i]);
-        tbFocusInputs[i] = document.querySelector(tbFocusInputs[i]);
-        addEventHandler(tbFocusInputs[i],'click',handleMouseUp,false);
-      }
+      // const tbFocusInputs = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW  ];
+      // for (let i = 0; i < tbFocusInputs.length; i++) {
+      //   // !VA convert the ID string to the object inside the loop
+      //   console.log('document.querySelector(tbFocusInputs[i]) is: ' + document.querySelector(tbFocusInputs[i]));
+      //   console.log('tbFocusInputs[i]) is: ' + tbFocusInputs[i]);
+      //   tbFocusInputs[i] = document.querySelector(tbFocusInputs[i]);
+      //   addEventHandler(tbFocusInputs[i],'click',handleMouseUp,false);
+      // }
       
       // !VA Add event handlers for input toolbarElements
       const tbKeypresses = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrCurImgW, toolbarElements.iptTbrCurImgH, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW ];
@@ -2801,7 +2802,20 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Get the target element of the click
       // el = document.getElementById(this.id);
       // !VA Select the clicked element's value, or if there's no value, set it to empty with a cursor, which is the default select behavior for empty fields.
-      this.select();
+      // this.select();
+      // !VA Branch: doEventHandlers01 (070720)
+      // !VA If iptTbrImgViewerW, iptTbrSPhonesW or iptTbrSPhonesW, replace the input contents with a cursor. This isn't the desired effect but it will have to do for now since I don't have a solution for making this exactly like the default behavior of the CCP input fields, which is 1) select the input contents on focus and 2) replace the selection with a cursor on second click.
+      const toolbarInputs = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW ];
+      if ( toolbarInputs.includes('#' + evt.target.id)) {
+        console.log('HIT');
+        this.value = '';
+        this.selectionStart = this.selectionEnd = this.value.length;
+      } else {
+        console.log('CCP input');
+        this.select;
+      }
+
+
     }
 
     function handleMouseUp(evt) {
