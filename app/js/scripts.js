@@ -2804,14 +2804,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       const toolbarInputs = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW ];
       if ( toolbarInputs.includes('#' + evt.target.id)) {
         console.log('HIT');
-        this.value = '';
-        this.selectionStart = this.selectionEnd = this.value.length;
+        // this.value = '';
+        // this.selectionStart = this.selectionEnd = this.value.length;
       } else {
         console.log('CCP input');
-        console.log('Appobj is: ');
-        console.log(Appobj);
-        console.log('Appobj[faa] is: ' + Appobj[faa]);
-        this.value = Appobj[faa];
+        // console.log('Appobj is: ');
+        // console.log(Appobj);
+        // console.log('Appobj[faa] is: ' + Appobj[faa]);
+        // this.value = Appobj[faa];
+        this.select;
       }
 
 
@@ -2837,6 +2838,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         this.value = '';
       } else {
         this.value = Appobj[appObjProp];
+
       }
     }
 
