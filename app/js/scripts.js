@@ -2796,14 +2796,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
     }
 
-    // !VA appController private function
-    // !VA Branch: doEventHandlers01 (070720)
-    // !VA Was thinking of using this to define a specific focus/second click behavior for the toolbar input elements, but it's not worth it. OK to remove this unless I decide otherwise.
-    function handleMouseUp(evt) {
-      console.log('handleMouseUp running');
-      // this.selectionStart = this.selectionEnd = this.value.length;
-    }
-
+    // !VA Branch: doEventHandlers01 (071020)
+    // !VA This is deprecated now, I guess.
     // !VA appController private function
     function handleBlur(evt) {
       // !VA Handle blur
@@ -2818,21 +2812,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
     }
 
-    function handleTabKey(userInputObj) {
-      console.log('handleTabKey running');
+    function applyInputValue(userInputObj) {
+      console.log('applyInputValue running');
       // !VA Destructure userInputObj into variables
       let { evtTargetVal, appObjProp } = userInputObj;
       let inputObj = {};
-      console.log('evtTargetVal is: ' + evtTargetVal);
-      // console.log('typeof(evtTargetVal) is: ' + typeof(evtTargetVal));
-      console.log('appObjProp is: ' + appObjProp);
-
       // !VA If the target element value doesn't equal the existing Appobj value, then a new value was user-entered into the input element, so update Appobj with the new value. This is done in ALL cases, including curImgW and curImgH. Otherwise, evtTargetValue is unchanged, so do nothing, i.e. blur and leave the input value unchanged. An else clause is not necessary here, but it's included for possible error checking and console logging. 
       if ( evtTargetVal !== Appobj[appObjProp]) {
         Appobj[appObjProp] = evtTargetVal;
       } else {
-        // !VA The 
-        // console.log('evtTargetValue is unchanged...');
+        console.log('ERROR in applyInputValue - evtTargetValue !== Appobj[appObjProp]');
       }
 
       // !VA 3) For toolbarElements, create a new obj with evtTargetVal and appObjProp to pass to writeToolbarInputToAppobj. writeToolbarInputToAppobj writes new values to localStorage and resizes the dynamicElements based on the user input. writeToolbarInputToAppobj contains the aspect ratio logic to get the adjacent dimension from a curImg value. 
@@ -2841,12 +2830,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         inputObj.evtTargetVal = Appobj[appObjProp];
         inputObj.appObjProp = appObjProp;
         writeToolbarInputToAppobj(inputObj);
-
       }
-
-      console.log('handleTabKey Appobj: ');
+      console.log('applyInputValue Appobj: ');
       console.dir(Appobj);
-
     }
 
     // !VA appController private 
@@ -2866,32 +2852,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Branch: implementCcpInput09 (070220)
       // !VA There was a try/catch here but I don't know what it was supposed to catch - see earlier versions
 
-      function moveCursorToEnd(el) {
-
-      } 
 
       // !VA Handle the increment toolbuttons
       if (event.type === 'click') {
         console.log('click!');
-        // this.selectionStart = this.selectionEnd = this.value.length;
-
-
-
-        // if (this.id.substring( 0 , 7) === 'ipt-tbr') {
-
-        //   if (typeof el.selectionStart == "number") {
-        //     console.log('NUMBER');
-        //     el.selectionStart = el.selectionEnd = el.value.length;
-        //   } else if (typeof el.createTextRange != "undefined") {
-        //     console.log('NOT UNDEFINED');
-        //     // el.focus();
-        //     var range = el.createTextRange();
-        //     console.log('range is: ' + range);
-        //     range.collapse(false);
-        //     range.select();
-        //   }
-        // }
-
 
         // !VA TODO: Revisit this
       }  else if ( event.type === 'drop') {
@@ -2908,8 +2872,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA NOTE: Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
     // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Sorts keypresses by data types number and string based on the target input element. Calls checkNumericInput or checkTextInput, which validates the input and returns either an integer or a string and calls handleBlur (for TAB key) or handleEnterKey with the userInputObj { evtTargetVal, appObjProp} argument.
     function handleKeydown(evt) {
-      console.log('handleKeydown running');
-      debugger;
+      // console.log('handleKeydown running');
       // console.clear();
       let numericInputs = [], stringInputs = [];
       let retVal;
@@ -2930,7 +2893,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
         // !VA evtTargetVal is the value the user entered into the input element as integer.
         userInputObj.evtTargetVal = evt.target.value;
-        console.log('userInputObj.evtTargetVal is: ' + userInputObj.evtTargetVal);
 
         // !VA Branch: implementCcpInput09 (070220)
         // !VA Exception: For curImgW and curImgH, if user tabs out of the input field without entering a value, we need to skip the blur handling and error checking completely and just perform the default TAB action, i.e. skip to the next element in the TAB order and leave the input empty so the placeholder shows.
@@ -2941,28 +2903,18 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         } else {
           // !VA If appObjProp is included in the numericInputs array (which includes all of the UI elements that require numeric input), then run checkNumericInput on the contents of userInputObj. Check numeric input returns false if the integer validation fails, otherwise it converts the numeric string to number where appropriate returns userInputObj.evtTargetVal as integer
           if (numericInputs.includes( userInputObj.appObjProp )) { 
-            console.log('mark1');
 
             // !VA Branch: doEventHandlers01 (071020)
             // !VA If the target is a CCP input and it is empty, don't do the validation. For CCP inputs, if the field is empty, the respective property won't get written to the clipboard, so an empty value has functional value. This is in contrast to the Toolbar inputs, where a value is required.
-            console.log('userInputObj: ');
-            console.dir(userInputObj);
-            var foo = userInputObj.evtTargetVal;
-            console.log('foo is: ' + foo);
-            console.log('userInputObj.appObjProp.substring( 3 , 6 ) is: ' + userInputObj.appObjProp.substring( 3 , 6 ));
-            // if ( userInputObj.appObjProp.substring( 3 , 6 ) === 'Ccp' && userInputObj.evtTargetVal === '' ) {
-            //   console.log('HIT');
-            //   // handleTabKey(userInputObj);
-            //   // return;
-            // } else {
-
-            //   retVal = checkNumericInput(userInputObj); 
-            //   console.log('retVal is: ' + retVal);
-            // }
-
+            if ( userInputObj.appObjProp.substring( 3 , 6 ) === 'Ccp' && userInputObj.evtTargetVal === '' ) {
+              // console.log('HIT');
+              // !VA The CCP input field is empty - do nothing.
+              // return;
+            } else {
+              // !VA Error check the numeric input
               retVal = checkNumericInput(userInputObj); 
-              console.log('retVal is: ' + retVal);
-            // console.log('retVal is: ' + retVal);
+            }
+
           } 
           // !VA Currently no string validation implemented, so the function just returns the argument unchanged
           else if (stringInputs.includes( userInputObj.appObjProp )) {
@@ -2975,14 +2927,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           // !VA If not false, write it back to userInputObj.evtTargetVal and pass userInputObj to handleBlur/handleEnterKey
           if ( retVal !== false ) { 
             userInputObj.evtTargetVal = retVal; 
-            // !VA If TAB pressed
+            // !VA Handling TAB and ENTER here separately just in case...but for now they do the same thing, i.e. run applyInputValue
             if (keydown == 9 ) {
-              // !VA Call handleBlur directly here unless there's a reason to handle the TAB key separately.
-              handleTabKey(userInputObj);
-              // handleBlur(userInputObj);
+              // !VA Handling TAB 
+              applyInputValue(userInputObj);
             } else if ( keydown == 13 ) {
               // !VA Pass userInputObj to handle the Enter key
-              handleEnterKey(userInputObj);
+              applyInputValue(userInputObj);
             } else {
               // !VA NOTE: Any other key than TAB or ENTER - don't need to trap this I don't think.
               // console.log('ERROR in handleKeydown - unknown keypress');
@@ -2995,13 +2946,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
     }
 
-  function handleEnterKey(userInputObj) {
-      console.log('handleEnterKey running');
-      // !VA elementIdToAppobjProp gets the Appobj key that corresponds to a given element ID. We need the Appobj key to get the Appobj value to compare to the user-entered value in the respective Toolbar input field. 
-
-      // userInputObj.appObjProp = elementIdToAppobjProp(this.id);
-      
-    }
 
     // !VA appController private
     // !VA TODO: Why are there unused elements and what is actually happening here?
@@ -3055,8 +2999,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       console.log('checkNumericInput running');
       // !VA Destructure userInputObj
       const { appObjProp, evtTargetVal } = userInputObj;
-      // console.log('appObjProp is: ' + appObjProp);
-      // console.log('evtTargetVal is: ' + evtTargetVal);
 
 
 
