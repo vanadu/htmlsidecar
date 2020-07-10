@@ -113,10 +113,11 @@ button:disabled  {
   -ms-touch-action: manipulation;
   touch-action: manipulation;
   cursor: pointer;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  // VA! Comment this out so the Toolbar inputs behave normally, i.e. collapse the selection at the first mouseclick after selection
+  // -webkit-user-select: none;
+  // -moz-user-select: none;
+  // -ms-user-select: none;
+  // user-select: none;
   background-image: none;
   border: 1px solid transparent;
       border-top-color: transparent;

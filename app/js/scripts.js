@@ -2467,10 +2467,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA Event handler for initializing event listeners 
       function addEventHandler(oNode, evt, oFunc, bCaptures) {
+        // console.log('oNode is: ' + oNode);
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
 
-
+      // !VA CLICK HANDLERS
+      // ------------------
       // !VA Branch: implementCcpInput09 (070220)
       // !VA Add click and blur event handlers for clickable toolbarElements 
       const tbClickables = [ toolbarElements.btnTbrIncr50, toolbarElements.btnTbrIncr10, toolbarElements.btnTbrIncr01, toolbarElements.btnTbrDecr50, toolbarElements.btnTbrDecr10, toolbarElements.btnTbrDecr01  ];
@@ -2480,42 +2482,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         addEventHandler(tbClickables[i],'click',handleMouseEvents,false);
       }
 
-      // !VA Branch: implementCcpInput10 (070420)
-      // var toolbarAliases = Object.keys(toolbarElements);
-      // console.log('toolbarAliases: ');
-      // console.dir(toolbarAliases);
-      // for (let i = 0; i < toolbarAliases.length; i++) {
-      //   // !VA convert the ID string to the object inside the loop
-      //   toolbarElements[i] = document.querySelector(toolbarElements[toolbarAliases[i]]);
-      //   addEventHandler(toolbarElements[i],'click',handleMouseEvents,false);
-      // }
-
-
-      // !VA Branch: doEventHandlers01 (070720)
-      // !VA I was trying here to 1) Select the input contents on focus and then 2) replace the selected input contents on the second click but I couldn't get that to work, so we're commenting this out unless I come up with a solution. 
-      // !VA Add onfocus event handlers globally for input elements  
-      // !VA NOTE: This doesn't appear to do anything, so deprecating...
-      // const tbFocusInputs = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW  ];
-      // for (let i = 0; i < tbFocusInputs.length; i++) {
-      //   // !VA convert the ID string to the object inside the loop
-      //   console.log('document.querySelector(tbFocusInputs[i]) is: ' + document.querySelector(tbFocusInputs[i]));
-      //   console.log('tbFocusInputs[i]) is: ' + tbFocusInputs[i]);
-      //   tbFocusInputs[i] = document.querySelector(tbFocusInputs[i]);
-      //   addEventHandler(tbFocusInputs[i],'click',handleMouseUp,false);
-      // }
-      
-      // !VA Add event handlers for input toolbarElements
-      const tbKeypresses = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrCurImgW, toolbarElements.iptTbrCurImgH, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW ];
-      for (let i = 0; i < tbKeypresses.length; i++) {
-        // !VA convert the ID string to the object inside the loop
-        tbKeypresses[i] = document.querySelector(tbKeypresses[i]);
-        // !VA Handles all key events except TAB, which require keyDown to get the value of the current input rather than the input being tabbed to.
-        addEventHandler((tbKeypresses[i]),'keydown',handleKeydown,false);
-        addEventHandler((tbKeypresses[i]),'keyup',handleKeyup,false);
-        addEventHandler((tbKeypresses[i]),'focus',handleFocus,false);
-        addEventHandler((tbKeypresses[i]),'blur',handleBlur,false);
-      }
-
       // !VA Add click event handlers for Inspector clickable elements: Display Size, Small Phones and Large Phones values in the programmatically created SPAN tags
       const inspectorClickables = [ inspectorLabels.insDisplaySizeLabel, inspectorLabels.insSmallPhonesLabel, inspectorLabels.insLargePhonesLabel, inspectorValues.insDisplaySizeWidthValue, inspectorValues.insDisplaySizeHeightValue, inspectorValues.insSmallPhonesWidthValue, inspectorValues.insSmallPhonesHeightValue, inspectorValues.insLargePhonesWidthValue, inspectorValues.insLargePhonesHeightValue ];
       for (let i = 0; i < inspectorClickables.length; i++) {
@@ -2523,26 +2489,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         inspectorClickables[i] = document.querySelector(inspectorClickables[i]);
         addEventHandler(inspectorClickables[i],'click',CBController.doClipboard,false);
       }
-
-      // !VA Add mouseover event handlers for Inspector clickable elements: Display Size, Small Phones and Large Phones values in the programmatically created SPAN tags
-      const inspectorHoverables = [ inspectorLabels.insDisplaySizeLabel, inspectorLabels.insSmallPhonesLabel, inspectorLabels.insLargePhonesLabel, inspectorValues.insDisplaySizeWidthValue, inspectorValues.insDisplaySizeHeightValue, inspectorValues.insSmallPhonesWidthValue, inspectorValues.insSmallPhonesHeightValue, inspectorValues.insLargePhonesWidthValue, inspectorValues.insLargePhonesHeightValue ];
-      for (let i = 0; i < inspectorHoverables.length; i++) {
-        // !VA convert the ID string to the object inside the loop
-        inspectorHoverables[i] = document.querySelector(inspectorHoverables[i]);
-        // !VA IMPORTANT: WTF is this?
-        addEventHandler(inspectorHoverables[i],'mouseenter',CBController.enteredMe,false);
-      }
-
-
-      // !VA Branch: implementAppobj08 (062020)
-      // !VA Commenting out these event handlers for now until I deal with getting the values
-      // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. These are the class input elements for ccp Img, Td and Table options
-      // const ccpClassInputs = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass ];
-      // for (let i = 0; i < ccpClassInputs.length; i++) {
-      //   // !VA convert the ID string to the object inside the loop
-      //   ccpClassInputs[i] = document.querySelector(ccpClassInputs[i]);
-      //   addEventHandler((ccpClassInputs[i]),'input',showElementOnInput,false);
-      // }
 
       // !VA Add click handlers for Inspector - there's only the clipboard button now but there could be more. 
       var dvClickables = [ inspectorElements.btnToggleCcp ];
@@ -2559,18 +2505,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         if(btnCcpMakeClips.hasOwnProperty(i)){
           clipBut = document.querySelector(btnCcpMakeClips[i]);
           addEventHandler(clipBut,'click',CBController.doClipboard,false);
-        }
-      }
-
-      // !VA Add event handlers for input toolbarElements
-      let ccpKeypresses;
-      for(let i in ccpUserInput) {
-        if (ccpUserInput[i].substring(0,4) === '#ipt') {
-          ccpKeypresses = document.querySelector(ccpUserInput[i]);
-          addEventHandler(ccpKeypresses,'keydown',handleKeydown,false);
-          addEventHandler(ccpKeypresses,'keyup',handleKeyup,false);
-          addEventHandler(ccpKeypresses,'focus',handleFocus,false);
-          // addEventHandler(ccpKeypresses,'blur',handleBlur,false);
         }
       }
 
@@ -2595,6 +2529,65 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       let includeAnchorCheckbox = document.querySelector(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk);
       addEventHandler(includeAnchorCheckbox,'click',toggleCheckbox,false);
 
+      // !VA Branch: implementCcpInput10 (070420)
+      // var toolbarAliases = Object.keys(toolbarElements);
+      // console.log('toolbarAliases: ');
+      // console.dir(toolbarAliases);
+      // for (let i = 0; i < toolbarAliases.length; i++) {
+      //   // !VA convert the ID string to the object inside the loop
+      //   toolbarElements[i] = document.querySelector(toolbarElements[toolbarAliases[i]]);
+      //   addEventHandler(toolbarElements[i],'click',handleMouseEvents,false);
+      // }
+
+      // !VA KEYBOARD HANDLERS
+      // -----------------------
+      // !VA Add event handlers for input toolbarElements
+      const tbKeypresses = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrCurImgW, toolbarElements.iptTbrCurImgH, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW ];
+      for (let i = 0; i < tbKeypresses.length; i++) {
+        // !VA convert the ID string to the object ins ypresses[i]);
+        // !VA Handles all key events except TAB, which require keyDown to get the value of the current input rather than the input being tabbed to.
+        tbKeypresses[i] = document.querySelector(tbKeypresses[i]);
+        addEventHandler((tbKeypresses[i]),'keydown',handleKeydown,false);
+        addEventHandler((tbKeypresses[i]),'keyup',handleKeyup,false);
+        addEventHandler((tbKeypresses[i]),'focus',handleFocus,false);
+        // !VA Branch: doEventHandlers01 (070720)
+        // !VA Commented out
+        // addEventHandler((tbKeypresses[i]),'blur',handleBlur,false);
+      }
+
+      // !VA Add event handlers for input toolbarElements
+      let ccpKeypresses;
+      for(let i in ccpUserInput) {
+        if (ccpUserInput[i].substring(0,4) === '#ipt') {
+          ccpKeypresses = document.querySelector(ccpUserInput[i]);
+          addEventHandler(ccpKeypresses,'keydown',handleKeydown,false);
+          addEventHandler(ccpKeypresses,'keyup',handleKeyup,false);
+          addEventHandler(ccpKeypresses,'focus',handleFocus,false);
+          // addEventHandler(ccpKeypresses,'blur',handleBlur,false);
+        }
+      }     
+      
+      // !VA Branch: implementAppobj08 (062020)
+      // !VA Commenting out these event handlers for now until I deal with getting the values
+      // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. These are the class input elements for ccp Img, Td and Table options
+      // const ccpClassInputs = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass ];
+      // for (let i = 0; i < ccpClassInputs.length; i++) {
+      //   // !VA convert the ID string to the object inside the loop
+      //   ccpClassInputs[i] = document.querySelector(ccpClassInputs[i]);
+      //   addEventHandler((ccpClassInputs[i]),'input',showElementOnInput,false);
+      // }
+
+
+      // !VA HOVER HANDLERS
+      // ------------------
+      // !VA Add mouseover event handlers for Inspector clickable elements: Display Size, Small Phones and Large Phones values in the programmatically created SPAN tags
+      const inspectorHoverables = [ inspectorLabels.insDisplaySizeLabel, inspectorLabels.insSmallPhonesLabel, inspectorLabels.insLargePhonesLabel, inspectorValues.insDisplaySizeWidthValue, inspectorValues.insDisplaySizeHeightValue, inspectorValues.insSmallPhonesWidthValue, inspectorValues.insSmallPhonesHeightValue, inspectorValues.insLargePhonesWidthValue, inspectorValues.insLargePhonesHeightValue ];
+      for (let i = 0; i < inspectorHoverables.length; i++) {
+        // !VA convert the ID string to the object inside the loop
+        inspectorHoverables[i] = document.querySelector(inspectorHoverables[i]);
+        // !VA IMPORTANT: WTF is this?
+        addEventHandler(inspectorHoverables[i],'mouseenter',CBController.enteredMe,false);
+      }
 
       // !VA Misc Unused Handlers for review
       // =============================
@@ -2790,47 +2783,31 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private
     // !VA Handle behavior when an element gets the focus. Pertains only to keyboard input, actually, I'm not sure whether buttons or CCP elements need special handling. Takes no argument because this is used instead of the passed event.
     function handleFocus(evt) {
-      console.log('handleFocus running');
-      console.log('evt.target.id is: ' + evt.target.id);
-      let faa;
-      faa = elementIdToAppobjProp(this.id);
-      console.log('faa is: ' + faa);
-      // !VA Get the target element of the click
-      // el = document.getElementById(this.id);
-      // !VA Select the clicked element's value, or if there's no value, set it to empty with a cursor, which is the default select behavior for empty fields.
-      // this.select();
+      // console.log('handleFocus running');
+      // console.log('evt.target.id is: ' + evt.target.id);
       // !VA Branch: doEventHandlers01 (070720)
       // !VA If iptTbrImgViewerW, iptTbrSPhonesW or iptTbrSPhonesW, replace the input contents with a cursor. This isn't the desired effect but it will have to do for now since I don't have a solution for making this exactly like the default behavior of the CCP input fields, which is 1) select the input contents on focus and 2) replace the selection with a cursor on second click.
       const toolbarInputs = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW ];
       if ( toolbarInputs.includes('#' + evt.target.id)) {
-        console.log('HIT');
-        // this.value = '';
+        this.select();
         // this.selectionStart = this.selectionEnd = this.value.length;
-      } else {
-        console.log('CCP input');
-        // console.log('Appobj is: ');
-        // console.log(Appobj);
-        // console.log('Appobj[faa] is: ' + Appobj[faa]);
-        // this.value = Appobj[faa];
-        this.select;
+      } else {  
+        this.select();
       }
-
-
     }
 
+    // !VA appController private function
+    // !VA Branch: doEventHandlers01 (070720)
+    // !VA Was thinking of using this to define a specific focus/second click behavior for the toolbar input elements, but it's not worth it. OK to remove this unless I decide otherwise.
     function handleMouseUp(evt) {
       console.log('handleMouseUp running');
       // this.selectionStart = this.selectionEnd = this.value.length;
-
-
     }
-
 
     // !VA appController private function
     function handleBlur(evt) {
       // !VA Handle blur
       console.log('handleBlur running');
-
       var appObjProp = elementIdToAppobjProp(evt.target.id);
       // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appdata property.
       // !VA NOTE: This can probably replace the blur statements in handleKeydown
@@ -2838,7 +2815,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         this.value = '';
       } else {
         this.value = Appobj[appObjProp];
-
       }
     }
 
@@ -2871,60 +2847,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       console.log('handleTabKey Appobj: ');
       console.dir(Appobj);
 
-
-
-      
-    }
-
-
-
-    // !VA appController private
-    // !VA Called from handleKeydown and ...? Handle behavior when element loses the focus, i.e. on TAB key. This only has Appobj logic. Display logic, i.e. clearing the input to display the placeholders must happen in a UIController function. 
-    // !VA Branch: implementCcpInput09 (070220)
-    // !VA This is more complex than it should be - success depends on the sequence of actions. 1) Determine if the value has changed from its preexisting Appobj value 2) Determine if the input target is curImgW or curImgH, and a) if so, set evtTargetVal to an empty string so that on blur the input element will assume the placeholder value and set the appObjProp in the keyval to the toolbarElement alias/evtTargetVal or b) else if the target input is any of the other toolbarElements then leave evtTargetVal unchanged and set the appObjProp in the keyval to the toolbarElement alias. If none of the above conditions are true, then the input element is a CCP element, so pass the key/value pair unchanged to writeAppobjToDOM. That takes care of the input value handing in the actual input elements. Now, if the target input element was a toolbarElement, that input has to be reflected in the dynamicElements containers. Since Appobj was already updated in Step 1, trap the toolbarElement input elements and create a new object containing the Appobj name and the evtTargetVal and pass it to writeToolbarInputToAppobj, which calculates the adjacent dimension for curImgW/curImgH and runs calcViewerSize. 
-    function handleBlurDeprecated(userInputObj) {
-      // console.clear();
-      console.log('handleBlur running');
-      // !VA Destructure userInputObj into variables
-      let { evtTargetVal, appObjProp } = userInputObj;
-      let keyval = [];
-      let inputObj = {};
-      // !VA 1) Update Appobj
-
-      if ( evtTargetVal !== Appobj[appObjProp]) {
-        Appobj[appObjProp] = evtTargetVal;
-      } else {
-        // !VA The 
-        // console.log('evtTargetValue is unchanged...');
-      }
-      
-
-      // !VA Branch: implementCcpInput10 (070420)
-      // !VA All of the below is unnecessary since I put handleBlur in the eventListener handler...ugh
-      // !VA Write values to target input DOM element
-      // !VA Run appObjPropToAlias on appObjProp to get the corresponding toolbarElements alias -- writeAppobjToDOM needs the alias to select the element with document.querySelector()
-      if (appObjProp === 'curImgW' || appObjProp === 'curImgH') {
-        // !VA For curImgW and curImgH, get the toolbarElements alias via appObjPropToAlias and write an empty string to keyval[1] so that the placeholder values show through. This has no effect on Appobj, which has already received the user-entered value in the above if-else.
-        keyval = [ appObjPropToAlias(appObjProp), '' ];
-      }  else if (appObjProp === 'imgViewerW' || appObjProp === 'sPhonesW' || appObjProp === 'lPhonesW' ) {
-        // !VA NOTE: We could get rid of this by having appObjPropToAlias support all Appobj properties, not just toolbarElements ones, but this will do for now. Get the toolbarElements alias via appObjPropToAlias and write evtTargetVal to keyval[1].
-        keyval = [ appObjPropToAlias(appObjProp), evtTargetVal ];
-      } else {
-        // !VA All other, i.e. CCP elements, because their Appobj property names already match the ccpUserInput aliases, just write appObjProp and evtTargetVal to keyval.
-        keyval = [ appObjProp, evtTargetVal ];
-      }
-      // !VA Branch: implementCcpInput09 (070220)
-
-
-
-
-
-
-      // !VA Write the input element key/value to the respective DOM input element 
-      UIController.writeAppobjToDOM(keyval);
-
-      // console.log('END handleBlur Appobj is: ');
-      console.log(Appobj);
     }
 
     // !VA appController private 
@@ -2986,6 +2908,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA NOTE: Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
     // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Sorts keypresses by data types number and string based on the target input element. Calls checkNumericInput or checkTextInput, which validates the input and returns either an integer or a string and calls handleBlur (for TAB key) or handleEnterKey with the userInputObj { evtTargetVal, appObjProp} argument.
     function handleKeydown(evt) {
+      console.log('handleKeydown running');
+      debugger;
       // console.clear();
       let numericInputs = [], stringInputs = [];
       let retVal;
@@ -3006,6 +2930,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
         // !VA evtTargetVal is the value the user entered into the input element as integer.
         userInputObj.evtTargetVal = evt.target.value;
+        console.log('userInputObj.evtTargetVal is: ' + userInputObj.evtTargetVal);
 
         // !VA Branch: implementCcpInput09 (070220)
         // !VA Exception: For curImgW and curImgH, if user tabs out of the input field without entering a value, we need to skip the blur handling and error checking completely and just perform the default TAB action, i.e. skip to the next element in the TAB order and leave the input empty so the placeholder shows.
@@ -3016,9 +2941,27 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         } else {
           // !VA If appObjProp is included in the numericInputs array (which includes all of the UI elements that require numeric input), then run checkNumericInput on the contents of userInputObj. Check numeric input returns false if the integer validation fails, otherwise it converts the numeric string to number where appropriate returns userInputObj.evtTargetVal as integer
           if (numericInputs.includes( userInputObj.appObjProp )) { 
-            console.log('Mark2');
-            retVal = checkNumericInput(userInputObj); 
-            console.log('retVal is: ' + retVal);
+            console.log('mark1');
+
+            // !VA Branch: doEventHandlers01 (071020)
+            // !VA If the target is a CCP input and it is empty, don't do the validation. For CCP inputs, if the field is empty, the respective property won't get written to the clipboard, so an empty value has functional value. This is in contrast to the Toolbar inputs, where a value is required.
+            console.log('userInputObj: ');
+            console.dir(userInputObj);
+            var foo = userInputObj.evtTargetVal;
+            console.log('foo is: ' + foo);
+            console.log('userInputObj.appObjProp.substring( 3 , 6 ) is: ' + userInputObj.appObjProp.substring( 3 , 6 ));
+            // if ( userInputObj.appObjProp.substring( 3 , 6 ) === 'Ccp' && userInputObj.evtTargetVal === '' ) {
+            //   console.log('HIT');
+            //   // handleTabKey(userInputObj);
+            //   // return;
+            // } else {
+
+            //   retVal = checkNumericInput(userInputObj); 
+            //   console.log('retVal is: ' + retVal);
+            // }
+
+              retVal = checkNumericInput(userInputObj); 
+              console.log('retVal is: ' + retVal);
             // console.log('retVal is: ' + retVal);
           } 
           // !VA Currently no string validation implemented, so the function just returns the argument unchanged
@@ -3052,7 +2995,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
     }
 
-    function handleEnterKey(userInputObj) {
+  function handleEnterKey(userInputObj) {
       console.log('handleEnterKey running');
       // !VA elementIdToAppobjProp gets the Appobj key that corresponds to a given element ID. We need the Appobj key to get the Appobj value to compare to the user-entered value in the respective Toolbar input field. 
 
@@ -3109,7 +3052,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA TODO: Why are there unused variables and what is actually happening here?
     // !VA appController private
     function checkNumericInput(userInputObj) {
-      // console.log('checkNumericInput running');
+      console.log('checkNumericInput running');
       // !VA Destructure userInputObj
       const { appObjProp, evtTargetVal } = userInputObj;
       // console.log('appObjProp is: ' + appObjProp);
