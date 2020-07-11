@@ -512,7 +512,7 @@ var Witty = (function () {
       initUI: function(initMode) {
 
         const delayInMilliseconds = 10;
-        // !VA Here we initialze DEV mode, i.e. reading a hardcoded image from the HTML file instead of loading one manually in production mode
+        // !VA Here we initialize DEV mode, i.e. reading a hardcoded image from the HTML file instead of loading one manually in production mode
         if (initMode === 'devmode') {
           // !VA Set a timeout to give the image time to load
           setTimeout(function() {
@@ -531,7 +531,7 @@ var Witty = (function () {
             appController.initCalcViewerSize();
 
             // !VA Open the CCP by default in dev mode
-            // !VA First, set it to the opposite of how you want to start it.
+            // !VA First, set it to how you want to start it.
             document.querySelector(staticContainers.ccpContainer).classList.add('active');
             // !VA The return variable isn't used, but keeping it for reference
             // var ccpState = UIController.toggleCcp();
@@ -2549,8 +2549,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         addEventHandler((tbKeypresses[i]),'keydown',handleKeydown,false);
         addEventHandler((tbKeypresses[i]),'keyup',handleKeyup,false);
         addEventHandler((tbKeypresses[i]),'focus',handleFocus,false);
-        // !VA Here we need to handle the case where the user enters a value but then exits the field per mouseclick without TAB or ENTER to apply the value. This action has to be equivalent to the ESC keypress.
-        addEventHandler((tbKeypresses[i]),'blur',handleMouseEvents,false);
+        addEventHandler((tbKeypresses[i]),'blur',handleBlur,false);
       }
 
 
@@ -2563,7 +2562,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           addEventHandler(ccpInputs,'keydown',handleKeydown,false);
           addEventHandler(ccpInputs,'keyup',handleKeyup,false);
           addEventHandler(ccpInputs,'focus',handleFocus,false);
-          addEventHandler(ccpInputs,'blur',handleMouseEvents,false);
+          addEventHandler(ccpInputs,'blur',handleBlur,false);
         }
       }     
       
@@ -2734,7 +2733,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA sdf MODIFIER KEYS FOR TOOLTIP DISPLAY
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('Running on DOM content load');
+      // console.log('Running on DOM content load');
 
       // !VA Get the root (html) element 
       const rootElement = document.querySelector(':root');
@@ -2801,20 +2800,21 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     function handleBlur(evt) {
       // !VA Handle blur
       let userInputObj = {};
-      console.log('handleBlur running');
+      let target = evt.target;
       userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
       // !VA evtTargetVal is the value the user entered into the input element as integer.
       userInputObj.evtTargetVal = evt.target.value;
-
-
+      // !VA Apply the user-entered input value in Toolbar or CCP, i.e. writes the value to Appobj and, if Toolbar, runs writeToolbarInputToAppobj which then runs calcViewerSize to update the dynamicElements with the new value.
       applyInputValue(userInputObj);
       // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appdata property.
       // !VA NOTE: This can probably replace the blur statements in handleKeydown
-      // if (appObjProp === 'curImgW' || appObjProp === 'curImgH') {
-      //   this.value = '';
-      // } else {
-      //   this.value = Appobj[appObjProp];
-      // }
+      if (userInputObj.appObjProp === 'curImgW' || userInputObj.appObjProp === 'curImgH') {
+        target.value = '';
+      } else {
+        target.value = Appobj[userInputObj.appObjProp];
+      }
+      // console.log('Appobj: ');
+      // console.dir(Appobj);
     }
 
     // !VA appController private 
@@ -2852,12 +2852,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Branch: implementClipboard01 (071020)
     // !VA Called from handleKeydown. Applies the user-entered input value in the Toolbar or CCP, i.e. writes the value to Appobj and, if Toolbar, runs writeToolbarInputToAppobj which then runs calcViewerSize to update the dynamicElements with the new value.
     function applyInputValue(userInputObj) {
+      // console.log('applyInputValue running');
       // !VA Destructure userInputObj into variables
       let { evtTargetVal, appObjProp } = userInputObj;
-      console.log('applyInputValue appObjProp is: ' + appObjProp);
-      console.log('applyInputValue evtTargetValue is: ' + evtTargetVal);
+      // console.log('applyInputValue appObjProp is: ' + appObjProp);
+      // console.log('applyInputValue evtTargetValue is: ' + evtTargetVal);
       let inputObj = {};
       // !VA If the target element value doesn't equal the existing Appobj value, then a new value was user-entered into the input element, so update Appobj with the new value. This is done in ALL cases, including curImgW and curImgH. Otherwise, evtTargetValue is unchanged, so do nothing, i.e. blur and leave the input value unchanged. An else clause is not necessary here, but it's included for possible error checking and console logging. 
+      // debugger;
       if ( evtTargetVal !== Appobj[appObjProp]) {
         Appobj[appObjProp] = evtTargetVal;
       } else {
@@ -2871,25 +2873,29 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         inputObj.appObjProp = appObjProp;
         writeToolbarInputToAppobj(inputObj);
       }
-      console.dir(Appobj);
+      // console.log('applyInputValue Appobj is: ');
+      // console.log(Appobj);
     }
 
     // !VA appController private 
     // !VA Preprocess mouse events and route them to respective eval handler.
     function handleMouseEvents(evt) {
+      console.clear();
       console.log('handleMouseEvents running');
       // !VA Get the target element of the click
-      console.log('evt.target.id is: ' + evt.target.id);
-      console.log('this.id is: ' + this.id);
-      console.log('event.type is: ' + event.type);
+      // console.log('this.id is: ' + this.id);
+      // console.log('event.type is: ' + event.type);
+      let elId = '#' + evt.target.id;
+      let val, retVal;
+      console.log('elId is: ' + elId); 
+
+      // !VA Branch: implementClipboard01 (071020)
+      // !VA userInputObj is required by checkNumericInput
       let userInputObj = { };
-      userInputObj.appObjProp = elementIdToAppobjProp(this.id);
-      userInputObj.evtTargetVal = evt.target.value;
-      console.log('userInputObj.appObjProp is: ' + userInputObj.appObjProp);
-      console.log('userInputObj.evtTargetVal is: ' + userInputObj.evtTargetVal);
-      // userInputObj.
-      var el = document.querySelector('#' + this.id);
-      console.log(el);
+      // userInputObj.appObjProp = elementIdToAppobjProp(this.id);
+
+      // var el = document.querySelector('#' + this.id);
+      // console.log(el);
       
       // !VA Branch: implementCcpInput09 (070220)
       // !VA There was a try/catch here but I don't know what it was supposed to catch - see earlier versions
@@ -2897,13 +2903,39 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA Handle the increment toolbuttons
       if (event.type === 'click') {
-        console.log('click!');
+        // !VA Create userInputObj - appObjProp is curImgW because that is the Appobj property that the increment/decrement buttons modify
+        userInputObj.appObjProp = 'curImgW';
+        // !VA Get the 8 char identifier for Toolbar buttons. These are the increment/decrement buttons
+        if ( elId.substr( 0, 8 ) === '#btn-tbr') {
+          // !VA Get the last two chars of the id and convert to integer -- this is the value to be incremented/decremented
+          val = parseInt(elId.slice(-2));
+          // !VA If the target ID includes 'incr' then the image dimension will be incremented, if 'decr' then it will be decremented
+          (elId.includes('incr')) ? val : val = -val;
+          // !VA Add val to the current imgW to get the value to be passed to checkUserInput for error parsing.
+          console.log('Appobj.curImgW is: ' + Appobj.curImgW);
+          val = Appobj.curImgW + val;
+          console.log('val is NOW: ' + val);
+          Appobj.curImgW = val;
+          console.log('Appobj.curImgW is NOW: ' + Appobj.curImgW);
+          userInputObj.evtTargetVal = Appobj.curImgW;
+          retVal = checkNumericInput(userInputObj);
+          console.log('retVal is: ' + retVal);
+          if (retVal !== false ) {
+            writeToolbarInputToAppobj(userInputObj);
+          } else {
+            return;
+          }
+        }
 
-        // !VA TODO: Revisit this
+      // !VA Branch: implementClipboard01 (071020)
+      // !VA I dinked around wit this so much I'm going to leave this blur handler in here with an alert to trap it in case it pops up.
       }  else if ( event.type === 'blur') {
         // !VA Branch: implementClipboard01 (071020)
         // !VA When the current input element is blurred due to a mouseclick, even if the user has input a new value, then the action is equivalent to the ESC key being pressed, i.e. the input value is reset to what it was prior to the mouseclick-triggered blur.
-        applyInputValue(userInputObj);
+        // !VA Branch: implementClipboard01 (071020)
+        // !VA This is deprecated, I think -- all blurs are handled via handleBlur directly, not via mouseclick events on input elements.
+        // applyInputValue(userInputObj);
+        alert('Error in handleMouseEvents - blur not handled');
 
       } else if ( event.type === 'drop') {
         evt.preventDefault;
@@ -3002,7 +3034,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Branch: implementAppobj08 (062020)
     // !VA NOTE: Appd... already replaced with Appobj here. Could be a source of error.
     function handleKeyup(evt) {
-      console.log('handleKeyup running');
+      // console.log('handleKeyup running');
       let keyup;
       // !VA Find out which key was struck
       keyup = evt.which || evt.keyCode || evt.key;
@@ -3157,6 +3189,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA appController private
     // !VA This was rewritten and derived from evalToolbarInput. 
+    // !VA Branch: implementClipboard01 (071020)
+    // !VA Rewrite this comment
     // !VA Called from handleMouseActions and handleBlur, this function name is a misnomer here. More importantly that writing to Appobj, this function imgViewerW, sPhonesW and lPhonesW to localStorage and calculates the adjacent side of the curImgW/curImgH input, then runs calcViewerSize to resize the dynamicElements containers.  
     function writeToolbarInputToAppobj(userInputObj) {
       // console.log('writeToolbarInputToAppobj');
@@ -4020,7 +4054,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           appobjProp = appobjArray[i];
         }
       }
-      console.log('appobjProp is: ' + appobjProp);
+
       return appobjProp;
     }
 
