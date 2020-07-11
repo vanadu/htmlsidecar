@@ -639,7 +639,7 @@ var Witty = (function () {
         // !VA Loop throught the list of args, determine what type of element it is from the six-character element prefix and perform the appropriate action.  
         // console.log('writeAppobjToDOM args[0][0]: ');
         // console.dir(args[0][0]);
-        console.log('writeAppobjToDOM - args[0]: ' + args[0] + ', args[1]: ' + args[1]);
+        // console.log('writeAppobjToDOM - args[0]: ' + args[0] + ', args[1]: ' + args[1]);
         // !VA Loop through all the args in the rest parameters passed in. 
         // !VA This is the top of the args loop
         for (let i = 0; i < args.length; i++) {
@@ -744,7 +744,7 @@ var Witty = (function () {
 
         }
         function populateCcpProperties(Appobj) {
-          console.log('populateCcpProperties running');
+          // console.log('populateCcpProperties running');
           // !VA Now initialize Appobj with the CCP element values. This includes ALL CCP elements, including those that are displayed/undisplayed depending on which TDOption or imgType radio is selected. 
           // !VA Don't forget to use bracket notation to add properties to an object: https://stackoverflow.com/questions/1184123/is-it-possible-to-add-dynamically-named-properties-to-javascript-object
           // !VA  for loop: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
@@ -932,6 +932,8 @@ var Witty = (function () {
           ccpElementId = ccpUserInput.iptCcpImgClass;
           str = Appobj.iptCcpImgClass;
           retObj = returnObject(ccpElementId, str);
+          console.log('imgClass retObj: ');
+          console.dir(retObj);
           return retObj;
         })(),
         imgWidth: (function() {
@@ -987,7 +989,7 @@ var Witty = (function () {
         imgAlign: (function() {  
           // !VA This value is get-only.
           ccpElementId = false;
-          console.log('Appobj.selCcpImgAlign is: ' + Appobj.selCcpImgAlign);
+          // console.log('Appobj.selCcpImgAlign is: ' + Appobj.selCcpImgAlign);
           Appobj.selCcpImgAlign !== 'none' ? str = Appobj.selCcpImgAlign : str = '';
 
           // str = '', options = [], selectid = '';
@@ -1037,7 +1039,7 @@ var Witty = (function () {
         tdHeight: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
-          console.log('Appobj.iptCcpTdHeight is: ' + Appobj.iptCcpTdHeight);
+          // console.log('Appobj.iptCcpTdHeight is: ' + Appobj.iptCcpTdHeight);
 
           retObj = returnObject( ccpElementId, ccpIfNoUserInput('height',document.querySelector(ccpUserInput.iptCcpTdHeight).value));
           return retObj;
@@ -1228,12 +1230,6 @@ var Witty = (function () {
     // !VA Called multiple times from getAttributes
     function ccpGetAttValue(att, value) {
       // !VA Gets the insFilename from Appobj in case the user leaves 'path' empty
-      // var Appobj = appController.getAppobj();
-      let fileName;
-      // !VA Branch: implementCcpInput05 (062720)
-      // !VA Not sure this call to Appobj is necessary
-      fileName = appController.getAppobj('fileName');
-
       var str;
       // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
       if (value && att) {
@@ -1244,11 +1240,11 @@ var Witty = (function () {
           // !VA Include the space here to ensure no duplicate spaces slip in when the clip is built
           str = value;
         }
-
       } else {
         // !VA If the path field is empty, return the insFilename without the path.
         if (att === 'src' && value === '' ) {
-          str = `${att}="${fileName}" `;
+          // !VA Get the filename from Appobj.fileName
+          str = `${att}="${appController.getAppobj('fileName')}" `;
         } else if ( att === '#' || att === '') {
           str = '';
         } else {
@@ -1714,8 +1710,10 @@ var Witty = (function () {
       if(Attributes.imgIncludeAnchor.str === true) {
         let anchor = document.createElement('a');
         anchor.href = '#';
-        anchor.setAttribute('style', 'color: #FF0000');
-        anchor.setAttribute('target', '_blank');
+        // !VA Branch: implementClipboard01 (071020)
+        // !VA Commenting color and target out for now
+        // anchor.setAttribute('style', 'color: #FF0000');
+        // anchor.setAttribute('target', '_blank');
         anchor.appendChild(imgNode);
         returnNodeFragment.appendChild(anchor);
       } else {
@@ -1952,7 +1950,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CBController private
     // !VA NOTE: This routine identifies if the nodes 1) contain the id 'stack-column-center' 2) contain MS conditional code and 2) contain an A tag. It applies indents accordingly to the nodes using insertAdjacentHTML. 1) Is problematic because if that class name is not present in the HTML file, the indent will break. I couldn't figure out a way to do this without the id by looking for sibling nodes, so trying to create options for three or even two column tables will be ridiculous time-consuming - not an option for now.
     function applyIndents( id, outputNL ) {
-      console.log('applyIndents id is: ' + id);
+      // console.log('applyIndents id is: ' + id);
 
       // !VA Query Appobj to get the selected TD option
       let selectedTdOption;
@@ -2541,29 +2539,31 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA KEYBOARD HANDLERS
       // -----------------------
+      // !VA Branch: implementClipboard01 (071020)
+      // !VA This is the wrong approach - we are handling keypresses only for the Toolbar input elements but also should be handling ALL the toolbar elements, including the increment buttons, since they can be activated with the enter key.
       // !VA Add event handlers for input toolbarElements
       const tbKeypresses = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrCurImgW, toolbarElements.iptTbrCurImgH, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW ];
       for (let i = 0; i < tbKeypresses.length; i++) {
-        // !VA convert the ID string to the object ins ypresses[i]);
-        // !VA Handles all key events except TAB, which require keyDown to get the value of the current input rather than the input being tabbed to.
+        // !VA convert the ID string to the object inside the loop
         tbKeypresses[i] = document.querySelector(tbKeypresses[i]);
         addEventHandler((tbKeypresses[i]),'keydown',handleKeydown,false);
         addEventHandler((tbKeypresses[i]),'keyup',handleKeyup,false);
         addEventHandler((tbKeypresses[i]),'focus',handleFocus,false);
-        // !VA Branch: doEventHandlers01 (070720)
-        // !VA Commented out
-        // addEventHandler((tbKeypresses[i]),'blur',handleBlur,false);
+        // !VA Here we need to handle the case where the user enters a value but then exits the field per mouseclick without TAB or ENTER to apply the value. This action has to be equivalent to the ESC keypress.
+        addEventHandler((tbKeypresses[i]),'blur',handleMouseEvents,false);
       }
 
+
+
       // !VA Add event handlers for input toolbarElements
-      let ccpKeypresses;
+      let ccpInputs;
       for(let i in ccpUserInput) {
         if (ccpUserInput[i].substring(0,4) === '#ipt') {
-          ccpKeypresses = document.querySelector(ccpUserInput[i]);
-          addEventHandler(ccpKeypresses,'keydown',handleKeydown,false);
-          addEventHandler(ccpKeypresses,'keyup',handleKeyup,false);
-          addEventHandler(ccpKeypresses,'focus',handleFocus,false);
-          // addEventHandler(ccpKeypresses,'blur',handleBlur,false);
+          ccpInputs = document.querySelector(ccpUserInput[i]);
+          addEventHandler(ccpInputs,'keydown',handleKeydown,false);
+          addEventHandler(ccpInputs,'keyup',handleKeyup,false);
+          addEventHandler(ccpInputs,'focus',handleFocus,false);
+          addEventHandler(ccpInputs,'blur',handleMouseEvents,false);
         }
       }     
       
@@ -2786,36 +2786,76 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // console.log('handleFocus running');
       // console.log('evt.target.id is: ' + evt.target.id);
       // !VA Branch: doEventHandlers01 (070720)
-      // !VA If iptTbrImgViewerW, iptTbrSPhonesW or iptTbrSPhonesW, replace the input contents with a cursor. This isn't the desired effect but it will have to do for now since I don't have a solution for making this exactly like the default behavior of the CCP input fields, which is 1) select the input contents on focus and 2) replace the selection with a cursor on second click.
-      const toolbarInputs = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW ];
-      if ( toolbarInputs.includes('#' + evt.target.id)) {
-        this.select();
-        // this.selectionStart = this.selectionEnd = this.value.length;
-      } else {  
-        this.select();
-      }
+      // !VA Don't forget that it was the CSS user-select property that was causing the non-default input behavior in the Toolbar elements. That CSS property is disabled now, so all we have to do is this.select on focus for all alements
+      // const toolbarInputs = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW ];
+      // if ( toolbarInputs.includes('#' + evt.target.id)) {
+      this.select();
+      // this.selectionStart = this.selectionEnd = this.value.length;
+      // } else {  
+      //   this.select();
+      // }
     }
 
-    // !VA Branch: doEventHandlers01 (071020)
-    // !VA This is deprecated now, I guess.
+    // !VA Branch: implementClipboard01 (071020)
     // !VA appController private function
     function handleBlur(evt) {
       // !VA Handle blur
+      let userInputObj = {};
       console.log('handleBlur running');
-      var appObjProp = elementIdToAppobjProp(evt.target.id);
+      userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
+      // !VA evtTargetVal is the value the user entered into the input element as integer.
+      userInputObj.evtTargetVal = evt.target.value;
+
+
+      applyInputValue(userInputObj);
       // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appdata property.
       // !VA NOTE: This can probably replace the blur statements in handleKeydown
+      // if (appObjProp === 'curImgW' || appObjProp === 'curImgH') {
+      //   this.value = '';
+      // } else {
+      //   this.value = Appobj[appObjProp];
+      // }
+    }
+
+    // !VA appController private 
+    // !VA Called from handleMouseEvents and handleKeyup. Runs when the user presses ESC or mouses out of a field. If the user has made an entry in the input element, this cancels that entry and restores the input value to what it was prior to that entry based on the localStorage, placeholder or Appobj value. 
+    function resetInputValue(evt) {
+      console.log('resetInputValue running');
+      let target, appObjProp, curLocalStorage;
+      target = evt.target;
+      appObjProp = elementIdToAppobjProp(evt.target.id );
+      // !VA If the event target is the curImgW or curImgH input fields, on ESC exit the field and restore the placeholder set in the HTML file.
       if (appObjProp === 'curImgW' || appObjProp === 'curImgH') {
-        this.value = '';
+        target.value = ('');
+        target.blur();
+      } else if ( appObjProp.substr( 0, 6) === 'iptCcp' ) {
+        // !VA IMPORTANT: DON'T FORGET THIS!!!!!! 
+        // !VA If the event target is a CCP input field, set the input value to the last Appobj value for that property and blur
+        target.value = (Appobj[appObjProp]);
+        target.blur();
       } else {
-        this.value = Appobj[appObjProp];
+        // !VA If the event target is imgViewerW, iptTbrSmallPhonesW and iptTbrLargePhonesW, on ESC exit the field and restore the preexisting value localStorage if it exists, if not, restore the default stored in the HTML placeholder. In any case, blur on ESC.
+        curLocalStorage = appController.getLocalStorage();
+        if (appObjProp === 'imgViewerW') {
+          curLocalStorage[0] ? target.value = curLocalStorage[0] : target.value = document.querySelector(toolbarElements.iptTbrViewerW).placeholder;
+        } else if (appObjProp === 'sPhonesW') {
+          curLocalStorage[1] ? target.value = curLocalStorage[1] : target.value = document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder;
+        } else if (appObjProp === 'lPhonesW') {
+          curLocalStorage[2] ? target.value = curLocalStorage[2] : target.value = document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder;
+        } else {
+          console.log('ERROR in handleKeyup: localStorage value does not exist');
+        }
+        target.blur();
       }
     }
 
+    // !VA Branch: implementClipboard01 (071020)
+    // !VA Called from handleKeydown. Applies the user-entered input value in the Toolbar or CCP, i.e. writes the value to Appobj and, if Toolbar, runs writeToolbarInputToAppobj which then runs calcViewerSize to update the dynamicElements with the new value.
     function applyInputValue(userInputObj) {
-      console.log('applyInputValue running');
       // !VA Destructure userInputObj into variables
       let { evtTargetVal, appObjProp } = userInputObj;
+      console.log('applyInputValue appObjProp is: ' + appObjProp);
+      console.log('applyInputValue evtTargetValue is: ' + evtTargetVal);
       let inputObj = {};
       // !VA If the target element value doesn't equal the existing Appobj value, then a new value was user-entered into the input element, so update Appobj with the new value. This is done in ALL cases, including curImgW and curImgH. Otherwise, evtTargetValue is unchanged, so do nothing, i.e. blur and leave the input value unchanged. An else clause is not necessary here, but it's included for possible error checking and console logging. 
       if ( evtTargetVal !== Appobj[appObjProp]) {
@@ -2831,7 +2871,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         inputObj.appObjProp = appObjProp;
         writeToolbarInputToAppobj(inputObj);
       }
-      console.log('applyInputValue Appobj: ');
       console.dir(Appobj);
     }
 
@@ -2842,9 +2881,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Get the target element of the click
       console.log('evt.target.id is: ' + evt.target.id);
       console.log('this.id is: ' + this.id);
+      console.log('event.type is: ' + event.type);
       let userInputObj = { };
       userInputObj.appObjProp = elementIdToAppobjProp(this.id);
+      userInputObj.evtTargetVal = evt.target.value;
       console.log('userInputObj.appObjProp is: ' + userInputObj.appObjProp);
+      console.log('userInputObj.evtTargetVal is: ' + userInputObj.evtTargetVal);
       // userInputObj.
       var el = document.querySelector('#' + this.id);
       console.log(el);
@@ -2858,7 +2900,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         console.log('click!');
 
         // !VA TODO: Revisit this
-      }  else if ( event.type === 'drop') {
+      }  else if ( event.type === 'blur') {
+        // !VA Branch: implementClipboard01 (071020)
+        // !VA When the current input element is blurred due to a mouseclick, even if the user has input a new value, then the action is equivalent to the ESC key being pressed, i.e. the input value is reset to what it was prior to the mouseclick-triggered blur.
+        applyInputValue(userInputObj);
+
+      } else if ( event.type === 'drop') {
         evt.preventDefault;
         // !VA TODO: Revisit this
       } else if ( event.type === 'dragover') {
@@ -2893,7 +2940,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
         // !VA evtTargetVal is the value the user entered into the input element as integer.
         userInputObj.evtTargetVal = evt.target.value;
-
         // !VA Branch: implementCcpInput09 (070220)
         // !VA Exception: For curImgW and curImgH, if user tabs out of the input field without entering a value, we need to skip the blur handling and error checking completely and just perform the default TAB action, i.e. skip to the next element in the TAB order and leave the input empty so the placeholder shows.
         if (  userInputObj.appObjProp === 'curImgW' && userInputObj.evtTargetVal === ''  ||   userInputObj.appObjProp === 'curImgH' && userInputObj.evtTargetVal === '' ) {
@@ -2929,14 +2975,17 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             userInputObj.evtTargetVal = retVal; 
             // !VA Handling TAB and ENTER here separately just in case...but for now they do the same thing, i.e. run applyInputValue
             if (keydown == 9 ) {
-              // !VA Handling TAB 
-              applyInputValue(userInputObj);
+              // !VA Handling TAB - this should call handleBlur which calls applyInputValue, otherwise it's blurring twice...
+              handleBlur(evt);
             } else if ( keydown == 13 ) {
-              // !VA Pass userInputObj to handle the Enter key
-              applyInputValue(userInputObj);
-            } else {
-              // !VA NOTE: Any other key than TAB or ENTER - don't need to trap this I don't think.
-              // console.log('ERROR in handleKeydown - unknown keypress');
+              // !VA Branch: implementClipboard01 (071020)
+              // !VA We don't need to trap the Toolbar increment/decrement buttons here because the ENTER keypress is equivalent to a mouseclick and triggers the click event, so we can handle the ENTER keypress in handleMouseEvents. This is also why tdKeypresses in the eventHandlers doesn't include the Toolbar buttons - they're handled as mouse clicks.
+              if ( evt.target.id.substr( 0, 3 ) === 'ipt')  {
+                applyInputValue(userInputObj);
+              } else {
+                // !VA The element is neither an input element nor an increment/decrement button
+                console.log(' ERROR in handleKeydown - element type not handled');
+              }  
             }
           // !VA If false, that means that the user has deleted the input value and it is now empty, which isn't allowed. So prevent the default TAB behavior, i.e. leave the cursor in the field until the user enters a valid value
           } else {
@@ -2954,7 +3003,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA NOTE: Appd... already replaced with Appobj here. Could be a source of error.
     function handleKeyup(evt) {
       console.log('handleKeyup running');
-      let appObjProp, curLocalStorage, keyup;
+      let keyup;
       // !VA Find out which key was struck
       keyup = evt.which || evt.keyCode || evt.key;
       // !VA  On ESC, we want curImgW and curImgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the inspectorElements and there's no need to recalc the W and H each time the user makes and entry - that would just be confusing. For imgViewerW, sSphonesW and lPhonesW, revert to the previously displayed value if the user escapes out of the input field. The previously displayed value will be either 1) the default in the HTML placeholder attribute or 2) the localStorage value. So, the localStorage value is false, get the placeholder, otherwise get the localStorage value.
@@ -2962,31 +3011,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       if (keyup == 27 ) {
         console.log('handleKeyUp - ESC key');
         // !VA We only need the property here, so no need to create an args object. We could actually just use the target but since we're standardizing on property names, let's stick with that. Get the property name from the id of this, i.e. the event target
-        appObjProp = elementIdToAppobjProp(this.id);
-        console.log('appObjProp is: ' + appObjProp);
-        // !VA If the event target is the curImgW or curImgH input fields, on ESC exit the field and restore the placeholder set in the HTML file.
-        if (appObjProp === 'curImgW' || appObjProp === 'curImgH') {
-          this.value = ('');
-          this.blur();
-        } else if ( appObjProp.substr( 0, 6) === 'iptCcp' ) {
-          // !VA IMPORTANT: DON'T FORGET THIS!!!!!! 
-          // !VA If the event target is a CCP input field, set the input value to the last Appobj value for that property and blur
-          this.value = (Appobj[appObjProp]);
-          this.blur();
-        } else {
-          // !VA If the event target is imgViewerW, iptTbrSmallPhonesW and iptTbrLargePhonesW, on ESC exit the field and restore the preexisting value localStorage if it exists, if not, restore the default stored in the HTML placeholder. In any case, blur on ESC.
-          curLocalStorage = appController.getLocalStorage();
-          if (appObjProp === 'imgViewerW') {
-            curLocalStorage[0] ? this.value = curLocalStorage[0] : this.value = document.querySelector(toolbarElements.iptTbrViewerW).placeholder;
-          } else if (appObjProp === 'sPhonesW') {
-            curLocalStorage[1] ? this.value = curLocalStorage[1] : this.value = document.querySelector(toolbarElements.iptTbrSPhonesWidth).placeholder;
-          } else if (appObjProp === 'lPhonesW') {
-            curLocalStorage[2] ? this.value = curLocalStorage[2] : this.value = document.querySelector(toolbarElements.iptTbrLPhonesWidth).placeholder;
-          } else {
-            console.log('ERROR in handleKeyup: localStorage value does not exist');
-          }
-          this.blur();
-        }
+        resetInputValue(evt);
       }
     }
 
@@ -3979,7 +4004,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private
     // !VA Get the Appobj property that corresponds to the ID of the DOM input element that sets it. 1) Removes the hypens in the ID string, converts the identifier string (the Appobj/ccpUserInput property name string) to lowercase, finds the match, and returns the aforementioned Appobj/ccpUserInput property name string.
     function elementIdToAppobjProp(id) {
-      // console.clear();
       // console.log('elementIdToAppobjProp running');
       // console.log('id is: ' + id);
       let idStr, appobjProp;
@@ -3996,6 +4020,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           appobjProp = appobjArray[i];
         }
       }
+      console.log('appobjProp is: ' + appobjProp);
       return appobjProp;
     }
 
@@ -4077,7 +4102,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
       // !VA appController public
-      // !VA Access Appobj from outside appController. If identifier is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is a property identifier, i.e. an Appobj property name, return the corresponding property value. If it is neither of the above, error condition
+      // !VA Access Appobj from outside appController. Called from getAttributes, ccpGetAttValue, ccpIfNoUserInput, getSelectedTdOptionFromAppobj, getCheckboxState, getImgSwapBlockIf identifier is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is a property identifier, i.e. an Appobj property name, return the corresponding property value. If it is neither of the above, error condition
       getAppobj: function(identifier) {
         console.log('getAppobj running');
         // console.log('identifier is: ' + identifier);
