@@ -2540,21 +2540,21 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA KEYBOARD HANDLERS
       // -----------------------
       // !VA Branch: implementClipboard01 (071020)
-      // !VA This is the wrong approach - we are handling keypresses only for the Toolbar input elements but also should be handling ALL the toolbar elements, including the increment buttons, since they can be activated with the enter key.
-      // !VA Add event handlers for input toolbarElements
-      const tbKeypresses = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrCurImgW, toolbarElements.iptTbrCurImgH, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW ];
-      for (let i = 0; i < tbKeypresses.length; i++) {
+      // !VA Handle the Toolbar input elements separately from the Toolbar increment/decrement buttons because the buttons are handled by mouseclick or by default as mouseclicks when ENTER is pressed, so none of these handlers apply to those buttons.
+      // !VA Add event handlers for input toolbarElements. This could be merged with ccpInputs below but leave it for now.
+      const toolbarInputs = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrCurImgW, toolbarElements.iptTbrCurImgH, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW ];
+      for (let i = 0; i < toolbarInputs.length; i++) {
         // !VA convert the ID string to the object inside the loop
-        tbKeypresses[i] = document.querySelector(tbKeypresses[i]);
-        addEventHandler((tbKeypresses[i]),'keydown',handleKeydown,false);
-        addEventHandler((tbKeypresses[i]),'keyup',handleKeyup,false);
-        addEventHandler((tbKeypresses[i]),'focus',handleFocus,false);
-        addEventHandler((tbKeypresses[i]),'blur',handleBlur,false);
+        toolbarInputs[i] = document.querySelector(toolbarInputs[i]);
+        addEventHandler((toolbarInputs[i]),'keydown',handleKeydown,false);
+        addEventHandler((toolbarInputs[i]),'keyup',handleKeyup,false);
+        addEventHandler((toolbarInputs[i]),'focus',handleFocus,false);
+        addEventHandler((toolbarInputs[i]),'blur',handleBlur,false);
       }
 
 
 
-      // !VA Add event handlers for input toolbarElements
+      // !VA Add event handlers for CCP input elements.  This could be merged with tbKeypresses above below but leave it for now.
       let ccpInputs;
       for(let i in ccpUserInput) {
         if (ccpUserInput[i].substring(0,4) === '#ipt') {
@@ -2797,14 +2797,24 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA Branch: implementClipboard01 (071020)
     // !VA appController private function
+    // !VA Called from handleKeydown. Calls applyInputValue(userInputObj) and sets the current input element's value to either the corresponding  Appobj property value or, for curImgW and curImgH, to an empty string so the placeholder value is displayed. curImgW and curImgH don't need to display a value because their value is displayed prominently in the Display Size inspector.
     function handleBlur(evt) {
-      // !VA Handle blur
+      console.log('handleBlur running');
       let userInputObj = {};
       let target = evt.target;
+      let retVal2;
       userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
       // !VA evtTargetVal is the value the user entered into the input element as integer.
       userInputObj.evtTargetVal = evt.target.value;
       // !VA Apply the user-entered input value in Toolbar or CCP, i.e. writes the value to Appobj and, if Toolbar, runs writeToolbarInputToAppobj which then runs calcViewerSize to update the dynamicElements with the new value.
+
+      retVal2 = checkUserInput( userInputObj );
+      console.log('handleBlur retVal2 is: ' + retVal2);
+      userInputObj.evtTargetVal = retVal2;
+
+
+
+      console.log('handleBlur applyInputValue');
       applyInputValue(userInputObj);
       // !VA If blurring from imgW or imgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appdata property.
       // !VA NOTE: This can probably replace the blur statements in handleKeydown
@@ -2813,12 +2823,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       } else {
         target.value = Appobj[userInputObj.appObjProp];
       }
-      // console.log('Appobj: ');
-      // console.dir(Appobj);
+      console.log('Appobj: ');
+      console.dir(Appobj);
+
     }
 
     // !VA appController private 
-    // !VA Called from handleMouseEvents and handleKeyup. Runs when the user presses ESC or mouses out of a field. If the user has made an entry in the input element, this cancels that entry and restores the input value to what it was prior to that entry based on the localStorage, placeholder or Appobj value. 
+    // !VA Called from handleKeyup. Runs when the user presses ESC to get outof an input element. If the user has made an entry in the input element, this cancels that entry and restores the input value to what it was prior to that entry based on the localStorage, placeholder or Appobj value. 
     function resetInputValue(evt) {
       console.log('resetInputValue running');
       let target, appObjProp, curLocalStorage;
@@ -2852,7 +2863,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Branch: implementClipboard01 (071020)
     // !VA Called from handleKeydown. Applies the user-entered input value in the Toolbar or CCP, i.e. writes the value to Appobj and, if Toolbar, runs writeToolbarInputToAppobj which then runs calcViewerSize to update the dynamicElements with the new value.
     function applyInputValue(userInputObj) {
-      // console.log('applyInputValue running');
+      console.log('applyInputValue running');
       // !VA Destructure userInputObj into variables
       let { evtTargetVal, appObjProp } = userInputObj;
       // console.log('applyInputValue appObjProp is: ' + appObjProp);
@@ -2861,13 +2872,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA If the target element value doesn't equal the existing Appobj value, then a new value was user-entered into the input element, so update Appobj with the new value. This is done in ALL cases, including curImgW and curImgH. Otherwise, evtTargetValue is unchanged, so do nothing, i.e. blur and leave the input value unchanged. An else clause is not necessary here, but it's included for possible error checking and console logging. 
       // debugger;
       if ( evtTargetVal !== Appobj[appObjProp]) {
+        console.log('Mark1');
         Appobj[appObjProp] = evtTargetVal;
       } else {
+        console.log('Mark2');
         console.log('ERROR in applyInputValue - evtTargetValue !== Appobj[appObjProp]');
       }
 
       // !VA 3) For toolbarElements, create a new obj with evtTargetVal and appObjProp to pass to writeToolbarInputToAppobj. writeToolbarInputToAppobj writes new values to localStorage and resizes the dynamicElements based on the user input. writeToolbarInputToAppobj contains the aspect ratio logic to get the adjacent dimension from a curImg value. 
       // !VA IMPORTANT: This works but it sucks. We're only running this now to set the localStorage and to get the adjacent side curImg dimensions. writeToolbarInputToAppobj doesn't reflect what's being done in that function, and it should be reevaluated in any case. Also, the below condition with all the OR conditions isn't good - should call appObjPropToAlias and base the condition on the return value i.e. not undefined. But for now, need to move on.
+
       if (appObjProp === 'curImgW' || appObjProp === 'curImgH' || appObjProp === 'imgViewerW' || appObjProp === 'sPhonesW' || appObjProp === 'lPhonesW' ) {
         inputObj.evtTargetVal = Appobj[appObjProp];
         inputObj.appObjProp = appObjProp;
@@ -2878,32 +2892,22 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController private 
-    // !VA Preprocess mouse events and route them to respective eval handler.
+    // !VA Called from tbClickables event handler. Handles clicks on the Toolbar increment/decrement buttons and any other mouse actions that aren't handled by the default handlers for the ENTER keypress. NOTE: Does not handle blurring of input fields initiated by mouseclick. 
     function handleMouseEvents(evt) {
       console.clear();
       console.log('handleMouseEvents running');
-      // !VA Get the target element of the click
-      // console.log('this.id is: ' + this.id);
-      // console.log('event.type is: ' + event.type);
+      // !VA elId adds the hash to evt.target.id
       let elId = '#' + evt.target.id;
+      // !VA val is a temporary variable to mutate evt.target.value into Appobj.curImgW. retVal is the value returned by checkNumericInput, i.e. either an integer or false if validation fails. 
       let val, retVal;
-      console.log('elId is: ' + elId); 
-
       // !VA Branch: implementClipboard01 (071020)
       // !VA userInputObj is required by checkNumericInput
       let userInputObj = { };
-      // userInputObj.appObjProp = elementIdToAppobjProp(this.id);
-
-      // var el = document.querySelector('#' + this.id);
-      // console.log(el);
-      
       // !VA Branch: implementCcpInput09 (070220)
       // !VA There was a try/catch here but I don't know what it was supposed to catch - see earlier versions
-
-
-      // !VA Handle the increment toolbuttons
+      // !VA Handle the click event
       if (event.type === 'click') {
-        // !VA Create userInputObj - appObjProp is curImgW because that is the Appobj property that the increment/decrement buttons modify
+        // !VA Set userInputObj.appObjProp to curImgW because that is the Appobj property that the increment/decrement buttons modify
         userInputObj.appObjProp = 'curImgW';
         // !VA Get the 8 char identifier for Toolbar buttons. These are the increment/decrement buttons
         if ( elId.substr( 0, 8 ) === '#btn-tbr') {
@@ -2911,15 +2915,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           val = parseInt(elId.slice(-2));
           // !VA If the target ID includes 'incr' then the image dimension will be incremented, if 'decr' then it will be decremented
           (elId.includes('incr')) ? val : val = -val;
-          // !VA Add val to the current imgW to get the value to be passed to checkUserInput for error parsing.
-          console.log('Appobj.curImgW is: ' + Appobj.curImgW);
+          // !VA Add val to the current imgW to get the value to be passed to checkNumericInput for error parsing.
           val = Appobj.curImgW + val;
-          console.log('val is NOW: ' + val);
-          Appobj.curImgW = val;
-          console.log('Appobj.curImgW is NOW: ' + Appobj.curImgW);
-          userInputObj.evtTargetVal = Appobj.curImgW;
+          // !VA Branch: implementClipboard01 (071020)
+          // !VA NO - do not set Appobj here
+          // Appobj.curImgW = val;
+          // !VA Now set userInput.evtTargetVal to the updated val pass userInputObj to checkNumericInput for validation.
+          userInputObj.evtTargetVal = val;
           retVal = checkNumericInput(userInputObj);
-          console.log('retVal is: ' + retVal);
+          // !VA If checkNumericInput is not false, pass the curImgW property name and evtTargetVal to writeToolbarInputToAppobj to update Appobj.curImgW and resize the dynamicElements accordingly. If it returns false, then an error message is displayed, so return without updating any values or dynamicElements.
           if (retVal !== false ) {
             writeToolbarInputToAppobj(userInputObj);
           } else {
@@ -2954,7 +2958,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // console.log('handleKeydown running');
       // console.clear();
       let numericInputs = [], stringInputs = [];
-      let retVal;
+      let retVal, retVal2;
       // !VA Get the keypress
       let keydown = evt.which || evt.keyCode || evt.key;
       // !VA userInputObj is the array containing the values needed to check input, evaluate the Toolbar input, and update Appobj prior to writing dynamicElements to the DOM after user input in the Toolbar input fields.
@@ -2980,27 +2984,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA For all other cases, do logic:
         } else {
           // !VA If appObjProp is included in the numericInputs array (which includes all of the UI elements that require numeric input), then run checkNumericInput on the contents of userInputObj. Check numeric input returns false if the integer validation fails, otherwise it converts the numeric string to number where appropriate returns userInputObj.evtTargetVal as integer
-          if (numericInputs.includes( userInputObj.appObjProp )) { 
+          // !VA Branch: implementClipboard01 (071020)
+          retVal2 = checkUserInput( userInputObj );
+          console.log('retVal2: ');
+          console.dir(retVal2);
 
-            // !VA Branch: doEventHandlers01 (071020)
-            // !VA If the target is a CCP input and it is empty, don't do the validation. For CCP inputs, if the field is empty, the respective property won't get written to the clipboard, so an empty value has functional value. This is in contrast to the Toolbar inputs, where a value is required.
-            if ( userInputObj.appObjProp.substring( 3 , 6 ) === 'Ccp' && userInputObj.evtTargetVal === '' ) {
-              // console.log('HIT');
-              // !VA The CCP input field is empty - do nothing.
-              // return;
-            } else {
-              // !VA Error check the numeric input
-              retVal = checkNumericInput(userInputObj); 
-            }
 
-          } 
-          // !VA Currently no string validation implemented, so the function just returns the argument unchanged
-          else if (stringInputs.includes( userInputObj.appObjProp )) {
-            retVal = checkTextInput(userInputObj);
-          }
-          else {
-            console.log('ERROR in handleKeydown - unknown data type');
-          }
+
+
+        
           // !VA Now that retVal is a validated number or string or false:
           // !VA If not false, write it back to userInputObj.evtTargetVal and pass userInputObj to handleBlur/handleEnterKey
           if ( retVal !== false ) { 
@@ -3008,11 +3000,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             // !VA Handling TAB and ENTER here separately just in case...but for now they do the same thing, i.e. run applyInputValue
             if (keydown == 9 ) {
               // !VA Handling TAB - this should call handleBlur which calls applyInputValue, otherwise it's blurring twice...
-              handleBlur(evt);
+              // !VA Branch: implementClipboard01 (071020)
+              // !VA Commenting out...this is now in the eventHandler
+              // handleBlur(evt);
             } else if ( keydown == 13 ) {
               // !VA Branch: implementClipboard01 (071020)
               // !VA We don't need to trap the Toolbar increment/decrement buttons here because the ENTER keypress is equivalent to a mouseclick and triggers the click event, so we can handle the ENTER keypress in handleMouseEvents. This is also why tdKeypresses in the eventHandlers doesn't include the Toolbar buttons - they're handled as mouse clicks.
               if ( evt.target.id.substr( 0, 3 ) === 'ipt')  {
+                console.log('handleKeyDown applyInputValue');
                 applyInputValue(userInputObj);
               } else {
                 // !VA The element is neither an input element nor an increment/decrement button
@@ -3046,6 +3041,52 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         resetInputValue(evt);
       }
     }
+
+
+    function checkUserInput(userInputObj) {
+      console.log('checkUserInput running');
+      // !VA Destructure userInputObj
+      const { appObjProp, evtTargetVal } = userInputObj;
+      console.log('checkUserInput appObjProp is: ' + appObjProp);
+      console.log('checkUserInput evtTargetVal is: ' + evtTargetVal);
+      let numericInputs, stringInputs, retVal;
+      numericInputs = [ 'imgViewerW', 'curImgW', 'curImgH',  'sPhonesW', 'lPhonesW', 'iptCcpTdHeight', 'iptCcpTdWidth', 'iptCcpTableWidth', 'iptCcpTableWrapperWidth', 'iptCcpTdBorderRadius' ];
+      stringInputs = ['iptCcpImgClass', 'iptCcpImgAlt', 'iptCcpImgRelPath', 'iptCcpTdClass', 'iptCcpTdBgColor', 'iptCcpTdFontColor', 'iptCcpTdBorderColor', 'iptCcpTableClass', 'iptCcpTableBgColor', 'iptCcpTableWrapperClass', 'iptCcpTableWrapperBgColor' ];
+
+      // !VA If appObjProp is included in the numericInputs array (which includes all of the UI elements that require numeric input), then run checkNumericInput on the contents of userInputObj. Check numeric input returns false if the integer validation fails, otherwise it converts the numeric string to number where appropriate returns userInputObj.evtTargetVal as integer
+      if (numericInputs.includes( appObjProp )) { 
+
+
+        // !VA If the target is a CCP input and it is empty, don't do the validation. For CCP inputs, if the field is empty, the respective property won't get written to the clipboard, so an empty value has functional value. This is in contrast to the Toolbar inputs, where a value is required.
+        if ( userInputObj.appObjProp.substring( 3 , 6 ) === 'Ccp' && userInputObj.evtTargetVal === '' ) {
+          // console.log('HIT');
+          // !VA The CCP input field is empty - do nothing.
+          // return;
+        } else {
+          // !VA Error check the numeric input
+          retVal = checkNumericInput(userInputObj); 
+        }
+      }           
+      // !VA Currently no string validation implemented, so the function just returns the argument unchanged
+      else if (stringInputs.includes( userInputObj.appObjProp )) {
+        retVal = checkTextInput(userInputObj);
+      }
+      else {
+        console.log('ERROR in checkUserInput - unknown data type');
+      }
+
+      return retVal;
+
+    }
+
+
+
+
+
+
+
+
+
 
 
     // !VA  Parsing keyboard input based on Appobj property passed in from handleKeyup.
@@ -3190,8 +3231,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private
     // !VA This was rewritten and derived from evalToolbarInput. 
     // !VA Branch: implementClipboard01 (071020)
-    // !VA Rewrite this comment
-    // !VA Called from handleMouseActions and handleBlur, this function name is a misnomer here. More importantly that writing to Appobj, this function imgViewerW, sPhonesW and lPhonesW to localStorage and calculates the adjacent side of the curImgW/curImgH input, then runs calcViewerSize to resize the dynamicElements containers.  
+    // !VA Called from applyInputValue and handleMouseEvents. This function name is a misnomer here. More importantly than writing to Appobj, this function writes imgViewerW, sPhonesW and lPhonesW to localStorage and calculates the adjacent side of the curImgW/curImgH input, then runs calcViewerSize to resize the dynamicElements containers. NOTE: This function does things that are done elsewhere and does other things that it shouldn't do. Revisit this at some point but for now it works.
     function writeToolbarInputToAppobj(userInputObj) {
       // console.log('writeToolbarInputToAppobj');
       // !VA Initialize vars for curImgH and curImgW in order to calculate one based on the value of the other * Appobj.aspect.
@@ -3209,6 +3249,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         localStorage.setItem(appObjProp, evtTargetVal);
 
       // !VA appObjProp is curImgW or curImgH
+
       } else if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
         // !VA Calculate the adjacent dimension of appObjProp based on the aspect ratio, then set the Appobj property of the dimension and its adjacent dimension
         if ( appObjProp === 'curImgW') {
@@ -3374,6 +3415,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // console.dir(Appobj);
     }
 
+    
     // !VA appController private
     function batchDOMToAppobj() {
       console.log('batchDOMToAppobj running');
@@ -3393,8 +3435,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA TODO: Needs to be commented
     // !VA Reads Appobj every time the CCP is opened and writes CCP options to the CCP DOM based on Appobj presets: 1) If the Include wrapper checkbox is checked/unchecked, runs showIncludeWrapperOptions to display/undisplay the Include wrapper-dependent options. 2) Determines which rdoCcpTd option is selected and runs handleTdOptions with the selected ID. 3) Determines the fluid/fixed option and runs handleImgType with the selected option.  
     function batchAppobjToDOM() {
-      console.log('batchAppobjToDOM running');
-      // console.log(Appobj);
+      console.log('START batchAppobjToDOM running');
+      console.log(Appobj);
+
+
 
       // !VA Flag is set based on Include wrapper checkbox status below.
       let flag, arr;
@@ -3417,6 +3461,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA If the first 8 characters of the Appobj property name is rdoCcpTd, then loop through the property names and find the one whose value is true. That is the selected tdoptions radio button. Then loop though the ccpUserInput element alias list and get the element ID of the selected tdoptions radio button, and call handleTdOptions with that ID as parameter.
         // !VA TODO: Make this an arrow function with find, like below
         // var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
+
+        if (arr[i] === 'curImgW' || arr[i] === 'curImgH') {
+          console.log('Appobj[arr[i]] is: ' + Appobj[arr[i]]);
+        }
+
 
         if (arr[i].substring( 0, 6) === 'iptCcp' || (arr[i].substring( 0, 6) === 'selCcp')) {
           // console.log('arr[i] is: ' + arr[i]);
@@ -3442,7 +3491,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       //   handleImgType(ccpUserInput.rdoCcpImgFluid);
       // }
 
-      console.log('batchAppobjToDOM Appobj is: ');
+      console.log('END batchAppobjToDOM Appobj is: ');
       console.log(Appobj);
 
     }
@@ -4167,6 +4216,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         ccpState = UIController.toggleCcp(true);
         if (ccpState) {
           // !VA Do logic for opening the CCP with the current state of the selected options reflected. batchAppobjToDOM only runs handleTdOptions for the rdoCcpTdImgswap option. Everything else carries over when the CCP is open and closed.
+          console.log('Mark3');
           batchAppobjToDOM();
 
         } else if (!ccpState) {
