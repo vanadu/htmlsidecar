@@ -2799,6 +2799,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private function
     // !VA Called from handleKeydown. Calls applyInputValue(userInputObj) and sets the current input element's value to either the corresponding  Appobj property value or, for curImgW and curImgH, to an empty string so the placeholder value is displayed. curImgW and curImgH don't need to display a value because their value is displayed prominently in the Display Size inspector.
     function handleBlur(evt) {
+      console.clear();
       console.log('handleBlur running');
       let userInputObj = {};
       let target = evt.target;
