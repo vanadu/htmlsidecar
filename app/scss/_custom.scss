@@ -460,7 +460,6 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
     // -webkit-transition: -webkit-transform 500ms;
   }
 }
-
 .inspectors-left-col, .inspectors-right-col, .inspectors-center-col {
   display: flex;
 }
@@ -482,7 +481,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 .inspectors-center-col {
   flex-direction: column;
   justify-content: flex-start;
-  width: 200px;
+  width: 300px;
 }
 .inspector {
   padding: 2px 2px 2px 0;

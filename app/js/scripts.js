@@ -6,19 +6,27 @@
 /* !VA  - June Reboot Notes
 =========================================================
 
+Branch: review0720A
+
+TODO: Fix BuildCSS buttons
+TODO: Dev mode: Fix Include wrapper table options don't appear if the CCP is closed and re-opened 
+
+DONE: Add CCP options to anchor tag: color, target="_blank" -
+DONE: Change checkbox name from Wrap img... to Include anchor
+DONE: Make the filename div wider - now 300px
+DONE: CCP numeric input fiels need an input validator
+DONE: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- All the CCP display/undisplay does is add/remove the active class, which has no effect on the state of value of CCP elements.
+DONE: Add px to max-width in tableTagWrapperStyle in getAttributes.
+TODO: Remove height and width in tdoptions 'basic' - they should only be available in excludeimg option.
+
+
+
+TODO: BUG! Load 625X525 with imgViewerW set to 600 - loads without resizing to container size
+TODO: Have a bit problem with td options height and width fields. Currently these fields are available when the 'rdoCcpTdBasic' option is selected, but there is no case when they would ever write the values the user might enter here to the clipboard. Beccause, what happens when the user enters values that are smaller than the current image resolution. That can't be possible. The TD can't be smaller than its child. The height should never be available when the child is an image and the width should either be preset to the image width or unavailable. Or it should be allowed to be larger than the child, for instance if padding is desired, but never smaller. And if you add padding, you'd add it to the img, not to the TD, right? Have to check that out before resolving this. 
+NOTE: It's important to remember that handleCcpActions handles the display of elements whose state or value in the CCP is changed by OTHER CCP elements. For example, the imgType radio buttons trigger value changes in OTHER elements. So handleCcpActions handles the display of the CCP UI. In contrast, the Attributes control only the Clipboard output. For instance, the class attribute only writes to the Clipboard if there is an entry in the input field. That's why it's handled in getAttributes - it doesn't result in a change to the CCP UI.
 DONE: Inspector values need to be rounded to two digits -- they show the entire floating point value and overflow the container.
 
 
-DONE: Add options to anchor tag: color, target="_blank" -
-TODO: Change checkbox name from Wrap img... to Include anchor
-TODO: BUG! Load 625X525 with imgViewerW set to 600 - loads without resizing to container size
-TODO: Change the default parent class on 
-TODO: Have a bit problem with td options height and width fields. Currently these fields are available when the 'rdoCcpTdBasic' option is selected, but there is no case when they would ever write the values the user might enter here to the clipboard. Beccause, what happens when the user enters values that are smaller than the current image resolution. That can't be possible. The TD can't be smaller than its child. The height should never be available when the child is an image and the width should either be preset to the image width or unavailable. Or it should be allowed to be larger than the child, for instance if padding is desired, but never smaller. And if you add padding, you'd add it to the img, not to the TD, right? Have to check that out before resolving this. 
-NOTE: It's important to remember that handleCcpActions handles the display of elements whose state or value in the CCP is changed by OTHER CCP elements. For example, the imgType radio buttons trigger value changes in OTHER elements. So handleCcpActions handles the display of the CCP UI. In contrast, the Attributes control only the Clipboard output. For instance, the class attribute only writes to the Clipboard if there is an entry in the input field. That's why it's handled in getAttributes - it doesn't result in a change to the CCP UI.
-
-
-TODO: Remove all writing of values from initUI and put them in getAttributes. initUI should only be for turning display amd disabling on and off. 
-TODO: Make the filename div wider
 TODO: No tooltip available for posswitch and imgswap
 TODO: Tooltips don't appear on checkboxes
 TODO: Add error to vmlbutton height not matching img height
@@ -32,20 +40,16 @@ Error Handling
 --------------
 TODO: The CSS output will need to be revisited for td and table.
 TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
-TODO: Fix Include wrapper table options don't appear if the CCP is closed and re-opened 
 TODO: Assign tab order
 
 
 /* !VA  - For Consideration
 =========================================================
 
-TODO: Add some kind of fluid option to the img options. Cerberus hard codes it into the img tag. That needs to be tested. Litmus overrides the width and height style properties in the CSS media queries. Need to test before that is implemented - but there's no reason to include a fluid option if that's settable in CSS.
-TODO: CCP numeric input fiels need an input validator
 TODO: Fix being able to resize imgViewerW smaller than curImgW - current behavior is imgw resizes with imgViewerW. If that's the desired behavior, curImgW still doesn't write the udpated width to Appobj, that needs to be fixed.
 TODO: Fix bug - load 400X1000, multiple click on +50, Display Size shows 450 but the img doesn't grow...
 TODO: Parent table class att only shows in CB output if Wrapper is selected, not in just the Partent table output.
 TODO: Fix, when curImgNW is greater than curImgW the curImgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
-TODO: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- I think. Not sure if this is the right behavior...think bout it. Probably not. I think it does this anyway. 
 TODO: Assign keyboard  shortcuts
 
 */
@@ -261,6 +265,7 @@ var Witty = (function () {
     };
 
     // !VA UIController private
+    // !VA Called from writeInspectors. Evaluate which Inspectors should be flagged with alerts for having too low a resolution for retina devices
     function evalInspectorAlerts(Appobj) {
       // !VA init inspector and flagged inspector lists
       let allInspectors = [];
@@ -489,6 +494,7 @@ var Witty = (function () {
       },
 
       // !VA UIController public
+      // !VA Called from init(). Set dev mode options: Display toolbar, curImg, filename, display/undisplay CCP. Then initialize the UI: get localStorage and show dynamic containers and toolbar.
       initUI: function(initMode) {
 
         const delayInMilliseconds = 10;
@@ -528,6 +534,8 @@ var Witty = (function () {
         arr = [ 'imgViewerW', 'sPhonesW', 'lPhonesW' ];
         // !VA If there's localStorage, push it to the curDeviceWidths array. Otherwise, push false.
         for (let i = 0; i < arr.length; i++) {
+          // !VA Branch: review0720A (071320)
+          // !VA This should call getLocalStorage making individual calls to localStorage.getItem.
           localStorage.getItem(arr[i]) ? curDeviceWidths.push(localStorage.getItem(arr[i])) : curDeviceWidths.push(false);
         }
         // !VA TODO: Shouldn't all localStorage operations be in one place?
@@ -757,16 +765,15 @@ var Witty = (function () {
       },
 
       // !VA UIController public
-      // !VA This has to cancel the timeouts for the runmn
+      // !VA Pass-thru public function to pass display actions to the UIController. If isShow is true, call showAppMessages. If it's false, call hideAppMessages. 
       displayAppMessages: function (isShow, appMessContainerId, tooltipTarget) {
-        // !VA Pass-thur public function to pass display actions to the UIController. If isShow is true, call showAppMessages. If it's false, call hideAppMessages. NOTE: the tooltip appMessage is undisplayed in 
         isShow ? showAppMessages(appMessContainerId, tooltipTarget) : hideAppMessages(appMessContainerId, tooltipTarget);
       },
 
 
       // !VA UIController public
+      // !VA Hide  the default 'No Image' value displayed when the app is opened with no image and display the Inspector values for the current image, show the Clipboard button and call evalInspectorAlerts to determine which Inspector labels should get dimension alerts (red font applied). 
       writeInspectors: function(Appobj) {
-        // !VA Hide  the default 'No Image' value displayed when the app is opened with no image and display the Inspector values for the current image, show the Clipboard button and call evalInspectorAlerts to determine which Inspector labels should get dimension alerts (red font applied). 
 
         // !VA IMPORTANT - this is a devmode hack. The fileName has already been written to inspectorElements.insFilename in initUI devmode. So now we have to write it to Appobj, otherwise it will be undefined it gets written to the innerHTML below. This should probably be dependent on whether we're in devmode or not, but this works in any case and can be deleted for production. 
         Appobj.fileName = document.querySelector(inspectorElements.insFilename).textContent;
@@ -810,8 +817,8 @@ var Witty = (function () {
       },
 
       //UIController public
+      // !VA Displays flaggedInspectors in red font 
       writeInspectorAlerts: function(flaggedInspectors) {
-        // !VA flaggedInspectors are displayed in red font 
         const att = 'red';
         // !VA We want to use this same function to reset the dim alerts when a new image is loaded. So first, reset all the inspector labels to their inherited font.
         for (let i = 0; i < document.getElementsByClassName('inspector-label').length; i++) {
@@ -971,13 +978,15 @@ var Witty = (function () {
          
           // !VA Branch: fixEventHandlers01 (071320)
           // !VA Isn't ccpIfNoUserInput deprecated, isn't this logic now included in makeTdNode?
-          retObj = returnObject( ccpElementId, ccpIfNoUserInput('height',document.querySelector(ccpUserInput.iptCcpTdHeight).value));
+          retObj = returnObject(ccpElementId, Appobj.iptCcpTdHeight);
+          // retObj = returnObject( ccpElementId, ccpIfNoUserInput('height',document.querySelector(ccpUserInput.iptCcpTdHeight).value));
           return retObj;
         })(),
         tdWidth: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
-          retObj = returnObject( ccpElementId, ccpIfNoUserInput('width',document.querySelector(ccpUserInput.iptCcpTdWidth).value) );
+          retObj = returnObject(ccpElementId, Appobj.iptCcpTdWidth);
+          // retObj = returnObject( ccpElementId, ccpIfNoUserInput('width',document.querySelector(ccpUserInput.iptCcpTdWidth).value) );
           return retObj;
         })(),
         // !VA The selected tdoption radio button determines which TD options will be displayed/undisplayed. Only the checked one will be displayed; all other ones will be undisplayed  
@@ -1048,13 +1057,14 @@ var Witty = (function () {
         tdClass: (function() {
           // !VA This value is get-only
           ccpElementId = false;
-          retObj = returnObject( ccpElementId, ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpTdClass).value) );
+          retObj = returnObject( ccpElementId, Appobj.iptCcpTdClass );
           return retObj;
         })(),
         tdBgcolor: (function() {
           // !VA This value is get-only
           ccpElementId = false;
-          retObj = returnObject( ccpElementId, ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpTdBgColor).value) );
+          // retObj = returnObject( ccpElementId, ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpTdBgColor).value) );
+          retObj = returnObject( ccpElementId, Appobj.iptCcpTdBgColor);
           return retObj;
         })(),
         tdBackground: (function() {
@@ -1070,10 +1080,10 @@ var Witty = (function () {
           if (imgType === 'fixed') {
             // !VA If imgType is fixed, then set tableClass to 'devicewidth' if the curImgW equals the imgViewerW. Otherwise, set it to the user input.
             document.querySelector(ccpElementId).value === Appobj.imgViewerW ? str = 'devicewidth' : 
-              str = ccpIfNoUserInput('class',document.querySelector(ccpElementId).value);
+              str = Appobj.iptCcpTableClass;
           } else {
             // !VA If the imgType is fluid, set the class input value to the user input, even though that might have unforseen consequences for the user.
-            str = ccpIfNoUserInput('class',document.querySelector(ccpElementId).value);
+            str = Appobj.iptCcpTableClass;
           }
           retObj = returnObject( ccpElementId, str );
           return retObj;
@@ -1088,7 +1098,7 @@ var Witty = (function () {
         tableBgcolor: (function() {
           // !VA This value is get-only
           ccpElementId = false;
-          retObj = returnObject( ccpElementId, ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.iptCcpTableBgColor).value));
+          retObj = returnObject( ccpElementId, Appobj.iptCcpTableBgColor);
           return retObj;
         })(),
         tableAlign: (function() {
@@ -1137,14 +1147,14 @@ var Witty = (function () {
         tableTagWrapperBgcolor: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
-          retObj = returnObject( ccpElementId,ccpIfNoUserInput('bgcolor',document.querySelector(ccpUserInput.iptCcpTableWrapperBgColor).value));
+          retObj = returnObject( ccpElementId, Appobj.iptCcpTableWrapperBgColor);
           return retObj;
         })(),
         tableTagWrapperStyle: (function() {
           // !VA This value is get-only
           ccpElementId = false;
           // !VA Only include a style attribute for the wrapper for fluid images.  The conditional for this is in makeTableNode and there's no case where a style attribute is included for fixed images, so just provide the style attribute string to return
-          imgType === 'fixed' ? str = '' : str = `max-width: ${Appobj.curImgW}`;
+          imgType === 'fixed' ? str = '' : str = `max-width: ${Appobj.curImgW}px`;
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
@@ -1156,6 +1166,8 @@ var Witty = (function () {
     // !VA CBController private
     // !VA Branch: implementCcpInput05 (062720)
     // !VA Called multiple times from getAttributes
+    // !VA Branch: review0720A (071320)
+    // !VA I think this is deprecated now.
     function ccpGetAttValue(att, value) {
       // !VA Gets the insFilename from Appobj in case the user leaves 'path' empty
       var str;
@@ -1284,7 +1296,7 @@ var Witty = (function () {
       return selectedTdOption;
     }
 
-
+    // !VA CBController private
     // !VA Get a checkbox state from the Appobj property for the mock checkbox.
     function getCheckboxState(identifier) {
       let bool;
@@ -1293,8 +1305,9 @@ var Witty = (function () {
       return bool;
     }
 
-    // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
+
     // !VA CBController private
+    // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
     function buildOutputNodeList( id ) {
       let selectedTdOption, hasAnchor, hasWrapper, Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
       // !VA Get the selected TD option
@@ -1675,11 +1688,16 @@ var Witty = (function () {
       // !VA If the 'td with options' or 'td with options (exclude img) radio buttons are checked...
       case (selectedTdOption === 'rdoCcpTdBasic' || selectedTdOption === 'rdoCcpTdExcludeimg'):
         // !VA class attribute
+        // !VA Add to the node only if the attribute is set, i.e. the input has an entry
         if (Attributes.tdClass.str) { tdInner.className = Attributes.tdClass.str; }
         // !VA valign attribute
+        // !VA Add to the node only if the option 'none' is not selected
         if (Attributes.tdAlign.str) { tdInner.align = Attributes.tdAlign.str; }
+        // !VA Add to the node only if the option 'none' is not selected
         if (Attributes.tdValign.str) { tdInner.vAlign = Attributes.tdValign.str; }
+        // !VA Add to the node only if the attribute is set, i.e. the input has an entry
         if (Attributes.tdHeight.str) { tdInner.height = Attributes.imgWidth.str; }
+        // !VA Add to the node only if the attribute is set, i.e. the input has an entry
         if (Attributes.tdWidth.str) { tdInner.width = Attributes.imgHeight.str; }
         // !VA If 'rdoCcpTdBasic' is checked, create imgNode and append it, otherwise exclude the imgNode.
         if (selectedTdOption === 'rdoCcpTdBasic') {
@@ -1689,8 +1707,11 @@ var Witty = (function () {
         break;
       // !VA (selectedTdOption === 'rdoCcpTdImgswap'):
       case (selectedTdOption === 'rdoCcpTdImgswap'):
+        // !VA Add to the node only if the attribute is set, i.e. the input has an entry
         if (Attributes.tdClass.str) { tdInner.className = Attributes.tdClass.str; }
+        // !VA Add to the node only if the option 'none' is not selected
         if (Attributes.tdValign.str) { tdInner.vAlign = Attributes.tdValign.str; }
+        // !VA Add to the node only if the option 'none' is not selected
         if (Attributes.tdAlign.str) { tdInner.align = Attributes.tdAlign.str; }
         break;
       // !VA (selectedTdOption === 'rdoCcpTdBgimage'):
@@ -1730,7 +1751,7 @@ var Witty = (function () {
       default:
         console.log('Some error has occurred in makeTdNode');
       } 
-      // // !VA Set the node fragment to the TD node
+      // !VA Set the node fragment to the TD node
       tdNodeFragment.appendChild(tdInner);
       // !VA TODO: This error handling is poor because it only allows for one possible error. But, it does return nothing, which is then passed on to the calling function and terminates in buildOutputNodeList
       if (isErr) { 
@@ -1757,11 +1778,14 @@ var Witty = (function () {
       // !VA Make the inner table. If Include wrapper table is unchecked, we return just the inner table. If it's checked, we return the inner table and the outer table 
       // !VA Add inner table attributes
       // !VA table class attribute
+      // !VA Add to the node only if the attribute is set, i.e. the input has an entry
       if (Attributes.tableClass.str) { tableInner.className = Attributes.tableClass.str; }
       // !VA table align attribute
+      // !VA Add to the node only if the option 'none' is not selected
       if (Attributes.tableAlign.str) { tableInner.align = Attributes.tableAlign.str; }
       tableInner.width = Attributes.tableWidth.str;
       // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for now
+      // !VA Add to the node only if the attribute is set, i.e. the input has an entry
       if (Attributes.tableBgcolor.str) { tableInner.bgColor = Attributes.tableBgcolor.str; }
       // !VA Add border, cellspacing and cellpadding
       tableInner.border = '0', tableInner.cellSpacing = '0', tableInner.cellPadding = '0';
@@ -1779,12 +1803,15 @@ var Witty = (function () {
       }
       // !VA If include table wrapper is checked, build the outer table and return it
       // !VA table wrapper class
+      // !VA Add to the node only if the option 'none' is not selected
       if (Attributes.tableTagWrapperAlign.str) { tableOuter.align = Attributes.tableTagWrapperAlign.str; }
       // !VA wrapper table align attribute
+      // !VA Add to the node only if the option 'none' is not selected
       if (Attributes.tableTagWrapperClass.str) { tableOuter.className = Attributes.tableTagWrapperClass.str; }
       // !VA the default wrapper table width is the current display size - so it gets the value from the toolbar's Content Width field.
       tableOuter.width = Attributes.tableTagWrapperWidth.str;
       // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for now. 
+      // !VA Add to the node only if the attribute is set, i.e. the input has an entry
       if (Attributes.tableTagWrapperBgcolor.str) { tableOuter.bgColor = Attributes.tableTagWrapperBgcolor.str; }
       // !VA Style attribute - only included for fluid images
       if (getRadioState(ccpUserInput.rdoCcpImgFluid)) {
@@ -1798,8 +1825,10 @@ var Witty = (function () {
       // !VA Append the outer td to the outer tr
       trOuter.appendChild(tdOuter);
       // !VA Add the outer td attributes
+      // !VA Add to the node only if the option 'none' is not selected
       if (Attributes.tdAlign.str) { tdOuter.align = Attributes.tdAlign.str; }
       // !VA valign attribute
+      // !VA Add to the node only if the option 'none' is not selected
       if (Attributes.tdValign.str) { tdOuter.vAlign = Attributes.tdValign.str; }
       // !VA Append the inner table to the outer table's td
       tdOuter.appendChild(tableInner);
@@ -1832,6 +1861,7 @@ var Witty = (function () {
     }
 
     // !VA UIController private
+    // !VA Called from buildOutputNodeList. Gets the clipboardStr that comprises the MS Conditional code for the Bgimage.
     function getBgimageBlock( id, indentLevel, Attributes ) {
       // !VA Keeping the original reference to fallback for posterity for now
       // let bgimageStr, fallback, bgcolor;
@@ -1970,6 +2000,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA CLIPBOARD FUNCTIONS
     // !VA CBController private
+    // !VA Write the clipboardStr to the clipboard. 
     function writeClipboard(id, str) {
       let clipboardStr;
       // !VA clipboardStr is returned to clipboard.js
@@ -1999,21 +2030,25 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CBController private
     // !VA NOTE: Originally, this function took classname, wval and hval as arguments, so keeping that here for reference
     // function  makeCssRule( id, classname, wval, hval ) {
-    function  makeCssRule( id ) {
+    // !VA Called from doClipboard. Generate clipboard strings for CSS output
+    function makeCssRule( id ) {
 
       let Attributes = [];
       Attributes = getAttributes();
+      console.log('makeCssRule Attributes is: ');
+      console.log(Attributes);
       // !VA Branch: implementCcpInput02 (062420)
       // !VA Call getAppobj with rest parameters and destructure the return array into separate variables.
       // !VA props is the array of rest parameters returned from getAppobj
-      let props;
-      props = appController.getAppobj2('curImgW', 'curImgH', 'sPhonesW', 'sPhonesH', 'lPhonesW', 'lPhonesH');
-      const { curImgW, curImgH, sPhonesW, sPhonesH, lPhonesW, lPhonesH } = props;
+      let Appobj = {};
+      Appobj = appController.getAppobj();
+      console.log('makeCssRule Appobj is: ');
+      console.log(Appobj);
+      // !VA Destructure Appobj to variables
+      let { curImgW, curImgH, sPhonesW, sPhonesH, lPhonesW, lPhonesH } = Appobj;
       let clipboardStr;
-      // !VA TODO: isErr is passed to Clipboard object to indicate whether to flash the success message or an alert message
-      // let isErr;
-      // isErr = false;
       switch(true) {
+      // !VA Build the CSS clipboard output strings
       case (id.includes('img-dsktp')):
         clipboardStr = `img.${Attributes.imgClass.str} { width: ${curImgW}px !important; height: ${curImgH}px !important; }`;
         break;
@@ -2049,6 +2084,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA CBController private
+    // !VA Gets the values of the Inspector elements and formats them for the clipboard output.
     function handleInspectorClicks(targetid, modifierKey) {
       let Appobj = {};
       let clipboardStr, widthval, heightval;
@@ -2233,12 +2269,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     };
 
     // !VA ADD EVENT LISTENERS FOR TOOLTIP TRIGGERS
-    // !VA NOTE: I'm sure the add and remove event listeners can be consolidated into one - but not today.
+    // !VA NOTE: Separate event listener setup for Tooltips. Managed separately from the main Toolbar and CCP element event handlers just for manageability's sake. 
     function addTooltipEventListeners() {
       // !VA Event handler for initializing tooltip event listeners 
       function addEventHandler(oNode, evt, oFunc, bCaptures) {
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
+
       // !VA initialize the toolbar tooltip triggers
       var toolbarIds = Object.values(toolbarElements);
       let el;
@@ -2294,6 +2331,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
     }
 
+    // !VA appController private
+    // !VA Separate event listener setup for Tooltips. Managed separately from the main Toolbar and CCP element event handlers just for manageability's sake. NOTE: This should probably be merged with its sister handler, addTooltipEventListeners, somehow
     function removeTooltipEventListeners() {
       // !VA Event handler for initializing tooltip event listeners 
       function removeEventHandler(oNode, evt, oFunc, bCaptures) {
@@ -2476,15 +2515,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         }
       }     
       
-      // !VA Branch: implementAppobj08 (062020)
-      // !VA Commenting out these event handlers for now until I deal with getting the values
       // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. These are the class input elements for ccp Img, Td and Table options
-      // const ccpClassInputs = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass ];
-      // for (let i = 0; i < ccpClassInputs.length; i++) {
-      //   // !VA convert the ID string to the object inside the loop
-      //   ccpClassInputs[i] = document.querySelector(ccpClassInputs[i]);
-      //   addEventHandler((ccpClassInputs[i]),'input',showElementOnInput,false);
-      // }
+      const ccpClassInputs = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass ];
+      for (let i = 0; i < ccpClassInputs.length; i++) {
+        // !VA convert the ID string to the object inside the loop
+        ccpClassInputs[i] = document.querySelector(ccpClassInputs[i]);
+        addEventHandler((ccpClassInputs[i]),'input',showElementOnInput,false);
+      }
 
 
       // !VA HOVER HANDLERS
@@ -2529,8 +2566,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA EVENT HANDLING END
 
     // !VA FILEREADER OBJECT PROCESSING
-    // appController private: hfs - FILEREADER OBJECT PROCESSING
-    //Get the user-selected image file object 
+    // !VA appController private: hfs - FILEREADER OBJECT PROCESSING
+    // !VA Includes all the FileReader processing for loading the image the user has dropped in the dropZone as blob, and initializing the image in the DOM.  
     function handleFileSelect(evt) {
       // If a file is already being displayed, i.e. Appobj.fname is true, then remove that image to make room for the next image being dropped
       // !VA Remove the current #cur-img from the DOM. This has to be done in a separate function call, I'm not sure why handleFileSelect doesn't see #cur-img even though it is in the DOM at this point
@@ -2642,6 +2679,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
     // !VA sdf MODIFIER KEYS FOR TOOLTIP DISPLAY
+    // !VA appController private
+    // !VA NOTE: This all should be enclosed in a function or at least an IIFE.
     document.addEventListener('DOMContentLoaded', function() {
       // !VA Get the root (html) element 
       const rootElement = document.querySelector(':root');
@@ -2727,8 +2766,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA appController private
     // !VA Called from handleKeydown. Applies the user-entered input value in the Toolbar or CCP, i.e. writes the value to Appobj and, if Toolbar, runs writeToolbarInputToAppobj which then runs calcViewerSize to update the dynamicElements with the new value.
-    // !VA Branch: fixEventHandlers01 (071320)
-    // !VA This is probably a functional dupe of writeToolbarInputToAppobj
+    // !VA NOTE: This is probably a functional dupe of writeToolbarInputToAppobj
     function applyInputValue(userInputObj) {
       // !VA Destructure userInputObj into variables
       let { evtTargetVal, appObjProp } = userInputObj;
@@ -2738,7 +2776,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       if ( evtTargetVal !== Appobj[appObjProp]) {
         Appobj[appObjProp] = evtTargetVal;
       } else {
-        console.log('ERROR in applyInputValue - evtTargetValue !== Appobj[appObjProp]');
+        console.log('ERROR in applyInputValue - evtTargetValue !== Appobj[appObjProp]. applyInputValue probably running successively');
       }
       // !VA 3) For toolbarElements, create a new obj with evtTargetVal and appObjProp to pass to writeToolbarInputToAppobj. writeToolbarInputToAppobj writes new values to localStorage and resizes the dynamicElements based on the user input. writeToolbarInputToAppobj contains the aspect ratio logic to get the adjacent dimension from a curImg value. 
       // !VA IMPORTANT: This works but it sucks. We're only running this now to set the localStorage and to get the adjacent side curImg dimensions. writeToolbarInputToAppobj doesn't reflect what's being done in that function, and it should be reevaluated in any case. Also, the below condition with all the OR conditions isn't good - should call appObjPropToAlias and base the condition on the return value i.e. not undefined. But for now, need to move on.
@@ -2783,7 +2821,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             return;
           }
         }
-      // !VA Handle mouse-initiated blur events.
+      // !VA Handle mouse-initiated blur events. This is called from the event handler for the respective input field, so it runs AFTER the TAB-initiated blur has already taken place. I don't know how to prevent the default
       }  else if ( event.type === 'blur') {
         // !VA First, select all the input elements - their mouse-initiated blur action will be handled here.
         // !VA NOTE: This is more or less the same routine as in handleKeydown - TAB key, with minor mods for mouse context
@@ -2841,7 +2879,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           
     // !VA appController private function
     // !VA NOTE: Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
-    // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Sorts keypresses by data types number and string based on the target input element. Calls checkNumericInput or checkTextInput, which validates the input and returns either an integer or a string and calls handleBlur (for TAB key) or handleEnterKey with the userInputObj { evtTargetVal, appObjProp} argument.
+    // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Sorts keypresses by data types number and string based on the target input element. Calls checkUserInput which validates the input and returns either an integer or a string and passes the value to applyInputValue to write to Appobj and the DOM. Then, for curImgW/curImgH, sets the input value to '' so the placeholder shows through. For all other input elements, sets the input value to the respective Appobj property.
     function handleKeydown(evt) {
       let retVal;
       let target;
@@ -2880,17 +2918,17 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
               userInputObj.evtTargetVal = evt.target.value;
               // !VA Apply the user-entered input value in Toolbar or CCP, i.e. writes the value to Appobj and, if Toolbar, runs writeToolbarInputToAppobj which then runs calcViewerSize to update the dynamicElements with the new value.
               userInputObj.evtTargetVal = retVal;
-              // !VA Branch: fixEventHandlers01 (071320)
-              // !VA Review need for applyInputValue
-              applyInputValue(userInputObj);
+              // !VA Branch: review0720A (071320)
+              // !VA I swear I've been through this before, but there doesn't appear to be any need for applyInputValue here because it is handled by handleMouseEvents by default on blur -- blur is the default action on TAB, and handleMouseEvents is the default blur handler for input elements. So, handleMouseEvents runs on TAB by default. So commenting out the below for now in case wierdness happens because this is a dupe of the same routine in handleMouseEvents.
+              // applyInputValue(userInputObj);
               // !VA If blurring from curImgW or curImgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appdata property.
-              if (userInputObj.appObjProp === 'curImgW' || userInputObj.appObjProp === 'curImgH') {
-                target.value = '';
-                target.blur();
-              } else {
-                target.value = Appobj[userInputObj.appObjProp];
-                target.blur();
-              }
+              // if (userInputObj.appObjProp === 'curImgW' || userInputObj.appObjProp === 'curImgH') {
+              //   target.value = '';
+              //   target.blur();
+              // } else {
+              //   target.value = Appobj[userInputObj.appObjProp];
+              //   target.blur();
+              // }
             } else if ( keydown == 13 ) {
               // !VA We don't need to trap the Toolbar increment/decrement buttons here because the ENTER keypress is equivalent to a mouseclick and triggers the click event, so we can handle the ENTER keypress in handleMouseEvents. This is also why tdKeypresses in the eventHandlers doesn't include the Toolbar buttons - they're handled as mouse clicks.
               if ( evt.target.id.substr( 0, 3 ) === 'ipt')  {
@@ -2930,7 +2968,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
     }
 
-
+    // !VA appController private
+    // !VA Called from handleKeydown and handleMouseEvents. Separates numeric input from string input based on the Appobj property name included in two arrays. Numeric input is routed to checkNumericInput where values of type string are converted to integers. String inputs are routed to checkTextInput for valiation and error checking. 
     function checkUserInput(userInputObj) {
       // !VA Destructure userInputObj
       const { appObjProp, evtTargetVal } = userInputObj;
@@ -2961,6 +3000,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA  Parsing keyboard input based on Appobj property passed in from handleKeyup/checkUserInput.
     // !VA TODO: Why are there unused variables and what is actually happening here?
     // !VA appController private
+    // !VA Called from checkUserInput. Runs validateInteger to return a value of type Number, then evaluates any error conditions on the input and passes any error codes generated to appController.handleAppMessages and returns false if there was an error, or the integer value of no error was detected.
     function checkNumericInput(userInputObj) {
       // !VA Destructure userInputObj
       const { appObjProp, evtTargetVal } = userInputObj;
@@ -3072,7 +3112,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController private
-    // !VA Include required string validation here. Only applies to CCP input elements that take text input, as defined in handleKeydown. i.e. class, alt, relpath, bgcolor, etc input elements. 
+    // !VA Called by checkUserInput. Includes any validation or error checking on input elements that take values of type string. Only applies to CCP input elements that take text input, as defined in handleKeydown. i.e. class, alt, relpath, bgcolor, etc input elements. 
     function checkTextInput(userInputObj) {
       let retVal;
       // !VA Destructure userInputObj
@@ -3119,7 +3159,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
     // !VA  appController private
-    // !VA calcViewerSize is called 1) in initUI (devmode) after the devimg is loaded from the HTML file 2) in handleFileSelect after setTimeOut callback is run and the image is loaded 3) in evalToolbarInput/ after a user-initiated Toolbar input. calcViewerSize calculates the current size of dynamicElements.imgViewer based on Appobj values. 
+    // !VA Called 1) in initUI (devmode) after the devimg is loaded from the HTML file 2) in handleFileSelect after setTimeOut callback is run and the image is loaded 3) in writeToolbarInputToAppobj after a user-initiated Toolbar input. calcViewerSize calculates the current size of DynamicElements.imgViewer based on Appobj values. The flag parameter indicates whether call was made at initialization (true) or after a user-initiated Toolbar input (false). This doesn’t access the DOM or make changes to existing Appobj values. All it does is resize the viewer to fit the image based on aspect ratio and Appobj.viewerW, then calls resizeContainers to write these recalculated element values to the DOM; writeAppobjToDOM ( tableWidth, tableWrapperWidth) writes the current Appobj.imgW and Appobj.viewerW to the CCP ccpUserInput.iptCcpTableWidth and ccpUserInput.iptCcpTableWrapperWidth; and writeInspectors(Appobj) to write all the current Appobj values to the corresponding Inspector DOM elements.
     function calcViewerSize(flag) {
       // !VA Here, just populate the dynamicElements of Appobj. If flag is true, then calcViewerSize was called from writeToolbarInputToAppobj, so this is a user-initiated Toolbar input action. If false, it's an image initialization action called from initUI (devmode) or handleFileSelect.
       if (flag === true ) {
@@ -3176,6 +3216,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController private
+    // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values which are passed in from calcViewerSize, then runs writedynamicElementsDOM(Appobj, viewportH, appH) to size the containers. NOTE: The complete Appobj is passed here although only imgViewer and curImg values are needed to resize the dynamicElements. 
     function resizeContainers()  {
       // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values which are passed in from calcViewerSize.
       // !VA Initial height is 450, as explicitly defined in calcViewerSize. TOo much hassle to try and get the value as defined in the CSS programmatically.
@@ -3235,7 +3276,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA appController private
     // !VA Branch: implementAppobj03 (060820)
-    // !VA Handle the tdoptions and imgType radio buttons. I'm not sure why there is a separate handler for this that doesn't encompass all the CCP UI elements. 
+    // !VA Handle the tdoptions and imgType radio buttons. Called from the ccpRadioClicks event handler in setupEventListeners. Calls handleImgType(id) or handleTdOptions(id). This function basically just routes the click to the respective handler for imgType/tdoptions. NOTE: handleTdOptions and handleImgType are also called from batchAppobjToDOM because whenever the entire Appobj is parsed to write to the DOM, these functions need to be run to determine the current tdoptions selection and the current fluid/fixed state. 
     function handleCcpRadioSelection(evt) {
       let id;
       id = '#' + evt.target.id;
@@ -3359,7 +3400,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController private 
-    // !VA First, resets all the options to their defaults with resetTdOptions, then sets the values of the CCP elements based on the selected radio button.  The id argument selects the corresponding radio button element. Doesn't handle imgType radio selection - that has a different handler.
+    // !VA Called from handleCcpRadioSelection(evt) which is called from the ccpRadioClicks click event handler in setupEventListeners. The id arument is the id of the click target. First, loops through all Appobj entries whose first 8 chars is rdoCcpTd, i.e. all the tdOption entries, and selects the option identified in the id argument. Then sets the preset values for the respective options and handles the option states for the individual radio buttons, i.e. displays/undisplays and disables/enables the respective options. NOTE: This function is quite cluttered, and there should be only ONE handleCcpActions call for each condition, otherwise we’re passing Appobj multiple times.
     function handleTdOptions(id) {
       // !VA Loop through all Appobj entries whose first 8 chars is rdoCcpTd, i.e. all the tdOption entries and select the option identified in the id argument. NOTE: This could be separated out into a new function.
       // !VA NOTE: Value isn't accessed, but when I tried to just use Object.keys, something broke. Fix it, no for loop necessary with Object.keys.
@@ -3620,7 +3661,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController private 
-    // !VA Function to display/undisplay the CCP wrapper table options if the checkbox is checked. If Appobj.spnCcpTableIncludeWrapperCheckmrk === 'off', run this to turn it on. NOTE: That's not accurate - I don't think the flag parameter actually does anything. This just switches the display of the INclude wrapper options on and off based on the Appobj.spnCcpTableIncludeWrapperCheckmrk property.
+    // !VA Function to display/undisplay the CCP wrapper table options if the checkbox is checked. If Appobj.spnCcpTableIncludeWrapperCheckmrk === 'off', run this to turn it on. NOTE: I’m not sure why the flag is being passed here. This function doesn’t depend on the flag argument for anything. All it does is display/undisplay the Include wrapper options based on the value of the spnCcpTableIncludeWrapperCheckmrk property in Appobj. Review this.
     function showIncludeWrapperOptions(flag) {
       // !VA If the Include wrapper checkbox is checked, show the dependent options. Otherwise, undislay them.
       if (Appobj.spnCcpTableIncludeWrapperCheckmrk === 'on') {
@@ -3677,13 +3718,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA END CCP FUNCTIONS
       
-    // !VA Show element when input in another element is made 
     // !VA appController private
-    // !VA Branch: implementAppobj08 (062020)
-    // !VA This needs to be integrated into one of the keyboard event handlers. Can't have two event handlers for the same event. Right now, let's focus on getting values from the keyboard input and deal with this later. - commenting out the event handler in setupEventListeners
-    // !VA Branch: fixEventHandlers01 (071320)
-    // !VA This isn't called and doesn't work -- should display the buildCSS buttons when an input in a class field is made
-    function showElementOnInput(event) {
+    // !VA Show element when input in another element is made – used to show the buildCSS buttons when an input is made in the CCP class input elements. Called from the ccpClassInputs event listeners
+    function showElementOnInput(evt) {
       console.log('showElementOnInput running');
       // !VA Here we catch the event handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
       var elems = [];
@@ -3703,12 +3740,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         for (let i = 0; i <= 2; i++) {
           this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
         }
-      } else if (('#' + event.target.id) === ccpUserInput.iptCcpTdClass) { 
+      } else if (('#' + evt.target.id) === ccpUserInput.iptCcpTdClass) { 
         // !VA If the input is in the td fieldset, only show the next three buttons in the array
         for (let i = 3; i <= 5 ; i++) {
           this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
         }
-      } else if (('#' + event.target.id) === ccpUserInput.iptCcpTableClass) {
+      } else if (('#' + evt.target.id) === ccpUserInput.iptCcpTableClass) {
         // !VA If the input is in the table fieldset, only show the next buttons in the array
         for (let i = 6; i <= 8 ; i++) {
           this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
@@ -3857,8 +3894,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // appController private 
+    // !VA Integer validation is used for all height/width input fields, including those in CCP. If the input value is not of type number, converts it and returns an integer.
     function validateInteger(inputVal) {
-      // !VA Integer validation is used for all height/width input fields, including those in CCP
       let retVal;
       // !VA Handle the CCP input from the fields that should be returning integers. i.e. the numeric inputs in handleKeydown. If they are type string, then convert them to number. If the conversion fails, then throw an error - that means that the user didn't enter a valid numeric string. This returns false if parseInt fails, i.e. returns NaN. Otherwise, it returns the inputVal as integer.
       if (!parseInt(inputVal, 10) || inputVal % 1 !== 0 || inputVal < 0) {
@@ -3972,7 +4009,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
       // !VA appController public
-      // !VA Access Appobj from outside appController. Called from getAttributes, ccpGetAttValue, ccpIfNoUserInput, getSelectedTdOptionFromAppobj, getCheckboxState, getImgSwapBlockIf identifier is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is a property identifier, i.e. an Appobj property name, return the corresponding property value. If it is neither of the above, error condition
+      // !VA Access Appobj from outside appController. Called from getAttributes, ccpGetAttValue, ccpIfNoUserInput, getSelectedTdOptionFromAppobj, getCheckboxState, getImgSwapBlock. If identifier is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is a property identifier, i.e. an Appobj property name, return the corresponding property value. If it is neither of the above, error condition
       getAppobj: function(identifier) {
         let retval;
         if (typeof identifier === 'undefined') {
@@ -3992,7 +4029,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       },
 
       // !VA appController public 
-      // !VA Called from UIController.toggleCcp in initUI devMode where you can init with CCP open or closed. Otherwise, UIController.toggleCcp is called from the click handler. 
+      // !VA Calls UIController.toggleCCP, which returns ccpState, a flag indicating if the CCP is open or closed. If it is open, runs batchAppobjToDOM(), which contains the logic for opening the CCP with the current state of the selected options reflected. batchAppobjToDOM only runs handleTdOptions for the rdoCcpTdImgswap option. All other element states and values carry over when the CCP is open and closed. NOTE: Need to confirm that the above statement is correct. If the flag is false, batchDOMToAppobj is run to save all the DOM settings to Appobj so they can be restored by batchAppobjToDOM. NOTE: I’m not sure this is required, at least there is no logic in batchDOMToAppobj currently
       initCcp: function () {
         let ccpState;
         // !VA Get the current open/closed state of the CCP
@@ -4036,9 +4073,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA appController public
       // !VA APP MESSAGES START
-      // !VA This is the entry point where we sort the three types of messages. We have the target id for all three types. For tooltips, we have it in the event object passed in from the event handler. For msg and err, we can't get it because handleAppMessages only takes one parameter -- either the event for tooltips or the appMessCode for msg and err. 
-      // !VA So now the problem is that tooltips require the caller id because the tooltip shows on mouseenter and has to hide on mouseleave, and we need the id for the mouseleave to create the eventListener for it. So:
-      // !VA Call showAppMessages with two parameters: targetid, which is either a string for tooltips or false for msg and err, and the second parameter is the appMessContent.
+      // !VA Entry point for sorting the three types of messages. Target id is used for all three types. For tooltips, target id is in the event object passed in from the event handler. For msg and err, target id isn't passed because handleAppMessages only takes one parameter -- either the event for tooltips or the appMessCode for msg and err. Problem: Tooltips require the calling element's id because the tooltip shows on mouseenter and has to hide on mouseleave, and the id is required for the mouseleave eventListener. Solution: call showAppMessages with two parameters: targetid, which is either a string for tooltips or false for msg and err, and the second parameter is the appMessContent.
       handleAppMessages: function ( evt ) {
         let appMessCode, appMessType, appMessContent, duration, appMessContainerId, tooltipTarget;
         // !VA Duplicate evt into appMessCode - we could just receive the event as appMessCode but it's more transparent to do it explicitly
@@ -4105,6 +4140,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       },
 
       // !VA appController public
+      // !VA Initialize the app. Display the app in full window mode or in isolate mode. Run populateAppobj to populate Appobj with initial default CCP values. Initialize the 'basic' td option. Run setupEventListeners. Determine if running in dev or prod mode based on whether there's a devimg in the HTML file. Finally, run initUI.
       init: function(){
         console.log('App initialized.');
         // !VA Determine if the window is an isolate window, i.e. should be displayed with just the Witty app in window with fixed dimensions without header or tutorial content.
