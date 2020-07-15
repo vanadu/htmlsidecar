@@ -7,12 +7,12 @@
 =========================================================
 JULY REVIEW:
 
-Branch bugFix0720A
+Branch review0720C
 TD Options - excludeimg: height and width fields don't write to clipboard properly. When 90/18 are entered in the inputs, width writes as 30, height as 600. This is because that's the image that's currently loaded. Excludeimg has to override the Appobj property without writing to the property. It also has to override any error checking related to the loaded image - but not the imgViewerW, it still can't be greater than that. Ugh!
 Table Options - Parent Table. Clearing the width input does not exclude the value from the CB output - still writes the width of the currently loaded image. That should NOT be tied to the TD excludeimg option. The width field should be clearable in any case and any value should be enterable as long as it's not larger than imgViewerW. Ugh! 
 
 
-
+TODO: Loading a new image doesn't reset all class and alt fields. All fields should reset on page refresh. ALT doesn't appear to do that all the time, and I can't figure out what the trigger is.
 
 
 
@@ -862,6 +862,8 @@ var Witty = (function () {
 
     // !VA ATTRIBUTE FUNCTIONS
     // !VA CBController private
+    // !VA Branch: review0720C (071520)
+    // !VA NOTE: All these attributes are set here prior to building the individual nodes. It is first called in buildOutputNodeList, and is passed to each make node function in succesion after that. So, it would make sense that getAttributes includes ALL the logic for rendering each attribute before it is passed to the respective make node function. In the last branch, I was moving the logic for 
     // !VA Set values for all the Attributes of the individual ccpUserInput elements. Each attribute is either get-only or settable. If it is get-only, then the user-defined value is accessed directly from the DOM element. If it is a preset, then the value is defined programmatically based on a condition. For instance, the class name 'img-fluid' is a preset that becomes active when the user selects the Fluid image option. In this case, the CCP element ID corresponding to the attribute is written to the ccpElementId variable. Otherwise, ccpElement takes the false flag.
     // !VA NOTE: Could probably make all the retObject arguments ccpElementId, str and consolidate this function somehow -- think about it.
     function getAttributes() {
@@ -869,7 +871,7 @@ var Witty = (function () {
       // !VA Branch: implementCcpInput02 (062420)
       // !VA We don't need the entire Appobj here. What we should do is call rest parameters on what we need and then destructure the return array into separate variables. This needs to be done when getAttributes is reevaluated since there appears to be a lot of unnecessary DOM access here.
       Appobj = appController.getAppobj();
-      let checked, str, options, selectid, ccpElementId, imgType, Attributes, retObj;
+      let checked, str, ccpElementId, imgType, Attributes, retObj;
       // !VA Create the array to return. First value is the id of the CCP element, second value is the string to write to the CCP element. If the first value is false, then the str isn't queried from a Ccp element, but rather is generated in the Attribute based on other conditions. For instance, the img style attribute is conditioned on the fluid/fixed option, but writes to the style attribute of the img tag.
       // !VA Branch: implementCcpInput06 (062820)
       // !VA I'm not sure I need to return the elementID at all. Wouldn't the identifier suffice? For later.
@@ -880,28 +882,6 @@ var Witty = (function () {
         return obj;
       }
       Attributes = {
-        // !VA IMG attributes
-        // !VA Branch: implementCcpInput06 (062820)
-        // !VA Deprecating...
-        // !VA imgType is now integrated into Appobj, so this logic is deprecated here. Leaving it for the time being but pretty sure this entire Attribute is no longer pertinent.
-        // imgType:  (function() {
-        //   // !VA This value is written to CCP so we can pre-select the tdoption 'rdoCcpTdBasic' if the imgType 'fluid' is selected. 
-        //   // !VA If the fixed radio button is checked, set ccpElementId to the fixed element id. Otherwise, set ccpEcurvcurlementId to the fluid element id. 
-
-        //   Appobj.rdoCcpImgFixed  ? ccpElementId = ccpUserInput.rdoCcpImgFixed : ccpElementId = ccpUserInput.rdoCcpImgFluid;
-        //   // !VA Now get the str based on the above
-        //   // !VA Branch: implementCcpInput06 (062820)
-        //   // !VA What does the str do?
-        //   ccpElementId === ccpUserInput.rdoCcpImgFixed ? str = 'fixed' : str = 'fluid';
-        //   // !VA Locally, we need a variable for the imgType, so create one.
-        //   imgType = str;
-        //   retObj = returnObject(ccpElementId, str);
-
-        //   return retObj;
-        // })(),
-        // !VA NOTE: ccpIfNoUserInput should be deprecated. That logic is now included in makeImgNode, makeTdNode and makeTableNode functions
-
-        
         imgClass: (function() {
           // !VA Set the element associated with the string
           ccpElementId = ccpUserInput.iptCcpImgClass;
@@ -944,7 +924,6 @@ var Witty = (function () {
           return retObj;
         })(),
         imgStyle: (function() {
-
           // !VA Branch: implementCcpInput06 (062820)
           // !VA Set imgType according to radio button selection. This determines the style attribute that is output to the Clipboard. All the other imgType logic is in appController.
           Appobj.rdoCcpImgFixed  ? imgType = 'fixed' : imgType = 'fluid';
@@ -989,19 +968,31 @@ var Witty = (function () {
         })(),
         tdHeight: (function() {
           // !VA This value is get-only.
+          let retVal;
           ccpElementId = false;
-         
-          // !VA Branch: fixEventHandlers01 (071320)
-          // !VA Isn't ccpIfNoUserInput deprecated, isn't this logic now included in makeTdNode?
+
+          // var foo = getSelectedTdOptionFromAppobj();
+          // console.log('foo is: ' + foo);
+          // if (getSelectedTdOptionFromAppobj() ===  'rdoCcpTdExcludeimg') {
+          //   console.log('HIT');
+          //   retVal = document.querySelector(ccpUserInput.iptCcpTdHeight).value;
+          //   console.log('retVal is: ' + retVal);
+          // } else {
+          //   retVal = Appobj.iptCcpTdHeight;
+          // }
+
+          // retObj = returnObject(ccpElementId, retVal);
           retObj = returnObject(ccpElementId, Appobj.iptCcpTdHeight);
-          // retObj = returnObject( ccpElementId, ccpIfNoUserInput('height',document.querySelector(ccpUserInput.iptCcpTdHeight).value));
+          console.log('tdHeight retObj is: ');
+          console.dir(retObj);
           return retObj;
         })(),
         tdWidth: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
           retObj = returnObject(ccpElementId, Appobj.iptCcpTdWidth);
-          // retObj = returnObject( ccpElementId, ccpIfNoUserInput('width',document.querySelector(ccpUserInput.iptCcpTdWidth).value) );
+          console.log('tdHeight retObj is: ');
+          console.dir(retObj);
           return retObj;
         })(),
         // !VA The selected tdoption radio button determines which TD options will be displayed/undisplayed. Only the checked one will be displayed; all other ones will be undisplayed  
@@ -1105,6 +1096,8 @@ var Witty = (function () {
         })(),
         tableWidth: (function() {
           // !VA The value is written to the table width field - use ccpElementId
+          // !VA Branch: review0720C (071520)
+          // !VA Need handler for the empty input field here.
           ccpElementId = ccpUserInput.iptCcpTableWidth;
           imgType === 'fixed' ? str = Appobj.curImgW : str = '100%';
           retObj = returnObject( ccpElementId, str );
@@ -1136,6 +1129,8 @@ var Witty = (function () {
         tableTagWrapperClass: (function() {
           // !VA This value writes to the CCP in the class input so populate ccpElementId
           // !VA If imgType is fixed, set the default class to 'devicewidth'. If it's fluid, set it to 'responsive-table' as per the Litmus newsletter template.
+          // !VA Branch: review0720C (071520)
+          // !VA This should be disabled since it can't be changed, or it should be changeable.
           ccpElementId = ccpUserInput.iptCcpTableWrapperClass;
           imgType === 'fixed' ? str = 'devicewidth' : str = 'responsive-table';
           retObj = returnObject( ccpElementId, str );
@@ -1257,35 +1252,14 @@ var Witty = (function () {
       return checked;
     }
 
-    // clipboardController: IF NO USER INPUT IN CCP OPTION ELEMENTS 
-    // !VA TODO: This should be in handleUserInput
     // !VA CBController private
-    // !VA Called from getAttributes when an attribute should be included in the Clipboard output ONLY if there is a user input for that attribute If there is no input, exclude the attribute itself from the clipboard output. For instance, if the user doesn't enter a class name, then the class attribute itself is excluded from the clipboard output at all. 
-    function ccpIfNoUserInput(att, value) {
-      // !VA We need get the insFilename from Appobj in case the user leaves 'path' empty
-      let fileName;
-      // !VA Branch: implementCcpInput05 (062720)
-      // !VA Called multiple times from getAttributes because if the filename...why?
-      fileName = appController.getAppobj('fileName');
-      var str;
-      // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
-      if (value && att) {
-        // !VA I might want to change this to include the # in the string itself.
-        value === '#' ? str = '' : str = value;
-
-      } else {
-        // !VA If the path field is empty, we need to return the insFilename without the path.
-        if (att === 'src' && value === '' ) {
-          str = `${att}="${fileName}" `;
-        } else if ( att === '#' || att === '') {
-          str = '';
-        } else {
-          // !VA If there is no input, exclude the attribute entry.
-          str = '';
-        }
-      }
-      return str;
+    // !VA Omit a node attribute if the corresponding getAttributes Attribute is empty, i.e. the corresponding Appobj property/CCP element has no value. str is the Attribute object property. myNode is the current node, i.e. imgNode, tdNode, or tableNode. attr is the current attribute, i.e. className, alt, align etc. 
+    function omitIfEmpty(str, myNode, attr) {
+      // !VA If the Attribute is not empty, set the node attribute to the Attribute property. Otherwise, false for eventual error checking.
+      str ? myNode[attr] = str : false;
+      // return myNode[attr];
     }
+
     // !VA END ATTRIBUTE FUNCTIONS
 
     // !VA NODE FUNCTIONS
@@ -1452,6 +1426,7 @@ var Witty = (function () {
         clipboardStr = clipboardStr.replace('/replacestart//replaceend/', codeBlock + '\n');
       } 
       // !VA Convert the alias of the clicked button to an ID the Clipboard object recognizes and write clipboardStr to the clipboard.
+      console.log(clipboardStr);
       writeClipboard( id, clipboardStr );
     }
 
@@ -1637,6 +1612,7 @@ var Witty = (function () {
 
     // !VA Make the img node, including anchor if it is checked
     // !VA CBController private
+    // !VA Builds the imgNode that is appended to the tdNode, that is in turn appended to the tableNode to generate the clipboard output. The individual attributes of the node (i.e. class, alt, etc) are received in the Attributes argument, which is originally created in getAttributes and called in buildOutputNodeList. Each property of the Attributes object contains any logic required to create the Attribute, but the logic of WHETHER the Attribute is to be included in the imgNode is 
     function makeImgNode ( id, Attributes ) {
       // !VA Id is passed but not used here,  because we're only building the node.
       let imgNode, returnNodeFragment;
@@ -1644,22 +1620,24 @@ var Witty = (function () {
       imgNode = document.createElement('img');
       // !VA Create the node fragment that will contain the IMG or A/IMG tags
       returnNodeFragment = document.createDocumentFragment();
-      // !VA Set the img attributes. 
-      // !VA Class attribute - Add to the node only if the attribute is set, i.e. the input has an entry
-      // !VA Add to the node only if the attribute is set, i.e. the input has an entry
-      if (Attributes.imgClass.str) { imgNode.className = Attributes.imgClass.str; }
-      // !VA alt attribute - Add to the node only if the attribute is set, i.e. the input has an entry
-      if (Attributes.imgAlt.str) { imgNode.alt = Attributes.imgAlt.str; }
-      // !VA src attribute;
+
+      // !VA Branch: review0720C (071520)
+      // !VA If the Attributes property is empty, i.e. there is no input in the CCP input element, do not include the attribute in the node. attr is the string containing the node name to populate. NOTE: The dropdown value of the 'none' option is an empty string, so omitIfEmpty works for align attributes as well.
+      // !VA imgNode.className
+      omitIfEmpty( Attributes.imgClass.str, imgNode, 'className');
+      // !VA imgNode.alt
+      omitIfEmpty( Attributes.imgAlt.str, imgNode, 'alt' );
+      // !VA imgNode.src;
       imgNode.src = Attributes.imgSrc.str;
       // !VA width attribute
       imgNode.width = Attributes.imgWidth.str;
       // !VA height attribute
       imgNode.height = Attributes.imgHeight.str;
-      // !VA style attribute
+      // !VA Style attribute - The logic for outputting different style attributes for fixed/fluid imgTypes to the Clipboard is in the imgStyle attribute of the Attributes object in getAttributes. 
       imgNode.setAttribute('style', Attributes.imgStyle.str);
-      if (Attributes.imgAlign.str) { imgNode.align = Attributes.imgAlign.str; }
-      // !VA border attribute
+      // !VA imgNode.align
+      omitIfEmpty( Attributes.imgAlign.str, imgNode, 'align' );
+      // !VA border attribute - always set to 0
       imgNode.border = '0';
       // !VA If the include anchor option is checked, create the anchor element, add the attributes, append the imgNode to the nodeFragment, and return it.
       if(Attributes.imgIncludeAnchor.str === true) {
@@ -1675,7 +1653,7 @@ var Witty = (function () {
         // !VA Otherwise, set returnNodeFragment to imgNode without the anchor.
         returnNodeFragment.appendChild(imgNode);
       }
-      // return the imgNode as node fragment;
+      // !VA return the imgNode as node fragment;
       return returnNodeFragment;
     }
 
@@ -1702,18 +1680,28 @@ var Witty = (function () {
       switch(true) {
       // !VA If the 'td with options' or 'td with options (exclude img) radio buttons are checked...
       case (selectedTdOption === 'rdoCcpTdBasic' || selectedTdOption === 'rdoCcpTdExcludeimg'):
-        // !VA class attribute
-        // !VA Add to the node only if the attribute is set, i.e. the input has an entry
-        if (Attributes.tdClass.str) { tdInner.className = Attributes.tdClass.str; }
-        // !VA valign attribute
-        // !VA Add to the node only if the option 'none' is not selected
-        if (Attributes.tdAlign.str) { tdInner.align = Attributes.tdAlign.str; }
-        // !VA Add to the node only if the option 'none' is not selected
-        if (Attributes.tdValign.str) { tdInner.vAlign = Attributes.tdValign.str; }
-        // !VA Add to the node only if the attribute is set, i.e. the input has an entry
-        if (Attributes.tdHeight.str) { tdInner.height = Attributes.imgWidth.str; }
-        // !VA Add to the node only if the attribute is set, i.e. the input has an entry
-        if (Attributes.tdWidth.str) { tdInner.width = Attributes.imgHeight.str; }
+        // !VA tdInner.className
+        omitIfEmpty( Attributes.tdClass.str, tdInner, 'className');
+        // !VA tdInner.align
+        omitIfEmpty( Attributes.tdAlign.str, tdInner, 'align');
+        // if (Attributes.tdClass.str) { tdInner.className = Attributes.tdClass.str; }
+        // !VA tdInner.vAlign
+        omitIfEmpty( Attributes.tdValign.str, tdInner, 'vAlign');
+        // !VA tdInner.height - if tdoption is basic, don't show. if tdoption is excludeimg, show.
+        // !VA CAUTION here...
+        // !VA Branch: review0720C (071520)
+        // !VA This is where we do the excludeimg logic
+        // !VA The below is what it was before - tdHeight was set to the current image height
+        // omitIfEmpty( Attributes.tdHeight.str, tdInner, Attributes.imgHeight.str);
+        // !VA Now it's set to the current value of the input element, i.e. the Appobj property
+        omitIfEmpty( Attributes.tdHeight.str, tdInner, 'height');
+        // !VA tdInner.width - if tdoption is basic, don't show. if tdoption is excludeimg, show.
+        // !VA Branch: review0720C (071520)
+        // !VA This is where we do the excludeimg logic
+        // !VA The below is what it was before - tdWidth was set to the current image width
+        omitIfEmpty( Attributes.tdWidth.str, tdInner, Attributes.imgWidth.str);
+        // !VA Now it's set to the current value of the input element, i.e. the Appobj property
+        omitIfEmpty( Attributes.tdWidth.str, tdInner, 'width');
         // !VA If 'rdoCcpTdBasic' is checked, create imgNode and append it, otherwise exclude the imgNode.
         if (selectedTdOption === 'rdoCcpTdBasic') {
           imgNode = makeImgNode( id, Attributes );
@@ -1722,12 +1710,13 @@ var Witty = (function () {
         break;
       // !VA (selectedTdOption === 'rdoCcpTdImgswap'):
       case (selectedTdOption === 'rdoCcpTdImgswap'):
-        // !VA Add to the node only if the attribute is set, i.e. the input has an entry
-        if (Attributes.tdClass.str) { tdInner.className = Attributes.tdClass.str; }
-        // !VA Add to the node only if the option 'none' is not selected
-        if (Attributes.tdValign.str) { tdInner.vAlign = Attributes.tdValign.str; }
-        // !VA Add to the node only if the option 'none' is not selected
-        if (Attributes.tdAlign.str) { tdInner.align = Attributes.tdAlign.str; }
+        // !VA tdInner.className
+        omitIfEmpty( Attributes.tdClass.str, tdInner, 'className');
+        // !VA tdInner.align
+        omitIfEmpty( Attributes.tdAlign.str, tdInner, 'align');
+        // if (Attributes.tdClass.str) { tdInner.className = Attributes.tdClass.str; }
+        // !VA tdInner.vAlign
+        omitIfEmpty( Attributes.tdValign.str, tdInner, 'vAlign');
         break;
       // !VA (selectedTdOption === 'rdoCcpTdBgimage'):
       case (selectedTdOption === 'rdoCcpTdBgimage'):
@@ -1794,16 +1783,23 @@ var Witty = (function () {
       // !VA Add inner table attributes
       // !VA table class attribute
       // !VA Add to the node only if the attribute is set, i.e. the input has an entry
-      if (Attributes.tableClass.str) { tableInner.className = Attributes.tableClass.str; }
-      // !VA table align attribute
-      // !VA Add to the node only if the option 'none' is not selected
-      if (Attributes.tableAlign.str) { tableInner.align = Attributes.tableAlign.str; }
-      tableInner.width = Attributes.tableWidth.str;
+
+      // !VA tableInner.className
+      omitIfEmpty( Attributes.tableClass.str, tableInner, 'className');
+      // !VA tableInner.align
+      omitIfEmpty( Attributes.tableAlign.str, tableInner, 'align');
+      // !VA Branch: review0720C (071520)
+      // !VA Making this contingent on user input now, it was static before. But logic for how to handle the empty input element has to be in Attributes.tableWidth - currently there's no provision for it. 
+      // !VA tableInner.width
+      omitIfEmpty( Attributes.tableWidth.str, tableInner, 'width');
       // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for now
-      // !VA Add to the node only if the attribute is set, i.e. the input has an entry
-      if (Attributes.tableBgcolor.str) { tableInner.bgColor = Attributes.tableBgcolor.str; }
+      // !VA Branch: review0720C (071520)
+      // !VA Check the attribute string - I don't know why it's camelCase
+      // !VA tableInner.bgColor
+      omitIfEmpty( Attributes.tableBgcolor.str, tableInner, 'bgColor');
       // !VA Add border, cellspacing and cellpadding
       tableInner.border = '0', tableInner.cellSpacing = '0', tableInner.cellPadding = '0';
+      // !VA Set the role=presentation attribute
       tableInner.setAttribute('role', 'presentation'); 
       // !VA Build the inner tr
       tableInner.appendChild(trInner);
@@ -1817,17 +1813,14 @@ var Witty = (function () {
         return;
       }
       // !VA If include table wrapper is checked, build the outer table and return it
-      // !VA table wrapper class
-      // !VA Add to the node only if the option 'none' is not selected
-      if (Attributes.tableTagWrapperAlign.str) { tableOuter.align = Attributes.tableTagWrapperAlign.str; }
-      // !VA wrapper table align attribute
-      // !VA Add to the node only if the option 'none' is not selected
-      if (Attributes.tableTagWrapperClass.str) { tableOuter.className = Attributes.tableTagWrapperClass.str; }
+      // !VA tableOuter.className
+      omitIfEmpty( Attributes.tableTagWrapperClass.str, tableOuter, 'className');
+      // !VA tableOuter.align
+      omitIfEmpty( Attributes.tableTagWrapperAlign.str, tableOuter, 'align');
       // !VA the default wrapper table width is the current display size - so it gets the value from the toolbar's Content Width field.
       tableOuter.width = Attributes.tableTagWrapperWidth.str;
-      // !VA table bgcolor attribute. Pass the input value, don't prepend hex # character for now. 
-      // !VA Add to the node only if the attribute is set, i.e. the input has an entry
-      if (Attributes.tableTagWrapperBgcolor.str) { tableOuter.bgColor = Attributes.tableTagWrapperBgcolor.str; }
+      // !VA tableOuter.bgColor - Pass the input value, don't prepend hex # character for now. 
+      omitIfEmpty( Attributes.tableTagWrapperBgcolor.str, tableOuter, 'bgColor');
       // !VA Style attribute - only included for fluid images
       if (getRadioState(ccpUserInput.rdoCcpImgFluid)) {
         tableOuter.setAttribute('style', Attributes.tableTagWrapperStyle.str); 
@@ -2481,6 +2474,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         }
       }
 
+      // !VA Branch: review0720C (071520)
+      // !VA onchange event handlers for dropdown select elements
+      let ccpDropdowns;
+      for(let i in ccpUserInput) {
+        if (ccpUserInput[i].substring(0,4) === '#sel') {
+          ccpDropdowns = document.querySelector(ccpUserInput[i]);
+          addEventHandler(ccpDropdowns,'change',handleCcpDropdowns,false);
+        }
+      }
+
       // !VA eventListener for the Include Wrapper checkbox. Checkboxes need to have separate event handlers because their functions are too different to consolidate into a single one.
       // !VA Branch: implementCcpInput01 (062120)
       // !VA Then why are they both driving to the same function i.e. toggleCheckbox?
@@ -2928,6 +2931,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             if (keydown == 9 ) {
               // !VA Branch: fixEventHandlers01 (071320)
               // !VA Get the Appobj property corresponding to the target element
+              console.log('HIT');
               userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
               // !VA evtTargetVal is the value the user entered into the input element as integer.
               userInputObj.evtTargetVal = evt.target.value;
@@ -3308,6 +3312,22 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         console.log('ERROR in handleCcpRadioSelection - unknown condition');
       } 
     }
+
+
+    // !VA appController private
+    // !VA Gets the selected CCP align option from the dropdown element and writes it to the corresponding Appobj property, and return a userInputObj
+    function handleCcpDropdowns(evt) {
+      let userInputObj = {};
+      userInputObj.evtTargetId = '#' + evt.target.id;
+      userInputObj.appObjProp = Appobj[elementIdToAppobjProp(userInputObj.evtTargetId)] = evt.target.value;
+      // console.log('Appobj[elementIdToAppobjProp(userInputObj.evtTargetId)] is: ' + Appobj[elementIdToAppobjProp(userInputObj.evtTargetId)]);
+      // console.log('userInputObj.evtTargetId is: ' + userInputObj.evtTargetId);
+      // console.log('userInputObj.appObjProp is: ' + userInputObj.appObjProp);
+      return userInputObj;
+
+    }
+
+
 
     
     // !VA appController private
