@@ -5,11 +5,12 @@
 // !VA GENERAL NOTES
 /* !VA  - June Reboot Notes
 =========================================================
+JULY REVIEW:
 
 Branch: review0720A
+-------------------
 
-TODO: Fix BuildCSS buttons
-TODO: Dev mode: Fix Include wrapper table options don't appear if the CCP is closed and re-opened 
+DONE: Fix BuildCSS buttons
 
 DONE: Add CCP options to anchor tag: color, target="_blank" -
 DONE: Change checkbox name from Wrap img... to Include anchor
@@ -17,7 +18,11 @@ DONE: Make the filename div wider - now 300px
 DONE: CCP numeric input fiels need an input validator
 DONE: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- All the CCP display/undisplay does is add/remove the active class, which has no effect on the state of value of CCP elements.
 DONE: Add px to max-width in tableTagWrapperStyle in getAttributes.
-TODO: Remove height and width in tdoptions 'basic' - they should only be available in excludeimg option.
+
+Branch: review0720B
+-------------------
+TODO: Dev mode: Fix Include wrapper table options don't appear if the CCP is closed and re-opened - Maybe not worth fixing
+DONE: Remove height and width in tdoptions 'basic' - they should only be available in excludeimg option.
 
 
 
@@ -3421,15 +3426,25 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA Handle the option states for the respective radio button.
       switch(true) {
-      case id === (ccpUserInput.rdoCcpTdBasic) || id === (ccpUserInput.rdoCcpTdExcludeimg):
+      case id === (ccpUserInput.rdoCcpTdBasic):
+        // !VA Handle the td options for the 'rdoCcpTdBasic' and 'rdoCcpTdExcludeimg' options: class, height, width, bgcolor, align, valign
+        UIController.handleCcpActions( true, 
+          [ 'iptCcpTdClass', 'setactiveparent'], 
+          [ 'selCcpTdAlign', 'setactiveparent'], 
+          // [ 'iptCcpTdWidth', 'setactiveparent'], 
+          [ 'iptCcpTdBgColor', 'setactiveparent'], 
+          // [ 'iptCcpTdHeight', 'setactiveparent'],
+          [ 'selCcpTdValign', 'setactiveparent']); 
+        break;
+      case id === (ccpUserInput.rdoCcpTdExcludeimg):
         // !VA Handle the td options for the 'rdoCcpTdBasic' and 'rdoCcpTdExcludeimg' options: class, height, width, bgcolor, align, valign
         UIController.handleCcpActions( true, 
           [ 'iptCcpTdClass', 'setactiveparent'], 
           [ 'selCcpTdAlign', 'setactiveparent'], 
           [ 'iptCcpTdWidth', 'setactiveparent'], 
           [ 'iptCcpTdBgColor', 'setactiveparent'], 
-          [ 'selCcpTdValign', 'setactiveparent'], 
-          [ 'iptCcpTdHeight', 'setactiveparent']);
+          [ 'iptCcpTdHeight', 'setactiveparent'],
+          [ 'selCcpTdValign', 'setactiveparent']); 
         break;
       case id === (ccpUserInput.rdoCcpTdPosswitch):
         // !VA Handle the 'rdoCcpTdPosswitch' option
