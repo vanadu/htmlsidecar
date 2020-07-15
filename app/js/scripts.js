@@ -7,6 +7,20 @@
 =========================================================
 JULY REVIEW:
 
+Branch bugFix0720A
+TD Options - excludeimg: height and width fields don't write to clipboard properly. When 90/18 are entered in the inputs, width writes as 30, height as 600. This is because that's the image that's currently loaded. Excludeimg has to override the Appobj property without writing to the property. It also has to override any error checking related to the loaded image - but not the imgViewerW, it still can't be greater than that. Ugh!
+Table Options - Parent Table. Clearing the width input does not exclude the value from the CB output - still writes the width of the currently loaded image. That should NOT be tied to the TD excludeimg option. The width field should be clearable in any case and any value should be enterable as long as it's not larger than imgViewerW. Ugh! 
+
+
+
+
+
+
+Branch: review0720B
+-------------------
+TODO: Dev mode: Fix Include wrapper table options don't appear if the CCP is closed and re-opened - Maybe not worth fixing
+DONE: Remove height and width in tdoptions 'basic' - they should only be available in excludeimg option.
+
 Branch: review0720A
 -------------------
 
@@ -18,12 +32,6 @@ DONE: Make the filename div wider - now 300px
 DONE: CCP numeric input fiels need an input validator
 DONE: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- All the CCP display/undisplay does is add/remove the active class, which has no effect on the state of value of CCP elements.
 DONE: Add px to max-width in tableTagWrapperStyle in getAttributes.
-
-Branch: review0720B
--------------------
-TODO: Dev mode: Fix Include wrapper table options don't appear if the CCP is closed and re-opened - Maybe not worth fixing
-DONE: Remove height and width in tdoptions 'basic' - they should only be available in excludeimg option.
-
 
 
 TODO: BUG! Load 625X525 with imgViewerW set to 600 - loads without resizing to container size
@@ -892,6 +900,8 @@ var Witty = (function () {
         //   return retObj;
         // })(),
         // !VA NOTE: ccpIfNoUserInput should be deprecated. That logic is now included in makeImgNode, makeTdNode and makeTableNode functions
+
+        
         imgClass: (function() {
           // !VA Set the element associated with the string
           ccpElementId = ccpUserInput.iptCcpImgClass;
