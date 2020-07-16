@@ -2044,6 +2044,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Branch: implementCcpInput02 (062420)
       // !VA Call getAppobj with rest parameters and destructure the return array into separate variables.
       // !VA props is the array of rest parameters returned from getAppobj
+      // !VA Branch: review0720D (071620)
+      // !VA NOTE: This never happened, getAppobj still returns the entire Appobj object.
       let Appobj = {};
       Appobj = appController.getAppobj();
       console.log('makeCssRule Appobj is: ');
@@ -2051,6 +2053,22 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Destructure Appobj to variables
       let { curImgW, curImgH, sPhonesW, sPhonesH, lPhonesW, lPhonesH } = Appobj;
       let clipboardStr;
+
+      function getTdOutput() {
+        console.log('buildOutputString running');
+        // !VA For img, assumed is always a fixed image that includes width and height. For td, either width or height or both can be provided, so the clipboard output must include either, or, or both.
+        let wProp, hProp, outputStr;
+        if (getSelectedTdOptionFromAppobj() === 'rdoCcpTdExcludeimg') {
+          Attributes.tdWidth.str ? wProp = `width: ${Attributes.tdWidth.str}px !important;` : wProp = '';
+          Attributes.tdHeight.str ? hProp = `height: ${Attributes.tdHeight.str}px !important;` : hProp = '';
+          outputStr = wProp + ' ' + hProp;
+        } else {
+          outputStr = `width: ${Appobj.curImgW}px !important; height: ${Appobj.curImgH}px !important;`;
+        }
+        console.log('outputStr is: ' + outputStr);
+        return outputStr;
+      }
+
       switch(true) {
       // !VA Build the CSS clipboard output strings
       case (id.includes('img-dsktp')):
@@ -2062,12 +2080,18 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       case (id.includes('img-lgphn')):
         clipboardStr = `img.${Attributes.imgClass.str} { width: ${lPhonesW}px !important; height: ${lPhonesH}px !important; }`;
         break;
-      case (id.includes('td-dsktp') || id.includes('td-smphn') || id.includes('td-lgphn')) :
-        if ( Attributes.tdHeight.str) {
-          clipboardStr = `td.${Attributes.tdClass.str} { height: ${Attributes.tdHeight.str}px !important; }`;
-        } else {
-          clipboardStr = `td.${Attributes.tdClass.str} {  }`;
-        }
+      // !VA Branch: review0720D (071620)
+      // !VA Output depends on tdoptions, so use getTdOutput. 
+      case (id.includes('td-dsktp')) :
+        clipboardStr = `td.${Attributes.tdClass.str} { ${getTdOutput()} }`;
+        break;
+      // !VA Branch: review0720D (071620)
+      // !VA It's conceivable that one could want to set the TD width/height to the curImg sPhones/lPhones value, so we'll include that even though it is a stretch that anyone would want it.
+      case ( id.includes('td-smphn')) :
+        clipboardStr = `td.${Attributes.tdClass.str} { width: ${sPhonesW}px !important; height: ${sPhonesH}px !important; }`;
+        break;
+      case ( id.includes('td-lgphn')) :
+        clipboardStr = `td.${Attributes.tdClass.str} { width: ${lPhonesW}px !important; height: ${lPhonesH}px !important; }`;
         break;
       case (id.includes('table-dsktp')):
         clipboardStr = `table.${Attributes.tableClass.str} { width: ${Attributes.tableWidth.str}px !important; align: ${Attributes.tableAlign.str} !important; }`;
