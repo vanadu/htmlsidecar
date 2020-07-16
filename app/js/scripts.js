@@ -6,12 +6,18 @@
 /* !VA  - June Reboot Notes
 =========================================================
 JULY REVIEW:
+Branch review0720D - 07.16.20
+
+TODO: Tabbing out of TD width doesn't apply the value to Appobj apparently. 
+
+TODO: Event handling in CCP numeric input fields is AFU. TAB make error handling run twice, looks like 2 blurs. It's not the btn or btn-default class or the toolbar-button class. It's not the preventDefault in handleKeydown. Added a preventDefault targeting Ccp inputs to handleKeydown to prevent the second blur, but that prevents TAB from exiting the field. It's probably because applyinput
+
+
+
 
 Branch review0720C
-TD Options - excludeimg: height and width fields don't write to clipboard properly. When 90/18 are entered in the inputs, width writes as 30, height as 600. This is because that's the image that's currently loaded. Excludeimg has to override the Appobj property without writing to the property. It also has to override any error checking related to the loaded image - but not the imgViewerW, it still can't be greater than that. Ugh!
+DONE - Fixed, added conditions for excludeimg to TD Options to buildCssRule. Problem: excludeimg: height and width fields don't write to clipboard properly. When 90/18 are entered in the inputs, width writes as 30, height as 600. This is because that's the image that's currently loaded. Excludeimg has to override the Appobj property without writing to the property. It also has to override any error checking related to the loaded image - but not the imgViewerW, it still can't be greater than that. Ugh!
 Table Options - Parent Table. Clearing the width input does not exclude the value from the CB output - still writes the width of the currently loaded image. That should NOT be tied to the TD excludeimg option. The width field should be clearable in any case and any value should be enterable as long as it's not larger than imgViewerW. Ugh! 
-
-
 TODO: Loading a new image doesn't reset all class and alt fields. All fields should reset on page refresh. ALT doesn't appear to do that all the time, and I can't figure out what the trigger is.
 
 
@@ -974,7 +980,6 @@ var Witty = (function () {
           // var foo = getSelectedTdOptionFromAppobj();
           // console.log('foo is: ' + foo);
           // if (getSelectedTdOptionFromAppobj() ===  'rdoCcpTdExcludeimg') {
-          //   console.log('HIT');
           //   retVal = document.querySelector(ccpUserInput.iptCcpTdHeight).value;
           //   console.log('retVal is: ' + retVal);
           // } else {
@@ -2777,6 +2782,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private 
     // !VA Called from handleKeyup. Runs when the user presses ESC to get outof an input element. If the user has made an entry in the input element, this cancels that entry and restores the input value to what it was prior to that entry based on the localStorage, placeholder or Appobj value. 
     function resetInputValue(evt) {
+      console.log('resetInputValue');
       let target, appObjProp, curLocalStorage;
       target = evt.target;
       appObjProp = elementIdToAppobjProp(evt.target.id );
@@ -2831,6 +2837,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private 
     // !VA Called from tbClickables event handler. Handles clicks on the Toolbar increment/decrement buttons and any other mouse actions that aren't handled by the default handlers for the ENTER keypress. NOTE: Handles blurring of input fields initiated by mouseclick. 
     function handleMouseEvents(evt) {
+      console.log('handleMouseEvents');
       // !VA elId adds the hash to evt.target.id
       let elId = '#' + evt.target.id;
       // !VA val is a temporary variable to mutate evt.target.value into Appobj.curImgW. retVal is the value returned by checkNumericInput, i.e. either an integer or false if validation fails. 
@@ -2944,7 +2951,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           return;
         // !VA For all other cases, do logic:
         } else {
+          console.log('handleKeydown HIT');
           // !VA If appObjProp is included in the numericInputs array (which includes all of the UI elements that require numeric input), then run checkNumericInput on the contents of userInputObj. Check numeric input returns false if the integer validation fails, otherwise it converts the numeric string to number where appropriate returns userInputObj.evtTargetVal as integer
+          // !VA Branch: review0720D (071620)
+          // !VA Problem here: checkUserInput is run here even if the keypress is TAB but if the keypress is TAB, it will be run again in handleMouseEvents. Move this into the ENTER handler below, otherwise on TAB we'll get duplicate error checking.
           retVal = checkUserInput( userInputObj );
           // !VA Now that retVal is a validated number or string or false:
           // !VA If not false, write it back to userInputObj.evtTargetVal and pass userInputObj to handleBlur/handleEnterKey
@@ -2952,24 +2962,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             userInputObj.evtTargetVal = retVal; 
             // !VA Handling TAB and ENTER here separately just in case...but for now they do the same thing, i.e. run applyInputValue
             if (keydown == 9 ) {
-              // !VA Branch: fixEventHandlers01 (071320)
-              // !VA Get the Appobj property corresponding to the target element
-              console.log('HIT');
-              userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
-              // !VA evtTargetVal is the value the user entered into the input element as integer.
-              userInputObj.evtTargetVal = evt.target.value;
-              // !VA Apply the user-entered input value in Toolbar or CCP, i.e. writes the value to Appobj and, if Toolbar, runs writeToolbarInputToAppobj which then runs calcViewerSize to update the dynamicElements with the new value.
-              userInputObj.evtTargetVal = retVal;
-              // !VA Branch: review0720A (071320)
-              // !VA I swear I've been through this before, but there doesn't appear to be any need for applyInputValue here because it is handled by handleMouseEvents by default on blur -- blur is the default action on TAB, and handleMouseEvents is the default blur handler for input elements. So, handleMouseEvents runs on TAB by default. So commenting out the below for now in case wierdness happens because this is a dupe of the same routine in handleMouseEvents.
-              // applyInputValue(userInputObj);
-              // !VA If blurring from curImgW or curImgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appdata property.
-              // if (userInputObj.appObjProp === 'curImgW' || userInputObj.appObjProp === 'curImgH') {
-              //   target.value = '';
-              //   target.blur();
-              // } else {
-              //   target.value = Appobj[userInputObj.appObjProp];
-              //   target.blur();
+              // console.log('TAB key');
+              // !VA Branch: review0720D (071620)
+              // !VA TAB key does nothing because the blur is handled by default by the mouse event which is handled by handleMouseEvents. The preventDefault below targets only the CCP inputs because for some reason they're blurring twice and running checkUserInput twice. It's a hack, but it works for now.
+              // !VA Branch: review0720D (071620)
+              // !VA No it doesn't - it prevents TAB out of the input 
+              // if ( userInputObj.appObjProp.substr( 3, 3) === 'Ccp') {
+              // evt.preventDefault(); 
               // }
             } else if ( keydown == 13 ) {
               // !VA We don't need to trap the Toolbar increment/decrement buttons here because the ENTER keypress is equivalent to a mouseclick and triggers the click event, so we can handle the ENTER keypress in handleMouseEvents. This is also why tdKeypresses in the eventHandlers doesn't include the Toolbar buttons - they're handled as mouse clicks.
@@ -3062,6 +3061,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         isErr = true;
       // !VA If retVal is not false then it contains an integer value, so begin the error checking on the numeric input
       } else {
+        console.log('Error handling for ' + appObjProp);
         // !VA The input is an integer, so handle the error cases for the user input
         switch (true) {
         case (appObjProp === 'imgViewerW') :
@@ -3113,6 +3113,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         
         // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply - exclude rdoCcpTdExcludeimg from the error condition
         case (appObjProp === 'iptCcpTdWidth') :
+          // console.log('checkUserInput case iptCcpTdWidth HIT');
+          // console.log('Appobj.iptCcpTdWidth is: ' + Appobj.iptCcpTdWidth);
+          // console.log('Appobj.imgViewerW is: ' + Appobj.imgViewerW);
+          if ( Appobj.iptCcpTdWidth > Appobj.imgViewerW ) {
+            isErr = true;
+            appMessCode = 'err_cell_wider_than_parent_table';
+          }
           if (evtTargetVal < Appobj.curImgW  && !Appobj.rdoCcpTdExcludeimg ) {
             // !VA errorHandler!
             isErr = true;
@@ -3834,7 +3841,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA STATUS
         msg_copied_2_CB: 'Code snippet copied to Clipboard!',
         // !VA ERRORS
-        err_not_Integer: 'This value has to be a positive whole number - try again or press ESC.',
+        err_not_Integer: 'Invalid input - the value has to be a positive whole number.',
         err_imgW_GT_viewerW: `Image width must be less than the current parent table width of ${Appobj.imgViewerW}px. Make the parent table wider first.`,
         err_tbButton_LT_zero: 'Image dimension can\'t be less than 1.',
         err_tbButton_GT_viewerW: `Image can't be wider than its parent table. Parent table width is currently ${Appobj.imgViewerW}px`,
@@ -3846,7 +3853,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         err_vmlbutton_no_value: 'Height and width must be entered to create a VML button.',
         err_vmlbutton_height_mismatch: 'Is the correct image loaded? Img height should match entry. Check the code output. ',
         err_cell_smaller_than_image: 'Table cell cannot be smaller than the image it contains',
-
+        err_cell_wider_than_parent_table: 'Table cell cannot be wider than its parent table',
 
         // !VA ERROR MESSAGE NOT YET IMPLEMENTED
         err_not_yet_implemented: 'This error code is not yet implemented',
