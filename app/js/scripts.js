@@ -2952,42 +2952,44 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA For all other cases, do logic:
         } else {
           console.log('handleKeydown HIT');
+          console.clear();
           // !VA If appObjProp is included in the numericInputs array (which includes all of the UI elements that require numeric input), then run checkNumericInput on the contents of userInputObj. Check numeric input returns false if the integer validation fails, otherwise it converts the numeric string to number where appropriate returns userInputObj.evtTargetVal as integer
           // !VA Branch: review0720D (071620)
-          // !VA Problem here: checkUserInput is run here even if the keypress is TAB but if the keypress is TAB, it will be run again in handleMouseEvents. Move this into the ENTER handler below, otherwise on TAB we'll get duplicate error checking.
+          // !VA Problem here: checkUserInput is run here even if the keypress is TAB but if the keypress is TAB, it will be run again in handleMouseEvents. Move this into the ENTER handler below, otherwise on TAB we'll get duplicate error checking. What we need is a separate handler for TAB if checkUserInput returns false.
           retVal = checkUserInput( userInputObj );
           // !VA Now that retVal is a validated number or string or false:
           // !VA If not false, write it back to userInputObj.evtTargetVal and pass userInputObj to handleBlur/handleEnterKey
-          if ( retVal !== false ) { 
-            userInputObj.evtTargetVal = retVal; 
-            // !VA Handling TAB and ENTER here separately just in case...but for now they do the same thing, i.e. run applyInputValue
-            if (keydown == 9 ) {
-              // console.log('TAB key');
-              // !VA Branch: review0720D (071620)
-              // !VA TAB key does nothing because the blur is handled by default by the mouse event which is handled by handleMouseEvents. The preventDefault below targets only the CCP inputs because for some reason they're blurring twice and running checkUserInput twice. It's a hack, but it works for now.
-              // !VA Branch: review0720D (071620)
-              // !VA No it doesn't - it prevents TAB out of the input 
-              // if ( userInputObj.appObjProp.substr( 3, 3) === 'Ccp') {
-              // evt.preventDefault(); 
-              // }
-            } else if ( keydown == 13 ) {
-              // !VA We don't need to trap the Toolbar increment/decrement buttons here because the ENTER keypress is equivalent to a mouseclick and triggers the click event, so we can handle the ENTER keypress in handleMouseEvents. This is also why tdKeypresses in the eventHandlers doesn't include the Toolbar buttons - they're handled as mouse clicks.
-              if ( evt.target.id.substr( 0, 3 ) === 'ipt')  {
-                applyInputValue(userInputObj);
-              } else {
-                // !VA The element is neither an input element nor an increment/decrement button
-                console.log(' ERROR in handleKeydown - element type not handled');
-              }  
+          userInputObj.evtTargetVal = retVal; 
+          if (keydown == 9 ) {
+            console.log('TAB key');
+            // !VA Branch: review0720D (071620)
+            // !VA If checkUserInput returns an error, handle the TAB key behavior, i.e. show the error message, restore the previous value, and set the cursor at the end of that value so the user can change it or TAB/ESC out.
+            if ( retVal === false ) {
+              // !VA The user-entered value is invalid, so restore the prior value from Appobj or, for curImgW and curImgH, set it to empty so the placeholder shows, and prevent the default behavior of blurring out of the field with the TAB key 
+              if ( userInputObj.appObjProp === 'curImgW' || userInputObj.appObjProp === 'curImgH' ) {
+                evt.target.value = ''; }
+              else {
+                evt.target.value = Appobj[userInputObj.appObjProp];
+              }
+              // !VA Prevent tabbing out of the field until user fixes error or presses TAB/ESC to exit.
+              evt.preventDefault(); 
+            } else {
+              console.log('TAB - no error, userInputObj.appObjProp is:' + userInputObj.appObjProp + ' - running handleMouseEvents');
             }
-          // !VA If false, that means that the user has deleted the input value and it is now empty, which isn't allowed. So prevent the default TAB behavior, i.e. leave the cursor in the field until the user enters a valid value
-          } else {
-            // !VA The user-entered value is invalid, so restore the prior value from Appobj or, for curImgW and curImgH, set it to empty so the placeholder shows, and prevent the default behavior of blurring out of the field with the TAB key 
-            if ( userInputObj.appObjProp === 'curImgW' || userInputObj.appObjProp === 'curImgH' ) {
-              evt.target.value = ''; }
-            else {
-              evt.target.value = Appobj[userInputObj.appObjProp];
+          } else if ( keydown == 13 ) {
+            console.log('ENTER key');
+            if ( retVal === false ) {
+              // !VA The user-entered value is invalid, so restore the prior value from Appobj or, for curImgW and curImgH, set it to empty so the placeholder shows, and prevent the default behavior of blurring out of the field with the TAB key 
+              if ( userInputObj.appObjProp === 'curImgW' || userInputObj.appObjProp === 'curImgH' ) {
+                evt.target.value = ''; }
+              else {
+                evt.target.value = Appobj[userInputObj.appObjProp];
+              }
+              // !VA Prevent tabbing out of the field until user fixes error or presses TAB/ESC to exit.
+              evt.preventDefault(); 
+            } else {
+              console.log('ENTER - no error, userInputObj.appObjProp is:' + userInputObj.appObjProp + ' - running handleMouseEvents');
             }
-            evt.preventDefault(); 
           }
         }
       }
