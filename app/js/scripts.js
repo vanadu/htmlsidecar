@@ -983,16 +983,12 @@ var Witty = (function () {
 
           // retObj = returnObject(ccpElementId, retVal);
           retObj = returnObject(ccpElementId, Appobj.iptCcpTdHeight);
-          console.log('tdHeight retObj is: ');
-          console.dir(retObj);
           return retObj;
         })(),
         tdWidth: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
           retObj = returnObject(ccpElementId, Appobj.iptCcpTdWidth);
-          console.log('tdHeight retObj is: ');
-          console.dir(retObj);
           return retObj;
         })(),
         // !VA The selected tdoption radio button determines which TD options will be displayed/undisplayed. Only the checked one will be displayed; all other ones will be undisplayed  
@@ -2088,6 +2084,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA If the input includes a percent char, remove the hard-coded trailing px on the value and just output the value with the user-entered percent char.
       clipboardStr.includes('%')  ? clipboardStr = clipboardStr.replace('%px', '%') : clipboardStr;
       // !VA Write CSS code to clipboard
+      console.log('clipboardStr is: ');
+      console.log(clipboardStr);
+      
       writeClipboard(id, clipboardStr);
     }
 
