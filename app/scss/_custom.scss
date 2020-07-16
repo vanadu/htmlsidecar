@@ -95,6 +95,17 @@ button:disabled  {
   border: 1px solid magenta;
 }
 
+// VA! Get rid of the default decrement/increment arrows on input elements of type number 
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
 // VA! Button styles from bootstrap 3
 
 

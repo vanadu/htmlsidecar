@@ -6,11 +6,10 @@
 /* !VA  - June Reboot Notes
 =========================================================
 JULY REVIEW:
-Branch review0720D - 07.16.20
 
-TODO: Tabbing out of TD width doesn't apply the value to Appobj apparently. 
+// !VA Branch: fixEventHandling02 (071620)
 
-TODO: Event handling in CCP numeric input fields is AFU. TAB make error handling run twice, looks like 2 blurs. It's not the btn or btn-default class or the toolbar-button class. It's not the preventDefault in handleKeydown. Added a preventDefault targeting Ccp inputs to handleKeydown to prevent the second blur, but that prevents TAB from exiting the field. It's probably because applyinput
+DONE: Change input type to number for all numeric input elements and add the CSS line that suppresses the default increment/decrement arrows on the number inputs.
 
 
 
@@ -537,7 +536,7 @@ var Witty = (function () {
 
             // !VA Open the CCP by default in dev mode
             // !VA First, set it to how you want to start it.
-            document.querySelector(staticContainers.ccpContainer).classList.add('active');
+            document.querySelector(staticContainers.ccpContainer).classList.remove('active');
             // !VA The return variable isn't used, but keeping it for reference
             // var ccpState = UIController.toggleCcp();
             // !VA NOW: The toggle Ccp element functions are all in appController either I have to replicated them here or find another solution or live with the fact that they don't initialize. Or run initUI from here...
@@ -2837,7 +2836,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private 
     // !VA Called from tbClickables event handler. Handles clicks on the Toolbar increment/decrement buttons and any other mouse actions that aren't handled by the default handlers for the ENTER keypress. NOTE: Handles blurring of input fields initiated by mouseclick. 
     function handleMouseEvents(evt) {
-      console.log('handleMouseEvents');
+      // console.log('handleMouseEvents running');
       // !VA elId adds the hash to evt.target.id
       let elId = '#' + evt.target.id;
       // !VA val is a temporary variable to mutate evt.target.value into Appobj.curImgW. retVal is the value returned by checkNumericInput, i.e. either an integer or false if validation fails. 
@@ -2879,36 +2878,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
           // !VA evtTargetVal is the value the user entered into the input element as integer.
           userInputObj.evtTargetVal = evt.target.value;
-          // !VA Exception: For curImgW and curImgH, if user tabs out of the input field without entering a value, we need to skip the blur handling and error checking completely and just perform the default TAB action, i.e. skip to the next element in the TAB order and leave the input empty so the placeholder shows.
+          // !VA Exception: For curImgW and curImgH, if user tabs out of the input field without entering a value, we need to skip  applyInputValue, otherwise curImgW/curImgH will be set to an empty string and curImg will disappear. 
           if (  userInputObj.appObjProp === 'curImgW' && userInputObj.evtTargetVal === ''  ||   userInputObj.appObjProp === 'curImgH' && userInputObj.evtTargetVal === '' ) {
             return;
           // !VA For all other cases, do logic:
           } else {
-            // !VA If appObjProp is included in the numericInputs array (which includes all of the UI elements that require numeric input), then run checkNumericInput on the contents of userInputObj. Check numeric input returns false if the integer validation fails, otherwise it converts the numeric string to number where appropriate returns userInputObj.evtTargetVal as integer
-            // !VA Branch: implementClipboard01 (071020)
-            retVal = checkUserInput( userInputObj );
-            // !VA Now that retVal is a validated number or string or false:
-            // !VA If not false, write it back to userInputObj.evtTargetVal and pass userInputObj to applyInputValue
-            if ( retVal !== false ) { 
-              // !VA Note: See if applyInputValue is a functional duplicate of another function
-              applyInputValue(userInputObj);
-              // !VA If blurring from curImgW or curImgH, clear the field to display the placeholders. Otherwise, restore the field value to the Appdata property.
-              if (userInputObj.appObjProp === 'curImgW' || userInputObj.appObjProp === 'curImgH') {
-                evt.target.value = '';
-                // target.blur();
-              } else {
-                evt.target.value = Appobj[userInputObj.appObjProp];
-                // target.blur();
-              }
-            // !VA If retVal is false, then either the user deleted the entry or the entry was invalid and generated an error. In either case...
-            } else {
-              // !VA Restore the prior value from Appobj or, for curImgW and curImgH, set it to empty so the placeholder shows, and prevent the default behavior of blurring out of the field with the TAB key 
-              if ( userInputObj.appObjProp === 'curImgW' || userInputObj.appObjProp === 'curImgH' ) {
-                evt.target.value = ''; }
-              else {
-                evt.target.value = Appobj[userInputObj.appObjProp];
-              }
-            }
+            console.log('handleMouseEvents applyInputValue');
+            applyInputValue(userInputObj);
           }
         // !VA The element was not an input element and so is not handled by the blur handler yet.
         } else {
@@ -2942,56 +2918,59 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       userInputObj.evtTargetId = evt.target.id;
       // !VA If TAB or ENTER
       if (keydown == 9 || keydown == 13) {
+        console.log('TAB or ENTER');
         // !VA elementIdToAppobjProp gets the Appobj key that corresponds to a given element ID. We need the Appobj key to get the Appobj value to compare to the user-entered value in the respective Toolbar input field. 
         userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
         // !VA evtTargetVal is the value the user entered into the input element as integer.
         userInputObj.evtTargetVal = evt.target.value;
-        // !VA Exception: For curImgW and curImgH, if user tabs out of the input field without entering a value, we need to skip the blur handling and error checking completely and just perform the default TAB action, i.e. skip to the next element in the TAB order and leave the input empty so the placeholder shows.
-        if (  userInputObj.appObjProp === 'curImgW' && userInputObj.evtTargetVal === ''  ||   userInputObj.appObjProp === 'curImgH' && userInputObj.evtTargetVal === '' ) {
-          return;
-        // !VA For all other cases, do logic:
-        } else {
-          console.log('handleKeydown HIT');
-          console.clear();
-          // !VA If appObjProp is included in the numericInputs array (which includes all of the UI elements that require numeric input), then run checkNumericInput on the contents of userInputObj. Check numeric input returns false if the integer validation fails, otherwise it converts the numeric string to number where appropriate returns userInputObj.evtTargetVal as integer
-          // !VA Branch: review0720D (071620)
-          // !VA Problem here: checkUserInput is run here even if the keypress is TAB but if the keypress is TAB, it will be run again in handleMouseEvents. Move this into the ENTER handler below, otherwise on TAB we'll get duplicate error checking. What we need is a separate handler for TAB if checkUserInput returns false.
+        // !VA Now that userInputObj is created for passing as argument, destructure it to use locally.
+        let { appObjProp, evtTargetVal } = userInputObj;
+
+        // !VA Branch: review0720D (071620)
+        // !VA There needs to be an escape handler if either curImgW/curImgH is empty OR userInputObj.evtTargetVal = userInputObj.appObjProp, i.e. the user has tabbed out of the input without making a change. But first, we have to validate the input in order to convert the 
+
+        // !VA Exception: For curImgW and curImgH, if user tabs out of the input field without entering a value, skip to the end of the function and override all input handling and error checking. This is only possible because these fields are empty by default. Any field that already has a value has to be error checked. 
+        if (  userInputObj.appObjProp !== 'curImgW' && userInputObj.evtTargetVal !== ''  ||   userInputObj.appObjProp !== 'curImgH' && userInputObj.evtTargetVal !== '' ) {
+          // !VA Now do the error checking and return an integer if no error. Number type is required to compare evtTargetVal and the Appobj property, which is stored as type number.
           retVal = checkUserInput( userInputObj );
-          // !VA Now that retVal is a validated number or string or false:
-          // !VA If not false, write it back to userInputObj.evtTargetVal and pass userInputObj to handleBlur/handleEnterKey
-          userInputObj.evtTargetVal = retVal; 
-          if (keydown == 9 ) {
-            console.log('TAB key');
-            // !VA Branch: review0720D (071620)
-            // !VA If checkUserInput returns an error, handle the TAB key behavior, i.e. show the error message, restore the previous value, and set the cursor at the end of that value so the user can change it or TAB/ESC out.
-            if ( retVal === false ) {
-              // !VA The user-entered value is invalid, so restore the prior value from Appobj or, for curImgW and curImgH, set it to empty so the placeholder shows, and prevent the default behavior of blurring out of the field with the TAB key 
-              if ( userInputObj.appObjProp === 'curImgW' || userInputObj.appObjProp === 'curImgH' ) {
-                evt.target.value = ''; }
-              else {
-                evt.target.value = Appobj[userInputObj.appObjProp];
+          // !VA NOTE: does changing the variable also change the destructured object property?
+          // !VA Set evtTargetVal and userInputObj.evtTargetVal to retVal - userInputObj must also pass an integer of type number
+          evtTargetVal = userInputObj.evtTargetVal = retVal;
+          console.log('handleKeydown evtTargetVal is: ' + typeof(evtTargetVal)); 
+          console.log('handleKeydown appObjProp is: ' + appObjProp); 
+          console.log('handleKeydown Appobj[appObjProp] is: ' + Appobj[appObjProp]); 
+          // !VA If checkUserInput returned a value instead of false, there was no error
+          if (retVal !== false ) {
+            // !VA If the user changed the value, i.e. evtTargetVal !== Appobj[appObjProp], run applyInput to copy the value to Appobj[appObjProp] and update the dynamicRegions if applicable.
+            if (evtTargetVal !== Appobj[appObjProp] ) {
+              console.log('CHANGED');
+              // applyInputValue( userInputObj );
+              if (keydown == 9 ) {
+                // !VA No change to the default TAB behavior for changed values
+                console.log('TAB - CHANGED');
+
+              } else if (keydown == 13) {
+                // !VA We have to run applyInputValue here otherwise no action will occur. This results in applyInputValue being run again on blur, not ideal but acceptable.
+                applyInputValue(userInputObj);
+                console.log('ENTER - CHANGED');
+                // !VA No change to the default ENTER behavior for changed values
+              } else {
+                console.log('ERROR in handleKeydown - unknown key code ');
               }
-              // !VA Prevent tabbing out of the field until user fixes error or presses TAB/ESC to exit.
-              evt.preventDefault(); 
             } else {
-              console.log('TAB - no error, userInputObj.appObjProp is:' + userInputObj.appObjProp + ' - running handleMouseEvents');
-            }
-          } else if ( keydown == 13 ) {
-            console.log('ENTER key');
-            if ( retVal === false ) {
-              // !VA The user-entered value is invalid, so restore the prior value from Appobj or, for curImgW and curImgH, set it to empty so the placeholder shows, and prevent the default behavior of blurring out of the field with the TAB key 
-              if ( userInputObj.appObjProp === 'curImgW' || userInputObj.appObjProp === 'curImgH' ) {
-                evt.target.value = ''; }
-              else {
-                evt.target.value = Appobj[userInputObj.appObjProp];
+              console.log('INPUT VALUE UNCHANGED');
+              if (keydown == 9 ) {
+                console.log('TAB - UNCHANGED');
+                // !VA Do nothing
+              } else if (keydown == 13 ) {
+                console.log('ENTER - UNCHANGED');
+                // !VA Do nothing
+              } else {
+                console.log('ERROR in handleKeydown - unknown key code ');
               }
-              // !VA Prevent tabbing out of the field until user fixes error or presses TAB/ESC to exit.
-              evt.preventDefault(); 
-            } else {
-              console.log('ENTER - no error, userInputObj.appObjProp is:' + userInputObj.appObjProp + ' - running handleMouseEvents');
             }
           }
-        }
+        } 
       }
     }
 
@@ -3027,6 +3006,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           // !VA The CCP input field is empty - do nothing.
         } else {
           // !VA Error check the numeric input
+          console.log('Mark1 ');
           retVal = checkNumericInput(userInputObj); 
         }
       }           
