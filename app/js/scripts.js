@@ -7,8 +7,12 @@
 =========================================================
 JULY REVIEW:
 
-// !VA Branch: fixEventHandling02 (071620)
 
+
+// !VA Branch: fixEventHandling04 (071720)
+DONE: fixed event handling...so far. Cleaned up, commented, merged to master
+
+// !VA Branch: fixEventHandling02 (071620)
 DONE: Change input type to number for all numeric input elements and add the CSS line that suppresses the default increment/decrement arrows on the number inputs.
 
 
