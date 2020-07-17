@@ -2538,7 +2538,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       for (let i = 0; i < toolbarInputs.length; i++) {
         // !VA convert the ID string to the object inside the loop
         toolbarInputs[i] = document.querySelector(toolbarInputs[i]);
-        addEventHandler((toolbarInputs[i]),'keydown',handleKeydown2,false);
+        addEventHandler((toolbarInputs[i]),'keydown',handleKeydown,false);
         addEventHandler((toolbarInputs[i]),'keyup',handleKeyup,false);
         addEventHandler((toolbarInputs[i]),'focus',handleFocus,false);
         // !VA Handle the mouse-initiated blurring of inputs in the blur handler of handleMouseEvents
@@ -2552,7 +2552,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       for(let i in ccpUserInput) {
         if (ccpUserInput[i].substring(0,4) === '#ipt') {
           ccpInputs = document.querySelector(ccpUserInput[i]);
-          addEventHandler(ccpInputs,'keydown',handleKeydown2,false);
+          addEventHandler(ccpInputs,'keydown',handleKeydown,false);
           addEventHandler(ccpInputs,'keyup',handleKeyup,false);
           addEventHandler(ccpInputs,'focus',handleFocus,false);
           // !VA Handle the mouse-initiated blurring of inputs in the blur handler of handleMouseEvents
@@ -3016,9 +3016,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       return retVal;
     }
 
-    function handleKeydown2(evt) {
+    function handleKeydown(evt) {
       // console.clear();
-      console.log('handleKeydown2 running');
+      console.log('handleKeydown running');
       let retVal;
       // !VA Get the keypress
       let keydown = evt.which || evt.keyCode || evt.key;
@@ -3088,7 +3088,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private function
     // !VA NOTE: Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
     // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Sorts keypresses by data types number and string based on the target input element. Calls checkUserInput which validates the input and returns either an integer or a string and passes the value to applyInputValue to write to Appobj and the DOM. Then, for curImgW/curImgH, sets the input value to '' so the placeholder shows through. For all other input elements, sets the input value to the respective Appobj property.
-    function handleKeydown(evt) {
+    function handleKeydownOLD(evt) {
       let retVal;
       let target;
       target = evt.target;
