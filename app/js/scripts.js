@@ -2948,7 +2948,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     function handleTbrInput(keydown, userInputObj) {
-      console.clear();
+      // console.clear();
       console.log('handleTbrInput running');
       console.log('keydown is: ' + keydown);
       console.log('userInputObj: ');
@@ -2956,7 +2956,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       let retVal;
       // !VA Destructure userInputObj.
-      let { evtTargetId, appObjProp, evtTargetVal } = userInputObj;
+      let { appObjProp, evtTargetVal } = userInputObj;
       // !VA Exception: For curImgW and curImgH, if user tabs out of the input field without entering a value, skip to the end of the function and override all input handling and error checking. This is only possible because these fields are empty by default. Any field that already has a value has to be error checked. 
       if (  userInputObj.appObjProp !== 'curImgW' && userInputObj.evtTargetVal !== ''  ||   userInputObj.appObjProp !== 'curImgH' && userInputObj.evtTargetVal !== '' ) {
         // !VA Now do the error checking and return an integer if no error. Number type is required to compare evtTargetVal and the Appobj property, which is stored as type number.
@@ -3013,6 +3013,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             }
           }
           // !VA ERROR condition
+ 
         } else {
           console.log('ERROR in handleKeydown - unknown condition ');
         }
