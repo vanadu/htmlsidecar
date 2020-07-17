@@ -2867,19 +2867,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             return;
           }
         }
-      // !VA Handle mouse-initiated blur events. This is called from the event handler for the respective input field.
+      // !VA Handle mouse-initiated blur events. This is called from the event handler for the respective input field. This facilitates error-checking and applying values on blur with the mouse, and allows users to mouse through inputs, entering values as they go without having to press TAB or ENTER.
       }  else if ( event.type === 'blur') {
         // !VA First, select all the input elements - their mouse-initiated blur action will be handled here.
         if (evt.target.id.substring( 0, 3 ) === 'ipt') {
           // !VA On blur with the mouse from input fields, dispatch a TAB keypress from the respective input to simulate a TAB keypress. 
           userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
           userInputObj.evtTargetVal = evt.target.value;
-          console.log('userInputObj.appObjProp is: ' + userInputObj.appObjProp);
-          console.log('userInputObj.evtTargetVal is: ' + userInputObj.evtTargetVal);
-          console.log('Appobj[appObjProp] is: ' + Appobj[userInputObj.appObjProp]);
+          // !VA The userInputObj values have to be error-checked here to ensure that the TAB keypress isn't dispatched with invalid values in userInputObj. 
           retVal = checkUserInput( userInputObj );
-          console.log('hME retVal is: ' + retVal);
-          // !VA For Toolbar elements, these are the cases where the TAB key is dispatched - error conditions and user-initiated changes. For the other cases, focus stays in the current input element - handling the blur here would result in the keydown handler running again which would introduce errors.  
+          // !VA These are the cases where the TAB key is dispatched - error conditions and user-initiated changes. For these cases, handleKeydown and the respective input handler appears to run twice, but it doesn't appear to cause any errors because the second time the input value hasn't changed - and there doesn't appear to be any way to avoid it. For the other cases, handleKeydown only runs once.  
           if ( retVal === false  || Appobj[userInputObj.appObjProp] !== userInputObj.evtTargetVal) {
             // !VA Get the element to which the TAB keypress should be dispatched, i.e. the current element.
             document.querySelector( '#' + evt.target.id).dispatchEvent(
@@ -2914,32 +2911,23 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     function handleCcpInput(keydown, userInputObj) {
-      console.log('handleCcpInput running');
-      console.log('keydown is: ' + keydown);
-      console.log('userInputObj: ');
       console.dir(userInputObj);
+      // !VA priorVal is the Appobj property value that was replaced by the new evtTargetVal
       let retVal, priorVal;
       // !VA Destructure userInputObj.
       let { appObjProp, evtTargetVal } = userInputObj;
-      console.log('CCP routine here');
       // !VA Save the existing Appobj property value to priorVal
       priorVal = Appobj[appObjProp];
-      console.log('priorVal is: ' + priorVal);
-      if (priorVal === '') { console.log('priorVal is empty');}
-      // !VA Save the current evtTargetVal to Appobj pending error checking
+      // !VA Save the current evtTargetVal to Appobj pending error checking. 
       Appobj[appObjProp] = evtTargetVal;
-      console.log('handleCcpInput evtTargetVal is: ' + typeof(evtTargetVal)); 
-      console.log('handleCcpInput evtTargetVal is: ' + evtTargetVal); 
-      console.log('handleCcpInput appObjProp is: ' + appObjProp); 
-      console.log('handleCcpInput Appobj[appObjProp] is: ' + Appobj[appObjProp]); 
-      // !VA Error check the current 
+      // !VA Error check the userInputObj, which contains the current Appobj property. If it passes error-checking, then retVal returns the value as type number
       retVal = checkUserInput( userInputObj );
       if (retVal !== false) {
         // !VA If no error, set evtTargetVal and userInputObj.evtTargetVal to the error-checked retVal, which now has the type number, and also set the Appobj property to this, overwriting the stored foo if there is one
         evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = retVal;
-        console.log('evtTargetVal is UPDATED: ' + evtTargetVal);
+        // console.log('evtTargetVal is UPDATED: ' + evtTargetVal);
       } else {
-        // !VA If error-checking failed, restore 
+        // !VA If error-checking failed, restore the prior value from priorVal and write that value back to the current input element.
         evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = priorVal;
         console.log('evtTargetVal is RESTORED: ' + evtTargetVal);
         UIController.writeAppobjToDOM( [ appObjProp, priorVal ] );
@@ -2950,10 +2938,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     function handleTbrInput(keydown, userInputObj) {
       // console.clear();
       console.log('handleTbrInput running');
-      console.log('keydown is: ' + keydown);
-      console.log('userInputObj: ');
-      console.dir(userInputObj);
-
       let retVal;
       // !VA Destructure userInputObj.
       let { appObjProp, evtTargetVal } = userInputObj;
@@ -2964,16 +2948,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA NOTE: does changing the variable also change the destructured object property?
         // !VA Set evtTargetVal and userInputObj.evtTargetVal to retVal - userInputObj must also pass an integer of type number
         evtTargetVal = userInputObj.evtTargetVal = retVal;
-        console.log('handleTbrInput evtTargetVal is: ' + typeof(evtTargetVal)); 
-        console.log('handleTbrInput appObjProp is: ' + appObjProp); 
-        console.log('handleTbrInput Appobj[appObjProp] is: ' + Appobj[appObjProp]); 
         // !VA If checkUserInput returned a value instead of false, there was no error, so process the input
         if (retVal !== false ) {
           // !VA If the user changed the value, i.e. evtTargetVal !== Appobj[appObjProp], run applyInput to copy the value to Appobj[appObjProp] and update the dynamicRegions if applicable.
           if (evtTargetVal !== Appobj[appObjProp] ) {
             if (keydown == 9 ) {
               // !VA No change to the default TAB behavior for changed values
-              console.log('TAB - CHANGED - running applyInputValue');
               applyInputValue(userInputObj);
               // !VA Set the value of the input to null for curImgW and curImgH so the placeholder shows
               if (appObjProp === 'curImgW' || appObjProp === 'curImgH') {
@@ -2981,7 +2961,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
               }
             } else if (keydown == 13) {
               // !VA We have to run applyInputValue here otherwise no action will occur. This results in applyInputValue being run again on blur, not ideal but acceptable.
-              console.log('ENTER - CHANGED: running applyInputValue');
               applyInputValue(userInputObj);
             } else {
               console.log('ERROR in handleKeydown - unknown key code ');
@@ -2998,9 +2977,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             } 
           }
         }  else if ( retVal === false ) {
-          console.log('NEW ERROR');
           if (keydown == 9 || keydown == 13) {
-            console.log('TAB or ENTER - ERROR');
             // debugger;
             // !VA Set the value of the input to null for curImgW and curImgH so the placeholder shows
             if (appObjProp === 'curImgW' || appObjProp === 'curImgH') {
