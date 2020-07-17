@@ -2818,7 +2818,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       let { evtTargetVal, appObjProp } = userInputObj;
       let inputObj = {};
       // !VA If the target element value doesn't equal the existing Appobj value, then a new value was user-entered into the input element, so update Appobj with the new value. This is done in ALL cases, including curImgW and curImgH. Otherwise, evtTargetValue is unchanged, so do nothing, i.e. blur and leave the input value unchanged. An else clause is not necessary here, but it's included for possible error checking and console logging. 
-      // debugger;
       if ( evtTargetVal !== Appobj[appObjProp]) {
         Appobj[appObjProp] = evtTargetVal;
       } else {
@@ -2836,7 +2835,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private 
     // !VA Called from tbClickables event handler. Handles clicks on the Toolbar increment/decrement buttons and any other mouse actions that aren't handled by the default handlers for the ENTER keypress. NOTE: Handles blurring of input fields initiated by mouseclick. 
     function handleMouseEvents(evt) {
-      // console.log('handleMouseEvents running');
+      console.log('handleMouseEvents running');
       // !VA elId adds the hash to evt.target.id
       let elId = '#' + evt.target.id;
       // !VA val is a temporary variable to mutate evt.target.value into Appobj.curImgW. retVal is the value returned by checkNumericInput, i.e. either an integer or false if validation fails. 
@@ -2873,60 +2872,29 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA First, select all the input elements - their mouse-initiated blur action will be handled here.
         // !VA NOTE: This is more or less the same routine as in handleKeydown - TAB key, with minor mods for mouse context
         if (evt.target.id.substring( 0, 3 ) === 'ipt') {
-
-
-          if ( evt.target.id.substr( 3, 4 ) === '-ccp') {
-            console.log('CCP routine here');
-            // !VA Save the existing Appobj property value to priorVal
-            priorVal = Appobj[userInputObj.appObjProp];
-            console.log('priorVal is: ' + priorVal);
-            if (priorVal === '') { console.log('priorVal is empty');}
-            // !VA Save the current evtTargetVal to Appobj pending error checking
-            Appobj[userInputObj.appObjProp] = userInputObj.evtTargetVal;
-            console.log('handleKeydown2 evtTargetVal is: ' + typeof(evtTargetVal)); 
-            console.log('handleKeydown2 evtTargetVal is: ' + userInputObj.evtTargetVal); 
-            console.log('handleKeydown2 appObjProp is: ' + userInputObj.appObjProp); 
-            console.log('handleKeydown2 Appobj[appObjProp] is: ' + Appobj[userInputObj.appObjProp]); 
-            // !VA Error check the current 
-            retVal = checkUserInput( userInputObj );
-            if (retVal !== false) {
-              // !VA If no error, set evtTargetVal and userInputObj.evtTargetVal to the error-checked retVal, which now has the type number, and also set the Appobj property to this, overwriting the stored foo if there is one
-              userInputObj.evtTargetVal = userInputObj.evtTargetVal = Appobj[userInputObj.appObjProp] = retVal;
-              console.log('evtTargetVal is UPDATED: ' + userInputObj.evtTargetVal);
-            } else {
-              // !VA If error-checking failed, restore 
-              userInputObj.evtTargetVal = userInputObj.evtTargetVal = Appobj[userInputObj.appObjProp] = priorVal;
-              console.log('evtTargetVal is RESTORED: ' + userInputObj.evtTargetVal);
-              UIController.writeAppobjToDOM( [ userInputObj.appObjProp, priorVal ] );
-              // !VA If TAB was pressed, prevent advance to next tab index element
-              // if (keydown == 9) {
-              //   evt.preventDefault();
-              // }
-            }
-          } else if ( evt.target.id.substr( 3, 4 ) === '-tbr') {
-
-
-            // !VA All input elements have corresponding Appobj property, so now get the property name and build userInputObj
-            // !VA elementIdToAppobjProp gets the Appobj key that corresponds to a given element ID. We need the Appobj key to get the Appobj value to compare to the user-entered value in the respective Toolbar input field. 
-            userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
-            // !VA evtTargetVal is the value the user entered into the input element as integer.
-            userInputObj.evtTargetVal = evt.target.value;
-            // !VA Exception: For curImgW and curImgH, if user tabs out of the input field without entering a value, we need to skip  applyInputValue, otherwise curImgW/curImgH will be set to an empty string and curImg will disappear. 
-            if (  userInputObj.appObjProp === 'curImgW' && userInputObj.evtTargetVal === ''  ||   userInputObj.appObjProp === 'curImgH' && userInputObj.evtTargetVal === '' ) {
-              return;
-            // !VA For all other cases, do logic:
-            } else {
-              console.log('handleMouseEvents applyInputValue');
-              applyInputValue(userInputObj);
-            }
-
-
+          // !VA On blur with the mouse from input fields, dispatch a TAB keypress from the respective input to simulate a TAB keypress. 
+          // !VA Get the element to which the TAB keypress should be dispatched, i.e. the current element.
+          userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
+          userInputObj.evtTargetVal = evt.target.value;
+          console.log('userInputObj.appObjProp is: ' + userInputObj.appObjProp);
+          console.log('userInputObj.evtTargetVal is: ' + userInputObj.evtTargetVal);
+          console.log('Appobj[appObjProp] is: ' + Appobj[userInputObj.appObjProp]);
+          retVal = checkUserInput( userInputObj );
+          console.log('hME retVal is: ' + retVal);
+          if ( retVal === false  || Appobj[userInputObj.appObjProp] !== userInputObj.evtTargetVal) {
+            document.querySelector( '#' + evt.target.id).dispatchEvent(
+              new KeyboardEvent('keydown', {
+                key: 'Tab',
+                keyCode: 9, // example values.
+                code: 'Tab', // put everything you need in this object.
+                which: 9,
+                shiftKey: false, // you don't need to include values
+                ctrlKey: false,  // if you aren't going to use them.
+                metaKey: false   // these are here for example's sake.
+              })
+            );
           }
-
-
-
-
-
+          
 
 
 
@@ -2945,13 +2913,124 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
     }
 
+    function handleCcpInput(keydown, userInputObj) {
+      console.log('handleCcpInput running');
+      console.log('keydown is: ' + keydown);
+      console.log('userInputObj: ');
+      console.dir(userInputObj);
+      let retVal, priorVal;
+      // !VA Destructure userInputObj.
+      let { appObjProp, evtTargetVal } = userInputObj;
+      console.log('CCP routine here');
+      // !VA Save the existing Appobj property value to priorVal
+      priorVal = Appobj[appObjProp];
+      console.log('priorVal is: ' + priorVal);
+      if (priorVal === '') { console.log('priorVal is empty');}
+      // !VA Save the current evtTargetVal to Appobj pending error checking
+      Appobj[appObjProp] = evtTargetVal;
+      console.log('handleCcpInput evtTargetVal is: ' + typeof(evtTargetVal)); 
+      console.log('handleCcpInput evtTargetVal is: ' + evtTargetVal); 
+      console.log('handleCcpInput appObjProp is: ' + appObjProp); 
+      console.log('handleCcpInput Appobj[appObjProp] is: ' + Appobj[appObjProp]); 
+      // !VA Error check the current 
+      retVal = checkUserInput( userInputObj );
+      if (retVal !== false) {
+        // !VA If no error, set evtTargetVal and userInputObj.evtTargetVal to the error-checked retVal, which now has the type number, and also set the Appobj property to this, overwriting the stored foo if there is one
+        evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = retVal;
+        console.log('evtTargetVal is UPDATED: ' + evtTargetVal);
+      } else {
+        // !VA If error-checking failed, restore 
+        evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = priorVal;
+        console.log('evtTargetVal is RESTORED: ' + evtTargetVal);
+        UIController.writeAppobjToDOM( [ appObjProp, priorVal ] );
+      }
+      return retVal;
+    }
+
+    function handleTbrInput(keydown, userInputObj) {
+      console.clear();
+      console.log('handleTbrInput running');
+      console.log('keydown is: ' + keydown);
+      console.log('userInputObj: ');
+      console.dir(userInputObj);
+
+      let retVal;
+      // !VA Destructure userInputObj.
+      let { evtTargetId, appObjProp, evtTargetVal } = userInputObj;
+      // !VA Exception: For curImgW and curImgH, if user tabs out of the input field without entering a value, skip to the end of the function and override all input handling and error checking. This is only possible because these fields are empty by default. Any field that already has a value has to be error checked. 
+      if (  userInputObj.appObjProp !== 'curImgW' && userInputObj.evtTargetVal !== ''  ||   userInputObj.appObjProp !== 'curImgH' && userInputObj.evtTargetVal !== '' ) {
+        // !VA Now do the error checking and return an integer if no error. Number type is required to compare evtTargetVal and the Appobj property, which is stored as type number.
+        retVal = checkUserInput( userInputObj );
+
+        // !VA NOTE: does changing the variable also change the destructured object property?
+        // !VA Set evtTargetVal and userInputObj.evtTargetVal to retVal - userInputObj must also pass an integer of type number
+        evtTargetVal = userInputObj.evtTargetVal = retVal;
+        console.log('handleTbrInput evtTargetVal is: ' + typeof(evtTargetVal)); 
+        console.log('handleTbrInput appObjProp is: ' + appObjProp); 
+        console.log('handleTbrInput Appobj[appObjProp] is: ' + Appobj[appObjProp]); 
+        // !VA If checkUserInput returned a value instead of false, there was no error
+        if (retVal !== false ) {
+          // !VA If the user changed the value, i.e. evtTargetVal !== Appobj[appObjProp], run applyInput to copy the value to Appobj[appObjProp] and update the dynamicRegions if applicable.
+          if (evtTargetVal !== Appobj[appObjProp] ) {
+            console.log('handleMouseEvents CHANGED');
+            // applyInputValue( userInputObj );
+            if (keydown == 9 ) {
+              // !VA No change to the default TAB behavior for changed values
+              console.log('handleMouseEvents TAB - CHANGED');
+              applyInputValue(userInputObj);
+
+              console.log('zeroing out curImgW and curImgH');
+              document.querySelector(toolbarElements.iptTbrCurImgW).value = document.querySelector(toolbarElements.iptTbrCurImgH).value = '';
+
+            } else if (keydown == 13) {
+              // !VA We have to run applyInputValue here otherwise no action will occur. This results in applyInputValue being run again on blur, not ideal but acceptable.
+              // !VA Branch: review0720E (071620)
+
+              console.log('ENTER - CHANGED: applyInputValue');
+              applyInputValue(userInputObj);
+              // !VA No change to the default ENTER behavior for changed values
+            } else {
+              console.log('ERROR in handleKeydown - unknown key code ');
+            }
+          } else {
+            console.log('INPUT VALUE UNCHANGED');
+            if (keydown == 9 ) {
+              console.log('TAB - UNCHANGED');
+              // !VA Do nothing
+            } else if (keydown == 13 ) {
+              console.log('ENTER - UNCHANGED');
+              // !VA Do nothing
+            } else {
+              console.log('ERROR in handleKeydown - unknown key code ');
+            } 
+          }
+        }  else if ( retVal === false ) {
+          console.log('ERROR');
+          if (keydown == 9) {
+            if (appObjProp === 'curImgW' || appObjProp === 'curImgH') {
+              // !VA Set the value of the input to null so the placeholder shows
+              document.querySelector(toolbarElements[appObjPropToAlias(appObjProp)]).value = '';
+            }
+          }
+          // !VA ERROR condition
+        } else {
+          console.log('ERROR in handleKeydown - unknown condition ');
+        }
+      }
+      return retVal;
+    }
+
+
 
     function handleKeydown2(evt) {
-      console.clear();
+      // console.clear();
       console.log('handleKeydown2 running');
       let retVal, priorVal;
       // !VA Get the keypress
       let keydown = evt.which || evt.keyCode || evt.key;
+      
+           
+      
       // !VA userInputObj is the array containing the values needed to check input, evaluate the Toolbar input, and update Appobj prior to writing dynamicElements to the DOM after user input in the Toolbar input fields.
       const userInputObj = { };
       // !VA Add the event target ID to userInputObj. We will need this later to select toolbarElements since their property names don't correspond to the toolbarElements aliases. This is a structural issue that I'm not going to deal with now, if ever.
@@ -2973,98 +3052,51 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
         // !VA CCP-specific keydown handling. CCP input elements, unlike Toolbar elements, have no existing values and can be empty. So in order to error-check the current evtTargetVal and restore it to its prior value if the current evtTargetVal fails error-checking: 1) the prior Appobj property has to be temporarily stored and 2) the current evtTargetVal has to be error-checked and then written to Appobj. 
         if ( evt.target.id.substr( 3, 4 ) === '-ccp') {
-          console.log('CCP routine here');
-          // !VA Save the existing Appobj property value to priorVal
-          priorVal = Appobj[appObjProp];
-          console.log('priorVal is: ' + priorVal);
-          if (priorVal === '') { console.log('priorVal is empty');}
-          // !VA Save the current evtTargetVal to Appobj pending error checking
-          Appobj[appObjProp] = evtTargetVal;
-          console.log('handleKeydown2 evtTargetVal is: ' + typeof(evtTargetVal)); 
-          console.log('handleKeydown2 evtTargetVal is: ' + evtTargetVal); 
-          console.log('handleKeydown2 appObjProp is: ' + appObjProp); 
-          console.log('handleKeydown2 Appobj[appObjProp] is: ' + Appobj[appObjProp]); 
-          // !VA Error check the current 
-          retVal = checkUserInput( userInputObj );
-          if (retVal !== false) {
-            // !VA If no error, set evtTargetVal and userInputObj.evtTargetVal to the error-checked retVal, which now has the type number, and also set the Appobj property to this, overwriting the stored foo if there is one
-            evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = retVal;
-            console.log('evtTargetVal is UPDATED: ' + evtTargetVal);
-          } else {
-            // !VA If error-checking failed, restore 
-            evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = priorVal;
-            console.log('evtTargetVal is RESTORED: ' + evtTargetVal);
-            UIController.writeAppobjToDOM( [ appObjProp, priorVal ] );
-            // !VA If TAB was pressed, prevent advance to next tab index element
-            if (keydown == 9) {
+          if ( keydown === 9) {
+            retVal = handleCcpInput(keydown, userInputObj);
+            if (retVal === false ) {
+              this.value = Appobj[appObjProp];
+              this.select();
               evt.preventDefault();
             }
+          } else if ( keydown === 13) {
+            retVal = handleCcpInput(keydown, userInputObj);
+            this.value = Appobj[appObjProp];
+            this.select();
+          } else {
+            console.log('ERROR in handleKeydown - unknown keypress');
           }
         } else if ( evt.target.id.substr( 3, 4 ) === '-tbr') {
-          console.log('Toolbar routine here');
-          // !VA Exception: For curImgW and curImgH, if user tabs out of the input field without entering a value, skip to the end of the function and override all input handling and error checking. This is only possible because these fields are empty by default. Any field that already has a value has to be error checked. 
-          if (  userInputObj.appObjProp !== 'curImgW' && userInputObj.evtTargetVal !== ''  ||   userInputObj.appObjProp !== 'curImgH' && userInputObj.evtTargetVal !== '' ) {
-            // !VA Now do the error checking and return an integer if no error. Number type is required to compare evtTargetVal and the Appobj property, which is stored as type number.
-            retVal = checkUserInput( userInputObj );
-            // !VA NOTE: does changing the variable also change the destructured object property?
-            // !VA Set evtTargetVal and userInputObj.evtTargetVal to retVal - userInputObj must also pass an integer of type number
-            evtTargetVal = userInputObj.evtTargetVal = retVal;
-            console.log('handleKeydown evtTargetVal is: ' + typeof(evtTargetVal)); 
-            console.log('handleKeydown appObjProp is: ' + appObjProp); 
-            console.log('handleKeydown Appobj[appObjProp] is: ' + Appobj[appObjProp]); 
-            // !VA If checkUserInput returned a value instead of false, there was no error
-            if (retVal !== false ) {
-              // !VA If the user changed the value, i.e. evtTargetVal !== Appobj[appObjProp], run applyInput to copy the value to Appobj[appObjProp] and update the dynamicRegions if applicable.
-              if (evtTargetVal !== Appobj[appObjProp] ) {
-                console.log('CHANGED');
-                // applyInputValue( userInputObj );
-                if (keydown == 9 ) {
-                  // !VA No change to the default TAB behavior for changed values
-                  console.log('TAB - CHANGED');
 
-                } else if (keydown == 13) {
-                  // !VA We have to run applyInputValue here otherwise no action will occur. This results in applyInputValue being run again on blur, not ideal but acceptable.
-                  // !VA Branch: review0720E (071620)
-
-                  console.log('ENTER - CHANGED: applyInputValue');
-                  applyInputValue(userInputObj);
-                  // !VA No change to the default ENTER behavior for changed values
-                } else {
-                  console.log('ERROR in handleKeydown - unknown key code ');
-                }
+          if ( keydown === 9) {
+            retVal = handleTbrInput(keydown, userInputObj);
+            // if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
+            //   console.log('HIT');
+            //   console.log('appObjProp is: ' + appObjProp);
+            //   // debugger;
+            //   // document.querySelector(toolbarElements[appObjPropToAlias(appObjProp)]).value = '';
+            // }
+            if (retVal === false ) {
+              // !VA If error - 
+              if (appObjProp === 'curImgW' || appObjProp === 'curImgH'  ) {
+                // !VA The value of curImgW and curImgH has to be empty in order for the placeholder values to show, so stay in the field and show the cursor so the user can enter anotion value
+                evt.preventDefault();
               } else {
-                console.log('INPUT VALUE UNCHANGED');
-                if (keydown == 9 ) {
-                  console.log('TAB - UNCHANGED');
-                  // !VA Do nothing
-                } else if (keydown == 13 ) {
-                  console.log('ENTER - UNCHANGED');
-                  // !VA Do nothing
-                } else {
-                  console.log('ERROR in handleKeydown - unknown key code ');
-                } 
-              }
-            }  else if ( retVal === false ) {
-              console.log('ERROR');
-
-              // !VA ERROR condition
-              if (keydown == 9 ) {
-                console.log('TAB - ERROR');
                 this.value = Appobj[appObjProp];
                 this.select();
                 evt.preventDefault();
-              } else if (keydown == 13) {
-                console.log('ENTER - ERROR');
-                this.value = Appobj[appObjProp];
-                this.select();
-                // !VA No change to the default ENTER behavior for changed values
-              } else {
-                console.log('ERROR in handleKeydown - unknown key code ');
               }
-            } else {
-              console.log('ERROR in handleKeydown - unknown condition ');
             }
+          } else if ( keydown === 13) {
+            retVal = handleTbrInput(keydown, userInputObj);
+            if (retVal === false ) {
+              this.value = Appobj[appObjProp];
+              this.select();
+            }
+          } else {
+            console.log('ERROR in handleKeydown - unknown keypress');
           }
+
         }
       }
     }
@@ -3177,6 +3209,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA If the target is a CCP input and it is empty, don't do the validation. For CCP inputs, if the field is empty, the respective property won't get written to the clipboard, so an empty value has functional value. This is in contrast to the Toolbar inputs, where a value is required.
         if ( userInputObj.appObjProp.substring( 3 , 6 ) === 'Ccp' && userInputObj.evtTargetVal === '' ) {
           // !VA The CCP input field is empty - do nothing.
+
+        }
+        else if ( appObjProp === 'curImgW' && evtTargetVal === '' || appObjProp === 'curImgH' && evtTargetVal === '' ) {
+          console.log('The CCP input field is empty - do nothing.');
+        // !VA Skip if curImgW is empty.
+
         } else {
           // !VA Error check the numeric input
           retVal = checkNumericInput(userInputObj); 
