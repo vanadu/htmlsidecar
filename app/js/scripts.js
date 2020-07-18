@@ -7,7 +7,8 @@
 =========================================================
 JULY REVIEW:
 
-
+// !VA Branch: review0720F (071720)
+TODO: Override parent table width if excludeimg. The point is to be able to create any table options of any width up to imgViewerW.
 
 // !VA Branch: fixEventHandling04 (071720)
 DONE: fixed event handling...so far. Cleaned up, commented, merged to master
@@ -943,8 +944,12 @@ var Witty = (function () {
         })(),
         imgAlign: (function() {  
           // !VA This value is get-only.
+          let str, selectid, options = [];
+          options = [ '', 'left', 'middle', 'right'];
+          selectid = ccpUserInput.selCcpImgAlign;
           ccpElementId = false;
-          Appobj.selCcpImgAlign !== 'none' ? str = Appobj.selCcpImgAlign : str = '';
+          // !VA Get the string corresponding to the selectid index in the options array
+          str = options[getAlignAttribute(selectid)];
           retObj = returnObject(ccpElementId, str);
           return retObj;
         })(),
@@ -1047,20 +1052,22 @@ var Witty = (function () {
         tdAlign: (function() {
           // !VA This value is get-only
           ccpElementId = false;
-          let str = '', options = [], selectid = '';
+          let str, selectid, options = [];
           selectid = ccpUserInput.selCcpTdAlign;
           options = [ '', 'left', 'center', 'right'];
-          str = getAlignAttribute( selectid, options );
+          // !VA Get the string corresponding to the selectid index in the options array
+          str = options[getAlignAttribute(selectid)];
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
         tdValign: (function() {
           // !VA This value is get-only
           ccpElementId = false;
-          let str = '', options = [], selectid = '';
+          let str, selectid, options = [];
           selectid = ccpUserInput.selCcpTdValign;
           options = [ '', 'top', 'middle', 'bottom'];
-          str = getAlignAttribute( selectid, options );
+          // !VA Get the string corresponding to the selectid index in the options array
+          str = options[getAlignAttribute(selectid)];
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
@@ -1103,7 +1110,8 @@ var Witty = (function () {
           // !VA Branch: review0720C (071520)
           // !VA Need handler for the empty input field here.
           ccpElementId = ccpUserInput.iptCcpTableWidth;
-          imgType === 'fixed' ? str = Appobj.curImgW : str = '100%';
+          // imgType === 'fixed' ? str = Appobj.curImgW : str = '100%';
+          // imgType === 'fixed' ? str = Appobj.curImgW : str = '100%';
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
@@ -1116,10 +1124,11 @@ var Witty = (function () {
         tableAlign: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
-          let str = '', options = [], selectid = '';
+          let str, selectid, options = [];
           selectid = ccpUserInput.selCcpTableAlign;
           options = [ '', 'left', 'center', 'right'];
-          str = getAlignAttribute( selectid, options );
+          // !VA Get the string corresponding to the selectid index in the options array
+          str = options[getAlignAttribute(selectid)];
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
@@ -1143,10 +1152,11 @@ var Witty = (function () {
         tableTagWrapperAlign: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
-          let str = '', options = [], selectid = '';
+          let str, selectid, options = [];
           selectid = ccpUserInput.selCcpTableWrapperAlign;
           options = [ '', 'left', 'center', 'right'];
-          str = getAlignAttribute( selectid, options );
+          // !VA Get the string corresponding to the selectid index in the options array
+          str = options[getAlignAttribute(selectid)];
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
@@ -1211,7 +1221,14 @@ var Witty = (function () {
 
     // !VA CBController private
     // !VA Gets the selected align option from its CCP dropdown box
-    function getAlignAttribute(selectid, options) {
+    // !VA Branch: review0720F (071720)
+    // !VA The call to this is repetitive in getAttributes, could be DRYified. All this really needs to return is the selected. The options don't need to be passed in, they're local to each getAttributes property.
+    function getAlignAttribute(selectid) {
+      return document.querySelector(selectid).selectedIndex;
+    }
+
+
+    function getAlignAttributeOLD(selectid, options) {
       var str, selInd;
       selInd = document.querySelector(selectid).selectedIndex;
       switch (true) {
@@ -2837,13 +2854,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController private 
-    // !VA Called from tbClickables event handler. Handles clicks on the Toolbar increment/decrement buttons and any other mouse actions that aren't handled by the default handlers for the ENTER keypress. NOTE: Handles blurring of input fields initiated by mouseclick. 
+    // !VA Called from tbClickables event handler. Handles clicks on the Toolbar increment/decrement buttons and handles blur for Toolbar and ccpUserInput input elements, which facilitates error-checking and applying values on blur with the mouse, allowing users to mouse through inputs, entering values as they go without having to press TAB or ENTER. To do this, it dispatches a keydown keyboardEvent for the TAB key to the current input element to simulate the keypress. Also handles drop and dragover events, applying preventDefault.
     function handleMouseEvents(evt) {
       console.log('handleMouseEvents running');
       // !VA elId adds the hash to evt.target.id
       let elId = '#' + evt.target.id;
       // !VA val is a temporary variable to mutate evt.target.value into Appobj.curImgW. retVal is the value returned by checkNumericInput, i.e. either an integer or false if validation fails. 
-      let val, retVal, priorVal;
+      let val, retVal;
       // !VA Branch: implementClipboard01 (071020)
       // !VA userInputObj is required by checkNumericInput
       let userInputObj = { };
@@ -2895,10 +2912,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
               })
             );
           }
-          
-
-
-
         // !VA The element was not an input element and so is not handled by the blur handler yet.
         } else {
           console.log('ERROR in handleMouseEvents - not an INPUT element');
@@ -2914,6 +2927,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
     }
 
+    // !VA Called from handleKeydown to handle CCP element user input. Runs checkUserInput to check for error conditions. If checkUserInput returns a value, further actions (i.e. writing to Appobj) are handled in the blur handler of handleMouseEvents. If error checking fails, writes an error message to the console and returns control to handleKeydown to handle the input elements on error.
     function handleCcpInput(keydown, userInputObj) {
       console.dir(userInputObj);
       // !VA priorVal is the Appobj property value that was replaced by the new evtTargetVal
@@ -2939,6 +2953,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       return retVal;
     }
 
+    // !VA appController private
+    // !VA Called from handleKeydown to handle Toolbar element user input. Runs checkUserInput to check for error conditions. If checkUserInput returns a value, runs applyInputValue to write the value to the corresponding Appobj property and update the dynamicElements dimensions. If error checking fails, writes an error message to the console and returns control to handleKeydown to handle the input elements on error.
     function handleTbrInput(keydown, userInputObj) {
       // console.clear();
       console.log('handleTbrInput running');
