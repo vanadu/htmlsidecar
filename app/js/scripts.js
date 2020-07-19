@@ -12,7 +12,7 @@ Override parent table width if excludeimg. The point is to be able to create any
 This will be very complicated:
 1) Create excludeimg-specific error handling. If tdWidth has a value, Attributes.tableWidth can only be greater than tdWidth and less than Attributes.wrapperTableWidth. If tdWidth has no value, tableWidth can be ANY integer less than Attributes.wrapperTableWidth. 
 
-
+TODO: Wrapper table class can't be overwritten - it is always devicewidth
 
 DONE: Create condition in Attributes.tableWidth property to ensure that the iptCcpTdWidth input element shows the value of the input element when the tdoption excludeimg is selected, and otherwise shows the value of Appobj.curImgW. 
 DONE: Fix undefined error in CCP input on TAB or ENTER - Added condition to skip error checking if evtTargetVal is empty and set Appobj property to empty string.
@@ -50,7 +50,7 @@ DONE: Change checkbox name from Wrap img... to Include anchor
 DONE: Make the filename div wider - now 300px
 DONE: CCP numeric input fiels need an input validator
 DONE: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- All the CCP display/undisplay does is add/remove the active class, which has no effect on the state of value of CCP elements.
-DONE: Add px to max-width in tableTagWrapperStyle in getAttributes.
+DONE: Add px to max-width in tableWrapperStyle in getAttributes.
 
 
 TODO: BUG! Load 625X525 with imgViewerW set to 600 - loads without resizing to container size
@@ -748,6 +748,10 @@ var Witty = (function () {
           let checkboxId;
           // !VA TODO:  Created an styCcpTableWrapperStyle property with the value ''. This is a placeholder for the max-width style property which is only used in handleImgType if the image type is fluid. There is no correspondent for this in the CCP DOM - need to determine if this extra Appobj property is necessary.
           Appobj.styCcpTableWrapperStyle = '';
+          // !VA Branch: review0720F (071720)
+          // !VA Adding this -- one if these may be deprecated
+          // Appobj.styCcpTableStyle = '';
+          
           // !VA Loop through all the ccpUserInput properties. If the property is NOT a span (i.e. a mock checkbox) add an Appobj property that corresponds to the key of the respective ccpUserInput property. Otherwise, convert the span ID to the input ID, then add the Appobj property that corresponds to the key of the respective ID.
           // !VA For instance, if the ccpUserInput value starts with '#ipt', create an Appobject property whose key is 'iptCCP...' and assign it the value of the CCP element with the corresponding ccpUserInput alias.
           for (const [key, value] of Object.entries(ccpUserInput)) {
@@ -1103,14 +1107,17 @@ var Witty = (function () {
         tableClass: (function() {
           // !VA This value depends on the status of the Fixed/Fluid image radio button, so use ccpElementId
           ccpElementId = ccpUserInput.iptCcpTableClass;
+          // !VA Branch: review0720F (071720)
+          // !VA This is wonky
           if (imgType === 'fixed') {
             console.log('Mark1');
-            // !VA If imgType is fixed, then set tableClass to 'devicewidth' if the curImgW equals the imgViewerW. Otherwise, set it to the user input.
-            document.querySelector(ccpElementId).value === Appobj.imgViewerW ? str = 'devicewidth' : 
-              str = Appobj.iptCcpTableClass;
+            // !VA If imgType is fixed, then set tableClass to 'devicewidth' if the curImgW equals the imgViewerW. Otherwise, set it to the user input. 
+            // !VA Branch: review0720F (071720)
+            // !VA The default is set in the UI, so just set iptCcpTableClass to the Appobj property.
+            str = Appobj.iptCcpTableClass;
           } else {
             // !VA If the imgType is fluid, set the class input value to the user input, even though that might have unforseen consequences for the user.
-            str = 'responsive-table';
+            str = '';
           }
           retObj = returnObject( ccpElementId, str );
           return retObj;
@@ -1122,16 +1129,26 @@ var Witty = (function () {
           ccpElementId = ccpUserInput.iptCcpTableWidth;
           // !VA Branch: review0720F (071720)
           // !VA Add the condition that if tdoptions = excludeimg, str is the value of the input element, otherwise it is Appobj.curImgW
-          var foo = getSelectedTdOptionFromAppobj();
-          console.log('foo is: ' + foo);
-          getSelectedTdOptionFromAppobj() === 'rdoCcpTdExcludeimg' ? str = document.querySelector(ccpElementId).value : str = Appobj.curImgW;
+          // !VA Branch: review0720F (071720)
+          // !VA Problem here is we're getting the value from the element directly rather than from Appobj...
+          // getSelectedTdOptionFromAppobj() === 'rdoCcpTdExcludeimg' ? str = document.querySelector(ccpElementId).value : str = Appobj.curImgW;
+          // !VA Branch: review0720F (071720)
+          // !VA And the other problem is that we have a different str output for fixed than fluid. If the tdoption is excludeImg, the output will ALWAYS be the fixed option because fixed is the default for the excludeimg tdoption. So first get the string if excludeimg is selected: 
+          var fixedStr;
+          // !VA Branch: review0720F (071720)
+          // !VA I don't think this should be contingent on excludeimg - it should always show Appobj property. The default is set in the UI, I think. 
+          // getSelectedTdOptionFromAppobj() === 'rdoCcpTdExcludeimg' ? fixedStr = Appobj.iptCcpTableWidth : fixedStr = Appobj.curImgW;
+          fixedStr = Appobj.iptCcpTableWidth;
+          // !VA Now, set str based on whether fixed or fluid
+          imgType === 'fixed' ? str = fixedStr : str = '100%';
+          // !VA Then, if the tdoption is excludeimg, modify the imgTypeStr accordingly
           console.log('str is: ' + str);
-
-
-
+          // !VA Include handling for imgType -- if fixed the input preset is Appobj.curImgW, if fluid then it is 100%
           // imgType === 'fixed' ? str = Appobj.curImgW : str = '100%';
           // imgType === 'fixed' ? str = Appobj.curImgW : str = '100%';
           retObj = returnObject( ccpElementId, str );
+          console.log('tableWidth retObj: ');
+          console.dir(retObj);
           return retObj;
         })(),
         tableBgcolor: (function() {
@@ -1147,7 +1164,11 @@ var Witty = (function () {
           selectid = ccpUserInput.selCcpTableAlign;
           options = [ '', 'left', 'center', 'right'];
           // !VA Get the string corresponding to the selectid index in the options array
-          str = options[getAlignAttribute(selectid)];
+          // !VA Branch: review0720F (071720)
+          // !VA If imgType is fluid, then override the selection and pass 0 so the attribute will not be output to the clipboard
+          imgType === 'fluid' ? str = '' : str = options[getAlignAttribute(selectid)];
+          // !VA Branch: review0720F (071720)
+          // str = options[getAlignAttribute(selectid)];
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
@@ -1155,6 +1176,8 @@ var Witty = (function () {
           // !VA This value is get-only
           ccpElementId = false;
           // !VA Only include a style attribute for the wrapper for fluid images.  The conditional for this is in makeTableNode and there's no case where a style attribute is included for fixed images, so just provide the style attribute string to return
+          // !VA Branch: review0720F (071720)
+          // imgType === 'fixed' ? str = '' : str = `max-width: ${Appobj.curImgW } `;
           imgType === 'fixed' ? str = '' : str = '';
           retObj = returnObject( ccpElementId, str );
           return retObj;
@@ -1166,18 +1189,20 @@ var Witty = (function () {
           retObj = returnObject( ccpElementId, checked );
           return retObj;
         })(),
-        tableTagWrapperClass: (function() {
+        tableWrapperClass: (function() {
           // !VA This value writes to the CCP in the class input so populate ccpElementId
           // !VA If imgType is fixed, set the default class to 'devicewidth'. If it's fluid, set it to 'responsive-table' as per the Litmus newsletter template.
           // !VA Branch: review0720F (071720)
           // !VA This is all wrong for imgType = responsive. 
           // !VA This should be disabled since it can't be changed, or it should be changeable.
           ccpElementId = ccpUserInput.iptCcpTableWrapperClass;
-          imgType === 'fixed' ? str = 'devicewidth' : str = '';
+          // !VA Branch: review0720F (071720)
+          // !VA The defaults are set in the UI. We don't need to handle them here. We need to handle the cases where the user overrides them with user input. Str should therefor always correspond to the Appobj property. This doesn't need to be contingent on excludeimg - unlike the tdoptions, the wrapper table options should be settable in any environment.
+          imgType === 'fixed' ? str = Appobj.iptCcpTableWrapperClass : str = 'responsive-table';
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
-        tableTagWrapperAlign: (function() {
+        tableWrapperAlign: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
           let str, selectid, options = [];
@@ -1188,25 +1213,29 @@ var Witty = (function () {
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
-        tableTagWrapperWidth: (function() {
+        tableWrapperWidth: (function() {
           // !VA This value depends on the selection under Fixed image. 
           ccpElementId = ccpUserInput.iptCcpTableWrapperWidth;
           // !VA If the imgTyp is fixed, set the wrapper width to the value of the input field, which for the most part will be imgViewerW. If it's fluid, set it to 100%
-          imgType === 'fixed' ? str = Appobj.imgViewerW : str = '100%';
+          // !VA Branch: review0720F (071720)
+          // !VA The defaults are set in the UI. We don't need to handle them here. We need to handle the cases where the user overrides them with user input. Str should therefore always correspond to the Appobj property. This doesn't need to be contingent on excludeimg - unlike the tdoptions, the wrapper table options should be settable in any environment.
+          imgType === 'fixed' ? str = Appobj.iptCcpTableWrapperWidth : str = '100%';
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
-        tableTagWrapperBgcolor: (function() {
+        tableWrapperBgcolor: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
           retObj = returnObject( ccpElementId, Appobj.iptCcpTableWrapperBgColor);
           return retObj;
         })(),
-        tableTagWrapperStyle: (function() {
+        tableWrapperStyle: (function() {
           // !VA This value is get-only
           ccpElementId = false;
           // !VA Only include a style attribute for the wrapper for fluid images.  The conditional for this is in makeTableNode and there's no case where a style attribute is included for fixed images, so just provide the style attribute string to return
-          imgType === 'fixed' ? str = '' : str = '';
+          // !VA Branch: review0720F (071720)
+          // !VA This may be deprecated - max-width moved to tableStyle
+          imgType === 'fixed' ? str = '' : str = `max-width: ${Appobj.curImgW }px; `;
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
@@ -1847,6 +1876,12 @@ var Witty = (function () {
       // !VA tableInner.bgColor
       omitIfEmpty( Attributes.tableBgcolor.str, tableInner, 'bgColor');
       // !VA Add border, cellspacing and cellpadding
+
+      // !VA Branch: review0720F (071720)
+      if (getRadioState(ccpUserInput.rdoCcpImgFluid)) {
+        tableOuter.setAttribute('style', Attributes.tableStyle.str); 
+      }
+
       tableInner.border = '0', tableInner.cellSpacing = '0', tableInner.cellPadding = '0';
       // !VA Set the role=presentation attribute
       tableInner.setAttribute('role', 'presentation'); 
@@ -1863,16 +1898,18 @@ var Witty = (function () {
       }
       // !VA If include table wrapper is checked, build the outer table and return it
       // !VA tableOuter.className
-      omitIfEmpty( Attributes.tableTagWrapperClass.str, tableOuter, 'className');
+      omitIfEmpty( Attributes.tableWrapperClass.str, tableOuter, 'className');
       // !VA tableOuter.align
-      omitIfEmpty( Attributes.tableTagWrapperAlign.str, tableOuter, 'align');
+      omitIfEmpty( Attributes.tableWrapperAlign.str, tableOuter, 'align');
       // !VA the default wrapper table width is the current display size - so it gets the value from the toolbar's Content Width field.
-      tableOuter.width = Attributes.tableTagWrapperWidth.str;
+      tableOuter.width = Attributes.tableWrapperWidth.str;
       // !VA tableOuter.bgColor - Pass the input value, don't prepend hex # character for now. 
-      omitIfEmpty( Attributes.tableTagWrapperBgcolor.str, tableOuter, 'bgColor');
+      omitIfEmpty( Attributes.tableWrapperBgcolor.str, tableOuter, 'bgColor');
       // !VA Style attribute - only included for fluid images
+      // !VA Branch: review0720F (071720)
+      // !VA This may be deprecated
       if (getRadioState(ccpUserInput.rdoCcpImgFluid)) {
-        tableOuter.setAttribute('style', Attributes.tableTagWrapperStyle.str); 
+        tableOuter.setAttribute('style', Attributes.tableWrapperStyle.str); 
       }
       // !VA Add default border, cellspacing, cellpadding and role for accessiblity
       tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
@@ -3095,8 +3132,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             console.log('ERROR in handleKeydown - unknown keypress');
           }
           // !VA Branch: review0720F (071720)
-          // console.log('Appobj: ');
-          // console.dir(Appobj);
+          console.log('Appobj: ');
+          console.dir(Appobj);
 
 
         } else if ( evt.target.id.substr( 3, 4 ) === '-tbr') {
@@ -3668,7 +3705,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA This is called from batchAppobjToDOM, which is run whenever the CCP is closed, but it contains a clause that only runs this if the current tdOption is imgswap. That's the only condition that requires complete reset, including disabling and active states. Otherwise, when the CCP is reopened, it restores the CCP to the last state of Appobj.
       Appobj.iptCcpImgClass = Appobj.iptCcpTdClass = Appobj.iptCcpTdHeight = Appobj.iptCcpTdWidth = Appobj.iptCcpTableClass = Appobj.iptCcpTdBgColor = '';
       Appobj.iptCcpTableWidth = Appobj.curImgW;
+      // !VA Branch: review0720F (071720)
+      // !VA This is where the default for iptCcpTableWrapperWidth is set
       Appobj.iptCcpTableWrapperWidth = Appobj.imgViewerW;
+      // !VA Branch: review0720F (071720)
+      // !VA This is where the default for iptCcpTableWrapperClass is set
       Appobj.iptCcpTableWrapperClass = 'devicewidth';
       // !VA Write the defaults to the CCP DOM elements.
       UIController.writeAppobjToDOM( 
@@ -3921,16 +3962,20 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
         Appobj.iptCcpImgClass = 'img-fluid';
         Appobj.iptCcpTableWidth = '100%';
-        Appobj.iptCcpTableClass = 'responsive-table';
+        // !VA Branch: review0720F (071720)
+        Appobj.iptCcpTableClass = '';
         Appobj.iptCcpTableWrapperWidth = '100%';
         // !VA Branch: review0720F (071720)
         // !VA This still has devicewidth written to iptCcpTableWrapperClass, I don't know
-        // Appobj.iptCcpTableWrapperClass = 'responsive-table';
+        Appobj.iptCcpTableWrapperClass = 'responsive-table';
         Appobj.iptCcpTdClass = '';
-        Appobj.iptCcpTdBgColor = '';
+        Appobj.iptCcpTdBgColor = ''; 
         // !VA Branch: implementAppobj06 (061820)
         // !VA IMPORTANT: Not sure if it's best to put this here or only in Attributes, since it only affects the Clipboard output. Leaving it here for now since it doesn't hurt anything
-        Appobj.styCcpTableWrapperStyle = 'style = "max-width: ' + Appobj.curImgW + ';"';
+        // !VA Branch: review0720F (071720)
+        // !VA Adding Appobj.styCcpTableStyle - Appobj.styCcpTableWrapperStyle may be deprecated
+        // Appobj.styCcpTableStyle = 'style = "max-width: ' + Appobj.curImgW + ';"';
+        Appobj.styCcpTableWrapperStyle = 'style = "max-width: ' + Appobj.curImgW + 'px;"';
         
         // !VA Write the Appobj presets to the CCP DOM. Some of these existing values should be copied to the element's placeholder attribute
         UIController.writeAppobjToDOM(
