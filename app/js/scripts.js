@@ -14,9 +14,9 @@ This will be very complicated:
 
 
 
-TODO: Create condition in Attributes.tableWidth property that if tdoptions = excludeimg, str is the value of the input element, otherwise it is Appobj.curImgW. 
+DONE: Create condition in Attributes.tableWidth property to ensure that the iptCcpTdWidth input element shows the value of the input element when the tdoption excludeimg is selected, and otherwise shows the value of Appobj.curImgW. 
 DONE: Fix undefined error in CCP input on TAB or ENTER - Added condition to skip error checking if evtTargetVal is empty and set Appobj property to empty string.
-TODO: Add error handling for excludeimg TD option for tableWidth, tableWrapperWidth and tdWidth inputs. NOTE: Don't forget, ALL ERROR HANDLING FOR NUMERIC INPUTS IS IN checkNumericInput.
+DONE: Add error handling for excludeimg TD option for tableWidth, tableWrapperWidth and tdWidth inputs. NOTE: Don't forget, ALL ERROR HANDLING FOR NUMERIC INPUTS IS IN checkNumericInput.
 
 
 // !VA Branch: fixEventHandling04 (071720)
@@ -1104,12 +1104,13 @@ var Witty = (function () {
           // !VA This value depends on the status of the Fixed/Fluid image radio button, so use ccpElementId
           ccpElementId = ccpUserInput.iptCcpTableClass;
           if (imgType === 'fixed') {
+            console.log('Mark1');
             // !VA If imgType is fixed, then set tableClass to 'devicewidth' if the curImgW equals the imgViewerW. Otherwise, set it to the user input.
             document.querySelector(ccpElementId).value === Appobj.imgViewerW ? str = 'devicewidth' : 
               str = Appobj.iptCcpTableClass;
           } else {
             // !VA If the imgType is fluid, set the class input value to the user input, even though that might have unforseen consequences for the user.
-            str = Appobj.iptCcpTableClass;
+            str = 'responsive-table';
           }
           retObj = returnObject( ccpElementId, str );
           return retObj;
@@ -1150,6 +1151,14 @@ var Witty = (function () {
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
+        tableStyle: (function() {
+          // !VA This value is get-only
+          ccpElementId = false;
+          // !VA Only include a style attribute for the wrapper for fluid images.  The conditional for this is in makeTableNode and there's no case where a style attribute is included for fixed images, so just provide the style attribute string to return
+          imgType === 'fixed' ? str = '' : str = '';
+          retObj = returnObject( ccpElementId, str );
+          return retObj;
+        })(),
         tableIncludeWrapper: (function() {
           // !VA Changing this to CCP-write to clean up updateCcp
           ccpElementId = ccpUserInput.spnCcpTableIncludeWrapperCheckmrk;
@@ -1160,10 +1169,11 @@ var Witty = (function () {
         tableTagWrapperClass: (function() {
           // !VA This value writes to the CCP in the class input so populate ccpElementId
           // !VA If imgType is fixed, set the default class to 'devicewidth'. If it's fluid, set it to 'responsive-table' as per the Litmus newsletter template.
-          // !VA Branch: review0720C (071520)
+          // !VA Branch: review0720F (071720)
+          // !VA This is all wrong for imgType = responsive. 
           // !VA This should be disabled since it can't be changed, or it should be changeable.
           ccpElementId = ccpUserInput.iptCcpTableWrapperClass;
-          imgType === 'fixed' ? str = 'devicewidth' : str = 'responsive-table';
+          imgType === 'fixed' ? str = 'devicewidth' : str = '';
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
@@ -1196,7 +1206,7 @@ var Witty = (function () {
           // !VA This value is get-only
           ccpElementId = false;
           // !VA Only include a style attribute for the wrapper for fluid images.  The conditional for this is in makeTableNode and there's no case where a style attribute is included for fixed images, so just provide the style attribute string to return
-          imgType === 'fixed' ? str = '' : str = `max-width: ${Appobj.curImgW}px`;
+          imgType === 'fixed' ? str = '' : str = '';
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
@@ -3911,9 +3921,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
         Appobj.iptCcpImgClass = 'img-fluid';
         Appobj.iptCcpTableWidth = '100%';
-        Appobj.iptCcpTableClass = 'devicewidth';
+        Appobj.iptCcpTableClass = 'responsive-table';
         Appobj.iptCcpTableWrapperWidth = '100%';
-        Appobj.iptCcpTableWrapperClass = 'responsive-table';
+        // !VA Branch: review0720F (071720)
+        // !VA This still has devicewidth written to iptCcpTableWrapperClass, I don't know
+        // Appobj.iptCcpTableWrapperClass = 'responsive-table';
         Appobj.iptCcpTdClass = '';
         Appobj.iptCcpTdBgColor = '';
         // !VA Branch: implementAppobj06 (061820)
