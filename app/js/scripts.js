@@ -1902,7 +1902,9 @@ var Witty = (function () {
       // !VA tableOuter.align
       omitIfEmpty( Attributes.tableWrapperAlign.str, tableOuter, 'align');
       // !VA the default wrapper table width is the current display size - so it gets the value from the toolbar's Content Width field.
-      tableOuter.width = Attributes.tableWrapperWidth.str;
+      // !VA Branch: review0720F (071720)
+      // tableOuter.width = Attributes.tableWrapperWidth.str;
+      omitIfEmpty( Attributes.tableWrapperWidth.str, tableOuter, 'width');
       // !VA tableOuter.bgColor - Pass the input value, don't prepend hex # character for now. 
       omitIfEmpty( Attributes.tableWrapperBgcolor.str, tableOuter, 'bgColor');
       // !VA Style attribute - only included for fluid images
