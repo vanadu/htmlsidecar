@@ -6,14 +6,19 @@
 /* !VA  - June Reboot Notes
 =========================================================
 JULY REVIEW:
+// !VA Branch: review0720H (071720)
+
+DONE: Changed default tableAlign option for imgType fluid to ‘none’ and updated tableAlign attribute to make it editable. 
+DONE: Made default tableWrapperClass for imgType fluid not disabled. It still has the default value of responsive-table, but it is now editable as per Litmus template.
+DONE: In excludeimg, if parent table is empty and td width is provided, then the td width is greater than the empty parent table input and throws an error. Added condition in checkNumericInput/tableWidth that overrides the error condition if Appobj.iptCcpTableWidth is empty.
+DONE: Width and height inputs don't allow percents - they must. Added checkPercent(val) to checkUserInput as condition so that if evtTargetVal is a valid percent it is returned without any numeric error checking.
+DONE: In excludeimg mode, clicking on the makeCSSRule button should include the class name in the output, currently it just shows td. { }. THis could be useful for adding text properties in the empty brackets.
+
+TODO: Numeric values 
+TODO: CCP is opening with after loading new image with the fluid option selected, if that is what the last selection was. It should always open after loading a new image wiht the fixed option selected.
+
 
 // !VA Branch: review0720F (071720)
-Override parent table width if excludeimg. The point is to be able to create any table options of any width up to imgViewerW. 
-This will be very complicated:
-1) Create excludeimg-specific error handling. If tdWidth has a value, Attributes.tableWidth can only be greater than tdWidth and less than Attributes.wrapperTableWidth. If tdWidth has no value, tableWidth can be ANY integer less than Attributes.wrapperTableWidth. 
-
-TODO: Wrapper table class can't be overwritten - it is always devicewidth
-
 DONE: Create condition in Attributes.tableWidth property to ensure that the iptCcpTdWidth input element shows the value of the input element when the tdoption excludeimg is selected, and otherwise shows the value of Appobj.curImgW. 
 DONE: Fix undefined error in CCP input on TAB or ENTER - Added condition to skip error checking if evtTargetVal is empty and set Appobj property to empty string.
 DONE: Add error handling for excludeimg TD option for tableWidth, tableWrapperWidth and tdWidth inputs. NOTE: Don't forget, ALL ERROR HANDLING FOR NUMERIC INPUTS IS IN checkNumericInput.
@@ -783,7 +788,6 @@ var Witty = (function () {
         } else {
           console.log('Error in populateAppobj: unknown argument - access');
         }
-        return Appobj;
       },
 
       // !VA UIController public
@@ -1166,7 +1170,7 @@ var Witty = (function () {
           // !VA Get the string corresponding to the selectid index in the options array
           // !VA Branch: review0720F (071720)
           // !VA If imgType is fluid, then override the selection and pass 0 so the attribute will not be output to the clipboard
-          imgType === 'fluid' ? str = '' : str = options[getAlignAttribute(selectid)];
+          str = options[getAlignAttribute(selectid)];
           // !VA Branch: review0720F (071720)
           // str = options[getAlignAttribute(selectid)];
           retObj = returnObject( ccpElementId, str );
@@ -1198,7 +1202,7 @@ var Witty = (function () {
           ccpElementId = ccpUserInput.iptCcpTableWrapperClass;
           // !VA Branch: review0720F (071720)
           // !VA The defaults are set in the UI. We don't need to handle them here. We need to handle the cases where the user overrides them with user input. Str should therefor always correspond to the Appobj property. This doesn't need to be contingent on excludeimg - unlike the tdoptions, the wrapper table options should be settable in any environment.
-          imgType === 'fixed' ? str = Appobj.iptCcpTableWrapperClass : str = 'responsive-table';
+          str = Appobj.iptCcpTableWrapperClass;
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
@@ -2101,7 +2105,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       let clipboardStr;
       // !VA clipboardStr is returned to clipboard.js
       clipboardStr = str;
-      // console.clear();
       // clipboardStr = tag.outerHTML;
       var currentCB = new ClipboardJS('#' + id, {
         text: function(trigger) {
@@ -2996,7 +2999,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA Called from handleKeydown to handle CCP element user input. Runs checkUserInput to check for error conditions. If checkUserInput returns a value, further actions (i.e. writing to Appobj) are handled in the blur handler of handleMouseEvents. If error checking fails, writes an error message to the console and returns control to handleKeydown to handle the input elements on error.
     function handleCcpInput(keydown, userInputObj) {
-      console.dir(userInputObj);
+      console.log('handleCcpInput running');
+      console.log(userInputObj);
       // !VA priorVal is the Appobj property value that was replaced by the new evtTargetVal
       let retVal, priorVal;
       // !VA Destructure userInputObj.
@@ -3018,10 +3022,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA If evtTargetVal is not empty, run the error-check
         if (retVal !== false) {
           // !VA If checkUserInput returns truthy, evtTargetVal and userInputObj.evtTargetVal to the error-checked retVal, which now has the type number, and also set the Appobj property to this, overwriting the prior value if there is one
+          console.log('retVal is: ' + retVal);
           console.log('retVal is NOT false');
           // !VA If no error, set 
           evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = retVal;
-          // console.log('evtTargetVal is UPDATED: ' + evtTargetVal);
+          console.log('evtTargetVal is UPDATED: ' + evtTargetVal);
         } else {
           // !VA If error-checking failed, restore the prior value from priorVal and write that value back to the current input element.
           evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = priorVal;
@@ -3036,7 +3041,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController  
     // !VA Called from handleKeydown to handle Toolbar element user input. Runs checkUserInput to check for error conditions. If checkUserInput returns a value, runs applyInputValue to write the value to the corresponding Appobj property and update the dynamicElements dimensions. If error checking fails, writes an error message to the console and returns control to handleKeydown to handle the input elements on error.
     function handleTbrInput(keydown, userInputObj) {
-      // console.clear();
       console.log('handleTbrInput running');
       let retVal;
       // !VA Destructure userInputObj.
@@ -3094,8 +3098,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     function handleKeydown(evt) {
-      // console.clear();
-      // console.log('handleKeydown running');
       let retVal;
       // !VA Get the keypress
       let keydown = evt.which || evt.keyCode || evt.key;
@@ -3112,19 +3114,26 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
         // !VA evtTargetVal is the value the user entered into the input element as integer.
         userInputObj.evtTargetVal = evt.target.value;
+        // console.log('handleKeydown userInputObj is: ');
+        // console.log(userInputObj);
         // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp locally.  
         let { appObjProp } = userInputObj;
+        console.log('appObjProp is: ' + appObjProp);
         // !VA CCP-specific keydown handling. CCP input elements, unlike Toolbar elements, have no existing values and can be empty. So in order to error-check the current evtTargetVal and restore it to its prior value if the current evtTargetVal fails error-checking: 1) the prior Appobj property has to be temporarily stored and 2) the current evtTargetVal has to be error-checked and then written to Appobj. 
         if ( evt.target.id.substr( 3, 4 ) === '-ccp') {
           if ( keydown === 9) {
             retVal = handleCcpInput(keydown, userInputObj);
+            console.log('retVal is: ' + retVal);
             if (retVal === false ) {
               this.value = Appobj[appObjProp];
               this.select();
               evt.preventDefault();
             }
           } else if ( keydown === 13) {
+            console.log('13 userInputObj is: ');
+            console.log(userInputObj);
             retVal = handleCcpInput(keydown, userInputObj);
+            console.log('13 retVal is: ' + retVal);
             if (retVal === false) { 
               console.log('FALSE');
               this.value = Appobj[appObjProp];
@@ -3133,13 +3142,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           } else {
             console.log('ERROR in handleKeydown - unknown keypress');
           }
-          // !VA Branch: review0720F (071720)
-          console.log('Appobj: ');
-          console.dir(Appobj);
-
 
         } else if ( evt.target.id.substr( 3, 4 ) === '-tbr') {
-
+          // !VA Branch: review0720H (072020)
+          // !VA Comment this
           if ( keydown === 9) {
             retVal = handleTbrInput(keydown, userInputObj);
             // !VA Handle error conditions
@@ -3263,14 +3269,45 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController  
     // !VA Called from handleKeydown and handleMouseEvents. Separates numeric input from string input based on the Appobj property name included in two arrays. Numeric input is routed to checkNumericInput where values of type string are converted to integers. String inputs are routed to checkTextInput for valiation and error checking. 
     function checkUserInput(userInputObj) {
-      // !VA Destructure userInputObj
-      const { appObjProp, evtTargetVal } = userInputObj;
-      // !VA Distinguish between string input elements and numeric input elements. Currenly only numeric input elements have any validation but that could change.
-      let numericInputs, stringInputs, retVal;
+      console.log('checkUserInput userInputObj is: ');
+      console.log(userInputObj);
+      // !VA Destructure userInputObj, making variables instead of constants
+      let { appObjProp, evtTargetVal } = userInputObj;
+      // !VA Distinguish between elements that allow percent input, elements that allow string input and elements that allow numeric input. Percent inputs validate the percent value and return it with no further error checking. Numeric input elements have validation with error codes that display error messages. String inputs have no validation currently, but validation for hex color codes might be an option.
+      let numericInputs, stringInputs, retVal, val, percentVal;
+      percentInputs = [ 'iptCcpTdWidth', 'iptCcpTableWidth', 'iptCcpTableWrapperWidth']
       numericInputs = [ 'imgViewerW', 'curImgW', 'curImgH',  'sPhonesW', 'lPhonesW', 'iptCcpTdHeight', 'iptCcpTdWidth', 'iptCcpTableWidth', 'iptCcpTableWrapperWidth', 'iptCcpTdBorderRadius' ];
       stringInputs = ['iptCcpImgClass', 'iptCcpImgAlt', 'iptCcpImgRelPath', 'iptCcpTdClass', 'iptCcpTdBgColor', 'iptCcpTdFontColor', 'iptCcpTdBorderColor', 'iptCcpTableClass', 'iptCcpTableBgColor', 'iptCcpTableWrapperClass', 'iptCcpTableWrapperBgColor' ];
+
+      // !VA Determine if the numeric portion of evtTargetVal; is a valid percent value 
+      function checkPercent(val) {
+        // !VA Slice the percent sign off of evtTargetVal to test the rest of the value for valid percent
+        var val = evtTargetVal.slice( 0, -1 );
+        // !VA Test val for valid percent
+        var x = parseFloat(val);
+        // !VA Test if the value is in percentage range
+        if (isNaN(x) || x < 0 || x > 100) {
+            // !VA If it is out of range, return false
+            console.log('Out of range');
+            percentVal = false;
+        } else {
+          // !VA If it is within the valid percentage range, add the percent character back at the end and return it - it now has the type 'string'
+          console.log('valid percent');
+          var percentVal = x + '%';
+        }
+        return percentVal
+      }
+      // !VA If the last char of evtTargetVal is a percent char, test if it is a valid percent value
+      if ( evtTargetVal.substr(-1) === '%') {
+        console.log('HIT');
+        percentVal = checkPercent(evtTargetVal);
+      }
+      // !VA If evtTargetVal ended in a percent char and the target element is in the list of elements that accept percentage values, set retVal to percentVal and return it
+      if (percentInputs.includes(appObjProp) && evtTargetVal.substr(-1) === '%' ) {
+        console.log('percentVal');
+        retVal = percentVal;
       // !VA If appObjProp is included in the numericInputs array (which includes all of the UI elements that require numeric input), then run checkNumericInput on the contents of userInputObj. Check numeric input returns false if the integer validation fails, otherwise it converts the numeric string to number where appropriate returns userInputObj.evtTargetVal as integer
-      if (numericInputs.includes( appObjProp )) { 
+      } else if (numericInputs.includes( appObjProp )) { 
         // !VA If the target is a CCP input and it is empty, don't do the validation. For CCP inputs, if the field is empty, the respective property won't get written to the clipboard, so an empty value has functional value. This is in contrast to the Toolbar inputs, where a value is required.
         if ( userInputObj.appObjProp.substring( 3 , 6 ) === 'Ccp' && userInputObj.evtTargetVal === '' ) {
           // !VA The CCP input field is empty - do nothing.
@@ -3280,12 +3317,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA If curImgW or curImgH is empty, do nothing.
         } else {
           // !VA Error check the numeric input
-          retVal = checkNumericInput(userInputObj); 
-          console.log('checkUserInput retVal is: ' + retVal);
+          console.log('numeric evtTargetVal is: ' + evtTargetVal);
+          retVal = checkNumericInput( {appObjProp, evtTargetVal } ); 
         }
       }           
       // !VA Currently no string validation implemented, so the function just returns the argument unchanged
       else if (stringInputs.includes( userInputObj.appObjProp )) {
+        console.log('String...');
         retVal = checkTextInput(userInputObj);
       }
       else {
@@ -3299,8 +3337,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private
     // !VA Called from checkUserInput. Runs validateInteger to return a value of type Number, then evaluates any error conditions on the input and passes any error codes generated to appController.handleAppMessages and returns false if there was an error, or the integer value of no error was detected.
     function checkNumericInput(userInputObj) {
+      console.log('checkNumericInput running');
       // !VA Destructure userInputObj
       const { appObjProp, evtTargetVal } = userInputObj;
+      console.log('checkNumericInput evtTargetVal is: ' + evtTargetVal);
       // !VA The code that will be passed to getAppMessageStrings
       let appMessCode, isErr, retVal;
       // !VA The flag indicating an error condition,
@@ -3309,7 +3349,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       var maxViewerWidth = 800;
       // !VA If appObjProp refers to one of the CCP elements that require numeric input
       // !VA First, validate that the user-entered value is an integer. validateInteger returns false if the input is either not an integer or is not a string that can be converted to an integer. Otherwise, it returns the evtTargetVal as a number.
+
+      
+
+
+
       retVal = validateInteger(evtTargetVal);
+
+      console.log('checkNumericInput retVal is: ' + retVal);
       // !VA If validateInteger returned false to retVal, then there is an error condition with the input value.
       if (!retVal) {
         // !VA NOTE: This is where we could easily trap the negative button increment if it falls below 0 to send a different message than just the standard 'not_Integer' message. Revisit.
@@ -3368,13 +3415,21 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           break;
         // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply - exclude rdoCcpTdExcludeimg from the error condition
         case (appObjProp === 'iptCcpTdWidth') :
+          console.log('checkNumericInput iptCcpTdWidth');
           if (Appobj.rdoCcpTdExcludeimg) { 
-            if ( evtTargetVal > Appobj.iptCcpTableWidth ) {
+            console.log('Mark1');
+            if ( Appobj.iptCcpTableWidth === '' ) {
+              console.log('Appobj.iptCcpTableWidth is EMPTY');
+            }
+            else if ( evtTargetVal > Appobj.iptCcpTableWidth ) {
+              console.log('Appobj.iptCcpTableWidth is: ' + Appobj.iptCcpTableWidth);
+              console.log('evtTargetVal is: ' + evtTargetVal);
               isErr = true;
               appMessCode = 'err_table_cell_wider_than_parent_table';
             }
           } 
           if ( evtTargetVal > Appobj.imgViewerW ) {
+            console.log('Mark2');
             isErr = true;
             appMessCode = 'err_cell_wider_than_parent_table';
           }
@@ -3627,12 +3682,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController  
     // !VA Gets the selected CCP align option from the dropdown element and writes it to the corresponding Appobj property, and return a userInputObj
     function handleCcpDropdowns(evt) {
+      console.log('handleCcpDropdowns running');
       let userInputObj = {};
       userInputObj.evtTargetId = '#' + evt.target.id;
       userInputObj.appObjProp = Appobj[elementIdToAppobjProp(userInputObj.evtTargetId)] = evt.target.value;
       // console.log('Appobj[elementIdToAppobjProp(userInputObj.evtTargetId)] is: ' + Appobj[elementIdToAppobjProp(userInputObj.evtTargetId)]);
       // console.log('userInputObj.evtTargetId is: ' + userInputObj.evtTargetId);
       // console.log('userInputObj.appObjProp is: ' + userInputObj.appObjProp);
+      console.log('handleCcpDropdowns userInputObj.appObjProp is: ');
+      console.log(userInputObj.appObjProp);
       return userInputObj;
 
     }
@@ -3906,6 +3964,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA Run handleTdOptions with the 'rdoCcpTdBasic' option as argument to preselect the basic option
         handleTdOptions(ccpUserInput.rdoCcpTdBasic);
         // !VA NOTE: This is where the placeholder value would be swapped. But for now, use these presets - any existing user selections will be lost until saving them to the placeholder is implemented.
+        // !VA Branch: review0720H (072020)
+        // !VA tableAlign and tableWrapperAlign must be written to Appobj here and they have to be gotten from the UI here. 
+
         Appobj.iptCcpImgClass = '';
         Appobj.iptCcpTableWidth = Appobj.curImgW;
         Appobj.iptCcpTableClass = '';
@@ -3964,11 +4025,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
         Appobj.iptCcpImgClass = 'img-fluid';
         Appobj.iptCcpTableWidth = '100%';
-        // !VA Branch: review0720F (071720)
         Appobj.iptCcpTableClass = '';
+        Appobj.selCcpTableAlign = 'none';
+        // Appobj.selCcpTableAlign = '';
+        console.log('Appobj.selCcpTableAlign is: ' + Appobj.selCcpTableAlign);
         Appobj.iptCcpTableWrapperWidth = '100%';
-        // !VA Branch: review0720F (071720)
-        // !VA This still has devicewidth written to iptCcpTableWrapperClass, I don't know
         Appobj.iptCcpTableWrapperClass = 'responsive-table';
         Appobj.iptCcpTdClass = '';
         Appobj.iptCcpTdBgColor = ''; 
@@ -3985,6 +4046,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           [ 'iptCcpImgClass', Appobj.iptCcpImgClass ], 
           [ 'iptCcpTableWidth', Appobj.iptCcpTableWidth ], 
           ['iptCcpTableClass', Appobj.iptCcpTableClass ], 
+          // !VA Branch: review0720H (072020)
+          // !VA The line below gives and error
+          ['selCcpTableAlign', Appobj.selCcpTableAlign ], 
           ['iptCcpTableWrapperWidth', Appobj.iptCcpTableWrapperWidth ],
           ['iptCcpTableWrapperClass', Appobj.iptCcpTableWrapperClass ],  
           [ 'iptCcpTdClass', Appobj.iptCcpTdClass ],
@@ -4018,7 +4082,15 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           ['iptCcpTableWidth', 'setdisabledtextinput'], 
           ['iptCcpTableClass', 'setdisabledtextinput'], 
           ['iptCcpTableWrapperWidth', 'setdisabledtextinput'], 
-          ['iptCcpTableWrapperClass', 'setdisabledtextinput']
+          // ['iptCcpTableWrapperClass', 'setdisabledtextinput'],
+          // !VA Branch: review0720H (072020)
+          // !VA Need to set the parent table align option to none and disable it - can we use set
+
+
+
+
+
+
         );
       } else {
         console.log('ERROR in handleImgType - unknown condition');
@@ -4268,6 +4340,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // appController   
     // !VA Integer validation is used for all height/width input fields, including those in CCP. If the input value is not of type number, converts it and returns an integer.
     function validateInteger(inputVal) {
+      console.log('validateInteger running');
       let retVal;
       // !VA Handle the CCP input from the fields that should be returning integers. i.e. the numeric inputs in handleKeydown. If they are type string, then convert them to number. If the conversion fails, then throw an error - that means that the user didn't enter a valid numeric string. This returns false if parseInt fails, i.e. returns NaN. Otherwise, it returns the inputVal as integer.
       if (!parseInt(inputVal, 10) || inputVal % 1 !== 0 || inputVal < 0) {

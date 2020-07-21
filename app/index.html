@@ -153,25 +153,25 @@
         <!-- #toolbar-buttons -->
         <ul class="toolbar-buttons btn-group" role="group" aria-label="...">
             <!-- VA! viewerW value is set from localStorage or CSS in calcViewerSize -->
-            <li><input id="ipt-tbr-imgviewerw" class="ttip toolbar-input btn btn-default" type="text" value="" placeholder="650" tabindex="1"></li>
+            <li><input id="ipt-tbr-imgviewerw" class="ttip toolbar-input btn btn-default" type="text" value="" placeholder="650" ></li>
             <!-- TODO: Replace this image with a SVG or HTML entity -->
             <li role="separator"><img class="divider" src="img/divider.png" alt="witty.JS"></li>
-            <li><button id="btn-tbr-incr50" type="button" class="toolbar-but btn btn-default"  tabindex="7"></button></li>
-            <li><button id="btn-tbr-incr10" type="button" class="toolbar-but btn btn-default" tabindex="8"></button></li>
-            <li><button id="btn-tbr-incr01" type="button" class="toolbar-but btn btn-default" tabindex="9"></button></li>
+            <li><button id="btn-tbr-incr50" type="button" class="toolbar-but btn btn-default" tabindex="-1"></button></li>
+            <li><button id="btn-tbr-incr10" type="button" class="toolbar-but btn btn-default" tabindex="-1"></button></li>
+            <li><button id="btn-tbr-incr01" type="button" class="toolbar-but btn btn-default" tabindex="-1"></button></li>
     
-            <li><input id="ipt-tbr-curimgw" class="toolbar-input btn btn-default" type="text" placeholder="W (px)" tabindex="2"></li>
-            <li><input id="ipt-tbr-curimgh" class="toolbar-input btn btn-default" type="text" placeholder="H (px)" tabindex="3"></li>
+            <li><input id="ipt-tbr-curimgw" class="toolbar-input btn btn-default" type="text" placeholder="W (px)"></li>
+            <li><input id="ipt-tbr-curimgh" class="toolbar-input btn btn-default" type="text" placeholder="H (px)" ></li>
     
-            <li><button id="btn-tbr-decr01" type="button" class="toolbar-but btn btn-default" tabindex="10"></button></li>
-            <li><button id="btn-tbr-decr10" type="button" class="toolbar-but btn btn-default" tabindex="11"></button></li>
-            <li><button id="btn-tbr-decr50" type="button" class="toolbar-but btn btn-default" tabindex="12"></button></li>
+            <li><button id="btn-tbr-decr01" type="button" class="toolbar-but btn btn-default" tabindex="-1"></button></li>
+            <li><button id="btn-tbr-decr10" type="button" class="toolbar-but btn btn-default" tabindex="-1"></button></li>
+            <li><button id="btn-tbr-decr50" type="button" class="toolbar-but btn btn-default" tabindex="-1"></button></li>
 
           <li role="separator"><img class="divider" src="img/divider.png" alt="witty.JS"></li>
           <!-- VA! 900 is a dummy value that should be overwritten programmatically by the setAttribute property -->
           <!-- VA! 050920 Changed the values for value, data-sphonesw and data-lphonesw to empty because the dummy value I had in there before was just confusing me  -->
-          <li><input id="ipt-tbr-sphonesw" class="toolbar-input btn btn-default" data-sphonesw="" value="" placeholder="320" type="text" tabindex="4"></li>
-          <li><input id="ipt-tbr-lphonesw" class="toolbar-input btn btn-default" data-lphonesw="" value="" placeholder="414" type="text" tabindex="5"></li>
+          <li><input id="ipt-tbr-sphonesw" class="toolbar-input btn btn-default" data-sphonesw="" value="" placeholder="320" type="text"></li>
+          <li><input id="ipt-tbr-lphonesw" class="toolbar-input btn btn-default" data-lphonesw="" value="" placeholder="414" type="text" ></li>
         </ul> 
         <!-- /#toolbar-buttons -->
 
@@ -192,10 +192,10 @@
               <div class="ccp-options-container">
                 <div class="ccp-options-col-1"> 
                     <!-- VA! Reboot: why no parent div here?-->
-                    <button id="btn-ccp-make-img-tag" class="ccp-but"></button> 
+                    <button id="btn-ccp-make-img-tag" class="ccp-but" tabindex="-1"></button> 
                     <div id="ccp-img-align" class='ttip'> 
                       <label id="sel-ccp-img-align-label" class="col-2-label" for="sel-ccp-img-align">align=</label> 
-                      <select id="sel-ccp-img-align"> 
+                      <select id="sel-ccp-img-align" tabindex="-1"> 
                         <option selected="selected">none</option> 
                         <option>left</option> 
                         <option>middle</option> 
@@ -243,7 +243,7 @@
                       
                       Wrap &lt;img&gt; with anchor tag</label> -->
                     <!-- The default checkbox is hidden -->
-                    <input type="checkbox" checked id="chk-ccp-img-include-anchor-checkbox">
+                    <input type="checkbox" checked id="chk-ccp-img-include-anchor-checkbox" tabindex="-1">
                     <span id="spn-ccp-img-include-anchor-checkmrk"></span>
                     <!-- VA! These options are set in handleTableWidth -->
                   </label> 
@@ -251,13 +251,13 @@
 
                   <div class="ccp-img-type-container">
                     <div id="ccp-img-fixed" class="ccp-img-type" > 
-                      <input name="imgtype" checked type="radio" id="rdo-ccp-img-fixed"  value="imgfixed">
+                      <input name="imgtype" checked type="radio" id="rdo-ccp-img-fixed" value="imgfixed"  tabindex="-1">
                       <label for="rdo-ccp-img-fixed" class="rdo-ccp-img-fixed-label" id="rdo-ccp-img-fixed-label">
                         Fixed image
                     </div>
 
                     <div id="ccp-img-fluid" class="ccp-img-type"> 
-                      <input name="imgtype" type="radio" id="rdo-ccp-img-fluid"  value="imgfluid">
+                      <input name="imgtype" type="radio" id="rdo-ccp-img-fluid" value="imgfluid"  tabindex="-1">
                       <label for="rdo-ccp-img-fluid" class="rdo-ccp-img-fluid-label" id="rdo-ccp-img-fluid-label" >
                         Fluid image
                     </div> 
@@ -265,13 +265,13 @@
                 </div>
                 <div class="ccp-options-col-4"> 
                   <div id="ccp-make-img-dsktp-css-rule" class="ccp-but-container"> 
-                    <button id="btn-ccp-make-img-dsktp-css-rule" class="ccp-but"></button> 
+                    <button id="btn-ccp-make-img-dsktp-css-rule" class="ccp-but" tabindex="-1"></button> 
                   </div>  
                   <div id="ccp-make-img-smphn-css-rule" class="ccp-but-container"> 
-                    <button id="btn-ccp-make-img-smphn-css-rule" class="ccp-but"></button> 
+                    <button id="btn-ccp-make-img-smphn-css-rule" class="ccp-but" tabindex="-1"></button> 
                   </div> 
                   <div id="ccp-make-img-lgphn-css-rule" class="ccp-but-container"> 
-                    <button id="btn-ccp-make-img-lgphn-css-rule" class="ccp-but"></button> 
+                    <button id="btn-ccp-make-img-lgphn-css-rule" class="ccp-but" tabindex="-1"></button> 
                   </div> 
                 </div> 
               </div> <!-- VA! Test -->
@@ -286,10 +286,10 @@
               <div class="ccp-options-container">
                 <div class="ccp-options-col-1"> 
                   <!-- VA! Reboot: why no parent div here? -->
-                    <button id="btn-ccp-make-td-tag" class="ccp-but"></button> 
+                    <button id="btn-ccp-make-td-tag" class="ccp-but" tabindex="-1"></button> 
                     <div id="ccp-td-align"> 
                       <label id="sel-ccp-td-align-label" class="col-1-label" for="sel-ccp-td-align">align=</label> 
-                      <select id="sel-ccp-td-align">
+                      <select id="sel-ccp-td-align" tabindex="-1">
                         <option>none</option> 
                         <option selected="selected">left</option> 
                         <option>center</option> 
@@ -298,7 +298,7 @@
                     </div> 
                     <div id="ccp-td-valign"> 
                       <label id="sel-ccp-td-valign-label" class="col-1-label" for="sel-ccp-td-valign">valign=</label>
-                      <select id="sel-ccp-td-valign"> 
+                      <select id="sel-ccp-td-valign" tabindex="-1"> 
                         <option>none</option> 
                         <option selected="selected">top</option> 
                         <option>middle</option> 
@@ -328,7 +328,7 @@
                     <input type="text" id="ipt-ccp-td-height" placeholder="none" value="" />
                   </div>
                   <div id="ccp-td-bgcolor">
-                    <label id="ipt-ccp-td-bgcolor-label" for="ipt-ccp-td-bgcolor" class="col-2-label" id="ipt-ccp-td-bgcolor-label">bkgrnd  color=</label>
+                    <label id="ipt-ccp-td-bgcolor-label" for="ipt-ccp-td-bgcolor" class="col-2-label" id="ipt-ccp-td-bgcolor-label">bkgrnd color=</label>
                     <input type="text" id="ipt-ccp-td-bgcolor" placeholder="none" value="" />
                   </div>
                   <div id="ccp-td-fontcolor">
@@ -343,48 +343,48 @@
                 <div class="ccp-options-col-3">
 
                   <div id="ccp-td-basictd" > 
-                    <input name="tdoptions" checked type="radio" id="rdo-ccp-td-basic"  value="basic">
-                    <label class="rdo-ccp-td-basic-label" id="rdo-ccp-td-basic-label" for="rdo-ccp-td-basic">
+                    <input name="tdoptions" checked type="radio" id="rdo-ccp-td-basic" value="basic" tabindex="-1">
+                    <label class="rdo-ccp-td-basic-label" id="rdo-ccp-td-basic-label" for="rdo-ccp-td-basic" tabindex="-1">
                       &lt;td&gt; with options
                   </div> 
 
                   <div id="ccp-td-basictd-excludeimg" > 
-                    <input name="tdoptions" type="radio" id="rdo-ccp-td-excludeimg"  value="excludeimg">
+                    <input name="tdoptions" type="radio" id="rdo-ccp-td-excludeimg" value="excludeimg" tabindex="-1">
                     <label class="rdo-ccp-td-excludeimg-label" id="rdo-ccp-td-excludeimg-label" for="rdo-ccp-td-excludeimg">
                       &lt;td&gt; with options (exclude &lt;img&gt;)
                   </div>
 
                   <div id="ccp-td-posswitch" > 
-                    <input name="tdoptions" type="radio" id="rdo-ccp-td-posswitch" value="posswitch">
+                    <input name="tdoptions" type="radio" id="rdo-ccp-td-posswitch" value="posswitch" tabindex="-1">
                     <label class="rdo-ccp-td-posswitch-label" id="rdo-ccp-td-posswitch-label" for="rdo-ccp-td-posswitch-radio">
                       RTL Position Switch
                   </div> 
 
                   <div id="ccp-td-imgswap" > 
                     <!-- The default checkbox is hidden -->
-                    <input name="tdoptions" type="radio" id="rdo-ccp-td-imgswap" value="imgswap">
+                    <input name="tdoptions" type="radio" id="rdo-ccp-td-imgswap" value="imgswap" tabindex="-1">
                     <label class="rdo-ccp-td-imgswap-label" id="rdo-ccp-td-imgswap-label" for="rdo-ccp-td-imgswap">
                       Mobile image swap
                   </div> 
 
                   <div id="ccp-td-bgimage" > 
-                    <input type="radio" name="tdoptions" id="rdo-ccp-td-bgimage" value="bgimage">
+                    <input type="radio" name="tdoptions" id="rdo-ccp-td-bgimage" value="bgimage" tabindex="-1">
                     <label class="rdo-ccp-td-bgimage-label" id="rdo-ccp-td-bgimage-label" for="rdo-chk-ccp-td-bgimage">
-                      Background image by <a class="ccp-link" href="https://backgrounds.cm/">Stig</a>
+                      Background image by <a class="ccp-link" href="https://backgrounds.cm/" tabindex="-1">Stig</a>
                       </label>
                   </div> 
 
                   <div id="ccp-td-vmlbutton" > 
-                    <input type="radio" name="tdoptions" id="rdo-ccp-td-vmlbutton" value="vmlbutton">
+                    <input type="radio" name="tdoptions" id="rdo-ccp-td-vmlbutton" value="vmlbutton" tabindex="-1">
                     <label class="rdo-ccp-td-vmlbutton-label" id="rdo-ccp-td-vmlbutton-label" for="rdo-chk-ccp-td-vmlbutton">
-                      VML Button by <a class="ccp-link" href="https://buttons.cm/">Stig</a>
+                      VML Button by <a class="ccp-link" href="https://buttons.cm/" tabindex="-1">Stig</a>
                       </label>
                   </div>
                 </div>
                 <div class="ccp-options-col-4"> 
-                  <button id="btn-ccp-make-td-dsktp-css-rule" class="ccp-but"></button> 
-                  <button id="btn-ccp-make-td-smphn-css-rule" class="ccp-but"></button> 
-                  <button id="btn-ccp-make-td-lgphn-css-rule" class="ccp-but"></button> 
+                  <button id="btn-ccp-make-td-dsktp-css-rule" class="ccp-but" tabindex="-1"></button> 
+                  <button id="btn-ccp-make-td-smphn-css-rule" class="ccp-but" tabindex="-1"></button> 
+                  <button id="btn-ccp-make-td-lgphn-css-rule" class="ccp-but" tabindex="-1"></button> 
                 </div> 
               </div>
             </fieldset>
@@ -397,7 +397,7 @@
               <div class="ccp-options-container">  
                 <div class="ccp-options-col-1">
                     <!-- VA! Reboot: why no parent div here-->
-                  <button id="btn-ccp-make-table-tag" class="ccp-but"></button> 
+                  <button id="btn-ccp-make-table-tag" class="ccp-but" tabindex="-1"></button> 
                 </div> 
                 <div class="ccp-options-col-2">
                   <p class="ccp-heading">Parent Table</p>
@@ -412,7 +412,7 @@
                   <div id="ccp-table-align"> 
                     <label class="col-2-label" id="sel-ccp-table-align-label" for="sel-ccp-table-align">align=</label> 
                     <!-- We can hard code these because there isn't any dynamic data -->
-                    <select id="sel-ccp-table-align"> 
+                    <select id="sel-ccp-table-align" tabindex="-1"> 
                       <option>none</option>
                       <option>left</option> 
                       <option selected="selected">center</option> 
@@ -420,7 +420,7 @@
                     </select>
                   </div>
                   <div id="ccp-table-bgcolor">
-                      <label id="ipt-ccp-table-bgcolor-label" class="col-2-label" for="ipt-ccp-table-bgcolor" id="ipt-ccp-table-bgcolor-label">bkgrnd  color=</label>
+                      <label id="ipt-ccp-table-bgcolor-label" class="col-2-label" for="ipt-ccp-table-bgcolor" id="ipt-ccp-table-bgcolor-label">bkgrnd color=</label>
                       <input type="text" id="ipt-ccp-table-bgcolor" placeholder="none" value="" />
                   </div> 
                 </div>
@@ -436,7 +436,7 @@
                         <!-- <label class="ccp-table-include-wrapper-label mock-checkbox" id="ccp-table-include-wrapper-label" for="chk-ccp-table-include-wrapper-checkbox">Include wrapper table
                         </label> -->
                       <!-- The default checkbox is hidden -->
-                      <input type="checkbox" disabled id="chk-ccp-table-include-wrapper-checkbox">
+                      <input type="checkbox" disabled id="chk-ccp-table-include-wrapper-checkbox" tabindex="-1">
                       <span id="spn-ccp-table-include-wrapper-checkmrk"></span>
                       <!-- VA! These options are set in handleTableWidth -->
                     </label> 
@@ -451,7 +451,7 @@
                   </div> 
                   <div id="ccp-table-wrapper-align"> 
                     <label id="sel-ccp-table-wrapper-align-label" class="col-3-label" for="sel-ccp-table-wrapper-align">align=</label>
-                    <select id="sel-ccp-table-wrapper-align"> 
+                    <select id="sel-ccp-table-wrapper-align" tabindex="-1"> 
                       <option>none</option>
                       <option>left</option> 
                       <option selected="selected">center</option> 
@@ -495,7 +495,7 @@
             <!-- DEVIMG HERE -->
             <div id="cur-img-container">
               <!-- <img src="img/witty-logo-colors-dark.png" data-is-dev1=true  id="cur-img" alt=""> -->
-              <!-- <img src="img/_200X150.png" id="cur-img" alt=""> -->
+              <img src="img/_200X150.png" id="cur-img" alt="">
               <!-- <img src="img/_625X525.png" data-is-dev1=true    id="cur-img" alt=""> -->
               <!-- <img src="img/bo-ben.png" data-is-dev1=true    id="cur-img" alt=""> -->
             </div>
