@@ -7,12 +7,15 @@
 =========================================================
 JULY REVIEW:
 // !VA Branch: review0720H (071720)
+NOTE: img class doesn't output to bgimage
 
 DONE: Changed default tableAlign option for imgType fluid to ‘none’ and updated tableAlign attribute to make it editable. 
 DONE: Made default tableWrapperClass for imgType fluid not disabled. It still has the default value of responsive-table, but it is now editable as per Litmus template.
 DONE: In excludeimg, if parent table is empty and td width is provided, then the td width is greater than the empty parent table input and throws an error. Added condition in checkNumericInput/tableWidth that overrides the error condition if Appobj.iptCcpTableWidth is empty.
 DONE: Width and height inputs don't allow percents - they must. Added checkPercent(val) to checkUserInput as condition so that if evtTargetVal is a valid percent it is returned without any numeric error checking.
 DONE: In excludeimg mode, clicking on the makeCSSRule button should include the class name in the output, currently it just shows td. { }. THis could be useful for adding text properties in the empty brackets.
+DONE: Set tab order with tabindex
+TODO: bgimage shows undefined instead of curImg
 
 TODO: Numeric values 
 TODO: CCP is opening with after loading new image with the fluid option selected, if that is what the last selection was. It should always open after loading a new image wiht the fixed option selected.
@@ -898,6 +901,8 @@ var Witty = (function () {
       // !VA Branch: implementCcpInput02 (062420)
       // !VA We don't need the entire Appobj here. What we should do is call rest parameters on what we need and then destructure the return array into separate variables. This needs to be done when getAttributes is reevaluated since there appears to be a lot of unnecessary DOM access here.
       Appobj = appController.getAppobj();
+      console.log('Appobj is: ');
+      console.log(Appobj);
       let checked, str, ccpElementId, imgType, Attributes, retObj;
       // !VA Create the array to return. First value is the id of the CCP element, second value is the string to write to the CCP element. If the first value is false, then the str isn't queried from a Ccp element, but rather is generated in the Attribute based on other conditions. For instance, the img style attribute is conditioned on the fluid/fixed option, but writes to the style attribute of the img tag.
       // !VA Branch: implementCcpInput06 (062820)
@@ -946,6 +951,7 @@ var Witty = (function () {
           ccpElementId = false;
           // !VA Branch: implementCcpInput06 (062820)
           // !VA If the path input element is not empty, include the Appobj.iptCcpImgRelPath, otherwise just use the filename without the path
+          console.log('Appobj.fileName is: ' + Appobj.fileName);
           Appobj.iptCcpImgRelPath !== '' ? str = Appobj.iptCcpImgRelPath + '/' + Appobj.fileName : str = Appobj.fileName;
           retObj = returnObject( ccpElementId, str);
           return retObj;
@@ -1104,7 +1110,8 @@ var Witty = (function () {
         tdBackground: (function() {
           // !VA This value is get-only
           ccpElementId = false;
-          retObj = returnObject( ccpElementId, document.querySelector(ccpUserInput.iptCcpImgRelPath).value + '/' + (Appobj.fname) );
+          // !VA 
+          retObj = returnObject( ccpElementId, Appobj.iptCcpImgRelPath + '/' + (Appobj.fileName) );
           return retObj;
         })(),
         // !VA TABLE attributes
@@ -1963,8 +1970,15 @@ var Witty = (function () {
     // !VA UIController   
     // !VA Called from buildOutputNodeList. Gets the clipboardStr that comprises the MS Conditional code for the Bgimage.
     function getBgimageBlock( id, indentLevel, Attributes ) {
+      console.log('getBgimageBlock running');
       // !VA Keeping the original reference to fallback for posterity for now
       // let bgimageStr, fallback, bgcolor;
+
+      console.log('Attributes is: ');
+      console.log(Attributes);
+      console.log('Attributes.tdBackground.str is: ' + Attributes.tdBackground.str);
+
+
       let bgimageStr, bgcolor;
       let linebreak;
       linebreak = '\n';
@@ -1973,7 +1987,7 @@ var Witty = (function () {
       // fallback = '#7bceeb';
       Attributes.tdBgcolor.str ? bgcolor = Attributes.tdBgcolor.str : bgcolor = document.querySelector(ccpUserInput.iptCcpTdBgColor).value;
       // !VA Define the innerHTML of the bgimage code
-      bgimageStr = `${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth.str}px;height:${Attributes.imgHeight.str}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.tdBackground.str}" color="${bgcolor}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}${getIndent(indentLevel)}<div>${linebreak}${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div>${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}  </v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect>${linebreak}${getIndent(indentLevel)}<![endif]-->`;
+      bgimageStr = `${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth.str}px;height:${Attributes.imgHeight.str}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc.str}" color="${Attributes.tdBgcolor.str}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}${getIndent(indentLevel)}<div>${linebreak}${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div>${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}  </v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect>${linebreak}${getIndent(indentLevel)}<![endif]-->`;
       // !VA Return the code block with line breaks and indents
       return bgimageStr;
     }
