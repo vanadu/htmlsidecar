@@ -7,6 +7,7 @@
 =========================================================
 JULY REVIEW:
 
+
 // !VA Branch: review0720I (071720)
 TODO: Review fluid functionality.
   * Litmus template appears to always have parent table with 100% width and a wrapper table with max-width and the class responsive-table. 
@@ -953,7 +954,6 @@ var Witty = (function () {
           ccpElementId = false;
           // !VA Branch: implementCcpInput06 (062820)
           // !VA If the path input element is not empty, include the Appobj.iptCcpImgRelPath, otherwise just use the filename without the path
-          console.log('Appobj.fileName is: ' + Appobj.fileName);
           Appobj.iptCcpImgRelPath !== '' ? str = Appobj.iptCcpImgRelPath + '/' + Appobj.fileName : str = Appobj.fileName;
           retObj = returnObject( ccpElementId, str);
           return retObj;
@@ -1123,7 +1123,6 @@ var Witty = (function () {
           // !VA Branch: review0720F (071720)
           // !VA This is wonky
           if (imgType === 'fixed') {
-            console.log('Mark1');
             // !VA If imgType is fixed, then set tableClass to 'devicewidth' if the curImgW equals the imgViewerW. Otherwise, set it to the user input. 
             // !VA Branch: review0720F (071720)
             // !VA The default is set in the UI, so just set iptCcpTableClass to the Appobj property.
@@ -1155,13 +1154,10 @@ var Witty = (function () {
           // !VA Now, set str based on whether fixed or fluid
           imgType === 'fixed' ? str = fixedStr : str = '100%';
           // !VA Then, if the tdoption is excludeimg, modify the imgTypeStr accordingly
-          console.log('str is: ' + str);
           // !VA Include handling for imgType -- if fixed the input preset is Appobj.curImgW, if fluid then it is 100%
           // imgType === 'fixed' ? str = Appobj.curImgW : str = '100%';
           // imgType === 'fixed' ? str = Appobj.curImgW : str = '100%';
           retObj = returnObject( ccpElementId, str );
-          console.log('tableWidth retObj: ');
-          console.dir(retObj);
           return retObj;
         })(),
         tableBgcolor: (function() {
@@ -1389,6 +1385,7 @@ var Witty = (function () {
     // !VA CBController   
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
     function buildOutputNodeList( id ) {
+      console.clear();
       let selectedTdOption, hasAnchor, hasWrapper, Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
       // !VA Get the selected TD option
       selectedTdOption = getSelectedTdOptionFromAppobj();
@@ -1446,6 +1443,7 @@ var Witty = (function () {
         case ( '#' + id === btnCcpMakeClips.btnCcpMakeTableTag):
           // !VA basic or excludeimg option is selected 
           // !VA We can hardcode the 'rdoCcpTdBasic' and 'rdoCcpTdPosswitch' positions for now, but these will have to be revisited if any new options are added that change the outputNL indices. 
+
           if (hasWrapper) {
             // !VA The Include wrapper table option is selected, so the entire nodeList is extracted
             extractPos = 0;
@@ -1464,6 +1462,29 @@ var Witty = (function () {
         // !VA Create the outputNL nodeList to pass to the Clipboard object
         outputNL = container.querySelectorAll('*');
         applyIndents( id, outputNL );
+
+
+
+        // !VA Branch: ghost01 (072820)
+        // !VA NOW is when we apply ghost tables  
+
+        // if ( appController.getAppobj('rdoCcpImgFluid')) {
+        //   console.log('HIT');
+        //   console.log('outputNL[0]' + outputNL[0]);
+        //   var foo = outputNL[0];
+        //   foo.insertAdjacentHTML('beforeend', 'a;lsdkfaslkdfas;ldkfj\n');
+        //   console.log('foo is: ');
+        //   console.log(foo.outerHTML);
+          
+
+
+
+        // }
+
+
+
+
+
         clipboardStr = outputNL[0].outerHTML;
 
       // !VA These options include MS conditional code retrieved by getImgSwapBlock, getBgimageBlock, getVMLBlock which includes getIndent functions. First, run applyIndents on outputNL. applyIndents also inserts tokens at the position where the codeBlock is to be inserted. The parent nodelist is converted to a string, the code blocks are retrieved, indents are inserted, and finally the codeblocks are inserted into the string between the tags of the last node in the outputNL.outerHTML string. 
@@ -1502,9 +1523,14 @@ var Witty = (function () {
         outputNL = container.querySelectorAll('*');
         // !VA Apply the indents and insert the tokens marking the position for inserting the MS conditional code.
 
+        console.log('outputNL is: ');
+        console.log(outputNL);
+
         applyIndents(id, outputNL);
         // !VA Convert outputNL to a string (including tokens for inserting MS conditional code) for output to Clipboard object.
         clipboardStr = outputNL[0].outerHTML;
+        console.log('outputNL[0] is: ');
+        console.log(clipboardStr);
         // !VA Get the codeBlock corresponding to the selected TD option
         if ( selectedTdOption === 'rdoCcpTdImgswap') {
           codeBlock = getImgSwapBlock( id, indentLevel, Attributes);
@@ -1512,11 +1538,44 @@ var Witty = (function () {
           codeBlock = getBgimageBlock(id, indentLevel, Attributes);
         } else if (selectedTdOption === 'rdoCcpTdVmlbutton') {
           codeBlock = getVmlButtonBlock(id, indentLevel, Attributes);
-        }
+        } 
         // !VA Replace the tokens in clipboardStr that were added in applyIndents with the respective codeBlock
         clipboardStr = clipboardStr.replace('/replacestart//replaceend/', codeBlock + '\n');
       } 
+
+
+
+
       // !VA Convert the alias of the clicked button to an ID the Clipboard object recognizes and write clipboardStr to the clipboard.
+      // console.log('clipboardStr is before ghost tables is: ');
+      // console.log(clipboardStr);
+
+
+
+
+
+      // !VA Branch: ghost01 (072820)
+      // !VA This may be the only place to create the ghost tables.
+      var ghostopen;
+      ghostopen = `<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="${appController.getAppobj('curImgW')}">
+<tr>
+<td align="center" valign="top" width="${appController.getAppobj('curImgW')}">
+<![endif]-->\n`;
+      var ghostclose;
+      ghostclose = `\n<!--[if (gte mso 9)|(IE)]>
+</td>
+</tr>
+</table>
+<![endif]-->`;
+
+
+      if ( appController.getAppobj('rdoCcpImgFluid')) {
+        clipboardStr = ghostopen + clipboardStr + ghostclose;
+      }
+
+      
+      console.log('clipboardStr is:');
       console.log(clipboardStr);
       writeClipboard( id, clipboardStr );
     }
@@ -1933,6 +1992,11 @@ var Witty = (function () {
       tableOuter.appendChild(trOuter);
       // !VA Append the outer td to the outer tr
       trOuter.appendChild(tdOuter);
+
+
+      // !VA Branch: ghost01 (072820)
+
+
       // !VA Add the outer td attributes
       // !VA Add to the node only if the option 'none' is not selected
       if (Attributes.tdAlign.str) { tdOuter.align = Attributes.tdAlign.str; }
@@ -1943,6 +2007,11 @@ var Witty = (function () {
       tdOuter.appendChild(tableInner);
       // !VA Pass the outer table to the tableNodeFragment.
       // tableNode = tableOuter;
+
+
+
+
+      
       // !VA Append the wrapper table to the node fragment and return it
       tableNodeFragment.appendChild(tableOuter);
       return tableNodeFragment;
@@ -2011,6 +2080,17 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
       return vmlButtonStr;
     }
+
+    function getGhostTableOpeningTag (id, indentLevel, Attributes) {
+
+
+
+
+
+
+      
+    }
+
     // !VA END TD OPTIONS MS-CONDITIONAL CODE BLOCKS
 
     // !VA INDENT FUNCTIONS
@@ -4044,7 +4124,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         Appobj.iptCcpTableClass = '';
         Appobj.selCcpTableAlign = 'none';
         // Appobj.selCcpTableAlign = '';
-        console.log('Appobj.selCcpTableAlign is: ' + Appobj.selCcpTableAlign);
         Appobj.iptCcpTableWrapperWidth = '100%';
         Appobj.iptCcpTableWrapperClass = 'responsive-table';
         Appobj.iptCcpTdClass = '';
@@ -4097,17 +4176,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           ['iptCcpImgClass', 'setdisabledtextinput'], 
           ['iptCcpTableWidth', 'setdisabledtextinput'], 
           ['iptCcpTableClass', 'setdisabledtextinput'], 
-          ['iptCcpTableWrapperWidth', 'setdisabledtextinput'], 
+          ['iptCcpTableWrapperWidth', 'setdisabledtextinput'] 
           // ['iptCcpTableWrapperClass', 'setdisabledtextinput'],
           // !VA Branch: review0720H (072020)
           // !VA Need to set the parent table align option to none and disable it - can we use set
-
-
-
-
-
-
         );
+
+        // !VA Branch: ghost01 (072820)
+        // !VA Put code for ghost table here
+
+
       } else {
         console.log('ERROR in handleImgType - unknown condition');
       }
