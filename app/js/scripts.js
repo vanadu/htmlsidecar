@@ -6,35 +6,37 @@
 /* !VA  - June Reboot Notes
 =========================================================
 JULY REVIEW:
-// !VA Branch: review0720H (071720)
-NOTE: img class doesn't output to bgimage
 
+// !VA Branch: review0720I (071720)
+TODO: Review fluid functionality.
+  * Litmus template appears to always have parent table with 100% width and a wrapper table with max-width and the class responsive-table. 
+  * Litmus template always has a ghost table around any table with the max-width style property.
+
+
+TODO: Make sure the fluid functionality switches properly - there was an instance of the necessary options not appearing when the fluid radio was clicked. 
+TODO: In bgimage option, none of the img options write any output to the td. They need to be disabled or undisplayed.
+TODO: CCP is opening with after loading new image with the fluid option selected, if that is what the last selection was. It should always open after loading a new image wiht the fixed option selected.
+TODO: Changing TD Options resets all the CCP options to default - that is annoying. Always check the TD Option first, or fix it - or make sure loading a new image resets the TD Option to Td Basic.
+
+// !VA Branch: review0720H (071720)
 DONE: Changed default tableAlign option for imgType fluid to ‘none’ and updated tableAlign attribute to make it editable. 
 DONE: Made default tableWrapperClass for imgType fluid not disabled. It still has the default value of responsive-table, but it is now editable as per Litmus template.
 DONE: In excludeimg, if parent table is empty and td width is provided, then the td width is greater than the empty parent table input and throws an error. Added condition in checkNumericInput/tableWidth that overrides the error condition if Appobj.iptCcpTableWidth is empty.
 DONE: Width and height inputs don't allow percents - they must. Added checkPercent(val) to checkUserInput as condition so that if evtTargetVal is a valid percent it is returned without any numeric error checking.
 DONE: In excludeimg mode, clicking on the makeCSSRule button should include the class name in the output, currently it just shows td. { }. THis could be useful for adding text properties in the empty brackets.
 DONE: Set tab order with tabindex
-TODO: bgimage shows undefined instead of curImg
-
-TODO: Numeric values 
-TODO: CCP is opening with after loading new image with the fluid option selected, if that is what the last selection was. It should always open after loading a new image wiht the fixed option selected.
-
+DONE: bgimage shows undefined instead of curImg, fixed in getBgimageBlock
 
 // !VA Branch: review0720F (071720)
 DONE: Create condition in Attributes.tableWidth property to ensure that the iptCcpTdWidth input element shows the value of the input element when the tdoption excludeimg is selected, and otherwise shows the value of Appobj.curImgW. 
 DONE: Fix undefined error in CCP input on TAB or ENTER - Added condition to skip error checking if evtTargetVal is empty and set Appobj property to empty string.
 DONE: Add error handling for excludeimg TD option for tableWidth, tableWrapperWidth and tdWidth inputs. NOTE: Don't forget, ALL ERROR HANDLING FOR NUMERIC INPUTS IS IN checkNumericInput.
 
-
 // !VA Branch: fixEventHandling04 (071720)
 DONE: fixed event handling...so far. Cleaned up, commented, merged to master
 
 // !VA Branch: fixEventHandling02 (071620)
 DONE: Change input type to number for all numeric input elements and add the CSS line that suppresses the default increment/decrement arrows on the number inputs.
-
-
-
 
 Branch review0720C
 DONE - Fixed, added conditions for excludeimg to TD ptions to buildCssRule. Problem: excludeimg: height and width fields don't write to clipboard properly. When 90/18 are entered in the inputs, width writes as 30, height as 600. This is because that's the image that's currently loaded. Excludeimg has to override the Appobj property without writing to the property. It also has to override any error checking related to the loaded image - but not the imgViewerW, it still can't be greater than that. Ugh!
