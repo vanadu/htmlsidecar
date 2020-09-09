@@ -3601,7 +3601,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Destructure userInputObj
       // !VA TODO: I don't think evtTargetId is ever used...remove?
       // const { evtTargetId, appObjProp, evtTargetVal } = userInputObj;
-      const { appObjProp, evtTargetVal } = userInputObj;
+      const { evtTargetVal } = userInputObj;
       // !VA Add string validation here if required
       retVal = evtTargetVal;
       return retVal;
@@ -3769,39 +3769,40 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       switch(true) {
       case alias === 'default' :
         // !VA For initialization, resetArray includes aliases in mkcssReset, defaultReset and wraprReset 
-        configObj = defaultConfig( alias, option);
+        configObj = configDefault( alias, option);
         break;
       case alias === 'ccpImgExcldRdo' :
-        // !VA Set option to !option to make this work - otherwise it sticks on 'true'. For later...
-        Appobj[alias] = option;
-        configObj = excldConfig( alias, option );
+        // !VA Branch: 0909A
+        // !VA Deprecating... Appobj is set in handleRadioEvent
+        // Appobj[alias] = option;
+        // !VA Get the CCP configuration for the IMG Exclude Image radio switch
+        configObj = configExcld( alias, option );
         break;
       case alias === 'ccpImgItypeRdo' :
-        // !VA Set option to !option to make this work - otherwise it sticks on 'true'. For later...
-        Appobj[alias] = option;
-        configObj = itypeConfig( alias, option );
+        // !VA Branch: 0909A
+        // !VA Deprecating... Appobj is set in handleRadioEvent
+        // Appobj[alias] = option;
+        // !VA Get the CCP configuration for the IMG Itype (fixed/fluid) radio switch
+        configObj = configItype( alias, option );
         break;
       case alias === 'ccpTdaOptnsRdo' :
-        if ( option === 'basic' || option === 'swtch') {
-          configObj = defaultConfig( alias, option);
-        } else {
-          configObj = optnsConfig( alias, option );
-        }
+        // !VA Get the configuration for the selected TD Option
+        // !VA Branch: 0909A
+        // !VA Deprecating...
+        // if ( option === 'basic' || option === 'swtch') {
+        //   configObj = configDefault( alias, option);
+        // } else {
+        //   configObj = configOptns( alias, option );
+        // }
+        configObj = configOptns( alias, option );
         break;
       case alias === 'ccpTblWraprChk' :
-        // !VA Set option to !option to make this work - otherwise it sticks on 'true'. For later...
-        // !VA Branch: OVERHAUL0908
-        // !VA Getting rid of this backwardsy thing
-        // Appobj[alias] = option;
-        configObj = wraprConfig( alias, option );
+        // !VA Get the CCP configuration for the Include Wrapper checkbox icon
+        configObj = configWrapr( alias, option );
         break;
       case alias === 'ccpTblHybrdChk' :
-        // !VA Branch: OVERHAUL0908B
-        // !VA Option is the parameter passed in from selectCheckbox - in that context it is passed as isChecked, so it reflects the checked state of ccpTblHybrdChk
-        // !VA Set Appobj to the current checked state of ccpTblHybrdChk
-        // Appobj[alias] = option;
-        // !VA Call hybrdConfig to get the configObj, i.e. the methods and properties to pass to configCCP for configuring the CCP for the Hybrid option.
-        configObj = hybrdConfig( alias, option );
+        // !VA Get the configObj, i.e. the methods and properties to pass to configCCP for configuring the CCP for the Hybrid option.
+        configObj = configHybrd( alias, option );
         break;
       
       default:
@@ -4272,8 +4273,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA Branch: OVERHAUL0906B
     // !VA configs
-    function defaultConfig( alias, option ) {
-      let configObj, reflectArray, radioArray, revealReset, checkedArray;
+    function configDefault( alias, option ) {
+      let configObj, reflectArray, radioArray, checkedArray;
 
 
       // !VA APPOBJ PROPERTIES
@@ -4311,28 +4312,36 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController private
-    function excldConfig( alias, option) {
-      let configObj, revealArray, flag;
+    function configExcld( alias, option) {
+      let configObj, revealArray, revealFlag, radioArray;
       selectTdaOptions('basic');
-      Appobj[alias] = option;
+      // !VA Branch: 0909A
+      // !VA Note: Appobj for ccpImgExcldRdo is set in handleRadioEvent
+      // !VA revealFlag is false because elements are revealed by REMOVING the ccp-conceal-ctn class
+      revealFlag = false;
+
+      // !VA radioState METHOD
+      // !VA Set the array of radio element states to set, i.e. the current element - do this for both incld and excld
+      radioArray = [ 'ccpImgExcldRdo' ];
+      // !VA Toggleable config properties
       if ( option === 'excld') {
-        flag = false;
+        // !VA revealElements METHOD
+        // !VA Set the array of elements to reveal
         revealArray  = [ 'ccpImgExcldRdo', 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo' ];
         // revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgItypeRdo', ];
-
       } else {
-        flag = false;
         revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaOptnsRdo'  ];
       }
       configObj = {
         // !VA revealReset conceals all the elements, i.e. hides the ones that aren't explicitly revealed with revealElements.
+        radioState: { radio: radioArray },
         revealReset: { alias: alias },
-        revealElements: { flag: flag, reveal: revealArray }
+        revealElements: { flag: revealFlag, reveal: revealArray }
       };
       return configObj;
     }
     // !VA appController private
-    function itypeConfig( alias, option) {
+    function configItype( alias, option) {
       let configObj, reflectArray, radioArray;
       // !VA REFLECT APPOBJ to TEXT INPUT FIELDS
       option === 'fluid' ?  Appobj['ccpImgClassTfd'] = 'img-fluid' : Appobj['ccpImgClassTfd'] = '';
@@ -4346,18 +4355,19 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController private
-    function optnsConfig( alias, option ) {
+    function configOptns( alias, option ) {
       let revealFlag, revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray;
       let configObj = {};
       // !VA Branch: OVERHAUL0908
       // !VA Appobj is set in handleRadioEvent
       // Appobj[alias] = option;
       // !VA Branch: OVERHAUL0908C
-      // !VA Option will never be basic or swtch here - they get their config from defaultConfig. That's not ideal, the call to defaultConfig should be made from here, not fetchConfigObj
+      // !VA Option will never be basic or swtch here - they get their config from configDefault. That's not ideal, the call to configDefault should be made from here, not fetchConfigObj
       if ( option === 'basic' || option === 'swtch') {
-        console.log('optnsConfig basic');
-        // !VA Branch: OVERHAUL0906B
-        // !VA Nothing happens here - for basic and swtch the config is set in fetchConfigObj to fetch the defaultConfig, only including this condition for future use.
+        console.log('configOptns basic');
+        // !VA Branch: 0909A
+        // !VA For the TD Options basic and swtch, use the default CCP configuration
+        configObj = configDefault( alias, option );
       } else {
         // !VA Now handle the other TD Options
         switch(true) {
@@ -4501,7 +4511,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController private
-    function wraprConfig( alias, isChecked ) {
+    function configWrapr( alias, isChecked ) {
       // !VA Branch: OVERHAUL0908
       let configObj, revealFlag, revealArray;
       
@@ -4521,8 +4531,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController private
-    function hybrdConfig( alias, isChecked ) {
-      // console.log('hybrdConfig running'); 
+    function configHybrd( alias, isChecked ) {
+      // console.log('configHybrd running'); 
       let checkedArray, radioArray, reflectArray, revealFlag, revealArray, disableFlag, disableArray;
       let configObj = {};
 
@@ -4578,7 +4588,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA revealElements METHOD
       // !VA Set the reveal flag. The reveal flag is the opposite of the isChecked property because the ccp-conceal-ctn class is REMOVED in order to reveal the elements.
       revealFlag = !isChecked;
-      // !VA Set the array of the elements to be revealed  according to the APPOBJ PROPERTIES set above. IMPORTANT: These correspond to the Table Wrapper options. They are being set manually here instead of calling wraprConfig to set the configuration for transparency and simplicity's sake. 
+      // !VA Set the array of the elements to be revealed  according to the APPOBJ PROPERTIES set above. IMPORTANT: These correspond to the Table Wrapper options. They are being set manually here instead of calling configWrapr to set the configuration for transparency and simplicity's sake. 
       revealArray = [  'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
 
       // !VA disableElements METHOD
