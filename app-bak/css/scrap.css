@@ -1,0 +1,11 @@
+body {
+  background: #000000;
+}
+#main-image {
+  position: relative;
+  display: block;
+}
+#cur-img {
+  display: block;
+  margin: 0 auto;
+}

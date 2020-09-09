@@ -1,0 +1,507 @@
+<!--   Copyright 2018 Van L. Albert
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License. -->
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr" itemscope itemtype="http://schema.org/Article">
+<head>
+  <meta charset="utf-8">
+  <title>witty-js v1.01</title>
+  
+
+  <meta name="description" content="HTML Email builder tool to set image dimensions and get image info (i.e. aspect ratio) and build tabular HTML code snippets.">
+  <meta name="keywords" content="HTML Email, image, dimensions, aspect ratio, builder, tabular, tables, tool, CSS, code, snippets">
+  <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,400italic,600,800|Source+Code+Pro" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Ubuntu&display=swap" rel="stylesheet">
+
+  <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@600&display=swap" rel="stylesheet"> 
+
+  <link rel="icon" href="/favicon_16x16.ico?v=2" type="image/x-icon"/>
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"> -->
+  <link rel="stylesheet" media="all" href="css/style.css">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5-els.js"></script>
+  <![endif]-->
+
+</head>
+<!-- <html> -->
+<!-- /this script on the body tag prevents unwanted triggering of the handleFileSelect function if app elements are inadvertently dragged; not sure if this is the best way to do this. -->
+<BODY ondragstart="return false;" ondrop="return false;">
+
+  <!-- HEADER -->
+  <!-- /.header-container -->
+
+  <div class="header-isolate-app isolate">
+    <img src="img/isolate-witty.png" alt="" class="src">
+  </div>
+
+
+  <div class="header-container">
+    <!-- .header-content -->
+    <div class="header-content">
+      <div class="header-image">
+        <a href="#"><img id="testme" src="img/witty-logo-colors-dark.png" alt="witty" class="header-img left"></a>
+      </div>
+
+      <div class="header-text">
+        <div class="header-logo">
+          <h1 id="testme2">witty-js.com</h1>
+          <div class="header-version"><p>v 1.02</p></div>
+        </div>
+  
+        <div class="header-slug">
+          <h2><span class="slug-initial-cap initial-cap">W</span>ebapp for <span class="slug-initial-cap initial-cap">I</span>mage <span class="slug-initial-cap initial-cap">T</span>ags and <span class="slug-initial-cap initial-cap">T</span>abular La<span class="slug-initial-cap initial-cap">y</span>outs</h2> 
+        </div>
+      </div>
+      <!-- .header-subtext -->
+    </div><!-- /.header-content -->
+  </div><!-- /.header-container -->
+
+  
+
+  <!-- APP -->
+  <!-- #app-container -->
+  <div id="app-container">
+      <div id="app-blocker"></div>
+      <div id="app-message-container">
+        <p id="tip-content">
+          <!-- Placeholder error message -->
+        <!-- <span class="tooltip-heading">Display Size:</span> Scaled image dimensions if smaller than Size On Disk. Set width or height in toolbar. Shift+Click to copy attributes. Ctrl+Click to copy style properties.  -->
+        </p>
+        <p id="msg-content">
+          <!-- Placeholder status message -->
+        </p>
+        <p id="err-content">
+          <!-- Placeholder error message -->
+        </p>
+      </div>
+
+
+    <!-- #image-viewport -->
+    <div id="image-viewport">
+
+      <!-- #ccp clipboard control panel -->
+      <div id="ccp">
+        <div class="overlay">
+          <!-- <img src="img/_FigmaCCPScreenshot_08.16.20K.png" alt=""> -->
+        </div>
+        <!-- VA! 08.13.20A -->
+        <!-- VA! Removed -->
+        <!-- <h2>Clipboard Options</h2> -->
+        <!-- #ccp-content -->
+        <div id="ccp-content">
+          <!-- #ccp-content -->
+          <fieldset id="ccp-img-options" class="ccp-fieldset">
+            <!-- VA! 08.13.20A -->
+            <!-- VA! Removed 'options' -->
+            <legend>&lt;img&gt;</legend>
+              <div class="ccp-options-container">
+                <!-- VA!  Make clip buttons -position absolute -->
+                <div id="img-clipboard-buttons" class="clipboard-buttons">
+                  <button id="btn-ccp-make-img-tag" class="ccp-but make-html-but" tabindex="-1"></button>
+                  <div class="btn-ccp-make-css-rule-wrapper">
+                    <button id="btn-ccp-make-img-dsktp-css-rule" class="ccp-but make-css-but" tabindex="-1"></button> 
+                    <button id="btn-ccp-make-img-smphn-css-rule" class="ccp-but make-css-but" tabindex="-1"></button> 
+                    <button id="btn-ccp-make-img-lgphn-css-rule" class="ccp-but make-css-but" tabindex="-1"></button> 
+                  </div>
+                </div> <!-- VA! /Make clip buttons -->
+
+                <!-- VA! Left Container - img options only have two containers for now  -->
+                <div id="img-options-left" class="ccp-options">
+                  <div id="img-options-left-row-1" class="ccp-row">
+                    <div id="ccp-img-class" class="ccp-class-container ccp-container"> 
+                      <label id="ipt-ccp-img-class-label" class="ccp-class-input-label ccp-input-label" for="ipt-ccp-img-class-input"></label>
+                      <input id="ipt-ccp-img-class" class="ccp-class-btn ccp-btn btn-default" />  
+                    </div> 
+                    <!-- VA! Img Align wrapper, buttons and radio emulator  -->
+                    <div id="ccp-img-align" class="ccp-align-container">
+                      <div id="sel-ccp-img-align" class="align-icon-group">
+                        <input checked="checked" id="ccp-img-align-none" type="radio" name="img-align" value="align-none">
+                        <label class="align-btn align-none" for="ccp-img-align-none"></label>
+                        <input id="ccp-img-align-left" type="radio" name="img-align" value="align-left">
+                        <label class="align-btn align-left" for="ccp-img-align-left"></label>
+                        <input id="ccp-img-align-center" type="radio" name="img-align" value="align-center">
+                        <label class="align-btn align-center" for="ccp-img-align-center"></label>
+                        <input id="ccp-img-align-right" type="radio" name="img-align" value="align-right">
+                        <label class="align-btn align-right" for="ccp-img-align-right"></label>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div id="img-options-left-row-2" class="ccp-row"> 
+                    <div id="ccp-img-alt" class="ccp-wide-container ccp-container"> 
+                      <label id="ipt-ccp-img-alt-label" class="ccp-alt-input-label ccp-input-label" for="ipt-ccp-img-alt-input"></label>
+                      <input id="ipt-ccp-img-alt" class="ccp-wide-btn ccp-btn btn-default" value="" />  
+                    </div> 
+
+                  </div>
+                  <div id="img-options-left-row-3" class="ccp-row"> 
+                    <div id="ccp-img-anchor" class="ccp-wide-container ccp-container"> 
+                      <label id="ipt-ccp-img-anchor-label" class="ccp-anchor-input-label ccp-input-label" for="ipt-ccp-img-anchor-input"></label>
+                      <input id="ipt-ccp-img-anchor" class="ccp-wide-btn ccp-btn btn-default" value="" />  
+                    </div> 
+                  </div>
+                  <div id="img-options-left-row-3" class="ccp-row"> 
+                    <div id="ccp-img-location" class="ccp-wide-container ccp-container"> 
+                      <label id="ipt-ccp-img-location-label" class="ccp-location-input-label ccp-input-label" for="ipt-ccp-img-location"></label>
+                      <input id="ipt-ccp-img-location" class="ccp-wide-btn ccp-btn btn-default" value="" />  
+                    </div> 
+                  </div>
+                </div>
+                <div id="img-options-right" class="ccp-options">
+                  <div id="img-binary-icons">
+                    <!-- VA! 08.17.20A -->
+                    <!-- VA!  Review class nomenclature-->
+                    <div id="ccp-img-include" class="binary-icon-group ">
+                      <input checked="checked" id="sel-ccp-img-include" type="radio" name="img-include">
+                      <label class="binary-btn img-include" for="sel-ccp-img-include"></label>
+                      <input id="sel-ccp-img-exclude" type="radio" name="img-include">
+                      <label class="binary-btn img-exclude" for="sel-ccp-img-exclude"></label>
+                    </div>
+                    <div id="ccp-img-type" class="binary-icon-group ">
+                      <input checked="checked" id="sel-ccp-img-fixed" type="radio" name="img-type" value="img-fixed">
+                      <label class="binary-btn img-fixed" for="sel-ccp-img-fixed"></label>
+                      <input id="sel-ccp-img-fluid" type="radio" name="img-type" value="img-fluid">
+                      <label class="binary-btn img-fluid" for="sel-ccp-img-fluid"></label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+            <!-- /This element is populated dynamically in scripts.js -->
+          </fieldset>
+          <!-- /fieldset #image-options -->
+
+          <fieldset id="ccp-td-options" class="ccp-fieldset">
+            <!-- /This element is populated dynamically in scripts.js -->
+              <!-- VA! 08.13.20A -->
+              <!-- VA! Removed 'options' -->
+              <legend>&lt;td&gt;</legend> 
+              <div class="ccp-options-container">
+                <!-- VA! Make clip buttons - position absolute -->
+                <div id="td-clipboard-buttons" class="clipboard-buttons">
+                  <button id="btn-ccp-make-td-tag" class="ccp-but make-html-but" tabindex="-1"></button> 
+                  <div class="btn-ccp-make-css-rule-wrapper">
+                    <button id="btn-ccp-make-td-dsktp-css-rule" class="ccp-but make-css-but" tabindex="-1"></button> 
+                    <button id="btn-ccp-make-td-smphn-css-rule" class="ccp-but make-css-but" tabindex="-1"></button> 
+                    <button id="btn-ccp-make-td-lgphn-css-rule" class="ccp-but make-css-but" tabindex="-1"></button> 
+                  </div>
+                </div><!-- VA! /Make clip buttons -->
+
+                <div id="td-options-left" class="ccp-options">
+                  <div id="td-options-left-row-1" class="ccp-row">
+                    <div id="ccp-td-class" class="ccp-class-container ccp-container"> 
+                      <label id="ipt-ccp-td-class-label" class="ccp-class-input-label ccp-input-label" for="ipt-ccp-td-class-input"></label>
+                      <input id="ipt-ccp-td-class" class="ccp-class-btn ccp-btn btn-default" value="" />  
+                    </div> 
+                  </div>
+                  <div id="td-options-left-row-2" class="ccp-row">
+                    <div id="ccp-td-width" class="ccp-medium-container ccp-container"> 
+                      <label id="ipt-ccp-td-width-label" class="ccp-width-input-label ccp-input-label" for="ipt-ccp-td-width-input"></label>
+                      <input id="ipt-ccp-td-width" class="ccp-medium-input ccp-btn btn-default" value="" />  
+                    </div> 
+                    <div id="ccp-td-height" class="ccp-medium-container ccp-container"> 
+                      <label id="ipt-ccp-td-height-label" class="ccp-height-input-label ccp-input-label" for="ipt-ccp-td-height-input"></label>
+                      <input id="ipt-ccp-td-height" class="ccp-medium-input ccp-btn btn-default" value="" />  
+                    </div> 
+                  </div>
+                  <div id="td-options-left-row-3" class="ccp-row">
+                    <div id="ccp-td-bgcolor" class="ccp-medium-container ccp-container"> 
+                      <label id="ipt-ccp-td-bgcolor-label" class="ccp-bgcolor-input-label ccp-input-label" for="ipt-ccp-td-bgcolor-input"></label>
+                      <input id="ipt-ccp-td-bgcolor" class="ccp-medium-input ccp-btn btn-default" value="" />  
+                    </div> 
+                    <div id="ccp-td-fontcolor" class="ccp-medium-container ccp-container"> 
+                      <label id="ipt-ccp-td-fontcolor-label" class="ccp-fontcolor-input-label ccp-input-label" for="ipt-ccp-td-fontcolor-input"></label>
+                      <input id="ipt-ccp-td-fontcolor" class="ccp-medium-input ccp-btn btn-default" value="" />  
+                    </div> 
+                  </div>
+                  <div id="td-options-left-row-4" class="ccp-row">
+                    <div id="ccp-td-borderradius" class="ccp-medium-container ccp-container"> 
+                      <label id="ipt-ccp-td-borderradius-label" class="ccp-borderradius-input-label ccp-input-label" for="ipt-ccp-td-borderradius-input"></label>
+                      <input id="ipt-ccp-td-borderradius" class="ccp-medium-input ccp-btn btn-default" value="" />  
+                    </div> 
+                    <div id="ccp-td-bordercolor-input-wrapper" class="ccp-narrow-input-wrapper ccp-input-wrapper"> 
+                      <label id="ipt-ccp-td-bordercolor-label" class="ccp-bordercolor-input-label ccp-input-label" for="ipt-ccp-td-bordercolor-input"></label>
+                      <input id="ipt-ccp-td-bordercolor" class="ccp-medium-input ccp-btn btn-default" value="" />  
+                    </div> 
+                  </div>
+                </div>
+                <div id="td-options-center" class="ccp-options">
+                  <div id="td-options-center-row-1" class="ccp-row">
+                    <div id="ccp-td-align" class="ccp-align-container">
+                      <div id="sel-ccp-td-align" class="align-icon-group">
+                        <!-- VA! All align elements should have ipt prefix -->
+                        <input checked="checked" id="ccp-td-align-none" type="radio" name="td-align" value="align-none">
+                        <label class="align-btn align-none" for="ccp-td-align-none"></label>
+                        <input id="ccp-td-align-left" type="radio" name="td-align" value="align-left">
+                        <label class="align-btn align-left" for="ccp-td-align-left"></label>
+                        <input id="ccp-td-align-center" type="radio" name="td-align" value="align-center">
+                        <label class="align-btn align-center" for="ccp-td-align-center"></label>
+                        <input id="ccp-td-align-right" type="radio" name="td-align" value="align-right">
+                        <label class="align-btn align-right" for="ccp-td-align-right"></label>
+                      </div>
+
+                    </div>
+                    <div id="ccp-td-padding" class="padding-ipt-group">
+                      <div id="ccp-td-padding-row-1" class="td-padding-row">
+                        <input id="ipt-ccp-td-padding-top" class="ccp-narrow-input btn-default ccp-btn" type="text" name="td-padding-top">
+                      </div>
+                      <div id="ccp-td-padding-row-2" class="td-padding-row">
+
+                        <input id="ipt-ccp-td-padding-left" class="ccp-narrow-input btn-default ccp-btn" type="text" name="td-padding-left">
+
+                        <div id="padding-icon" class="padding-icon-container">
+                          <img src="/img/icon-padding.png" alt="" id="td-padding-icon">
+                        </div>
+
+                        <input id="ipt-ccp-td-padding-right" class="ccp-narrow-input btn-default ccp-btn" type="text" name="td-padding-left">
+
+                      </div>
+                      <div id="ccp-td-padding-row-3" class="td-padding-row">
+                        <input id="ipt-ccp-td-padding-bottom" class="ccp-narrow-input btn-default ccp-btn" type="text" name="td-padding-left">
+                      </div>
+                    </div>
+                  </div>
+                  <div id="td-options-center-row-2" class="ccp-row">
+                    <div id="ccp-td-valign" class="ccp-align-container">
+                      <div id="sel-ccp-td-valign" class="align-icon-group">
+                        <!-- VA! All align elements should have ipt prefix -->
+                        <input checked="checked" id="ccp-td-valign-none" type="radio" name="td-valign" value="valign-none">
+                        <label class="align-btn align-none" for="ccp-td-valign-none"></label>
+                        <input id="ccp-td-valign-top" type="radio" name="td-valign">
+                        <label class="align-btn valign-top" for="ccp-td-valign-top"></label>
+                        <input id="ccp-td-valign-middle" type="radio" name="td-valign">
+                        <label class="align-btn valign-middle" for="ccp-td-valign-middle"></label>
+                        <input id="ccp-td-valign-bottom" type="radio" name="td-valign">
+                        <label class="align-btn valign-bottom" for="ccp-td-valign-bottom"></label>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="td-options-center-row-3" class="ccp-row">
+                    <div id="ccp-td-select-options" class="ccp-td-options-container">
+                      <div id="sel-ccp-td-options" class="select-icon-group">
+                        <input checked="checked" id="sel-ccp-td-options-basic" type="radio" name="td-options">
+                        <label class="select-btn td-options-basic" for="sel-ccp-td-options-basic"></label>
+                        <input id="sel-ccp-td-options-imgswap" type="radio" name="td-options">
+                        <label class="select-btn td-options-imgswap" for="sel-ccp-td-options-imgswap"></label>
+                        <input id="sel-ccp-td-options-posswitch" type="radio" name="td-options">
+                        <label class="select-btn td-options-posswitch" for="sel-ccp-td-options-posswitch"></label>
+                        <input id="sel-ccp-td-options-bgimage" type="radio" name="td-options">
+                        <label class="select-btn td-options-bgimage" for="sel-ccp-td-options-bgimage"></label>
+                        <input id="sel-ccp-td-options-vmlbutton" type="radio" name="td-options">
+                        <label class="select-btn td-options-vmlbutton" for="sel-ccp-td-options-vmlbutton"></label>
+
+                      </div>
+                    </div>
+                  </div>
+                  <div id="td-options-center-row-4" class="ccp-row">
+  
+
+
+                    
+                  </div>
+                </div>
+
+                <div id="td-options-right" class="ccp-options">
+
+
+                  
+                </div>
+
+
+              </div>
+            </fieldset>
+
+          <fieldset id="ccp-table-options" class="ccp-fieldset">
+          <!-- /This element is populated dynamically in scripts.js -->
+            <!-- VA! 08.13.20A -->
+            <!-- VA! Removed 'options' -->
+            <legend>&lt;table&gt;</legend> 
+
+              <div class="ccp-options-container"> 
+                <!-- VA! Make clip buttons - position absolute --> 
+                <div id="table-clipboard-buttons" class="clipboard-buttons">
+                  <button id="btn-ccp-make-table-tag" class="ccp-but make-html-but" tabindex="-1"></button> 
+                  <div class="btn-ccp-make-css-rule-wrapper">
+                    <button id="btn-ccp-make-table-dsktp-css-rule" class="ccp-but make-css-but" tabindex="-1"></button> 
+                    <button id="btn-ccp-make-table-smphn-css-rule" class="ccp-but make-css-but" tabindex="-1"></button> 
+                    <button id="btn-ccp-make-table-lgphn-css-rule" class="ccp-but make-css-but" tabindex="-1"></button><!-- VA! /Make clip buttons -->
+                  </div>
+                </div>
+
+                <div id="table-options-left" class="ccp-options">
+                  <div id="table-options-left-row-1" class="ccp-row">
+                    <!-- VA! Table Row 1:  Align radio emulator and Wrapper icon -->
+                    <div id="ccp-table-align" class="ccp-align-container">
+                      <div id="sel-ccp-table-align" class="align-icon-group">
+                        <!-- VA! All align elements should have ipt prefix -->
+                        <input checked="checked" id="ccp-table-align-none" type="radio" name="table-align" value="align-none">
+                        <label class="align-btn align-none" for="ccp-table-align-none"></label>
+                        <input id="ccp-table-align-left" type="radio" name="table-align" value="align-left">
+                        <label class="align-btn align-left" for="ccp-table-align-left"></label>
+                        <input id="ccp-table-align-center" type="radio" name="table-align" value="align-center">
+                        <label class="align-btn align-center" for="ccp-table-align-center"></label>
+                        <input id="ccp-table-align-right" type="radio" name="table-align" value="align-right">
+                        <label class="align-btn align-right" for="ccp-table-align-right"></label>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div id="table-options-left-row-2" class="ccp-row">
+                    <div id="ccp-table-class" class="ccp-class-container ccp-container"> 
+                      <label id="ipt-ccp-table-class-label" class="ccp-class-input-label ccp-input-label" for="ipt-ccp-table-class"></label>
+                      <input id="ipt-ccp-table-class" class="ccp-class-btn ccp-btn btn-default" value="" />  
+                    </div> 
+                  </div>
+                  <div id="table-options-left-row-3" class="ccp-row">
+                    <div id="ccp-table-width" class="ccp-medium-container ccp-container"> 
+                      <label id="ipt-ccp-table-width-label" class="ccp-width-input-label ccp-input-label" for="ipt-ccp-table-width"></label>
+                      <input id="ipt-ccp-table-width" class="ccp-medium-input ccp-btn btn-default" value="" />  
+                    </div> 
+                    <div id="ccp-table-maxwidth" class="ccp-medium-container ccp-container"> 
+                      <label id="ipt-ccp-table-maxwidth-label" class="ccp-maxwidth-input-label ccp-input-label" for="ipt-ccp-table-maxwidth"></label>
+                      <input id="ipt-ccp-table-maxwidth" class="ccp-medium-input ccp-btn btn-default" value="" />  
+                    </div> 
+                  </div>
+                  <div id="table-options-left-row-4" class="ccp-row">
+                    <div id="ccp-table-bgcolor" class="ccp-medium-container ccp-container"> 
+                      <label id="ipt-ccp-table-bgcolor-label" class="ccp-bgcolor-input-label ccp-input-label" for="ipt-ccp-table-bgcolor"></label>
+                      <input id="ipt-ccp-table-bgcolor" class="ccp-medium-input ccp-btn btn-default" value="" />  
+                    </div>
+                    <div id="ccp-table-ghost"  class="toggle-icon-group">
+                      <input type="checkbox"  name="toggle-table-ghost" value="" id="chk-ccp-table-ghost"/>
+                      <label class="toggle-ghost toggle-btn" for="chk-ccp-table-ghost"></label> 
+                    </div>
+                    <div id="ccp-table-120dpi" class="toggle-icon-group">
+                      <input type="checkbox"  name="toggle-table-120dpi" value="" id="chk-ccp-table-120dpi"/>
+                      <label class="toggle-dpi toggle-btn" for="chk-ccp-table-120dpi"></label> 
+                    </div>
+                  </div>
+                </div>
+
+
+
+                <div id="table-options-center">
+                  <div id="table-options-center-wrapper-icon">
+                    <div id="ccp-include-table-wrapper" class="toggle-icon-group">
+                      <input type="checkbox"  name="toggle-wrapper" value="valuable" id="chk-ccp-include-table-wrapper"/>
+                      <label class="toggle-wrapper toggle-btn" for="chk-ccp-include-table-wrapper"></label> 
+                    </div>
+                  </div>
+                  <div id="table-options-center-wrapper-options" class="ccp-options">
+                    <div id="table-options-left-row-1" class="ccp-row">
+
+                      <!-- VA! Table Row 1:  Align radio emulator and Wrapper icon -->
+                      <div id="ccp-table-wrapper-align" class="ccp-align-container">
+                        <div id="sel-ccp-table-wrapper-align"class="align-icon-group">
+                          <!-- VA! All align elements should have the ipt prefix -->
+                          <input checked="checked" id="ccp-table-wrapper-align-none" type="radio" name="table-wrapper-align" value="align-none">
+                          <label class="align-btn align-none" for="ccp-table-wrapper-align-none"></label>
+                          <input id="ccp-table-wrapper-align-left" type="radio" name="table-wrapper-align" value="align-left">
+                          <label class="align-btn align-left" for="ccp-table-wrapper-align-left"></label>
+                          <input id="ccp-table-wrapper-align-center" type="radio" name="table-wrapper-align" value="align-center">
+                          <label class="align-btn align-center" for="ccp-table-wrapper-align-center"></label>
+                          <input id="ccp-table-wrapper-align-right" type="radio" name="table-wrapper-align" value="align-right">
+                          <label class="align-btn align-right" for="ccp-table-wrapper-align-right"></label>
+                        </div>
+                      </div>
+                    </div>
+                    <div id="table-options-left-row-2" class="ccp-row">
+                      <div id="ccp-table-wrapper-class" class="ccp-class-container ccp-container"> 
+                        <label id="ipt-ccp-table-wrapper-class-label" class="ccp-class-input-label ccp-input-label" for="ipt-ccp-table-wrapper-class-input"></label>
+                        <input id="ipt-ccp-table-wrapper-class" class="ccp-class-btn ccp-btn btn-default" value="" />  
+                      </div> 
+                    </div>
+                    <div id="table-options-left-row-3" class="ccp-row">
+                      <div id="ccp-table-wrapper-width" class="ccp-medium-container ccp-container"> 
+                        <label id="ipt-ccp-table-wrapper-width-label" class="ccp-width-input-label ccp-input-label" for="ipt-ccp-table-wrapper-width"></label>
+                        <input id="ipt-ccp-table-wrapper-width" class="ccp-medium-input ccp-btn btn-default" value="" />  
+                      </div> 
+                      <div id="ccp-table-maxwidth" class="ccp-medium-container ccp-input-wrapper"> 
+                        <label id="ipt-ccp-table-wrapper-maxwidth-label" class="ccp-maxwidth-input-label ccp-input-label" for="ipt-ccp-table-wrapper-maxwidth"></label>
+                        <input id="ipt-ccp-table-wrapper-maxwidth" class="ccp-medium-input ccp-btn btn-default" value="" />  
+                      </div> 
+                    </div>
+                    <div id="table-options-left-row-4" class="ccp-row">
+                      <div id="ccp-table-wrapper-bgcolor" class="ccp-medium-container ccp-container"> 
+                        <label id="ipt-ccp-table-wrapper-bgcolor-label" class="ccp-bgcolor-input-label ccp-input-label" for="ipt-ccp-table-wrapper-bgcolor"></label>
+                        <input id="ipt-ccp-table-wrapper-bgcolor" class="ccp-medium-input ccp-btn btn-default" value="" />  
+                      </div>
+                      <div id="ccp-table-wrapper-ghost"  class="toggle-icon-group">
+                        <input type="checkbox"  name="toggle-table-wrapper-ghost" value="" id="chk-ccp-table-wrapper-ghost"/>
+                        <label class="toggle-ghost toggle-btn" for="chk-ccp-table-wrapper-ghost"></label> 
+                      </div>
+                      <div id="ccp-table-wrapper-120dpi" class="toggle-icon-group">
+                        <!-- <button id="btn-ccp-table-wrapper-120dpi" class="ccp-toggle-btn"></button> -->
+                        <input type="checkbox"  name="toggle-table-wrapper-120dpi" value="" id="chk-ccp-table-wrapper-120dpi"/>
+                        <label class="toggle-dpi toggle-btn" for="chk-ccp-table-wrapper-120dpi"></label> 
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div id="table-options-right" class="ccp-options">
+
+                  
+                </div>
+
+
+
+              </div>
+          </fieldset>
+
+        </div><!-- /#ccp-content -->
+      </div>
+      <!-- /#ccp clipboard control panel -->
+
+
+    </div>
+    <!-- /image-viewport -->
+
+  </div>
+  <!-- /#app-container -->
+
+
+
+
+
+
+  
+
+
+
+<!--<script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI="-->
+<!--crossorigin="anonymous"></script>-->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.10.3/beautify-html.min.js"></script> -->
+<!-- <script src="js/clipboard.min.js"></script>
+<script src="js/scripts.js"></script> -->
+<!-- <script src="js/test.js"></script> -->
+<!-- <script src="js/scrap.js"></script> -->
+<script src="js/new.js"></script>
+
+
+
+
+<!-- <script>
+
+(function(){
+    new ClipboardJS('#copy-button');
+})();
+
+</script> -->
+
+
+
+</body>
+</html>

@@ -1,0 +1,165 @@
+    // !VA appController private
+    // !VA Branch: OVERHAUL0905A
+    function fetchConfigObjOLD(alias, option) {
+      console.log('fetchConfigObj running'); 
+      let configObj = [], revealArray, reflectArray, radioArray, checkedArray, disableArray;
+      // !VA Variables for Include wrapper options handling
+      let wraprRevealArray, wraprChecked, arr;
+      // !VA RESET - Run revealReset for all options except ccpImgItypeRdo: ccpImgItypeRdo doesn't reveal any elements
+      if (alias !== 'ccpImgItypeRdo' ) { configObj.revealReset = { alias };}
+
+      // !VA Table Wrapper Reveal Array - accessed by ccpTblWraprChk and all TD Options except iswap, which has its own specific config for Table Wrapper options.
+      wraprRevealArray = [ 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd',  'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+      wraprChecked = appController.getAppobj('ccpTblWraprChk');
+      console.log('wraprChecked is: ' + wraprChecked);
+
+
+
+
+
+
+
+      // !VA Set the CCP configuration for specific user selections
+      switch(true) {
+
+      case alias === 'ccpImgItypeRdo' :
+        // !VA REFLECT APPOBJ to TEXT INPUT FIELDS
+        option === 'fluid' ?  Appobj['ccpImgClassTfd'] = 'img-fluid' : Appobj['ccpImgClassTfd'] = '';
+        reflectArray = ['ccpImgClassTfd' ];
+        configObj.reflectAppobj = { reflect: reflectArray };
+        // !VA RADIO GROUPS
+        radioArray = [ alias ];
+        configObj.radioState = { radio: radioArray };
+        break;
+      // !VA Image option group: Exclude Image option
+      case alias === 'ccpImgExcldRdo' :
+        // !VA Set Appobj property to the passed-in option value 
+        Appobj[alias] = option;
+
+        // !VA  DEFAULT OPTIONS FOR ccpTdaOptnsRdo 'basic' APPLY BELOW 
+        // !VA REFLECT APPOBJ to TEXT INPUT FIELDS
+        Appobj['ccpImgClassTfd'] = '';
+        Appobj['ccpTblClassTfd'] = '';
+        Appobj['ccpTbwClassTfd'] = 'devicewidth';
+        reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd' ];
+        configObj.reflectAppobj = { reflect: reflectArray };
+        // !VA RADIO GROUPS
+        Appobj['ccpTdaAlignRdo'] = 'left', Appobj['ccpTdaValgnRdo'] = 'top';
+        radioArray = [ 'ccpTdaAlignRdo' , 'ccpTdaValgnRdo' ];
+        configObj.radioState = { radio: radioArray };
+        // !VA DISABLE
+        disableArray =  [ 'ccpImgClassTfd', 'ccpTblClassTfd','ccpTblWidthTfd', 'ccpTblAlignRdo', 'ccpTblWraprChk', 'ccpTbwClassTfd','ccpTbwWidthTfd', 'ccpTbwAlignRdo' ];
+        configObj.disableElements = { flag: false, disable: disableArray };
+        // !VA ccpImgExcldRdo-SPECIFIC OPTIONS
+        // !VA REVEAL
+        if ( option === 'excld') {
+          revealArray  = [ 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo','ccpImgExcldRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo' ];
+          configObj.revealElements = { flag: false, reveal: revealArray };
+        } else {
+          // !VA REVEAL
+          revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaOptnsRdo'  ];
+          configObj.revealElements = { flag: false, reveal: revealArray };
+        }
+        break;
+      // !VA TDA option group: Select TD options
+      case alias === 'ccpTdaOptnsRdo':
+        // !VA Branch: OVERHAUL0905A
+        // !VA TODO: Set defaults here and reference them in each case below where applicable.
+        // !VA Set Appobj to option
+        Appobj[alias] = option;
+        switch(true) {
+        case option === 'basic' || option === 'swtch':
+          // !VA Branch: OVERHAUL0830A
+          // !VA Still not too sure if width and height should be included in TD basic.
+          // !VA REFLECT APPOBJ to TEXT INPUT FIELDS
+          Appobj['ccpImgClassTfd'] = '';
+          Appobj['ccpTblClassTfd'] = '';
+          Appobj['ccpTbwClassTfd'] = 'devicewidth';
+          reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd' ];
+          configObj.reflectAppobj = { reflect: reflectArray };
+          // !VA RADIO GROUPS
+          Appobj['ccpTdaAlignRdo'] = 'left', Appobj['ccpTdaValgnRdo'] = 'top';
+          radioArray = [ 'ccpTdaAlignRdo' , 'ccpTdaValgnRdo' ];
+          configObj.radioState = { radio: radioArray };
+          // !VA REVEAL
+          configObj.revealReset = { alias };
+          // !VA arr is the temporary array containing the revealArray for the selected option
+          // arr = [  'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaOptnsRdo',  'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
+          arr = [  'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaOptnsRdo' ];
+          // !VA If the Include Wrapper icon is unchecked, use arr for revealArray. If it is checked, merge arr with the Table Wrapper options to create revealArray
+          revealArray = arr;
+          // !wraprChecked ? revealArray = arr : revealArray = arr.concat(wraprRevealArray);
+          if (wraprChecked) { selectCheckbox( true, 'ccpTblWraprChk'); }
+
+
+
+
+          console.log('revealArray is: ');
+          console.log(revealArray);
+          configObj.revealElements = { flag: false, reveal: revealArray };
+          // !VA DISABLE
+          disableArray =  [ 'ccpImgClassTfd', 'ccpTblClassTfd','ccpTblWidthTfd', 'ccpTblAlignRdo', 'ccpTblWraprChk', 'ccpTbwClassTfd','ccpTbwWidthTfd', 'ccpTbwAlignRdo' ];
+          configObj.disableElements = { flag: false, disable: disableArray };
+          break;
+        case option === 'iswap':
+          // !VA REFLECT APPOBJ to TEXT INPUT FIELDS
+          Appobj['ccpImgClassTfd'] = 'mobileshow';
+          Appobj['ccpTblClassTfd'] = Appobj['ccpTbwClassTfd'] = 'devicewidth';
+          reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd' ];
+          configObj.reflectAppobj = { reflect: reflectArray };
+          // !VA RADIO GROUPS
+          Appobj['ccpTblAlignRdo'] = 'center', Appobj['ccpTbwAlignRdo'] = 'center';
+          radioArray = [ 'ccpTblAlignRdo' , 'ccpTbwAlignRdo' ];
+          configObj.radioState = { radio: radioArray };
+          // !VA REVEAL
+          revealArray = [ 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaOptnsRdo', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblMsdpiChk', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+          configObj.revealElements = { flag: false, reveal: revealArray };
+          // !VA DISABLE
+          disableArray =  [ 'ccpImgClassTfd', 'ccpTblClassTfd','ccpTblWidthTfd', 'ccpTblAlignRdo', 'ccpTblWraprChk', 'ccpTbwClassTfd','ccpTbwWidthTfd', 'ccpTbwAlignRdo' ];
+          configObj.disableElements = { flag: true, disable: disableArray };
+          break;
+        case option === 'bgimg':
+          Appobj['ccpImgClassTfd'] = '';
+          Appobj['ccpTblClassTfd'] = '';
+          Appobj['ccpTbwClassTfd'] = 'devicewidth';
+          reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd' ];
+          // !VA arr is the temporary array containing the revealArray for the selected option
+          arr = [ 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaOptnsRdo', 'ccpTblMaxwdTfd' ];
+          // !VA If the Include Wrapper icon is unchecked, use arr for revealArray. If it is checked, merge arr with the Table Wrapper options to create revealArray
+          !wraprChecked ? revealArray = arr : revealArray = arr.concat(wraprRevealArray);
+          configObj.revealElements = { flag: false, reveal: revealArray };
+          break;
+        case option === 'vmlbt':
+          // !VA REFLECT
+          Appobj['ccpImgClassTfd'] = '';
+          Appobj['ccpTblClassTfd'] = '';
+          Appobj['ccpTbwClassTfd'] = 'devicewidth';
+          reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd' ];
+          // !VA REVEAL
+          // !VA arr is the temporary array containing the revealArray for the selected option
+          arr = [ 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaOptnsRdo', 'ccpTblMaxwdTfd' ];
+          // !VA If the Include Wrapper icon is unchecked, use arr for revealArray. If it is checked, merge arr with the Table Wrapper options to create revealArray
+          !wraprChecked ? revealArray = arr : revealArray = arr.concat(wraprRevealArray);
+          configObj.revealElements = { flag: false, reveal: revealArray };
+          break;
+        default:
+          console.log('ERROR in revealConfigs - Appobj property not recognized');
+        } 
+        break;
+      case alias === 'ccpTblWraprChk':
+        // !VA Set Appobj to the option parameter, i.e. the checked state
+        // !VA Branch: OVERHAUL0905A
+        // !VA Set option to !option to make this work - otherwise it sticks on 'true'. For later...
+        Appobj[alias] = !option;
+        // !VA REVEAL
+        revealArray = wraprRevealArray;
+        configObj.revealElements = { flag: option, reveal: revealArray };
+        // !VA CHECKBOX
+        checkedArray = [ alias ];
+        configObj.checkboxState = { checked: checkedArray};
+        break;
+      default:
+        console.log('ERROR in fetchConfigObj = Alias not recognized');
+      } 
+      return configObj;
+    }

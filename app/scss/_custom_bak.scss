@@ -1,0 +1,1425 @@
+// VA! Dev styles
+.devred { border: 1px solid red !important; }
+.devblue { border: 1px solid blue !important; }
+.devgreen { border: 1px solid green !important; }
+.devmag { border: 1px solid magenta !important; }
+
+// VARIABLES - COLOR
+$primary-bg-color:                #337AB7;
+$primary-font-color:              #FFF;
+// HEADER
+$logo-color:                      #AD1310;
+$logo-font:                        'Titillium Web', 'Lucida Grande', 'Lucida', sans-serif;
+$header-subtext-color:            #959595;
+
+// APP IMAGE TOOLBAR
+$image-toolbar-bkgd-color:        #FFF;
+
+
+//APP INSPECTORS
+$inspector-font-color:             rgba(160, 160, 160, 1);              
+$inspector-pop-font-color:         rgba(255, 255, 255, .9);
+// VA! Red 139,0,0
+$inspector-hover-color:            #e29b02;
+$inspector-shift-hover-font-color: rgba(255, 255, 255, .9);  
+$inspector-ctrl-hover-font-color:  rgba(255, 255, 255, .9); 
+$filename-viewer-font-color:       rgba(255, 255, 255, .8);
+
+//APP TOOLTIPS
+$tooltip-bg-color:                rgba(107, 107, 107, .9);
+$tooltip-font-color:              #FFF;
+$tooltip-border-color:            #555 transparent transparent transparent;
+
+
+//APP CCP
+$fieldset-border-color:           #959595;
+$fieldset-legend-color:           #959595;
+
+
+// VARIABLES - TYPOGRAPHY
+$primary-font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+$inspector-font-family: 'Ubuntu', Arial, Helvetica, sans-serif;
+
+
+
+// VA! STYLES
+// VA! Reboot: box-sizing from Bootstrap in case I decide to remove Bootstrap
+* {
+  box-sizing: border-box;
+}
+*, ::after, ::before {
+  box-sizing: border-box;
+}
+
+// VA! Got rid of Bootstrap hopefully for good 051220
+// VA! Reboot: Overriding the default Bootstrap root font size of 10px
+html {
+  font-size: 16px;
+  box-sizing: border-box;
+  &.modifier-pressed {
+    cursor: help !important;
+  }
+}
+
+body {
+  // VA!Reboot: not sure what this does.
+  min-height: 100% !important; 
+  color: #333;
+  font-family: $primary-font-family;
+  // VA! From normalize.less 
+  font-size: 1rem;
+  line-height: 1.42857143;
+}
+
+// VA! From Bootstrap 3
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+  color: inherit;
+  font-family: inherit;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+// VA! Reboot: only for content, probably can delete
+span.code {
+  font-family: 'Courier New', monospace;
+}
+
+// VA! Reboot: not sure what this does
+// FIX
+button:disabled  {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.output {
+  border: 1px solid magenta;
+}
+
+// VA! Get rid of the default decrement/increment arrows on input elements of type number 
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+// VA! Button styles from bootstrap 3
+
+
+
+// VA! From buttons.less
+.btn {
+  display: inline-block;
+  padding: 6px 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  // VA! Comment this out so the Toolbar inputs behave normally, i.e. collapse the selection at the first mouseclick after selection
+  // -webkit-user-select: none;
+  // -moz-user-select: none;
+  // -ms-user-select: none;
+  // user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
+  border-top-color: transparent;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+  border-radius: 4px;
+}
+
+// VA! From bootstrap 3
+.btn-default {
+  color: #333;
+  background-color: #fff;
+  border-color: #ccc;
+}
+
+.navbar-container {
+  position: relative;
+  height: 40px;
+  margin-bottom: 3px;
+  border-bottom: 1px solid $primary-bg-color;
+  background: $primary-bg-color;
+}
+
+.navbar {
+  display: block;
+  position: relative;
+  width: 1200px;
+  margin: 0 auto;
+  li {
+    display: block;
+    float: left;
+    a {
+      color: $primary-font-color;
+    }
+  }
+}
+
+// HERO/HEADER
+.header-container {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 65px;
+  margin: 0 auto 40px;
+  padding-bottom: 5px;
+}
+
+.header-isolate-app {
+  display: block;
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  // border: 5px solid #959595;
+  // border-radius: 10px;
+  padding: 5px 5px 0 10px;
+  z-index: 100;
+  &:hover {
+    cursor: nw-resize;
+  }
+  img {
+    width: 30px;
+    height: auto;
+  }
+
+}
+
+.header-content {
+  display: flex;
+  position: relative;
+  justify-content: flex-start;
+  width: 100%;
+  height: 80px;
+  padding: 0 0 0 60px;
+}
+
+.header-text {
+  width: 500px;
+}
+
+.header-headline {
+  position: relative;
+  width: 440px;
+  height: 46px;
+  float: left;
+}
+
+.header-image {
+  position: relative;
+  // top: 0;
+  width: 70px;
+  height: 90px;
+  margin-top: 5px;
+  margin-left: -8px;
+  float: left;
+  // VA! z-index is for the 'runMe' link, only for dev
+  z-index: 100;
+  img {
+    width: 100%;
+    height: auto;
+  }
+}
+
+.header-logo {
+  position: relative;
+  width: 225px;
+  height: 32px;
+  h1 {
+    top: 0;
+    margin: 0;
+    padding: 0;
+    color: $logo-color;
+    // color: #F24747;
+    font-family: $logo-font;
+    font-size: 32px;
+    font-weight: bold;
+  }
+  .header-version {
+    position: absolute;
+    font-size: 12px;
+    top: 17px;
+    right: 0;
+    p {
+      color: #959595;
+      margin: 0;
+      padding: 0;
+    }
+  }
+}
+
+
+.header-slug {
+  position: relative;
+  width: 100%;
+  h2 {
+    width: 100%;
+    margin-top: 6px;
+    padding: 0;
+    color: $header-subtext-color;
+    font-size: 20px;
+    text-align: left;
+    text-transform: uppercase;
+  }
+}
+
+.initial-cap {
+  color: $logo-color;
+  font-size: 110%;
+  font-weight: 800;
+}
+
+// APP-CONTAINER
+#app-container {
+  display: block;
+  position: relative;
+  // VA! This yields a viewport width of 802, which allows a user-entered width of 800 max
+  width: 860px;
+  min-height: 725px;
+  margin: 45px auto 0;
+}
+// VA! Add a blocker overlay to prevent user input while error and status messages are showing. Tooltip messages don't need the blocker since they depend on user input, not setTimeOut, to show and hide.
+#app-blocker {
+  display: none;
+  position: absolute;
+  top: -5px;
+  left: 0;
+  width: 850px;
+  height: 720px !important;
+  background: transparent;
+  z-index: 999;
+  &.active {
+    display: block;
+  }
+}
+
+// TOOLS
+// VA! Reboot 
+#toolbar-container {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 35px;
+  &.show-err {
+    transform: translate(0, 50px);
+    transition: transform 250ms;
+    // -webkit-transform: scaleX(0);
+    // -webkit-transition: -webkit-transform 500ms;
+  }
+  &.hide-err {
+    transform: translate(0, 0);
+    transition: transform 250ms;
+    // -webkit-transform: scaleX(0);
+    // -webkit-transition: -webkit-transform 500ms;
+  }
+}
+
+// UL -- Toolbar button container 
+.toolbar-buttons {
+  // z-index: -1;
+  display: flex;
+  // display: none;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
+  margin: 0 auto;
+  padding: 0;
+  list-style-type: none;
+  // VA! Reboot: replacing all the element selectors with class selectors and removing their parent li selector from the hierarchy
+  .btn {
+    // VA! Overrides Bootstrap default padding in buttons.less
+    padding: 0;
+  }
+  // VA! Reboot: deleted input selector, moved input styling to class .toolbar-input
+  .toolbar-input {
+    width: 50px;
+    height: 32px;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    font-style: italic;
+    line-height: 18px;
+    text-align: center;
+  }
+  // VA! Reboot: Style all the toolbar buttons
+  .toolbar-but {
+    width: 50px;
+    height: 30px;
+    background-size: cover;
+  }
+  // VA! Reboot: deleted img selector, moved img styling to class .toolbar-but
+  // VA! Reboot: deleted .divider child selector under input selector, moved divider styling to class .divider
+  .divider {
+    width: 5px;
+    height: 18px;
+    margin: 0 7px;
+    opacity: .2;
+  }
+  // VA! Reboot: deleted img element in HTML and set the background image of each toolbar-button to its corresponding image
+  #btn-tbr-incr50 {
+    background-image: url('../img/incr50-button.png');
+  }
+  #btn-tbr-incr10 {
+    background-image: url('../img/incr10-button.png');
+  }
+  #btn-tbr-incr01 {
+    background-image: url('../img/incr01-button.png');
+  }
+  #btn-tbr-decr01 {
+    background-image: url('../img/decr01-button.png');
+  }
+  #btn-tbr-decr10 {
+    background-image: url('../img/decr10-button.png');
+  }
+  #btn-tbr-decr50 {
+    background-image: url('../img/decr50-button.png');
+  }
+  // VA! Reboot: Deleted #tb-but-mobile-swap 
+  #ipt-tbr-imgviewerw {
+    width: 80px;
+    padding-left: 30px;
+    background: url('../img/table-icon.png') no-repeat scroll 7px 7px;
+    text-align: center;
+  }
+  #ipt-tbr-sphonesw {
+    width: 70px;
+    padding-left: 30px;
+    background: url('../img/small-phones-toolbar-icon.png') no-repeat scroll 12px 2px;
+    background-size: 15px 26px;
+  }
+  #ipt-tbr-lphonesw {
+    width: 85px;
+    padding-left: 30px;
+    background: url('../img/large-phones-toolbar-icon.png') no-repeat scroll 7px 2px;
+    background-size: 34px 24px;
+  }
+}
+
+// TODO: Nest this under toolbar-buttons so that the JS works to make it
+// disappear on focus
+// VA! Reboot: I don't know what this does.
+input:focus::-webkit-input-placeholder { color:transparent; }
+input:focus:-moz-placeholder { color:transparent; } /* FF 4-18 */
+input:focus::-moz-placeholder { color:transparent; } /* FF 19+ */
+input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
+
+
+
+
+// IMAGE-VIEWPORT- contains dim viewer, dim-error-container and ccp
+#image-viewport {
+  display: block;
+  position: absolute;
+  top: 40px;
+  width: 850px;
+  height: 679px;
+  // width: 100%;
+  // height: 1170px !important;
+  // !VA Setting min height here because anything less than 679px won't make enough room for CCP
+  min-height: 679px !important;
+  margin: 0 auto;
+  border-top: 110px solid #000;
+  border-right:  24px solid #000;
+  border-bottom:  24px solid #000;
+  border-left:  24px solid #000;
+
+  border-radius: 10px;
+  // overflow: auto;
+  background: #E1E1E1 url('../img/html-email-icon-blue.png') repeat;
+  z-index: 2;
+}
+
+// INSPECTORS
+#inspector-container {
+  display: flex;
+  position: absolute;
+  top: 50px;
+  justify-content: space-evenly;
+  width: 850px;
+  height:  95px;
+  margin: 0;
+  padding: 0;
+  background-color: #000000;
+  color: $inspector-font-color;
+  // VA! Testing
+  overflow: hidden;
+  z-index: 3;
+  // VA! Reboot: I can't remember what this does.
+  &.show-err {
+    transform: translate(0, -85px);
+    transition: transform 250ms;
+    // -webkit-transform: scaleX(0);
+    // -webkit-transition: -webkit-transform 500ms;
+  }
+  &.hide-err {
+    transform: translate(0, 0);
+    transition: transform 250ms;
+    // -webkit-transform: scaleX(0);
+    // -webkit-transition: -webkit-transform 500ms;
+  }
+}
+.inspectors-left-col, .inspectors-right-col, .inspectors-center-col {
+  display: flex;
+}
+.inspector-list {
+  width: 240px;
+  margin: 0;
+  padding: 0;
+}
+.inspectors-left-col {
+  justify-content: flex-end;
+  width: 280px;
+  margin-top: 3px;
+}
+.inspectors-right-col {
+  justify-content: flex-end;
+  width: 300px;
+  margin-top: 3px;
+}
+.inspectors-center-col {
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 300px;
+}
+.inspector {
+  padding: 2px 2px 2px 0;
+  border: 0;
+  // VA! Reboot: default pop-font, inherited in writeInspectorAlerts
+  font-family: $inspector-font-family;
+  font-size: 1em;
+  font-weight: normal;
+  text-transform: uppercase;
+  list-style-type: none;
+  // VA!Hover on clickable Inspector value elements
+  .inspector-click {
+    &:hover {
+      color: $inspector-hover-color !important;
+      cursor: pointer;
+    }
+  }
+}
+
+// VA! Disabled element classes
+// VA! Labels, inputs
+.disabled {
+  font-style: italic;
+  color: #959595 !important;
+}
+// VA! Radio buttons
+.disabled-radio {
+  opacity: .4 !important;
+}
+
+.disable-checkbox {
+  color: #959595 !important;
+  pointer-events: none;
+}
+
+.inspector-content, .inspector-label, .inspector-x, .no-image  {
+  display: inline;
+}
+
+.inspector-x {
+  display: none;
+}
+
+#btn-toggle-ccp {
+  display: block;
+  width: 40px;
+  height: 47px;
+  margin: 15px auto 0;
+  border: 0;
+  background-color: transparent;
+  background-image: url('../img/clipboard.png');
+  background-position: center top;
+  background-size: 40px 47px; 
+  &.active {
+    // VA! Reboot: bg image not swapping on active and the image is misnamed - it should be clipboard-active. There should be a different hover image.
+    background-image: url('../img/clipboard-hover.png');
+  }
+}
+#ins-filename {
+  height: 22px;
+  color: $filename-viewer-font-color;
+  font-size: 1rem;
+  text-align: center;
+
+}
+
+.pop-font {
+  // VA! Reboot: Pop font for Inspector
+  // VA! Need the important hack to override the alert style set in writeInspectorAlerts
+  color: $inspector-pop-font-color !important;
+}
+
+// APP ERROR DISPLAY
+#app-message-container {
+  display: flex;
+  // flex-direction: column;
+  position: relative;
+  top: -40px;
+  // top: 0px;
+  left: 0;
+  width: 100%;
+  height: 35px;
+}
+
+#tip-content, #err-content, #msg-content {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: opacity .125s;
+  font-size: 1rem;
+  font-style: italic;
+  line-height: 1.125rem;
+  text-align: center;
+  opacity: 0;
+  z-index: -1;
+  &.active {
+    transition: opacity .125s;
+    opacity: 1;
+  }
+}
+
+#tip-content {
+  color: #04508e;
+}
+#err-content {
+  color: #FF0000;
+}
+#msg-content {
+  color: #959595;
+}
+
+// MAIN IMAGE VIEWER
+#main-image-viewer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 650px;
+  height: 450px;
+  // !VA Width and height should only be set programmatically
+  transform:  translateY(-50%) translateX(-50%);
+  background: #e1e1e1 url('../img/html-email-icon-white.png') repeat;
+}
+
+#main-image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform:  translateY(-50%) translateX(-50%);
+  z-index: -1;
+  // The displayed img
+  #main-img {
+    border: 1px dotted #959595;
+  }
+  // DROP AREA
+  #drop-area {
+    // VA! display: flex is set programmatically
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 600px;
+    min-height: 400px;
+    border: 2px dashed #bbb;
+    border-radius: 10px;
+    .witty {
+      color: #6a6a6a;
+      font-size: 110%;
+    }
+  }
+}
+
+.drop-callout {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 70px;
+  margin-top: 0;
+  padding: 15px 25px;
+  color: #959595;
+  font-size: 40px;
+  text-align: center;
+  text-transform: uppercase;
+}
+.drop-area-content {
+  display: block;
+  margin: 0 20px 10px 40px;
+  color: #959595;
+  font-size: 1.125rem !important;
+  line-height: 1.365rem;
+  text-align: left;
+  a {
+    color: inherit;
+    text-decoration: underline;
+  }
+}
+
+// :VA Not sure where this goes
+output {
+  // :VA override bootstrap default -- !important required here
+  padding: 0 !important;
+}
+
+// :VA Not sure where this goes
+#ipad-container {
+  position: absolute;
+  top: -72px;
+  left: -86px;
+}
+
+// CLIPBOARD CONTROL PANEL
+
+#ccp {
+  position: relative;
+  width: 98%;
+  height: 530px;
+  margin: 6px auto 0;
+  padding: 0;
+  transform: scaleX(0);
+  transition: transform 100ms;
+  border: 1px solid #161616;
+  border-radius: 10px;
+  background: #000000;
+  cursor: default;
+  opacity: .91;
+  z-index: 100;
+  // -webkit-transform: scaleX(0);
+  // -webkit-transition: -webkit-transform 500ms;
+  // Animation
+  // Get rid of vendor prefixes
+  &.active {
+    // :VA Fix the vendor prefixes
+    // -webkit-transform: scaleX(1);
+    transform: scaleX(1);
+  }
+  h2 {
+    display: block;
+    margin: 8px 0 0 0;
+    padding: 0;
+    color: $primary-font-color;
+    font-size: 14px;
+    text-align: center;
+  }
+}
+
+.ccp-link {
+  color: #057cc6;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+#ccp-content {
+  // VA! Reboot: Working
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  width: 100%;
+  height: 500px;
+  // margin: 0 auto;
+  padding: 0 10px;
+  // Character styles for CCP user text input elements
+  input, label {
+    display: inline-block;
+    max-width: 100%;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 300;
+  }
+  .ccp-table-include-wrapper-container {
+    font-weight: 700;
+  }
+  select {
+    width: 70px;
+    font-size: 14px;
+  }
+  input {
+    width: 150px;
+    border: 1px solid #616161;
+    background: #000000;
+    color: #FFFFFF;
+  }
+
+  input[type='radio'] {
+    position: relative;
+    margin-top: 6px;
+  }
+
+}
+
+
+// VA! Set the width of the 4 options columns in each fieldset
+fieldset {
+  // VA! Reboot - Applying flex to fieldset didn't work
+  display: block;
+  position: relative;
+  width: 100%;
+  // VA! Below overrides the fieldset margin in normalize.less
+  margin: 0;
+  // VA! Below overrides the fieldset padding in normalize.less
+  padding: 0;
+  margin-bottom: 3px;
+  border: 1px solid $fieldset-border-color;
+  border-radius: 5px;
+  legend {
+    width: 145px;
+    height: 20px;
+    margin: 0 0 0 20px;
+    padding: 0 10px;
+    border: none;
+    color: $fieldset-legend-color;
+    font-size: 16px;
+    font-weight: 400;
+  }
+  &#ccp-img-options {
+    height: 140px;
+    .ccp-options-container {
+      height: 119px;
+    }
+  }
+  &#ccp-td-options {
+    height: 190px;
+    .ccp-options-container {
+      height: 169px;
+    }
+  }
+  &#ccp-table-options {
+    height: 160px;
+    .ccp-options-container {
+      height: 139px;
+    }
+  }
+}
+
+// VA! This fixes the discrepancy between Firefox and Chrome with the alignment of the ccp-columns
+.ccp-options-container {
+  display: flex;
+  // VA! The below broke the layout in webkit, don't know why. Changed to position: relative, not even sure whether any position is necessary here
+  // position: absolute;
+  // top: 3px;
+  position: relative;
+  align-content: flex-start;
+  justify-content: space-evenly;
+}
+
+// VA! Reboot: NEW
+// VA! All the columns are absolutely positioned 2px from top
+.ccp-options-col-1, .ccp-options-col-2, .ccp-options-col-3, .ccp-options-col-4 {
+  // VA! Reboot: positioning now done by flex on the parent container
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+.ccp-options-col-1 {
+  // !VA Height is irrelevant here since these elements get their height from the parent
+  left: 0;
+  width: 150px;
+  margin: 5px 0;
+  padding: 0;
+  padding-bottom: 3px;
+  .ccp-but {
+    display: block;
+    width: 90px;
+    height: 46px; 
+    margin: 10px auto 20px;
+    padding: 0 7px 0 0;
+    border: none;
+    background-color: transparent;
+    background-size: 90px 46px !important;
+  }
+  label {
+    width: 50px;
+    text-align: right;
+  }
+  #ipt-ccp-td-borderradius-label {
+    width: 95px;
+    margin-left: 5px !important;
+  }
+  #ipt-ccp-td-borderradius {
+    width: 40px !important;
+  }
+}
+.ccp-options-col-2 {
+  left: 120px;
+  width: 210px;
+  label {
+    width: 95px;
+  }
+  input {
+    width: 110px !important;
+  }
+}
+.ccp-options-col-3 {
+  left: 350px;
+  width: 300px;
+  margin-left: 10px; 
+  // VA! All these labels have to be targeted individually to ge the alignment right because bgcolor is an input label and the othe three are checkbox labels that have a label acting as mock checkbox.
+  #ccp-img-alt {
+    padding: 0;
+    label {
+      width: 25px;
+      text-align: left;
+    }
+    input {
+      width: 250px;
+    }
+  }
+  .ccp-img-type-container {
+    width: 100%;
+    margin-top: 6px;
+  }
+  .ccp-img-type {
+    display: inline-block;
+    width: 49%;
+    #rdo-ccp-img-fixed, #rdo-ccp-img-fluid {
+      width: 15%;
+      margin: -3px 0 0 -3px;
+    }
+  }
+  .rdo-ccp-img-fluid-label, .rdo-ccp-img-fixed-label {
+    padding-left: 7px;
+  }
+  // VA! branch: makeFluidOption Just removing this from the DOM for now, but the functionality will have to be removed as well
+  #ccp-img-include-width-height {
+    display: none;
+  }
+}
+
+.ccp-options-col-4 {
+  left: 680px;
+  width: 70px;
+  .ccp-but {
+    display: block;
+    width: 52px;
+    height: 30px;
+    margin-bottom: 8px;
+    // border: 1px solid transparent;
+    background-color:  transparent;
+    cursor: default;
+    border: none;
+    background-size:  52px 30px !important;
+    &.active {
+      display: block;
+      cursor: pointer;
+    }
+  }
+}
+// VA! Reboot: Headings for table options
+.ccp-heading {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  font-size: .85rem;
+  font-weight: bold;
+  color: #a8a8a8;
+  color: #FFFFFF;
+}
+
+// VA! Reboot: need separate classes for the col 2 and col 3 labels that are NOT mock checkbox labels so we can set the width separately
+
+.col-2-label, .col-3-label {
+
+  margin-bottom: 5px;
+  padding-right: 2px;
+  text-align: right;
+} 
+.col-2-label {
+
+}
+
+// VA! Custom, i.e Mock checkbox
+/* These are the actual text labels for the checkboxes. */
+.mock-checkbox-container  {
+  display: block;
+  position: relative;
+  width: 249px;
+  // padding-left: 35px;
+  margin-bottom: 3px;
+  // font-size: 22px;
+  text-align: left;
+  cursor: pointer;
+  z-index: 100;
+  user-select: none;
+  // -webkit-user-select: none;
+  // -moz-user-select: none;
+  // -ms-user-select: none;
+  a {
+    font-weight: bold;
+    text-decoration: underline;
+  }
+}
+
+#chk-ccp-table-include-wrapper-checkbox-label, #chk-ccp-img-include-anchor-checkbox-label {
+  z-index: 100;
+}
+
+.ccp-img-include-anchor-container, .ccp-table-include-wrapper-container {
+  margin-left: 30px;
+}
+
+// VA! Individual Styling for the Mock Checkboxes
+/* These are the hidden browser's default checkboxes. VA! It appears they are attached to the first label element in the parent container */
+.ccp-img-include-anchor-container input, 
+.ccp-table-include-wrapper-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+
+}
+
+/* Create a custom checkbox -- this is the span after the checkbox input element. */
+#spn-ccp-img-include-anchor-checkmrk, 
+#spn-ccp-table-include-wrapper-checkmrk {
+  position: absolute;
+  top: 3px;
+  // left: 40px;
+  height: 15px;
+  width: 15px;
+  background-color: #eee;
+  display: block;
+  z-index: 100;
+  z-index: -1;
+  margin-left: -30px;
+
+}
+
+/* On mouse-over, add a grey background color */
+.ccp-img-include-anchor-container:hover input ~ #spn-ccp-img-include-anchor-checkmrk, 
+.ccp-table-include-wrapper-container:hover input ~ #spn-ccp-table-include-wrapper-checkmrk {
+  background-color: #ccc;
+}
+/* When the checkbox is checked, add a gray background */
+.ccp-img-include-anchor-container input:checked ~ #spn-ccp-img-include-anchor-checkmrk, 
+.ccp-table-include-wrapper-container input:checked ~ #spn-ccp-table-include-wrapper-checkmrk {
+  background-color: #5f5e5e;
+}
+
+.ccp-table-include-wrapper-container ~ #spn-ccp-table-include-wrapper-checkmrk {
+  border: 1px solid magenta;
+}
+
+/* Create the checkmrk/indicator (hidden when not checked) */
+#spn-ccp-img-include-anchor-checkmrk:after, 
+#spn-ccp-table-include-wrapper-checkmrk:after {
+  content: "";
+  position: absolute;
+  display: none;
+
+}
+
+/* Show the checkmrk when checked */
+.ccp-img-include-anchor-container input:checked ~ #spn-ccp-img-include-anchor-checkmrk:after, 
+.ccp-table-include-wrapper-container input:checked ~ #spn-ccp-table-include-wrapper-checkmrk:after  {
+  display: block;
+}
+
+/* Style the checkmrk/indicator */
+.ccp-img-include-anchor-container #spn-ccp-img-include-anchor-checkmrk:after, 
+.ccp-table-include-wrapper-container #spn-ccp-table-include-wrapper-checkmrk:after {
+  top: 2px;
+  left: 5px;
+  width: 5px;
+  height: 10px;
+  transform: rotate(45deg);
+  border: solid white;
+  border-width: 0 3px 3px 0;
+
+}
+
+.ccp-img-include-anchor-label {
+  z-index: 111;
+}
+
+// VA! Hide the real checkbox input element so that it doesn't obscure the imgtype radio buttons below.
+#chk-ccp-img-include-anchor-checkbox {
+  display: none !important;
+}
+
+// VA! TD Radio buttons
+#ccp-td-basictd, #ccp-td-basictd-excludeimg, #ccp-td-imgswap, #ccp-td-posswitch, #ccp-td-bgimage, #ccp-td-vmlbutton {
+  display: flex;
+  justify-content: flex-start;
+  input {
+    width: 15px;
+    margin-right: 10px;
+    padding-top: 5px;
+  }
+  label {
+    width: 80%;
+    margin: 0;
+    line-height: 1.5rem;
+    text-align: left;
+
+  }
+}
+
+// VA! Appobj - Removing this for now.
+// VA! TD options to display/undisplay based on selected radio; table wrapper options to display/undisplay when Include table wrapper checkbox is checked/unchecked
+#ccp-td-align, #ccp-td-valign, #ccp-td-class, #ccp-td-height, #ccp-td-width, #ccp-td-bgcolor, #ccp-td-fontcolor, #ccp-td-bordercolor, #ccp-td-borderradius, #ccp-table-wrapper-class, #ccp-table-wrapper-width, #ccp-table-wrapper-align, #ccp-table-wrapper-bgcolor {
+  display: none;
+  &.active {
+    display: block;
+  }
+} 
+
+
+
+
+// VA! Reboot: 
+#ccp-table-include-wrapper-label {
+  margin: 0;
+  // padding: 0 0 0 34px;
+  font-weight: bold !important;
+}
+
+
+// VA! Reboot: Here are all the CCP button images and their hovers
+#btn-ccp-make-img-tag {
+  background: #000000 url('../img/img-to-cb-html.png') no-repeat center;
+  background-size: 90px 46px;
+  &:hover {
+    background-image: url('../img/img-to-cb-html-hover.png');
+  }
+}
+#btn-ccp-make-td-tag {
+  background: #000000 url('../img/td-to-cb-html-icon.png') no-repeat center;
+  &:hover {
+    background-image: url('../img/td-to-cb-html-icon-hover.png');
+  }
+}
+#btn-ccp-make-table-tag {
+  background: #000000 url('../img/table-to-cb-html-icon.png') no-repeat center;
+  &:hover {
+    background-image: url('../img/table-to-cb-html-icon-hover.png');
+  }
+}
+
+#btn-ccp-make-img-dsktp-css-rule.active {
+  background:  #000000 url('../img/img-display-css-to-clipboard-icon.png') no-repeat center;
+  &:hover {
+    background-image:  url('../img/img-display-css-to-clipboard-icon-hover.png');
+  }
+}
+#btn-ccp-make-img-lgphn-css-rule.active {
+  background:  #000000 url('../img/img-lphone-css-to-clipboard-icon.png') no-repeat center;
+  &:hover {
+    background-image:  url('../img/img-lphone-css-to-clipboard-icon-hover.png');
+  }
+}
+#btn-ccp-make-img-smphn-css-rule.active {
+  background:  #000000 url('../img/img-sphone-css-to-clipboard-icon.png') no-repeat center;
+  &:hover {
+    background-image:  url('../img/img-sphone-css-to-clipboard-icon-hover.png');
+  }
+}
+
+#btn-ccp-make-td-dsktp-css-rule.active {
+  background:  #000000 url('../img/td-display-css-to-clipboard-icon.png') no-repeat center;
+  &:hover {
+    background-image:  url('../img/td-display-css-to-clipboard-icon-hover.png');
+  }
+}
+#btn-ccp-make-td-lgphn-css-rule.active {
+  background:  #000000 url('../img/td-lphone-css-to-clipboard-icon.png') no-repeat center;
+  &:hover {
+    background-image:  url('../img/td-lphone-css-to-clipboard-icon-hover.png');
+  }
+}
+#btn-ccp-make-td-smphn-css-rule.active {
+  background:  #000000 url('../img/td-sphone-css-to-clipboard-icon.png') no-repeat center;
+  &:hover {
+    background-image:  url('../img/td-sphone-css-to-clipboard-icon-hover.png');
+  }
+}
+
+#btn-ccp-make-table-dsktp-css-rule.active {
+  background:  #000000 url('../img/table-display-css-to-clipboard-icon.png') no-repeat center;
+  &:hover {
+    background-image:  url('../img/table-display-css-to-clipboard-icon-hover.png');
+  }
+}
+#btn-ccp-make-table-lgphn-css-rule.active {
+  background:  #000000 url('../img/table-lphone-css-to-clipboard-icon.png') no-repeat center;
+  &:hover {
+    background-image:  url('../img/table-lphone-css-to-clipboard-icon-hover.png');
+  }
+}
+#btn-ccp-make-table-smphn-css-rule.active {
+  background:  #000000 url('../img/table-sphone-css-to-clipboard-icon.png') no-repeat center;
+  &:hover {
+    background-image:  url('../img/table-sphone-css-to-clipboard-icon-hover.png');
+  }
+}
+
+/* Input placeholder */
+//Get rid of these vendor prefixes
+#ccp input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: #959595;
+  font-style: italic;
+}
+#ccp input::-moz-placeholder { /* Firefox 19+ */
+  color: #959595;
+  font-style: italic;
+}
+#ccp input:-ms-input-placeholder { /* IE 10+ */
+  color: #959595;
+  font-style: italic;
+}
+#ccp input:-moz-placeholder { /* Firefox 18- */
+  color: #959595;
+  font-style: italic;
+}
+
+// CCP CLose Button
+#ccp-close {
+  position: absolute;
+  top: 450px;
+  right: 20px;
+  width: 80px;
+  float: right;
+  background-image: url(../img/close-icon.png);
+  background-repeat: no-repeat;
+  background-position: center right;
+  color: #FFFFFF;
+  font-size: 16px;
+  text-transform: uppercase;
+  opacity: 1;
+}
+
+
+// Separators =========================================
+// VA! I assume this is deprecated
+// .separator1 {
+//   width: 100%;
+//   height: 9px;
+//   border-top: 3px solid $whit-color;
+//   border-bottom: 3px solid $dim-color;
+// }
+
+
+// VA! I assume this is deprecated
+// .page-content-heading {
+//   max-width: 1200px;
+//   margin: 0 auto;
+//   padding: 0;
+//   p.tl-dr {
+//     color: #979595;
+//     font-family: $primary-font-family;
+//     font-size: 48px;
+//     text-align: center;
+//     font-weight: normal;
+//     margin: 0;
+//     padding: 0;
+//     span.dim-color {
+//       color: $dim-color;
+//     }
+//     span.whit-color {
+//       color: $whit-color;
+//     }
+//   }
+// }
+
+
+
+// VA! I assume this is deprecated
+// figure {
+//   position: relative;
+//   margin: 15px 0 !important;
+//   padding: 0 0 10px;
+//   border-top: 1px solid $dim-color;
+//   border-bottom: 1px solid $whit-color;
+//   &.qs-clipboard-functions {
+//     position: relative;
+//     width: 100%;
+//     // !VA CLEARFIX! WORKS!
+//     &::after {
+//       display: block;
+//       clear: both;
+//       content: '';
+//     }
+//     .qs-clipboard-functions-left {
+//       display: block;
+//       position: relative;
+//       width: 50%;
+//       float: left;
+//     }
+//     .qs-clipboard-functions-right {
+//       display: block;
+//       position: relative;
+//       width: 50%;
+//       float: left;
+//     }
+
+//   }
+  
+//   h4 {
+//     margin-bottom: 5px;
+//     font-size: 18px;
+//     font-style: italic;
+//   }
+//   img {
+//     margin-bottom: 10px;
+//     &.qs-inspector-content {
+//       width: 800px;
+//       height: 102px;
+//     }
+//     &.qs-image-resize-tools {
+//       width: 646px; 
+//       height: 50px;
+//     }
+//     &.qs-ccp-but {
+//       width: 85px;
+//       height: 50px;
+//       float: left;
+//       margin: 0 20px 10px 0;
+//     }
+//   }
+//   figcaption, aside {
+//     margin-top: 5px;
+//     font-size: 16px;
+//     line-height: 19px;
+//     &.qs-ccp-but-caption {
+//       min-height: 60px;
+//       margin-bottom: 15px;
+//       padding-right: 50px;
+//     }
+//   }
+ 
+
+//   img {
+//     &.qs-viewer-width-icon {
+//       vertical-align: -12px;
+//     }
+//   }
+//   img {
+//     &.viewer-width-field {
+//       width: 146px;
+//       height: 50px;
+//     }
+//   }
+// }
+
+
+
+
+// Page Content =========================================
+
+.content-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  padding-top: 100px;
+}
+
+.content__overview {
+  @include smallest  {
+  
+  }
+  @include small  {
+  
+  }
+  @include tablet  {
+  
+  }
+  @include desktop  {
+
+  }
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 1000px;
+}
+
+.content__overview-heading {
+  display: block;
+  text-align: center;
+  width: 100%;
+}
+
+
+.end__matter {
+  width: 100%;
+
+}
+
+.video {
+  position: relative;
+  width: 720px;
+  iframe {
+    display: block;
+    position: relative;
+    margin: 0 auto;
+  }
+}
+
+/* TEST */
+#test-container {
+  display: block;
+  width: 800px;
+  height: 600px;
+  margin: 0 auto;
+}
+
+#test-left {
+  float: left;
+  width: 390px;
+  height: 100%;
+}
+
+#test-right {
+  float: right;
+  width: 390px;
+  height: 100%;
+}
+
+#test-right * {
+}
+
+
+
+/* VA! Fix for Firefox displaying extra styling on Select elements on Linux. Note: the dropdown options still show with white text on black background but I can live with that. Thanks to: https://stackoverflow.com/questions/44147362/firefox-overriding-style-of-html-select-option
+But note that it's possible that I've disabled Multiprocess (about:support) on my Windows Firefox versions. That needs to be tested before I go shooting my mouth off about this on SO.
+*/
+/* VA! ALSO: about the @supports rule...
+https://developer.mozilla.org/en-US/docs/Web/CSS/@supports   */
+@supports (-moz-appearance:none) {
+  select
+  {
+  -moz-appearance:none !important;
+  background: white url('data:image/gif;base64,R0lGODlhBgAGAKEDAFVVVX9/f9TU1CgmNyH5BAEKAAMALAAAAAAGAAYAAAIODA4hCDKWxlhNvmCnGwUAOw==') right center no-repeat !important;
+  background-position: calc(100% - 5px) center !important;
+  
+  }
+}
+
+
+// VA! Tooltip tests
+button, .btn, .btn-default {
+  cursor: inherit;
+}
+
+#testme {
+  &.active {
+    background: yellow;
+  }
+}

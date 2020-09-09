@@ -1,99 +1,10 @@
-// !VA REBOOT 12/29/19
+// !VA OVERHAUL 08/24/20
 // ===================
-// See C:\Users\VANA\OneDrive\WhittyReview_12.30.19.docx
-
-// !VA GENERAL NOTES
-/* !VA  - June Reboot Notes
-=========================================================
-JULY REVIEW:
+// See WittyAugustOverhaulLog_08.24.20A.docx
+// See WittyStructure_08.24.20.docx
+/* !VA  
 
 
-// !VA Branch: review0720I (071720)
-TODO: Review fluid functionality.
-  * Litmus template appears to always have parent table with 100% width and a wrapper table with max-width and the class responsive-table. 
-  * Litmus template always has a ghost table around any table with the max-width style property.
-
-
-TODO: Make sure the fluid functionality switches properly - there was an instance of the necessary options not appearing when the fluid radio was clicked. 
-TODO: In bgimage option, none of the img options write any output to the td. They need to be disabled or undisplayed.
-TODO: CCP is opening with after loading new image with the fluid option selected, if that is what the last selection was. It should always open after loading a new image wiht the fixed option selected.
-TODO: Changing TD Options resets all the CCP options to default - that is annoying. Always check the TD Option first, or fix it - or make sure loading a new image resets the TD Option to Td Basic.
-
-// !VA Branch: review0720H (071720)
-DONE: Changed default tableAlign option for imgType fluid to ‘none’ and updated tableAlign attribute to make it editable. 
-DONE: Made default tableWrapperClass for imgType fluid not disabled. It still has the default value of responsive-table, but it is now editable as per Litmus template.
-DONE: In excludeimg, if parent table is empty and td width is provided, then the td width is greater than the empty parent table input and throws an error. Added condition in checkNumericInput/tableWidth that overrides the error condition if Appobj.iptCcpTableWidth is empty.
-DONE: Width and height inputs don't allow percents - they must. Added checkPercent(val) to checkUserInput as condition so that if evtTargetVal is a valid percent it is returned without any numeric error checking.
-DONE: In excludeimg mode, clicking on the makeCSSRule button should include the class name in the output, currently it just shows td. { }. THis could be useful for adding text properties in the empty brackets.
-DONE: Set tab order with tabindex
-DONE: bgimage shows undefined instead of curImg, fixed in getBgimageBlock
-
-// !VA Branch: review0720F (071720)
-DONE: Create condition in Attributes.tableWidth property to ensure that the iptCcpTdWidth input element shows the value of the input element when the tdoption excludeimg is selected, and otherwise shows the value of Appobj.curImgW. 
-DONE: Fix undefined error in CCP input on TAB or ENTER - Added condition to skip error checking if evtTargetVal is empty and set Appobj property to empty string.
-DONE: Add error handling for excludeimg TD option for tableWidth, tableWrapperWidth and tdWidth inputs. NOTE: Don't forget, ALL ERROR HANDLING FOR NUMERIC INPUTS IS IN checkNumericInput.
-
-// !VA Branch: fixEventHandling04 (071720)
-DONE: fixed event handling...so far. Cleaned up, commented, merged to master
-
-// !VA Branch: fixEventHandling02 (071620)
-DONE: Change input type to number for all numeric input elements and add the CSS line that suppresses the default increment/decrement arrows on the number inputs.
-
-Branch review0720C
-DONE - Fixed, added conditions for excludeimg to TD ptions to buildCssRule. Problem: excludeimg: height and width fields don't write to clipboard properly. When 90/18 are entered in the inputs, width writes as 30, height as 600. This is because that's the image that's currently loaded. Excludeimg has to override the Appobj property without writing to the property. It also has to override any error checking related to the loaded image - but not the imgViewerW, it still can't be greater than that. Ugh!
-Table Options - Parent Table. Clearing the width input does not exclude the value from the CB output - still writes the width of the currently loaded image. That should NOT be tied to the TD excludeimg option. The width field should be clearable in any case and any value should be enterable as long as it's not larger than imgViewerW. Ugh! 
-TODO: Loading a new image doesn't reset all class and alt fields. All fields should reset on page refresh. ALT doesn't appear to do that all the time, and I can't figure out what the trigger is.
-
-
-
-Branch: review0720B
--------------------
-TODO: Dev mode: Fix Include wrapper table options don't appear if the CCP is closed and re-opened - Maybe not worth fixing
-DONE: Remove height and width in tdoptions 'basic' - they should only be available in excludeimg option.
-
-Branch: review0720A
--------------------
-
-DONE: Fix BuildCSS buttons
-
-DONE: Add CCP options to anchor tag: color, target="_blank" -
-DONE: Change checkbox name from Wrap img... to Include anchor
-DONE: Make the filename div wider - now 300px
-DONE: CCP numeric input fiels need an input validator
-DONE: THe CCP should store all the currently selected options and restore them whenever the ccp is opened -- All the CCP display/undisplay does is add/remove the active class, which has no effect on the state of value of CCP elements.
-DONE: Add px to max-width in tableWrapperStyle in getAttributes.
-
-
-TODO: BUG! Load 625X525 with imgViewerW set to 600 - loads without resizing to container size
-TODO: Have a bit problem with td options height and width fields. Currently these fields are available when the 'rdoCcpTdBasic' option is selected, but there is no case when they would ever write the values the user might enter here to the clipboard. Beccause, what happens when the user enters values that are smaller than the current image resolution. That can't be possible. The TD can't be smaller than its child. The height should never be available when the child is an image and the width should either be preset to the image width or unavailable. Or it should be allowed to be larger than the child, for instance if padding is desired, but never smaller. And if you add padding, you'd add it to the img, not to the TD, right? Have to check that out before resolving this. 
-NOTE: It's important to remember that handleCcpActions handles the display of elements whose state or value in the CCP is changed by OTHER CCP elements. For example, the imgType radio buttons trigger value changes in OTHER elements. So handleCcpActions handles the display of the CCP UI. In contrast, the Attributes control only the Clipboard output. For instance, the class attribute only writes to the Clipboard if there is an entry in the input field. That's why it's handled in getAttributes - it doesn't result in a change to the CCP UI.
-DONE: Inspector values need to be rounded to two digits -- they show the entire floating point value and overflow the container.
-
-
-TODO: No tooltip available for posswitch and imgswap
-TODO: Tooltips don't appear on checkboxes
-TODO: Add error to vmlbutton height not matching img height
-TODO: Add error handling and the isErr argument to makeTdNode and makeTableNode so that the Clipboard object can discern between success messages and 'alert' messages, i.e. when the Clipboard output should be reviewed by the user for some reason, i.e. when vmlbutton height doesn't match the height of the loaded image. I don't think this is possible due to Clipboard object constraints
-TODO: Determine whether the parent table class or wrapper table class is output to CSS. It should be the parent table class, or even both.
-TODO: curImg doesn't resize back if you change imgViewerW to smaller than curImg and then change it back. It should follow the size of imgViewerW shouldn't it? Maybe not...
-DONE: Make bgcolor add the hash if it's not in the value. Don't do that, need to allow for non-hash values like color aliases
-DONE: Fix table width: doesn't reflect what's in toolbar viewer width field. FIXED - Appears to work as designed, curImgW in Parent table width and imgViewerW in Wrapper table width
-
-Error Handling
---------------
-TODO: The CSS output will need to be revisited for td and table.
-TODO: There's an issue with what to do if the user grows the image past the viewer height, but not past the viewer width. Currently, the image height CAN grow past the viewer height; the only limitation is that it can't grow past the viewer width. That's no good.
-TODO: Assign tab order
-
-
-/* !VA  - For Consideration
-=========================================================
-
-TODO: Fix being able to resize imgViewerW smaller than curImgW - current behavior is imgw resizes with imgViewerW. If that's the desired behavior, curImgW still doesn't write the udpated width to Appobj, that needs to be fixed.
-TODO: Fix bug - load 400X1000, multiple click on +50, Display Size shows 450 but the img doesn't grow...
-TODO: Parent table class att only shows in CB output if Wrapper is selected, not in just the Partent table output.
-TODO: Fix, when curImgNW is greater than curImgW the curImgNW size flashes before resizing to the viewer size. This is probably because of the settimeout, which might not be necesssary if the onload function is running.
-TODO: Assign keyboard  shortcuts
 
 */
 //SCRIPT START
@@ -105,9 +16,7 @@ var Witty = (function () {
   // // !VA Run on page load
   // document.addEventListener("DOMContentLoaded", function() {
   //   setTimeout(function(){ 
-  //     // !VA Don't forget you can't use button aliases here..
-  //     document.querySelector('#btn-ccp-make-td-tag').click();
-  //     appobjPropToAlias('curImgW');
+
   //   }, 100);
   // });
 
@@ -124,6 +33,25 @@ var Witty = (function () {
   //   testbut.classList.add('active')
   // }
 
+  // !VA Branch: OVERHAUL0907A
+  // !VA MUTATIONOBSERVER
+  // !VA https://www.seanmcp.com/articles/event-listener-for-class-change/
+  // Select the node that will be observed for mutations
+
+  // const mainNode = document.getElementById('ccp-tbl-wrapr-lbl');
+
+  // function callback(mutationsList, observer) {
+  //   console.log('Mutations:', mutationsList);
+  //   console.log('Observer:', observer);
+  //   mutationsList.forEach(mutation => {
+  //     if (mutation.attributeName === 'class') {
+  //       console.log('Class change = set debugger to determine where...');
+  //     }
+  //   });
+  // }
+  // const mutationObserver = new MutationObserver(callback);
+  // mutationObserver.observe(mainNode, { attributes: true });
+
 
   var testbut = document.querySelector('#testme');
   // var testbut2 = document.querySelector('#testme2');
@@ -136,8 +64,8 @@ var Witty = (function () {
 
   testbut.onclick = function() {
     // foo = !foo;
-    // console.log('foo is: ' + foo);
-    // foo ?  testbut2.addEventListener('click', addMe, false) : testbut2.removeEventListener('click', addMe, false);
+    // console.log('someVar is: ' + someVar);
+    // someVar ?  testbut2.addEventListener('click', addMe, false) : testbut2.removeEventListener('click', addMe, false);
     var Attributes = CBController.initGetAttributes();
     const getImgType = Attributes.imgType;
     console.log('getImgType is: ' + getImgType);
@@ -149,6 +77,7 @@ var Witty = (function () {
   myObject.variable = 'This is a string';
 
   var UIController = (function() {
+
 
     // !VA Element Aliases
     // !VA UIController: Inspector ID strings
@@ -225,80 +154,99 @@ var Witty = (function () {
       appBlocker: '#app-blocker',
       hdrIsolateApp: '.header-isolate-app'
     };
-
-    // !VA  UIController: ccpUserInput ID Strings
+    
+    // !VA  OVERHAUL NEW: UIController: ccpUserInput ID Strings
     // !VA imgAnchor is just a flag for the status of the checkbox. The actual propStrings have to have an Open and Close property.
     const ccpUserInput = {
-      // !VA Not renaming the checkbox/checkmarks because they already have code that queries the last three characters to determine if mrk or box...
-      // !VA IMG tag user input
-      iptCcpImgClass: '#ipt-ccp-img-class',
-      iptCcpImgAlt: '#ipt-ccp-img-alt',
-      rdoCcpImgFixed: '#rdo-ccp-img-fixed',
-      rdoCcpImgFluid: '#rdo-ccp-img-fluid',
-      selCcpImgAlign: '#sel-ccp-img-align',
-      iptCcpImgRelPath: '#ipt-ccp-img-relpath',
-      spnCcpImgIncludeAnchorCheckmrk: '#spn-ccp-img-include-anchor-checkmrk',
-      // !VA TD tag user input
-      iptCcpTdClass: '#ipt-ccp-td-class',
-      selCcpTdAlign: '#sel-ccp-td-align',
-      selCcpTdValign: '#sel-ccp-td-valign',
-      iptCcpTdHeight: '#ipt-ccp-td-height',
-      iptCcpTdWidth: '#ipt-ccp-td-width',
-      iptCcpTdBgColor: '#ipt-ccp-td-bgcolor',
-      iptCcpTdFontColor: '#ipt-ccp-td-fontcolor',
-      iptCcpTdBorderColor: '#ipt-ccp-td-bordercolor',
-      iptCcpTdBorderRadius: '#ipt-ccp-td-borderradius',
-      rdoCcpTdBasic: '#rdo-ccp-td-basic',
-      rdoCcpTdExcludeimg: '#rdo-ccp-td-excludeimg',
-      rdoCcpTdImgswap: '#rdo-ccp-td-imgswap',
-      rdoCcpTdPosswitch: '#rdo-ccp-td-posswitch',
-      rdoCcpTdBgimage: '#rdo-ccp-td-bgimage',
-      rdoCcpTdVmlbutton: '#rdo-ccp-td-vmlbutton',
-      // !VA TABLE tag user input
-      iptCcpTableClass: '#ipt-ccp-table-class',
-      selCcpTableAlign: '#sel-ccp-table-align',
-      iptCcpTableWidth: '#ipt-ccp-table-width',
-      // !VA Not in use yet
-      // tableMaxWidth: '#ipt-ccp-table-max-width',
-      iptCcpTableBgColor: '#ipt-ccp-table-bgcolor',
-      spnCcpTableIncludeWrapperCheckmrk: '#spn-ccp-table-include-wrapper-checkmrk',
-      iptCcpTableWrapperClass: '#ipt-ccp-table-wrapper-class',
-      iptCcpTableWrapperWidth: '#ipt-ccp-table-wrapper-width',
-      selCcpTableWrapperAlign: '#sel-ccp-table-wrapper-align',
-      iptCcpTableWrapperBgColor: '#ipt-ccp-table-wrapper-bgcolor',
+      ccpImgMkcssGrp: '#ccp-img-mkcss-grp',
+      ccpImgCbhtmBtn: '#ccp-img-cbhtm-btn',
+      ccpImgCbdtpBtn: '#ccp-img-cbdtp-btn',
+      ccpImgCbsphBtn: '#ccp-img-cbsph-btn',
+      ccpImgCblphBtn: '#ccp-img-cblph-btn',
+      ccpImgClassTfd: '#ccp-img-class-tfd',
+      ccpImgAltxtTfd: '#ccp-img-altxt-tfd',
+      ccpImgLoctnTfd: '#ccp-img-loctn-tfd',
+      ccpImgAnchrTfd: '#ccp-img-anchr-tfd',
+      ccpImgTxclrTfd: '#ccp-img-txclr-tfd',
+      ccpImgTargtChk: '#ccp-img-targt-chk',
+      ccpImgAlignRdo: '#ccp-img-align-rdo',
+      ccpImgExcldRdo: '#ccp-img-excld-rdo',
+      ccpImgItypeRdo: '#ccp-img-itype-rdo',
+      ccpTdaCbhtmBtn: '#ccp-tda-cbhtm-btn',
+      ccpTdaMkcssGrp: '#ccp-tda-mkcss-grp',
+      ccpTdaCbdtpBtn: '#ccp-tda-cbdtp-btn',
+      ccpTdaCbsphBtn: '#ccp-tda-cbsph-btn',
+      ccpTdaCblphBtn: '#ccp-tda-cblph-btn',
+      ccpTdaClassTfd: '#ccp-tda-class-tfd',
+      ccpTdaWidthTfd: '#ccp-tda-width-tfd',
+      ccpTdaHeigtTfd: '#ccp-tda-heigt-tfd',
+      ccpTdaBgclrTfd: '#ccp-tda-bgclr-tfd',
+      ccpTdaTxclrTfd: '#ccp-tda-txclr-tfd',
+      ccpTdaBdradTfd: '#ccp-tda-bdrad-tfd',
+      ccpTdaBdclrTfd: '#ccp-tda-bdclr-tfd',
+      ccpTdaAlignRdo: '#ccp-tda-align-rdo',
+      ccpTdaValgnRdo: '#ccp-tda-valgn-rdo',
+      ccpTdaPadngGrp: '#ccp-tda-padng-grp',
+      ccpTdaOptnsRdo: '#ccp-tda-optns-rdo',
+      ccpTdaBasicPar: '#ccp-tda-basic-par',
+      ccpTdaIswapPar: '#ccp-tda-iswap-par',
+      ccpTdaSwtchPar: '#ccp-tda-swtch-par',
+      ccpTdaBgimgPar: '#ccp-tda-bgimg-par',
+      ccpTdaVmlbtPar: '#ccp-tda-vmlbt-par',
+      ccpTblMkcssGrp: '#ccp-tbl-mkcss-grp',
+      ccpTblCbhtmBtn: '#ccp-tbl-cbhtm-btn',
+      ccpTblCbdtpBtn: '#ccp-tbl-cbdtp-btn',
+      ccpTblCbsphBtn: '#ccp-tbl-cbsph-btn',
+      ccpTblCblphBtn: '#ccp-tbl-cblph-btn',
+      ccpTblAlignRdo: '#ccp-tbl-align-rdo',
+      ccpTblClassTfd: '#ccp-tbl-class-tfd',
+      ccpTblWidthTfd: '#ccp-tbl-width-tfd',
+      ccpTblMaxwdTfd: '#ccp-tbl-maxwd-tfd',
+      ccpTblBgclrTfd: '#ccp-tbl-bgclr-tfd',
+      ccpTblGhostChk: '#ccp-tbl-ghost-chk',
+      ccpTblMsdpiChk: '#ccp-tbl-msdpi-chk',
+      ccpTblWraprChk: '#ccp-tbl-wrapr-chk',
+      ccpTblHybrdChk: '#ccp-tbl-hybrd-chk',
+      ccpTbwAlignRdo: '#ccp-tbw-align-rdo',
+      ccpTbwClassTfd: '#ccp-tbw-class-tfd',
+      ccpTbwWidthTfd: '#ccp-tbw-width-tfd',
+      ccpTbwMaxwdTfd: '#ccp-tbw-maxwd-tfd',
+      ccpTbwBgclrTfd: '#ccp-tbw-bgclr-tfd',
+      ccpTbwGhostChk: '#ccp-tbw-ghost-chk',
+      ccpTbwMsdpiChk: '#ccp-tbw-msdpi-chk'
+    
     };
 
     // !VA CCP Elements used for tooltips. This is a different list than the CCPUserInput elements although some are duplicated. The element that triggers the tooltip has to be the parent element of the input or checkbox element, otherwise if the user hovers over a label instead of the actual input element, nothing happens.
     const ccpUserInputLabels = {
-      selCcpImgAlignLabel: '#sel-ccp-img-align-label',
-      iptCcpImgClassLabel: '#ipt-ccp-img-class-label',
-      iptCcpImgRelpathLabel: '#ipt-ccp-img-relpath-label',
-      iptCcpImgAltLabel: '#ipt-ccp-img-alt-label',
+      ccpImgAlignRdoLabel: '#sel-ccp-img-align-label',
+      ccpImgClassTfdLabel: '#ipt-ccp-img-class-label',
+      ccpImgLoctnTfdLabel: '#ipt-ccp-img-relpath-label',
+      ccpImgAltxtTfdLabel: '#ipt-ccp-img-alt-label',
       iptCcpImgIncludeWidthHeightLabel: '#ccp-img-include-width-height-label',
     };
       
-    const btnCcpMakeClips = {
-      // !VA Build HTML Clipboard Buttons
-      // !VA NEW
-      btnCcpMakeImgTag: '#btn-ccp-make-img-tag',
-      // btnCcpImgBuildHtmlClip: '#btn-ccp-img-build-html-clip',
-      btnCcpMakeTdTag: '#btn-ccp-make-td-tag',
-      btnCcpMakeTableTag: '#btn-ccp-make-table-tag',
-      
+    // !VA OVERHAUL NEW: Build HTML Clipboard Buttons. 
+    // !VA NOTE: The suffix on the alias is Btn and the suffix on the element ID is ipt. Consider fixing this at some point
+    const iptCcpMakeClips = {
+      // !VA Make HTML Tag Buttons
+      ccpTdaCbhtmIpt: '#ccp-tda-cbhtm-ipt',
+      ccpImgCbhtmIpt: '#ccp-img-cbhtm-ipt',
+      ccpTblCbhtmIpt: '#ccp-tbl-cbhtm-ipt',
       // !VA Make Image CSS Rule Buttons
-      btnCcpMakeImgDsktpCssRule: '#btn-ccp-make-img-dsktp-css-rule',
-      btnCcpMakeImgSmphnCssRule: '#btn-ccp-make-img-smphn-css-rule',
-      btnCcpMakeImgLgphnCssRule: '#btn-ccp-make-img-lgphn-css-rule',
+      ccpImgCbdtpIpt: '#ccp-img-cbdtp-ipt',
+      ccpImgCbsphIpt: '#ccp-img-cbsph-ipt',
+      ccpImgCblphIpt: '#ccp-img-cblph-ipt',
       // !VA Make Td CSS Rule Buttons
-      btnCcpMakeTdDsktpCssRule:  '#btn-ccp-make-td-dsktp-css-rule',
-      btnCcpMakeTdSmphnCssRule: '#btn-ccp-make-td-smphn-css-rule',
-      btnCcpMakeTdLgphnCssRule: '#btn-ccp-make-td-lgphn-css-rule',
+      ccpTdaCbdtpIpt: '#ccp-tda-cbdtp-ipt',
+      ccpTdaCbsphIpt: '#ccp-tda-cbsph-ipt',
+      ccpTdaCblphIpt: '#ccp-tda-cblph-ipt',
       // !VA Make Table CSS Rule  Buttons
-      btnCcpMakeTableDsktpCssRule:  '#btn-ccp-make-table-dsktp-css-rule',
-      btnCcpMakeTableSmphnCssRule: '#btn-ccp-make-table-smphn-css-rule',
-      btnCcpMakeTableLgphnCssRule: '#btn-ccp-make-table-lgphn-css-rule',
-      
+      ccpTblCbdtpIpt: '#ccp-tbl-cbdtp-ipt',
+      ccpTblCbsphIpt: '#ccp-tbl-cbsph-ipt',
+      ccpTblCblphIpt: '#ccp-tbl-cblph-ipt',
     };
+
     
     // !VA Appmessage elements
     const appMessageElements = {
@@ -383,121 +331,387 @@ var Witty = (function () {
       return [aspectReal, aspectInt];  
     }
 
-    // !VA CCP FUNCTIONS
-    // !VA --------------------
-    // !VA UIController   
-    // !VA Apply/remove disabled-radio and disabled style to radio button element and its label. Called from UIController public handleCcpActions. Flag is the boolean indicating whether to apply or remove the styles. Called from handleCcpActions (UIController public).
-    function setCcpDisabledRadio(flag, elementAlias ) {
-      let elementLabel;
-      // !VA The element label must have a disabled style too, so append -label to the alias to select it.
-      elementLabel = ccpUserInput[elementAlias] +  '-label';
-      // !VA If the Appobj property rdoCcpImgFluid is true, then the rdoCcpImgFluid radio is selected, so apply the disabled styles and disabled attribute
-      if (flag ) {
-        // !VA Apply the disabled styles to the elements
-        document.querySelector(ccpUserInput[elementAlias]).disabled = true;
-        document.querySelector(elementLabel).classList.add('disabled');
-        document.querySelector(ccpUserInput[elementAlias]).classList.add('disabled-radio');
-      } else {
-        // !VA The fluid radio button is not selected, so remove the disabled styles and the disabled attribute
-        document.querySelector(ccpUserInput[elementAlias]).disabled = false;
-        document.querySelector(elementLabel).classList.remove('disabled');
-        document.querySelector(ccpUserInput[elementAlias]).classList.remove('disabled-radio');
+    // !VA UIController private
+    // !VA Branch: OVERHAUL0903A
+    // !VA This is only called from populateAppobj?
+    // !VA Gets the value of a text input field in a text input field container based on the alias/Appobj property of the parent text input field container. Called from populateAppobj, could probably be deprecated.
+    // !VA Branch: OVERHAUL0904A
+    // !VA Deprecating...
+    // function fetchTextInput( alias ) {
+    //   let selectedOption;
+    //   // !VA Replace the parent's id code with the input element's id code, get the input element and add its value to Appobj 
+    //   selectedOption = document.querySelector(ccpUserInput[alias].replace('tfd', 'ipt')).value;
+    //   return selectedOption;
+    // }
+
+    // !VA Branch: OVERHAUL0902A
+    // !VA UIController private
+    // !VA If called from populateAppobj, returns the value of text input fields as hard-coded in the HTML. Otherwise, called by configCCP, which receives an array of aliases whose corresponding CCP element value is set to its corresponding Appobj value. 
+    function reflectAppobj( reflectArray) { 
+      // console.log('reflectArray is: ');
+      // console.log(reflectArray);
+      // console.log('reflectAppobj running'); 
+      let el, isInit, retVal;
+      for (const alias of reflectArray) {
+        typeof(appController.getAppobj(alias)) === 'undefined' ? isInit = true : isInit = false;
+        el = document.querySelector(ccpUserInput[alias].replace('tfd', 'ipt'));
+        if (isInit) {
+          retVal = el.value;
+          return retVal;
+        } else {
+          el.value = appController.getAppobj( alias );
+        }
       }
     }
 
-    // !VA UIController   
-    // !VA Apply the active class to the parent element of the element with the passed identifier. The identifier corresponds to the Appobj property name. Called from handleCcpActions (UIController public).
-    function setCcpActiveParentClass(flag, elementAlias) {
-      // !VA Build the parent div id from the elementAlias
-      let parentDivId;
-      // !VA Get the ID of the parent div of the target element.
-      function getParentDiv(elementAlias) {
-        parentDivId = '#' + ccpUserInput[elementAlias].substring( 5 );
-        // !VA Not necessary to return it since it's scoped to the parent function.
-        // return parentDivId;
+    // !VA Branch: OVERHAUL0901A
+    // !VA UIController private
+    // !VA If called from populateAppobj, returns the value of checkbox input elements as hard-coded in the HTML. Otherwise, called by configCCP, which receives an array of aliases whose corresponding CCP element value is set to its corresponding Appobj value. 
+    function checkboxState( checkedArray ) {
+      // console.log('checkboxState running'); 
+      let el, isChecked, isInit;
+      for (let i = 0; i < checkedArray.length; i++) {
+        isChecked = appController.getAppobj( checkedArray[i]);
+        // !VA Replace the 'chk' suffix in the alias with 'ipt' to target the checkbox input
+        el = document.querySelector(ccpUserInput[checkedArray[i]].replace('chk', 'ipt'));
+        // console.log('el.id is: ' + el.id);
+        // console.log('isChecked is: ' + isChecked);
+        // !VA If the Appobj property of the alias is 'undefined', then the call comes from populateCcpProperties and the Appobj property hasn't been in itialized yet. Set the isInit flag to true to get the value of the element corresponding to the alias and write it to Appobj to initialize
+        typeof(appController.getAppobj(checkedArray[i])) === 'undefined' ? isInit = true : isInit = false;
+        // !VA If isInit is true, then get the hard-coded checkbox state from the HTML DOM and return it to populate Appobj with it.  
+        if (isInit) {
+          isChecked = el.checked;
+          return isChecked;
+        } else  {
+          // !VA If isInit is false, then Appobj is already populated, so get the checked state from Appobj and set the current elements' checked state to it.
+          // !VA Branch: OVERHAUL0905A
+          // !VA Fixing... 
+          // isChecked = appController.getAppobj(checkedArray[i]);
+
+          el.checked = isChecked;
+
+          
+
+          // !VA Check the checkbox of the passed-in alias
+        }
+        // console.log('checkboxState Appobj is: ');
+        // console.dir(appController.getAppobj());
       }
-      getParentDiv(elementAlias);
-      // !VA Add or remove the active class based on the flag value
-      if (flag === true ) {
-        document.querySelector(parentDivId).classList.add('active');
-      }   else if (flag === false ) {
-        document.querySelector(parentDivId).classList.remove('active');
-      } else {
-        console.log('ERROR in setCcpActiveParentClass: unknown condition');
+    }
+    
+    // !VA UIController private
+    // !VA Branch: OVERHAUL0901A
+    // !VA  If called from populateAppobj, returns the selected (checked) value of radio input elements as hard-coded in the HTML. Otherwise, called by configCCP, which receives an array of aliases whose corresponding radio element selection is set to its corresponding Appobj value. Handles both align radio elements and binary/multi-select radio option groups.
+    function radioState( radioArray ) {
+      let retVal, iptElements, option,  parent, chldrn, isInit;
+      for (let i = 0; i < radioArray.length; i++) {
+        // !VA This is called directly in populateAppobj to initialize Appobj with the CCP UI values as defined in the HTML file. So the getAppobj call for initialization will return 'undefined'. In that case, get the element's option value from the DOM and set Appobj to that value. 
+
+        // !VA Branch: OVERHAUL0904A
+        // !VA Added handling for Align/Valign Rdo elements
+        // !VA Branch: OVERHAUL0904A
+        // !VA If the Appobj property of the alias is 'undefined', then the call comes from populateCcpProperties and the Appobj property hasn't been initialized yet. Set the isInit flag to true to get the value of the element corresponding to the alias and write it to Appobj to initialize
+        typeof(appController.getAppobj(radioArray[i])) === 'undefined' ? isInit = true : isInit = false;
+        // !VA If not isInit, then get the selected option from Appobj. 
+        if (!isInit) { option = appController.getAppobj(radioArray[i]); }
+
+        // !VA If the element is an align radio group
+        if ( radioArray[i].includes('Align') || radioArray[i].includes('Valgn')) {
+          // !VA Get the parent container of the individual child input elements
+          parent = document.querySelector(ccpUserInput[radioArray[i]]);
+          // !VA Get a collection of the children
+          chldrn = parent.children;
+          // !VA Loop through the children
+          for (const chld of chldrn) {
+            // !VA If the child is an INPUT element and Appobj needs to be initialized
+            if (isInit) { 
+              // !VA set the return value to the value attribute of the checked align element
+              if (chld.checked === true) { retVal = chld.value; }
+            // !VA Otherwise, if the Appobj property matches the attribute value of the element, check that element
+            } else {
+              if ( chld.value === option ) {
+                chld.checked = true;
+              } 
+            }
+          }
+        } else {
+          // !VA iptElements is the collection of child INPUT elements of the element with the id ccpUserInput[alias]. Value is the value attribute set in the HTML, which is used as the 'option' string.
+          iptElements = document.querySelector(ccpUserInput[radioArray[i]]).getElementsByTagName('INPUT');
+          // !VA Loop through the iptElements collection
+          for (const el of iptElements) {
+            // !VA If isInit is true, then the caller is populateAppobj and Appobj needs to be initialized, so return the value attribute of the element indicated by the alias.
+            if (isInit) { 
+              if (el.checked === true ) { retVal = el.value; }
+            // !VA Otherwise...
+            } else  { 
+              // !VA If the element ID contains the passed-in 'option' string, then set that element to checked
+              if  (el.id.includes(option)) {
+                el.checked = true; 
+              } 
+            }
+          }
+        }
+      }
+      return retVal;
+    }
+
+
+
+
+
+    // !VA UIController private
+    // !VA Branch: OVERHAUL0901A
+    // !VA Resets (i.e. adds the ccp-conceal-ctn class) to the container elements for the CPP option section affected by the CCP control associated with the alias. 
+    function revealReset( alias ) {
+      let el, mkcssReset = [], defaultArr, defaultReset = [], wraprArr,  wraprReset = [], resetArray;
+      // !VA Only log if not init
+      // if (alias !== 'default' ) { console.log('revealReset running'); }
+       
+
+
+      // !VA There are three reset element matrices: mkcssReset includes all the Make CSS Button containers. That is obtained by getting the elements with classname 'ccp-mkcss-ctn' - it includes the Make CSS buttons and the curly braces that surround them. defaultReset includes the containers corresponding to the TD Options 'basic' configuration, and wraprReset includes the Wrapper Option elements.
+      defaultArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgMkcssGrp', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPadngGrp', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
+      wraprArr = ['ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk', ];
+
+
+      // !VA Array of Make CSS buttons to reset
+      for (const el of document.getElementsByClassName('ccp-mkcss-ctn')) {
+        mkcssReset.push(el);
+      }
+      // !VA Array of default elements to reset
+      for (const alias of defaultArr) {
+        el = document.querySelector(ccpUserInput[alias]);
+        defaultReset.push(el);
+      }
+      // !VA Array of Table Wrapper elements to reset
+      for (const alias of wraprArr) {
+        el = document.querySelector(ccpUserInput[alias]);
+        wraprReset.push(el);
+      }
+
+
+      switch(true) {
+      case alias === 'default':
+        // !VA For init, revea; the default configuration
+      // !VA Conceal all elements to reset them
+        // console.log('default reset running');
+        for (const el of document.getElementsByClassName('ccp-ctn')) {
+          el.classList.add('ccp-conceal-ctn');
+        }
+        resetArray = defaultReset;
+        for (const el of resetArray) {
+          el.classList.add('ccp-conceal-ctn');
+          el.classList.remove('ccp-conceal-ctn');
+        }
+        break;
+      case alias === 'ccpImgExcldRdo':
+        resetArray =  [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgItypeRdo', 'ccpTdaOptnsRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpImgCbhtmBtn'  ];
+        for (const alias of resetArray ) {
+          el = document.querySelector(ccpUserInput[alias]);
+          el.classList.add('ccp-conceal-ctn');
+        }
+        break;
+      case alias === 'ccpTblWraprChk':
+        // !VA For init, reveal the default configuration
+        resetArray = wraprReset;
+        break;
+      case alias === 'ccpTblHybrdChk':
+        // !VA For init, reveal the default configuration
+        resetArray = wraprReset;
+        break;
+      default:
+        console.log('revealReset: case not handled');
+        // !VA Reveal the table wrapper config
+
+        console.log('revealReset: condition not handled');
+      } 
+    }
+
+
+
+
+
+    // !VA UIController private  
+    // !VA Branch: OVERHAUL0827B
+    // !VA Reveal and conceal CCP parent containers with sequential animation. flag specifies if the reveal class cpp-hide-ctn is to be added or removed: true = add, false = remove. aliasArray is the array of elements to reveal/conceal. Called from UIController.configCCP. 
+    // !VA Note: The only reason so far that this exists is to target the CSS Make buttons via their parent element. They can't be targeted directly because they're not in the ccpElementInput object and it would complicate things unduly to add them to that object when they're already in their own alias object.
+    // !VA Note: the setTimeout loop could probably be done better with a for-in on the chldrn collection, but this works fine.
+    function revealParent( flag, aliasArray) {
+      let chldrn;
+      // !VA revealChildren isThe function that will be run sequentially with a 50ms delay
+      function revealChildren(chldrn) {
+        // !VA Iterate through the child element array of the current aliasArray item
+        for (var i = 0; i < chldrn.length; i++) {
+          // !VA Pause between each iteration 
+          (function (i) {
+            setTimeout(function () {
+              // !VA If flag is false, remove the class
+              if (!flag) {
+                chldrn[i].classList.remove('ccp-conceal-ctn');
+              // !VA If flag is true, add the class
+              } else if (flag) {
+                chldrn[i].classList.add('ccp-conceal-ctn');
+              } else {
+              // !VA If the action isn't recognized, log an error
+                console.log('ERROR in revealParent - unknown action');
+              }
+            // !VA Pause 25 milliseconds between iterations
+            }, 25 * i);
+          })(i);
+        }
+      }
+      // !VA Loop through the passed-in aliasArray and for each array item:
+      for (let i = 0; i < aliasArray.length; i++) {
+        // !VA Get collection of child elements of the element corresponding to the current alias
+        chldrn = document.querySelector(ccpUserInput[aliasArray[i]]).children;
+        // console.log('chldrn is: ');
+        // console.log(chldrn);
+        // !VA Run the callback function with the chldrn collection as parameter. This runs revealChildren to reveal/conceal each of the child elements in the collection.
+        revealChildren(chldrn);
       }
     }
 
-    // !VA UIController   
-    // !VA Apply the active class to an element. elementAlias is the identifier corresponding to Appobj/ccpUserInput property name. Called from handleCcpActions (UIController public).
-    function setCcpActiveClass(elementAlias) {
-      // !VA NOTE: Not sure why I removed this if condition and not sure if I should restore it
-      // if (!document.querySelector(ccpUserInput[elementAlias]).classList.contains('active')) {
-      document.querySelector(ccpUserInput[elementAlias]).classList.add('active');
+    // !VA UIController private  
+    // !VA Reveal and conceal individual CCP container elements with sequential animation. flag specifies if the reveal class cpp-hide-ctn is to be added or removed: true = add, false = remove. aliasArray is the array of elements to reveal/conceal. Called from UIController.configCCP. 
+    function revealElements( flag, aliasArray) {
+      let el,  elArray = [];
+      // !VA Create the array of elements to reveal/conceal. 
+      for (let i = 0; i < aliasArray.length; i++) {
+        el = document.querySelector(ccpUserInput[aliasArray[i]]);
+        elArray.push(el);
+      }
+      // !VA revealElements isThe function that will be run sequentially with a 50ms delay
+      function revealCcpElements(elArray) {
+        // !VA Iterate through the child element array of the current aliasArray item
+        for (var i = 0; i < elArray.length; i++) {
+          // !VA Pause between each iteration 
+          (function (i) {
+            setTimeout(function () {
+              // !VA If flag is false, remove the class
+              if (!flag) {
+                elArray[i].classList.remove('ccp-conceal-ctn');
+              // !VA If flag is true, add the class
+              } else if (flag) {
+                // console.log('chldrn[i] is: ' + chldrn[i]);
+                elArray[i].classList.add('ccp-conceal-ctn');
+              } else {
+              // !VA If the action isn't recognized, log an error
+                console.log('ERROR in revealParent - unknown action');
+              }
+            // !VA Pause 25 milliseconds between iterations
+            }, 25 * i);
+          })(i);
+        }
+      }
+      // !VA Loop through the passed-in aliasArray and for each array item:
+      for (let i = 0; i < aliasArray.length; i++) {
+        // !VA Run the callback function with the elArray array as parameter. This runs revealElements to reveal/conceal each of the array elements.
+        revealCcpElements(elArray);
+      }
+    }
+
+    function disableReset( alias ) {
+
+      // console.log('disableReset running');
+      // console.log('alias is: ' + alias); 
+      let disableArray, el, wraprBut;
+
+      // wraprBut = document.querySelector(ccpUserInput['ccpTblWraprChk']);
+      // wraprBut.disabled = false;
+      // wraperBut.classList.remove()
+      document.querySelector('#ccp-tbl-wrapr-ipt').disabled = false;
+      document.querySelector('#ccp-tbl-wrapr-lbl').classList.remove('ccp-disable-lbl');
+
+
+
+      disableArray = document.getElementsByClassName('ccp-ctn');
+      // !VA Loop through all the aliases in disableArray
+      for (const el of disableArray) {
+
+        // !VA When the target element is selected, the flag for each alias element in disableArray is set to true. When the target element is deselected, the flag is set to false.
+        // !VA If the element is a text input field...
+        if ( el.id.includes('tfd')) {
+          el.children[0].disabled = false;
+          el.children[0].style.color = '#FFFFFF';
+          el.children[0].style.fontStyle = 'normal';
+          el.children[1].classList.remove('ccp-disable-lbl');
+        // !VA If the element is an align radio group...
+        } else if (el.id.includes('rdo') && el.classList.contains('ccp-align-ctn')) {
+          
+          // !VA Loop through the child elements of the -rdo element
+          for (const chld of el.children) {
+            // !VA If the child element is an INPUT element, disable/enable it.
+            if (chld.tagName === 'INPUT') {
+              chld.disabled = false ;
+            // !VA If the child element is a LABEL element, add/remove the ccp-disable-lbl class to gray/ungray the icon.
+            } else if (chld.tagName === 'LABEL') {
+              chld.classList.remove('ccp-disable-lbl') ;
+            }
+          }
+        } else if ( el.id.includes('chk')) {
+
+          // console.log('disableReset el.id is: ' + el.id);
+          el.children[0].disabled = false;
+          el.children[1].classList.remove('ccp-disable-lbl');
+        } 
+      } 
+    }
+
+    // !VA UIController private  
+    function disableElements(  flag, disableArray ) {
+      let el;
+      // !VA Loop through all the aliases in disableArray
+
+      for (const alias of disableArray) {
+        el = document.querySelector(ccpUserInput[alias]);
+        // !VA When the target element is selected, the flag for each alias element in disableArray is set to true. When the target element is deselected, the flag is set to false.
+        // !VA If the element is a text input field...
+        if ( el.id.includes('tfd')) {
+          if ( flag ) {
+            el.children[0].disabled = true;
+            el.children[0].style.color = '#959595';
+            el.children[0].style.fontStyle = 'italic';
+            el.children[1].classList.add('ccp-disable-lbl');
+          } else {
+            // !VA When the target element is deselected, the flag for each alias element in disableArray is set to false
+            el.children[0].disabled = false;
+            el.children[0].style.color = '#FFFFFF';
+            el.children[0].style.fontStyle = 'normal';
+            el.children[1].classList.remove('ccp-disable-lbl');
+          }
+        // !VA If the element is an align radio group...
+        } else if (el.id.includes('rdo') && el.classList.contains('ccp-align-ctn')) {
+          
+          // !VA Loop through the child elements of the -rdo element
+          for (const chld of el.children) {
+            // !VA If the child element is an INPUT element, disable/enable it.
+            if (chld.tagName === 'INPUT') {
+              flag ? chld.disabled = true : chld.disabled = false ;
+            // !VA If the child element is a LABEL element, add/remove the ccp-disable-lbl class to gray/ungray the icon.
+            } else if (chld.tagName === 'LABEL') {
+              flag ? chld.classList.add('ccp-disable-lbl') : chld.classList.remove('ccp-disable-lbl') ;
+            }
+          }
+        } else if ( el.id.includes('chk')) {
+          // console.log('el.children[1].tagName is: ' + el.children[1].tagName);
+          flag ? el.children[0].disabled = true : el.children[0].disabled = false;
+          // debugger;
+          flag ? el.children[1].classList.add('ccp-disable-lbl') : el.children[1].classList.remove('ccp-disable-lbl');
+        } else {
+          console.log('el is: ' + el);
+          console.log('ERROR in disableElements - unknown element type');
+        }
+      } 
+      // if (flag === false ) {
+      //   document.querySelector('#ccp-tbl-wrapr-lbl').classList.remove('ccp-disable-lbl');
       // } else {
-      //   document.querySelector(ccpUserInput[elementAlias]).classList.remove('active');
+      //   document.querySelector('#ccp-tbl-wrapr-lbl').classList.add('ccp-disable-lbl');
       // }
-    }
 
-    // !VA UIController   
-    // !VA Add/remove the disabled class to a text input element and its label, and set/unset the disabled attribute of the input element. elementAlias is the identifier corresponding to Appobj/ccpUserInput property name. Called from handleCcpActions (UIController public).
-    function setDisabledTextInput( flag, elementAlias ) {
-      let elementLabel;
-      elementLabel = ccpUserInput[elementAlias] + '-label';
-      // !VA Add/remove the disabled class and set/unset the disabled attribute based on the flag value
-      if (flag) {
-        document.querySelector(elementLabel).classList.add('disabled');
-        document.querySelector(ccpUserInput[elementAlias]).disabled = true;
-        document.querySelector(ccpUserInput[elementAlias]).classList.add('disabled');
-      } else {
-        document.querySelector(elementLabel).classList.remove('disabled');
-        document.querySelector(ccpUserInput[elementAlias]).disabled = false;
-        document.querySelector(ccpUserInput[elementAlias]).classList.remove('disabled');
-      }
+
     }
 
 
-    // !VA UIController   
-    // !VA Check/uncheck a checkbox based on the true/false flag argument.  elementAlias is the identifier corresponding to Appobj/ccpUserInput property name. Called from handleCcpActions (UIController public). IMPORTANT: This function applies/removes the checked property to the actual DOM HTML input checkbox element. The corresponding Appobj property is set in appController handleTdOptions, and handleImgType
-    function setCcpCheckbox( flag, elementAlias ) {
-      let chkId, checkbox;
-      chkId = ccpUserInput[elementAlias];
-      chkId = chkId.replace('mrk', 'box');
-      chkId = chkId.replace('spn', 'chk');
-      checkbox = document.querySelector(chkId);
-      flag === true ? checkbox.checked = true : checkbox.checked = false;
-    }
-
-    // !VA UIController   
-    // !VA Disable/enable a mock checkbox based on the true/false flag argument. elementAlias is the identifier corresponding to Appobj/ccpUserInput property name. Called from handleCcpActions. IMPORTANT: This function applies/removes the disabled and disable-checkbox class to the SPAN mock checkbox only based on the flag switch. The actual DOM HTML checkbox input element never receives the disabled attribute. Instead, the mock checkbox is enabled/disabled by applying/removing the pointer-events CSS style. Since the actual HTML input element is hidden, applying the disabled attribute to it is irrelevant. However, the the pointer-events might not affect keyboard input, so it might still be possible to enable/disable the mock checkbox via the keyboard, that needs to be tested.
-    function setCcpDisabledCheckbox( flag, elementAlias ) {
-      let chkId, chkIdLabel, checkbox, checkboxLabel;
-      // !VA Convert the mrk identifier string in the span element to chk
-      chkId = ccpUserInput[elementAlias];
-      chkId = chkId.replace('mrk', 'box');
-      chkId = chkId.replace('spn', 'chk');
-      // !VA Add the -label suffix to the converted id string to get the id of the label element
-      chkIdLabel = chkId + '-label';
-      // !VA checkbox is the mock checkbox - the actual HTML checkbox is hidden.
-      checkbox = document.querySelector(ccpUserInput[elementAlias]);
-      checkboxLabel = document.querySelector(chkIdLabel);
-      if (flag) {
-        // !VA Add the disabled class to the checkbox label and turn off pointer-events for the mock checkbox. Pointer-events is set in the CSS
-        checkboxLabel.classList.add('disabled');
-        checkbox.classList.add('disable-checkbox');
-      } else {
-        // !VA Remove the disabled class from the checkbox label and turn on pointer-events for the mock checkbox. Pointer-events is set in the CSS
-        checkboxLabel.classList.remove('disabled');
-        checkbox.classList.remove('disable-checkbox');
-      }
-    }
-
-    // !VA UIController   
-    // !VA Select a radio button based on the true/false flag argument. elementAlias is the identifier corresponding to Appobj/ccpUserInput property name. Called from handleCcpActions. 
-    function selectCcpRadio(flag, elementAlias) {
-      let radio;
-      radio = document.querySelector(ccpUserInput[elementAlias]);
-      flag === true ? radio.checked = true : radio.checked = false;
-    }
     // !VA END CCP FUNCTIONS
 
     // !VA UIController public functions
@@ -529,12 +743,13 @@ var Witty = (function () {
       getCcpUserInputLabelIds: function() {
         return ccpUserInputLabels;
       },
-      getBtnCcpMakeClips: function() {
-        return btnCcpMakeClips;
+      getiptCcpMakeClips: function() {
+        return iptCcpMakeClips;
       },
       getAppMessageElements: function() {
         return appMessageElements;
       },
+
 
       // !VA UIController public
       // !VA Called from init(). Set dev mode options: Display toolbar, curImg, filename, display/undisplay CCP. Then initialize the UI: get localStorage and show dynamic containers and toolbar.
@@ -562,6 +777,7 @@ var Witty = (function () {
             // !VA Open the CCP by default in dev mode 
             // !VA First, set it to how you want to start it. devmodeccp
             document.querySelector(staticContainers.ccpContainer).classList.add('active');
+            document.querySelector('#btn-toggle-ccp').classList.add('active');
             // !VA The return variable isn't used, but keeping it for reference
             // var ccpState = UIController.toggleCcp();
             // !VA NOW: The toggle Ccp element functions are all in appController either I have to replicated them here or find another solution or live with the fact that they don't initialize. Or run initUI from here...
@@ -614,83 +830,44 @@ var Witty = (function () {
         document.querySelector(dynamicElements.imgViewer).style.height = Appobj.imgViewerH + 'px';
         document.querySelector(dynamicElements.imgViewport).style.height = viewportH + 'px';
         document.querySelector(dynamicElements.appContainer).style.height = appH + 'px';
-
+        
       }, 
 
-      // !VA UIController public 
-      // !VA Writes Appobj values to the CCP DOM based on parameters: flag and an array of rest parameters from the appController Appobj handler. The rest parameter arrays contain key/value arrays with the identifier corresponding to the appObj/ccpUserInput key and a string identifying the action to perform. This facilitates making multiple DOM accesses based on only one cross-module call to Appobj.
-      handleCcpActions: function (flag, ...args) {
-        // !VA Loop through all the rest parameter arrays. [1] is the string identifying the action to perform. [0] is the appObj/ccpUserInput key. Based on the condition defined by the action identifier, executed the appropriate function for each of the items in the rest parameter array. 
-        for (let i = 0; i < args.length; i++) {
-          switch(true) {
-          // !VA Route the arguments to the function indicated in the action identifier, i.e. the second item in the args array.
-          case args[i][1] === 'selectradio':
-            selectCcpRadio(flag, args[i][0]);
-            break;
-          case args[i][1] === 'setdisabledradio':
-            setCcpDisabledRadio(flag, args[i][0] );
-            break;
-          case args[i][1] === 'setactiveparent':
-            setCcpActiveParentClass(flag, args[i][0]);
-            break;
-          case args[i][1] === 'setactiveclass':
-            setCcpActiveClass(args[i][0]);
-            break;
-          case args[i][1] === 'setcheckbox':
-            setCcpCheckbox( flag, args[i][0] );
-            break;
-          case args[i][1] === 'setdisabledtextinput':
-            setDisabledTextInput( flag, args[i][0] );
-            break;
-          case args[i][1] === 'setdisabledcheckbox':
-            // !VA The flag here relates to the fluid/fixed Appobj property, not the property of the element in args[i][1], so get the state of the fluid radio button from the DOM
-            flag = document.querySelector(ccpUserInput.rdoCcpImgFluid).checked;
-            setCcpDisabledCheckbox( flag, args[i][0] );
-            break;
-          default:
-            // code block
-            console.log('ERROR in handleCcpActions - case not defined');
-          } 
+      // !VA UIController public
+      // !VA Branch: OVERHAUL0903A
+      // !VA Implement configuration settings/options for CCP UI DOM elements. This is basically a public router to private UIController functions to catch cross-module calls, whereby all arguments are passed in a single multidimensional configObj object.
+      configCCP: function (configObj) {
+        let retVal;
+        // !VA 
+        if ( configObj.reflectAppobj ) {
+          reflectAppobj( configObj.reflectAppobj.reflect );
         }
-      },
-
-      // !VA UIController public 
-      // !VA This function writes both rest parameter values from populateAppobj and user-input values to the CCP DOM. Called by resizeContainers to write CCP tableWidth and tableWrapperWidth on initialization and toolbar input. Called by resetTdOptions, handleTdOptions, handleImgType to set CCP DOM element values. args is a rest parameter list of key/value arrays, whereby the key is the alias of the element to write to and value value to write. 
-      // !VA TODO: Find a more descriptive name for this.
-      writeAppobjToDOM: function (...args) {
-        // !VA Loop throught the list of args, determine what type of element it is from the six-character element prefix and perform the appropriate action.  
-        // !VA Loop through all the args in the rest parameters passed in. 
-        // !VA This is the top of the args loop
-        for (let i = 0; i < args.length; i++) {
-          // !VA Handle input elements, both CCP and Toolbar
-          if (args[i][0].substring( 0 , 3) === 'ipt') {
-            // !VA Write the values for the input elements. [0] is the element ID and [1] is the element value. 
-            // !VA NOTE: Separate conditions for different element types here - need to prune the ones that aren't necessary
-            if (args[i][0].substring( 3 , 6) === 'Tbr') { 
-              // !VA Branch: implementCcpInput09 (070220)
-              // console.log('WHY IS THIS HERE?');
-              document.querySelector(toolbarElements[args[i][0]]).value = args[i][1];
-            } else if (args[i][0].substring( 3 , 6) === 'Ccp') {
-              document.querySelector(ccpUserInput[args[i][0]]).value = args[i][1];
-            } else {
-              console.log('ERROR in writeAppobjToDOM - unknown alias');
-            }
-          } else if (args[i][0].substring( 0 , 3) === 'rdo') {
-            console.log('ERROR in writeAppobjToDOM - radio button not handled ');
-          } else if (args[i][0].substring( 0 , 3) === 'sel') {
-            // !VA NOTE: THis is the same as the 'ipt' condition
-            document.querySelector(ccpUserInput[args[i][0]]).value = args[i][1];
-          } else if (args[i][0].substring( 0 , 3) === 'spn') {
-            console.log('ERROR in writeAppobjToDOM - span mock checkbox not handled');
-          } else {
-            document.querySelector(ccpUserInput[args[i][0]]).value = args[i][1];
-          }
+        if ( configObj.revealReset) {
+          revealReset( configObj.revealReset.alias );
         }
-
+        if ( configObj.revealElements ) {
+          revealElements( configObj.revealElements.flag, configObj.revealElements.reveal );
+        }
+        if ( configObj.concealElements ) {
+          revealElements( configObj.concealElements.flag, configObj.concealElements.conceal );
+        }
+        if ( configObj.radioState ) {
+          radioState( configObj.radioState.radio );
+        }
+        if ( configObj.checkboxState ) {
+          checkboxState( configObj.checkboxState.checked );
+        }
+        if ( configObj.revealParent ) {
+          retVal = revealParent( configObj.revealParent.flag, configObj.revealParent.reveal );
+        }
+        if ( configObj.disableReset) {
+          disableReset( configObj.disableReset.alias );
+        }
+        if ( configObj.disableElements ) {
+          disableElements( configObj.disableElements.flag, configObj.disableElements.disable );
+        }
+        return retVal;
       },
-
-
-
 
       // !VA UIController public
       // !VA Stash arrays of key/value pairs.
@@ -711,12 +888,9 @@ var Witty = (function () {
         let curImg, curLocalStorage;
         // !VA Get the values for the dynamicElements
         // !VA Get the curImg and imgViewer
+
         // !VA TODO: Move to external if appropriate or delete if unneeded 
-        function chkmrkToChkbox(val) {
-          val = val.replace('mrk', 'box');
-          val = val.replace('spn', 'chk');
-          return val;
-        }
+        // !VA Branch: OVERHAUL0825B
         function populateAppProperties(Appobj) {
           // !VA Get the current image
           curImg = document.querySelector(dynamicElements.curImg);
@@ -756,29 +930,35 @@ var Witty = (function () {
           // !VA Now initialize Appobj with the CCP element values. This includes ALL CCP elements, including those that are displayed/undisplayed depending on which TDOption or imgType radio is selected. 
           // !VA Don't forget to use bracket notation to add properties to an object: https://stackoverflow.com/questions/1184123/is-it-possible-to-add-dynamically-named-properties-to-javascript-object
           // !VA  for loop: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
-          let checkboxId;
-          // !VA TODO:  Created an styCcpTableWrapperStyle property with the value ''. This is a placeholder for the max-width style property which is only used in handleImgType if the image type is fluid. There is no correspondent for this in the CCP DOM - need to determine if this extra Appobj property is necessary.
-          Appobj.styCcpTableWrapperStyle = '';
-          // !VA Branch: review0720F (071720)
-          // !VA Adding this -- one if these may be deprecated
-          // Appobj.styCcpTableStyle = '';
-          
-          // !VA Loop through all the ccpUserInput properties. If the property is NOT a span (i.e. a mock checkbox) add an Appobj property that corresponds to the key of the respective ccpUserInput property. Otherwise, convert the span ID to the input ID, then add the Appobj property that corresponds to the key of the respective ID.
-          // !VA For instance, if the ccpUserInput value starts with '#ipt', create an Appobject property whose key is 'iptCCP...' and assign it the value of the CCP element with the corresponding ccpUserInput alias.
+          // !VA Branch: OVERHAUL0904A
+          // !VA Convert this to Object.keys - ccpUserInput properties aren't used here.
+          // !VA Loop through all the ccpUserInput elements and add their values to Appobj. The last three characters ( 11 - last ) are the alias code that identify the input type
+          // !VA Branch: OVERHAUL0828C
+          // !VA  radioState and checkboxState are called here before Appobj has been initialized, so the key argument is 'undefined'. This causes checkboxState and radioState to return the attribute value of the queried element as hard-coded in the HTML, thus initializing Appobj. 
           for (const [key, value] of Object.entries(ccpUserInput)) {
-            if (value.substring( 0, 4) === '#ipt' || value.substring( 0, 4) === '#sel' ) {
-              Appobj[key] = document.querySelector(value).value;
+            // !VA Write the text input element values to Appobj
+            if (key.substring( 11 ) === 'Tfd') {
+              // !VA Branch: OVERHAUL0904A
+              // !VA Appobj[ key ] is undefined, causing reflectAppobj to return the hard-coded values in the HTML file. These are the Appobj initialization values. These values are currently all empty strings but that could change so the best place to get them is value attribute of the the HTML file, just like the other Appobj init functions below.
+              // if ( typeof(Appobj[key]) !== 'undefined' ) {console.log('HIT:' + key);}
+              Appobj[ key ] = reflectAppobj( [ key ] );
             }
-            if (value.substring( 0, 4) === '#rdo' ) {
-              Appobj[key] = document.querySelector(value).checked;
+            // !VA Write the Align/Valgn radio input element values to Appobj.
+            if (key.substring( 11 ).includes('Rdo')) {
+              // !VA Branch: OVERHAUL0904A
+              // !VA Appobj[ key ] is undefined, causing radioState to return the hard-coded values in the HTML file. These are the Appobj initialization values. 
+              Appobj[ key ] = radioState( [ key ]);
             }
-            if (value.substring( 0, 4) === '#spn' ) {
-              // !VA For mock checkboxes, first get the actual HTML checkbox into checkboxId. 'value' is the mock checkbox span id
-              checkboxId = chkmrkToChkbox(value);
-              // !VA The actual HTML checkbox input will return a checked attribute of true or false. Convert that to 'on' or 'off' for the Appobj mock checkbox span property.
-              document.querySelector(checkboxId).checked ? Appobj[key] = 'on' : Appobj[key] = 'off';
+            if ( key.substring( 11 ).includes('Chk')) {
+
+              // !VA Branch: OVERHAUL0904A
+              // !VA Appobj[ key ] is undefined, causing checkboxState to return the hard-coded values in the HTML file. These are the Appobj initialization values. 
+              Appobj[ key ] = checkboxState( [ key ] );
             }
           }
+          
+          console.log('populateCcpPropertiesAppobj is: ');
+          console.log(Appobj);        
         }
 
         if ( access === 'app') {
@@ -790,7 +970,6 @@ var Witty = (function () {
           // !VA Write all values
         } else if ( access === 'all' ) {
           populateAppProperties(Appobj);
-          populateCcpProperties(Appobj);
         } else {
           console.log('Error in populateAppobj: unknown argument - access');
         }
@@ -804,6 +983,9 @@ var Witty = (function () {
         // !VA If the toggle argument is true, toggle the CCP on and off
         if (toggle) {
           document.querySelector(staticContainers.ccpContainer).classList.toggle('active');
+          // !VA Branch: OVERHAUL0825B
+          // !VA Adding the clipboard button active class to this - it should have an alias 
+          document.querySelector('#btn-toggle-ccp').classList.toggle('active');
         }
         // !VA If the CCP is displayed, return true, otherwise false
         document.querySelector(staticContainers.ccpContainer).classList.contains('active') ? ccpState = true : ccpState = false;
@@ -891,12 +1073,12 @@ var Witty = (function () {
     // !VA NOTE: If we want to access any of the DOM IDs we have to call them from UIController where they're defined.
     var inspectorElements = UIController.getInspectorElementIDs();
     var ccpUserInput = UIController.getCcpUserInputIDs();
-    var btnCcpMakeClips = UIController.getBtnCcpMakeClips();
+    var iptCcpMakeClips = UIController.getiptCcpMakeClips();
 
     // !VA ATTRIBUTE FUNCTIONS
     // !VA CBController   
     // !VA Branch: review0720C (071520)
-    // !VA NOTE: All these attributes are set here prior to building the individual nodes. It is first called in buildOutputNodeList, and is passed to each make node function in succesion after that. So, it would make sense that getAttributes includes ALL the logic for rendering each attribute before it is passed to the respective make node function. In the last branch, I was moving the logic for 
+    // !VA NOTE: All these attributes are set here prior to building the individual nodes. It is first called in buildOutputNodeList, and is passed to each make node function in succesion after that. So, it would make sense that getAttributes includes ALL the logic for rendering each attribute before it is passed to the respective make node function. 
     // !VA Set values for all the Attributes of the individual ccpUserInput elements. Each attribute is either get-only or settable. If it is get-only, then the user-defined value is accessed directly from the DOM element. If it is a preset, then the value is defined programmatically based on a condition. For instance, the class name 'img-fluid' is a preset that becomes active when the user selects the Fluid image option. In this case, the CCP element ID corresponding to the attribute is written to the ccpElementId variable. Otherwise, ccpElement takes the false flag.
     // !VA NOTE: Could probably make all the retObject arguments ccpElementId, str and consolidate this function somehow -- think about it.
     function getAttributes() {
@@ -904,9 +1086,10 @@ var Witty = (function () {
       // !VA Branch: implementCcpInput02 (062420)
       // !VA We don't need the entire Appobj here. What we should do is call rest parameters on what we need and then destructure the return array into separate variables. This needs to be done when getAttributes is reevaluated since there appears to be a lot of unnecessary DOM access here.
       Appobj = appController.getAppobj();
-      console.log('Appobj is: ');
-      console.log(Appobj);
+      
       let checked, str, ccpElementId, imgType, Attributes, retObj;
+      // !VA Branch: OVERHAUL0826A
+      let appObjProp, selectedOption, inputVal;
       // !VA Create the array to return. First value is the id of the CCP element, second value is the string to write to the CCP element. If the first value is false, then the str isn't queried from a Ccp element, but rather is generated in the Attribute based on other conditions. For instance, the img style attribute is conditioned on the fluid/fixed option, but writes to the style attribute of the img tag.
       // !VA Branch: implementCcpInput06 (062820)
       // !VA I'm not sure I need to return the elementID at all. Wouldn't the identifier suffice? For later.
@@ -916,75 +1099,83 @@ var Witty = (function () {
         obj.str = str;
         return obj;
       }
+      // !VA Branch: OVERHAUL0826A
+      /* !VA  Notes: 
+        *** ccpElementId was only used in getRadioState, which is now deprecated. So there's no need for ccpElementId - the description above about inluding the ID if the attribute doesn't ALWAYS get the value from Appobj doesn't make much sense . Replace it with alias, and if we need the ID we can get it from that.
+      
+      
+      
+      
+      */
       Attributes = {
         imgClass: (function() {
-          // !VA Set the element associated with the string
-          ccpElementId = ccpUserInput.iptCcpImgClass;
-          str = Appobj.iptCcpImgClass;
-          retObj = returnObject(ccpElementId, str);
+          appObjProp = 'ccpImgClassTfd';
+          var foo = Appobj['ccpImgItypeRdo'];
+          foo === 'fixed' ? str = Appobj[appObjProp] : str = 'img-fluid';
+          // str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
         imgWidth: (function() {
           // !VA Branch: implementCcpInput06 (062820)
-          // !VA IMPORTANT: Shouldn't this only be output if imgType = fixed?
-          // !VA This value is get-only
-          ccpElementId = false;
-          retObj = returnObject(ccpElementId, Appobj.curImgW);
+          appObjProp = 'curImgW';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
         imgHeight: (function() {
-          // !VA This value is get-only
-          // !VA Branch: implementCcpInput06 (062820)
-          // !VA IMPORTANT: Shouldn't this only be output if imgType = fixed?
-          ccpElementId = false;
-          retObj = returnObject(ccpElementId, Appobj.curImgH);
+          appObjProp = 'curImgH';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
         imgAlt: (function() {
-          // !VA This value is get-only
-          ccpElementId = false;
-          // !VA Branch: implementCcpInput06 (062820)
-          // !VA We get the filename from Appobj now
-          // retObj = returnObject(ccpElementId, ccpGetAttValue('alt',document.querySelector(ccpUserInput.iptCcpImgAlt).value));
-          retObj = returnObject(ccpElementId, Appobj.iptCcpImgAlt);
+          appObjProp = 'ccpImgAltxtTfd';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
         imgSrc: (function() {
           // !VA This value is get-only
-          ccpElementId = false;
+          appObjProp = 'ccpImgLoctnTfd';
           // !VA Branch: implementCcpInput06 (062820)
-          // !VA If the path input element is not empty, include the Appobj.iptCcpImgRelPath, otherwise just use the filename without the path
-          Appobj.iptCcpImgRelPath !== '' ? str = Appobj.iptCcpImgRelPath + '/' + Appobj.fileName : str = Appobj.fileName;
-          retObj = returnObject( ccpElementId, str);
+          // !VA If the path input element is not empty, include the Appobj.ccpImgLoctnTfd, otherwise just use the filename without the path
+          // !VA Branch: OVERHAUL0826A
+          // !VA Removing the slash. From now, the path must be included, otherwise the inclusion of it here could corrupt img tokens or URLs.
+          Appobj.ccpImgLoctnTfd !== '' ? str = Appobj.ccpImgLoctnTfd  + Appobj.fileName : str = Appobj.fileName;
+          retObj = returnObject( appObjProp, str);
           return retObj;
+        })(),
+        imgExcld: (function() {
+          // !VA Branch: OVERHAUL0827A
+          // !VA Functionality for the IMG excld radio button. 
+          // !VA First, get the selected option.
+          appObjProp = 'ccpImgExcldRdo';
+          selectedOption = Appobj[appObjProp];
+
+
         })(),
         imgStyle: (function() {
           // !VA Branch: implementCcpInput06 (062820)
           // !VA Set imgType according to radio button selection. This determines the style attribute that is output to the Clipboard. All the other imgType logic is in appController.
-          Appobj.rdoCcpImgFixed  ? imgType = 'fixed' : imgType = 'fluid';
-          ccpElementId = false;
+          // !VA Branch: OVERHAUL0826A
+          // !VA This works now, but I'm not sure H and W attributes are supposed to be inluded in HTML for fluid option
+          appObjProp = 'ccpImgItypeTfd';
+          Appobj.ccpImgItypeRdo === 'fixed' ? imgType = 'fixed' : imgType = 'fluid';
           imgType === 'fixed' ? str = `display: block; width: ${Appobj.curImgW}px; height: ${Appobj.curImgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;` : str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;';
           retObj = returnObject(ccpElementId , str);
           return retObj;
         })(),
         imgAlign: (function() {  
-          // !VA This value is get-only.
-          let str, selectid, options = [];
-          options = [ '', 'left', 'middle', 'right'];
-          selectid = ccpUserInput.selCcpImgAlign;
-          ccpElementId = false;
-          // !VA Get the string corresponding to the selectid index in the options array
-          str = options[getAlignAttribute(selectid)];
-          retObj = returnObject(ccpElementId, str);
+          appObjProp = 'ccpImgAlignRdo';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
         imgIncludeAnchor: (function() {
-          // !VA This value is get-only.
-          ccpElementId = false;
-          let checked;
-          // !VA If Include anchor is checked, return true, else false
-          Appobj.spnCcpImgIncludeAnchorCheckmrk === 'on' ? checked = true : checked = false;
-          retObj = returnObject( ccpElementId, checked );
+          appObjProp = 'ccpImgAnchrTfd';
+          str = Appobj[appObjProp];
+          retObj = returnObject( appObjProp, str );
           return retObj;
         })(),
         // !VA TD Attributes
@@ -992,141 +1183,93 @@ var Witty = (function () {
         // !VA Why can't I just access Appobj directly in getBgimageBlock?
         // !VA TD Width and height from Appobj = curImgW and curImgW -- only used for Stig's BG image
         tdAppobjWidth: (function() {
-          // !VA This value is get-only.
-          ccpElementId = false;
-          retObj = returnObject( ccpElementId, Appobj.curImgW );
+          // !VA Branch: OVERHAUL0826A
+          // !VA There is no Appobj property or alias for this, so why can't I just access Appobj directly in getBgimageBlock?
+          // !VA Branch: OVERHAUL0827A
+          // !VA Setting retObj here to false because there's no appObjProp for this, pending check attempt to set this directly in getBgimgBlock
+          retObj = returnObject( false, Appobj.curImgW );
           return retObj;
         })(),
-        // !VA Branch: implementCcpInput06 (062820)
-        // !VA Why can't I just access Appobj directly in getBgimageBlock?
         tdAppobjHeight: (function() {
-          // !VA This value is get-only.
-          ccpElementId = false;
-          retObj = returnObject( ccpElementId, Appobj.curImgH );
+          // !VA Branch: OVERHAUL0826A
+          // !VA There is no Appobj property or alias for this, so why can't I just access Appobj directly in getBgimageBlock?
+          // !VA Setting retObj here to false because there's no appObjProp for this, pending check attempt to set this directly in getBgimgBlock
+          retObj = returnObject( false, Appobj.curImgH );
           return retObj;
         })(),
         tdHeight: (function() {
-          // !VA This value is get-only.
-          let retVal;
-          ccpElementId = false;
-
-          // var foo = getSelectedTdOptionFromAppobj();
-          // console.log('foo is: ' + foo);
-          // if (getSelectedTdOptionFromAppobj() ===  'rdoCcpTdExcludeimg') {
-          //   retVal = document.querySelector(ccpUserInput.iptCcpTdHeight).value;
-          //   console.log('retVal is: ' + retVal);
-          // } else {
-          //   retVal = Appobj.iptCcpTdHeight;
-          // }
-
-          // retObj = returnObject(ccpElementId, retVal);
-          retObj = returnObject(ccpElementId, Appobj.iptCcpTdHeight);
+          appObjProp = 'ccpTdaHeigtTfd';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
         tdWidth: (function() {
-          // !VA This value is get-only.
-          ccpElementId = false;
-          retObj = returnObject(ccpElementId, Appobj.iptCcpTdWidth);
+          appObjProp = 'ccpTdaWidthTfd';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
-        // !VA The selected tdoption radio button determines which TD options will be displayed/undisplayed. Only the checked one will be displayed; all other ones will be undisplayed  
-        tdBasic: (function() {
-          // !VA This is a tdoptions selection radio - use ccpElementId
-          ccpElementId = ccpUserInput.rdoCcpTdBasic;
-          checked = getRadioState(ccpElementId);
-          retObj = returnObject( ccpElementId, checked );
+
+        // !VA Branch: OVERHAUL0826A
+        // !VA STOPPED HERE>
+        // !VA Branch: OVERHAUL0826A
+        // !VA Implement later...
+        tdOptions: (function() {
+          appObjProp = 'ccpTdaOptnsRdo';
+          selectedOption = Appobj[appObjProp];
+          //   // !VA !VA  If the imgswap radio is selected, overwrite whatever is in the imgClass input with 'hide', set parent table class to 'devicewidth' and display it, set wrapper table class to 'devicewidth' and display it. Displaying/undisplaying and disabling/enabling is handled in handleCcpActions. 
+
+
+
+
+          retObj = returnObject(appObjProp, Appobj.ccpTdaOptnsRdo);
           return retObj;
         })(),
-        tdExcludeimg: (function() {
-          // !VA This is a tdoptions selection radio - use ccpElementId
-          ccpElementId = ccpUserInput.rdoCcpTdExcludeimg;
-          checked = getRadioState(ccpElementId);
-          retObj = returnObject( ccpElementId, checked );
-          return retObj;
-        })(),
-        tdImgswap: (function() {
-          // !VA This is a tdoptions selection radio - use ccpElementId
-          // !VA !VA  If the imgswap radio is selected, overwrite whatever is in the imgClass input with 'hide', set parent table class to 'devicewidth' and display it, set wrapper table class to 'devicewidth' and display it. Displaying/undisplaying and disabling/enabling is handled in handleCcpActions. 
-          ccpElementId = ccpUserInput.rdoCcpTdImgswap;
-          checked = getRadioState(ccpElementId);
-          if (checked) {
-            // document.querySelector(ccpUserInput.iptCcpImgClass).style.display = 'inline-block';
-            document.querySelector(ccpUserInput.iptCcpImgClass).value = 'hide';
-            // document.querySelector(ccpUserInput.iptCcpTableClass).style.display = 'inline-block';
-            document.querySelector(ccpUserInput.iptCcpTableClass).value = 'devicewidth';
-            document.querySelector(ccpUserInput.iptCcpTableWrapperClass).value = 'devicewidth';
-            document.querySelector(ccpUserInput.iptCcpTableWidth).value = Appobj.curImgW;
-          }
-          retObj = returnObject( ccpElementId, checked );
-          return retObj;
-        })(),
-        tdBgimage: (function() {
-          // !VA This is a tdoptions selection radio - use ccpElementId
-          ccpElementId = ccpUserInput.rdoCcpTdBgimage;
-          checked = getRadioState(ccpElementId);
-          retObj = returnObject( ccpElementId, checked );
-          return retObj;
-        })(),
-        tdPosswitch: (function() {
-          // !VA This is a tdoptions selection radio - use ccpElementId
-          ccpElementId = ccpUserInput.rdoCcpTdPosswitch;
-          checked = getRadioState(ccpElementId);
-          retObj = returnObject( ccpElementId, checked );
-          return retObj;
-        })(),
+
+
+
         tdAlign: (function() {
-          // !VA This value is get-only
-          ccpElementId = false;
-          let str, selectid, options = [];
-          selectid = ccpUserInput.selCcpTdAlign;
-          options = [ '', 'left', 'center', 'right'];
-          // !VA Get the string corresponding to the selectid index in the options array
-          str = options[getAlignAttribute(selectid)];
-          retObj = returnObject( ccpElementId, str );
+          appObjProp = 'ccpTdaAlignRdo';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
         tdValign: (function() {
-          // !VA This value is get-only
-          ccpElementId = false;
-          let str, selectid, options = [];
-          selectid = ccpUserInput.selCcpTdValign;
-          options = [ '', 'top', 'middle', 'bottom'];
-          // !VA Get the string corresponding to the selectid index in the options array
-          str = options[getAlignAttribute(selectid)];
-          retObj = returnObject( ccpElementId, str );
+          appObjProp = 'ccpTdaValgnRdo';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
         tdClass: (function() {
-          // !VA This value is get-only
-          ccpElementId = false;
-          retObj = returnObject( ccpElementId, Appobj.iptCcpTdClass );
+          appObjProp = 'ccpTdaClassTfd';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
         tdBgcolor: (function() {
-          // !VA This value is get-only
-          ccpElementId = false;
-          // retObj = returnObject( ccpElementId, ccpGetAttValue('class',document.querySelector(ccpUserInput.iptCcpTdBgColor).value) );
-          retObj = returnObject( ccpElementId, Appobj.iptCcpTdBgColor);
+          appObjProp = 'ccpTdaBgclrTfd';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
         tdBackground: (function() {
           // !VA This value is get-only
           ccpElementId = false;
           // !VA 
-          retObj = returnObject( ccpElementId, Appobj.iptCcpImgRelPath + '/' + (Appobj.fileName) );
+          retObj = returnObject( ccpElementId, Appobj.ccpImgLoctnTfd + '/' + (Appobj.fileName) );
           return retObj;
         })(),
         // !VA TABLE attributes
         tableClass: (function() {
           // !VA This value depends on the status of the Fixed/Fluid image radio button, so use ccpElementId
-          ccpElementId = ccpUserInput.iptCcpTableClass;
+          ccpElementId = ccpUserInput.ccpTblClassTfd;
           // !VA Branch: review0720F (071720)
           // !VA This is wonky
           if (imgType === 'fixed') {
             // !VA If imgType is fixed, then set tableClass to 'devicewidth' if the curImgW equals the imgViewerW. Otherwise, set it to the user input. 
             // !VA Branch: review0720F (071720)
-            // !VA The default is set in the UI, so just set iptCcpTableClass to the Appobj property.
-            str = Appobj.iptCcpTableClass;
+            // !VA The default is set in the UI, so just set ccpTblClassTfd to the Appobj property.
+            str = Appobj.ccpTblClassTfd;
           } else {
             // !VA If the imgType is fluid, set the class input value to the user input, even though that might have unforseen consequences for the user.
             str = '';
@@ -1138,19 +1281,15 @@ var Witty = (function () {
           // !VA The value is written to the table width field - use ccpElementId
           // !VA Branch: review0720C (071520)
           // !VA Need handler for the empty input field here.
-          ccpElementId = ccpUserInput.iptCcpTableWidth;
+          ccpElementId = ccpUserInput.ccpTblWidthTfd;
           // !VA Branch: review0720F (071720)
           // !VA Add the condition that if tdoptions = excludeimg, str is the value of the input element, otherwise it is Appobj.curImgW
-          // !VA Branch: review0720F (071720)
-          // !VA Problem here is we're getting the value from the element directly rather than from Appobj...
-          // getSelectedTdOptionFromAppobj() === 'rdoCcpTdExcludeimg' ? str = document.querySelector(ccpElementId).value : str = Appobj.curImgW;
           // !VA Branch: review0720F (071720)
           // !VA And the other problem is that we have a different str output for fixed than fluid. If the tdoption is excludeImg, the output will ALWAYS be the fixed option because fixed is the default for the excludeimg tdoption. So first get the string if excludeimg is selected: 
           var fixedStr;
           // !VA Branch: review0720F (071720)
           // !VA I don't think this should be contingent on excludeimg - it should always show Appobj property. The default is set in the UI, I think. 
-          // getSelectedTdOptionFromAppobj() === 'rdoCcpTdExcludeimg' ? fixedStr = Appobj.iptCcpTableWidth : fixedStr = Appobj.curImgW;
-          fixedStr = Appobj.iptCcpTableWidth;
+          fixedStr = Appobj.ccpTblWidthTfd;
           // !VA Now, set str based on whether fixed or fluid
           imgType === 'fixed' ? str = fixedStr : str = '100%';
           // !VA Then, if the tdoption is excludeimg, modify the imgTypeStr accordingly
@@ -1163,19 +1302,26 @@ var Witty = (function () {
         tableBgcolor: (function() {
           // !VA This value is get-only
           ccpElementId = false;
-          retObj = returnObject( ccpElementId, Appobj.iptCcpTableBgColor);
+          retObj = returnObject( ccpElementId, Appobj.ccpTblBgclrTfd);
           return retObj;
         })(),
         tableAlign: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
           let str, selectid, options = [];
-          selectid = ccpUserInput.selCcpTableAlign;
+          selectid = ccpUserInput.ccpTblAlignRdo;
           options = [ '', 'left', 'center', 'right'];
           // !VA Get the string corresponding to the selectid index in the options array
           // !VA Branch: review0720F (071720)
           // !VA If imgType is fluid, then override the selection and pass 0 so the attribute will not be output to the clipboard
-          str = options[getAlignAttribute(selectid)];
+          // !VA Branch: OVERHAUL0903A 
+          // !VA getAlignAttribute is useless, deprecating...
+          // str = options[getAlignAttribute(selectid)];
+          str = appController.getAppobj('ccpTblAlignRdo');
+
+
+
+
           // !VA Branch: review0720F (071720)
           // str = options[getAlignAttribute(selectid)];
           retObj = returnObject( ccpElementId, str );
@@ -1191,51 +1337,60 @@ var Witty = (function () {
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
-        tableIncludeWrapper: (function() {
-          // !VA Changing this to CCP-write to clean up updateCcp
-          ccpElementId = ccpUserInput.spnCcpTableIncludeWrapperCheckmrk;
-          checked = getCheckboxSelection(ccpElementId);
-          retObj = returnObject( ccpElementId, checked );
-          return retObj;
-        })(),
+        // !VA Branch: OVERHAUL0826A
+        // !VA Deprecating this now, will need to replace it with an attribute 
+        // tableIncludeWrapper: (function() {
+        //   ccpElementId = ccpUserInput.ccpTblWraprChk;
+        //   checked = fetchCheckboxState(ccpElementId);
+        //   retObj = returnObject( ccpElementId, checked );
+        //   return retObj;
+        // })(),
         tableWrapperClass: (function() {
           // !VA This value writes to the CCP in the class input so populate ccpElementId
           // !VA If imgType is fixed, set the default class to 'devicewidth'. If it's fluid, set it to 'responsive-table' as per the Litmus newsletter template.
           // !VA Branch: review0720F (071720)
           // !VA This is all wrong for imgType = responsive. 
           // !VA This should be disabled since it can't be changed, or it should be changeable.
-          ccpElementId = ccpUserInput.iptCcpTableWrapperClass;
+          ccpElementId = ccpUserInput.ccpTbwClassTfd;
           // !VA Branch: review0720F (071720)
           // !VA The defaults are set in the UI. We don't need to handle them here. We need to handle the cases where the user overrides them with user input. Str should therefor always correspond to the Appobj property. This doesn't need to be contingent on excludeimg - unlike the tdoptions, the wrapper table options should be settable in any environment.
-          str = Appobj.iptCcpTableWrapperClass;
+          str = Appobj.ccpTbwClassTfd;
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
         tableWrapperAlign: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
-          let str, selectid, options = [];
-          selectid = ccpUserInput.selCcpTableWrapperAlign;
-          options = [ '', 'left', 'center', 'right'];
+          let str;
           // !VA Get the string corresponding to the selectid index in the options array
-          str = options[getAlignAttribute(selectid)];
+
+          // !VA Branch: OVERHAUL0903A
+          // !VA getAlignAttribute is useless, deprecating...
+          // str = options[getAlignAttribute(selectid)];
+          str = appController.getAppobj('ccpTblAlignRdo');
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
         tableWrapperWidth: (function() {
           // !VA This value depends on the selection under Fixed image. 
-          ccpElementId = ccpUserInput.iptCcpTableWrapperWidth;
+          ccpElementId = ccpUserInput.ccpTbwWidthTfd;
           // !VA If the imgTyp is fixed, set the wrapper width to the value of the input field, which for the most part will be imgViewerW. If it's fluid, set it to 100%
           // !VA Branch: review0720F (071720)
           // !VA The defaults are set in the UI. We don't need to handle them here. We need to handle the cases where the user overrides them with user input. Str should therefore always correspond to the Appobj property. This doesn't need to be contingent on excludeimg - unlike the tdoptions, the wrapper table options should be settable in any environment.
-          imgType === 'fixed' ? str = Appobj.iptCcpTableWrapperWidth : str = '100%';
+          imgType === 'fixed' ? str = Appobj.ccpTbwWidthTfd : str = '100%';
           retObj = returnObject( ccpElementId, str );
+          return retObj;
+        })(),
+        tableWrapperMaxwd: (function() {
+          // !VA This value depends on the selection under Fixed image. 
+          appObjProp = 'ccpTbwMaxwdTfd';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
         tableWrapperBgcolor: (function() {
           // !VA This value is get-only.
           ccpElementId = false;
-          retObj = returnObject( ccpElementId, Appobj.iptCcpTableWrapperBgColor);
           return retObj;
         })(),
         tableWrapperStyle: (function() {
@@ -1244,7 +1399,11 @@ var Witty = (function () {
           // !VA Only include a style attribute for the wrapper for fluid images.  The conditional for this is in makeTableNode and there's no case where a style attribute is included for fixed images, so just provide the style attribute string to return
           // !VA Branch: review0720F (071720)
           // !VA This may be deprecated - max-width moved to tableStyle
-          imgType === 'fixed' ? str = '' : str = `max-width: ${Appobj.curImgW }px; `;
+          if (Appobj['ccpTblHybrdChk']) {
+            str = `max-width: ${Appobj.imgViewerW }px; `;
+          } else {
+            str = '';
+          }
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
@@ -1254,92 +1413,15 @@ var Witty = (function () {
     }
 
     // !VA CBController   
-    // !VA Branch: implementCcpInput05 (062720)
-    // !VA Called multiple times from getAttributes
-    // !VA Branch: review0720A (071320)
-    // !VA I think this is deprecated now.
-    function ccpGetAttValue(att, value) {
-      // !VA Gets the insFilename from Appobj in case the user leaves 'path' empty
-      var str;
-      // !VA If there is an entry in the user entry field element, include the attribute string in the clipboard output. 
-      if (value && att) {
-        // !VA I might want to change this to include the # in the string itself.
-        if (value === '#') {
-          str = '';
-        } else {
-          // !VA Include the space here to ensure no duplicate spaces slip in when the clip is built
-          str = value;
-        }
-      } else {
-        // !VA If the path field is empty, return the insFilename without the path.
-        if (att === 'src' && value === '' ) {
-          // !VA Get the filename from Appobj.fileName
-          str = `${att}="${appController.getAppobj('fileName')}" `;
-        } else if ( att === '#' || att === '') {
-          str = '';
-        } else {
-          // !VA If there is no input, exclude the attribute entry.
-          str = '';
-        }
-      }
-      return str;
-    }
-
-    // !VA CBController   
-    // !VA Gets the selected align option from its CCP dropdown box
-    // !VA Branch: review0720F (071720)
     // !VA The call to this is repetitive in getAttributes, could be DRYified. All this really needs to return is the selected. The options don't need to be passed in, they're local to each getAttributes property.
-    function getAlignAttribute(selectid) {
-      return document.querySelector(selectid).selectedIndex;
-    }
+    // !VA Branch: OVERHAUL0828A
+    // !VA This will be gone from getAttributes soon. Deprecating...
+    // function getAlignAttribute(selectid) {
+    //   return document.querySelector(selectid).selectedIndex;
+    // }
 
 
-    function getAlignAttributeOLD(selectid, options) {
-      var str, selInd;
-      selInd = document.querySelector(selectid).selectedIndex;
-      switch (true) {
-      case (selInd === 0):
-        str = '';
-        break;
-      case (selInd === 1):
-        str = options[1];
-        break;
-      case (selInd === 2):
-        str = options[2];
-        break;
-      case (selInd === 3):
-        str = options[3];
-        break;
-      }
-      return str;
-    }
-
-    // !VA CBController   
-    // !VA TODO: Change target here to alias
-    // !VA Get the checked/unchecked status of a CCP mock checkbox. Note that the element alias refers to the checkmark element, which isn't the actual checkbox input element. Consequently, the checkmark element id has to be converted to its corresponding input element id in order to toggle it.
-    function getCheckboxSelection(target) {
-      let chkboxid, checked;
-      chkboxid = document.querySelector(target).id;
-      chkboxid = chkboxid.replace('mrk', 'box');
-      chkboxid = chkboxid.replace('spn', 'chk');
-      if (document.querySelector('#' + chkboxid).checked === false) {
-        checked = false;
-      } else {
-        checked = true;
-      }
-      return checked;
-    }
-
-    // !VA CBController   
-    // !VA Gets the state of a radio button element.
-    function getRadioState(ccpElementId) {
-      // !VA Passing in the ID, not the alias
-      let checked;
-      !document.querySelector(ccpElementId).checked ? checked = false : checked = true;
-      return checked;
-    }
-
-    // !VA CBController   
+    // !VA CBController public
     // !VA Omit a node attribute if the corresponding getAttributes Attribute is empty, i.e. the corresponding Appobj property/CCP element has no value. str is the Attribute object property. myNode is the current node, i.e. imgNode, tdNode, or tableNode. attr is the current attribute, i.e. className, alt, align etc. 
     function omitIfEmpty(str, myNode, attr) {
       // !VA If the Attribute is not empty, set the node attribute to the Attribute property. Otherwise, false for eventual error checking.
@@ -1349,54 +1431,64 @@ var Witty = (function () {
 
     // !VA END ATTRIBUTE FUNCTIONS
 
-    // !VA NODE FUNCTIONS
+    // !VA CBController
+    // !VA Branch: OVERHAUL0903A
+    // !VA Inserts a ghost table at the ghostopen an ghostclose tokens...not sure how functional it is.
+    function getGhostTable() {
+      let ghostopen, ghostclose;
+      let ghosttable = [];
+      ghostopen = 
+`<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="${appController.getAppobj('curImgW')}">
+<tr>
+<td align="center" valign="top" width="${appController.getAppobj('curImgW')}">
+<![endif]-->\n`;
 
-    // !VA CBController   
-    // !VA Getting the selected TD option from Appobj should be an public function, since this logic is repeated in batchAppobjToDOM and possibly elsewhere. No, because 1) batchAppobjToDOM is in appController and would require crossing modules and 2) batchAppobjToDOM returns the ccpUserInput property name corresponding to the selected Td option, not the td option itself.
-    // !VA Returns the selected TD option from Appobj as a element alias string, i.e. rdoCcpTdBasic. 
-    function getSelectedTdOptionFromAppobj() {
-      let arr, selectedTdOption;
-      let Appobj;
-      Appobj = appController.getAppobj();
-      // !VA arr is array of Appobj keys
-      arr = Object.keys(Appobj);
-      // !VA If the first 8 characters of the Appobj property name is rdoCcpTd, then loop through the property names and find the one whose value is true. That is the selected tdoptions radio button, so return it.
-      for (let i = 0; i < arr.length; i++) {
-        // !VA TODO: Make this an arrow function with find, like below
-        // var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
-        if (arr[i].substring( 0, 8) === 'rdoCcpTd') {
-          // !VA If the Appobj key string === true, then that is the selected radio button
-          if ( Appobj[arr[i]] === true) { selectedTdOption = arr[i]; }
-        }
-      }
-      return selectedTdOption;
+      ghostclose = 
+`\n<!--[if (gte mso 9)|(IE)]>
+</td>
+</tr>
+</table>
+<![endif]-->`;
+
+      ghosttable = [ ghostopen, ghostclose ];
+      return ghosttable;
+
     }
-
-    // !VA CBController   
-    // !VA Get a checkbox state from the Appobj property for the mock checkbox.
-    function getCheckboxState(identifier) {
-      let bool;
-      // !VA If the Appobj property for the mock checkbox span specified in 'identifier' is 'on', return true, otherwise false
-      appController.getAppobj(identifier) === 'on' ? bool = true : bool = false;
-      return bool;
-    }
-
 
     // !VA CBController   
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
     function buildOutputNodeList( id ) {
-      console.clear();
+      console.log('buildOutputNodeList running'); 
       let selectedTdOption, hasAnchor, hasWrapper, Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
+      // !VA Branch: OVERHAUL0908D
+      // !VA Set hasAnchor if ccpImgAnchrTfd has a value
+      appController.getAppobj('ccpImgAnchrTfd')  ? hasAnchor = true : hasAnchor = false;
+      // !VA Set hasWrapper if ccpTblWraprChk is selected
+      appController.getAppobj('ccpTblWraprChk')  ? hasWrapper = true : hasWrapper = false;
+      console.log('hasWrapper is: ' + hasWrapper);
+
+      // hasAnchor = appController.getAppobj('ccpImgAnchrTfd');
+      appController.getAppobj('ccpImgAnchrTfd')  ? hasAnchor = true : hasAnchor = false;
       // !VA Get the selected TD option
-      selectedTdOption = getSelectedTdOptionFromAppobj();
+      // !VA Branch: OVERHAUL0903A
+      // !VA Is there a reason to call a function like below instead of accessing Appobj?
+      // selectedTdOption = UIController.fetchInputSelection('ccpTdaOptnsRdo');
+      selectedTdOption = appController.getAppobj('ccpTdaOptnsRdo');
       // !VA Query Appobj for the Include anchor checkbox state: true = checked, false = unchecked
-      hasAnchor = getCheckboxState('spnCcpImgIncludeAnchorCheckmrk');
-      // !VA Query Appobj for the Include wrapper checkbox state: true = checked, false = unchecked
-      hasWrapper = getCheckboxState('spnCcpTableIncludeWrapperCheckmrk');
+      console.log('selectedTdOption is: ' + selectedTdOption);
+
+      // !VA Branch: OVERHAUL0826A
       // !VA Get the Attributes from which Clipboard strings are built
       Attributes = getAttributes();
+      console.log(Attributes);
+      
       // !VA Get the top node, i.e. tableNodeFragment. 
       tableNodeFragment = makeTableNode( id, Attributes );
+
+      // !VA Branch: OVERHAUL0826A
+      // !VA tableNodeFragment tested and OK
+
       // !VA Create the full nodeList from the tableNodeFragment. If tableNodeFragment is null, return to abort without creating Clipboard object.
       try {
         nl = tableNodeFragment.querySelectorAll('*');
@@ -1406,8 +1498,9 @@ var Witty = (function () {
       }
       // !VA Create the div container to which the extracted nodeList fragment will be appended
       var container = document.createElement('div');
+
       // !VA Handle the active tdoptions radio selection for the options that do NOT include an MS conditional code block. These options don't require special indent handling or post-processing of the clipboard output string, so extract the outputNL accordingly
-      if (selectedTdOption === 'rdoCcpTdBasic' || selectedTdOption === 'rdoCcpTdExcludeimg' || selectedTdOption === 'rdoCcpTdPosswitch') {
+      if (selectedTdOption === 'basic' || selectedTdOption === 'excld' || selectedTdOption === 'swtch') {
         // !VA Deterimine which makeNode button was clicked and extract a nodeList fragment with only those nodes that correspond to the clicked button. The index position of the extracted fragments is determined by the length of the tableNodeFragment nodeList minus an integer to compensate for the 0-based nodeList indices.
         let rtlNodePos, extractPos;
         // !VA For the posswitch option: Get the position of the RTL node, if it exists. 
@@ -1418,19 +1511,21 @@ var Witty = (function () {
         }
         // !VA Process the makeNode button clicks
         switch(true) {
-        // !VA btnCcpMakeImgTag is clicked. We can hardcode the index where the extraction begins because the imgNode is created in makeTdNode and the btnCcpMakeImgTag button click overrides any other makeNode button actions. 
-        case ( '#' + id === btnCcpMakeClips.btnCcpMakeImgTag):
+        // !VA ccpImgCbhtmIpt is clicked. We can hardcode the index where the extraction begins because the imgNode is created in makeTdNode and the ccpImgCbhtmIpt button click overrides any other makeNode button actions. 
+        case ( '#' + id === iptCcpMakeClips.ccpImgCbhtmIpt):
+          
           // !VA If hasAnchor === true then the checkbox is checked, so take the last two (i.e. A and IMG) nodes, otherwise just take the last (i.e. IMG) node.
-          hasAnchor ? frag = nl[nl.length - 2] : frag = nl[nl.length - 1]; 
+          hasAnchor === true ? frag = nl[nl.length - 2] : frag = nl[nl.length - 1]; 
+
           break;
-        // !VA btnCcpMakeTdTag is clicked. Here we handle the 'rdoCcpTdBasic', 'rdoCcpTdExcludeimg' and 'rdoCcpTdPosswitch' options because they process indents with no modifications. 'rdoCcpTdImgswap', 'rdoCcpTdBgimage' and 'rdoCcpTdVmlbutton' options are handled separately because they import comment nodes with MS conditional code
-        case ( '#' + id === btnCcpMakeClips.btnCcpMakeTdTag):
+        // !VA ccpTdaCbhtmIpt is clicked. Here we handle the 'rdoCcpTdBasic', 'rdoCcpTdExcludeimg' and 'rdoCcpTdPosswitch' options because they process indents with no modifications. 'rdoCcpTdImgswap', 'rdoCcpTdBgimage' and 'rdoCcpTdVmlbutton' options are handled separately because they import comment nodes with MS conditional code
+        case ( '#' + id === iptCcpMakeClips.ccpTdaCbhtmIpt):
           // !VA basic option is selected 
-          if ( selectedTdOption === 'rdoCcpTdBasic') { 
+          if ( selectedTdOption === 'basic') { 
             // !VA We can hardcode this for now, but that will be a problem if any other options with other nodes are added.
             hasAnchor ? extractPos = nl.length - 3 : extractPos = nl.length - 2;
             // frag = nl[extractPos];
-          } else if ( selectedTdOption === 'rdoCcpTdExcludeimg') {
+          } else if ( selectedTdOption === 'excld') {
             extractPos = 5;
             // !VA posswitch option is selected
           } else {
@@ -1440,11 +1535,18 @@ var Witty = (function () {
           frag = nl[extractPos];
           break;
         // !VA Target id is MakeTableTag button
-        case ( '#' + id === btnCcpMakeClips.btnCcpMakeTableTag):
+        case ( '#' + id === iptCcpMakeClips.ccpTblCbhtmIpt):
           // !VA basic or excludeimg option is selected 
           // !VA We can hardcode the 'rdoCcpTdBasic' and 'rdoCcpTdPosswitch' positions for now, but these will have to be revisited if any new options are added that change the outputNL indices. 
 
-          if (hasWrapper) {
+          // !VA Branch: OVERHAUL0903A
+          // !VA What is this supposed to do?
+          // selectedTdOption = appController.getAppobj('ccpTdaOptnsRdo');
+
+
+          // !VA Branch: OVERHAUL0903A
+          // !VA If the Appobj property for the Include table wrapper icon is true
+          if (appController.getAppobj('ccpTblWraprChk')) {
             // !VA The Include wrapper table option is selected, so the entire nodeList is extracted
             extractPos = 0;
           } else {
@@ -1452,45 +1554,30 @@ var Witty = (function () {
             extractPos = 3;
           }
           frag = nl[extractPos];
+
           break;
         default:
           console.log('Error in buildOutputNodeList: case not defined, id is: ' + id);
           // Default code block, this should be an error code
         }
         // !VA Append the fragment to the container
+
+
         container.appendChild(frag);
+
         // !VA Create the outputNL nodeList to pass to the Clipboard object
         outputNL = container.querySelectorAll('*');
+
         applyIndents( id, outputNL );
-
-
-
-        // !VA Branch: ghost01 (072820)
-        // !VA NOW is when we apply ghost tables  
-
-        // if ( appController.getAppobj('rdoCcpImgFluid')) {
-        //   console.log('HIT');
-        //   console.log('outputNL[0]' + outputNL[0]);
-        //   var foo = outputNL[0];
-        //   foo.insertAdjacentHTML('beforeend', 'a;lsdkfaslkdfas;ldkfj\n');
-        //   console.log('foo is: ');
-        //   console.log(foo.outerHTML);
-          
-
-
-
-        // }
-
-
-
-
-
+        // !VA Convert the nodeList to text for output to the clipboard.
         clipboardStr = outputNL[0].outerHTML;
 
-      // !VA These options include MS conditional code retrieved by getImgSwapBlock, getBgimageBlock, getVMLBlock which includes getIndent functions. First, run applyIndents on outputNL. applyIndents also inserts tokens at the position where the codeBlock is to be inserted. The parent nodelist is converted to a string, the code blocks are retrieved, indents are inserted, and finally the codeblocks are inserted into the string between the tags of the last node in the outputNL.outerHTML string. 
 
-      } else if (selectedTdOption === 'rdoCcpTdImgswap' || selectedTdOption  === 'rdoCcpTdBgimage' || selectedTdOption === 'rdoCcpTdVmlbutton') {
-        // !VA Start with the btnCcpMakeTdTag makeNode button because the img makeNode button isn't referenced in the imgswap option. The A/IMG tags are hard-coded into the MS Conditional code in getImgSwapBlock. Also, there's a switch to include/exclude the A/IMG node in makeTdNode.
+      // !VA These options include MS conditional code retrieved by getImgSwapBlock, getBgimageBlock, getVMLBlock which includes getIndent functions. First, run applyIndents on outputNL. applyIndents also inserts tokens at the position where the codeBlock is to be inserted. The parent nodelist is converted to a string, the code blocks are retrieved, indents are inserted, and finally the codeblocks are inserted into the string between the tags of the last node in the outputNL.outerHTML string.
+      
+
+      } else if (selectedTdOption === 'iswap' || selectedTdOption  === 'bgimg' || selectedTdOption === 'vmlbt') {
+        // !VA Start with the ccpTdaCbhtmIpt makeNode button because the img makeNode button isn't referenced in the imgswap option. The A/IMG tags are hard-coded into the MS Conditional code in getImgSwapBlock. Also, there's a switch to include/exclude the A/IMG node in makeTdNode.
         // !VA extractNodeIndex is the nl index position at which the nodes are extracted to build outputNL. It equals the nodeList length minus the indentLevel.
         let extractNodeIndex;
         // !VA indentLevel is the number of indents passed to getIndent.
@@ -1499,8 +1586,8 @@ var Witty = (function () {
         let codeBlock;
         // !VA If the makeTD button is clicked, then only the last node in nl is extracted and the MS conditional comments get one indent level
         // !VA NOTE: This code is repeated above in the if clause and again here in the else
-
-        if ( '#' + id === btnCcpMakeClips.btnCcpMakeTdTag) {
+        
+        if ( '#' + id === iptCcpMakeClips.ccpTdaCbhtmIpt) {
           indentLevel = 1;
           extractNodeIndex = nl.length - indentLevel;
         } else {
@@ -1522,59 +1609,27 @@ var Witty = (function () {
         // !VA Create the nodeList to pass to the Clipboard object. 
         outputNL = container.querySelectorAll('*');
         // !VA Apply the indents and insert the tokens marking the position for inserting the MS conditional code.
-
-        console.log('outputNL is: ');
-        console.log(outputNL);
-
         applyIndents(id, outputNL);
         // !VA Convert outputNL to a string (including tokens for inserting MS conditional code) for output to Clipboard object.
         clipboardStr = outputNL[0].outerHTML;
         console.log('outputNL[0] is: ');
         console.log(clipboardStr);
         // !VA Get the codeBlock corresponding to the selected TD option
-        if ( selectedTdOption === 'rdoCcpTdImgswap') {
+        if ( selectedTdOption === 'iswap') {
           codeBlock = getImgSwapBlock( id, indentLevel, Attributes);
-        } else if (  selectedTdOption === 'rdoCcpTdBgimage' ) {
+          console.log('codeBlock is: ');
+          console.log(codeBlock);
+        } else if (  selectedTdOption === 'bgimg' ) {
           codeBlock = getBgimageBlock(id, indentLevel, Attributes);
-        } else if (selectedTdOption === 'rdoCcpTdVmlbutton') {
+        } else if (selectedTdOption === 'vmlbt') {
           codeBlock = getVmlButtonBlock(id, indentLevel, Attributes);
         } 
         // !VA Replace the tokens in clipboardStr that were added in applyIndents with the respective codeBlock
         clipboardStr = clipboardStr.replace('/replacestart//replaceend/', codeBlock + '\n');
+        console.log('clipboardStr is: ');
+        console.log(clipboardStr);
       } 
 
-
-
-
-      // !VA Convert the alias of the clicked button to an ID the Clipboard object recognizes and write clipboardStr to the clipboard.
-      // console.log('clipboardStr is before ghost tables is: ');
-      // console.log(clipboardStr);
-
-
-
-
-
-      // !VA Branch: ghost01 (072820)
-      // !VA This may be the only place to create the ghost tables.
-      var ghostopen;
-      ghostopen = `<!--[if (gte mso 9)|(IE)]>
-<table align="center" border="0" cellspacing="0" cellpadding="0" width="${appController.getAppobj('curImgW')}">
-<tr>
-<td align="center" valign="top" width="${appController.getAppobj('curImgW')}">
-<![endif]-->\n`;
-      var ghostclose;
-      ghostclose = `\n<!--[if (gte mso 9)|(IE)]>
-</td>
-</tr>
-</table>
-<![endif]-->`;
-
-
-      if ( appController.getAppobj('rdoCcpImgFluid')) {
-        clipboardStr = ghostopen + clipboardStr + ghostclose;
-      }
-
-      
       console.log('clipboardStr is:');
       console.log(clipboardStr);
       writeClipboard( id, clipboardStr );
@@ -1597,13 +1652,17 @@ var Witty = (function () {
       sibling2Elements = [ 'div', 'td', 'table', 'tr', 'td'];
       // !VA We have to handle the Include anchor tag case here because once the nodeList is created, it's a hack to modify it. So we remove the a tag from the arrays before creating the nodeList and setting the node attributes. We'll have to remove the corresponding a tag index from the nodeAttributes array as well otherwise the loop assigning the attributes to the nodeList will break. Note: this is a HACK! But this whole makePosSwitchNodes thing is a hack anyway so lets' make it simple human-readable.
       // !VA Get the checkmark target
-      var target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
-      // !VA If Include anchor is NOT checked, remove the anchor item from both sibling1 arrays and 
-      if (!getCheckboxSelection(target) ) {
+      // !VA Branch: OVERHAUL0827A
+      // !VA Deprecated...don't need the checkbox target anymore
+      // var target = ccpUserInput.ccpImgAnchrTfd;
+      // !VA If Include anchor is NOT checked, remove the anchor item from both sibling1 arrays.
+      // !VA Branch: OVERHAUL0827A
+      // !VA Replace with query Appobj for ccpImgAnchr property. If the property value === '', then there is no entry, so do not include the anchor node in the sibling1 arrays.
+      if ( appController.getAppobj('ccpImgAnchrTfd') === '') {
         index = 5;
         sibling1Ids.splice(index, 1);
         sibling1Elements.splice(index, 1);
-      }   
+      }
       // !VA Now we have two branches of the node tree, each with a different number of descendants. So we have to loop through them separately to create their nodes.
       // !VA Loop through the arrays and create the elements with name and corresponding type
       // // !VA Start with the container items that are parents of the sibling elements.
@@ -1740,12 +1799,15 @@ var Witty = (function () {
       // !VA Create the array with the attribute objects. We use this array to cycle through the nodeList and apply the attributes to the individual nodes. I tried many ways to do this but was not able to assign these objects to the individual nodes any other way than to loop through them ensuring that the array and nodeList length were identical. If there is a way to assign attributes to nodes using the node ID as index, I'd like to learn that technique.
       nodeAttributes = [ td_switchcontainerAttr, table_switchparentAttr,  tr_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr,  tr_switchchild1Attr, td_switchcontent1Attr, a_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, tr_switchchild2Attr, td_switchcontent2Attr ];
 
-      // !VA Remove the anchor attributes from the array if the Include anchor checkbox is checked. The a tag is at position 7 in the attributes array.
-      var target = ccpUserInput.spnCcpImgIncludeAnchorCheckmrk;
-      if (!getCheckboxSelection(target)) {
+      // !VA Remove the anchor attributes from the array if the Include anchor checkbox is not checked. The a tag is at position 7 in the attributes array.
+      // !VA Branch: OVERHAUL0827A
+      // !VA Replacing with Appobj query
+      if ( appController.getAppobj('ccpImgAnchrTfd') === '') {
         index = 7;
         nodeAttributes.splice(index, 1);
-      } 
+      }
+
+
       // !VA Assign the attributes to the nodes using the length of the nodeAttribute array as index.
       for (let i = 0; i < nodeAttributes.length; i++) {
         for (let entries of Object.entries(nodeAttributes[i])) {
@@ -1790,19 +1852,21 @@ var Witty = (function () {
       // !VA border attribute - always set to 0
       imgNode.border = '0';
       // !VA If the include anchor option is checked, create the anchor element, add the attributes, append the imgNode to the nodeFragment, and return it.
-      if(Attributes.imgIncludeAnchor.str === true) {
+      // !VA Branch: OVERHAUL0826A
+      // !VA Overhaul, disabling...
+      if (Attributes.imgIncludeAnchor.str !== '') {
         let anchor = document.createElement('a');
-        anchor.href = '#';
-        // !VA Branch: implementClipboard01 (071020)
-        // !VA Commenting color and target out for now
-        // anchor.setAttribute('style', 'color: #FF0000');
-        // anchor.setAttribute('target', '_blank');
+        anchor.href = appController.getAppobj('ccpImgAnchrTfd');
         anchor.appendChild(imgNode);
         returnNodeFragment.appendChild(anchor);
       } else {
         // !VA Otherwise, set returnNodeFragment to imgNode without the anchor.
         returnNodeFragment.appendChild(imgNode);
       }
+      // !VA Branch: OVERHAUL0826A
+      // !VA Instead of the disabled instruction above...
+
+      // !VA Branch: OVERHAUL0826A
       // !VA return the imgNode as node fragment;
       return returnNodeFragment;
     }
@@ -1814,7 +1878,10 @@ var Witty = (function () {
       let isErr;
       // !VA Query Appobj to get the selected TD option
       let selectedTdOption;
-      selectedTdOption = getSelectedTdOptionFromAppobj();
+      // !VA Branch: OVERHAUL0903A
+      // !VA Reason for this function instead of Appobj query?
+      // selectedTdOption = UIController.fetchInputSelection( 'ccpTdaOptnsRdo');
+      selectedTdOption = appController.getAppobj('ccpTdaOptnsRdo');
       // !VA NOTE: No trapped errors here yet that would pass a code, but that will probably come.
       // let errCode;
       let tdInner, imgNode;
@@ -1829,7 +1896,7 @@ var Witty = (function () {
       // !VA Now add the attributes included only with the default Td configuration
       switch(true) {
       // !VA If the 'td with options' or 'td with options (exclude img) radio buttons are checked...
-      case (selectedTdOption === 'rdoCcpTdBasic' || selectedTdOption === 'rdoCcpTdExcludeimg'):
+      case (selectedTdOption === 'basic'):
         // !VA tdInner.className
         omitIfEmpty( Attributes.tdClass.str, tdInner, 'className');
         // !VA tdInner.align
@@ -1852,14 +1919,27 @@ var Witty = (function () {
         omitIfEmpty( Attributes.tdWidth.str, tdInner, Attributes.imgWidth.str);
         // !VA Now it's set to the current value of the input element, i.e. the Appobj property
         omitIfEmpty( Attributes.tdWidth.str, tdInner, 'width');
-        // !VA If 'rdoCcpTdBasic' is checked, create imgNode and append it, otherwise exclude the imgNode.
-        if (selectedTdOption === 'rdoCcpTdBasic') {
+        // !VA Branch: OVERHAUL0827A
+        // !VA Determine whether to include or exclude the img node. Query Appobj for the incld/excld option. If 'incld', include the img, else exclude it.
+
+        if (appController.getAppobj('ccpImgExcldRdo') === 'incld') {
+
           imgNode = makeImgNode( id, Attributes );
+
+
+          // !VA Branch: OVERHAUL0826A
+          // !VA tdInner tested and OK
           tdInner.appendChild(imgNode);
+
+
+        } else if (appController.getAppobj('ccpImgExcldRdo') === 'excld') {
+          console.log('makeTdNode - img excluded from tdNode');
+        } else {
+          console.log('ERROR in makeTdNode - unrecognized itype option');
         }
         break;
       // !VA (selectedTdOption === 'rdoCcpTdImgswap'):
-      case (selectedTdOption === 'rdoCcpTdImgswap'):
+      case (selectedTdOption === 'iswap'):
         // !VA tdInner.className
         omitIfEmpty( Attributes.tdClass.str, tdInner, 'className');
         // !VA tdInner.align
@@ -1869,7 +1949,7 @@ var Witty = (function () {
         omitIfEmpty( Attributes.tdValign.str, tdInner, 'vAlign');
         break;
       // !VA (selectedTdOption === 'rdoCcpTdBgimage'):
-      case (selectedTdOption === 'rdoCcpTdBgimage'):
+      case (selectedTdOption === 'bgimg'):
         // !VA Create the parent node to which the bgimage code block will be appended after outputNL is converted to text in buildOutputNodeList.
         // !VA Include width, height and valign as per Stig's version
         tdInner.width = Attributes.tdAppobjWidth.str;
@@ -1881,13 +1961,16 @@ var Witty = (function () {
         // !VA Include fallback color from the default set in showTdOptions
         break;
       // !VA  (selectedTdOption === 'rdoCcpTdPosswitch'):
-      case (selectedTdOption === 'rdoCcpTdPosswitch'):
+      case (selectedTdOption === 'swtch'):
         tdInner  = makePosSwitchNodes( id, Attributes );
         break;
       // !VA  (selectedTdOption === 'rdoCcpTdVmlbutton'):
-      case (selectedTdOption === 'rdoCcpTdVmlbutton'):
+      case (selectedTdOption === 'vmlbt'):
+
         // !VA IMPORTANT: Height and width fields have to be entered, otherwise the button can't be built. Button width and height are set here in makeTdNode, the rest of the options are set in getVmlCodeBlock in buildOutputNodeList. The defaults of 40/200 as per Stig are set in UIController.showTdOptions. So if there's no value for td height and width, then the user has deleted the default and not replaced it with a valid entry. In this case, throw an ERROR and abort before it gets to the clipboard.
-        if (!document.querySelector(ccpUserInput.iptCcpTdHeight).value || !document.querySelector(ccpUserInput.iptCcpTdWidth).value) {
+        // !VA Branch: OVERHAUL0827A
+        // !VA Replaced both these DOM accesses with Appobj queries.
+        if (!appController.getAppobj('ccpTdaHeigtTfd') || !appController.getAppobj('ccpTdaWidthTfd')) {
           console.log('ERROR in makeTdNode rdoCcpTdVmlbutton: no value for either height or width');
           isErr = true;
         } else {
@@ -1896,7 +1979,7 @@ var Witty = (function () {
           tdInner.height = Attributes.tdHeight.str;
         }
         // !VA TODO: If the height entered doesn't match the height of the loaded image, then the user probably has forgotten to load the image used for the button background, so the code output will probably not be what the user expects. Output the code, but show an alert in the message bar. This is going to require making a different clipboard message for alerts. It will also require somehow informing the Clipboard object that two different messages can be displayed onsuccess - one success message and one alert message. That will require passing an error status along with tdNodeFragment and tableNodeFragment, which will require returning an array rather than just the node fragment. 
-        if (document.querySelector(ccpUserInput.iptCcpTdHeight).value !== Attributes.imgHeight.str) {
+        if (document.querySelector(ccpUserInput.ccpTdaHeigtTfd).value !== Attributes.imgHeight.str) {
           // !VA TODO: This error message throws an error...
           // appController.handleAppMessages('vmlbutton_height_mismatch');
           console.log('ALERT vmlbutton: height value doesn\'t match height of loaded image');
@@ -1906,7 +1989,10 @@ var Witty = (function () {
         console.log('Some error has occurred in makeTdNode');
       } 
       // !VA Set the node fragment to the TD node
+      // !VA Branch: OVERHAUL0826A
+      // !VA tdNodeFragment tested and OK
       tdNodeFragment.appendChild(tdInner);
+
       // !VA TODO: This error handling is poor because it only allows for one possible error. But, it does return nothing, which is then passed on to the calling function and terminates in buildOutputNodeList
       if (isErr) { 
         console.log('makeTdNode: vml_button_no_value error: id is: ' + id);
@@ -1914,6 +2000,7 @@ var Witty = (function () {
         // appController.initMessage(id, true, 'vmlbutton_no_value');
         return;
       } else {
+
         return tdNodeFragment;
       }
     }
@@ -1950,9 +2037,11 @@ var Witty = (function () {
       // !VA Add border, cellspacing and cellpadding
 
       // !VA Branch: review0720F (071720)
-      if (getRadioState(ccpUserInput.rdoCcpImgFluid)) {
-        tableOuter.setAttribute('style', Attributes.tableStyle.str); 
-      }
+      // !VA 082520
+      // !VA This element no longer exists -- replace with Overhaul version, in the meantime, disabling...
+      // if (getRadioState(ccpUserInput.rdoCcpImgFluid)) {
+      //   tableOuter.setAttribute('style', Attributes.tableStyle.str); 
+      // }
 
       tableInner.border = '0', tableInner.cellSpacing = '0', tableInner.cellPadding = '0';
       // !VA Set the role=presentation attribute
@@ -1961,6 +2050,7 @@ var Witty = (function () {
       tableInner.appendChild(trInner);
       // !VA Get the inner TD from makeTdNode and append it to the nodeFragment
       tdNodeFragment = makeTdNode( id, Attributes );
+
       // !VA If tdNodeFragment is null, then there was an error in makeTdNode, so console the error and return null to buildOutputNodeList to abort.
       try {
         trInner.appendChild(tdNodeFragment);
@@ -1977,14 +2067,20 @@ var Witty = (function () {
       // !VA Branch: review0720F (071720)
       // tableOuter.width = Attributes.tableWrapperWidth.str;
       omitIfEmpty( Attributes.tableWrapperWidth.str, tableOuter, 'width');
-      // !VA tableOuter.bgColor - Pass the input value, don't prepend hex # character for now. 
+
+
       omitIfEmpty( Attributes.tableWrapperBgcolor.str, tableOuter, 'bgColor');
+
+      // !VA tableOuter.bgColor - Pass the input value, don't prepend hex # character for now. 
+      omitIfEmpty( Attributes.tableWrapperStyle.str, tableOuter, 'style');
       // !VA Style attribute - only included for fluid images
-      // !VA Branch: review0720F (071720)
+
+      // !VA Branch: OVERHAUL0826A
+      // !VA Element no longer exists, disabling
       // !VA This may be deprecated
-      if (getRadioState(ccpUserInput.rdoCcpImgFluid)) {
-        tableOuter.setAttribute('style', Attributes.tableWrapperStyle.str); 
-      }
+      // if (getRadioState(ccpUserInput.rdoCcpImgFluid)) {
+      //   tableOuter.setAttribute('style', Attributes.tableWrapperStyle.str); 
+      // }
       // !VA Add default border, cellspacing, cellpadding and role for accessiblity
       tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
       tableOuter.setAttribute('role', 'presentation'); 
@@ -2007,12 +2103,10 @@ var Witty = (function () {
       tdOuter.appendChild(tableInner);
       // !VA Pass the outer table to the tableNodeFragment.
       // tableNode = tableOuter;
-
-
-
-
-      
       // !VA Append the wrapper table to the node fragment and return it
+
+      // !VA Branch: OVERHAUL0826A
+      // !VA TableNodeFragment tested and OK
       tableNodeFragment.appendChild(tableOuter);
       return tableNodeFragment;
     }
@@ -2020,7 +2114,8 @@ var Witty = (function () {
 
     // !VA START TD OPTIONS MS-CONDITIONAL CODE BLOCKS
     // !VA These are the code blocks that contain MS conditionals in comment nodes or text nodes, i.e. mobile swap, background image, and vmlbutton
-    // !VA UIController   
+    // !VA UIController private
+    // !VA Called from buildOutputNodeList. Gets the clipboardStr that comprises the MS Conditional code for the iswap, i.e. TD OPTNS image swap option.
     function getImgSwapBlock( id, indentLevel, Attributes ) {
       let Appobj, linebreak;
       // !VA Branch: implementCcpInput02 (062420)
@@ -2056,7 +2151,7 @@ var Witty = (function () {
       // !VA 03.09.2020 Set the indentLevel to 1 for now
       // !VA The fallback color is written to the bgcolor input in showTdOptions, so get it from there
       // fallback = '#7bceeb';
-      Attributes.tdBgcolor.str ? bgcolor = Attributes.tdBgcolor.str : bgcolor = document.querySelector(ccpUserInput.iptCcpTdBgColor).value;
+      Attributes.tdBgcolor.str ? bgcolor = Attributes.tdBgcolor.str : bgcolor = document.querySelector(ccpUserInput.ccpTdaBgclrTfd).value;
       // !VA Define the innerHTML of the bgimage code
       bgimageStr = `${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth.str}px;height:${Attributes.imgHeight.str}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc.str}" color="${Attributes.tdBgcolor.str}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}${getIndent(indentLevel)}<div>${linebreak}${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div>${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}  </v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect>${linebreak}${getIndent(indentLevel)}<![endif]-->`;
       // !VA Return the code block with line breaks and indents
@@ -2068,8 +2163,8 @@ var Witty = (function () {
       let vmlButtonStr, linebreak, tdHeight, tdWidth;
       linebreak = '\n';
       // !VA Defaults for height and width are set in showTdOptions, so get the values from the inputs
-      tdHeight = document.querySelector(ccpUserInput.iptCcpTdHeight).value;
-      tdWidth = document.querySelector(ccpUserInput.iptCcpTdWidth).value;
+      tdHeight = document.querySelector(ccpUserInput.ccpTdaHeigtTfd).value;
+      tdWidth = document.querySelector(ccpUserInput.ccpTdaWidthTfd).value;
       // !VA Define the innerHTML of the vmlbutton code
       vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:${tdHeight}px;v-text-anchor:middle;width:${tdWidth}px;" arcsize="10%" strokecolor="#1e3650" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc.str}" color="#556270" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Show me the button!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="#"
 style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});border:1px solid #1e3650;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:${tdHeight}px;text-align:center;text-decoration:none;width:${tdWidth}px;-webkit-text-size-adjust:none;mso-hide:all;">Show me the button!</a></div>`;
@@ -2081,15 +2176,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       return vmlButtonStr;
     }
 
-    function getGhostTableOpeningTag (id, indentLevel, Attributes) {
-
-
-
-
-
-
-      
-    }
 
     // !VA END TD OPTIONS MS-CONDITIONAL CODE BLOCKS
 
@@ -2097,9 +2183,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CBController   
     // !VA NOTE: This routine identifies if the nodes 1) contain the id 'stack-column-center' 2) contain MS conditional code and 2) contain an A tag. It applies indents accordingly to the nodes using insertAdjacentHTML. 1) Is problematic because if that class name is not present in the HTML file, the indent will break. I couldn't figure out a way to do this without the id by looking for sibling nodes, so trying to create options for three or even two column tables will be ridiculous time-consuming - not an option for now.
     function applyIndents( id, outputNL ) {
-      // !VA Query Appobj to get the selected TD option
+      console.log('outputNL is: ');
+      console.log(outputNL);
       let selectedTdOption;
-      selectedTdOption = getSelectedTdOptionFromAppobj();
+      // !VA Branch: OVERHAUL0827A
+      // !VA Query Appobj to get the selected TD option
+      selectedTdOption = appController.getAppobj('ccpTdaOptnsRdo');
 
       // !VA Create array to store indent strings
       let indents = [];
@@ -2111,7 +2200,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       let hasMSConditional;
 
 
-      if ( selectedTdOption === 'rdoCcpTdImgswap' || selectedTdOption === 'rdoCcpTdBgimage' || selectedTdOption === 'rdoCcpTdVmlbutton') {
+      if ( selectedTdOption === 'iswap' || selectedTdOption === 'bgimg' || selectedTdOption === 'vmlbt') {
         hasMSConditional = true;
       }
       for (let i = 0; i < outputNL.length; i++) {
@@ -2179,6 +2268,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           }
         }
       }
+
       return outputNL;
     }
 
@@ -2239,17 +2329,20 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA NOTE: This never happened, getAppobj still returns the entire Appobj object.
       let Appobj = {};
       Appobj = appController.getAppobj();
-      console.log('makeCssRule Appobj is: ');
-      console.log(Appobj);
       // !VA Destructure Appobj to variables
       let { curImgW, curImgH, sPhonesW, sPhonesH, lPhonesW, lPhonesH } = Appobj;
       let clipboardStr;
 
       function getTdOutput() {
         console.log('buildOutputString running');
+        // !VA Branch: OVERHAUL0827A
+        // !VA This could be explained better because I'm not understanding right now why rdoCcpTdExcludeimg was called below. 
         // !VA For img, assumed is always a fixed image that includes width and height. For td, either width or height or both can be provided, so the clipboard output must include either, or, or both.
         let wProp, hProp, outputStr;
-        if (getSelectedTdOptionFromAppobj() === 'rdoCcpTdExcludeimg') {
+        // !VA Branch: OVERHAUL0827A
+        // !VA Query Appobj for the IMG excld option
+        if (appController.getAppobj('ccpImgExcldRdo') === 'excld') {
+          console.log('Exclude image');
           Attributes.tdWidth.str ? wProp = `width: ${Attributes.tdWidth.str}px !important;` : wProp = '';
           Attributes.tdHeight.str ? hProp = `height: ${Attributes.tdHeight.str}px !important;` : hProp = '';
           outputStr = wProp + ' ' + hProp;
@@ -2262,35 +2355,35 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       switch(true) {
       // !VA Build the CSS clipboard output strings
-      case (id.includes('img-dsktp')):
+      case (id.includes('img-cbdtp')):
         clipboardStr = `img.${Attributes.imgClass.str} { width: ${curImgW}px !important; height: ${curImgH}px !important; }`;
         break;
-      case (id.includes('img-smphn')):
+      case (id.includes('img-cbsph')):
         clipboardStr = `img.${Attributes.imgClass.str} { width: ${sPhonesW}px !important; height: ${sPhonesH}px !important; }`;
         break;
-      case (id.includes('img-lgphn')):
+      case (id.includes('img-cblph')):
         clipboardStr = `img.${Attributes.imgClass.str} { width: ${lPhonesW}px !important; height: ${lPhonesH}px !important; }`;
         break;
       // !VA Branch: review0720D (071620)
       // !VA Output depends on tdoptions, so use getTdOutput. 
-      case (id.includes('td-dsktp')) :
+      case (id.includes('tda-cbdtp')) :
         clipboardStr = `td.${Attributes.tdClass.str} { ${getTdOutput()} }`;
         break;
       // !VA Branch: review0720D (071620)
       // !VA It's conceivable that one could want to set the TD width/height to the curImg sPhones/lPhones value, so we'll include that even though it is a stretch that anyone would want it.
-      case ( id.includes('td-smphn')) :
+      case ( id.includes('tda-cbsph')) :
         clipboardStr = `td.${Attributes.tdClass.str} { width: ${sPhonesW}px !important; height: ${sPhonesH}px !important; }`;
         break;
-      case ( id.includes('td-lgphn')) :
+      case ( id.includes('tda-cblph')) :
         clipboardStr = `td.${Attributes.tdClass.str} { width: ${lPhonesW}px !important; height: ${lPhonesH}px !important; }`;
         break;
-      case (id.includes('table-dsktp')):
+      case (id.includes('tbl-cbdtp')):
         clipboardStr = `table.${Attributes.tableClass.str} { width: ${Attributes.tableWidth.str}px !important; align: ${Attributes.tableAlign.str} !important; }`;
         break;
-      case (id.includes('table-smphn')):
+      case (id.includes('tbl-cbsph')):
         clipboardStr = `table.${Attributes.tableClass.str} { width: ${sPhonesW}px !important; align: ${Attributes.tableAlign.str} !important; }`;
         break;
-      case (id.includes('table-lgphn')):
+      case (id.includes('tbl-cblph')):
         clipboardStr = `table.${Attributes.tableClass.str} { width: ${lPhonesW}px !important; align: ${Attributes.tableAlign.str} !important; }`;
         break;
       default:
@@ -2431,10 +2524,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA Branch: implementCcpInput03 (062520)
         // !VA The fluid/fixed condition is probably deprecated but needs to be tested in the next branch
         switch(true) {
-        case targetid.includes('tag') || targetid.includes('fluid') || targetid.includes('fixed') :
+
+        case targetid.includes('cbhtm') :
+        // case targetid.includes('tag') || targetid.includes('fluid') || targetid.includes('fixed') :
           buildOutputNodeList (targetid);
           break;
-        case targetid.includes('css') :
+        // !VA cbdtp, cbsph and cblph are the 5-char element codes for the Make CSS buttons
+        case targetid.includes('cbdtp') || targetid.includes('cbsph') || targetid.includes('cblph'):
           makeCssRule(targetid);
           break;
         case targetid.includes('ins') :
@@ -2454,10 +2550,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Run on page load
     // document.addEventListener("DOMContentLoaded", function() {
     //   setTimeout(function(){ 
-    //     // !VA Don't forget you can't use button aliases here..
-    //     var foo = appobjPropToAlias('curImgW');
-    //     console.log('foo is: ' + foo);
-        
+
+
     //   }, 100);
     // });
 
@@ -2474,7 +2568,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     const ccpUserInput = UICtrl.getCcpUserInputIDs();
     // !VA Deprecated?
     // const ccpUserInputLabels = UICtrl.getCcpUserInputLabelIds();
-    const btnCcpMakeClips =  UICtrl.getBtnCcpMakeClips();
+    const iptCcpMakeClips =  UICtrl.getiptCcpMakeClips();
     const appMessageElements =  UICtrl.getAppMessageElements();
 
 
@@ -2546,7 +2640,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         addEventHandler(labelel, 'mouseenter', tooltipTriggers, true);
       }
       // !VA Add tooltip targets to the Make Clip buttons - both the Make HTML and Make CSS buttons
-      var btnCcpMakeClipIds = Object.values(btnCcpMakeClips);
+      var btnCcpMakeClipIds = Object.values(iptCcpMakeClips);
       for (let i = 0; i < btnCcpMakeClipIds.length; i++) {
         el = document.querySelector(btnCcpMakeClipIds[i]);
         addEventHandler(el, 'mouseenter', tooltipTriggers, true);
@@ -2611,7 +2705,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         removeEventHandler(labelel, 'mouseenter', tooltipTriggers, true);
       }
       // !VA Add tooltip targets to the Make Clip buttons - both the Make HTML and Make CSS buttons
-      var btnCcpMakeClipIds = Object.values(btnCcpMakeClips);
+      var btnCcpMakeClipIds = Object.values(iptCcpMakeClips);
       for (let i = 0; i < btnCcpMakeClipIds.length; i++) {
         el = document.querySelector(btnCcpMakeClipIds[i]);
         removeEventHandler(el, 'mouseenter', tooltipTriggers, true);
@@ -2638,6 +2732,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA Event handler for initializing event listeners 
       function addEventHandler(oNode, evt, oFunc, bCaptures) {
+        // console.log('oNode is: ' + oNode);
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
 
@@ -2650,7 +2745,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         tbClickables[i] = document.querySelector(tbClickables[i]);
         addEventHandler(tbClickables[i],'click',handleMouseEvents,false);
       }
-
+      
       // !VA Add click event handlers for Inspector clickable elements: Display Size, Small Phones and Large Phones values in the programmatically created SPAN tags
       const inspectorClickables = [ inspectorLabels.insDisplaySizeLabel, inspectorLabels.insSmallPhonesLabel, inspectorLabels.insLargePhonesLabel, inspectorValues.insDisplaySizeWidthValue, inspectorValues.insDisplaySizeHeightValue, inspectorValues.insSmallPhonesWidthValue, inspectorValues.insSmallPhonesHeightValue, inspectorValues.insLargePhonesWidthValue, inspectorValues.insLargePhonesHeightValue ];
       for (let i = 0; i < inspectorClickables.length; i++) {
@@ -2658,7 +2753,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         inspectorClickables[i] = document.querySelector(inspectorClickables[i]);
         addEventHandler(inspectorClickables[i],'click',CBController.doClipboard,false);
       }
-
+      
       // !VA Add click handlers for Inspector - there's only the clipboard button now but there could be more. 
       var dvClickables = [ inspectorElements.btnToggleCcp ];
       for (let i = 0; i < dvClickables.length; i++) {
@@ -2666,55 +2761,41 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         dvClickables[i] = document.querySelector(dvClickables[i]);
         addEventHandler((dvClickables[i]),'click',appController.initCcp,false);
       }
-
-      // !VA We need eventListeners for ALL the clipboard buttons so make an eventListener for each value in the btnCcpMakeClips object. We need a for in loop for objects
-      for(let i in btnCcpMakeClips) {
+      
+      // !VA We need eventListeners for ALL the clipboard buttons so make an eventListener for each value in the iptCcpMakeClips object. We need a for in loop for objects
+      for(let i in iptCcpMakeClips) {
         // !VA loop through the object that contain the id and func properties.
         let clipBut;
-        if(btnCcpMakeClips.hasOwnProperty(i)){
-          clipBut = document.querySelector(btnCcpMakeClips[i]);
+        if(iptCcpMakeClips.hasOwnProperty(i)){
+          clipBut = document.querySelector(iptCcpMakeClips[i]);
           addEventHandler(clipBut,'click',CBController.doClipboard,false);
         }
       }
-
-      // !VA Branch: implementAppobj05 (061320)
-      // !VA What did I mean by the comment below?
-      // !VA Branch: implementAppobj03 (060820) This was the catch-all event handler prior to this branch but it doesn't work because it doesn't trap keyboard input. 
-      let ccpRadioClicks;
+      
+      // !VA Branch: OVERHAUL0825C
+      // !VA Add event handlers for ALL individual radio input elements. Note that Toolbar clicks and blur events on text input elements are handled separately in handleMouseEvents. Radio elements have a separate handler because they need to be sorted by radio group and calling it from handleMouseEvents would just add another clause and more complexity to handleMouseEvents unnecessarity.  
+      let rdoElements;
       for(let i in ccpUserInput) {
-        if (ccpUserInput[i].substring(0,4) === '#rdo') {
-          ccpRadioClicks = document.querySelector(ccpUserInput[i]);
-          addEventHandler(ccpRadioClicks,'click',handleCcpRadioSelection,false);
+        if (ccpUserInput[i].substring( 15 ) === 'rdo') {
+          rdoElements = document.querySelector(ccpUserInput[i]).getElementsByTagName('INPUT');
+          for (const el of rdoElements) {
+            addEventHandler(el,'click',handleRadioEvent,false);
+          }
         }
       }
 
-      // !VA Branch: review0720C (071520)
-      // !VA onchange event handlers for dropdown select elements
-      let ccpDropdowns;
+      // !VA Branch: OVERHAUL0825C
+      // !VA Add event handlers for ALL individual checkbox input elements. They are sorted out in handleCheckboxEvent called here. Note that Toolbar clicks and blur events on text input elements are handled separately in handleMouseEvents. Checkbox elements have a separate handler because calling it from handleMouseEvents would just add another clause and more complexity to handleMouseEvents.  
+      let chkElements;
       for(let i in ccpUserInput) {
-        if (ccpUserInput[i].substring(0,4) === '#sel') {
-          ccpDropdowns = document.querySelector(ccpUserInput[i]);
-          addEventHandler(ccpDropdowns,'change',handleCcpDropdowns,false);
+        if (ccpUserInput[i].substring( 15 ) === 'chk') {
+          chkElements = document.querySelector(ccpUserInput[i]).getElementsByTagName('INPUT');
+          for (const el of chkElements) {
+            addEventHandler(el,'click',handleCheckboxEvent,false);
+          }
         }
       }
-
-      // !VA eventListener for the Include Wrapper checkbox. Checkboxes need to have separate event handlers because their functions are too different to consolidate into a single one.
-      // !VA Branch: implementCcpInput01 (062120)
-      // !VA Then why are they both driving to the same function i.e. toggleCheckbox?
-      let includeWrapperCheckbox = document.querySelector(ccpUserInput.spnCcpTableIncludeWrapperCheckmrk);
-      addEventHandler(includeWrapperCheckbox,'click',toggleCheckbox,false);
-
-      // !VA eventListener for the Include Anchor checkbox. Checkboxes need to have separate event handlers because their functions are too different to consolidate into a single one.
-      let includeAnchorCheckbox = document.querySelector(ccpUserInput.spnCcpImgIncludeAnchorCheckmrk);
-      addEventHandler(includeAnchorCheckbox,'click',toggleCheckbox,false);
-
-      // !VA Branch: implementCcpInput10 (070420)
-      // var toolbarAliases = Object.keys(toolbarElements);
-      // for (let i = 0; i < toolbarAliases.length; i++) {
-      //   // !VA convert the ID string to the object inside the loop
-      //   toolbarElements[i] = document.querySelector(toolbarElements[toolbarAliases[i]]);
-      //   addEventHandler(toolbarElements[i],'click',handleMouseEvents,false);
-      // }
+ 
 
       // !VA KEYBOARD HANDLERS
       // -----------------------
@@ -2732,28 +2813,43 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         addEventHandler((toolbarInputs[i]),'blur',handleMouseEvents,false);
       }
 
-
-
-      // !VA Add event handlers for CCP input elements.  This could be merged with tbKeypresses above below but leave it for now.
-      let ccpInputs;
-      for(let i in ccpUserInput) {
-        if (ccpUserInput[i].substring(0,4) === '#ipt') {
-          ccpInputs = document.querySelector(ccpUserInput[i]);
-          addEventHandler(ccpInputs,'keydown',handleKeydown,false);
-          addEventHandler(ccpInputs,'keyup',handleKeyup,false);
-          addEventHandler(ccpInputs,'focus',handleFocus,false);
+      // !VA Branch: OVERHAUL0825C
+      // !VA Add input event listeners to run showElementOnInput for all labelled text input elements, i.e. elements whose alias ends in Tfd, and unlabelled child input elements of the padding group container. 
+      // !VA Loop through all the properties of ccpUserInput
+      for (const property in ccpUserInput) {
+        var el, iptId, firstChld, nextSibling;
+        // !VA Add event listeners for all labelled text input elements, i.e. those whose alias ends in Tfd. 
+        if (property.includes('Tfd')) {
+          iptId = ccpUserInput[property].replace('tfd', 'ipt');
+          el = document.querySelector(iptId);
+          addEventHandler(el,'input',handleTextInputEvent,false);
+          addEventHandler(el,'keydown',handleKeydown,false);
+          addEventHandler(el,'keyup',handleKeyup,false);
+          addEventHandler(el,'focus',handleFocus,false);
           // !VA Handle the mouse-initiated blurring of inputs in the blur handler of handleMouseEvents
-          addEventHandler(ccpInputs,'blur',handleMouseEvents,false);
+          addEventHandler(el,'blur',handleMouseEvents,false);
         }
-      }     
-      
-      // !VA Add event handlers for the input elements that show mobile CSS clipboard buttons in the CCP when input is made. These are the class input elements for ccp Img, Td and Table options
-      const ccpClassInputs = [ ccpUserInput.iptCcpImgClass, ccpUserInput.iptCcpTdClass, ccpUserInput.iptCcpTableClass ];
-      for (let i = 0; i < ccpClassInputs.length; i++) {
-        // !VA convert the ID string to the object inside the loop
-        ccpClassInputs[i] = document.querySelector(ccpClassInputs[i]);
-        addEventHandler((ccpClassInputs[i]),'input',showElementOnInput,false);
+        // !VA Add event listeners for the unlabelled child input elements of the padding input container.
+        if (property.includes('Padng')) {
+          // !VA The first child of the padding container is the icon. 
+          // !VA 082520
+          // !VA There should be an alias for this - it gets used in at least two places
+          firstChld = document.querySelector('#ccp-tda-padng-icn');
+          // !VA The next sibling of the icon is the first text input element.
+          nextSibling = firstChld.nextElementSibling;
+          // !VA Loop through the text input elements until there are no more.
+          while(nextSibling) {
+            // Add an input event listener for each of the child input element of the parent container
+            addEventHandler(nextSibling,'input',handleTextInputEvent,false);
+            addEventHandler(nextSibling,'keydown',handleKeydown,false);
+            addEventHandler(nextSibling,'keyup',handleKeyup,false);
+            addEventHandler(nextSibling,'focus',handleFocus,false);
+            addEventHandler(nextSibling,'blur',handleMouseEvents,false);
+            nextSibling = nextSibling.nextElementSibling;
+          }
+        }
       }
+
 
 
       // !VA HOVER HANDLERS
@@ -2781,10 +2877,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // Blur handlers - handleInputBlur
       // =================================
-      // addEventHandler(ccpUserInput.iptCcpImgClass,'blur',showMobileImageButtons,false);
-      // ccpUserInput.iptCcpImgAlt.addEventListener('blur', showMobileImageButtons);
-      // ccpUserInput.iptCcpImgClass.addEventListener('blur', showMobileImageButtons);
-      // ccpUserInput.iptCcpImgRelPath.addEventListener('blur', showMobileImageButtons);
+      // addEventHandler(ccpUserInput.ccpImgClassTfd,'blur',showMobileImageButtons,false);
+      // ccpUserInput.ccpImgAltxtTfd.addEventListener('blur', showMobileImageButtons);
+      // ccpUserInput.ccpImgClassTfd.addEventListener('blur', showMobileImageButtons);
+      // ccpUserInput.ccpImgLoctnTfd.addEventListener('blur', showMobileImageButtons);
       
       // Change handlers - handleOnChange
       // =================================
@@ -2971,7 +3067,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       console.log('resetInputValue');
       let target, appObjProp, curLocalStorage;
       target = evt.target;
-      appObjProp = elementIdToAppobjProp(evt.target.id );
+      appObjProp = evtTargetIdToAppobjProp(evt.target.id );
       // !VA If the event target is the curImgW or curImgH input fields, on ESC exit the field and restore the placeholder set in the HTML file.
       if (appObjProp === 'curImgW' || appObjProp === 'curImgH') {
         target.value = ('');
@@ -3011,7 +3107,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         console.log('ERROR in applyInputValue - evtTargetValue !== Appobj[appObjProp]. applyInputValue probably running successively');
       }
       // !VA 3) For toolbarElements, create a new obj with evtTargetVal and appObjProp to pass to writeToolbarInputToAppobj. writeToolbarInputToAppobj writes new values to localStorage and resizes the dynamicElements based on the user input. writeToolbarInputToAppobj contains the aspect ratio logic to get the adjacent dimension from a curImg value. 
-      // !VA IMPORTANT: This works but it sucks. We're only running this now to set the localStorage and to get the adjacent side curImg dimensions. writeToolbarInputToAppobj doesn't reflect what's being done in that function, and it should be reevaluated in any case. Also, the below condition with all the OR conditions isn't good - should call appObjPropToAlias and base the condition on the return value i.e. not undefined. But for now, need to move on.
+      // !VA IMPORTANT: This works but it sucks. We're only running this now to set the localStorage and to get the adjacent side curImg dimensions. writeToolbarInputToAppobj doesn't reflect what's being done in that function, and it should be reevaluated in any case. Also, the below condition with all the OR conditions isn't good - but for now, need to move on.
       if (appObjProp === 'curImgW' || appObjProp === 'curImgH' || appObjProp === 'imgViewerW' || appObjProp === 'sPhonesW' || appObjProp === 'lPhonesW' ) {
         inputObj.evtTargetVal = Appobj[appObjProp];
         inputObj.appObjProp = appObjProp;
@@ -3022,7 +3118,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController   
     // !VA Called from tbClickables event handler. Handles clicks on the Toolbar increment/decrement buttons and handles blur for Toolbar and ccpUserInput input elements, which facilitates error-checking and applying values on blur with the mouse, allowing users to mouse through inputs, entering values as they go without having to press TAB or ENTER. To do this, it dispatches a keydown keyboardEvent for the TAB key to the current input element to simulate the keypress. Also handles drop and dragover events, applying preventDefault.
     function handleMouseEvents(evt) {
-      console.log('handleMouseEvents running');
       // !VA elId adds the hash to evt.target.id
       let elId = '#' + evt.target.id;
       // !VA val is a temporary variable to mutate evt.target.value into Appobj.curImgW. retVal is the value returned by checkNumericInput, i.e. either an integer or false if validation fails. 
@@ -3057,9 +3152,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Handle mouse-initiated blur events. This is called from the event handler for the respective input field. This facilitates error-checking and applying values on blur with the mouse, and allows users to mouse through inputs, entering values as they go without having to press TAB or ENTER.
       }  else if ( event.type === 'blur') {
         // !VA First, select all the input elements - their mouse-initiated blur action will be handled here.
-        if (evt.target.id.substring( 0, 3 ) === 'ipt') {
+        if (evt.target.id.substring( 14 ) === 'ipt') {
           // !VA On blur with the mouse from input fields, dispatch a TAB keypress from the respective input to simulate a TAB keypress. 
-          userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
+          userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
           userInputObj.evtTargetVal = evt.target.value;
           // !VA The userInputObj values have to be error-checked here to ensure that the TAB keypress isn't dispatched with invalid values in userInputObj. 
           retVal = checkUserInput( userInputObj );
@@ -3095,10 +3190,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA Called from handleKeydown to handle CCP element user input. Runs checkUserInput to check for error conditions. If checkUserInput returns a value, further actions (i.e. writing to Appobj) are handled in the blur handler of handleMouseEvents. If error checking fails, writes an error message to the console and returns control to handleKeydown to handle the input elements on error.
     function handleCcpInput(keydown, userInputObj) {
-      console.log('handleCcpInput running');
-      console.log(userInputObj);
       // !VA priorVal is the Appobj property value that was replaced by the new evtTargetVal
-      let retVal, priorVal;
+      let retVal, priorVal, configObj;
       // !VA Destructure userInputObj.
       let { appObjProp, evtTargetVal } = userInputObj;
       // !VA Save the existing Appobj property value to priorVal
@@ -3118,16 +3211,21 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA If evtTargetVal is not empty, run the error-check
         if (retVal !== false) {
           // !VA If checkUserInput returns truthy, evtTargetVal and userInputObj.evtTargetVal to the error-checked retVal, which now has the type number, and also set the Appobj property to this, overwriting the prior value if there is one
-          console.log('retVal is: ' + retVal);
-          console.log('retVal is NOT false');
           // !VA If no error, set 
           evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = retVal;
-          console.log('evtTargetVal is UPDATED: ' + evtTargetVal);
         } else {
           // !VA If error-checking failed, restore the prior value from priorVal and write that value back to the current input element.
           evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = priorVal;
           console.log('evtTargetVal is RESTORED: ' + evtTargetVal);
-          UIController.writeAppobjToDOM( [ appObjProp, priorVal ] );
+          // !VA Branch: OVERHAUL0902A
+          // !VA This is a problem -- writeAppobjToDom is no more.
+          // UIController.writeAppobjToDOM( [ appObjProp, priorVal ] );
+          // !VA Write the priorVal back to Appobj
+          Appobj[appObjProp] = priorVal;
+          configObj = { 
+            reflectAppobj: { reflect: [ appObjProp] } 
+          };
+          UIController.configCCP( configObj );
         }
       }
       // !VA Return retVal: either '', an integer or false
@@ -3193,6 +3291,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       return retVal;
     }
 
+    // !VA appController function
+    // !VA NOTE: Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
+    // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Sorts keypresses by data types number and string based on the target input element. Calls checkUserInput which validates the input and returns either an integer or a string and passes the value to applyInputValue to write to Appobj and the DOM. Then, for curImgW/curImgH, sets the input value to '' so the placeholder shows through. For all other input elements, sets the input value to the respective Appobj property.
     function handleKeydown(evt) {
       let retVal;
       // !VA Get the keypress
@@ -3205,9 +3306,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // userInputObj.evtTargetId = evt.target.id;
       // !VA If TAB or ENTER
       if (keydown == 9 || keydown == 13) {
-        console.log('TAB or ENTER');
-        // !VA elementIdToAppobjProp gets the Appobj key that corresponds to a given element ID. We need the Appobj key to get the Appobj value to compare to the user-entered value in the respective Toolbar input field. 
-        userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
+        // console.log('TAB or ENTER');
+        // !VA evtTargetIdToAppobjProp gets the Appobj key that corresponds to a given element ID. We need the Appobj key to get the Appobj value to compare to the user-entered value in the respective Toolbar input field. 
+        userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
         // !VA evtTargetVal is the value the user entered into the input element as integer.
         userInputObj.evtTargetVal = evt.target.value;
         // console.log('handleKeydown userInputObj is: ');
@@ -3216,22 +3317,19 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         let { appObjProp } = userInputObj;
         console.log('appObjProp is: ' + appObjProp);
         // !VA CCP-specific keydown handling. CCP input elements, unlike Toolbar elements, have no existing values and can be empty. So in order to error-check the current evtTargetVal and restore it to its prior value if the current evtTargetVal fails error-checking: 1) the prior Appobj property has to be temporarily stored and 2) the current evtTargetVal has to be error-checked and then written to Appobj. 
-        if ( evt.target.id.substr( 3, 4 ) === '-ccp') {
+        // !VA 082520
+        // !VA Change to the Overhaul substring code
+        if ( evt.target.id.substr( 0, 3 ) === 'ccp') {
           if ( keydown === 9) {
             retVal = handleCcpInput(keydown, userInputObj);
-            console.log('retVal is: ' + retVal);
             if (retVal === false ) {
               this.value = Appobj[appObjProp];
               this.select();
               evt.preventDefault();
             }
           } else if ( keydown === 13) {
-            console.log('13 userInputObj is: ');
-            console.log(userInputObj);
             retVal = handleCcpInput(keydown, userInputObj);
-            console.log('13 retVal is: ' + retVal);
             if (retVal === false) { 
-              console.log('FALSE');
               this.value = Appobj[appObjProp];
               this.select();
             }
@@ -3239,6 +3337,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             console.log('ERROR in handleKeydown - unknown keypress');
           }
 
+        // !VA 082520
+        // !VA Demonstrates that Toolbar element nomenclature needs an overhaul too.
         } else if ( evt.target.id.substr( 3, 4 ) === '-tbr') {
           // !VA Branch: review0720H (072020)
           // !VA Comment this
@@ -3268,85 +3368,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
     }
 
-
-
-
-          
-    // !VA appController   function
-    // !VA NOTE: Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
-    // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Sorts keypresses by data types number and string based on the target input element. Calls checkUserInput which validates the input and returns either an integer or a string and passes the value to applyInputValue to write to Appobj and the DOM. Then, for curImgW/curImgH, sets the input value to '' so the placeholder shows through. For all other input elements, sets the input value to the respective Appobj property.
-    function handleKeydownOLD(evt) {
-      let retVal;
-      let target;
-      target = evt.target;
-      // !VA Get the keypress
-      let keydown = evt.which || evt.keyCode || evt.key;
-      // !VA userInputObj is the array containing the values needed to check input, evaluate the Toolbar input, and update Appobj prior to writing dynamicElements to the DOM after user input in the Toolbar input fields.
-      const userInputObj = { };
-      // !VA Add the event target ID to userInputObj. We will need this later to select toolbarElements since their property names don't correspond to the toolbarElements aliases. This is a structural issue that I'm not going to deal with now, if ever.
-      // !VA Branch: implementCcpInput09 (070220)
-      // !VA I don't think I need the ID...test it.
-      userInputObj.evtTargetId = evt.target.id;
-      // !VA If TAB or ENTER
-      if (keydown == 9 || keydown == 13) {
-        console.log('TAB or ENTER');
-        // !VA elementIdToAppobjProp gets the Appobj key that corresponds to a given element ID. We need the Appobj key to get the Appobj value to compare to the user-entered value in the respective Toolbar input field. 
-        userInputObj.appObjProp = elementIdToAppobjProp(evt.target.id);
-        // !VA evtTargetVal is the value the user entered into the input element as integer.
-        userInputObj.evtTargetVal = evt.target.value;
-        // !VA Now that userInputObj is created for passing as argument, destructure it to use locally.
-        let { appObjProp, evtTargetVal } = userInputObj;
-
-        // !VA Branch: review0720D (071620)
-        // !VA There needs to be an escape handler if either curImgW/curImgH is empty OR userInputObj.evtTargetVal = userInputObj.appObjProp, i.e. the user has tabbed out of the input without making a change. But first, we have to validate the input in order to convert the 
-
-
-        // !VA Exception: For curImgW and curImgH, if user tabs out of the input field without entering a value, skip to the end of the function and override all input handling and error checking. This is only possible because these fields are empty by default. Any field that already has a value has to be error checked. 
-        if (  userInputObj.appObjProp !== 'curImgW' && userInputObj.evtTargetVal !== ''  ||   userInputObj.appObjProp !== 'curImgH' && userInputObj.evtTargetVal !== '' ) {
-          // !VA Now do the error checking and return an integer if no error. Number type is required to compare evtTargetVal and the Appobj property, which is stored as type number.
-          retVal = checkUserInput( userInputObj );
-          // !VA NOTE: does changing the variable also change the destructured object property?
-          // !VA Set evtTargetVal and userInputObj.evtTargetVal to retVal - userInputObj must also pass an integer of type number
-          evtTargetVal = userInputObj.evtTargetVal = retVal;
-          console.log('handleKeydown evtTargetVal is: ' + typeof(evtTargetVal)); 
-          console.log('handleKeydown appObjProp is: ' + appObjProp); 
-          console.log('handleKeydown Appobj[appObjProp] is: ' + Appobj[appObjProp]); 
-          // !VA If checkUserInput returned a value instead of false, there was no error
-          if (retVal !== false ) {
-            // !VA If the user changed the value, i.e. evtTargetVal !== Appobj[appObjProp], run applyInput to copy the value to Appobj[appObjProp] and update the dynamicRegions if applicable.
-            if (evtTargetVal !== Appobj[appObjProp] ) {
-              console.log('CHANGED');
-              // applyInputValue( userInputObj );
-              if (keydown == 9 ) {
-                // !VA No change to the default TAB behavior for changed values
-                console.log('TAB - CHANGED');
-
-              } else if (keydown == 13) {
-                // !VA We have to run applyInputValue here otherwise no action will occur. This results in applyInputValue being run again on blur, not ideal but acceptable.
-                applyInputValue(userInputObj);
-                console.log('ENTER - CHANGED');
-                // !VA No change to the default ENTER behavior for changed values
-              } else {
-                console.log('ERROR in handleKeydown - unknown key code ');
-              }
-            } else {
-              console.log('INPUT VALUE UNCHANGED');
-              if (keydown == 9 ) {
-                console.log('TAB - UNCHANGED');
-                // !VA Do nothing
-              } else if (keydown == 13 ) {
-                console.log('ENTER - UNCHANGED');
-                // !VA Do nothing
-              } else {
-                console.log('ERROR in handleKeydown - unknown key code ');
-              }
-            }
-          }
-        } 
-      }
-    }
-
-
     // !VA appController  
     // !VA TODO: Why are there unused elements and what is actually happening here?
     // !VA keyPress handler for the ESC key.  This has to be handled on keyup, so we need a separate handler for it.
@@ -3362,18 +3383,18 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
     }
 
+
+
     // !VA appController  
     // !VA Called from handleKeydown and handleMouseEvents. Separates numeric input from string input based on the Appobj property name included in two arrays. Numeric input is routed to checkNumericInput where values of type string are converted to integers. String inputs are routed to checkTextInput for valiation and error checking. 
     function checkUserInput(userInputObj) {
-      console.log('checkUserInput userInputObj is: ');
-      console.log(userInputObj);
       // !VA Destructure userInputObj, making variables instead of constants
       let { appObjProp, evtTargetVal } = userInputObj;
       // !VA Distinguish between elements that allow percent input, elements that allow string input and elements that allow numeric input. Percent inputs validate the percent value and return it with no further error checking. Numeric input elements have validation with error codes that display error messages. String inputs have no validation currently, but validation for hex color codes might be an option.
       let numericInputs, stringInputs, retVal, val, percentVal;
-      percentInputs = [ 'iptCcpTdWidth', 'iptCcpTableWidth', 'iptCcpTableWrapperWidth']
-      numericInputs = [ 'imgViewerW', 'curImgW', 'curImgH',  'sPhonesW', 'lPhonesW', 'iptCcpTdHeight', 'iptCcpTdWidth', 'iptCcpTableWidth', 'iptCcpTableWrapperWidth', 'iptCcpTdBorderRadius' ];
-      stringInputs = ['iptCcpImgClass', 'iptCcpImgAlt', 'iptCcpImgRelPath', 'iptCcpTdClass', 'iptCcpTdBgColor', 'iptCcpTdFontColor', 'iptCcpTdBorderColor', 'iptCcpTableClass', 'iptCcpTableBgColor', 'iptCcpTableWrapperClass', 'iptCcpTableWrapperBgColor' ];
+      percentInputs = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd']
+      numericInputs = [ 'imgViewerW', 'curImgW', 'curImgH',  'sPhonesW', 'lPhonesW', 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTdaBdradTfd' ];
+      stringInputs = ['ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpImgLoctnTfd', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTblClassTfd', 'ccpTblBgclrTfd', 'ccpTbwClassTfd', 'ccpTbwBgclrTfd' ];
 
       // !VA Determine if the numeric portion of evtTargetVal; is a valid percent value 
       function checkPercent(val) {
@@ -3383,9 +3404,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         var x = parseFloat(val);
         // !VA Test if the value is in percentage range
         if (isNaN(x) || x < 0 || x > 100) {
-            // !VA If it is out of range, return false
-            console.log('Out of range');
-            percentVal = false;
+          // !VA If it is out of range, return false
+          console.log('Out of range');
+          percentVal = false;
         } else {
           // !VA If it is within the valid percentage range, add the percent character back at the end and return it - it now has the type 'string'
           console.log('valid percent');
@@ -3395,7 +3416,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
       // !VA If the last char of evtTargetVal is a percent char, test if it is a valid percent value
       if ( evtTargetVal.substr(-1) === '%') {
-        console.log('HIT');
         percentVal = checkPercent(evtTargetVal);
       }
       // !VA If evtTargetVal ended in a percent char and the target element is in the list of elements that accept percentage values, set retVal to percentVal and return it
@@ -3413,7 +3433,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // !VA If curImgW or curImgH is empty, do nothing.
         } else {
           // !VA Error check the numeric input
-          console.log('numeric evtTargetVal is: ' + evtTargetVal);
           retVal = checkNumericInput( {appObjProp, evtTargetVal } ); 
         }
       }           
@@ -3433,10 +3452,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA appController private
     // !VA Called from checkUserInput. Runs validateInteger to return a value of type Number, then evaluates any error conditions on the input and passes any error codes generated to appController.handleAppMessages and returns false if there was an error, or the integer value of no error was detected.
     function checkNumericInput(userInputObj) {
-      console.log('checkNumericInput running');
       // !VA Destructure userInputObj
       const { appObjProp, evtTargetVal } = userInputObj;
-      console.log('checkNumericInput evtTargetVal is: ' + evtTargetVal);
       // !VA The code that will be passed to getAppMessageStrings
       let appMessCode, isErr, retVal;
       // !VA The flag indicating an error condition,
@@ -3446,13 +3463,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA If appObjProp refers to one of the CCP elements that require numeric input
       // !VA First, validate that the user-entered value is an integer. validateInteger returns false if the input is either not an integer or is not a string that can be converted to an integer. Otherwise, it returns the evtTargetVal as a number.
 
-      
-
-
-
       retVal = validateInteger(evtTargetVal);
 
-      console.log('checkNumericInput retVal is: ' + retVal);
       // !VA If validateInteger returned false to retVal, then there is an error condition with the input value.
       if (!retVal) {
         // !VA NOTE: This is where we could easily trap the negative button increment if it falls below 0 to send a different message than just the standard 'not_Integer' message. Revisit.
@@ -3460,7 +3472,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         isErr = true;
       // !VA If retVal is not false then it contains an integer value, so begin the error checking on the numeric input
       } else {
-        console.log('Error handling for ' + appObjProp);
         // !VA The input is an integer, so handle the error cases for the user input
         switch (true) {
         case (appObjProp === 'imgViewerW') :
@@ -3502,7 +3513,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           console.log('Error handling for imagewidth input not implemented!');
           break;
         // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply - exclude rdoCcpTdExcludeimg from the error condition
-        case (appObjProp === 'iptCcpTdHeight' && !Appobj.rdoCcpTdExcludeimg ) :
+        case (appObjProp === 'ccpTdaHeigtTfd' && !Appobj.rdoCcpTdExcludeimg ) :
           if (evtTargetVal < Appobj.curImgH ) {
             // !VA errorHandler!
             isErr = true;
@@ -3510,36 +3521,28 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           }
           break;
         // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply - exclude rdoCcpTdExcludeimg from the error condition
-        case (appObjProp === 'iptCcpTdWidth') :
-          console.log('checkNumericInput iptCcpTdWidth');
+        case (appObjProp === 'ccpTdaWidthTfd') :
           if (Appobj.rdoCcpTdExcludeimg) { 
-            console.log('Mark1');
-            if ( Appobj.iptCcpTableWidth === '' ) {
-              console.log('Appobj.iptCcpTableWidth is EMPTY');
+            if ( Appobj.ccpTblWidthTfd === '' ) {
+              console.log('Appobj.ccpTblWidthTfd is EMPTY');
             }
-            else if ( evtTargetVal > Appobj.iptCcpTableWidth ) {
-              console.log('Appobj.iptCcpTableWidth is: ' + Appobj.iptCcpTableWidth);
-              console.log('evtTargetVal is: ' + evtTargetVal);
+            else if ( evtTargetVal > Appobj.ccpTblWidthTfd ) {
               isErr = true;
               appMessCode = 'err_table_cell_wider_than_parent_table';
             }
           } 
           if ( evtTargetVal > Appobj.imgViewerW ) {
-            console.log('Mark2');
             isErr = true;
             appMessCode = 'err_cell_wider_than_parent_table';
           }
           break;
-        case (appObjProp === 'iptCcpTableWidth') :
+        case (appObjProp === 'ccpTblWidthTfd') :
           if (Appobj.rdoCcpTdExcludeimg) {
-            console.log('excludeimg selected...');
-            console.log('Appobj.iptCcpTdWidth: ' + Appobj.iptCcpTdWidth);
-            console.log('Appobj.iptCcpTableWidth: ' + Appobj.iptCcpTableWidth);
             if (evtTargetVal > Appobj.imgViewerW) {
               isErr = true;
               console.log('larger than imgViewerW');
               appMessCode = 'err_table_wider_than_wrapper';
-            } else if ( evtTargetVal < Appobj.iptCcpTdWidth ) {
+            } else if ( evtTargetVal < Appobj.ccpTdaWidthTfd ) {
               console.log('err_table_cell_wider_than_parent_table');
               isErr = true;
               appMessCode = 'err_table_cell_wider_than_parent_table';
@@ -3555,13 +3558,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             }
           }
           break;
-        case (appObjProp === 'iptCcpTableWrapperWidth') :
+        case (appObjProp === 'ccpTbwWidthTfd') :
           if (Appobj.rdoCcpTdExcludeimg) {
             if (evtTargetVal > Appobj.imgViewerW) {
               isErr = true;
               console.log('');
               appMessCode = 'err_wrapper_table_wider_than_devicewidth';
-            } else if ( evtTargetVal < Appobj.iptCcpTableWidth ) {
+            } else if ( evtTargetVal < Appobj.ccpTblWidthTfd ) {
               console.log('err_parent_table_greater_than_wrapper');
               isErr = true;
               appMessCode = 'err_parent_table_greater_than_wrapper';
@@ -3639,7 +3642,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
     // !VA  appController   
-    // !VA Called 1) in initUI (devmode) after the devimg is loaded from the HTML file 2) in handleFileSelect after setTimeOut callback is run and the image is loaded 3) in writeToolbarInputToAppobj after a user-initiated Toolbar input. calcViewerSize calculates the current size of DynamicElements.imgViewer based on Appobj values. The flag parameter indicates whether call was made at initialization (true) or after a user-initiated Toolbar input (false). This doesn’t access the DOM or make changes to existing Appobj values. All it does is resize the viewer to fit the image based on aspect ratio and Appobj.viewerW, then calls resizeContainers to write these recalculated element values to the DOM; writeAppobjToDOM ( tableWidth, tableWrapperWidth) writes the current Appobj.imgW and Appobj.viewerW to the CCP ccpUserInput.iptCcpTableWidth and ccpUserInput.iptCcpTableWrapperWidth; and writeInspectors(Appobj) to write all the current Appobj values to the corresponding Inspector DOM elements.
+    // !VA Called 1) in initUI (devmode) after the devimg is loaded from the HTML file 2) in handleFileSelect after setTimeOut callback is run and the image is loaded 3) in writeToolbarInputToAppobj after a user-initiated Toolbar input. calcViewerSize calculates the current size of DynamicElements.imgViewer based on Appobj values. The flag parameter indicates whether call was made at initialization (true) or after a user-initiated Toolbar input (false). This doesn’t access the DOM or make changes to existing Appobj values. All it does is resize the viewer to fit the image based on aspect ratio and Appobj.viewerW, then calls resizeContainers to write these recalculated element values to the DOM; writeAppobjToDOM ( tableWidth, tableWrapperWidth) writes the current Appobj.imgW and Appobj.viewerW to the CCP ccpUserInput.ccpTblWidthTfd and ccpUserInput.ccpTbwWidthTfd; and writeInspectors(Appobj) to write all the current Appobj values to the corresponding Inspector DOM elements.
     function calcViewerSize(flag) {
       // !VA Here, just populate the dynamicElements of Appobj. If flag is true, then calcViewerSize was called from writeToolbarInputToAppobj, so this is a user-initiated Toolbar input action. If false, it's an image initialization action called from initUI (devmode) or handleFileSelect.
       if (flag === true ) {
@@ -3703,6 +3706,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Note: This has dynamicRegion values that are not written back to Appobj after recalculation, this may be a problem at some point.
       // !VA initViewerH is the same default value set in populateAppobj. That needs to be reset as default here since Appobj values at this point no longer correspond to the initialization defaults, but may also have changed due to user-initiated Toolbar input. 
       // !VA TODO:That's why this value should be pulled from the placeholder value of dynamicElements.iptTbrViewerW, not set as a literal here.
+      let aliasArray, configObj;
       const initViewerH = 450;
       let viewportH;
       let appH; 
@@ -3725,13 +3729,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       UIController.writedynamicElementsDOM(Appobj, viewportH, appH);
 
       // !VA Set Appobj table width and wrapper table width now.
-      Appobj.iptCcpTableWidth = Appobj.curImgW;
-      Appobj.iptCcpTableWrapperWidth = Appobj.imgViewerW;
-      var tableWidth = [];
-      var tableWrapperWidth = [];
-      // !VA Use the cross-object identifier instead of the ccp element alias here, that's what writeAppobjToDOM expects.
-      tableWidth = ['iptCcpTableWidth', Appobj.curImgW ];
-      tableWrapperWidth = ['iptCcpTableWrapperWidth', Appobj.imgViewerW];
+      Appobj.ccpTblWidthTfd = Appobj.curImgW;
+      Appobj.ccpTbwWidthTfd = Appobj.imgViewerW;
+
       
       // !VA True is the flag to stash instead of retrieve, tableWidth and tableWrapper are the rest parameters containing the key/value pairs to stash.;
       // !VA Branch: implementAppobj05 (061320)
@@ -3740,7 +3740,14 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       
       // !VA Called in resizeContainers after writedynamicElements, takes parameter list of CCP ID/value pairs, and updates the DOM with the passed parameters. It is the CCP DOM counterpart to updateAppobj, I think, since it only updates those DOM elements whose ID/Value passed in, rather than a blanket DOM update of all DOM. Renamed from writeDOMElementValues. writeCcpDOM takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the cross-object identifier (the value in the ccpUserInput object) as key and the Appobj value as value. 
       // !VA NOTE: This needs to bypass handleCcpActions, since it's not a result of any ccpAction but rather a direct write through the user input in the dynamicElements. It also has to happen before initCCP, othewise Appobj won't initialize with values for table width and table wrapper width. 
-      UICtrl.writeAppobjToDOM( tableWidth, tableWrapperWidth);
+      // !VA Create the aliasArray to pass to configCCP
+      aliasArray = [ 'ccpTblWidthTfd', 'ccpTbwWidthTfd'];
+      // !VA reflectAppobj implements the Appobj properties in CCP elements so that the CCP reflects the current state of Appobj
+      configObj = {
+        reflectAppobj: { reflect: aliasArray }
+      };
+      UIController.configCCP( configObj );
+
       // !VA Branch: implementCcpInput01 (062120)
       // !VA Why does this condition have no actions? Shouldn't write AppbojToDOM be called conditionally below?
       // !VA If CCP is open, write tableWidth and tableWrapperWidth to the DOM elements. 
@@ -3755,532 +3762,304 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController  
-    // !VA Branch: implementAppobj03 (060820)
-    // !VA Handle the tdoptions and imgType radio buttons. Called from the ccpRadioClicks event handler in setupEventListeners. Calls handleImgType(id) or handleTdOptions(id). This function basically just routes the click to the respective handler for imgType/tdoptions. NOTE: handleTdOptions and handleImgType are also called from batchAppobjToDOM because whenever the entire Appobj is parsed to write to the DOM, these functions need to be run to determine the current tdoptions selection and the current fluid/fixed state. 
-    function handleCcpRadioSelection(evt) {
-      let id;
-      id = '#' + evt.target.id;
+    // !VA Branch: OVERHAUL0906B
+    function fetchConfigObj( alias, option ) {
+      let configObj = [], flag;
+      // !VA Set the CCP configuration for specific user selections
       switch(true) {
-      // !VA handle the fixed/fluid imgType radion buttons
-      case id === ccpUserInput.rdoCcpImgFixed || id === ccpUserInput.rdoCcpImgFluid:
-        handleImgType(id);
+      case alias === 'default' :
+        // !VA For initialization, resetArray includes aliases in mkcssReset, defaultReset and wraprReset 
+        configObj = defaultConfig( alias, option);
         break;
-      // !VA Handle the tdoptions radio button group in TD Options
-      case id.includes('rdo-ccp-td') :
-        handleTdOptions(id);
+      case alias === 'ccpImgExcldRdo' :
+        // !VA Set option to !option to make this work - otherwise it sticks on 'true'. For later...
+        Appobj[alias] = option;
+        configObj = excldConfig( alias, option );
         break;
-      default:
-        console.log('ERROR in handleCcpRadioSelection - unknown condition');
-      } 
-    }
-
-
-    // !VA appController  
-    // !VA Gets the selected CCP align option from the dropdown element and writes it to the corresponding Appobj property, and return a userInputObj
-    function handleCcpDropdowns(evt) {
-      console.log('handleCcpDropdowns running');
-      let userInputObj = {};
-      userInputObj.evtTargetId = '#' + evt.target.id;
-      userInputObj.appObjProp = Appobj[elementIdToAppobjProp(userInputObj.evtTargetId)] = evt.target.value;
-      // console.log('Appobj[elementIdToAppobjProp(userInputObj.evtTargetId)] is: ' + Appobj[elementIdToAppobjProp(userInputObj.evtTargetId)]);
-      // console.log('userInputObj.evtTargetId is: ' + userInputObj.evtTargetId);
-      // console.log('userInputObj.appObjProp is: ' + userInputObj.appObjProp);
-      console.log('handleCcpDropdowns userInputObj.appObjProp is: ');
-      console.log(userInputObj.appObjProp);
-      return userInputObj;
-
-    }
-
-
-
-    
-    // !VA appController  
-    // !VA This doesn't do anything because there's no reason to write DOM values to Appobj when the CCP is closed - the current values are preserved.
-    function batchDOMToAppobj() {
-      let arr = [];
-      arr = Object.entries(Appobj);
-    }
-
-
-    // !VA appController  
-    // !VA Called in handleTdOptions
-    // !VA TODO: Needs to be commented
-    // !VA Reads Appobj every time the CCP is opened and writes CCP options to the CCP DOM based on Appobj presets: 1) If the Include wrapper checkbox is checked/unchecked, runs showIncludeWrapperOptions to display/undisplay the Include wrapper-dependent options. 2) Determines which rdoCcpTd option is selected and runs handleTdOptions with the selected ID. 3) Determines the fluid/fixed option and runs handleImgType with the selected option.  
-    function batchAppobjToDOM() {
-      console.log(Appobj);
-      // !VA Flag is set based on Include wrapper checkbox status below.
-      let flag, arr;
-      // !VA keyval is the Appobj key/value pair that is passed to writeAppobjToDOM to update the CCP DOM
-      let keyval = [];
-      // !VA Set the checkmarks as per the current Appobj properties 
-      if (Appobj.spnCcpTableIncludeWrapperCheckmrk === 'on') {
-        flag === true;
-      } else if (Appobj.spnCcpTableIncludeWrapperCheckmrk === 'off'){
-        flag === false;
-      }
-      // !VA Show the Include wrapper options if the Include wrapper checkbox is checked.
-      showIncludeWrapperOptions(flag);
-      // !VA Loop through all Appobj entries whose first 8 chars is rdoCcpTd, i.e. all the tdOption radio buttons, and get the selected radio button. Then pass the ID of that button to handleTdOptions to show the appropriate Td options for the selected radio button.
-
-      // !VA Determine which TD options radio is selected in Appobj and pass that element alias to handleTdOptions
-      // !VA arr is array of Appobj keys
-      arr = Object.keys(Appobj);
-      for (let i = 0; i < arr.length; i++) {
-        // !VA If the first 8 characters of the Appobj property name is rdoCcpTd, then loop through the property names and find the one whose value is true. That is the selected tdoptions radio button. Then loop though the ccpUserInput element alias list and get the element ID of the selected tdoptions radio button, and call handleTdOptions with that ID as parameter.
-        // !VA TODO: Make this an arrow function with find, like below
-        // var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
-        if (arr[i].substring( 0, 6) === 'iptCcp' || (arr[i].substring( 0, 6) === 'selCcp')) {
-          keyval = [ arr[i], Appobj[arr[i]] ];
-          UIController.writeAppobjToDOM( keyval );
-        }
-        // !VA Here we need to ONLY run handleTdOptions if tdoption is imgswap. 
-        if (arr[i] === 'rdoCcpTdImgswap') {
-          // !VA If the Appobj key string === true, then that is the selected radio button
-          if ( Appobj[arr[i]] === true) { 
-            handleTdOptions(ccpUserInput[arr[i]]); 
-          }
-        }
-      }
-      // !VA Query Appobj to determine which imgType option if the fluid option is selected, and run the handler for it. If fixed is selected then no handler is run because that's the default behavior 
-      if (Appobj.rdoCcpImgFluid === true ) {
-        handleImgType(ccpUserInput.rdoCcpImgFluid);
-      } 
-      // else if (Appobj.rdoCcpImgFluid === true ) {
-      //   handleImgType(ccpUserInput.rdoCcpImgFluid);
-      // }
-    }
-
-    // !VA appController   
-    // !VA Resets the display/disabling of the tdoptions radio button group. Turns off the active class for rhw parent elements of all CCP elements so the elements and their labels are undisplayed. Turns off the disable class and attribute for all text and select input elements and radio buttons (including the fixed/fluix buttons) 
-    function resetTdOptions() {
-      // !VA Loop through all the CCP Td options, undisplay them, remove any disablingto prepare for displaying them per radio button selection
-      var arr = [];
-      // !VA Get ccpUserInput aliases into an array
-      var aliasArray = Object.entries(ccpUserInput);
-      // !VA Reset values to defaults
-      // !VA This is called from batchAppobjToDOM, which is run whenever the CCP is closed, but it contains a clause that only runs this if the current tdOption is imgswap. That's the only condition that requires complete reset, including disabling and active states. Otherwise, when the CCP is reopened, it restores the CCP to the last state of Appobj.
-      Appobj.iptCcpImgClass = Appobj.iptCcpTdClass = Appobj.iptCcpTdHeight = Appobj.iptCcpTdWidth = Appobj.iptCcpTableClass = Appobj.iptCcpTdBgColor = '';
-      Appobj.iptCcpTableWidth = Appobj.curImgW;
-      // !VA Branch: review0720F (071720)
-      // !VA This is where the default for iptCcpTableWrapperWidth is set
-      Appobj.iptCcpTableWrapperWidth = Appobj.imgViewerW;
-      // !VA Branch: review0720F (071720)
-      // !VA This is where the default for iptCcpTableWrapperClass is set
-      Appobj.iptCcpTableWrapperClass = 'devicewidth';
-      // !VA Write the defaults to the CCP DOM elements.
-      UIController.writeAppobjToDOM( 
-        [ 'iptCcpImgClass', Appobj.iptCcpImgClass ], 
-        [ 'iptCcpTableClass', Appobj.iptCcpTableClass ],  
-        [ 'iptCcpTableWrapperClass', Appobj.iptCcpTableWrapperClass ], 
-        ['iptCcpTdWidth', Appobj.iptCcpTdWidth ], 
-        [ 'iptCcpTdHeight', Appobj.iptCcpTdHeight ], 
-        ['iptCcpTableWidth', Appobj.iptCcpTableWidth ], 
-        ['iptCcpTableWrapperWidth', Appobj.iptCcpTableWrapperWidth ], 
-        ['iptCcpTdBgColor', Appobj.iptCcpTdBgColor ] );
-
-      // !VA Loop through the ccpUserInput elements and undisplay/un-disable them
-      for (let i = 0; i < aliasArray.length; i++) {
-        // !VA For ONLY the TD OPTIONS input and select dropdown elements, remove the active class of the parent element to undisplay them.
-        if (aliasArray[i][1].substring( 0 , 11 ) === '#ipt-ccp-td' || aliasArray[i][1].substring( 0 , 11 ) === '#sel-ccp-td'  ) {
-          // !VA Create an array of the alias and the action to send to handleCcpActions to apply the active class to the parent of the respective element.
-          arr = [ aliasArray[i][0], 'setactiveparent'];
-          // !VA False is the flag to remove the active class
-          UIController.handleCcpActions( false, arr);
-        }
-        // !VA Remove the disabled class and disabled attribute from all text input elements and select dropdown input elements.
-        if (aliasArray[i][1].substring( 0 ,8) === '#ipt-ccp' || aliasArray[i][1].substring( 0 ,8) === '#sel-ccp') {
-          arr = [ aliasArray[i][0], 'setdisabledtextinput'];
-          // !VA False is the flag to remove the active class
-          UIController.handleCcpActions( false, arr);
-        }
-        // !VA FOR FLUID IMGTYPE: Remove the disabled class and disabled attribute from all radio button elements. 
-        if (aliasArray[i][1].substring( 0 ,11) === '#rdo-ccp-td') {
-          arr = [ aliasArray[i][0], 'setdisabledradio'];
-          // !VA False is the flag to remove the active class
-          UIController.handleCcpActions( false, arr);
-        }
-      }
-    }
-
-    // !VA appController   
-    // !VA Called from handleCcpRadioSelection(evt) which is called from the ccpRadioClicks click event handler in setupEventListeners. The id arument is the id of the click target. First, loops through all Appobj entries whose first 8 chars is rdoCcpTd, i.e. all the tdOption entries, and selects the option identified in the id argument. Then sets the preset values for the respective options and handles the option states for the individual radio buttons, i.e. displays/undisplays and disables/enables the respective options. NOTE: This function is quite cluttered, and there should be only ONE handleCcpActions call for each condition, otherwise we’re passing Appobj multiple times.
-    function handleTdOptions(id) {
-      // !VA Loop through all Appobj entries whose first 8 chars is rdoCcpTd, i.e. all the tdOption entries and select the option identified in the id argument. NOTE: This could be separated out into a new function.
-      // !VA NOTE: Value isn't accessed, but when I tried to just use Object.keys, something broke. Fix it, no for loop necessary with Object.keys.
-      for (const [key, value] of Object.entries(Appobj)) {
-        if (key.substring( 0, 8) === 'rdoCcpTd') {
-          // !VA If the Appobj key string === the element id of the click target, then set that Appobj property to true, otherwise set it to false. This replicates the behavior of a single-select radion button group for the Appobj properties of the radio buttons. If true, set that radio button's checked property to true;
-          if (ccpUserInput[key] === id) {
-            Appobj[key] = true;
-            UIController.handleCcpActions( true, [ key, 'selectradio' ]);
-          } else {
-            Appobj[key] = false;
-          }
-        }
-      }
-      // !VA Reset all Ccp element i.e. undisplay them and remove any disabled styles and attributes. The elements need to be reset before new options can be applied.
-      resetTdOptions();
-
-
-      // !VA Handle the option states for the respective radio button.
-      switch(true) {
-      case id === (ccpUserInput.rdoCcpTdBasic):
-        // !VA Handle the td options for the 'rdoCcpTdBasic' and 'rdoCcpTdExcludeimg' options: class, height, width, bgcolor, align, valign
-        UIController.handleCcpActions( true, 
-          [ 'iptCcpTdClass', 'setactiveparent'], 
-          [ 'selCcpTdAlign', 'setactiveparent'], 
-          // [ 'iptCcpTdWidth', 'setactiveparent'], 
-          [ 'iptCcpTdBgColor', 'setactiveparent'], 
-          // [ 'iptCcpTdHeight', 'setactiveparent'],
-          [ 'selCcpTdValign', 'setactiveparent']); 
+      case alias === 'ccpImgItypeRdo' :
+        // !VA Set option to !option to make this work - otherwise it sticks on 'true'. For later...
+        Appobj[alias] = option;
+        configObj = itypeConfig( alias, option );
         break;
-      case id === (ccpUserInput.rdoCcpTdExcludeimg):
-        // !VA Handle the td options for the 'rdoCcpTdBasic' and 'rdoCcpTdExcludeimg' options: class, height, width, bgcolor, align, valign
-        UIController.handleCcpActions( true, 
-          [ 'iptCcpTdClass', 'setactiveparent'], 
-          [ 'selCcpTdAlign', 'setactiveparent'], 
-          [ 'iptCcpTdWidth', 'setactiveparent'], 
-          [ 'iptCcpTdBgColor', 'setactiveparent'], 
-          [ 'iptCcpTdHeight', 'setactiveparent'],
-          [ 'selCcpTdValign', 'setactiveparent']); 
-        break;
-      case id === (ccpUserInput.rdoCcpTdPosswitch):
-        // !VA Handle the 'rdoCcpTdPosswitch' option
-        UIController.handleCcpActions( true, 
-          [ 'iptCcpTdClass', 'setactiveparent'], 
-          [ 'selCcpTdValign', 'setactiveparent'], 
-          [ 'selCcpTdAlign', 'setactiveparent'], 
-          [ 'iptCcpTdBgColor', 'setactiveparent']);
-        break;
-      // !VA Handle the 'rdoCcpTdImgswap' option
-      case id === (ccpUserInput.rdoCcpTdImgswap):
-        // !VA Make sure the Include wrapper checkbox is on and the options are displayed.
-        Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
-        showIncludeWrapperOptions(true);
-        UIController.handleCcpActions( true, [ 'spnCcpTableIncludeWrapperCheckmrk', 'setcheckbox']);
-        // !VA NOTE: These options can be merged with the above function call
-        // !VA Display the appropriate TD options
-        UIController.handleCcpActions( true,  
-          [ 'selCcpTdValign', 'setactiveparent'], 
-          [ 'selCcpTdAlign', 'setactiveparent'], 
-          [ 'iptCcpTdBgColor', 'setactiveparent']);
-        // !VA Preset the options:
-        // !VA img class presets
-        Appobj.iptCcpImgClass =  'mobileshow', 
-        // !VA Parent table presets: class = devicewidth, width = curImgW, td align = center, align = center,
-        Appobj.iptCcpTableClass = 'devicewidth', Appobj.iptCcpTableWidth = Appobj.curImgW, Appobj.selCcpTableAlign = 'center',
-        // !VA Wrapper table presets: class='devicewidth', width = imgViewerW, align=Center
-        Appobj.iptCcpTableWrapperClass = 'devicewidth', Appobj.iptCcpTableWrapperWidth = Appobj.imgViewerW, Appobj.selCcpTableWrapperAlign = 'center';
-        
-        // !VA Write the preset values to CCP DOM
-        UIController.writeAppobjToDOM( 
-          [ 'iptCcpImgClass', Appobj.iptCcpImgClass ], 
-          [ 'iptCcpTableClass', Appobj.iptCcpTableClass ], 
-          [ 'iptCcpTableWidth', Appobj.iptCcpTableWidth ], 
-          [ 'selCcpTableAlign', Appobj.selCcpTableAlign ], 
-          [ 'iptCcpTableWrapperClass', Appobj.iptCcpTableWrapperClass ], 
-          [ 'iptCcpTableWrapperWidth', Appobj.iptCcpTableWrapperWidth ], 
-          [ 'selCcpTableWrapperAlign', Appobj.selCcpTableWrapperAlign] );
-
-        // !VA Disable the appropriate presets
-        // !VA NOTE: These options can be merged with the above function call
-        UIController.handleCcpActions( true,  
-          [ 'iptCcpImgClass', 'setdisabledtextinput'], 
-          [ 'iptCcpTableClass', 'setdisabledtextinput'], 
-          [ 'iptCcpTableWidth', 'setdisabledtextinput'], 
-          [ 'selCcpTableAlign', 'setdisabledtextinput'], 
-          [ 'iptCcpTableWrapperClass', 'setdisabledtextinput'], 
-          [ 'iptCcpTableWrapperWidth', 'setdisabledtextinput'], 
-          [ 'selCcpTableWrapperAlign', 'setdisabledtextinput'] );
-        break;
-      case id === (ccpUserInput.rdoCcpTdBgimage):
-        // !VA Bgimage presets
-        Appobj.iptCcpTdHeight = Appobj.curImgH, Appobj.iptCcpTdWidth = Appobj.curImgW, Appobj.iptCcpTdBgColor = '#7bceeb';
-        // !VA Display applicable elements and preset values
-        UIController.handleCcpActions( true,  
-          [ 'iptCcpTdClass', 'setactiveparent'], 
-          [ 'iptCcpTdHeight', 'setactiveparent'], 
-          [ 'iptCcpTdWidth', 'setactiveparent'], 
-          [ 'iptCcpTdWidth', 'setactiveparent'], 
-          [ 'iptCcpTdBgColor', 'setactiveparent']) ;
-
-        UIController.writeAppobjToDOM( 
-          [ 'iptCcpTdHeight', Appobj.iptCcpTdHeight ], 
-          [ 'iptCcpTdWidth', Appobj.iptCcpTdWidth ], 
-          [ 'iptCcpTdBgColor', Appobj.iptCcpTdBgColor ],
-          [ 'iptCcpTdWidth', Appobj.iptCcpTdWidth ]) ;
-
-        // !VA NOTE: These options can be merged with the above function call
-        // UIController.handleCcpActions(Appobj, true,  [ 'iptCcpTdHeight', 'setvalue'], [ 'iptCcpTdWidth', 'setvalue'], [ 'iptCcpTdBgColor', 'setvalue'], [ 'iptCcpTdWidth', 'setactiveparent']) ;
-        break;
-      case id === (ccpUserInput.rdoCcpTdVmlbutton):
-        // !VA VML button presets
-        // !VA Appobj presets:
-        Appobj.iptCcpTdHeight = Appobj.curImgH;
-        Appobj.iptCcpTdWidth = Appobj.curImgW;
-        Appobj.iptCcpTdBgColor = '#556270';
-        Appobj.iptCcpTdBorderRadius = '4';
-        Appobj.iptCcpTdBorderColor= '#1e3650';
-        Appobj.iptCcpTdFontColor= '#FFFFFF';
-
-        UIController.writeAppobjToDOM( 
-          [ 'iptCcpTdClass', Appobj.iptCcpTdClass ], 
-          [ 'iptCcpTdHeight', Appobj.iptCcpTdHeight ], 
-          [ 'iptCcpTdWidth', Appobj.iptCcpTdWidth], 
-          [ 'iptCcpTdBgColor', Appobj.iptCcpTdBgColor], 
-          [ 'iptCcpTdFontColor', Appobj.iptCcpTdFontColor], 
-          [ 'iptCcpTdBorderColor', Appobj.iptCcpTdBorderColor ], 
-          ['iptCcpTdBorderRadius', Appobj.iptCcpTdBorderRadius ], 
-          [ 'iptCcpTdFontColor', Appobj.iptCcpTdFontColor ]);
-
-        UIController.handleCcpActions( true,  
-          [ 'iptCcpTdClass', 'setactiveparent'], 
-          [ 'iptCcpTdHeight', 'setactiveparent'], 
-          [ 'iptCcpTdWidth', 'setactiveparent'], 
-          [ 'iptCcpTdBgColor', 'setactiveparent'],
-          [ 'iptCcpTdFontColor', 'setactiveparent'], 
-          [ 'iptCcpTdBorderColor', 'setactiveparent'], 
-          ['iptCcpTdBorderRadius', 'setactiveparent'], 
-          [ 'iptCcpTdFontColor', 'setactiveparent']) ;
-
-        break;
-      default:
-        console.log('Error in handleTdOptions: unknown condition');
-      } 
-    }
-
-    // !VA appController  
-    // !VA Contains the logic for defining the fixed/fluid Appobj properties and calls handleCcpAction to set the appropriate values, display/undisplay and disabled/enabled states for the affected DOM elements. IMPORTANT: Calls resetTdOptions to first reset all the TdOptions to their defaults before setting them. This caused an issue when called from batchAppobjToDOM because the fluid options were being applied where they weren't wanted -- see the if (Appobj.rdoCcpImgFluid === true ) condition in batchAppobjToDOM.
-    function handleImgType(id) {
-      // !VA Reset all the td options to prepare for processing
-      resetTdOptions();
-      // !VA Set the fixed options, or reset them after switching back from fluid
-      if (id === ccpUserInput.rdoCcpImgFixed) {
-        Appobj.rdoCcpImgFixed = true, Appobj.rdoCcpImgFluid = false;
-        // !VA Run handleTdOptions with the 'rdoCcpTdBasic' option as argument to preselect the basic option
-        handleTdOptions(ccpUserInput.rdoCcpTdBasic);
-        // !VA NOTE: This is where the placeholder value would be swapped. But for now, use these presets - any existing user selections will be lost until saving them to the placeholder is implemented.
-        // !VA Branch: review0720H (072020)
-        // !VA tableAlign and tableWrapperAlign must be written to Appobj here and they have to be gotten from the UI here. 
-
-        Appobj.iptCcpImgClass = '';
-        Appobj.iptCcpTableWidth = Appobj.curImgW;
-        Appobj.iptCcpTableClass = '';
-        Appobj.iptCcpTableWrapperWidth = Appobj.imgViewerW;
-        Appobj.iptTableWrapperClass = 'devicewidth';
-        Appobj.iptCcpTdClass = '';
-        Appobj.iptCcpTdBgColor = '';
-        // !VA Branch: implementAppobj06 (061820)
-        // !VA IMPORTANT: Not sure if it's best to put this here or only in Attributes, since it only affects the Clipboard output. Leaving it here for now since it doesn't hurt anything
-        Appobj.styCcpTableWrapperStyle = '';
-        // !VA These options will be set whenever the user clicks the fixed option, even if they weren't selected before choosing the fluid option. That is a minor annoyance for the user probably.
-        // !VA Write the presets in Appobj to the CCP DOM
-        UIController.writeAppobjToDOM( 
-          [ 'iptCcpImgClass', Appobj.iptCcpImgClass ], 
-          [ 'iptCcpTableWidth', Appobj.iptCcpTableWidth ], 
-          ['iptCcpTableClass', Appobj.iptCcpTableClass ], 
-          ['iptCcpTableWrapperWidth', Appobj.iptCcpTableWrapperWidth ],
-          ['iptCcpTableWrapperClass', Appobj.iptCcpTableWrapperClass ],  
-          [ 'iptCcpTdClass', Appobj.iptCcpTdClass ],
-          [ 'iptCcpTdBgColor', Appobj.iptCcpTdBgColor ]
-        );
-        // !VA Set the checkbox and applicable display parent elements 
-        UIController.handleCcpActions( true, 
-          [ 'spnCcpTableIncludeWrapperCheckmrk', 'setcheckbox'], 
-          ['iptCcpTableWrapperWidth', 'setactiveparent'], 
-          ['iptCcpTableWrapperClass', 'setactiveparent'], 
-          ['selCcpTableWrapperAlign', 'setactiveparent'], 
-          ['iptCcpTableWrapperBgColor', 'setactiveparent'],
-          [ 'iptCcpTdClass', 'setactiveparent'],
-          [ 'iptCcpTdBgColor', 'setactiveparent']
-        );
-        // !VA Reset the disabling and fluid options to the fixed defaults.
-        UIController.handleCcpActions( false, 
-          // !VA NOTE: The false flag is ignored for setvalue but the AppobjMap is passed repeatedly here. That's not very DRY, look at it again.
-          // !VA Remove the disabled class from the radio buttons
-          ['rdoCcpTdExcludeimg', 'setdisabledradio'], 
-          ['rdoCcpTdPosswitch', 'setdisabledradio'],
-          ['rdoCcpTdImgswap', 'setdisabledradio'], 
-          ['rdoCcpTdBgimage', 'setdisabledradio'], 
-          ['rdoCcpTdVmlbutton', 'setdisabledradio'], 
-          // !VA Remove the pointer-events property from the mock checkbox and remove the disabled class from the label element
-          [ 'spnCcpTableIncludeWrapperCheckmrk', 'setdisabledcheckbox'], 
-          // !VA Remove the disabled class from the text input elements.
-          ['iptCcpImgClass', 'setdisabledtextinput'], 
-          ['iptCcpTableWidth', 'setdisabledtextinput'], 
-          ['iptCcpTableClass', 'setdisabledtextinput'], 
-          ['iptCcpTableWrapperWidth', 'setdisabledtextinput'], 
-          ['iptCcpTableWrapperClass', 'setdisabledtextinput']
-        );
-        
-        
-      } else if ( id === ccpUserInput.rdoCcpImgFluid) {
-        Appobj.rdoCcpImgFixed = false, Appobj.rdoCcpImgFluid = true;
-        // !VA Fluid-specific properties
-        // !VA This is where the existing values would be copied to the element placeholder attribute
-        Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
-        Appobj.iptCcpImgClass = 'img-fluid';
-        Appobj.iptCcpTableWidth = '100%';
-        Appobj.iptCcpTableClass = '';
-        Appobj.selCcpTableAlign = 'none';
-        // Appobj.selCcpTableAlign = '';
-        Appobj.iptCcpTableWrapperWidth = '100%';
-        Appobj.iptCcpTableWrapperClass = 'responsive-table';
-        Appobj.iptCcpTdClass = '';
-        Appobj.iptCcpTdBgColor = ''; 
-        // !VA Branch: implementAppobj06 (061820)
-        // !VA IMPORTANT: Not sure if it's best to put this here or only in Attributes, since it only affects the Clipboard output. Leaving it here for now since it doesn't hurt anything
-        // !VA Branch: review0720F (071720)
-        // !VA Adding Appobj.styCcpTableStyle - Appobj.styCcpTableWrapperStyle may be deprecated
-        // Appobj.styCcpTableStyle = 'style = "max-width: ' + Appobj.curImgW + ';"';
-        Appobj.styCcpTableWrapperStyle = 'style = "max-width: ' + Appobj.curImgW + 'px;"';
-        
-        // !VA Write the Appobj presets to the CCP DOM. Some of these existing values should be copied to the element's placeholder attribute
-        UIController.writeAppobjToDOM(
-          // !VA Preset values for the fluid imgType option
-          [ 'iptCcpImgClass', Appobj.iptCcpImgClass ], 
-          [ 'iptCcpTableWidth', Appobj.iptCcpTableWidth ], 
-          ['iptCcpTableClass', Appobj.iptCcpTableClass ], 
-          // !VA Branch: review0720H (072020)
-          // !VA The line below gives and error
-          ['selCcpTableAlign', Appobj.selCcpTableAlign ], 
-          ['iptCcpTableWrapperWidth', Appobj.iptCcpTableWrapperWidth ],
-          ['iptCcpTableWrapperClass', Appobj.iptCcpTableWrapperClass ],  
-          [ 'iptCcpTdClass', Appobj.iptCcpTdClass ],
-          [ 'iptCcpTdBgColor', Appobj.iptCcpTdClass ]
-        );
-
-        // !VA Some of these existing values should be copied to the element's placeholder attribute
-        UIController.handleCcpActions( true, 
-          // !VA Set the 'rdoCcpTdBasic' td option
-          [ 'rdoCcpTdBasic', 'selectradio'],
-          // !VA Make sure the Include wrapper checkbox is selected 
-          [ 'spnCcpTableIncludeWrapperCheckmrk', 'setcheckbox'], 
-          // !VA Disable all td radio buttons except the 'rdoCcpTdBasic' option
-          ['rdoCcpTdExcludeimg', 'setdisabledradio'], 
-          ['rdoCcpTdPosswitch', 'setdisabledradio'],
-          ['rdoCcpTdImgswap', 'setdisabledradio'], 
-          ['rdoCcpTdBgimage', 'setdisabledradio'], 
-          ['rdoCcpTdVmlbutton', 'setdisabledradio'], 
-          // !VA Make sure the Include wrapper table options are displayed
-          ['iptCcpTableWrapperWidth', 'setactiveparent'], 
-          ['iptCcpTableWrapperClass', 'setactiveparent'], 
-          ['selCcpTableWrapperAlign', 'setactiveparent'], 
-          ['iptCcpTableWrapperBgColor', 'setactiveparent'],
-          // !VA Display the allowable TD options for the fluid imgtype
-          [ 'iptCcpTdClass', 'setactiveparent'],
-          [ 'iptCcpTdBgColor', 'setactiveparent'],
-          // !VA Turn off pointer-events (set in CSS) and apply the disabled class to the label
-          [ 'spnCcpTableIncludeWrapperCheckmrk', 'setdisabledcheckbox'], 
-          // !VA Disable all the fluid-specific options so the user cannot change them
-          ['iptCcpImgClass', 'setdisabledtextinput'], 
-          ['iptCcpTableWidth', 'setdisabledtextinput'], 
-          ['iptCcpTableClass', 'setdisabledtextinput'], 
-          ['iptCcpTableWrapperWidth', 'setdisabledtextinput'] 
-          // ['iptCcpTableWrapperClass', 'setdisabledtextinput'],
-          // !VA Branch: review0720H (072020)
-          // !VA Need to set the parent table align option to none and disable it - can we use set
-        );
-
-        // !VA Branch: ghost01 (072820)
-        // !VA Put code for ghost table here
-
-
-      } else {
-        console.log('ERROR in handleImgType - unknown condition');
-      }
-    }
-
-    // !VA appController   
-    // !VA Function to display/undisplay the CCP wrapper table options if the checkbox is checked. If Appobj.spnCcpTableIncludeWrapperCheckmrk === 'off', run this to turn it on. NOTE: I’m not sure why the flag is being passed here. This function doesn’t depend on the flag argument for anything. All it does is display/undisplay the Include wrapper options based on the value of the spnCcpTableIncludeWrapperCheckmrk property in Appobj. Review this.
-    function showIncludeWrapperOptions(flag) {
-      // !VA If the Include wrapper checkbox is checked, show the dependent options. Otherwise, undislay them.
-      if (Appobj.spnCcpTableIncludeWrapperCheckmrk === 'on') {
-        flag = true;
-      } else if (Appobj.spnCcpTableIncludeWrapperCheckmrk === 'off') {
-        flag = false;
-      } else {
-        console.log('ERROR in showIncludeWrapperOptions: unknown condition');
-      }
-      UIController.handleCcpActions( flag, 
-        [ 'iptCcpTableWrapperClass', 'setactiveparent' ], 
-        [ 'iptCcpTableWrapperWidth', 'setactiveparent' ], 
-        [ 'selCcpTableWrapperAlign', 'setactiveparent' ], 
-        [ 'iptCcpTableWrapperBgColor', 'setactiveparent' ]);
-
-    }
-
-    // !VA appController   
-    // !VA Toggles a mock checkbox. This is only for toggling triggered by an event handler. Switching the checkboxes on and off programatically can be done by calling handleCcpActions.
-    function toggleCheckbox(evt) {
-      let chkId, checkbox;
-      chkId = '#' + evt.target.id;
-      // !VA Convert the 'mock' checkbox, which is the event target, to the actual HTML checkbox input so it can be processed by replacing  the mock checkbox indicator strings checkmark ID with the strings indicating the actual HTML checkbox element.
-      chkId = chkId.replace('mrk', 'box');
-      chkId = chkId.replace('spn', 'chk');
-      // !VA Select the actual HTML checkbox element
-      checkbox = document.querySelector(chkId);
-      // !VA Toggling the checkbox entails switching the checked state of the checkbox element on and of AND setting the corresponding Appobj property and, for Include wrapper checkbox, showing/hiding the dependent Include wrapper options.
-      if (checkbox) {
-        // !VA If option is a click event, toggle the checkmark on click and write the checked value to Appobj
-        if (checkbox.checked) {
-          checkbox.checked = false;
-          if ( '#' + evt.target.id   === ccpUserInput.spnCcpImgIncludeAnchorCheckmrk) {
-            Appobj.spnCcpImgIncludeAnchorCheckmrk = 'off';
-          } else if ( '#' + evt.target.id   === ccpUserInput.spnCcpTableIncludeWrapperCheckmrk) {
-            Appobj.spnCcpTableIncludeWrapperCheckmrk = 'off';
-            showIncludeWrapperOptions(false);
-          }
-          
+      case alias === 'ccpTdaOptnsRdo' :
+        if ( option === 'basic' || option === 'swtch') {
+          configObj = defaultConfig( alias, option);
         } else {
-          checkbox.checked = true;
-          if ( '#' + evt.target.id   === ccpUserInput.spnCcpImgIncludeAnchorCheckmrk) {
-            Appobj.spnCcpImgIncludeAnchorCheckmrk = 'on';
-          } else if ( '#' + evt.target.id   === ccpUserInput.spnCcpTableIncludeWrapperCheckmrk) {
-            Appobj.spnCcpTableIncludeWrapperCheckmrk = 'on';
-            showIncludeWrapperOptions(true);
-          }
+          configObj = optnsConfig( alias, option );
         }
-      } else {
-        console.log('ERROR in toggleCheckbox: unkknown checkbox state');
-      }
-
+        break;
+      case alias === 'ccpTblWraprChk' :
+        // !VA Set option to !option to make this work - otherwise it sticks on 'true'. For later...
+        // !VA Branch: OVERHAUL0908
+        // !VA Getting rid of this backwardsy thing
+        // Appobj[alias] = option;
+        configObj = wraprConfig( alias, option );
+        break;
+      case alias === 'ccpTblHybrdChk' :
+        // !VA Branch: OVERHAUL0908B
+        // !VA Option is the parameter passed in from selectCheckbox - in that context it is passed as isChecked, so it reflects the checked state of ccpTblHybrdChk
+        // !VA Set Appobj to the current checked state of ccpTblHybrdChk
+        // Appobj[alias] = option;
+        // !VA Call hybrdConfig to get the configObj, i.e. the methods and properties to pass to configCCP for configuring the CCP for the Hybrid option.
+        configObj = hybrdConfig( alias, option );
+        break;
+      
+      default:
+        console.log('ERROR in fetchConfigObj = Alias not recognized');
+      } 
+      return configObj;
     }
 
-    // !VA END CCP FUNCTIONS
-      
-    // !VA appController  
-    // !VA Show element when input in another element is made – used to show the buildCSS buttons when an input is made in the CCP class input elements. Called from the ccpClassInputs event listeners
-    function showElementOnInput(evt) {
-      console.log('showElementOnInput running');
-      // !VA Here we catch the event handlers for the CCP class input fields and show the mobile clipboard buttons when an input is made. The input event fires whenever a input element's value changes.
-      var elems = [];
-      // !VA TODO: DRYify this. 
-      elems[0] = document.querySelector(btnCcpMakeClips.btnCcpMakeImgDsktpCssRule);
-      elems[1] = document.querySelector(btnCcpMakeClips.btnCcpMakeImgSmphnCssRule);
-      elems[2] = document.querySelector(btnCcpMakeClips.btnCcpMakeImgLgphnCssRule);
-      elems[3] = document.querySelector(btnCcpMakeClips.btnCcpMakeTdDsktpCssRule);
-      elems[4] = document.querySelector(btnCcpMakeClips.btnCcpMakeTdSmphnCssRule);
-      elems[5] = document.querySelector(btnCcpMakeClips.btnCcpMakeTdLgphnCssRule);
-      elems[6] = document.querySelector(btnCcpMakeClips.btnCcpMakeTableDsktpCssRule);
-      elems[7] = document.querySelector(btnCcpMakeClips.btnCcpMakeTableSmphnCssRule);
-      elems[8] = document.querySelector(btnCcpMakeClips.btnCcpMakeTableLgphnCssRule);
-      // !VA We only want to show the buttons in each respective fieldset
-      // !VA If the input is in the img fieldset, only show the first three buttons in the array. Add the hash # to the target ID to find the match with the ID in ccpUserInput
-      if (('#' + event.target.id) == ccpUserInput.iptCcpImgClass) {
-        for (let i = 0; i <= 2; i++) {
-          this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
+
+    // !VA appController private
+    // !VA Branch: OVERHAUL0825C
+    // !VA 1) Converts the event ID to an Appobj alias and routes the alias to the appropriate handler for the selected element for setting the corresponding CCP UI configuration.
+    function handleRadioEvent(evt) {
+      // console.log('handleRadioEvent running');
+      let hash, radioGroup, alias;
+      // !VA hash is required to create the element ID from the radio group name
+      hash = '#';
+      // !VA Get event target's alias: get the element's name attribute set in the HTML and add the hash to the name attribute string, and add the -rdo suffix, resulting in the full ID string of the element's parent, i.e. the ccpUserInput alias.
+      radioGroup = hash.concat(evt.target.getAttribute('name')).concat('-rdo');
+      // !VA  Use the ID above to get the ccpUserInput alias/Appobj property name.
+      alias = elementIdToAppobjProp(radioGroup);
+      // !VA Set the Appobj property to the target of the click event
+      Appobj[alias] = evt.target.value;
+      // !VA Route the alias to the respective function for selection. Appobj[alias] is the Appobj property corresponding to the clicked element. When called from here, the user-initiated event determines the selection. Elsewhere, the options can be set programatically.
+      if (alias === 'ccpImgExcldRdo') {
+        selectImgExclude( Appobj[alias] );
+      } else if ( alias === 'ccpTdaOptnsRdo') {
+        selectTdaOptions( Appobj[alias] );
+      } else if ( alias === 'ccpImgItypeRdo') {
+        selectImgItype( Appobj[alias] );
+      } else if ( alias.includes('Align') || alias.includes('Valign')) {
+        // !VA Align/Valign element not handled in handleRadioEvent - including the condition in case they need to be
+      } else {
+        console.log('ERROR in handleRadioEvent - alias not handled');
+      }
+    }
+
+    // !VA appController private
+    // !VA Branch: OVERHAUL0901B
+    // !VA Called from handleRadioEvent and init to set the current IMG Itype selection options, write the selection to Appobj, set the dependent text in the IMG Class text input field, reflect the Appobj property in the CCP and set the radio state of the binary radio group. 
+    function selectImgItype( option) {
+      let alias, configObj, validOptions;
+      validOptions = [ 'fixed', 'fluid'];
+      // !VA Hard-code alias for this routine
+      alias = 'ccpImgItypeRdo';
+      // !VA Error handling
+      if (!validOptions.includes( option )) {
+        console.log('ERROR in selectImgType - unknown option');
+      }
+      // !VA Get the config
+      configObj = fetchConfigObj( alias, option);
+      // !VA Run the CCP UI config
+      UIController.configCCP( configObj );
+    }
+
+
+    // !VA appController private
+    // !VA Execute the actions associated with selecting one of the binary Exclude Image options in the IMG section: excld or incld. Gets the configObj configuration to pass to UIController to configure the CCP UI. This function is called from the event listener for EXCLD and INCLD icons and can be run programmatically by passing in the option value or Appobj[alias]. 
+    function selectImgExclude( option )  {
+      // !VA option is the selected option: excld or incld
+      let alias, configObj = [ ];
+      // !VA Hard-code alias for this handler
+      alias = 'ccpImgExcldRdo';
+      // !VA Set the error condition if option passes an unexpected parameter
+      if (option !== 'incld' && option !== 'excld') {console.log('ERROR in selectImgExclude - unknown option'); }
+      // !VA Get the configObj configuration to pass to UIController to set the CCP
+      configObj = fetchConfigObj( alias, option );
+      // !VA Run the config
+      UIController.configCCP(configObj);
+    }
+
+    // !VA appController private
+    // !VA Branch: OVERHAUL0831A
+    // !VA Called from handleRadioEvent and init to select one of the TD OPTIONS (OPTNS) in the TD section: basic, iswap, swtch, bgimg, or vmlbt. Sets the reveal configuation of the TD OPTNS and the option in configObj and runs configCCP to apply the configuration. 
+    function selectTdaOptions( option ) {
+      let alias, validOptions;
+      let configObj = {};
+      // !VA alias is hardcoded because this function is specific to this element.
+      alias = 'ccpTdaOptnsRdo';
+      // !VA Error condition - if the option parameter isn't one of the valid options
+      validOptions = [ 'basic', 'iswap', 'swtch', 'bgimg', 'vmlbt' ];
+      if (!validOptions.includes(option)) {
+        console.log('ERROR in selectTdaOptions - unknown option');
+      }
+      // !VA Get the config
+      configObj = fetchConfigObj( alias, option );
+      // !VA Run the CCP UI configuration
+      UIController.configCCP( configObj );
+    }
+
+
+    // !VA appController private
+    // !VA Branch: OVERHAUL0825C
+    // !VA Write the selected checkbox status to its corresponding Appobj property; is called from event listeners on the checkbox elements. 
+    function handleCheckboxEvent(evt) {
+      // console.log('handleCheckboxEvent running'); 
+      let id, isChecked, alias;
+      id = '#' + evt.target.id;
+      evt.target.checked ? isChecked = true : isChecked = false;
+      // !VA Replace the element's suffix with the suffix of its parent
+      id = id.replace('ipt', 'chk');
+      // !VA Convert the ID to the corresponding ccpUserInput alias/Appobj property and set it to isChecked
+      alias = elementIdToAppobjProp(id);
+      Appobj[alias] = isChecked;
+      selectCheckbox( isChecked, alias );
+    }
+
+
+    // !VA appController private
+    // !VA Branch: OVERHAUL0831A
+    // !VA Execute the actions associated with checkbox selection: ccpTblWraprChk, ccpTblGhostChk, ccpTblMsdpiChk, ccpTblGhostChk, ccpTblMsdpiChk. Calls UIController.configCCP => checkboxState
+    function selectCheckbox( isChecked, alias ) {
+      let configObj = {};
+      // !VA Error handling
+
+      switch(true) {
+      // !VA Handle the selected checkbox
+      case alias === 'ccpTblWraprChk':
+        // !VA Set the flag based on the isChecked parameter. This will be the 'option' parameter in fetchConfigObj
+        // !VA Branch: OVERHAUL0908
+        // !VA Removing this backwardsy thing
+        configObj = fetchConfigObj(  alias, isChecked );
+        UIController.configCCP( configObj);
+        break;
+      case alias === 'ccpTblHybrdChk':
+        // !VA Branch: OVERHAUL0908A
+        // !VA Set the flag based on the isChecked parameter. The flag parameter determines what action is executed by the methods of configObj. It's counterintuitive and confusing that it's set to false now even though the checkbox is checked. For later...
+        // flag = isChecked; 
+        Appobj['ccpTblHybrdChk'] = isChecked;
+        // console.log('selectCheckbox - isChecked is: ' + isChecked + ';  flag is: ' +  flag); 
+        configObj = fetchConfigObj(  alias, isChecked );
+        UIController.configCCP( configObj);
+        break;
+      default:
+        console.log('Alias not yet handled in selectCheckbox');
+      }    
+    }
+
+
+
+
+
+
+    // !VA appController private
+    // !VA Branch: OVERHAUL0825C
+    // !VA Convert an element ID (i.e. with the # prefix ) to its corresponding ccpUserInput/Appobj property. Only works for IDs that have a corresponding ccpUserInput property. For IDs that don't have a ccpUserInput property, try evtTargetIdToAppobjProperty. 
+    function elementIdToAppobjProp(id) {
+      let appObjProp, val;
+      val = id;
+      // !VA Branch: OVERHAUL0827A
+      // !VA Better than the below - get the correspnding key in ccpUserInput from its property value, i.e. the id
+      appObjProp = Object.keys(ccpUserInput).find(key => ccpUserInput[key] === val);
+      // !VA Branch: OVERHAUL0826A
+      // !VA This isn't as good as the above
+      // for (const [key, value] of Object.entries(ccpUserInput)) {
+      //   if ( id === value ) {
+      //     retVal = key;
+      //   }
+      // }
+      return appObjProp;
+    }
+
+    // !VA appController 
+    // !VA Branch: OVERHAUL0828A
+    // !VA This doesn't do anything because there's no reason to write DOM values to Appobj when the CCP is closed - the current values are preserved. So we are commenting out but not deprecating for now.
+    // function batchDOMToAppobj() {
+    //   let arr = [];
+    //   arr = Object.entries(Appobj);
+    // }
+
+    // // !VA appController  
+    // // !VA Branch: OVERHAUL0828A
+    // // !VA Function to get a rest parameter list and return an array. Called from handleTextInputEvent. 
+    function makeAliasArray(...args) {
+      var arr;
+      arr = args;
+      return arr;
+    }
+
+
+    // !VA appController private
+    // !VA Handle the logic associated with user-initiated text input.  1) If the element has an icon associated, highlight the icon on user input 2) If the text element is a padding input, highlight the padding icon if any of the padding text input elements have user input 3) If the text input element is a class input, show the Make CSS buttons. 4) If the text input element is the IMG anchor input, show the IMG text color and IMG targt parent elements. NOTE: There are a lot of references to IDs here: consider adding aliases for the elements whose IDs are referenced literally.
+    // !VA Branch: OVERHAUL0827A
+    // !VA NOTE: This function is in appController the actions are distinct from the actions in configCCP. Those controls pertain to specific option configurations that functionally depend on a selected option. These options below only make other options available if a text input is entered. Perhaps an insignificant distinction, but a valid one - all the configCCP react to checkbox state changes, not input values.
+    function handleTextInputEvent(evt) {
+      let tar, firstChld, nextSibling, hasValue, alias, flag;
+      let configObj = {};
+      let revealArray = [];
+      hasValue = false;
+      tar = evt.target;
+      alias = evtTargetIdToAppobjProp(evt.target.id);
+      // !VA Branch: OVERHAUL0902A
+      tar.value ? flag = true : flag = false;
+      if (!tar.id.includes('tda-pd')) {
+        // !VA If the input has a value, add the active class, otherwise remove it. The active class on the input applies the properties to the adjacent sibling, i.e. the label, as defined in the CSS.
+        // !VA Reveal/conceal the IMG Make CSS buttons when an input is made in the IMG class field
+        // !VA The 3 Make CSS buttons routines could be squeezed into a separate function but why bother?
+        if (tar.id === 'ccp-img-class-ipt') {
+          // !VA The 3 Make CSS buttons in the IMG group
+          revealArray = makeAliasArray('ccpImgMkcssGrp');
+          // !VA If there's a value in the field, then flag is true, so highlight the icon
+          flag ? tar.classList.add('active') : tar.classList.remove('active');
+          // !VA If there's a value in the field and flag is true, then set the revealParent flag to false to remove the conceal class and reveal the elements.
+          configObj = {
+            revealParent: { flag: !flag, reveal: revealArray }
+          };
+          UIController.configCCP( configObj );
+        // !VA TD class input shows Make CSS buttons
+        } else if (tar.id === 'ccp-tda-class-ipt') {
+          // !VA The 3 Make CSS buttons in the TDA group
+          revealArray = makeAliasArray('ccpTdaMkcssGrp');
+          // !VA If there's a value in the field, then flag is true, so highlight the icon
+          flag ? tar.classList.add('active') : tar.classList.remove('active');
+          // !VA If there's a value in the field and flag is true, then set the revealParent flag to false to remove the conceal class and reveal the elements.
+          configObj = {
+            revealParent: { flag: !flag, reveal: revealArray }
+          };
+          UIController.configCCP( configObj );
+          // !VA TBL class input shows Make CSS buttons
+        } else if (tar.id === 'ccp-tbl-class-ipt') {
+          // !VA The 3 Make CSS buttons in the TBL group
+          revealArray = makeAliasArray('ccpTblMkcssGrp');
+          // !VA If there's a value in the field, then flag is true, so highlight the icon
+          flag ? tar.classList.add('active') : tar.classList.remove('active');
+          // !VA If there's a value in the field and flag is true, then set the revealParent flag to false to remove the conceal class and reveal the elements.
+          configObj = {
+            revealParent: { flag: !flag, reveal: revealArray }
+          };
+          UIController.configCCP( configObj );
+        // !VA Show the options for the IMG anchor text input field
+        } else if (tar.id === 'ccp-img-anchr-ipt') {
+          // !VA The 2 elements that are dependent on the anchor input value
+          revealArray = makeAliasArray('ccpImgTxclrTfd', 'ccpImgTargtChk');
+          // !VA If there's a value in the field, then flag is true, so highlight the icon
+          flag ? tar.classList.add('active') : tar.classList.remove('active');
+          // !VA If there's a value in the field and flag is true, then set the revealParent flag to false to remove the conceal class and reveal the elements.
+          configObj = {
+            revealElements: { flag: !flag, reveal: revealArray }
+          };
+          UIController.configCCP( configObj );
+        } else {
+          // !VA Add/remove active class on all the other labelled text input elements
+          tar.value !== '' ? tar.classList.add('active') : tar.classList.remove('active');
         }
-      } else if (('#' + evt.target.id) === ccpUserInput.iptCcpTdClass) { 
-        // !VA If the input is in the td fieldset, only show the next three buttons in the array
-        for (let i = 3; i <= 5 ; i++) {
-          this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
+      // !VA Now handle the unlabelled padding text input elements
+      } else {
+        // !VA firstChld is the icon element, which is the first child of the container
+        // !VA NOTE: Add an alias for this? This is an element that is used to target other elements.
+        firstChld = document.querySelector('#ccp-tda-padng-icn');
+        // !VA nextSibling is the first padding input, i.e. top.
+        nextSibling = firstChld.nextElementSibling;
+        while(nextSibling) {
+          // !VA If there's a value in the input, set the flag to true
+          if (nextSibling.value !== '') { hasValue = true; }
+          nextSibling = nextSibling.nextElementSibling;
         }
-      } else if (('#' + evt.target.id) === ccpUserInput.iptCcpTableClass) {
-        // !VA If the input is in the table fieldset, only show the next buttons in the array
-        for (let i = 6; i <= 8 ; i++) {
-          this.value ? elems[i].classList.add('active') : elems[i].classList.remove('active');
-        }
+        // !VA If any of the padding inputs have a value, then the hasValue flag is true. If none of the padding inputs have value, the flag is false. If true, add the active class, otherwise, remove it.
+        hasValue ? firstChld.classList.add('active') : firstChld.classList.remove('active');
       }
     }
 
@@ -4434,7 +4213,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // appController   
     // !VA Integer validation is used for all height/width input fields, including those in CCP. If the input value is not of type number, converts it and returns an integer.
     function validateInteger(inputVal) {
-      console.log('validateInteger running');
       let retVal;
       // !VA Handle the CCP input from the fields that should be returning integers. i.e. the numeric inputs in handleKeydown. If they are type string, then convert them to number. If the conversion fails, then throw an error - that means that the user didn't enter a valid numeric string. This returns false if parseInt fails, i.e. returns NaN. Otherwise, it returns the inputVal as integer.
       if (!parseInt(inputVal, 10) || inputVal % 1 !== 0 || inputVal < 0) {
@@ -4451,23 +4229,30 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA appController  
     // !VA Get the Appobj property that corresponds to the ID of the DOM input element that sets it. 1) Removes the hypens in the ID string, converts the identifier string (the Appobj/ccpUserInput property name string) to lowercase, finds the match, and returns the aforementioned Appobj/ccpUserInput property name string.
-    function elementIdToAppobjProp(id) {
-      let idStr, appobjProp;
+    // !VA Branch: OVERHAUL0825B
+    // !VA This one is more comprehenive than elementIdToAppobjProp. The latter  
+    function evtTargetIdToAppobjProp(id) {
+      let idStr, appObjProp;
       idStr = id;
+      // !VA Replace the ipt with tfd, which is the code for the parent div, which is the element represented in Appobj
+      idStr = idStr.replace('ipt', 'tfd');
       // !VA Strip all the hypens out of the ID (str)
       idStr = idStr.replace(/-/g,'');
       // !VA Loop through the Object.keys array 
       var appobjArray = Object.keys(Appobj);
+      // AppObjProp = Object.keys(Appobj).find(key => Appobj[key] === id);
+      // console.log('AppObjProp is: ');
+      // console.log(AppObjProp);
+
       for (let i = 0; i < appobjArray.length; i++) {
         // !VA If the lowercase Appobj property name is contained in the id, then put the original Appobj property name match into appobjProp.
         // !VA TODO: Make this an arrow function with find, like below
         // var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
         if (idStr.includes(appobjArray[i].toLowerCase())) {
-          appobjProp = appobjArray[i];
+          appObjProp = appobjArray[i];
         }
       }
-
-      return appobjProp;
+      return appObjProp;
     }
 
     // !VA appController  
@@ -4485,31 +4270,350 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       return alias;
     }
 
+    // !VA Branch: OVERHAUL0906B
+    // !VA configs
+    function defaultConfig( alias, option ) {
+      let configObj, reflectArray, radioArray, revealReset, checkedArray;
+
+
+      // !VA APPOBJ PROPERTIES
+      Appobj['ccpTblWraprChk'] = false;
+      Appobj['ccpTblHybrdChk'] = false;
+      Appobj['ccpImgClassTfd'] = '';
+      Appobj['ccpImgLoctnTfd'] = '/img';
+      Appobj['ccpImgAnchrTfd'] = '#';
+      Appobj['ccpTblClassTfd'] = '';
+      Appobj['ccpTdaBgclrTfd'] = '';
+      Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
+      Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
+      Appobj['ccpTbwMaxwdTfd'] = '';
+      // Appobj['ccpTdaTxclrTfd'] = '#FFFFFF';
+      // Appobj['ccpTdaBdclrTfd'] = '#1e3650';
+      // Appobj['ccpTdaBdradTfd'] = 4;
+
+      Appobj['ccpTbwClassTfd'] = 'devicewidth';
+      reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpTblClassTfd', 'ccpTdaBgclrTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwClassTfd' ];
+      Appobj['ccpTdaAlignRdo'] = 'left', Appobj['ccpTdaValgnRdo'] = 'top';
+      radioArray = [ 'ccpTdaAlignRdo' , 'ccpTdaValgnRdo' ];
+
+      // !VA Branch: OVERHAUL0907A
+      // !VA Turn on and enable Wrapr checkbox
+      checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk' ];
+
+      configObj = {
+        revealReset: { alias: 'default'},
+        disableReset: { alias: 'default' },
+        reflectAppobj: { reflect: reflectArray },
+        checkboxState: { checked: checkedArray },
+        radioState: { radio: radioArray }
+      };
+      return configObj;
+    }
+
+    // !VA appController private
+    function excldConfig( alias, option) {
+      let configObj, revealArray, flag;
+      selectTdaOptions('basic');
+      Appobj[alias] = option;
+      if ( option === 'excld') {
+        flag = false;
+        revealArray  = [ 'ccpImgExcldRdo', 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo' ];
+        // revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgItypeRdo', ];
+
+      } else {
+        flag = false;
+        revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaOptnsRdo'  ];
+      }
+      configObj = {
+        // !VA revealReset conceals all the elements, i.e. hides the ones that aren't explicitly revealed with revealElements.
+        revealReset: { alias: alias },
+        revealElements: { flag: flag, reveal: revealArray }
+      };
+      return configObj;
+    }
+    // !VA appController private
+    function itypeConfig( alias, option) {
+      let configObj, reflectArray, radioArray;
+      // !VA REFLECT APPOBJ to TEXT INPUT FIELDS
+      option === 'fluid' ?  Appobj['ccpImgClassTfd'] = 'img-fluid' : Appobj['ccpImgClassTfd'] = '';
+      reflectArray = ['ccpImgClassTfd' ];
+      radioArray = [ alias ];
+      configObj = {
+        reflectAppobj: { reflect: reflectArray },
+        radioState: { radio: radioArray } 
+      };
+      return configObj;
+    }
+
+    // !VA appController private
+    function optnsConfig( alias, option ) {
+      let revealFlag, revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray;
+      let configObj = {};
+      // !VA Branch: OVERHAUL0908
+      // !VA Appobj is set in handleRadioEvent
+      // Appobj[alias] = option;
+      // !VA Branch: OVERHAUL0908C
+      // !VA Option will never be basic or swtch here - they get their config from defaultConfig. That's not ideal, the call to defaultConfig should be made from here, not fetchConfigObj
+      if ( option === 'basic' || option === 'swtch') {
+        console.log('optnsConfig basic');
+        // !VA Branch: OVERHAUL0906B
+        // !VA Nothing happens here - for basic and swtch the config is set in fetchConfigObj to fetch the defaultConfig, only including this condition for future use.
+      } else {
+        // !VA Now handle the other TD Options
+        switch(true) {
+        case option === 'iswap':
+          // !VA SET APPOBJ PROPERTIES FOR ISWAP
+          // !VA Show the table wrapper options
+          Appobj['ccpTblWraprChk'] = false;
+          Appobj['ccpTblHybrdChk'] = false;
+          // !VA APPOBJ PROPERTIES
+          Appobj['ccpImgClassTfd'] = 'mobileshow';
+          Appobj['ccpTblClassTfd'] = Appobj['ccpTbwClassTfd'] = 'devicewidth';
+          Appobj['ccpTblAlignRdo'] = 'center';
+          Appobj['ccpTbwAlignRdo'] = 'center';
+          Appobj['ccpTdaBgclrTfd'] = '';
+          // !VA NEW
+          Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
+          Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
+          Appobj['ccpTbwMaxwdTfd'] = '';
+
+          // !VA reflectAppobj METHOD
+          // !VA Array of elements whose values are set to the Appobj properties above
+          reflectArray = ['ccpImgClassTfd','ccpTdaBgclrTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd' ];
+          
+          // !VA checkboxState METHOD
+          // !VA Array of checkboxes whose checked state is to be set based on the Appobj property setting above.
+          checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk'];
+
+          // !VA radioState METHOD
+          // !VA Array of radio groups whose selection state is set based on the Appobj property above. The reveal
+          radioArray = [ 'ccpTblAlignRdo' , 'ccpTbwAlignRdo' ];
+
+          // !VA revealElements METHOD
+          // !VA revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
+          revealFlag = false;
+          // !VA Array of elements to be revealed.
+          revealArray = [ 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaOptnsRdo', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblMsdpiChk', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd','ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+
+          // !VA disableElements METHOD
+          // !VA disableFlag is always true. This isn't a toggle. Elements stay disabled until a different option with a different config is selected.
+          disableFlag = true;
+          // selectCheckbox( true, 'ccpTblWraprChk');
+          disableArray =  [ 'ccpImgClassTfd', 'ccpTblClassTfd','ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblAlignRdo' ];
+
+          // !VA Set the configObj with the methods and properties to configure
+          configObj = {
+            checkboxState: { checked: checkedArray },
+            reflectAppobj: { reflect: reflectArray },
+            radioState: { radio: radioArray },
+            disableElements: { flag: disableFlag, disable: disableArray },
+            revealReset: { alias: 'default'},
+            revealElements:  { flag: revealFlag, reveal: revealArray }
+          };
+          break;
+        case option === 'bgimg':
+          // !VA APPOBJ PROPERTIES
+          // !VA Table wrapper options not show by default
+          Appobj['ccpTblWraprChk'] = false;
+          Appobj['ccpTblHybrdChk'] = false;
+          Appobj['ccpImgClassTfd'] = '';
+          Appobj['ccpTblClassTfd'] = '';
+          Appobj['ccpTdaWidthTfd'] = Appobj['curImgW'];
+          Appobj['ccpTdaHeigtTfd'] = Appobj['curImgH'];
+          Appobj['ccpTdaBgclrTfd'] = '#7bceeb';
+          Appobj['ccpTbwClassTfd'] = 'devicewidth';
+          // !VA NEW
+          Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
+          Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
+          Appobj['ccpTbwMaxwdTfd'] = '';
+
+          // !VA reflectAppobj METHOD
+          // !VA Array of elements whose values are set to the Appobj properties above
+          reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTblWidthTfd', 'ccpTblWidthTfd' ];
+
+          // !VA revealElements METHOD
+          // !VA revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
+          revealFlag = false;
+          // !VA Array of elements to be revealed.
+          revealArray = [ 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaOptnsRdo', 'ccpTblMaxwdTfd' ];
+          // !VA If the Include Wrapper icon is unchecked, use arr for revealArray. If it is checked, merge arr with the Table Wrapper options to create revealArray
+
+          // !VA checkboxState METHOD
+          // !VA Array of checkbox elements whose checked state to set
+          checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk' ];
+
+          // !VA Set the configObj with the methods and properties to configure
+          configObj = {
+            checkboxState:  { checked: checkedArray },
+            disableReset: { alias: 'default' },
+            reflectAppobj: { reflect: reflectArray },
+            revealReset: { alias: 'default'},
+            revealElements: { flag: revealFlag, reveal: revealArray }
+          };
+          break;
+        case option === 'vmlbt':
+          // !VA APPOBJ PROPERTIES
+          // !VA Table wrapper options not show by default
+          Appobj['ccpTblWraprChk'] = false;
+          Appobj['ccpTblHybrdChk'] = false;
+          Appobj['ccpImgClassTfd'] = '';
+          Appobj['ccpTblClassTfd'] = '';
+          Appobj['ccpTdaWidthTfd'] = Appobj['curImgW'];
+          Appobj['ccpTdaHeigtTfd'] = Appobj['curImgH'];
+          Appobj['ccpTdaBgclrTfd'] = '#556270';
+          Appobj['ccpTdaTxclrTfd'] = '#FFFFFF';
+          Appobj['ccpTdaBdclrTfd'] = '#1e3650';
+          Appobj['ccpTdaBdradTfd'] = 4;
+          // !VA NEW
+          Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
+          Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
+          Appobj['ccpTbwMaxwdTfd'] = '';
+
+
+          // !VA reflectAppobj METHOD
+          // !VA Array of elements whose values are set to the Appobj properties above
+          reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd',  'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTdaBdradTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTblWidthTfd', 'ccpTblWidthTfd' ];
+          
+          // !VA checkboxState METHOD
+          // !VA Array of checkbox elements whose checked state to set
+          checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk' ];
+
+          // !VA revealElements METHOD
+          // !VA revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
+          revealFlag = false;
+          // !VA Array of elements to be revealed.
+          revealArray = [ 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTdaBdradTfd' ];
+
+          // !VA Set the configObj with the methods and properties to configure
+          configObj = {
+            checkboxState:  { checked: checkedArray },
+            disableReset: { alias: 'default' },
+            reflectAppobj: { reflect: reflectArray },
+            revealReset: { alias: 'default'},
+            revealElements: { flag: revealFlag, reveal: revealArray }
+          };
+          break;
+        default:
+          console.log('ERROR in revealConfigs - Appobj property not recognized');
+        } 
+      }
+      return configObj;
+    }
+
+    // !VA appController private
+    function wraprConfig( alias, isChecked ) {
+      // !VA Branch: OVERHAUL0908
+      let configObj, revealFlag, revealArray;
+      
+      // !VA Branch: OVERHAUL0908
+      // !VA revealElements METHOD
+      // !VA revealFlag is the opposite of isChecked because the revealElements method REMOVES the ccp-conceal-ctn class to reveal elements
+      revealFlag = !isChecked;
+      // !VA Set the array of elements to reveal when Table Wrapper is checked. These correspond to the Table Wrapper option group.
+      revealArray = [ 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd',  'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+
+      // !VA Create the configObj with the methods and properties to pass to configCCP to configure the CCP when Table Wrapper is checked/unchecked.
+      configObj = {
+        revealReset: { alias: alias },
+        revealElements: { flag: revealFlag, reveal: revealArray }
+      };
+      return configObj;
+    }
+
+    // !VA appController private
+    function hybrdConfig( alias, isChecked ) {
+      // console.log('hybrdConfig running'); 
+      let checkedArray, radioArray, reflectArray, revealFlag, revealArray, disableFlag, disableArray;
+      let configObj = {};
+
+      // !VA APPOBJ PROPERTIES FOR CONFIGURING THE HYBRID OPTION
+      // !VA If Hybrid is checked, set these options
+      if (isChecked) {
+        // !VA Set the Wrapper checkbox Appobj property to true if the Hybrid checkbox is checked
+        Appobj['ccpTblWraprChk'] = true;
+        Appobj['ccpImgClassTfd'] = 'img-fluid';
+        Appobj['ccpTdaOptnsRdo'] = 'basic';
+        Appobj['ccpTdaBgclrTfd'] = '';
+        Appobj['ccpTblClassTfd'] = '';
+        Appobj['ccpTbwClassTfd'] = 'responsive-table';
+        Appobj['ccpTblAlignRdo'] = '';
+        Appobj['ccpTbwAlignRdo'] = 'center';
+        Appobj['ccpTblWidthTfd'] = '100%';
+        Appobj['ccpTbwWidthTfd'] = '100%';
+        Appobj['ccpTbwMaxwdTfd'] = Appobj['imgViewerW'];
+        console.log('viewerW is: ' + Appobj['imgViewerW']);
+        
+      // !VA If Hybrid is unchecked, reset to default options
+      } else {
+        // !VA Set the Wrapper checkbox Appobj property to false if the Hybrid checkbox is unchecked
+        Appobj['ccpTblWraprChk'] = false;
+        // !VA APPOBJ PROPERTIES
+        // !VA REFLECT APPOBJ to TEXT INPUT FIELDS
+        Appobj['ccpImgClassTfd'] = '';
+        Appobj['ccpTdaOptnsRdo'] = 'basic';
+        Appobj['ccpTdaBgclrTfd'] = '';
+        Appobj['ccpTblClassTfd'] = '';
+        Appobj['ccpTbwClassTfd'] = 'devicewidth';
+        Appobj['ccpTblAlignRdo'] = '';
+        Appobj['ccpTbwAlignRdo'] = 'center';
+        Appobj['ccpTblWidthTfd'] = '';
+        Appobj['ccpTbwWidthTfd'] = '';
+        Appobj['ccpTbwMaxwdTfd'] = '';
+        // Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
+        // Appobj['ccpTbwWidthTfd'] = Appobj['viewerW'];
+      }
+
+      // !VA checkboxState METHOD
+      // !VA Set the Wrapper and Hybrid checkbox as properties of the checkboxState method. These two checkboxes will have checked state set by the Appobj property set above.
+      checkedArray = ['ccpTblWraprChk', 'ccpTblHybrdChk'];
+
+      // !VA reflectElements METHOD
+      // !VA Set the array of the elements whose CCP value should be set according to the REFLECT PROPERTIES set above
+      reflectArray = ['ccpImgClassTfd', 'ccpTdaBgclrTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd' ];
+
+      // !VA radioState METHOD
+      // !VA Set the properties of the radioState method whose selected option is set according to its Appobj properties set in the APPOBJ PROPERTIES section above
+      radioArray = [ 'ccpTblAlignRdo' , 'ccpTbwAlignRdo', 'ccpTdaOptnsRdo' ];
+
+      // !VA revealElements METHOD
+      // !VA Set the reveal flag. The reveal flag is the opposite of the isChecked property because the ccp-conceal-ctn class is REMOVED in order to reveal the elements.
+      revealFlag = !isChecked;
+      // !VA Set the array of the elements to be revealed  according to the APPOBJ PROPERTIES set above. IMPORTANT: These correspond to the Table Wrapper options. They are being set manually here instead of calling wraprConfig to set the configuration for transparency and simplicity's sake. 
+      revealArray = [  'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+
+      // !VA disableElements METHOD
+      // !VA Set the flag to disable/enable elements. disableFlag is equal to isChecked - it has a different name here only for transparency's sake. 
+      disableFlag = isChecked;
+      // !VA Set the array of the elements to be disabled. 
+      disableArray =  [ 'ccpImgClassTfd', 'ccpTblClassTfd','ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblAlignRdo', 'ccpTblWraprChk', 'ccpTbwClassTfd','ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwAlignRdo' ];
+
+      // !VA Create the configObj methods with the properties defined above.
+      configObj = {
+        checkboxState: { checked: checkedArray },
+        reflectAppobj: { reflect: reflectArray },
+        radioState: { radio: radioArray },
+        revealReset: { alias: 'default'},
+        revealElements: { flag: revealFlag, reveal: revealArray },
+        disableElements: { flag: disableFlag, disable: disableArray },
+        disableReset: { alias: 'default'}
+      };
+
+      return configObj;
+    }
+
     // !VA appController public functions
     return {
+
 
       // !VA Access Appobj from outside appController. If identifier is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is a property identifier, i.e. an Appobj property name, return the corresponding property value. 
       // !VA Branch: implementCcpInput04 (062520)
       // !VA getAppobj won't work here. The call comes before Appobj is populated. See https://stackoverflow.com/questions/62585279/javascript-object-both-has-properties-and-is-empty - which cost me about a day.
+      // !VA Branch: OVERHAUL0901A
+      // !VA This is still used in handleInspectorClicks
       getAppobj2: function(...identifiers) {
         console.log('getAppobj2 running');
         let retval, arr;
         Appobj = UIController.populateAppobj(Appobj, 'all');
-
-        // for (const property in Appobj) {
-        //   console.log(`for/in ${property}: ${Appobj[property]}`);
-        // }
-
-
-
-        // console.log('getAppobj2 Appobj is: ');
-        // console.dir(Appobj);
-        // if (Object.keys(Appobj).length == 0) { 
-        //   console.log('getAppobj2 NO LENGTH');
-        // } else {
-        //   console.log('getAppobj2 HAS LENGTH');
-        // }
-
 
         if (typeof identifiers === 'undefined') {
           console.log('UNDEFINED2');
@@ -4548,20 +4652,21 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
 
       // !VA appController public
-      // !VA Access Appobj from outside appController. Called from getAttributes, ccpGetAttValue, ccpIfNoUserInput, getSelectedTdOptionFromAppobj, getCheckboxState, getImgSwapBlock. If identifier is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is a property identifier, i.e. an Appobj property name, return the corresponding property value. If it is neither of the above, error condition
-      getAppobj: function(identifier) {
+      // !VA Branch: OVERHAUL0829A
+      // !VA Outdated description
+      // !VA Access Appobj from outside appController. Called from getAttributes, ccpGetAttValue, ccpIfNoUserInput, getSelectedTdOptionFromAppobj, getImgSwapBlock. If alias is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is an Appobj property/ccpUserInput property, return the corresponding property value. If it is neither of the above, error condition
+      getAppobj: function(alias) {
         let retval;
-        if (typeof identifier === 'undefined') {
+        if (typeof alias === 'undefined') {
           // console.log('UNDEFINED');
           retval = Appobj;
         } else {
-          // console.log('identifier is: ' + identifier);
-          retval = identifier;
+          // retval = alias;
           for (const [key, value] of Object.entries(Appobj)) {
-            // console.log('key is: ' + key);
-            if (key === identifier) {
+            // console.log(`key is: ${key}, value is: ${value}`);
+            if (key === alias) {
               retval = value;
-            }
+            } 
           }
         }
         return retval;
@@ -4569,21 +4674,49 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA appController public 
       // !VA Calls UIController.toggleCCP, which returns ccpState, a flag indicating if the CCP is open or closed. If it is open, runs batchAppobjToDOM(), which contains the logic for opening the CCP with the current state of the selected options reflected. batchAppobjToDOM only runs handleTdOptions for the rdoCcpTdImgswap option. All other element states and values carry over when the CCP is open and closed. NOTE: Need to confirm that the above statement is correct. If the flag is false, batchDOMToAppobj is run to save all the DOM settings to Appobj so they can be restored by batchAppobjToDOM. NOTE: I’m not sure this is required, at least there is no logic in batchDOMToAppobj currently
+      // !VA Branch: OVERHAUL0825B
+      // !VA Still no idea what ccpState is supposed to achieve.
       initCcp: function () {
         let ccpState;
+
         // !VA Get the current open/closed state of the CCP
         ccpState = UIController.toggleCcp(true);
-        if (ccpState) {
-          // !VA Do logic for opening the CCP with the current state of the selected options reflected. batchAppobjToDOM only runs handleTdOptions for the rdoCcpTdImgswap option. Everything else carries over when the CCP is open and closed.
-          batchAppobjToDOM();
 
-        } else if (!ccpState) {
-          // !VA On closing the CCP, need to save all the DOM settings so they can be restored by batchAppobjToDOM. 
-          // !VA NOTE: Not even sure this is necessary now since the problem with the input fields resetting has been dealt with.
-          batchDOMToAppobj();
-        } else {
-          console.log('ERROR in initCCP - unknown ccpState');
-        }
+        // !VA Branch: OVERHAUL0825B
+        // let el;
+        // if (ccpState) {
+        //   console.log('ccpState is: ' + ccpState);
+        //   console.log('on click it...closes');
+        // } else {
+        //   console.log('ccpState is: ' + ccpState);
+        //   console.log('on click it...opens');
+        // !VA Branch: OVERHAUL0828C
+        // !VA This is where we need to set presets based on Appobj properties: ccpTblWraprChk
+        // !VA Screw this - the CCP opens and closes with the selected option unless you refresh. That's good enough for now. 
+        // console.log('Appobj.ccpTblWraprChk is: ' + Appobj.ccpTblWraprChk);
+        // document.querySelector('#ccp-tbw-ghost-chk').style.opacity = 1;
+        // }
+
+
+
+        // !VA What does the below do? Looks like both clauses run batchAPpobjToDom exactly the same. Let's deprecate this and just run batchAppobjToDOM
+        // if (ccpState) {
+        // !VA Do logic for opening the CCP with the current state of the selected options reflected. batchAppobjToDOM only runs handleTdOptions for the rdoCcpTdImgswap option. Everything else carries over when the CCP is open and closed.
+        // batchAppobjToDOM();
+
+        // } else if (!ccpState) {
+        // !VA On closing the CCP, need to save all the DOM settings so they can be restored by batchAppobjToDOM. 
+        // !VA NOTE: Not even sure this is necessary now since the problem with the input fields resetting has been dealt with.
+        // batchDOMToAppobj();
+        // } else {
+        //   console.log('ERROR in initCCP - unknown ccpState');
+        // }
+
+
+        // !VA Branch: OVERHAUL0825B
+        // !VA This isn't called anywhere else and doesn't do anything
+        // !VA Disabling...
+        // batchDOMToAppobj();
       },
 
 
@@ -4682,6 +4815,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Initialize the app. Display the app in full window mode or in isolate mode. Run populateAppobj to populate Appobj with initial default CCP values. Initialize the 'basic' td option. Run setupEventListeners. Determine if running in dev or prod mode based on whether there's a devimg in the HTML file. Finally, run initUI.
       init: function(){
         console.log('App initialized.');
+
         // !VA Determine if the window is an isolate window, i.e. should be displayed with just the Witty app in window with fixed dimensions without header or tutorial content.
         let curUrl, initMode;
         // !VA If the value of the query string is true, then remove the header-container, isolate button and content from the DOM
@@ -4694,11 +4828,34 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           document.querySelector('.content-section').style.display = 'none';
         } 
 
+
+
         // !VA Populate the CCP with HTML defaults. tableWidth and tableWrapperWidth are undefined, they don't get written until resizeContainers.
         UIController.populateAppobj(Appobj, 'ccp');
 
-        // !VA Initialize the 'basic' tdoption
-        handleTdOptions(ccpUserInput.rdoCcpTdBasic); 
+        // !VA Branch: OVERHAUL0906B
+        // !VA On init, run the default config
+        var configObj = fetchConfigObj('default');
+        UIController.configCCP( configObj);
+
+
+        // !VA Default init configuation
+        // Appobj['ccpImgLoctnTfd'] = '/img';
+        // configObj.reflectAppobj = { reflectArray: ['ccpImgLoctnTfd'] };
+        // console.log('Appobj is: ');
+        // console.log(Appobj);
+
+
+
+        // !VA Pre-select the IMG EXCLD, TDA OPTNS and TBW WRAPR options so they open as selected by default on page load.
+        selectImgExclude('incld');
+        selectTdaOptions('basic');
+        selectCheckbox( false, 'ccpTblWraprChk' );
+        selectCheckbox( false, 'ccpTblHybrdChk' );
+        selectImgItype( 'fixed' );
+
+
+
         // !VA Set up event listeners
         setupEventListeners();
         
