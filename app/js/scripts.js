@@ -609,25 +609,19 @@ var Witty = (function () {
         revealCcpElements(elArray);
       }
     }
+    // !VA UIController private
 
+    // !VA UIController private. Resets the disabled attribute or ccp-disable-ctn class based on the alias of the elements whose selection triggers the disabling. Currently, the only parameter passed is 'default' and the alias parameter isn't accessed. This function actually loops through all the ccp-ctn elements in the document and resets the disable state/class for them. There's probably a better way to do this - that is a lot of elements to loop through to only catch a few of them.
     function disableReset( alias ) {
-
       // console.log('disableReset running');
       // console.log('alias is: ' + alias); 
-      let disableArray, el, wraprBut;
-
-      // wraprBut = document.querySelector(ccpUserInput['ccpTblWraprChk']);
-      // wraprBut.disabled = false;
-      // wraperBut.classList.remove()
+      let disableArray;
       document.querySelector('#ccp-tbl-wrapr-ipt').disabled = false;
       document.querySelector('#ccp-tbl-wrapr-lbl').classList.remove('ccp-disable-lbl');
-
-
 
       disableArray = document.getElementsByClassName('ccp-ctn');
       // !VA Loop through all the aliases in disableArray
       for (const el of disableArray) {
-
         // !VA When the target element is selected, the flag for each alias element in disableArray is set to true. When the target element is deselected, the flag is set to false.
         // !VA If the element is a text input field...
         if ( el.id.includes('tfd')) {
@@ -637,7 +631,6 @@ var Witty = (function () {
           el.children[1].classList.remove('ccp-disable-lbl');
         // !VA If the element is an align radio group...
         } else if (el.id.includes('rdo') && el.classList.contains('ccp-align-ctn')) {
-          
           // !VA Loop through the child elements of the -rdo element
           for (const chld of el.children) {
             // !VA If the child element is an INPUT element, disable/enable it.
@@ -649,7 +642,6 @@ var Witty = (function () {
             }
           }
         } else if ( el.id.includes('chk')) {
-
           // console.log('disableReset el.id is: ' + el.id);
           el.children[0].disabled = false;
           el.children[1].classList.remove('ccp-disable-lbl');
@@ -657,7 +649,8 @@ var Witty = (function () {
       } 
     }
 
-    // !VA UIController private  
+    // !VA UIController private
+    // !VA Toggles the disable/enable states of elements in the disabledArray based on their tfd, rdo or chk element type code. 
     function disableElements(  flag, disableArray ) {
       let el;
       // !VA Loop through all the aliases in disableArray
@@ -1138,23 +1131,20 @@ var Witty = (function () {
         imgSrc: (function() {
           // !VA This value is get-only
           appObjProp = 'ccpImgLoctnTfd';
+          str = Appobj[appObjProp];
+          console.log('mark1 str is: ' + str);
           // !VA Branch: implementCcpInput06 (062820)
-          // !VA If the path input element is not empty, include the Appobj.ccpImgLoctnTfd, otherwise just use the filename without the path
-          // !VA Branch: OVERHAUL0826A
-          // !VA Removing the slash. From now, the path must be included, otherwise the inclusion of it here could corrupt img tokens or URLs.
+          // !VA If the path input element is not empty, include Appobj.ccpImgLoctnTfd, otherwise just use the filename without the path
           Appobj.ccpImgLoctnTfd !== '' ? str = Appobj.ccpImgLoctnTfd  + Appobj.fileName : str = Appobj.fileName;
           retObj = returnObject( appObjProp, str);
           return retObj;
         })(),
-        imgExcld: (function() {
-          // !VA Branch: OVERHAUL0827A
-          // !VA Functionality for the IMG excld radio button. 
-          // !VA First, get the selected option.
-          appObjProp = 'ccpImgExcldRdo';
-          selectedOption = Appobj[appObjProp];
-
-
-        })(),
+        // !VA Branch: 0909A
+        // !VA Deprecating...
+        // imgExcld: (function() {
+        //   appObjProp = 'ccpImgExcldRdo';
+        //   selectedOption = Appobj[appObjProp];
+        // })(),
         imgStyle: (function() {
           // !VA Branch: implementCcpInput06 (062820)
           // !VA Set imgType according to radio button selection. This determines the style attribute that is output to the Clipboard. All the other imgType logic is in appController.
@@ -1466,10 +1456,6 @@ var Witty = (function () {
       appController.getAppobj('ccpImgAnchrTfd')  ? hasAnchor = true : hasAnchor = false;
       // !VA Set hasWrapper if ccpTblWraprChk is selected
       appController.getAppobj('ccpTblWraprChk')  ? hasWrapper = true : hasWrapper = false;
-      console.log('hasWrapper is: ' + hasWrapper);
-
-      // hasAnchor = appController.getAppobj('ccpImgAnchrTfd');
-      appController.getAppobj('ccpImgAnchrTfd')  ? hasAnchor = true : hasAnchor = false;
       // !VA Get the selected TD option
       // !VA Branch: OVERHAUL0903A
       // !VA Is there a reason to call a function like below instead of accessing Appobj?
@@ -2183,8 +2169,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CBController   
     // !VA NOTE: This routine identifies if the nodes 1) contain the id 'stack-column-center' 2) contain MS conditional code and 2) contain an A tag. It applies indents accordingly to the nodes using insertAdjacentHTML. 1) Is problematic because if that class name is not present in the HTML file, the indent will break. I couldn't figure out a way to do this without the id by looking for sibling nodes, so trying to create options for three or even two column tables will be ridiculous time-consuming - not an option for now.
     function applyIndents( id, outputNL ) {
-      console.log('outputNL is: ');
-      console.log(outputNL);
       let selectedTdOption;
       // !VA Branch: OVERHAUL0827A
       // !VA Query Appobj to get the selected TD option
@@ -3762,7 +3746,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     }
 
     // !VA appController  
-    // !VA Branch: OVERHAUL0906B
+    // !VA Branch: 0909A
+    // !VA Returns the CCP configurations for each CCP UI element, i.e. the properties for configCCP methods.
     function fetchConfigObj( alias, option ) {
       let configObj = [], flag;
       // !VA Set the CCP configuration for specific user selections
@@ -4281,7 +4266,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       Appobj['ccpTblWraprChk'] = false;
       Appobj['ccpTblHybrdChk'] = false;
       Appobj['ccpImgClassTfd'] = '';
-      Appobj['ccpImgLoctnTfd'] = '/img';
+      Appobj['ccpImgLoctnTfd'] = 'img/';
       Appobj['ccpImgAnchrTfd'] = '#';
       Appobj['ccpTblClassTfd'] = '';
       Appobj['ccpTdaBgclrTfd'] = '';
