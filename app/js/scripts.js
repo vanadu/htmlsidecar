@@ -1162,10 +1162,33 @@ var Witty = (function () {
           retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
-        imgIncludeAnchor: (function() {
+        imgAnchor: (function() {
           appObjProp = 'ccpImgAnchrTfd';
           str = Appobj[appObjProp];
           retObj = returnObject( appObjProp, str );
+          return retObj;
+        })(),
+        // !VA Branch: 0909A
+        imgAnchorTxtclr: (function() {
+          appObjProp = 'ccpImgTxclrTfd';
+          str = Appobj[appObjProp];
+          console.log('imgAnchorTxtclr str is: ' + str);
+
+
+
+          retObj = returnObject( appObjProp, str );
+          console.log('imgAnchorTxtclr retObj is: ');
+          console.log(retObj);
+          return retObj;
+        })(),
+        // !VA Branch: 0909A
+        imgAnchorTargt: (function() {
+          appObjProp = 'ccpImgTargtChk';
+          str = Appobj[appObjProp];
+          console.log('ccpImgTargtChk str is: ' + str);
+          retObj = returnObject(ccpElementId , str);
+          console.log('imgAnchorTxtclr retObj is: ');
+          console.log(retObj);
           return retObj;
         })(),
         // !VA TD Attributes
@@ -1813,7 +1836,7 @@ var Witty = (function () {
     // !VA Builds the imgNode that is appended to the tdNode, that is in turn appended to the tableNode to generate the clipboard output. The individual attributes of the node (i.e. class, alt, etc) are received in the Attributes argument, which is originally created in getAttributes and called in buildOutputNodeList. Each property of the Attributes object contains any logic required to create the Attribute, but the logic of WHETHER the Attribute is to be included in the imgNode is 
     function makeImgNode ( id, Attributes ) {
       // !VA Id is passed but not used here,  because we're only building the node.
-      let imgNode, returnNodeFragment;
+      let imgNode, returnNodeFragment, textColorProp;
       // !VA Create the image node
       imgNode = document.createElement('img');
       // !VA Create the node fragment that will contain the IMG or A/IMG tags
@@ -1840,9 +1863,19 @@ var Witty = (function () {
       // !VA If the include anchor option is checked, create the anchor element, add the attributes, append the imgNode to the nodeFragment, and return it.
       // !VA Branch: OVERHAUL0826A
       // !VA Overhaul, disabling...
-      if (Attributes.imgIncludeAnchor.str !== '') {
+      if (Attributes.imgAnchor.str !== '') {
         let anchor = document.createElement('a');
-        anchor.href = appController.getAppobj('ccpImgAnchrTfd');
+        anchor.href = Attributes.imgAnchor.str;
+        // !VA Create the style property for the user-entered string for the anchor element's text color as a text string within the style attribute - using the color property would either convert a hex value to RGB or fail if an invalid color value is entered.
+        textColorProp =  `color: ${Attributes.imgAnchorTxtclr.str}; `;
+        // !VA Branch: 0909A
+        // !VA Deprecating... there can't be any existing style attributes in a new node.
+        // !VA Get any existing style attributes
+        // styleAtt = anchor.getAttribute('style');
+        anchor.setAttribute('style', textColorProp);
+
+
+        if ( Attributes.imgAnchorTargt.str ) { anchor.target = '_blank'; }
         anchor.appendChild(imgNode);
         returnNodeFragment.appendChild(anchor);
       } else {
@@ -3921,6 +3954,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         configObj = fetchConfigObj(  alias, isChecked );
         UIController.configCCP( configObj);
         break;
+      case alias === 'ccpImgTargtChk':
+        // !VA This alias is handled in CBController getAttributes and UIController makeImgNode. If checked, this element writes the target attribute to the img clipboard output. If unchecked, it does nothing - so it has no effect on the DOM.
+        // console.log('selectCheckbox - ccpImgTargtChk');
+        break;
       default:
         console.log('Alias not yet handled in selectCheckbox');
       }    
@@ -4259,7 +4296,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Branch: OVERHAUL0906B
     // !VA configs
     function configDefault( alias, option ) {
-      let configObj, reflectArray, radioArray, checkedArray;
+      let configObj, reflectArray, radioArray, revealArray, checkedArray;
 
 
       // !VA APPOBJ PROPERTIES
@@ -4268,26 +4305,32 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       Appobj['ccpImgClassTfd'] = '';
       Appobj['ccpImgLoctnTfd'] = 'img/';
       Appobj['ccpImgAnchrTfd'] = '#';
+      Appobj['ccpImgTxclrTfd'] = '#0000FF';
+      Appobj['ccpImgTargtChk'] = true;
       Appobj['ccpTblClassTfd'] = '';
       Appobj['ccpTdaBgclrTfd'] = '';
       Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
       Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
       Appobj['ccpTbwMaxwdTfd'] = '';
-      // Appobj['ccpTdaTxclrTfd'] = '#FFFFFF';
-      // Appobj['ccpTdaBdclrTfd'] = '#1e3650';
-      // Appobj['ccpTdaBdradTfd'] = 4;
-
       Appobj['ccpTbwClassTfd'] = 'devicewidth';
-      reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpTblClassTfd', 'ccpTdaBgclrTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwClassTfd' ];
-      Appobj['ccpTdaAlignRdo'] = 'left', Appobj['ccpTdaValgnRdo'] = 'top';
+      Appobj['ccpTdaAlignRdo'] = 'left';
+      Appobj['ccpTdaValgnRdo'] = 'top';
+
+      // !VA reflectAppobj METHOD: set the array of elements whose Appobj properties above are to be written to the CCP DOM
+      reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaBgclrTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwClassTfd' ];
+
+      // !VA revealElements METHOD:
+      // !VA Since ccpImgAnchrTfd is configured here to have the value '#', set ccpImgTxclrTfd and ccpImgTargtChk to reveal
+      revealArray = ['ccpImgTxclrTfd', 'ccpImgTargtChk'];
+
+      // !VA radioState METHOD: set the elements whose selected value is to be set to the Appobj properties above.
       radioArray = [ 'ccpTdaAlignRdo' , 'ccpTdaValgnRdo' ];
-
-      // !VA Branch: OVERHAUL0907A
-      // !VA Turn on and enable Wrapr checkbox
-      checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk' ];
-
+      // !VA checkboxState METHOD: set the checkboxes whose checked value is to be set to the Appobj properties above.
+      checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpImgTargtChk'];
+      // !VA Make the configuration object to pass to configCCP
       configObj = {
         revealReset: { alias: 'default'},
+        revealElements: { flag: false, reveal: revealArray }, 
         disableReset: { alias: 'default' },
         reflectAppobj: { reflect: reflectArray },
         checkboxState: { checked: checkedArray },
