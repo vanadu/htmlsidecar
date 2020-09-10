@@ -1664,8 +1664,9 @@ var Witty = (function () {
       // !VA Get the ghost table
       // !VA Branch: 0910A
       // !VA Disabling for dev
-      // clipboardStr = addGhostTable(clipboardStr, Attributes.tableGhost.str, Attributes.tableWrapperGhost.str);
-
+      clipboardStr = configGhostTable(clipboardStr, Attributes.tableGhost.str, Attributes.tableWrapperGhost.str);
+      console.log('buildOutputNodeList clipboardStr is: ');
+      console.log(clipboardStr);
 
       writeClipboard( id, clipboardStr );
     }
@@ -2080,29 +2081,13 @@ var Witty = (function () {
       // !VA tableInner.bgColor
       omitIfEmpty( Attributes.tableBgcolor.str, tableInner, 'bgColor');
       // !VA Add border, cellspacing and cellpadding
-
-      // !VA Branch: review0720F (071720)
-      // !VA 082520
-      // !VA This element no longer exists -- replace with Overhaul version, in the meantime, disabling...
-      // if (getRadioState(ccpUserInput.rdoCcpImgFluid)) {
-      //   tableOuter.setAttribute('style', Attributes.tableStyle.str); 
-      // }
-
       tableInner.border = '0', tableInner.cellSpacing = '0', tableInner.cellPadding = '0';
       // !VA Set the role=presentation attribute
       tableInner.setAttribute('role', 'presentation'); 
-
-      // !VA Branch: 0909C
-      // !VA ghost table
-      // console.log('Attributes.tableGhost.str is: ' + Attributes.tableGhost.str);
-      // tableInner.setAttribute('data-ghost-tbl', Attributes.tableGhost.str);
-
-
       // !VA Build the inner tr
       tableInner.appendChild(trInner);
       // !VA Get the inner TD from makeTdNode and append it to the nodeFragment
       tdNodeFragment = makeTdNode( id, Attributes );
-
       // !VA If tdNodeFragment is null, then there was an error in makeTdNode, so console the error and return null to buildOutputNodeList to abort.
       try {
         trInner.appendChild(tdNodeFragment);
@@ -2111,55 +2096,38 @@ var Witty = (function () {
         return;
       }
       // !VA If include table wrapper is checked, build the outer table and return it
-      // !VA tableOuter.className
+      // !VA Only output the table class name attribute if Appobj has a value for it.
       omitIfEmpty( Attributes.tableWrapperClass.str, tableOuter, 'className');
-      // !VA tableOuter.align
+      // !VA Only output the the table align attribute if Appobj has a value for it, i.e. an icon other than the none symbol is selected.
       omitIfEmpty( Attributes.tableWrapperAlign.str, tableOuter, 'align');
       // !VA the default wrapper table width is the current display size - so it gets the value from the toolbar's Content Width field.
-      // !VA Branch: review0720F (071720)
-      // tableOuter.width = Attributes.tableWrapperWidth.str;
+      // !VA Only output the table width attribute if Appobj has a value for it.
       omitIfEmpty( Attributes.tableWrapperWidth.str, tableOuter, 'width');
-
-
+      // !VA Only output the bgcolor attribute if Appobj has a value for it. Pass the input value, don't prepend hex # character for now - the user might want to use a text token or scss variable
       omitIfEmpty( Attributes.tableWrapperBgcolor.str, tableOuter, 'bgColor');
-
-      // !VA tableOuter.bgColor - Pass the input value, don't prepend hex # character for now. 
+      // !VA Branch: 0910A
+      // !VA Not sure whether the style attribute is used now, for review.
       omitIfEmpty( Attributes.tableWrapperStyle.str, tableOuter, 'style');
-      // !VA Style attribute - only included for fluid images
-
-      // !VA Branch: OVERHAUL0826A
-      // !VA Element no longer exists, disabling
-      // !VA This may be deprecated
-      // if (getRadioState(ccpUserInput.rdoCcpImgFluid)) {
-      //   tableOuter.setAttribute('style', Attributes.tableWrapperStyle.str); 
-      // }
       // !VA Add default border, cellspacing, cellpadding and role for accessiblity
       tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
       tableOuter.setAttribute('role', 'presentation'); 
-
-      // !VA Branch: 0909C
-      // !VA ghost table
-      // tableOuter.setAttribute('data-ghost-tbw', Attributes.tableWrapperGhost.str);
-
       // !VA Append the outer tr to the wrapper
       tableOuter.appendChild(trOuter);
       // !VA Append the outer td to the outer tr
       trOuter.appendChild(tdOuter);
-
+      // !VA Branch: 0910A
+      // !VA What is the TD align logic doing here?
       // !VA Add the outer td attributes
       // !VA Add to the node only if the option 'none' is not selected
       if (Attributes.tdAlign.str) { tdOuter.align = Attributes.tdAlign.str; }
+      // !VA Branch: 0910A
+      // !VA What is the TD align logic doing here?
       // !VA valign attribute
       // !VA Add to the node only if the option 'none' is not selected
       if (Attributes.tdValign.str) { tdOuter.vAlign = Attributes.tdValign.str; }
       // !VA Append the inner table to the outer table's td
       tdOuter.appendChild(tableInner);
-      // !VA Pass the outer table to the tableNodeFragment.
-      // tableNode = tableOuter;
-      // !VA Append the wrapper table to the node fragment and return it
-
-      // !VA Branch: OVERHAUL0826A
-      // !VA TableNodeFragment tested and OK
+      // !VA Pass the outer table to the tableNodeFragment and return it.
       tableNodeFragment.appendChild(tableOuter);
       return tableNodeFragment;
     }
@@ -2192,12 +2160,9 @@ var Witty = (function () {
       console.log('getBgimageBlock running');
       // !VA Keeping the original reference to fallback for posterity for now
       // let bgimageStr, fallback, bgcolor;
-
       console.log('Attributes is: ');
       console.log(Attributes);
       console.log('Attributes.tdBackground.str is: ' + Attributes.tdBackground.str);
-
-
       let bgimageStr, bgcolor;
       let linebreak;
       linebreak = '\n';
@@ -2228,8 +2193,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       }
       return vmlButtonStr;
     }
-
-
     // !VA END TD OPTIONS MS-CONDITIONAL CODE BLOCKS
 
     // !VA INDENT FUNCTIONS
@@ -2436,92 +2399,119 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     
         // !VA CBController private
     */
-    function addGhostTable(tbl, bool1, bool2) {
+    function configGhostTable(tbl, bool1, bool2) {
       console.clear();
-      console.log('addGhostTable running');
+      console.log('configGhostTable running');
       console.log('bool1 is: ' + bool1 + ';  bool2 is: ' + bool2); 
-      console.log('tbl is: ');
-      console.log(tbl);
-      let result, dataAtt, dataAttArray = [];
-      dataAttArray = [ 'data-ghost-tbl', 'data-ghost-tbw'];
-
-      result = addGhostTags(tbl, dataAttArray[0]);
-      console.log('result is: ');
-      console.log(result);
-
-      
-
-      // return clipboardStr;
-    }
-
-    // !VA CBController private
-    function addGhostTags(tbl, dataAtt) {
-      console.log('addGhostTags running'); 
-      // !VA Get the full data property string including boolean
-
-
-      // !VA Add ghost tags to a single, unnested table
-      let index, dataAttLength, boolPos, bool, boolLength, replStr;
-      let ghostTags = [];
+      let openTag, closeTag, ghostOpen1, ghostClose1, ghostOpen2, ghostClose2;
+      let indexPos, ghostTags = [], hasWrapper, indent;
+      // !VA Define the tokens to use as placeholders before the replace operation
+      ghostOpen1 = '/ghostOpen1/', ghostClose1 = '/ghostClose1/', ghostOpen2 = '/ghostOpen2/', ghostClose2 = '/ghostClose2/';
+      // !VA Define the opening and closing table tags
+      openTag = '<table';
+      closeTag = '</table>';
+      // !VA Get the ghost tags and their indents
       ghostTags = getGhostTags();
-      dataAtt = 'data-ghost-tbl';
-      // !VA Get the index of the data attribute
-      index = tbl.indexOf(dataAtt);
-      // !VA Get the length of the data attribute
-      dataAttLength = dataAtt.length;
-      // !VA Get the index of the data attribute's value, which is a boolean
-      boolPos = index + dataAttLength + 2;
-      // !VA If the 4 chars following boolpos equals 'true' then the bool is true, else it is false
-      tbl.substr( boolPos, 4) === 'true' ? bool = true : bool = false;
-      // !VA Length of the data attribute value, i.e. the boolean
-      bool ? boolLength = 4 : boolLength = 5;
-      // !VA Length of the data attribute including value, including equal sign, two quotes and a space
-      dataAttLength = dataAttLength + boolLength + 4;
-      // !VA The full data attribute string, including value and closing space
-      dataAtt = tbl.substr( index, dataAttLength);
-      console.log('dataAtt is: ' + dataAtt, '; bool is: ' + bool);
-      // !VA The string to add the opening ghost tag to. The string length is the index of the data attribute, i.e. index, plus the length of the data attribute, i.e. dataAttLength.
-      replStr = tbl.substr( 0, index + dataAttLength);
-      // !VA If the Ghost checkbox icon is checked, i.e. bool is true, then prepend the ghost table to the table, and add the closing ghost tag after the closing table tag
-      if (bool) { 
-        tbl = tbl.replace( replStr, `${ghostTags[0]}${replStr}`); 
-        tbl = tbl.replace( '</table>', `</table>${ghostTags[1]}`);
+      // !VA Get the state of the Table Wrapper checkbox icon
+      hasWrapper = appController.getAppobj('ccpTblWraprChk');
+      // !VA If the Table wrapper checkbox is unchecked, then this is the only table, so assign the tokens for ghostTag1 before/after the opening/closing table tag respectively.
+      if (!hasWrapper) {
+        // !VA Add the token for ghostOpen1 tag
+        indexPos = tbl.indexOf( openTag,  0 );
+        tbl = ghostOpen1 + tbl.substring( indexPos, openTag.length) +  tbl.substring( openTag.length, tbl.length);
+        // !VA Add the token for ghostClose1 tag
+        indexPos = tbl.indexOf( closeTag, 0);
+        console.log('indexPos is: ' + indexPos);
+        tbl = tbl.substring( 0, indexPos + closeTag.length) + ghostClose1 + tbl.substring( indexPos + closeTag.length, tbl.length);
+      // !VA If the Table wrapper checkbox is checked, then ghostOpen2 and ghostClose2 apply to the outer table and ghostOpen1 and ghostClose1 apply to the inner table.
+      } else {
+
+        // !VA Add the token for ghostOpen2 tag
+        indexPos = tbl.indexOf( openTag,  0 );
+        tbl = ghostOpen2 + tbl.substring( indexPos, openTag.length) +  tbl.substring( openTag.length, tbl.length);
+
+        // !VA Add the token for ghostClose2 tag
+        indexPos = tbl.indexOf( closeTag, tbl.indexOf(closeTag) + closeTag.length );
+        // console.log('indexPos is: ' + indexPos);
+        tbl = tbl + ghostClose2;
+  
+        // !VA Add the token for ghostOpen1 tag
+        indexPos = tbl.indexOf( openTag, ghostOpen1.length + openTag.length );
+        tbl = tbl.substring( 0, indexPos) + ghostOpen1 + tbl.substring( indexPos, tbl.length);
+
+        // !VA Add the token for ghostClose1 tag
+        indexPos = tbl.indexOf( closeTag, 0);
+        console.log('indexPos is: ' + indexPos);
+        tbl = tbl.substring( 0, indexPos + closeTag.length) + ghostClose1 + tbl.substring( indexPos + closeTag.length, tbl.length);
       }
-      // !VA Remove the data attribute string
-      tbl = tbl.replace( dataAtt, '');
-      // console.log('tbl is: ');
-      // console.log(tbl);
+      // !VA Now that the tokens are in place, replace them with the ghost tags or strip them out based on the bool values.
+      if (tbl.includes(ghostClose2)) {
+        console.log('HIT');
+      }
+      if (bool1) {
+        tbl = tbl.replace(ghostOpen1,  ghostTags[0]);
+        tbl = tbl.replace(ghostClose1, ghostTags[1]);
+      } else {
+        tbl = tbl.replace(ghostOpen1,'');
+        tbl = tbl.replace(ghostClose1, '');
+      }
+      if (bool2) {
+        tbl = tbl.replace(ghostOpen2, ghostTags[2]);
+        tbl = tbl.replace(ghostClose2, ghostTags[3]);
+      } else {
+        tbl = tbl.replace(ghostOpen2,'');
+        tbl = tbl.replace('/ghostClose2/', '');
+      }
+      // !VA Return this to buildOutputNodeList clipboardStr
       return tbl;
-
     }
-
-    // !VA GHOST FUNCTIONS
 
 
     // !VA CBController private
-    // !VA Returns the strings for opening and closing ghost table tag as a two-item array
+    // !VA Returns the strings for opening and closing ghost table tag as a two-item array with indents on the inner table based on the status of the Table Wrapper checkbox icon.
     function getGhostTags() {
-      let ghostopen, ghostclose;
+      let ghostOpen1, ghostClose1, ghostOpen2, ghostClose2, hasWrapper, indent;
       let ghosttags = [];
-      ghostopen = 
+      // !VA Get the status of the Table Wrapper checkbox - it determines whether indents are applied to the inner table or not.
+      hasWrapper = appController.getAppobj('ccpTblWraprChk');
+      hasWrapper ? indent = '      ' : indent = '';
+      // !VA Define the opening and closing ghost tags for the inner table
+      ghostOpen1 = 
+      // !VA The first opening inner table tag gets no indent
 `<!--[if (gte mso 9)|(IE)]>
-<table align="center" border="0" cellspacing="0" cellpadding="0" width="${appController.getAppobj('curImgW')}">
+${indent}<table align="center" border="0" cellspacing="0" cellpadding="0" width="${appController.getAppobj('curImgW')}">
+${indent}<tr>
+${indent}<td align="center" valign="top" width="${appController.getAppobj('curImgW')}">
+${indent}<![endif]-->\n`;
+
+      ghostClose1 = 
+`\n${indent}<!--[if (gte mso 9)|(IE)]>
+${indent}</td>
+${indent}</tr>
+${indent}</table>
+${indent}<![endif]-->`;
+
+      // !VA Define the opening and closing ghost tags for the outer table.
+      ghostOpen2 = 
+`<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="${appController.getAppobj('imgViewerW')}">
 <tr>
-<td align="center" valign="top" width="${appController.getAppobj('curImgW')}">
+<td align="center" valign="top" width="${appController.getAppobj('imgViewerW')}">
 <![endif]-->\n`;
 
-      ghostclose = 
+      ghostClose2 = 
 `\n<!--[if (gte mso 9)|(IE)]>
 </td>
 </tr>
 </table>
 <![endif]-->`;
 
-      ghosttags = [ ghostopen, ghostclose ];
+      // !VA Build the array of ghost tags to return to configGhostTags
+      ghosttags = [ ghostOpen1, ghostClose1, ghostOpen2, ghostClose2 ];
       return ghosttags;
     }
 
-
+    // !VA GHOST FUNCTIONS
 
     // !VA CLIPBOARD FUNCTIONS
     // !VA CBController   
