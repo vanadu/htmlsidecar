@@ -53,69 +53,59 @@ var Witty = (function () {
   // mutationObserver.observe(mainNode, { attributes: true });
 
 
-  var tbl = 
-`<table role="presentation" data-ghost-tbl="true" width="200" cellspacing="0" cellpadding="0" border="0">
-  <tr>
-    <td valign="top" align="left">
-      <a href="#" style="color: #0000FF; " target="_blank"><img src="img/_200X150.png" style="display: block; width: 200px; height: 150px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;" width="200" height="150" border="0"></a>
-    </td>
-  </tr>
-</table>`;
+//   var tbl = 
+// `<table role="presentation" data-ghost-tbl="true" width="200" cellspacing="0" cellpadding="0" border="0">
+//   <tr>
+//     <td valign="top" align="left">
+//       <a href="#" style="color: #0000FF; " target="_blank"><img src="img/_200X150.png" style="display: block; width: 200px; height: 150px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;" width="200" height="150" border="0"></a>
+//     </td>
+//   </tr>
+// </table>`;
   
-  var ghostOpen = 
-`<!--[if (gte mso 9)|(IE)]>
-<table align="center" border="0" cellspacing="0" cellpadding="0" width="200">
-<tr>
-<td align="center" valign="top" width="200">
-<![endif]-->\n`;
+//   var ghostOpen = 
+// `<!--[if (gte mso 9)|(IE)]>
+// <table align="center" border="0" cellspacing="0" cellpadding="0" width="200">
+// <tr>
+// <td align="center" valign="top" width="200">
+// <![endif]-->\n`;
 
-  var ghostClose = 
-`\n<!--[if (gte mso 9)|(IE)]>
-</td>
-</tr>
-</table>
-<![endif]-->`;
+//   var ghostClose = 
+// `\n<!--[if (gte mso 9)|(IE)]>
+// </td>
+// </tr>
+// </table>
+// <![endif]-->`;
 
-  // !VA Get the full data property string including boolean
-  var index, dataAtt, dataAttLength, boolPos, bool, boolLength, replStr;
-  dataAtt = 'data-ghost-tbl';
-  // !VA Get the index of the data attribute
-  index = tbl.indexOf(dataAtt);
-  // !VA Get the length of the data attribute
-  dataAttLength = dataAtt.length;
-  // !VA Get the index of the data attribute's value, which is a boolean
-  boolPos = index + dataAttLength + 2;
-  // !VA If the 4 chars following boolpos equals 'true' then the bool is true, else it is false
-  tbl.substr( boolPos, 4) === 'true' ? bool = true : bool = false;
-  // !VA Length of the data attribute value, i.e. the boolean
-  bool ? boolLength = 4 : boolLength = 5;
-  // !VA Length of the data attribute including value, including equal sign, two quotes and a space
-  dataAttLength = dataAttLength + boolLength + 4;
-  // !VA The full data attribute string, including value and closing space
-  dataAtt = tbl.substr( index, dataAttLength);
-  console.log('dataAtt is: ' + dataAtt, '; bool is: ' + bool);
-  // !VA The string to add the opening ghost tag to. The string length is the index of the data attribute, i.e. index, plus the length of the data attribute, i.e. dataAttLength.
-  replStr = tbl.substr( 0, index + dataAttLength);
-  // !VA If the Ghost checkbox icon is checked, i.e. bool is true, then prepend the ghost table to the table, and add the closing ghost tag after the closing table tag
-  if (bool) { 
-    tbl = tbl.replace( replStr, `${ghostOpen}${replStr}`); 
-    tbl = tbl.replace( '</table>', `</table>${ghostClose}`)
+  // // !VA Get the full data property string including boolean
+  // var index, dataAtt, dataAttLength, boolPos, bool, boolLength, replStr;
+  // dataAtt = 'data-ghost-tbl';
+  // // !VA Get the index of the data attribute
+  // index = tbl.indexOf(dataAtt);
+  // // !VA Get the length of the data attribute
+  // dataAttLength = dataAtt.length;
+  // // !VA Get the index of the data attribute's value, which is a boolean
+  // boolPos = index + dataAttLength + 2;
+  // // !VA If the 4 chars following boolpos equals 'true' then the bool is true, else it is false
+  // tbl.substr( boolPos, 4) === 'true' ? bool = true : bool = false;
+  // // !VA Length of the data attribute value, i.e. the boolean
+  // bool ? boolLength = 4 : boolLength = 5;
+  // // !VA Length of the data attribute including value, including equal sign, two quotes and a space
+  // dataAttLength = dataAttLength + boolLength + 4;
+  // // !VA The full data attribute string, including value and closing space
+  // dataAtt = tbl.substr( index, dataAttLength);
+  // console.log('dataAtt is: ' + dataAtt, '; bool is: ' + bool);
+  // // !VA The string to add the opening ghost tag to. The string length is the index of the data attribute, i.e. index, plus the length of the data attribute, i.e. dataAttLength.
+  // replStr = tbl.substr( 0, index + dataAttLength);
+  // // !VA If the Ghost checkbox icon is checked, i.e. bool is true, then prepend the ghost table to the table, and add the closing ghost tag after the closing table tag
+  // if (bool) { 
+  //   tbl = tbl.replace( replStr, `${ghostOpen}${replStr}`); 
+  //   tbl = tbl.replace( '</table>', `</table>${ghostClose}`)
 
-  }
-  // !VA Remove the data attribute string
-  tbl = tbl.replace( dataAtt, '');
-  console.log('tbl is: ');
-  console.log(tbl);
-
-
-
-
-
-
-
-  console.log('tbl is: ');
-  console.log(tbl);
-
+  // }
+  // // !VA Remove the data attribute string
+  // tbl = tbl.replace( dataAtt, '');
+  // // console.log('tbl is: ');
+  // // console.log(tbl);
 
 
 
@@ -1380,8 +1370,13 @@ var Witty = (function () {
         tableGhost: (function() {
           appObjProp = 'ccpTblGhostChk';
           str = Appobj[appObjProp];
-          console.log('tableGhost str is: ' + str);
-          retObj = returnObject( ccpElementId, str );
+          retObj = returnObject( appObjProp, str );
+          return retObj;
+        })(),
+        tableMsdpi: (function() {
+          appObjProp = 'ccpTblMsdpiChk';
+          str = Appobj[appObjProp];
+          retObj = returnObject( appObjProp, str );
           return retObj;
         })(),
         tableStyle: (function() {
@@ -1450,6 +1445,18 @@ var Witty = (function () {
           ccpElementId = false;
           return retObj;
         })(),
+        tableWrapperGhost: (function() {
+          appObjProp = 'ccpTbwGhostChk';
+          str = Appobj[appObjProp];
+          retObj = returnObject( appObjProp, str );
+          return retObj;
+        })(),
+        tableWrapperMsdpi: (function() {
+          appObjProp = 'ccpTbwMsdpiChk';
+          str = Appobj[appObjProp];
+          retObj = returnObject( appObjProp, str );
+          return retObj;
+        })(),
         tableWrapperStyle: (function() {
           // !VA This value is get-only
           ccpElementId = false;
@@ -1469,15 +1476,6 @@ var Witty = (function () {
       return Attributes;
     }
 
-    // !VA CBController   
-    // !VA The call to this is repetitive in getAttributes, could be DRYified. All this really needs to return is the selected. The options don't need to be passed in, they're local to each getAttributes property.
-    // !VA Branch: OVERHAUL0828A
-    // !VA This will be gone from getAttributes soon. Deprecating...
-    // function getAlignAttribute(selectid) {
-    //   return document.querySelector(selectid).selectedIndex;
-    // }
-
-
     // !VA CBController public
     // !VA Omit a node attribute if the corresponding getAttributes Attribute is empty, i.e. the corresponding Appobj property/CCP element has no value. str is the Attribute object property. myNode is the current node, i.e. imgNode, tdNode, or tableNode. attr is the current attribute, i.e. className, alt, align etc. 
     function omitIfEmpty(str, myNode, attr) {
@@ -1488,38 +1486,7 @@ var Witty = (function () {
 
     // !VA END ATTRIBUTE FUNCTIONS
 
-    // !VA CBController
-    // !VA Branch: OVERHAUL0903A
-    // !VA Inserts a ghost table at the ghostopen an ghostclose tokens...not sure how functional it is.
-    function getGhostTable() {
-      let ghostopen, ghostclose;
-      let ghosttable = [];
-      ghostopen = 
-`<!--[if (gte mso 9)|(IE)]>
-<table align="center" border="0" cellspacing="0" cellpadding="0" width="${appController.getAppobj('curImgW')}">
-<tr>
-<td align="center" valign="top" width="${appController.getAppobj('curImgW')}">
-<![endif]-->\n`;
-
-      ghostclose = 
-`\n<!--[if (gte mso 9)|(IE)]>
-</td>
-</tr>
-</table>
-<![endif]-->`;
-
-      ghosttable = [ ghostopen, ghostclose ];
-      return ghosttable;
-
-    }
-
-    // !VA Branch: ghost01 (072820)
-    // !VA If the fluid imgType option is selected, wrap the clipboardStr in the ghost table code.
-    // !VA Branch: OVERHAUL0826A
-    // !VA Disabling...
-    // if ( appController.getAppobj('rdoCcpImgFluid')) {
-    //   clipboardStr = getGhostTable()[0] + clipboardStr + getGhostTable()[1];
-    // }
+    // !VA DOM NODE FUNCTIONS
 
     // !VA CBController   
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
@@ -1630,7 +1597,10 @@ var Witty = (function () {
         // !VA Convert the nodeList to text for output to the clipboard.
         console.log('Mark1 outputNL is: ');
         console.log(outputNL);
+
         clipboardStr = outputNL[0].outerHTML;
+
+
 
 
       // !VA These options include MS conditional code retrieved by getImgSwapBlock, getBgimageBlock, getVMLBlock which includes getIndent functions. First, run applyIndents on outputNL. applyIndents also inserts tokens at the position where the codeBlock is to be inserted. The parent nodelist is converted to a string, the code blocks are retrieved, indents are inserted, and finally the codeblocks are inserted into the string between the tags of the last node in the outputNL.outerHTML string.
@@ -1694,8 +1664,14 @@ var Witty = (function () {
         // console.log(clipboardStr);
       } 
 
-      console.log('clipboardStr is:');
-      console.log(clipboardStr);
+      // console.log('clipboardStr is:');
+      // console.log(clipboardStr);
+
+      // !VA Branch: 0909C
+      // !VA Get the ghost table
+      clipboardStr = addGhostTable(clipboardStr, Attributes.tableGhost.str, Attributes.tableWrapperGhost.str);
+
+
       writeClipboard( id, clipboardStr );
     }
 
@@ -2164,14 +2140,15 @@ var Witty = (function () {
       // !VA Add default border, cellspacing, cellpadding and role for accessiblity
       tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
       tableOuter.setAttribute('role', 'presentation'); 
+
+      // !VA Branch: 0909C
+      // !VA ghost table
+      tableOuter.setAttribute('data-ghost-tbw', Attributes.tableWrapperGhost.str);
+
       // !VA Append the outer tr to the wrapper
       tableOuter.appendChild(trOuter);
       // !VA Append the outer td to the outer tr
       trOuter.appendChild(tdOuter);
-
-
-      // !VA Branch: ghost01 (072820)
-
 
       // !VA Add the outer td attributes
       // !VA Add to the node only if the option 'none' is not selected
@@ -2359,6 +2336,96 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       return indent;
     }
     // !VA END INDENT FUNCTTIONS
+
+    // !VA GHOST FUNCTIONS
+
+    // !VA Branch: 0909C
+    // !VA CBController private
+    function addGhostTable(clipboardStr, bool1, bool2) {
+      console.log('addGhostTable running');
+      console.log('bool1 is: ' + bool1 + ';  bool2 is: ' + bool2); 
+      console.log('clipboardStr is: ');
+      console.log(clipboardStr);
+      let tblInner, ghostTags, dataAtt;
+
+
+
+
+      // !VA Handle the inner table
+      tblInner = addGhostTags( clipboardStr, dataAtt );
+      console.log('addGhostTable tbl is: ');
+      console.log(tblInner);
+
+
+
+      clipboardStr = tblInner;
+      return clipboardStr;
+    }
+
+    function addGhostTags(tbl, dataAtt) {
+      console.log('addGhostTags running'); 
+      // !VA Get the full data property string including boolean
+      let index, dataAttLength, boolPos, bool, boolLength, replStr;
+      let ghostTags = [];
+      ghostTags = getGhostTags();
+      dataAtt = 'data-ghost-tbl';
+      // !VA Get the index of the data attribute
+      index = tbl.indexOf(dataAtt);
+      // !VA Get the length of the data attribute
+      dataAttLength = dataAtt.length;
+      // !VA Get the index of the data attribute's value, which is a boolean
+      boolPos = index + dataAttLength + 2;
+      // !VA If the 4 chars following boolpos equals 'true' then the bool is true, else it is false
+      tbl.substr( boolPos, 4) === 'true' ? bool = true : bool = false;
+      // !VA Length of the data attribute value, i.e. the boolean
+      bool ? boolLength = 4 : boolLength = 5;
+      // !VA Length of the data attribute including value, including equal sign, two quotes and a space
+      dataAttLength = dataAttLength + boolLength + 4;
+      // !VA The full data attribute string, including value and closing space
+      dataAtt = tbl.substr( index, dataAttLength);
+      console.log('dataAtt is: ' + dataAtt, '; bool is: ' + bool);
+      // !VA The string to add the opening ghost tag to. The string length is the index of the data attribute, i.e. index, plus the length of the data attribute, i.e. dataAttLength.
+      replStr = tbl.substr( 0, index + dataAttLength);
+      // !VA If the Ghost checkbox icon is checked, i.e. bool is true, then prepend the ghost table to the table, and add the closing ghost tag after the closing table tag
+      if (bool) { 
+        tbl = tbl.replace( replStr, `${ghostTags[0]}${replStr}`); 
+        tbl = tbl.replace( '</table>', `</table>${ghostTags[1]}`)
+
+      }
+      // !VA Remove the data attribute string
+      tbl = tbl.replace( dataAtt, '');
+      // console.log('tbl is: ');
+      // console.log(tbl);
+      return tbl;
+
+    }
+
+    // !VA GHOST FUNCTIONS
+
+
+    // !VA CBController private
+    // !VA Returns the strings for opening and closing ghost table tag as a two-item array
+    function getGhostTags() {
+      let ghostopen, ghostclose;
+      let ghosttags = [];
+      ghostopen = 
+`<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="${appController.getAppobj('curImgW')}">
+<tr>
+<td align="center" valign="top" width="${appController.getAppobj('curImgW')}">
+<![endif]-->\n`;
+
+      ghostclose = 
+`\n<!--[if (gte mso 9)|(IE)]>
+</td>
+</tr>
+</table>
+<![endif]-->`;
+
+      ghosttags = [ ghostopen, ghostclose ];
+      return ghosttags;
+    }
+
 
 
     // !VA CLIPBOARD FUNCTIONS
