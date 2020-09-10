@@ -53,17 +53,82 @@ var Witty = (function () {
   // mutationObserver.observe(mainNode, { attributes: true });
 
 
+  var tbl = 
+`<table role="presentation" data-ghost-tbl="true" width="200" cellspacing="0" cellpadding="0" border="0">
+  <tr>
+    <td valign="top" align="left">
+      <a href="#" style="color: #0000FF; " target="_blank"><img src="img/_200X150.png" style="display: block; width: 200px; height: 150px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;" width="200" height="150" border="0"></a>
+    </td>
+  </tr>
+</table>`;
+  
+  var ghostOpen = 
+`<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="200">
+<tr>
+<td align="center" valign="top" width="200">
+<![endif]-->\n`;
+
+  var ghostClose = 
+`\n<!--[if (gte mso 9)|(IE)]>
+</td>
+</tr>
+</table>
+<![endif]-->`;
+
+  // !VA Get the full data property string including boolean
+  var index, dataAtt, dataAttLength, boolPos, bool, boolLength, replStr;
+  dataAtt = 'data-ghost-tbl';
+  // !VA Get the index of the data attribute
+  index = tbl.indexOf(dataAtt);
+  // !VA Get the length of the data attribute
+  dataAttLength = dataAtt.length;
+  // !VA Get the index of the data attribute's value, which is a boolean
+  boolPos = index + dataAttLength + 2;
+  // !VA If the 4 chars following boolpos equals 'true' then the bool is true, else it is false
+  tbl.substr( boolPos, 4) === 'true' ? bool = true : bool = false;
+  // !VA Length of the data attribute value, i.e. the boolean
+  bool ? boolLength = 4 : boolLength = 5;
+  // !VA Length of the data attribute including value, including equal sign, two quotes and a space
+  dataAttLength = dataAttLength + boolLength + 4;
+  // !VA The full data attribute string, including value and closing space
+  dataAtt = tbl.substr( index, dataAttLength);
+  console.log('dataAtt is: ' + dataAtt, '; bool is: ' + bool);
+  // !VA The string to add the opening ghost tag to. The string length is the index of the data attribute, i.e. index, plus the length of the data attribute, i.e. dataAttLength.
+  replStr = tbl.substr( 0, index + dataAttLength);
+  // !VA If the Ghost checkbox icon is checked, i.e. bool is true, then prepend the ghost table to the table, and add the closing ghost tag after the closing table tag
+  if (bool) { 
+    tbl = tbl.replace( replStr, `${ghostOpen}${replStr}`); 
+    tbl = tbl.replace( '</table>', `</table>${ghostClose}`)
+
+  }
+  // !VA Remove the data attribute string
+  tbl = tbl.replace( dataAtt, '');
+  console.log('tbl is: ');
+  console.log(tbl);
+
+
+
+
+
+
+
+  console.log('tbl is: ');
+  console.log(tbl);
+
+
+
+
+
+
+
   var testbut = document.querySelector('#testme');
   // var testbut2 = document.querySelector('#testme2');
   var addMe = function() {
     console.log('event listener');
   };
 
-  // var foo;
-  // foo = true;
-
   testbut.onclick = function() {
-    // foo = !foo;
     // console.log('someVar is: ' + someVar);
     // someVar ?  testbut2.addEventListener('click', addMe, false) : testbut2.removeEventListener('click', addMe, false);
     var Attributes = CBController.initGetAttributes();
@@ -1079,7 +1144,6 @@ var Witty = (function () {
       // !VA Branch: implementCcpInput02 (062420)
       // !VA We don't need the entire Appobj here. What we should do is call rest parameters on what we need and then destructure the return array into separate variables. This needs to be done when getAttributes is reevaluated since there appears to be a lot of unnecessary DOM access here.
       Appobj = appController.getAppobj();
-      
       let checked, str, ccpElementId, imgType, Attributes, retObj;
       // !VA Branch: OVERHAUL0826A
       let appObjProp, selectedOption, inputVal;
@@ -1095,17 +1159,11 @@ var Witty = (function () {
       // !VA Branch: OVERHAUL0826A
       /* !VA  Notes: 
         *** ccpElementId was only used in getRadioState, which is now deprecated. So there's no need for ccpElementId - the description above about inluding the ID if the attribute doesn't ALWAYS get the value from Appobj doesn't make much sense . Replace it with alias, and if we need the ID we can get it from that.
-      
-      
-      
-      
       */
       Attributes = {
         imgClass: (function() {
           appObjProp = 'ccpImgClassTfd';
-          var foo = Appobj['ccpImgItypeRdo'];
-          foo === 'fixed' ? str = Appobj[appObjProp] : str = 'img-fluid';
-          // str = Appobj[appObjProp];
+          Appobj['ccpImgItypeRdo'] === 'fixed' ? str = Appobj[appObjProp] : str = 'img-fluid';
           retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
@@ -1132,7 +1190,6 @@ var Witty = (function () {
           // !VA This value is get-only
           appObjProp = 'ccpImgLoctnTfd';
           str = Appobj[appObjProp];
-          console.log('mark1 str is: ' + str);
           // !VA Branch: implementCcpInput06 (062820)
           // !VA If the path input element is not empty, include Appobj.ccpImgLoctnTfd, otherwise just use the filename without the path
           Appobj.ccpImgLoctnTfd !== '' ? str = Appobj.ccpImgLoctnTfd  + Appobj.fileName : str = Appobj.fileName;
@@ -1172,23 +1229,14 @@ var Witty = (function () {
         imgAnchorTxtclr: (function() {
           appObjProp = 'ccpImgTxclrTfd';
           str = Appobj[appObjProp];
-          console.log('imgAnchorTxtclr str is: ' + str);
-
-
-
           retObj = returnObject( appObjProp, str );
-          console.log('imgAnchorTxtclr retObj is: ');
-          console.log(retObj);
           return retObj;
         })(),
         // !VA Branch: 0909A
         imgAnchorTargt: (function() {
           appObjProp = 'ccpImgTargtChk';
           str = Appobj[appObjProp];
-          console.log('ccpImgTargtChk str is: ' + str);
           retObj = returnObject(ccpElementId , str);
-          console.log('imgAnchorTxtclr retObj is: ');
-          console.log(retObj);
           return retObj;
         })(),
         // !VA TD Attributes
@@ -1231,16 +1279,9 @@ var Witty = (function () {
           appObjProp = 'ccpTdaOptnsRdo';
           selectedOption = Appobj[appObjProp];
           //   // !VA !VA  If the imgswap radio is selected, overwrite whatever is in the imgClass input with 'hide', set parent table class to 'devicewidth' and display it, set wrapper table class to 'devicewidth' and display it. Displaying/undisplaying and disabling/enabling is handled in handleCcpActions. 
-
-
-
-
           retObj = returnObject(appObjProp, Appobj.ccpTdaOptnsRdo);
           return retObj;
         })(),
-
-
-
         tdAlign: (function() {
           appObjProp = 'ccpTdaAlignRdo';
           str = Appobj[appObjProp];
@@ -1330,13 +1371,16 @@ var Witty = (function () {
           // !VA Branch: OVERHAUL0903A 
           // !VA getAlignAttribute is useless, deprecating...
           // str = options[getAlignAttribute(selectid)];
-          str = appController.getAppobj('ccpTblAlignRdo');
-
-
-
-
+          str = Appobj['ccpTblAlignRdo'];
           // !VA Branch: review0720F (071720)
           // str = options[getAlignAttribute(selectid)];
+          retObj = returnObject( ccpElementId, str );
+          return retObj;
+        })(),
+        tableGhost: (function() {
+          appObjProp = 'ccpTblGhostChk';
+          str = Appobj[appObjProp];
+          console.log('tableGhost str is: ' + str);
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
@@ -1380,7 +1424,7 @@ var Witty = (function () {
           // !VA Branch: OVERHAUL0903A
           // !VA getAlignAttribute is useless, deprecating...
           // str = options[getAlignAttribute(selectid)];
-          str = appController.getAppobj('ccpTblAlignRdo');
+          str = Appobj['ccpTblAlignRdo'];
           retObj = returnObject( ccpElementId, str );
           return retObj;
         })(),
@@ -1469,10 +1513,17 @@ var Witty = (function () {
 
     }
 
+    // !VA Branch: ghost01 (072820)
+    // !VA If the fluid imgType option is selected, wrap the clipboardStr in the ghost table code.
+    // !VA Branch: OVERHAUL0826A
+    // !VA Disabling...
+    // if ( appController.getAppobj('rdoCcpImgFluid')) {
+    //   clipboardStr = getGhostTable()[0] + clipboardStr + getGhostTable()[1];
+    // }
+
     // !VA CBController   
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
     function buildOutputNodeList( id ) {
-      console.log('buildOutputNodeList running'); 
       let selectedTdOption, hasAnchor, hasWrapper, Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
       // !VA Branch: OVERHAUL0908D
       // !VA Set hasAnchor if ccpImgAnchrTfd has a value
@@ -1485,12 +1536,10 @@ var Witty = (function () {
       // selectedTdOption = UIController.fetchInputSelection('ccpTdaOptnsRdo');
       selectedTdOption = appController.getAppobj('ccpTdaOptnsRdo');
       // !VA Query Appobj for the Include anchor checkbox state: true = checked, false = unchecked
-      console.log('selectedTdOption is: ' + selectedTdOption);
 
       // !VA Branch: OVERHAUL0826A
       // !VA Get the Attributes from which Clipboard strings are built
       Attributes = getAttributes();
-      console.log(Attributes);
       
       // !VA Get the top node, i.e. tableNodeFragment. 
       tableNodeFragment = makeTableNode( id, Attributes );
@@ -1579,6 +1628,8 @@ var Witty = (function () {
 
         applyIndents( id, outputNL );
         // !VA Convert the nodeList to text for output to the clipboard.
+        console.log('Mark1 outputNL is: ');
+        console.log(outputNL);
         clipboardStr = outputNL[0].outerHTML;
 
 
@@ -1622,6 +1673,8 @@ var Witty = (function () {
         // !VA Convert outputNL to a string (including tokens for inserting MS conditional code) for output to Clipboard object.
         clipboardStr = outputNL[0].outerHTML;
         console.log('outputNL[0] is: ');
+        console.log(outputNL[0]);
+        
         console.log(clipboardStr);
         // !VA Get the codeBlock corresponding to the selected TD option
         if ( selectedTdOption === 'iswap') {
@@ -1634,9 +1687,11 @@ var Witty = (function () {
           codeBlock = getVmlButtonBlock(id, indentLevel, Attributes);
         } 
         // !VA Replace the tokens in clipboardStr that were added in applyIndents with the respective codeBlock
+        // !VA Branch: 0909C
+        // !VA Deprecating...
         clipboardStr = clipboardStr.replace('/replacestart//replaceend/', codeBlock + '\n');
-        console.log('clipboardStr is: ');
-        console.log(clipboardStr);
+        // console.log('clipboardStr is: ');
+        // console.log(clipboardStr);
       } 
 
       console.log('clipboardStr is:');
@@ -2065,6 +2120,12 @@ var Witty = (function () {
       tableInner.border = '0', tableInner.cellSpacing = '0', tableInner.cellPadding = '0';
       // !VA Set the role=presentation attribute
       tableInner.setAttribute('role', 'presentation'); 
+
+      // !VA Branch: 0909C
+      // !VA ghost table
+      tableInner.setAttribute('data-ghost-tbl', Attributes.tableGhost.str);
+
+
       // !VA Build the inner tr
       tableInner.appendChild(trInner);
       // !VA Get the inner TD from makeTdNode and append it to the nodeFragment
@@ -2215,8 +2276,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       let stackColumnIndentLevel;
       // !VA Flag for whether to insert the tokens used to insert the MS conditional code blocks after converting the output node list to text.
       let hasMSConditional;
-
-
       if ( selectedTdOption === 'iswap' || selectedTdOption === 'bgimg' || selectedTdOption === 'vmlbt') {
         hasMSConditional = true;
       }
@@ -2243,6 +2302,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           // !VA Here we apply the 'regular' indents.
           // !VA If stackColumnPos is empty, then the 'rdoCcpTdBasic' or 'excludetd' td option is selected. Apply regular indents to all nodes.
           if (stackColumnPos.length === 0) {
+            // !VA Branch: 0909C
+            // !VA Deprecating...
             // !VA If the node is the last index in outputNL AND the option 'rdoCcpTdImgswap', 'rdoCcpTdBgimage' or 'rdoCcpTdVmlbutton' is selected, then modify the indent to include the token for inserting the MS conditional code after outputNL is converted to text.
             if ( i === outputNL.length - 1 && hasMSConditional === true) {
               outputNL[i].insertAdjacentHTML('beforebegin', getIndent(i));
@@ -2256,7 +2317,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
               outputNL[i].insertAdjacentHTML('afterbegin', '\n');
               outputNL[i].insertAdjacentHTML('beforeend', getIndent(i));
             }
-
           } else {
             // !VA If the node index is less than the index of the first stacking column
             if ( i < stackColumnPos[1] ) {
@@ -3954,6 +4014,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         configObj = fetchConfigObj(  alias, isChecked );
         UIController.configCCP( configObj);
         break;
+      case alias === 'ccpTblGhostChk':
+        // !VA This alias is handled in CBController getAttributes and UIController makeImgNode. If checked, this element writes the target attribute to the img clipboard output. If unchecked, it does nothing - so it has no effect on the DOM.
+        console.log('selectCheckbox - Appobj ccpTblGhostChk is:' + Appobj['ccpTblGhostChk']);
+        break;
       case alias === 'ccpImgTargtChk':
         // !VA This alias is handled in CBController getAttributes and UIController makeImgNode. If checked, this element writes the target attribute to the img clipboard output. If unchecked, it does nothing - so it has no effect on the DOM.
         // console.log('selectCheckbox - ccpImgTargtChk');
@@ -4392,7 +4456,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Branch: OVERHAUL0908C
       // !VA Option will never be basic or swtch here - they get their config from configDefault. That's not ideal, the call to configDefault should be made from here, not fetchConfigObj
       if ( option === 'basic' || option === 'swtch') {
-        console.log('configOptns basic');
         // !VA Branch: 0909A
         // !VA For the TD Options basic and swtch, use the default CCP configuration
         configObj = configDefault( alias, option );
@@ -4891,6 +4954,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         selectCheckbox( false, 'ccpTblWraprChk' );
         selectCheckbox( false, 'ccpTblHybrdChk' );
         selectImgItype( 'fixed' );
+        // !VA for ghost table dev, check the ghost table option
+        Appobj['ccpTblGhostChk'] = true;
+        var checkedArray = ['ccpTblGhostChk'];
+        configObj = {
+          checkboxState: { checked: checkedArray },
+        };
+        UIController.configCCP(configObj);
 
 
 
