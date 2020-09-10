@@ -15,9 +15,8 @@ var Witty = (function () {
 
   // // !VA Run on page load
   // document.addEventListener("DOMContentLoaded", function() {
-  //   setTimeout(function(){ 
-
-  //   }, 100);
+  //   // setTimeout(function(){ 
+  //   // }, 100);
   // });
 
   // !VA Test function to identify the target of the mouseclick
@@ -53,28 +52,28 @@ var Witty = (function () {
   // mutationObserver.observe(mainNode, { attributes: true });
 
 
-//   var tbl = 
-// `<table role="presentation" data-ghost-tbl="true" width="200" cellspacing="0" cellpadding="0" border="0">
-//   <tr>
-//     <td valign="top" align="left">
-//       <a href="#" style="color: #0000FF; " target="_blank"><img src="img/_200X150.png" style="display: block; width: 200px; height: 150px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;" width="200" height="150" border="0"></a>
-//     </td>
-//   </tr>
-// </table>`;
-  
-//   var ghostOpen = 
-// `<!--[if (gte mso 9)|(IE)]>
-// <table align="center" border="0" cellspacing="0" cellpadding="0" width="200">
-// <tr>
-// <td align="center" valign="top" width="200">
-// <![endif]-->\n`;
+  //   var tbl = 
+  // `<table role="presentation" data-ghost-tbl="true" width="200" cellspacing="0" cellpadding="0" border="0">
+  //   <tr>
+  //     <td valign="top" align="left">
+  //       <a href="#" style="color: #0000FF; " target="_blank"><img src="img/_200X150.png" style="display: block; width: 200px; height: 150px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;" width="200" height="150" border="0"></a>
+  //     </td>
+  //   </tr>
+  // </table>`;
+    
+  //   var ghostOpen = 
+  // `<!--[if (gte mso 9)|(IE)]>
+  // <table align="center" border="0" cellspacing="0" cellpadding="0" width="200">
+  // <tr>
+  // <td align="center" valign="top" width="200">
+  // <![endif]-->\n`;
 
-//   var ghostClose = 
-// `\n<!--[if (gte mso 9)|(IE)]>
-// </td>
-// </tr>
-// </table>
-// <![endif]-->`;
+  //   var ghostClose = 
+  // `\n<!--[if (gte mso 9)|(IE)]>
+  // </td>
+  // </tr>
+  // </table>
+  // <![endif]-->`;
 
   // // !VA Get the full data property string including boolean
   // var index, dataAtt, dataAttLength, boolPos, bool, boolLength, replStr;
@@ -1595,8 +1594,6 @@ var Witty = (function () {
 
         applyIndents( id, outputNL );
         // !VA Convert the nodeList to text for output to the clipboard.
-        console.log('Mark1 outputNL is: ');
-        console.log(outputNL);
 
         clipboardStr = outputNL[0].outerHTML;
 
@@ -1657,11 +1654,7 @@ var Witty = (function () {
           codeBlock = getVmlButtonBlock(id, indentLevel, Attributes);
         } 
         // !VA Replace the tokens in clipboardStr that were added in applyIndents with the respective codeBlock
-        // !VA Branch: 0909C
-        // !VA Deprecating...
         clipboardStr = clipboardStr.replace('/replacestart//replaceend/', codeBlock + '\n');
-        // console.log('clipboardStr is: ');
-        // console.log(clipboardStr);
       } 
 
       // console.log('clipboardStr is:');
@@ -1669,7 +1662,9 @@ var Witty = (function () {
 
       // !VA Branch: 0909C
       // !VA Get the ghost table
-      clipboardStr = addGhostTable(clipboardStr, Attributes.tableGhost.str, Attributes.tableWrapperGhost.str);
+      // !VA Branch: 0910A
+      // !VA Disabling for dev
+      // clipboardStr = addGhostTable(clipboardStr, Attributes.tableGhost.str, Attributes.tableWrapperGhost.str);
 
 
       writeClipboard( id, clipboardStr );
@@ -2099,7 +2094,8 @@ var Witty = (function () {
 
       // !VA Branch: 0909C
       // !VA ghost table
-      tableInner.setAttribute('data-ghost-tbl', Attributes.tableGhost.str);
+      // console.log('Attributes.tableGhost.str is: ' + Attributes.tableGhost.str);
+      // tableInner.setAttribute('data-ghost-tbl', Attributes.tableGhost.str);
 
 
       // !VA Build the inner tr
@@ -2143,7 +2139,7 @@ var Witty = (function () {
 
       // !VA Branch: 0909C
       // !VA ghost table
-      tableOuter.setAttribute('data-ghost-tbw', Attributes.tableWrapperGhost.str);
+      // tableOuter.setAttribute('data-ghost-tbw', Attributes.tableWrapperGhost.str);
 
       // !VA Append the outer tr to the wrapper
       tableOuter.appendChild(trOuter);
@@ -2339,32 +2335,132 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA GHOST FUNCTIONS
 
+    document.addEventListener("DOMContentLoaded", function() {
+
+      let tbl, bool1, bool2;
+      tbl = 
+`<table class="devicewidth" role="presentation" width="600" cellspacing="0" cellpadding="0" border="0">
+  <tr>
+    <td valign="top" align="left">
+      <table role="presentation" width="200" cellspacing="0" cellpadding="0" border="0">
+        <tr>
+          <td valign="top" align="left">
+            <a href="#" style="color: #0000FF; " target="_blank"><img src="img/_200X150.png" style="display: block; width: 200px; height: 150px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;" width="200" height="150" border="0"></a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>`;
+  
+      let indexPos, indexPos2;
+      // for (let i = 0; i < 2; i++) {
+      //   console.log('i is: ' +  i);
+      //   indexPos = tbl.indexOf( '<table', i );
+      //   console.log('indexPos is: ' + indexPos);
+      //   tbl = tbl.substring( indexPos, indexPos + 6 ) + '_ghost' + i + tbl.substring( indexPos + 7, indexPos + 12);
+      //   console.log('tbl is: ');
+      //   console.log(tbl);
+      // }
+
+      // indexPos = tbl.indexOf( '<table', 0 );
+      // console.log('indexPos is: ' + indexPos);
+      // tbl = '/ghostOpen1/' + tbl.substring( 0, 6) +  tbl.substring( 7, tbl.length);
+      // console.log('tbl is: ');
+      // console.log(tbl);
+      let openTag, closeTag, ghostOpen1, ghostClose1, ghostOpen2, ghostClose2;
+      ghostOpen1 = '/ghostOpen1/', ghostClose1 = '/ghostClose1/', ghostOpen2 = '/ghostOpen2/', ghostClose2 = '/ghostClose2/';
+      openTag = '<table';
+      closeTag = '</table>';
+      var foo;
+
+      // !VA Add ghostOpen1 token
+      indexPos = tbl.indexOf( openTag,  0 );
+      tbl = ghostOpen1 + tbl.substring( indexPos, openTag.length) +  tbl.substring( openTag.length, tbl.length);
+
+      // !VA Add ghostOpen2 token
+      indexPos = tbl.indexOf( openTag, ghostOpen2.length + openTag.length );
+      tbl = tbl.substring( 0, indexPos) + ghostOpen2 + tbl.substring( indexPos, tbl.length);
+
+      // !VA Add ghostClose1 token
+      indexPos = tbl.indexOf( closeTag, 0);
+      console.log('indexPos is: ' + indexPos);
+      tbl = tbl.substring( 0, indexPos + closeTag.length) + ghostClose1 + tbl.substring( indexPos + closeTag.length, tbl.length);
+
+      // !VA Add ghostClose2 token
+      indexPos = tbl.indexOf( closeTag, tbl.indexOf(closeTag) + closeTag.length );
+      // console.log('indexPos is: ' + indexPos);
+      tbl = tbl + ghostClose2;
+
+
+      console.log('tbl is: \n' + tbl);
+
+  
+  
+  
+    });
+
+
+
+
     // !VA Branch: 0909C
     // !VA CBController private
-    function addGhostTable(clipboardStr, bool1, bool2) {
-      console.log('addGhostTable running');
-      console.log('bool1 is: ' + bool1 + ';  bool2 is: ' + bool2); 
-      console.log('clipboardStr is: ');
-      console.log(clipboardStr);
-      let tblInner, ghostTags, dataAtt;
+    /* !VA  Data attributes only have to identify the current table as TBL or TBW. Whether to apply the ghost table is determined by the checked state of the respective Ghost checkbox element.  
+    
+    
+    Possible ghost table configurations:
+    A) Wrapper unchecked, tbl-ghost unchecked, tbw-ghost unchecked - do nothing
+    B) Wrapper checked, tbl-ghost unchecked, tbw-ghost unchecked - do nothing
+    C) Wrapper unchecked, tbl-ghost checked - add ghost to single table
+    D) Wrapper checked, tbl-ghost checked, tbw-ghost unchecked - add ghost to inner table
+    E) Wrapper checked, tbl-ghost unchecked, tbw-ghost checked - add ghost to outer table
+    F) Wrapper checked, tbl-ghost checked, tbw-ghost checked - add ghost to inner and outer table
+
+    Actions for configGhostTags:
+    1) 
 
 
 
-
-      // !VA Handle the inner table
-      tblInner = addGhostTags( clipboardStr, dataAtt );
-      console.log('addGhostTable tbl is: ');
-      console.log(tblInner);
-
-
-
-      clipboardStr = tblInner;
-      return clipboardStr;
+    if (bool1 && !bool2) { 
+      addGhostToSingleTable( dataAttArray[0] );
+    } else if ( !bool1 && bool2 )  {
+      addGhostToOuterTable( dataAttArray[1]);
+    } else if ( bool1 && bool2 ) {
+      addGhostToInnerAndOuterTable( dataAttArr );
     }
 
+
+
+
+
+    
+        // !VA CBController private
+    */
+    function addGhostTable(tbl, bool1, bool2) {
+      console.clear();
+      console.log('addGhostTable running');
+      console.log('bool1 is: ' + bool1 + ';  bool2 is: ' + bool2); 
+      console.log('tbl is: ');
+      console.log(tbl);
+      let result, dataAtt, dataAttArray = [];
+      dataAttArray = [ 'data-ghost-tbl', 'data-ghost-tbw'];
+
+      result = addGhostTags(tbl, dataAttArray[0]);
+      console.log('result is: ');
+      console.log(result);
+
+      
+
+      // return clipboardStr;
+    }
+
+    // !VA CBController private
     function addGhostTags(tbl, dataAtt) {
       console.log('addGhostTags running'); 
       // !VA Get the full data property string including boolean
+
+
+      // !VA Add ghost tags to a single, unnested table
       let index, dataAttLength, boolPos, bool, boolLength, replStr;
       let ghostTags = [];
       ghostTags = getGhostTags();
@@ -2389,8 +2485,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA If the Ghost checkbox icon is checked, i.e. bool is true, then prepend the ghost table to the table, and add the closing ghost tag after the closing table tag
       if (bool) { 
         tbl = tbl.replace( replStr, `${ghostTags[0]}${replStr}`); 
-        tbl = tbl.replace( '</table>', `</table>${ghostTags[1]}`)
-
+        tbl = tbl.replace( '</table>', `</table>${ghostTags[1]}`);
       }
       // !VA Remove the data attribute string
       tbl = tbl.replace( dataAtt, '');
