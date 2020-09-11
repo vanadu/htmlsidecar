@@ -3,6 +3,14 @@
 // See WittyAugustOverhaulLog_08.24.20A.docx
 // See WittyStructure_08.24.20.docx
 /* !VA  
+09.11.20A
+BUGS:
+TODO: Checkbox hover color is too dark, lighten it or disable it.
+TODO: Hybrid option doesn't check ghost tables by default -hybrid depends on ghost tables
+TODO: TD clipboard button leaves a ghost token in the output - ghost tables should only be applied on TBL and TBW clipboard output, not IMG and TD. THe easiest way to do this is probably to go back and add the data attributes to the table nodes and then use that as a flag to run configGhost. Let's do that.
+TODO: Img anchor Txclr text need to be left aligned in the input element.
+TODO: Change the link icon to an anchor icon
+
 
 
 
@@ -1585,15 +1593,18 @@ var Witty = (function () {
           // Default code block, this should be an error code
         }
         // !VA Append the fragment to the container
-
-
         container.appendChild(frag);
 
         // !VA Create the outputNL nodeList to pass to the Clipboard object
         outputNL = container.querySelectorAll('*');
+        console.log('Mark1 outputNL is: ');
+        console.log(outputNL);
+        
 
         applyIndents( id, outputNL );
         // !VA Convert the nodeList to text for output to the clipboard.
+
+
 
         clipboardStr = outputNL[0].outerHTML;
 
@@ -1664,7 +1675,7 @@ var Witty = (function () {
       // !VA Get the ghost table
       // !VA Branch: 0910A
       // !VA Disabling for dev
-      clipboardStr = configGhostTable(clipboardStr, Attributes.tableGhost.str, Attributes.tableWrapperGhost.str);
+      // clipboardStr = configGhostTable(clipboardStr, Attributes.tableGhost.str, Attributes.tableWrapperGhost.str);
       console.log('buildOutputNodeList clipboardStr is: ');
       console.log(clipboardStr);
 
@@ -2302,6 +2313,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CBController private
     // !VA handle the buildNodeList clipboardStr output, define and place the tokens in the clipboardStr output and replace the tokens with the ghost tabs from getGhostTags or strip them out depending on the checked status of the Ghost checkbox icons passed in as bool parameters from the caller.
     function configGhostTable(tbl, bool1, bool2) {
+    //   console.log('configGhostTable running'); 
+    //   console.log('tbl is: ');
+    //   console.log(tbl);
       let openTag, closeTag, ghostOpen1, ghostClose1, ghostOpen2, ghostClose2;
       let indexPos, ghostTags = [], hasWrapper;
       // !VA Define the tokens to use as placeholders before the replace operation
