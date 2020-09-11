@@ -1201,6 +1201,7 @@ fieldset {
       filter: brightness(1.2) grayscale(1) opacity(.5);
       -webkit-filter: brightness(1.2) grayscale(1) opacity(.5);
       -moz-filter: brightness(1.2) grayscale(1) opacity(.5);
+      transform: scale(1);
     }
   }
 }
@@ -1225,6 +1226,7 @@ fieldset {
     filter: brightness(1.2) grayscale(.5) opacity(.9);
     -webkit-filter: brightness(1.2) grayscale(.5) opacity(.9);
     -moz-filter: brightness(1.2) grayscale(.5) opacity(.9);
+    transform: scale(1.075);
   }
 }
 
