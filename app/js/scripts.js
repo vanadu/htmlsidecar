@@ -2298,118 +2298,16 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA GHOST FUNCTIONS
 
-    document.addEventListener("DOMContentLoaded", function() {
-
-      let tbl, bool1, bool2;
-      tbl = 
-`<table class="devicewidth" role="presentation" width="600" cellspacing="0" cellpadding="0" border="0">
-  <tr>
-    <td valign="top" align="left">
-      <table role="presentation" width="200" cellspacing="0" cellpadding="0" border="0">
-        <tr>
-          <td valign="top" align="left">
-            <a href="#" style="color: #0000FF; " target="_blank"><img src="img/_200X150.png" style="display: block; width: 200px; height: 150px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;" width="200" height="150" border="0"></a>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-</table>`;
-  
-      let indexPos, indexPos2;
-      // for (let i = 0; i < 2; i++) {
-      //   console.log('i is: ' +  i);
-      //   indexPos = tbl.indexOf( '<table', i );
-      //   console.log('indexPos is: ' + indexPos);
-      //   tbl = tbl.substring( indexPos, indexPos + 6 ) + '_ghost' + i + tbl.substring( indexPos + 7, indexPos + 12);
-      //   console.log('tbl is: ');
-      //   console.log(tbl);
-      // }
-
-      // indexPos = tbl.indexOf( '<table', 0 );
-      // console.log('indexPos is: ' + indexPos);
-      // tbl = '/ghostOpen1/' + tbl.substring( 0, 6) +  tbl.substring( 7, tbl.length);
-      // console.log('tbl is: ');
-      // console.log(tbl);
-      let openTag, closeTag, ghostOpen1, ghostClose1, ghostOpen2, ghostClose2;
-      ghostOpen1 = '/ghostOpen1/', ghostClose1 = '/ghostClose1/', ghostOpen2 = '/ghostOpen2/', ghostClose2 = '/ghostClose2/';
-      openTag = '<table';
-      closeTag = '</table>';
-      var foo;
-
-      // !VA Add ghostOpen1 token
-      indexPos = tbl.indexOf( openTag,  0 );
-      tbl = ghostOpen1 + tbl.substring( indexPos, openTag.length) +  tbl.substring( openTag.length, tbl.length);
-
-      // !VA Add ghostOpen2 token
-      indexPos = tbl.indexOf( openTag, ghostOpen2.length + openTag.length );
-      tbl = tbl.substring( 0, indexPos) + ghostOpen2 + tbl.substring( indexPos, tbl.length);
-
-      // !VA Add ghostClose1 token
-      indexPos = tbl.indexOf( closeTag, 0);
-      console.log('indexPos is: ' + indexPos);
-      tbl = tbl.substring( 0, indexPos + closeTag.length) + ghostClose1 + tbl.substring( indexPos + closeTag.length, tbl.length);
-
-      // !VA Add ghostClose2 token
-      indexPos = tbl.indexOf( closeTag, tbl.indexOf(closeTag) + closeTag.length );
-      // console.log('indexPos is: ' + indexPos);
-      tbl = tbl + ghostClose2;
-
-
-      console.log('tbl is: \n' + tbl);
-
-  
-  
-  
-    });
-
-
-
-
-    // !VA Branch: 0909C
+    
     // !VA CBController private
-    /* !VA  Data attributes only have to identify the current table as TBL or TBW. Whether to apply the ghost table is determined by the checked state of the respective Ghost checkbox element.  
-    
-    
-    Possible ghost table configurations:
-    A) Wrapper unchecked, tbl-ghost unchecked, tbw-ghost unchecked - do nothing
-    B) Wrapper checked, tbl-ghost unchecked, tbw-ghost unchecked - do nothing
-    C) Wrapper unchecked, tbl-ghost checked - add ghost to single table
-    D) Wrapper checked, tbl-ghost checked, tbw-ghost unchecked - add ghost to inner table
-    E) Wrapper checked, tbl-ghost unchecked, tbw-ghost checked - add ghost to outer table
-    F) Wrapper checked, tbl-ghost checked, tbw-ghost checked - add ghost to inner and outer table
-
-    Actions for configGhostTags:
-    1) 
-
-
-
-    if (bool1 && !bool2) { 
-      addGhostToSingleTable( dataAttArray[0] );
-    } else if ( !bool1 && bool2 )  {
-      addGhostToOuterTable( dataAttArray[1]);
-    } else if ( bool1 && bool2 ) {
-      addGhostToInnerAndOuterTable( dataAttArr );
-    }
-
-
-
-
-
-    
-        // !VA CBController private
-    */
+    // !VA handle the buildNodeList clipboardStr output, define and place the tokens in the clipboardStr output and replace the tokens with the ghost tabs from getGhostTags or strip them out depending on the checked status of the Ghost checkbox icons passed in as bool parameters from the caller.
     function configGhostTable(tbl, bool1, bool2) {
-      console.clear();
-      console.log('configGhostTable running');
-      console.log('bool1 is: ' + bool1 + ';  bool2 is: ' + bool2); 
       let openTag, closeTag, ghostOpen1, ghostClose1, ghostOpen2, ghostClose2;
-      let indexPos, ghostTags = [], hasWrapper, indent;
+      let indexPos, ghostTags = [], hasWrapper;
       // !VA Define the tokens to use as placeholders before the replace operation
       ghostOpen1 = '/ghostOpen1/', ghostClose1 = '/ghostClose1/', ghostOpen2 = '/ghostOpen2/', ghostClose2 = '/ghostClose2/';
       // !VA Define the opening and closing table tags
-      openTag = '<table';
-      closeTag = '</table>';
+      openTag = '<table', closeTag = '</table>';
       // !VA Get the ghost tags and their indents
       ghostTags = getGhostTags();
       // !VA Get the state of the Table Wrapper checkbox icon
@@ -2425,29 +2323,22 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         tbl = tbl.substring( 0, indexPos + closeTag.length) + ghostClose1 + tbl.substring( indexPos + closeTag.length, tbl.length);
       // !VA If the Table wrapper checkbox is checked, then ghostOpen2 and ghostClose2 apply to the outer table and ghostOpen1 and ghostClose1 apply to the inner table.
       } else {
-
         // !VA Add the token for ghostOpen2 tag
         indexPos = tbl.indexOf( openTag,  0 );
         tbl = ghostOpen2 + tbl.substring( indexPos, openTag.length) +  tbl.substring( openTag.length, tbl.length);
-
         // !VA Add the token for ghostClose2 tag
         indexPos = tbl.indexOf( closeTag, tbl.indexOf(closeTag) + closeTag.length );
         // console.log('indexPos is: ' + indexPos);
         tbl = tbl + ghostClose2;
-  
         // !VA Add the token for ghostOpen1 tag
         indexPos = tbl.indexOf( openTag, ghostOpen1.length + openTag.length );
         tbl = tbl.substring( 0, indexPos) + ghostOpen1 + tbl.substring( indexPos, tbl.length);
-
         // !VA Add the token for ghostClose1 tag
         indexPos = tbl.indexOf( closeTag, 0);
         console.log('indexPos is: ' + indexPos);
         tbl = tbl.substring( 0, indexPos + closeTag.length) + ghostClose1 + tbl.substring( indexPos + closeTag.length, tbl.length);
       }
       // !VA Now that the tokens are in place, replace them with the ghost tags or strip them out based on the bool values.
-      if (tbl.includes(ghostClose2)) {
-        console.log('HIT');
-      }
       if (bool1) {
         tbl = tbl.replace(ghostOpen1,  ghostTags[0]);
         tbl = tbl.replace(ghostClose1, ghostTags[1]);
@@ -2465,7 +2356,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Return this to buildOutputNodeList clipboardStr
       return tbl;
     }
-
 
     // !VA CBController private
     // !VA Returns the strings for opening and closing ghost table tag as a two-item array with indents on the inner table based on the status of the Table Wrapper checkbox icon.
