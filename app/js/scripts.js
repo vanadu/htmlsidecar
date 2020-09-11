@@ -7,7 +7,7 @@
 BUGS:
 TODO: Checkbox hover color is too dark, lighten it or disable it.
 TODO: Hybrid option doesn't check ghost tables by default -hybrid depends on ghost tables
-TODO: TD clipboard button leaves a ghost token in the output - ghost tables should only be applied on TBL and TBW clipboard output, not IMG and TD. THe easiest way to do this is probably to go back and add the data attributes to the table nodes and then use that as a flag to run configGhost. Let's do that.
+TODO: TD clipboard button leaves a ghost token in the output - ghost tables should only be applied on TBL and TBW clipboard output, not IMG and TD. THe easiest way to do this is probably to go back and add the data attributes to the table nodes and then use that as a flag to run configGhost. But now it looks like we'll have to go back to parsing data-ghost in the ghost table routine, because the swtch option includes an extra table in the CB output. The current configGhostTable routine only accounts for two tables, which was a stupid idea in the first place. Needs fixing.
 TODO: Img anchor Txclr text need to be left aligned in the input element.
 TODO: Change the link icon to an anchor icon
 
@@ -1667,18 +1667,14 @@ var Witty = (function () {
         // !VA Replace the tokens in clipboardStr that were added in applyIndents with the respective codeBlock
         clipboardStr = clipboardStr.replace('/replacestart//replaceend/', codeBlock + '\n');
       } 
-
-      // console.log('clipboardStr is:');
-      // console.log(clipboardStr);
-
-      // !VA Branch: 0909C
-      // !VA Get the ghost table
-      // !VA Branch: 0910A
-      // !VA Disabling for dev
-      // clipboardStr = configGhostTable(clipboardStr, Attributes.tableGhost.str, Attributes.tableWrapperGhost.str);
+      // !VA Branch: 0911A
+      // !VA If clipboardStr contains the data-ghost attribute, then call configGhostTable to add the ghost tags. Otherwise, don't since the ghost tokens screw up the IMG and TD clipboard output.
+      if (clipboardStr.includes('data-ghost')) {
+        clipboardStr = configGhostTable(clipboardStr, Attributes.tableGhost.str, Attributes.tableWrapperGhost.str);
+      }
       console.log('buildOutputNodeList clipboardStr is: ');
       console.log(clipboardStr);
-
+      // !VA Write clipboardStr to the Clipboard
       writeClipboard( id, clipboardStr );
     }
 
@@ -2093,6 +2089,9 @@ var Witty = (function () {
       omitIfEmpty( Attributes.tableBgcolor.str, tableInner, 'bgColor');
       // !VA Add border, cellspacing and cellpadding
       tableInner.border = '0', tableInner.cellSpacing = '0', tableInner.cellPadding = '0';
+      // !VA Branch: 0911A
+      // !VA If ccpTblGhostChk is checked, set the data-ghost attribute
+      if (Attributes.tableGhost.str) { tableInner.setAttribute('data-ghost', 'true'); };
       // !VA Set the role=presentation attribute
       tableInner.setAttribute('role', 'presentation'); 
       // !VA Build the inner tr
@@ -2122,6 +2121,9 @@ var Witty = (function () {
       // !VA Add default border, cellspacing, cellpadding and role for accessiblity
       tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
       tableOuter.setAttribute('role', 'presentation'); 
+      // !VA Branch: 0911A
+      // !VA If ccpTbwGhostChk is checked, set the data-ghost attribute
+      if (Attributes.tableWrapperGhost.str) { tableInner.setAttribute('data-ghost', 'true'); };
       // !VA Append the outer tr to the wrapper
       tableOuter.appendChild(trOuter);
       // !VA Append the outer td to the outer tr

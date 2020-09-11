@@ -853,6 +853,7 @@ fieldset {
     // flex-direction: column;
     justify-content: flex-start;
     width: 315px;
+  }
 
   // VA! Container to the right of the table wrapper icon container where the table wrapper options live
   #table-options-center-wrapper-options {
@@ -961,10 +962,7 @@ fieldset {
 // VA! Defaults for all CCP input/button elements
 // VA! 08.19.20
 .ccp-ipt {
-  display: block;
-  position: relative;
-  height: 25px;
-  padding-left: 10px;
+  padding-left: 5px;
   border: 1px solid #959595;
   // VA! Get rid of focus outline
   outline: 0;
@@ -1072,7 +1070,7 @@ fieldset {
 .ccp-padng-icn {
   display: block;
   position: relative;
-  top: 28px;
+  top: 30px;
   width: 25px;
   height: 25px;
   margin: 0 auto;
@@ -1095,10 +1093,10 @@ fieldset {
 }
 
 // VA! Padding input position
-.ccp-pdtop-ipt { position: absolute; top: 2px; left: 44px; }
+.ccp-pdtop-ipt { position: absolute; top: 0px; left: 44px; }
 .ccp-pdlft-ipt { position: absolute; top: 28px; left: 4px; }
 .ccp-pdrgt-ipt { position: absolute; top: 28px; left: 85px; }
-.ccp-pdbtm-ipt { position: absolute; top: 54px; left: 44px; }
+.ccp-pdbtm-ipt { position: absolute; top: 56px; left: 44px; }
 
 // VA! WRAPPER Icon Button
 // VA! Include wrapper checkbox icon container
@@ -1227,6 +1225,19 @@ fieldset {
     filter: brightness(1.2) grayscale(.5) opacity(.9);
     -webkit-filter: brightness(1.2) grayscale(.5) opacity(.9);
     -moz-filter: brightness(1.2) grayscale(.5) opacity(.9);
+  }
+}
+
+// VA! Override the above checkbox hover style to scale it instead of changing the filter - the color change was confusing. This also has the effect that the wrapper icon's rotation is cancelled...nice!
+.ccp-chkbx-lbl {
+    transition: all 100ms ease-in;
+    -webkit-transition: all 100ms ease-in;    
+    -moz-transition: all 100ms ease-in;
+  &:hover {
+  filter: brightness(2) grayscale(1) opacity(1);
+  -webkit-filter: brightness(2) grayscale(1) opacity(1);
+  -moz-filter: brightness(2) grayscale(1) opacity(1);
+  transform: scale(1.075);
   }
 }
 
