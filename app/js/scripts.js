@@ -1,20 +1,8 @@
-// !VA OVERHAUL 08/24/20
+// !VA September 2020
 // ===================
-// See WittyAugustOverhaulLog_08.24.20A.docx
-// See WittyStructure_08.24.20.docx
-/* !VA  
-09.11.20A
-BUGS:
-TODO: Checkbox hover color is too dark, lighten it or disable it.
-TODO: Hybrid option doesn't check ghost tables by default -hybrid depends on ghost tables
-TODO: TD clipboard button leaves a ghost token in the output - ghost tables should only be applied on TBL and TBW clipboard output, not IMG and TD. THe easiest way to do this is probably to go back and add the data attributes to the table nodes and then use that as a flag to run configGhost. But now it looks like we'll have to go back to parsing data-ghost in the ghost table routine, because the swtch option includes an extra table in the CB output. The current configGhostTable routine only accounts for two tables, which was a stupid idea in the first place. Needs fixing.
-TODO: Img anchor Txclr text need to be left aligned in the input element.
-TODO: Change the link icon to an anchor icon
+// See WittyDevelopmentLog_09.09.20A.docx
+// See WittyFunctions_09.09.20.xlsx
 
-
-
-
-*/
 //SCRIPT START
 //PAGE SETUP START
 
@@ -1597,19 +1585,10 @@ var Witty = (function () {
 
         // !VA Create the outputNL nodeList to pass to the Clipboard object
         outputNL = container.querySelectorAll('*');
-        console.log('Mark1 outputNL is: ');
-        console.log(outputNL);
-        
-
+        // !VA Run applyIndents to apply indents to outputNL
         applyIndents( id, outputNL );
         // !VA Convert the nodeList to text for output to the clipboard.
-
-
-
         clipboardStr = outputNL[0].outerHTML;
-
-
-
 
       // !VA These options include MS conditional code retrieved by getImgSwapBlock, getBgimageBlock, getVMLBlock which includes getIndent functions. First, run applyIndents on outputNL. applyIndents also inserts tokens at the position where the codeBlock is to be inserted. The parent nodelist is converted to a string, the code blocks are retrieved, indents are inserted, and finally the codeblocks are inserted into the string between the tags of the last node in the outputNL.outerHTML string.
       
@@ -1672,6 +1651,7 @@ var Witty = (function () {
       if (clipboardStr.includes('data-ghost')) {
         clipboardStr = configGhostTable(clipboardStr, Attributes.tableGhost.str, Attributes.tableWrapperGhost.str);
       }
+      // !VA Branch: 0911B
       console.log('buildOutputNodeList clipboardStr is: ');
       console.log(clipboardStr);
       // !VA Write clipboardStr to the Clipboard
@@ -2091,7 +2071,7 @@ var Witty = (function () {
       tableInner.border = '0', tableInner.cellSpacing = '0', tableInner.cellPadding = '0';
       // !VA Branch: 0911A
       // !VA If ccpTblGhostChk is checked, set the data-ghost attribute
-      if (Attributes.tableGhost.str) { tableInner.setAttribute('data-ghost', 'true'); };
+      if (Attributes.tableGhost.str) { tableInner.setAttribute('data-ghost', 'tbl'); }
       // !VA Set the role=presentation attribute
       tableInner.setAttribute('role', 'presentation'); 
       // !VA Build the inner tr
@@ -2123,7 +2103,8 @@ var Witty = (function () {
       tableOuter.setAttribute('role', 'presentation'); 
       // !VA Branch: 0911A
       // !VA If ccpTbwGhostChk is checked, set the data-ghost attribute
-      if (Attributes.tableWrapperGhost.str) { tableInner.setAttribute('data-ghost', 'true'); };
+      // !VA Branch: 0911B
+      if (Attributes.tableWrapperGhost.str) { tableOuter.setAttribute('data-ghost', 'tbw'); }
       // !VA Append the outer tr to the wrapper
       tableOuter.appendChild(trOuter);
       // !VA Append the outer td to the outer tr
@@ -2311,7 +2292,128 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA GHOST FUNCTIONS
 
-    
+    document.addEventListener("DOMContentLoaded", function() {
+
+      var tbl = `
+<table class="devicewidth" role="presentation" data-ghost="tbw" width="600" cellspacing="0" cellpadding="0" border="0">
+  <tr>
+    <td valign="top" align="left">
+      <table data-ghost="tbl" role="presentation" width="200" cellspacing="0" cellpadding="0" border="0">
+        <tr>
+          <td valign="top" align="left">
+            <a href="#" style="color: #0000FF; " target="_blank"><img src="img/_200X150.png" style="display: block; width: 200px; height: 150px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;" width="200" height="150" border="0"></a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+      `;
+
+      testit(tbl, true, true);
+
+    });
+
+    function testit(tbl, bool1, bool2) {
+      
+
+      // console.clear();
+      console.log('testit running...');
+      let openTag, closeTag, ghostOpen1, ghostClose1, ghostOpen2, ghostClose2;
+      let indexPos, ghostTags = [], hasWrapper;
+      // !VA Define the tokens to use as placeholders before the replace operation
+      ghostOpen1 = '/ghostOpen1/', ghostClose1 = '/ghostClose1/', ghostOpen2 = '/ghostOpen2/', ghostClose2 = '/ghostClose2/';
+      // !VA Define the opening and closing table tags
+      openTag = '<table', closeTag = '</table>';
+      // !VA Get the ghost tags and their indents
+      ghostTags = getGhostTags();
+      // !VA Get the state of the Table Wrapper checkbox icon
+      hasWrapper = true;
+      console.log('hasWrapper is: ' + hasWrapper);
+      // !VA If the Table wrapper checkbox is unchecked, then this is the outer table and any inner tables belong to the TD options' code block. Assign the tokens for ghostTag1 before/after the opening/closing table tag respectively.
+      if (!hasWrapper) {
+        console.log('Mark1');
+        // !VA Add the token for ghostOpen1 tag before the opening table tag
+        indexPos = tbl.indexOf( openTag,  0 );
+        tbl = ghostOpen1 + tbl.substring( indexPos, openTag.length) +  tbl.substring( openTag.length, tbl.length);
+        // !VA Add the token for ghostClose1 tag - it goes at the end of the tbl string.
+        tbl = tbl + ghostClose1;
+
+
+      // !VA If the Table wrapper checkbox is checked, then ghostOpen2 and ghostClose2 apply to the outer table and ghostOpen1 and ghostClose1 apply to the inner table, i.e. the child table of the outer table. Note that any indexOf searches for inner table tags have to go in reverse direction, i.e. from the end of the string towards the beginning, otherwise they will end up in any tables existing in the TD Options code blocks.
+      } else {
+        console.log('Mark2');
+        // !VA Add the token for ghostOpen2 tag
+        indexPos = tbl.indexOf( openTag,  0 );
+        tbl = ghostOpen2 + tbl.substring( indexPos, openTag.length) +  tbl.substring( openTag.length, tbl.length);
+        // !VA Add the token for ghostClose2 tag. It goes at the end of the tbl string.
+        // !VA Branch: 0911B
+        tbl = tbl + ghostClose2;
+        // !VA Add the token for ghostOpen1 tag
+        // !VA Branch: 0911B 
+        // !VA Find the data-ghost string
+        var dataAttIndex = tbl.indexOf('data-ghost="tbl"');
+        console.log('dataAttIndex is: ' + dataAttIndex);
+        // !VA Get the index of tableTag1
+        var tableOpen1Index;
+        tableOpen1Index = tbl.lastIndexOf( openTag, dataAttIndex );
+        
+        // console.log('tableOpen1Index is: ' + tableOpen1Index);
+        // console.log('tbl.substring( tableOpen1Index, tableOpen1Index + 6 ) is: ' + tbl.substring( tableOpen1Index, tableOpen1Index + 6 ));
+        tbl = tbl.substring( 0, tableOpen1Index ) + ghostOpen1 +  tbl.substring( tableOpen1Index, tbl.length);
+        // console.log('foo is: ' + foo);
+        
+        var foo;
+
+
+        var tableClose1Index, tableClose2Index;
+        console.log('closeTag is: ' + closeTag);
+        tableClose2Index = tbl.lastIndexOf( closeTag , tbl.length );
+        console.log('tableClose2Index is: ' + tableClose2Index);
+
+        tableClose1Index = tbl.lastIndexOf( closeTag , tableClose2Index - closeTag.length );
+        console.log('tableClose1Index is: ' + tableClose1Index);
+        tbl = tbl.substring( 0, tableClose1Index) + ghostClose1 + tbl.substring( tableClose1Index, tbl.length);
+
+
+
+        // console.log('tbl.substring( tableClose1Index - closeTag.length) is: ' + tbl.substring( tableClose1Index, tableClose1Index + closeTag.length));
+        // console.log('tbl.substring( tableClose1Index, tableClose1Index + 6 ) is: ' + tbl.substring( tableClose1Index, tableClose1Index + 6 ));
+
+
+
+
+
+
+        
+        // indexPos = tbl.indexOf( openTag, ghostOpen1.length + openTag.length );
+        // tbl = tbl.substring( 0, indexPos) + ghostOpen1 + tbl.substring( indexPos, tbl.length);
+        // // !VA Add the token for ghostClose1 tag
+        // indexPos = tbl.indexOf( closeTag, 0);
+        // console.log('indexPos is: ' + indexPos);
+        // tbl = tbl.substring( 0, indexPos + closeTag.length) + ghostClose1 + tbl.substring( indexPos + closeTag.length, tbl.length);
+      }
+      // !VA Now that the tokens are in place, replace them with the ghost tags or strip them out based on the bool values.
+      // if (bool1) {
+      //   tbl = tbl.replace(ghostOpen1,  ghostTags[0]);
+      //   tbl = tbl.replace(ghostClose1, ghostTags[1]);
+      // } else {
+      //   tbl = tbl.replace(ghostOpen1,'');
+      //   tbl = tbl.replace(ghostClose1, '');
+      // }
+      // if (bool2) {
+      //   tbl = tbl.replace(ghostOpen2, ghostTags[2]);
+      //   tbl = tbl.replace(ghostClose2, ghostTags[3]);
+      // } else {
+      //   tbl = tbl.replace(ghostOpen2,'');
+      //   tbl = tbl.replace('/ghostClose2/', '');
+      // }
+
+      // console.log('tbl is: ');
+      // console.log(tbl);
+    }
+
+
     // !VA CBController private
     // !VA handle the buildNodeList clipboardStr output, define and place the tokens in the clipboardStr output and replace the tokens with the ghost tabs from getGhostTags or strip them out depending on the checked status of the Ghost checkbox icons passed in as bool parameters from the caller.
     function configGhostTable(tbl, bool1, bool2) {
@@ -2328,31 +2430,52 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       ghostTags = getGhostTags();
       // !VA Get the state of the Table Wrapper checkbox icon
       hasWrapper = appController.getAppobj('ccpTblWraprChk');
-      // !VA If the Table wrapper checkbox is unchecked, then this is the only table, so assign the tokens for ghostTag1 before/after the opening/closing table tag respectively.
+      // !VA If the Table wrapper checkbox is unchecked, then this is the outer table and any inner tables belong to the TD options' code block. Assign the tokens for ghostTag1 before/after the opening/closing table tag respectively.
       if (!hasWrapper) {
-        // !VA Add the token for ghostOpen1 tag
+        // !VA Add the token for ghostOpen1 tag before the opening table tag
         indexPos = tbl.indexOf( openTag,  0 );
         tbl = ghostOpen1 + tbl.substring( indexPos, openTag.length) +  tbl.substring( openTag.length, tbl.length);
-        // !VA Add the token for ghostClose1 tag
-        indexPos = tbl.indexOf( closeTag, 0);
-        console.log('indexPos is: ' + indexPos);
-        tbl = tbl.substring( 0, indexPos + closeTag.length) + ghostClose1 + tbl.substring( indexPos + closeTag.length, tbl.length);
-      // !VA If the Table wrapper checkbox is checked, then ghostOpen2 and ghostClose2 apply to the outer table and ghostOpen1 and ghostClose1 apply to the inner table.
+        // !VA Add the token for ghostClose1 tag - it goes at the end of the tbl string.
+        tbl = tbl + ghostClose1;
+
+
+      // !VA If the Table wrapper checkbox is checked, then ghostOpen2 and ghostClose2 apply to the outer table and ghostOpen1 and ghostClose1 apply to the inner table, i.e. the child table of the outer table. Note that any indexOf searches for inner table tags have to go in reverse direction, i.e. from the end of the string towards the beginning, otherwise they will end up in any tables existing in the TD Options code blocks.
       } else {
         // !VA Add the token for ghostOpen2 tag
         indexPos = tbl.indexOf( openTag,  0 );
         tbl = ghostOpen2 + tbl.substring( indexPos, openTag.length) +  tbl.substring( openTag.length, tbl.length);
-        // !VA Add the token for ghostClose2 tag
-        indexPos = tbl.indexOf( closeTag, tbl.indexOf(closeTag) + closeTag.length );
-        // console.log('indexPos is: ' + indexPos);
+        // !VA Add the token for ghostClose2 tag. It goes at the end of the tbl string.
+        // !VA Branch: 0911B
         tbl = tbl + ghostClose2;
+
+
+        // console.clear();
+        // !VA Branch: 0911B 
         // !VA Add the token for ghostOpen1 tag
-        indexPos = tbl.indexOf( openTag, ghostOpen1.length + openTag.length );
-        tbl = tbl.substring( 0, indexPos) + ghostOpen1 + tbl.substring( indexPos, tbl.length);
-        // !VA Add the token for ghostClose1 tag
-        indexPos = tbl.indexOf( closeTag, 0);
-        console.log('indexPos is: ' + indexPos);
-        tbl = tbl.substring( 0, indexPos + closeTag.length) + ghostClose1 + tbl.substring( indexPos + closeTag.length, tbl.length);
+        // !VA Find the data-ghost string
+        var dataAttIndex = tbl.indexOf('data-ghost="tbl"');
+        console.log('dataAttIndex is: ' + dataAttIndex);
+        // !VA Get the index of tableTag1
+        var tableOpen1Index,  tableClose1Index, tableClose2Index;
+        tableOpen1Index = tbl.lastIndexOf( openTag, dataAttIndex );
+        tbl = tbl.substring( 0, tableOpen1Index ) + ghostOpen1 +  tbl.substring( tableOpen1Index, tbl.length);
+
+
+        console.log('closeTag is: ' + closeTag);
+        tableClose2Index = tbl.lastIndexOf( closeTag, tbl.length );
+        console.log('tableClose2Index is: ' + tableClose2Index);
+        tableClose1Index = tbl.lastIndexOf( closeTag , tableClose2Index - closeTag.length );
+        console.log('tableClose1Index is: ' + tableClose1Index);
+        // tbl = tbl.substring( 0, tableClose1Index) + ghostClose1 + tbl.substring( tableClose1Index - 7, tbl.length);
+        tbl = tbl.substring( 0, tableClose1Index + closeTag.length) + ghostClose1 + tbl.substring( tableClose1Index + closeTag.length, tbl.length);
+
+        
+        // indexPos = tbl.indexOf( openTag, ghostOpen1.length + openTag.length );
+        // tbl = tbl.substring( 0, indexPos) + ghostOpen1 + tbl.substring( indexPos, tbl.length);
+        // // !VA Add the token for ghostClose1 tag
+        // indexPos = tbl.indexOf( closeTag, 0);
+        // console.log('indexPos is: ' + indexPos);
+        // tbl = tbl.substring( 0, indexPos + closeTag.length) + ghostClose1 + tbl.substring( indexPos + closeTag.length, tbl.length);
       }
       // !VA Now that the tokens are in place, replace them with the ghost tags or strip them out based on the bool values.
       if (bool1) {
@@ -2388,7 +2511,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 ${indent}<table align="center" border="0" cellspacing="0" cellpadding="0" width="${appController.getAppobj('curImgW')}">
 ${indent}<tr>
 ${indent}<td align="center" valign="top" width="${appController.getAppobj('curImgW')}">
-${indent}<![endif]-->\n`;
+${indent}<![endif]-->`;
 
       ghostClose1 = 
 `\n${indent}<!--[if (gte mso 9)|(IE)]>
@@ -5009,16 +5132,18 @@ ${indent}<![endif]-->`;
         // !VA Pre-select the IMG EXCLD, TDA OPTNS and TBW WRAPR options so they open as selected by default on page load.
         selectImgExclude('incld');
         selectTdaOptions('basic');
-        selectCheckbox( false, 'ccpTblWraprChk' );
-        selectCheckbox( false, 'ccpTblHybrdChk' );
-        selectImgItype( 'fixed' );
-        // !VA for ghost table dev, check the ghost table option
+        selectCheckbox( true, 'ccpTblWraprChk' );
+        Appobj['ccpTblWraprChk'] = true;
+        // selectCheckbox( false, 'ccpTblHybrdChk' );
+        // selectImgItype( 'fixed' );
+        // // !VA for ghost table dev, check the ghost table option
         Appobj['ccpTblGhostChk'] = true;
-        var checkedArray = ['ccpTblGhostChk'];
+        Appobj['ccpTbwGhostChk'] = true;
+        var checkedArray = ['ccpTblWraprChk', 'ccpTblGhostChk', 'ccpTbwGhostChk'];
         configObj = {
           checkboxState: { checked: checkedArray },
         };
-        UIController.configCCP(configObj);
+        // UIController.configCCP(configObj);
 
 
 
