@@ -2442,59 +2442,26 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       // !VA If the Table wrapper checkbox is checked, then ghostOpen2 and ghostClose2 apply to the outer table and ghostOpen1 and ghostClose1 apply to the inner table, i.e. the child table of the outer table. Note that any indexOf searches for inner table tags have to go in reverse direction, i.e. from the end of the string towards the beginning, otherwise they will end up in any tables existing in the TD Options code blocks.
       } else {
-        // !VA If table wrapper checkbox is checked, TBL ghost is unchecked and TBW ghost is checked
-        if ( !bool1 && bool2) {
-
-          console.log('FALSE/TRUE');
-          // !VA Add the token for ghostOpen1 tag before the opening table tag
-          indexPos = tbl.indexOf( openTag,  0 );
-          tbl = ghostOpen2 + tbl.substring( indexPos, openTag.length) +  tbl.substring( openTag.length, tbl.length);
-          // !VA Add the token for ghostClose1 tag - it goes at the end of the tbl string.
-          tbl = tbl + ghostClose2;
-
-
-        // !VA If TBL ghost checkbox AND TBW ghost checkbox are checked, add the TBL and TBW ghost tags at their respective positions.
-        } else if ( bool1 && bool2 ) {
-          // !VA  !VA Add the token for ghostOpen2 tag
-          indexPos = tbl.indexOf( openTag,  0 );
-          tbl = ghostOpen2 + tbl.substring( indexPos, openTag.length) +  tbl.substring( openTag.length, tbl.length);
-          // !VA Add the token for ghostClose2 tag. It goes at the end of the tbl string.
-          // !VA Branch: 0911B
-          tbl = tbl + ghostClose2;
-          // !VA NOTE: The following routine is identical to the routine 
-
-
-
-          // !VA Search for the opening TBL starting backwards from the position of the data-ghost='tbl' attribute. 
+        // !VA If the TBL ghost checkbox is checked, add the ghostOpen1 and ghostClose1 tokens
+        if ( bool1 ) {
+          // !VA Search for the opening TBL tag starting from the position of the data-ghost attribute in reverse direction
           openTBLPos = tbl.lastIndexOf( openTag, tbl.indexOf('data-ghost="tbl"'));
           // !VA Insert the ghostOpen1 token at the position of the opening TBL tag.
           tbl = tbl.substring( 0, openTBLPos ) + ghostOpen1 +  tbl.substring( openTBLPos, tbl.length);
-  
-  
           // !VA Search for the last closing tag in the table starting backwards for the end of the table. That is the TBW closing tag.
           closeTBWPos = tbl.lastIndexOf( closeTag, tbl.length );
           // !VA Search for the closing TBL tag starting backwards from the start position of the last closing tag, i.e. the TBW closing tag position minus the length of the closing tag.
           closeTBLPos = tbl.lastIndexOf( closeTag , closeTBWPos - closeTag.length );
           // !VA Add the ghostClose1 token a at the end position of the TBL closing tag.
           tbl = tbl.substring( 0, closeTBLPos + closeTag.length) + ghostClose1 + tbl.substring( closeTBLPos + closeTag.length, tbl.length);
-  
-          
-        // !VA If table wrapper is checked but neither of the ghost table checkboxes are checked, then ERROR because that condition should have been trapped in buildOutputNodeList
-        } else if ( bool1 && !bool2) {
-          console.log('TRUE/FALSE');
-          openTBLPos = tbl.lastIndexOf( openTag, tbl.indexOf('data-ghost="tbl"'));
-          // !VA Insert the ghostOpen1 token at the position of the opening TBL tag.
-          tbl = tbl.substring( 0, openTBLPos ) + ghostOpen1 +  tbl.substring( openTBLPos, tbl.length);
-
-
-          // !VA Search for the last closing tag in the table starting backwards for the end of the table. That is the TBW closing tag.
-          closeTBWPos = tbl.lastIndexOf( closeTag, tbl.length );
-          // !VA Search for the closing TBL tag starting backwards from the start position of the last closing tag, i.e. the TBW closing tag position minus the length of the closing tag.
-          closeTBLPos = tbl.lastIndexOf( closeTag , closeTBWPos - closeTag.length );
-          // !VA Add the ghostClose1 token a at the end position of the TBL closing tag.
-          tbl = tbl.substring( 0, closeTBLPos + closeTag.length) + ghostClose1 + tbl.substring( closeTBLPos + closeTag.length, tbl.length);
-        } else {
-          console.log('ERROR in configGhostTable - unknown condition');
+        }
+        // !VA If the TBL ghost checkbox is checked, add the ghostOpen2 and ghostClose2 tokens
+        if ( bool2 ) {
+          // !VA Add the token for ghostOpen2 tag before the opening table tag
+          indexPos = tbl.indexOf( openTag,  0 );
+          tbl = ghostOpen2 + tbl.substring( indexPos, openTag.length) +  tbl.substring( openTag.length, tbl.length);
+          // !VA Add the token for ghostClose2 tag - it goes at the end of the tbl string.
+          tbl = tbl + ghostClose2;
         }
       }
       // !VA Now that the tokens are in place, replace them with the ghost tags or strip them out based on the bool values.
@@ -2515,10 +2482,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Now strip out the data-ghost attributes.
       tbl = tbl.replace(' data-ghost="tbl"', '');
       tbl = tbl.replace(' data-ghost="tbw"', '');
-      
-
       // !VA Return this to buildOutputNodeList clipboardStr
-
       return tbl;
     }
 
