@@ -1299,6 +1299,15 @@ var Witty = (function () {
           retObj = returnObject( ccpElementId, Appobj.ccpImgLoctnTfd + '/' + (Appobj.fileName) );
           return retObj;
         })(),
+        tdStyle: (function() {
+          // !VA If the TBL msdpi checkbox is checked, add style attribute with the width property set to the curImgW. To this for tableStyle as well and set that to imgViewerW.
+          if ( Appobj['ccpTblMsdpiChk']) {
+            str = `width: ${Appobj.curImgW}px; `;
+          }
+          // !VA There is no corrsponding appObj property for this so return false for the first parameter where the alias would normally go
+          retObj = returnObject( false, str );
+          return retObj;
+        })(),
         // !VA TABLE attributes
         tableClass: (function() {
           // !VA This value depends on the status of the Fixed/Fluid image radio button, so use ccpElementId
@@ -1369,20 +1378,22 @@ var Witty = (function () {
           retObj = returnObject( appObjProp, str );
           return retObj;
         })(),
-        tableMsdpi: (function() {
-          appObjProp = 'ccpTblMsdpiChk';
-          str = Appobj[appObjProp];
-          retObj = returnObject( appObjProp, str );
-          return retObj;
-        })(),
+        // !VA Branch: 0912B
+        // !VA This is handled in tableStyle. Deprecating...
+        // tableMsdpi: (function() {
+        //   appObjProp = 'ccpTblMsdpiChk';
+        //   str = Appobj[appObjProp];
+        //   console.log('ccpTblMsdpiChk str is: ' + str);
+        //   retObj = returnObject( appObjProp, str );
+        //   return retObj;
+        // })(),
         tableStyle: (function() {
-          // !VA This value is get-only
-          ccpElementId = false;
-          // !VA Only include a style attribute for the wrapper for fluid images.  The conditional for this is in makeTableNode and there's no case where a style attribute is included for fixed images, so just provide the style attribute string to return
-          // !VA Branch: review0720F (071720)
-          // imgType === 'fixed' ? str = '' : str = `max-width: ${Appobj.curImgW } `;
-          imgType === 'fixed' ? str = '' : str = '';
-          retObj = returnObject( ccpElementId, str );
+          // !VA If the TBL msdpi checkbox is checked, add style attribute with the width property set to the curImgW. To this for TdStyle as well.
+          if ( Appobj['ccpTblMsdpiChk']) {
+            str = `width: ${Appobj.curImgW}px; `;
+          }
+          // !VA There is no corrsponding appObj property for this so return false for the first parameter where the alias would normally go
+          retObj = returnObject( false, str );
           return retObj;
         })(),
         // !VA Branch: OVERHAUL0826A
@@ -1447,20 +1458,22 @@ var Witty = (function () {
           retObj = returnObject( appObjProp, str );
           return retObj;
         })(),
-        tableWrapperMsdpi: (function() {
-          appObjProp = 'ccpTbwMsdpiChk';
-          str = Appobj[appObjProp];
-          retObj = returnObject( appObjProp, str );
-          return retObj;
-        })(),
+        // !VA Branch: 0912B
+        // !VA This is handled in the style attribute now, deprecating...
+        // tableWrapperMsdpi: (function() {
+        //   appObjProp = 'ccpTbwMsdpiChk';
+        //   str = Appobj[appObjProp];
+        //   retObj = returnObject( appObjProp, str );
+        //   return retObj;
+        // })(),
         tableWrapperStyle: (function() {
-          // !VA This value is get-only
-          ccpElementId = false;
-          // !VA Only include a style attribute for the wrapper for fluid images.  The conditional for this is in makeTableNode and there's no case where a style attribute is included for fixed images, so just provide the style attribute string to return
-          // !VA Branch: review0720F (071720)
-          // !VA This may be deprecated - max-width moved to tableStyle
+          // !VA There are multiple properties to add to the TBW style property: if ccpTblHybridChk => max-width, if ccpTblMsdpiChk => width. 
+          var tbwStyle;
+          
           if (Appobj['ccpTblHybrdChk']) {
             str = `max-width: ${Appobj.imgViewerW }px; `;
+          } else if (Appobj['ccpTblMsdpiChk']) {
+            
           } else {
             str = '';
           }
@@ -1953,6 +1966,11 @@ var Witty = (function () {
         omitIfEmpty( Attributes.tdWidth.str, tdInner, Attributes.imgWidth.str);
         // !VA Now it's set to the current value of the input element, i.e. the Appobj property
         omitIfEmpty( Attributes.tdWidth.str, tdInner, 'width');
+
+        // !VA Branch: 0912B
+        console.log('Attributes.tdStyle.str is: ' + Attributes.tableStyle.str);
+        if (Attributes.tdStyle.str) { tdInner.setAttribute('style', Attributes.tdStyle.str ); }
+
         // !VA Branch: OVERHAUL0827A
         // !VA Determine whether to include or exclude the img node. Query Appobj for the incld/excld option. If 'incld', include the img, else exclude it.
 
@@ -2073,6 +2091,12 @@ var Witty = (function () {
       // !VA Branch: 0911A
       // !VA If ccpTblGhostChk is checked, set the data-ghost attribute
       if (Attributes.tableGhost.str) { tableInner.setAttribute('data-ghost', 'tbl'); }
+
+      // !VA Branch: 0912B
+      console.log('Attributes.tableStyle.str is: ' + Attributes.tableStyle.str);
+      if (Attributes.tableStyle.str) { tableInner.setAttribute('style', Attributes.tableStyle.str ); }
+
+
       // !VA Set the role=presentation attribute
       tableInner.setAttribute('role', 'presentation'); 
       // !VA Build the inner tr
@@ -2419,7 +2443,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA handle the buildNodeList clipboardStr output, define and place the tokens in the clipboardStr output and replace the tokens with the ghost tabs from getGhostTags or strip them out depending on the checked status of the Ghost checkbox icons passed in as bool parameters from the caller.
     function configGhostTable(tbl, bool1, bool2) {
       console.clear();
-      console.log('configGhostTable running - bool1: ' + bool1 + '; bool2: ' + bool2); 
+      // console.log('configGhostTable running - bool1: ' + bool1 + '; bool2: ' + bool2); 
       //   console.log('tbl is: ');
       //   console.log(tbl);
       let openTag, closeTag, ghostOpen1, ghostClose1, ghostOpen2, ghostClose2, openTBLPos,  closeTBLPos, closeTBWPos;
@@ -5125,14 +5149,14 @@ ${indent}<![endif]-->`;
         // !VA IMPORTANT! You cannot programattically run selectCheckbox more than once. The second run will also run revealReset again, thus cancelling reveal settings you made the first time. If you need to set checkbox-dependent reveals, do it manually, not through selectCheckbox.
         selectImgExclude('incld');
         selectTdaOptions('basic');
-        Appobj['ccpTblWraprChk'] = true;
-        selectCheckbox( true, 'ccpTblWraprChk' );
+        Appobj['ccpTblWraprChk'] = false;
+        selectCheckbox( false, 'ccpTblWraprChk' );
         // selectCheckbox( false, 'ccpTblHybrdChk' );
         selectImgItype( 'fixed' );
         // // !VA for ghost table dev, check the ghost table option
-        Appobj['ccpTblGhostChk'] = true;
-        Appobj['ccpTbwGhostChk'] = false;
-        var checkedArray = ['ccpTblWraprChk', 'ccpTblGhostChk', 'ccpTbwGhostChk'];
+        Appobj['ccpTblMsdpiChk'] = true;
+        // Appobj['ccpTbwGhostChk'] = false;
+        var checkedArray = ['ccpTblWraprChk', 'ccpTblMsdpiChk' ];
         configObj = {
           checkboxState: { checked: checkedArray },
         };
