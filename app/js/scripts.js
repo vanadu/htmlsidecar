@@ -1196,7 +1196,7 @@ var Witty = (function () {
           appObjProp = 'ccpImgItypeTfd';
           Appobj.ccpImgItypeRdo === 'fixed' ? imgType = 'fixed' : imgType = 'fluid';
           imgType === 'fixed' ? str = `display: block; width: ${Appobj.curImgW}px; height: ${Appobj.curImgH}px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;` : str = 'display: block; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;';
-          retObj = returnObject(ccpElementId , str);
+          retObj = returnObject(appObjProp , str);
           return retObj;
         })(),
         imgAlign: (function() {  
@@ -1293,16 +1293,15 @@ var Witty = (function () {
           return retObj;
         })(),
         tdBackground: (function() {
-          // !VA This value is get-only
-          ccpElementId = false;
+          appObjProp = false;
           // !VA 
-          retObj = returnObject( ccpElementId, Appobj.ccpImgLoctnTfd + '/' + (Appobj.fileName) );
+          retObj = returnObject( appObjProp, Appobj.ccpImgLoctnTfd + '/' + (Appobj.fileName) );
           return retObj;
         })(),
         tdStyle: (function() {
           // !VA If the TBL msdpi checkbox is checked, add style attribute with the width property set to the curImgW. To this for tableStyle as well and set that to imgViewerW.
           if ( Appobj['ccpTblMsdpiChk']) {
-            str = `width: ${Appobj.curImgW}px; `;
+            str = `width: ${Appobj['ccpTblWidthTfd']}px; `;
           }
           // !VA There is no corrsponding appObj property for this so return false for the first parameter where the alias would normally go
           retObj = returnObject( false, str );
@@ -1310,23 +1309,15 @@ var Witty = (function () {
         })(),
         // !VA TABLE attributes
         tableClass: (function() {
-          // !VA This value depends on the status of the Fixed/Fluid image radio button, so use ccpElementId
-          ccpElementId = ccpUserInput.ccpTblClassTfd;
-          // !VA Branch: review0720F (071720)
-          // !VA This is wonky
-          if (imgType === 'fixed') {
-            // !VA If imgType is fixed, then set tableClass to 'devicewidth' if the curImgW equals the imgViewerW. Otherwise, set it to the user input. 
-            // !VA Branch: review0720F (071720)
-            // !VA The default is set in the UI, so just set ccpTblClassTfd to the Appobj property.
-            str = Appobj.ccpTblClassTfd;
-          } else {
-            // !VA If the imgType is fluid, set the class input value to the user input, even though that might have unforseen consequences for the user.
-            str = '';
-          }
-          retObj = returnObject( ccpElementId, str );
+          appObjProp = 'ccpTblClassTfd';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
         tableWidth: (function() {
+          // !VA Branch: 0913A
+          // !VA Check this.
+
           // !VA The value is written to the table width field - use ccpElementId
           // !VA Branch: review0720C (071520)
           // !VA Need handler for the empty input field here.
@@ -1349,27 +1340,16 @@ var Witty = (function () {
           return retObj;
         })(),
         tableBgcolor: (function() {
-          // !VA This value is get-only
-          ccpElementId = false;
-          retObj = returnObject( ccpElementId, Appobj.ccpTblBgclrTfd);
+          appObjProp = 'ccpTblBgclrTfd';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
         tableAlign: (function() {
-          // !VA This value is get-only.
-          ccpElementId = false;
-          let str, selectid, options = [];
-          selectid = ccpUserInput.ccpTblAlignRdo;
-          options = [ '', 'left', 'center', 'right'];
-          // !VA Get the string corresponding to the selectid index in the options array
-          // !VA Branch: review0720F (071720)
-          // !VA If imgType is fluid, then override the selection and pass 0 so the attribute will not be output to the clipboard
-          // !VA Branch: OVERHAUL0903A 
-          // !VA getAlignAttribute is useless, deprecating...
-          // str = options[getAlignAttribute(selectid)];
-          str = Appobj['ccpTblAlignRdo'];
-          // !VA Branch: review0720F (071720)
-          // str = options[getAlignAttribute(selectid)];
-          retObj = returnObject( ccpElementId, str );
+          appObjProp = 'ccpTblAlignRdo';
+          str = Appobj[appObjProp];
+          console.log('tableAlign str is: ' + str);
+          retObj = returnObject( appObjProp, str );
           return retObj;
         })(),
         tableGhost: (function() {
@@ -1388,10 +1368,20 @@ var Witty = (function () {
         //   return retObj;
         // })(),
         tableStyle: (function() {
+          appObjProp = false;
           // !VA If the TBL msdpi checkbox is checked, add style attribute with the width property set to the curImgW. To this for TdStyle as well.
+          var msdpi, maxwd;
+          msdpi = `width: ${Appobj['ccpTblWidthTfd']}px; `;
+          maxwd = `max-width: ${Appobj['ccpTblMaxwdTfd']}px; `;
+
           if ( Appobj['ccpTblMsdpiChk']) {
-            str = `width: ${Appobj.curImgW}px; `;
+            str = msdpi;
+          } 
+          if ( Appobj['ccpTblMaxwdTfd']) {
+            str = msdpi + maxwd;
           }
+
+          console.log('tableStyle str is: ' + str);
           // !VA There is no corrsponding appObj property for this so return false for the first parameter where the alias would normally go
           retObj = returnObject( false, str );
           return retObj;
@@ -1405,29 +1395,16 @@ var Witty = (function () {
         //   return retObj;
         // })(),
         tableWrapperClass: (function() {
-          // !VA This value writes to the CCP in the class input so populate ccpElementId
-          // !VA If imgType is fixed, set the default class to 'devicewidth'. If it's fluid, set it to 'responsive-table' as per the Litmus newsletter template.
-          // !VA Branch: review0720F (071720)
-          // !VA This is all wrong for imgType = responsive. 
-          // !VA This should be disabled since it can't be changed, or it should be changeable.
-          ccpElementId = ccpUserInput.ccpTbwClassTfd;
-          // !VA Branch: review0720F (071720)
-          // !VA The defaults are set in the UI. We don't need to handle them here. We need to handle the cases where the user overrides them with user input. Str should therefor always correspond to the Appobj property. This doesn't need to be contingent on excludeimg - unlike the tdoptions, the wrapper table options should be settable in any environment.
-          str = Appobj.ccpTbwClassTfd;
-          retObj = returnObject( ccpElementId, str );
+          appObjProp = 'ccpTbwClassTfd';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
         tableWrapperAlign: (function() {
-          // !VA This value is get-only.
-          ccpElementId = false;
-          let str;
-          // !VA Get the string corresponding to the selectid index in the options array
-
-          // !VA Branch: OVERHAUL0903A
-          // !VA getAlignAttribute is useless, deprecating...
-          // str = options[getAlignAttribute(selectid)];
-          str = Appobj['ccpTblAlignRdo'];
-          retObj = returnObject( ccpElementId, str );
+          appObjProp = 'ccpTbwAlignRdo';
+          str = Appobj[appObjProp];
+          console.log('tableAlign str is: ' + str);
+          retObj = returnObject( appObjProp, str );
           return retObj;
         })(),
         tableWrapperWidth: (function() {
@@ -1448,8 +1425,10 @@ var Witty = (function () {
           return retObj;
         })(),
         tableWrapperBgcolor: (function() {
-          // !VA This value is get-only.
-          ccpElementId = false;
+          // !VA This value depends on the selection under Fixed image. 
+          appObjProp = 'ccpTbwBgclrTfd';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
         tableWrapperGhost: (function() {
@@ -1467,23 +1446,30 @@ var Witty = (function () {
         //   return retObj;
         // })(),
         tableWrapperStyle: (function() {
-          // !VA There are multiple properties to add to the TBW style property: if ccpTblHybridChk => max-width, if ccpTblMsdpiChk => width. 
-          var tbwStyle;
-          
-          if (Appobj['ccpTblHybrdChk']) {
-            str = `max-width: ${Appobj.imgViewerW }px; `;
-          } else if (Appobj['ccpTblMsdpiChk']) {
-            
-          } else {
-            str = '';
+          appObjProp = false;
+          // !VA If the TBW msdpi checkbox is checked, add style attribute with the width property set to the curImgW. To this for TdStyle as well.
+          var msdpi, maxwd;
+          msdpi = `width: ${Appobj['ccpTbwWidthTfd']}px; `;
+          maxwd = `max-width: ${Appobj['ccpTbwMaxwdTfd']}px; `;
+
+          if ( Appobj['ccpTbwMsdpiChk']) {
+            str = msdpi;
+          } 
+          if ( Appobj['ccpTbwMaxwdTfd']) {
+            str = msdpi + maxwd;
           }
-          retObj = returnObject( ccpElementId, str );
+
+          console.log('tableWrapperStyle str is: ' + str);
+          // !VA There is no corrsponding appObj property for this so return false for the first parameter where the alias would normally go
+          retObj = returnObject( false, str );
           return retObj;
         })(),
       };
       // !VA Return the Attributes defined above. 
       return Attributes;
     }
+
+    
 
     // !VA CBController public
     // !VA Omit a node attribute if the corresponding getAttributes Attribute is empty, i.e. the corresponding Appobj property/CCP element has no value. str is the Attribute object property. myNode is the current node, i.e. imgNode, tdNode, or tableNode. attr is the current attribute, i.e. className, alt, align etc. 
