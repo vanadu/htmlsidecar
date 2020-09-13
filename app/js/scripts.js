@@ -3506,13 +3506,20 @@ ${indent}<![endif]-->`;
 
     // !VA appController  
     // !VA Called from handleKeydown to handle Toolbar element user input. Runs checkUserInput to check for error conditions. If checkUserInput returns a value, runs applyInputValue to write the value to the corresponding Appobj property and update the dynamicElements dimensions. If error checking fails, writes an error message to the console and returns control to handleKeydown to handle the input elements on error.
-    function handleTbrInput(keydown, userInputObj) {
-      console.log('handleTbrInput running');
+    function handleInputRequired(keydown, userInputObj) {
+      console.log('handleInputRequired running');
       let retVal;
       // !VA Destructure userInputObj.
       let { appObjProp, evtTargetVal } = userInputObj;
+      console.log('userInputObj is: ');
+      console.log(userInputObj);
+
+
+
+
       // !VA Exception: For curImgW and curImgH, if user tabs out of the input field without entering a value, skip to the end of the function and override all input handling and error checking. This is only possible because these fields are empty by default. Any field that already has a value has to be error checked. 
       if (  userInputObj.appObjProp !== 'curImgW' && userInputObj.evtTargetVal !== ''  ||   userInputObj.appObjProp !== 'curImgH' && userInputObj.evtTargetVal !== '' ) {
+      // if (  userInputObj.appObjProp !== 'curImgW'   ||   userInputObj.appObjProp !== 'curImgH'  ) {
         // !VA Now do the error checking and return an integer if no error. Number type is required to compare evtTargetVal and the Appobj property, which is stored as type number.
         retVal = checkUserInput( userInputObj );
         // !VA NOTE: does changing the variable also change the destructured object property?
@@ -3559,6 +3566,18 @@ ${indent}<![endif]-->`;
         } else {
           console.log('ERROR in handleKeydown - unknown condition ');
         }
+      } else if (  userInputObj.appObjProp !== 'curImgW' && userInputObj.evtTargetVal === ''  ||   userInputObj.appObjProp !== 'curImgH' && userInputObj.evtTargetVal === '' ) {
+
+        // !VA Branch: 0913A
+        // !VA If the user tabs out of the target element while the element value is '', then reset the input value to Appobj value.
+        // !VA Branch: 0913A
+        // !VA This is lame. We shouldn't be accessing the DOM here.
+        if ( appObjProp.includes('ccp')) {
+          // !VA The input element is the first child of the target element, i.e. the Tfd referred to by the Appobj property is the parent of the input element
+          document.querySelector(ccpUserInput[appObjProp]).children[0].value= Appobj[appObjProp];
+        } else {
+          document.querySelector(toolbarElements[appObjPropToAlias(appObjProp)]).value = Appobj[appObjProp];
+        }
       }
       return retVal;
     }
@@ -3567,6 +3586,9 @@ ${indent}<![endif]-->`;
     // !VA NOTE: Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
     // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Sorts keypresses by data types number and string based on the target input element. Calls checkUserInput which validates the input and returns either an integer or a string and passes the value to applyInputValue to write to Appobj and the DOM. Then, for curImgW/curImgH, sets the input value to '' so the placeholder shows through. For all other input elements, sets the input value to the respective Appobj property.
     function handleKeydown(evt) {
+      console.log('evt.target.id is: ' + evt.target.id);
+      console.clear();
+      console.log('handleKeydown running'); 
       let retVal;
       // !VA Get the keypress
       let keydown = evt.which || evt.keyCode || evt.key;
@@ -3589,9 +3611,39 @@ ${indent}<![endif]-->`;
         let { appObjProp } = userInputObj;
         console.log('appObjProp is: ' + appObjProp);
         // !VA CCP-specific keydown handling. CCP input elements, unlike Toolbar elements, have no existing values and can be empty. So in order to error-check the current evtTargetVal and restore it to its prior value if the current evtTargetVal fails error-checking: 1) the prior Appobj property has to be temporarily stored and 2) the current evtTargetVal has to be error-checked and then written to Appobj. 
-        // !VA 082520
-        // !VA Change to the Overhaul substring code
-        if ( evt.target.id.substr( 0, 3 ) === 'ccp') {
+        /// !VA Branch: 0913A
+        // !VA The above is not true. TBW and TBL width inputs require an input and have to be handled the same as the Toolbar input elements. So the Appobj properties whose corresponding input elements require an input are, so far:
+
+        var required = [ 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'imgViewerW', 'curImgW', 'curImgH', 'sPhonesW', 'lPhonesW' ];
+
+        if (required.includes( appObjProp )) {
+          console.log('Input required');
+          // !VA Branch: review0720H (072020)
+          // !VA Comment this
+          if ( keydown === 9) {
+            retVal = handleInputRequired(keydown, userInputObj);
+            // !VA Handle error conditions
+            if (retVal === false ) {
+              // !VA The value of curImgW and curImgH has to be empty in order for the placeholder values to show, so stay in the input element and leave the cursor so the user can enter another value or TAB/ESC out. 
+              if (appObjProp === 'curImgW' || appObjProp === 'curImgH'  ) {
+                evt.preventDefault();
+              } else {
+                this.value = Appobj[appObjProp];
+                this.select();
+                evt.preventDefault();
+              }
+            }
+          } else if ( keydown === 13) {
+            retVal = handleInputRequired(keydown, userInputObj);
+            if (retVal === false ) {
+              this.value = Appobj[appObjProp];
+              this.select();
+            }
+          } else {
+            console.log('ERROR in handleKeydown - unknown keypress');
+          }
+        } else {
+          console.log('Input NOT required');
           if ( keydown === 9) {
             retVal = handleCcpInput(keydown, userInputObj);
             if (retVal === false ) {
@@ -3608,35 +3660,8 @@ ${indent}<![endif]-->`;
           } else {
             console.log('ERROR in handleKeydown - unknown keypress');
           }
-
-        // !VA 082520
-        // !VA Demonstrates that Toolbar element nomenclature needs an overhaul too.
-        } else if ( evt.target.id.substr( 3, 4 ) === '-tbr') {
-          // !VA Branch: review0720H (072020)
-          // !VA Comment this
-          if ( keydown === 9) {
-            retVal = handleTbrInput(keydown, userInputObj);
-            // !VA Handle error conditions
-            if (retVal === false ) {
-              // !VA The value of curImgW and curImgH has to be empty in order for the placeholder values to show, so stay in the input element and leave the cursor so the user can enter another value or TAB/ESC out. 
-              if (appObjProp === 'curImgW' || appObjProp === 'curImgH'  ) {
-                evt.preventDefault();
-              } else {
-                this.value = Appobj[appObjProp];
-                this.select();
-                evt.preventDefault();
-              }
-            }
-          } else if ( keydown === 13) {
-            retVal = handleTbrInput(keydown, userInputObj);
-            if (retVal === false ) {
-              this.value = Appobj[appObjProp];
-              this.select();
-            }
-          } else {
-            console.log('ERROR in handleKeydown - unknown keypress');
-          }
         }
+
       }
     }
 
@@ -4515,6 +4540,8 @@ ${indent}<![endif]-->`;
     // !VA Branch: OVERHAUL0825B
     // !VA This one is more comprehenive than elementIdToAppobjProp. The latter  
     function evtTargetIdToAppobjProp(id) {
+      console.log('evtTargetIdToAppobjProp running'); 
+      console.log('id is: ' + id);
       let idStr, appObjProp;
       idStr = id;
       // !VA Replace the ipt with tfd, which is the code for the parent div, which is the element represented in Appobj
