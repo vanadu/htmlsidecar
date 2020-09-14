@@ -1125,6 +1125,7 @@ var Witty = (function () {
     // !VA NOTE: All these attributes are set here prior to building the individual nodes. It is first called in buildOutputNodeList, and is passed to each make node function in succesion after that. So, it would make sense that getAttributes includes ALL the logic for rendering each attribute before it is passed to the respective make node function. 
     // !VA Set values for all the Attributes of the individual ccpUserInput elements. Each attribute is either get-only or settable. If it is get-only, then the user-defined value is accessed directly from the DOM element. If it is a preset, then the value is defined programmatically based on a condition. For instance, the class name 'img-fluid' is a preset that becomes active when the user selects the Fluid image option. In this case, the CCP element ID corresponding to the attribute is written to the ccpElementId variable. Otherwise, ccpElement takes the false flag.
     // !VA NOTE: Could probably make all the retObject arguments ccpElementId, str and consolidate this function somehow -- think about it.
+
     function getAttributes() {
       var Appobj = {};
       // !VA Branch: implementCcpInput02 (062420)
@@ -1136,16 +1137,14 @@ var Witty = (function () {
       // !VA Create the array to return. First value is the id of the CCP element, second value is the string to write to the CCP element. If the first value is false, then the str isn't queried from a Ccp element, but rather is generated in the Attribute based on other conditions. For instance, the img style attribute is conditioned on the fluid/fixed option, but writes to the style attribute of the img tag.
       // !VA Branch: implementCcpInput06 (062820)
       // !VA I'm not sure I need to return the elementID at all. Wouldn't the identifier suffice? For later.
-      function returnObject(ccpElementId, str ) {
+      function returnObject(appObjProp, str ) {
         let obj = {};
-        obj.id = ccpElementId;
+        obj.id = appObjProp;
         obj.str = str;
         return obj;
       }
-      // !VA Branch: OVERHAUL0826A
-      /* !VA  Notes: 
-        *** ccpElementId was only used in getRadioState, which is now deprecated. So there's no need for ccpElementId - the description above about inluding the ID if the attribute doesn't ALWAYS get the value from Appobj doesn't make much sense . Replace it with alias, and if we need the ID we can get it from that.
-      */
+
+      // !VA Return the defined Attributes based on the Appobj property alias.
       Attributes = {
         imgClass: (function() {
           appObjProp = 'ccpImgClassTfd';
@@ -1154,7 +1153,6 @@ var Witty = (function () {
           return retObj;
         })(),
         imgWidth: (function() {
-          // !VA Branch: implementCcpInput06 (062820)
           appObjProp = 'curImgW';
           str = Appobj[appObjProp];
           retObj = returnObject(appObjProp, str);
@@ -1300,9 +1298,12 @@ var Witty = (function () {
         })(),
         tdStyle: (function() {
           // !VA If the TBL msdpi checkbox is checked, add style attribute with the width property set to the curImgW. To this for tableStyle as well and set that to imgViewerW.
-          if ( Appobj['ccpTblMsdpiChk']) {
-            str = `width: ${Appobj['ccpTblWidthTfd']}px; `;
-          }
+          let msdpi;
+          msdpi = `width: ${Appobj['ccpTblWidthTfd']}px; `;
+          msdpi.includes('%')  ? msdpi = msdpi.replace('%px', '%') : msdpi;
+          str = msdpi;
+          // !VA Use an if condition 
+          Appobj['ccpTblMsdpiChk'] ? str = msdpi : str = '';
           // !VA There is no corrsponding appObj property for this so return false for the first parameter where the alias would normally go
           retObj = returnObject( false, str );
           return retObj;
@@ -1348,7 +1349,6 @@ var Witty = (function () {
         tableAlign: (function() {
           appObjProp = 'ccpTblAlignRdo';
           str = Appobj[appObjProp];
-          console.log('tableAlign str is: ' + str);
           retObj = returnObject( appObjProp, str );
           return retObj;
         })(),
@@ -1370,30 +1370,36 @@ var Witty = (function () {
         tableStyle: (function() {
           appObjProp = false;
           // !VA If the TBL msdpi checkbox is checked, add style attribute with the width property set to the curImgW. To this for TdStyle as well.
-          var msdpi, maxwd;
+          let msdpi, maxwd;
+          // !VA Set the msdpi string to the TBL width field value 
           msdpi = `width: ${Appobj['ccpTblWidthTfd']}px; `;
+          // !VA If the TBL width field value was a percent, remove the px on the units suffix
+          msdpi.includes('%')  ? msdpi = msdpi.replace('%px', '%') : msdpi;
           maxwd = `max-width: ${Appobj['ccpTblMaxwdTfd']}px; `;
-
+          console.log('msdpi is: ' + msdpi);
+          console.log('maxwd is: ' + maxwd);
           if ( Appobj['ccpTblMsdpiChk']) {
             str = msdpi;
           } 
           if ( Appobj['ccpTblMaxwdTfd']) {
             str = msdpi + maxwd;
           }
-
-          console.log('tableStyle str is: ' + str);
           // !VA There is no corrsponding appObj property for this so return false for the first parameter where the alias would normally go
           retObj = returnObject( false, str );
           return retObj;
         })(),
-        // !VA Branch: OVERHAUL0826A
-        // !VA Deprecating this now, will need to replace it with an attribute 
-        // tableIncludeWrapper: (function() {
-        //   ccpElementId = ccpUserInput.ccpTblWraprChk;
-        //   checked = fetchCheckboxState(ccpElementId);
-        //   retObj = returnObject( ccpElementId, checked );
-        //   return retObj;
-        // })(),
+        tdWrapperStyle: (function() {
+          // !VA If the TBL msdpi checkbox is checked, add style attribute with the width property set to the curImgW. To this for tableStyle as well and set that to imgViewerW.
+          let msdpi;
+          msdpi = `width: ${Appobj['ccpTbwWidthTfd']}px; `;
+          msdpi.includes('%')  ? msdpi = msdpi.replace('%px', '%') : msdpi;
+          str = msdpi;
+          // !VA Use an if condition 
+          Appobj['ccpTbwMsdpiChk'] ? str = msdpi : str = '';
+          // !VA There is no corrsponding appObj property for this so return false for the first parameter where the alias would normally go
+          retObj = returnObject( false, str );
+          return retObj;
+        })(),
         tableWrapperClass: (function() {
           appObjProp = 'ccpTbwClassTfd';
           str = Appobj[appObjProp];
@@ -1403,7 +1409,6 @@ var Witty = (function () {
         tableWrapperAlign: (function() {
           appObjProp = 'ccpTbwAlignRdo';
           str = Appobj[appObjProp];
-          console.log('tableAlign str is: ' + str);
           retObj = returnObject( appObjProp, str );
           return retObj;
         })(),
@@ -1449,17 +1454,18 @@ var Witty = (function () {
           appObjProp = false;
           // !VA If the TBW msdpi checkbox is checked, add style attribute with the width property set to the curImgW. To this for TdStyle as well.
           var msdpi, maxwd;
+          // !VA Set the msdpi string to the TBW width field value 
           msdpi = `width: ${Appobj['ccpTbwWidthTfd']}px; `;
+          // !VA If the TBW width field value was a percent, remove the px on the units suffix
+          msdpi.includes('%')  ? msdpi = msdpi.replace('%px', '%') : msdpi;
           maxwd = `max-width: ${Appobj['ccpTbwMaxwdTfd']}px; `;
-
           if ( Appobj['ccpTbwMsdpiChk']) {
             str = msdpi;
+            console.log('HIT');
           } 
           if ( Appobj['ccpTbwMaxwdTfd']) {
             str = msdpi + maxwd;
           }
-
-          console.log('tableWrapperStyle str is: ' + str);
           // !VA There is no corrsponding appObj property for this so return false for the first parameter where the alias would normally go
           retObj = returnObject( false, str );
           return retObj;
@@ -1953,8 +1959,8 @@ var Witty = (function () {
         // !VA Now it's set to the current value of the input element, i.e. the Appobj property
         omitIfEmpty( Attributes.tdWidth.str, tdInner, 'width');
 
-        // !VA Branch: 0912B
-        console.log('Attributes.tdStyle.str is: ' + Attributes.tableStyle.str);
+        // !VA Branch: 0913B
+        // !VA For TBL Msdpi
         if (Attributes.tdStyle.str) { tdInner.setAttribute('style', Attributes.tdStyle.str ); }
 
         // !VA Branch: OVERHAUL0827A
@@ -2078,8 +2084,7 @@ var Witty = (function () {
       // !VA If ccpTblGhostChk is checked, set the data-ghost attribute
       if (Attributes.tableGhost.str) { tableInner.setAttribute('data-ghost', 'tbl'); }
 
-      // !VA Branch: 0912B
-      console.log('Attributes.tableStyle.str is: ' + Attributes.tableStyle.str);
+      // !VA Branch: 0913B
       if (Attributes.tableStyle.str) { tableInner.setAttribute('style', Attributes.tableStyle.str ); }
 
 
@@ -2112,6 +2117,8 @@ var Witty = (function () {
       // !VA Add default border, cellspacing, cellpadding and role for accessiblity
       tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
       tableOuter.setAttribute('role', 'presentation'); 
+      // !VA Branch: 0913B
+      if (Attributes.tableStyle.str) { tableInner.setAttribute('style', Attributes.tableStyle.str ); }
       // !VA Branch: 0911A
       // !VA If ccpTbwGhostChk is checked, set the data-ghost attribute
       // !VA Branch: 0911B
@@ -2120,16 +2127,17 @@ var Witty = (function () {
       tableOuter.appendChild(trOuter);
       // !VA Append the outer td to the outer tr
       trOuter.appendChild(tdOuter);
-      // !VA Branch: 0910A
-      // !VA What is the TD align logic doing here?
-      // !VA Add the outer td attributes
-      // !VA Add to the node only if the option 'none' is not selected
-      if (Attributes.tdAlign.str) { tdOuter.align = Attributes.tdAlign.str; }
-      // !VA Branch: 0910A
-      // !VA What is the TD align logic doing here?
-      // !VA valign attribute
-      // !VA Add to the node only if the option 'none' is not selected
-      if (Attributes.tdValign.str) { tdOuter.vAlign = Attributes.tdValign.str; }
+      // !VA Branch: 0913B
+      // !VA Hard-coding the outer td align and valign attributes to left and top here - if the user wants to change it they can delete it from their code. 
+      // if (Attributes.tdAlign.str) { tdOuter.align = Attributes.tdAlign.str; }
+      tdOuter.align = 'left';
+      // if (Attributes.tdValign.str) { tdOuter.vAlign = Attributes.tdValign.str; }
+      tdOuter.vAlign = 'top';
+
+      // !VA Branch: 0913B
+      // !VA Add the Attributes.tdStyle attribute if TBW msdpi is checked.
+      if (Attributes.tdWrapperStyle.str) { tdOuter.setAttribute('style', Attributes.tdWrapperStyle.str ); }
+
       // !VA Append the inner table to the outer table's td
       tdOuter.appendChild(tableInner);
       // !VA Pass the outer table to the tableNodeFragment and return it.
@@ -4853,8 +4861,10 @@ ${indent}<![endif]-->`;
         Appobj['ccpTbwAlignRdo'] = 'center';
         Appobj['ccpTblWidthTfd'] = '100%';
         Appobj['ccpTbwWidthTfd'] = '100%';
+        Appobj['ccpTblMaxwdTfd'] = Appobj['curImgW'];
+        console.log('Appobj[curImgW] is: ');
+        console.log(Appobj['curImgW']);
         Appobj['ccpTbwMaxwdTfd'] = Appobj['imgViewerW'];
-        console.log('viewerW is: ' + Appobj['imgViewerW']);
         
       // !VA If Hybrid is unchecked, reset to default options
       } else {
@@ -4869,8 +4879,9 @@ ${indent}<![endif]-->`;
         Appobj['ccpTbwClassTfd'] = 'devicewidth';
         Appobj['ccpTblAlignRdo'] = '';
         Appobj['ccpTbwAlignRdo'] = 'center';
-        Appobj['ccpTblWidthTfd'] = '';
-        Appobj['ccpTbwWidthTfd'] = '';
+        Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
+        Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
+        Appobj['ccpTblMaxwdTfd'] = '';
         Appobj['ccpTbwMaxwdTfd'] = '';
         // Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
         // Appobj['ccpTbwWidthTfd'] = Appobj['viewerW'];
@@ -4882,7 +4893,7 @@ ${indent}<![endif]-->`;
 
       // !VA reflectElements METHOD
       // !VA Set the array of the elements whose CCP value should be set according to the REFLECT PROPERTIES set above
-      reflectArray = ['ccpImgClassTfd', 'ccpTdaBgclrTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd' ];
+      reflectArray = ['ccpImgClassTfd', 'ccpTdaBgclrTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
 
       // !VA radioState METHOD
       // !VA Set the properties of the radioState method whose selected option is set according to its Appobj properties set in the APPOBJ PROPERTIES section above
@@ -4892,13 +4903,15 @@ ${indent}<![endif]-->`;
       // !VA Set the reveal flag. The reveal flag is the opposite of the isChecked property because the ccp-conceal-ctn class is REMOVED in order to reveal the elements.
       revealFlag = !isChecked;
       // !VA Set the array of the elements to be revealed  according to the APPOBJ PROPERTIES set above. IMPORTANT: These correspond to the Table Wrapper options. They are being set manually here instead of calling configWrapr to set the configuration for transparency and simplicity's sake. 
-      revealArray = [  'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+      revealArray = [  'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd','ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
 
       // !VA disableElements METHOD
       // !VA Set the flag to disable/enable elements. disableFlag is equal to isChecked - it has a different name here only for transparency's sake. 
       disableFlag = isChecked;
       // !VA Set the array of the elements to be disabled. 
-      disableArray =  [ 'ccpImgClassTfd', 'ccpTblClassTfd','ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblAlignRdo', 'ccpTblWraprChk', 'ccpTbwClassTfd','ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwAlignRdo' ];
+      // !VA Branch: 0913B
+      // !VA Leaving disabling out for now
+      // disableArray =  [ 'ccpImgClassTfd', 'ccpTblClassTfd','ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblAlignRdo', 'ccpTblWraprChk', 'ccpTbwClassTfd','ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwAlignRdo' ];
 
       // !VA Create the configObj methods with the properties defined above.
       configObj = {
@@ -4907,8 +4920,10 @@ ${indent}<![endif]-->`;
         radioState: { radio: radioArray },
         revealReset: { alias: 'default'},
         revealElements: { flag: revealFlag, reveal: revealArray },
-        disableElements: { flag: disableFlag, disable: disableArray },
-        disableReset: { alias: 'default'}
+        // !VA Branch: 0913B
+        // !VA Leaving disabling out for now.
+        // disableElements: { flag: disableFlag, disable: disableArray },
+        // disableReset: { alias: 'default'}
       };
 
       return configObj;
@@ -5154,27 +5169,27 @@ ${indent}<![endif]-->`;
 
         // !VA Pre-select the IMG EXCLD, TDA OPTNS and TBW WRAPR options so they open as selected by default on page load.
         // !VA IMPORTANT! You cannot programattically run selectCheckbox more than once. The second run will also run revealReset again, thus cancelling reveal settings you made the first time. If you need to set checkbox-dependent reveals, do it manually, not through selectCheckbox.
-        selectImgExclude('incld');
-        selectTdaOptions('basic');
-        Appobj['ccpTblWraprChk'] = false;
-        selectCheckbox( true, 'ccpTblWraprChk' );
-        // selectCheckbox( false, 'ccpTblHybrdChk' );
-        selectImgItype( 'fixed' );
-        // // !VA for ghost table dev, check the ghost table option
-        Appobj['ccpTblMsdpiChk'] = true;
-        Appobj['ccpTbwMsdpiChk'] = true;
-        // Appobj['ccpTbwGhostChk'] = false;
-        var checkedArray = ['ccpTblWraprChk', 'ccpTblMsdpiChk', 'ccpTbwMsdpiChk' ];
-        configObj = {
-          checkboxState: { checked: checkedArray },
-        };
-        UIController.configCCP(configObj);
+        // selectImgExclude('incld');
+        // selectTdaOptions('basic');
+        // Appobj['ccpTblWraprChk'] = true;
+        // selectCheckbox( true, 'ccpTblWraprChk' );
+        // // selectCheckbox( false, 'ccpTblHybrdChk' );
+        // selectImgItype( 'fixed' );
+        // // // !VA for ghost table dev, check the ghost table option
+        // Appobj['ccpTblMsdpiChk'] = true;
+        // Appobj['ccpTbwMsdpiChk'] = true;
+        // // Appobj['ccpTbwGhostChk'] = false;
+        // var checkedArray = ['ccpTblWraprChk', 'ccpTblMsdpiChk', 'ccpTbwMsdpiChk' ];
+        // configObj = {
+        //   checkboxState: { checked: checkedArray },
+        // };
+        // UIController.configCCP(configObj);
 
         // !VA Set the default config on init
-        // configObj = configDefault('default', true );
-        // console.log('configObj is: ');
-        // console.log(configObj);
-        // UIController.configCCP(configObj);
+        configObj = configDefault('default', true );
+        console.log('configObj is: ');
+        console.log(configObj);
+        UIController.configCCP(configObj);
           
 
 
