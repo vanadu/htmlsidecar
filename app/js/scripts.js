@@ -236,7 +236,11 @@ var Witty = (function () {
       ccpTdaBdclrTfd: '#ccp-tda-bdclr-tfd',
       ccpTdaAlignRdo: '#ccp-tda-align-rdo',
       ccpTdaValgnRdo: '#ccp-tda-valgn-rdo',
-      ccpTdaPadngGrp: '#ccp-tda-padng-grp',
+      // ccpTdaPadngGrp: '#ccp-tda-padng-grp',
+      ccpTdaPdtopTfd: '#ccp-tda-pdtop-tfd',
+      ccpTdaPdrgtTfd: '#ccp-tda-pdrgt-tfd',
+      ccpTdaPdbtmTfd: '#ccp-tda-pdbtm-tfd',
+      ccpTdaPdlftTfd: '#ccp-tda-pdlft-tfd',
       ccpTdaOptnsRdo: '#ccp-tda-optns-rdo',
       ccpTdaBasicPar: '#ccp-tda-basic-par',
       ccpTdaIswapPar: '#ccp-tda-iswap-par',
@@ -520,7 +524,7 @@ var Witty = (function () {
 
 
       // !VA There are three reset element matrices: mkcssReset includes all the Make CSS Button containers. That is obtained by getting the elements with classname 'ccp-mkcss-ctn' - it includes the Make CSS buttons and the curly braces that surround them. defaultReset includes the containers corresponding to the TD Options 'basic' configuration, and wraprReset includes the Wrapper Option elements.
-      defaultArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgMkcssGrp', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPadngGrp', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
+      defaultArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgMkcssGrp', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
       wraprArr = ['ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk', ];
 
 
@@ -673,8 +677,8 @@ var Witty = (function () {
       // !VA Loop through all the aliases in disableArray
       for (const el of disableArray) {
         // !VA When the target element is selected, the flag for each alias element in disableArray is set to true. When the target element is deselected, the flag is set to false.
-        // !VA If the element is a text input field...
-        if ( el.id.includes('tfd')) {
+        // !VA If the element is a text input field but NOT a padding input field (because padding input fields have no icon/label)
+        if ( el.id.includes('tfd') && !el.id.includes('pd')) {
           el.children[0].disabled = false;
           el.children[0].style.color = '#FFFFFF';
           el.children[0].style.fontStyle = 'normal';
@@ -745,13 +749,17 @@ var Witty = (function () {
           console.log('ERROR in disableElements - unknown element type');
         }
       } 
-      // if (flag === false ) {
-      //   document.querySelector('#ccp-tbl-wrapr-lbl').classList.remove('ccp-disable-lbl');
-      // } else {
-      //   document.querySelector('#ccp-tbl-wrapr-lbl').classList.add('ccp-disable-lbl');
-      // }
+    }
 
-
+    function getPadding( id ) {
+      let padng = [];
+      var par = document.querySelector(ccpUserInput['ccpTdaPadngGrp']);
+      var chld = par.getElementsByTagName('INPUT');
+      console.log(chld);
+      for (let i = 0; i < chld.length; i++) {
+        padng.pop(chld[i].value);
+      }
+      return padng;
     }
 
 
@@ -999,6 +1007,9 @@ var Witty = (function () {
               // !VA Appobj[ key ] is undefined, causing checkboxState to return the hard-coded values in the HTML file. These are the Appobj initialization values. 
               Appobj[ key ] = checkboxState( [ key ] );
             }
+            if ( key.substring( 11 ).includes('Grp')) {
+              // Appobj[ key ] = getPadding();
+            }
           }
           
           console.log('populateCcpPropertiesAppobj is: ');
@@ -1018,6 +1029,7 @@ var Witty = (function () {
           console.log('Error in populateAppobj: unknown argument - access');
         }
       },
+
 
       // !VA UIController public
       // !VA The toggle argument is a boolean flag to indicate whether to actually toggle the CCP on and off or just to return the state. Don't forget that Appobj doesn't exist here, so don't try to log it. True means toggle it, false means just return the state
@@ -1295,6 +1307,12 @@ var Witty = (function () {
           // !VA 
           retObj = returnObject( appObjProp, Appobj.ccpImgLoctnTfd + '/' + (Appobj.fileName) );
           return retObj;
+        })(),
+        tdPadding: (function () {
+
+
+
+
         })(),
         tdStyle: (function() {
           // !VA If the TBL msdpi checkbox is checked, add style attribute with the width property set to the curImgW. To this for tableStyle as well and set that to imgViewerW.
@@ -2336,7 +2354,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     function testit(tbl, bool1, bool2) {
       
 
-      // console.clear();
       console.log('testit running...');
       let openTag, closeTag, ghostOpen1, ghostClose1, ghostOpen2, ghostClose2;
       let indexPos, ghostTags = [], hasWrapper;
@@ -2436,7 +2453,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CBController private
     // !VA handle the buildNodeList clipboardStr output, define and place the tokens in the clipboardStr output and replace the tokens with the ghost tabs from getGhostTags or strip them out depending on the checked status of the Ghost checkbox icons passed in as bool parameters from the caller.
     function configGhostTable(tbl, bool1, bool2) {
-      console.clear();
       // console.log('configGhostTable running - bool1: ' + bool1 + '; bool2: ' + bool2); 
       //   console.log('tbl is: ');
       //   console.log(tbl);
@@ -3061,6 +3077,8 @@ ${indent}<![endif]-->`;
           }
         }
       }
+
+
  
 
       // !VA KEYBOARD HANDLERS
@@ -3580,9 +3598,6 @@ ${indent}<![endif]-->`;
     // !VA NOTE: Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
     // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Sorts keypresses by data types number and string based on the target input element. Calls checkUserInput which validates the input and returns either an integer or a string and passes the value to applyInputValue to write to Appobj and the DOM. Then, for curImgW/curImgH, sets the input value to '' so the placeholder shows through. For all other input elements, sets the input value to the respective Appobj property.
     function handleKeydown(evt) {
-      console.log('evt.target.id is: ' + evt.target.id);
-      console.clear();
-      console.log('handleKeydown running'); 
       let retVal;
       // !VA Get the keypress
       let keydown = evt.which || evt.keyCode || evt.key;
@@ -3596,7 +3611,16 @@ ${indent}<![endif]-->`;
       if (keydown == 9 || keydown == 13) {
         // console.log('TAB or ENTER');
         // !VA evtTargetIdToAppobjProp gets the Appobj key that corresponds to a given element ID. We need the Appobj key to get the Appobj value to compare to the user-entered value in the respective Toolbar input field. 
-        userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
+
+        // !VA Branch: 0913B
+        // !VA THis is where we need to process the padding inputs
+        console.log('handleKeydown evt.target.id is: ' + evt.target.id);
+        console.log('evt.target.id.substring() is: ' + evt.target.id.substring( 8, 10));
+        evt.target.id.substring( 8, 10) === 'pd' ? userInputObj.appObjProp = 'ccpTdaPadngGrp' : evtTargetIdToAppobjProp(evt.target.id);
+        console.log('userInputObj is: ');
+        console.log(userInputObj);
+
+        // userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
         // !VA evtTargetVal is the value the user entered into the input element as integer.
         userInputObj.evtTargetVal = evt.target.value;
         // console.log('handleKeydown userInputObj is: ');
@@ -4289,13 +4313,13 @@ ${indent}<![endif]-->`;
     // !VA Branch: OVERHAUL0827A
     // !VA NOTE: This function is in appController the actions are distinct from the actions in configCCP. Those controls pertain to specific option configurations that functionally depend on a selected option. These options below only make other options available if a text input is entered. Perhaps an insignificant distinction, but a valid one - all the configCCP react to checkbox state changes, not input values.
     function handleTextInputEvent(evt) {
-      let tar, firstChld, nextSibling, hasValue, alias, flag;
+      console.log('handleTextInputEvent running'); 
+      let tar, icn, nextSibling, pdgElements, hasValue, flag;
       let configObj = {};
       let revealArray = [];
       hasValue = false;
       tar = evt.target;
-      alias = evtTargetIdToAppobjProp(evt.target.id);
-      // !VA Branch: OVERHAUL0902A
+      // !VA If the event was NOT triggered by a padding element...
       tar.value ? flag = true : flag = false;
       if (!tar.id.includes('tda-pd')) {
         // !VA If the input has a value, add the active class, otherwise remove it. The active class on the input applies the properties to the adjacent sibling, i.e. the label, as defined in the CSS.
@@ -4350,18 +4374,20 @@ ${indent}<![endif]-->`;
         }
       // !VA Now handle the unlabelled padding text input elements
       } else {
-        // !VA firstChld is the icon element, which is the first child of the container
-        // !VA NOTE: Add an alias for this? This is an element that is used to target other elements.
-        firstChld = document.querySelector('#ccp-tda-padng-icn');
-        // !VA nextSibling is the first padding input, i.e. top.
-        nextSibling = firstChld.nextElementSibling;
-        while(nextSibling) {
-          // !VA If there's a value in the input, set the flag to true
+        // !VA All we do here is highlight the 4--arrow icon if there's an input in any of the padding input fields.
+        // !VA icn is the 4-arrow pointer icon for padding
+        icn = document.querySelector('#ccp-tda-padng-icn');
+        // !VA Collection of all the padding input elements
+        pdgElements = document.getElementsByClassName('ccp-padng-ipt');
+        // !VA Set nextSibling to the first paddin input element in the collection
+        nextSibling = pdgElements[0];
+        // !VA Run the loop until one of the padding input elements has a value, then set the hasValue flag and exit to determine if any of the padding input elements have a value
+        while (nextSibling) {
           if (nextSibling.value !== '') { hasValue = true; }
           nextSibling = nextSibling.nextElementSibling;
         }
-        // !VA If any of the padding inputs have a value, then the hasValue flag is true. If none of the padding inputs have value, the flag is false. If true, add the active class, otherwise, remove it.
-        hasValue ? firstChld.classList.add('active') : firstChld.classList.remove('active');
+        // !VA If any of the padding input elements have a value, highlight the icon. If not, remove the highlight.
+        hasValue ? icn.classList.add('active') : icn.classList.remove('active');
       }
     }
 
@@ -4534,8 +4560,6 @@ ${indent}<![endif]-->`;
     // !VA Branch: OVERHAUL0825B
     // !VA This one is more comprehenive than elementIdToAppobjProp. The latter  
     function evtTargetIdToAppobjProp(id) {
-      console.log('evtTargetIdToAppobjProp running'); 
-      console.log('id is: ' + id);
       let idStr, appObjProp;
       idStr = id;
       // !VA Replace the ipt with tfd, which is the code for the parent div, which is the element represented in Appobj
@@ -5195,8 +5219,6 @@ ${indent}<![endif]-->`;
 
         // !VA Set the default config on init
         configObj = configDefault('default', true );
-        console.log('configObj is: ');
-        console.log(configObj);
         UIController.configCCP(configObj);
           
 

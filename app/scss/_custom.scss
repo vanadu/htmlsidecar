@@ -1049,35 +1049,61 @@ fieldset {
 // VA! Include table wrapper icon size - see the .ccp-wrapr-lbl rule below
 
 // VA! PADDING
+.ccp-grp {
+  display: flex;
+  justify-content: flex-start;
+  margin-left: 10px;
+  transition: opacity .250s; 
+  background: #000000;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 300;
+  opacity: 1;
+  pointer-events: auto;
+
+}
+
+
+
 // VA! 08.19.20
-.ccp-padng-ctn {
+.ccp-padng-grp {
+  display: flex;
+  justify-content: flex-start;
   position: absolute;
   top: -8px;
   right: 46px;
   width: 128px;
-  height: 80px;
+  height: 88px;
+  margin-left: 10px;
   // VA! Prevent overlay by #td-options-center-row-2
   z-index: 102;
+  pointer-events: auto;
+  opacity: 1 !important;
 }
-.ccp-pdng-icn-ctr {
-  display: block;
-  position: relative;
-  width: 44px;
-  height: 25px;
-}
+// .ccp-pdng-icn-ctr {
+//   display: block;
+//   position: relative;
+//   margin: 0 auto;
+//   width: 44px;
+//   height: 25px;
+//   opacity: 1 !important;
+//   border: 1px solid blue;
+// }
 
 // VA! Padding icon is a special case - it has no input element. If an active class it to be put on it to highlight user text input in any of the padding input fields, it has to be done separately here. 
 .ccp-padng-icn {
   display: block;
-  position: relative;
+  position: absolute;
   top: 30px;
+  left: 52px;
   width: 25px;
   height: 25px;
   margin: 0 auto;
-  background-color: #000000;
-  background-repeat: no-repeat;
-  background-position: center center;
+  // VA! background-image listed separately with all the other icons
   background-size: 25px 25px;
+  background-color: #000000;
+  background-position: center center;
+  // background-repeat: no-repeat;
   filter: brightness(2) grayscale(1) opacity(1) !important;
   -webkit-filter: brightness(2) grayscale(1) opacity(1) !important;
   -moz-filter: brightness(2) grayscale(1) opacity(1) !important;
