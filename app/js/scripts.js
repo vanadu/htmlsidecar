@@ -4579,7 +4579,7 @@ ${indent}<![endif]-->`;
       Appobj['ccpImgLoctnTfd'] = 'img/';
       Appobj['ccpImgAnchrTfd'] = '#';
       Appobj['ccpImgTxclrTfd'] = '#0000FF';
-      Appobj['ccpImgTargtChk'] = true;
+      Appobj['ccpImgTargtChk'] = false;
       Appobj['ccpTblClassTfd'] = '';
       Appobj['ccpTdaBgclrTfd'] = '';
       Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
@@ -4588,6 +4588,8 @@ ${indent}<![endif]-->`;
       Appobj['ccpTbwClassTfd'] = 'devicewidth';
       Appobj['ccpTdaAlignRdo'] = 'left';
       Appobj['ccpTdaValgnRdo'] = 'top';
+      Appobj['ccpTblAlignRdo'] = 'center';
+      Appobj['ccpTbwAlignRdo'] = 'center';
 
       // !VA reflectAppobj METHOD: set the array of elements whose Appobj properties above are to be written to the CCP DOM
       reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaBgclrTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwClassTfd' ];
@@ -4597,7 +4599,7 @@ ${indent}<![endif]-->`;
       revealArray = ['ccpImgTxclrTfd', 'ccpImgTargtChk'];
 
       // !VA radioState METHOD: set the elements whose selected value is to be set to the Appobj properties above.
-      radioArray = [ 'ccpTdaAlignRdo' , 'ccpTdaValgnRdo' ];
+      radioArray = [ 'ccpTdaAlignRdo' , 'ccpTdaValgnRdo', 'ccpTblAlignRdo', 'ccpTbwAlignRdo' ];
       // !VA checkboxState METHOD: set the checkboxes whose checked value is to be set to the Appobj properties above.
       checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpImgTargtChk'];
       // !VA Make the configuration object to pass to configCCP
@@ -5150,32 +5152,30 @@ ${indent}<![endif]-->`;
         UIController.configCCP( configObj);
 
 
-        // !VA Default init configuation
-        // Appobj['ccpImgLoctnTfd'] = '/img';
-        // configObj.reflectAppobj = { reflectArray: ['ccpImgLoctnTfd'] };
-        // console.log('Appobj is: ');
-        // console.log(Appobj);
-
-
-
         // !VA Pre-select the IMG EXCLD, TDA OPTNS and TBW WRAPR options so they open as selected by default on page load.
         // !VA IMPORTANT! You cannot programattically run selectCheckbox more than once. The second run will also run revealReset again, thus cancelling reveal settings you made the first time. If you need to set checkbox-dependent reveals, do it manually, not through selectCheckbox.
         selectImgExclude('incld');
         selectTdaOptions('basic');
         Appobj['ccpTblWraprChk'] = false;
-        selectCheckbox( false, 'ccpTblWraprChk' );
+        selectCheckbox( true, 'ccpTblWraprChk' );
         // selectCheckbox( false, 'ccpTblHybrdChk' );
         selectImgItype( 'fixed' );
         // // !VA for ghost table dev, check the ghost table option
         Appobj['ccpTblMsdpiChk'] = true;
+        Appobj['ccpTbwMsdpiChk'] = true;
         // Appobj['ccpTbwGhostChk'] = false;
-        var checkedArray = ['ccpTblWraprChk', 'ccpTblMsdpiChk' ];
+        var checkedArray = ['ccpTblWraprChk', 'ccpTblMsdpiChk', 'ccpTbwMsdpiChk' ];
         configObj = {
           checkboxState: { checked: checkedArray },
         };
         UIController.configCCP(configObj);
 
-
+        // !VA Set the default config on init
+        // configObj = configDefault('default', true );
+        // console.log('configObj is: ');
+        // console.log(configObj);
+        // UIController.configCCP(configObj);
+          
 
 
         // !VA Set up event listeners
