@@ -4592,6 +4592,7 @@ ${indent}<![endif]-->`;
       Appobj['ccpTdaBgclrTfd'] = '';
       Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
       Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
+      Appobj['ccpTblMaxwdTfd'] = '';
       Appobj['ccpTbwMaxwdTfd'] = '';
       Appobj['ccpTbwClassTfd'] = 'devicewidth';
       Appobj['ccpTdaAlignRdo'] = 'left';
@@ -4600,7 +4601,7 @@ ${indent}<![endif]-->`;
       Appobj['ccpTbwAlignRdo'] = 'center';
 
       // !VA reflectAppobj METHOD: set the array of elements whose Appobj properties above are to be written to the CCP DOM
-      reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaBgclrTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwClassTfd' ];
+      reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaBgclrTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd', 'ccpTbwClassTfd' ];
 
       // !VA revealElements METHOD:
       // !VA Since ccpImgAnchrTfd is configured here to have the value '#', set ccpImgTxclrTfd and ccpImgTargtChk to reveal
@@ -4684,7 +4685,7 @@ ${indent}<![endif]-->`;
         case option === 'iswap':
           // !VA SET APPOBJ PROPERTIES FOR ISWAP
           // !VA Show the table wrapper options
-          Appobj['ccpTblWraprChk'] = false;
+          Appobj['ccpTblWraprChk'] = true;
           Appobj['ccpTblHybrdChk'] = false;
           // !VA APPOBJ PROPERTIES
           Appobj['ccpImgClassTfd'] = 'mobileshow';
@@ -4695,11 +4696,12 @@ ${indent}<![endif]-->`;
           // !VA NEW
           Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
           Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
+          Appobj['ccpTblMaxwdTfd'] = '';
           Appobj['ccpTbwMaxwdTfd'] = '';
 
           // !VA reflectAppobj METHOD
           // !VA Array of elements whose values are set to the Appobj properties above
-          reflectArray = ['ccpImgClassTfd','ccpTdaBgclrTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd' ];
+          reflectArray = ['ccpImgClassTfd','ccpTdaBgclrTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
           
           // !VA checkboxState METHOD
           // !VA Array of checkboxes whose checked state is to be set based on the Appobj property setting above.
@@ -4712,14 +4714,18 @@ ${indent}<![endif]-->`;
           // !VA revealElements METHOD
           // !VA revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
           revealFlag = false;
-          // !VA Array of elements to be revealed.
+          // !VA Array of elements to be revealed. 
           revealArray = [ 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaOptnsRdo', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblMsdpiChk', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd','ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+          
+          selectCheckbox( true, 'ccpTblWraprChk');
 
           // !VA disableElements METHOD
           // !VA disableFlag is always true. This isn't a toggle. Elements stay disabled until a different option with a different config is selected.
+          // !VA Branch: 0913B
+          // !VA Only disabling IMG class for now.
           disableFlag = true;
-          // selectCheckbox( true, 'ccpTblWraprChk');
-          disableArray =  [ 'ccpImgClassTfd', 'ccpTblClassTfd','ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblAlignRdo' ];
+          // disableArray =  [ 'ccpImgClassTfd', 'ccpTblClassTfd','ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblAlignRdo' ];
+          disableArray =  [ 'ccpImgClassTfd' ];
 
           // !VA Set the configObj with the methods and properties to configure
           configObj = {
@@ -4745,11 +4751,12 @@ ${indent}<![endif]-->`;
           // !VA NEW
           Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
           Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
+          Appobj['ccpTblMaxwdTfd'] = '';
           Appobj['ccpTbwMaxwdTfd'] = '';
 
           // !VA reflectAppobj METHOD
           // !VA Array of elements whose values are set to the Appobj properties above
-          reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTblWidthTfd', 'ccpTblWidthTfd' ];
+          reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
 
           // !VA revealElements METHOD
           // !VA revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
@@ -4787,12 +4794,13 @@ ${indent}<![endif]-->`;
           // !VA NEW
           Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
           Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
+          Appobj['ccpTblMaxwdTfd'] = '';
           Appobj['ccpTbwMaxwdTfd'] = '';
 
 
           // !VA reflectAppobj METHOD
           // !VA Array of elements whose values are set to the Appobj properties above
-          reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd',  'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTdaBdradTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTblWidthTfd', 'ccpTblWidthTfd' ];
+          reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd',  'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTdaBdradTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
           
           // !VA checkboxState METHOD
           // !VA Array of checkbox elements whose checked state to set
