@@ -403,7 +403,7 @@ var Witty = (function () {
     // !VA If called from populateAppobj, returns the value of text input fields as hard-coded in the HTML. Otherwise, called by configCCP, which receives an array of aliases whose corresponding CCP element value is set to its corresponding Appobj value. 
     function reflectAppobj( reflectArray) { 
       // console.log('reflectArray is: ');
-      console.log(reflectArray);
+      // console.log(reflectArray);
       // console.log('reflectAppobj running'); 
       let el, isInit, retVal;
       for (const alias of reflectArray) {
@@ -414,7 +414,6 @@ var Witty = (function () {
           // !VA Branch: 0914B
           // !VA Deleting the value on init should reset all input fields to empty strings, thereby exposing whatever preset value attributes in the HTML. This should actually make resetting input elements to empty in configDefault redundant. For later...
           el.value = '';
-          console.log('el.value is: ' + el.value);
           retVal = el.value;
           // console.log('isInit is: ' + isInit + '; retVal is: ' + retVal);
           return retVal;
@@ -757,16 +756,7 @@ var Witty = (function () {
       } 
     }
 
-    function getPadding( id ) {
-      let padng = [];
-      var par = document.querySelector(ccpUserInput['ccpTdaPadngGrp']);
-      var chld = par.getElementsByTagName('INPUT');
-      console.log(chld);
-      for (let i = 0; i < chld.length; i++) {
-        padng.pop(chld[i].value);
-      }
-      return padng;
-    }
+
 
 
     // !VA END CCP FUNCTIONS
@@ -1320,19 +1310,51 @@ var Witty = (function () {
           return retObj;
         })(),
         tdPadding: (function () {
-
-
+          // var pdng = `${Appobj.ccpTdaPdtopTfd}; ${Appobj.ccpTdaPdRgtTfd}; ${Appobj.ccpTdaPdbtmTfd}; ${Appobj.ccpTdaPdlftTfd}; `;
+          // console.log('pdng is: ' + pdng);
 
 
         })(),
         tdStyle: (function() {
+          console.clear();
           // !VA If the TBL msdpi checkbox is checked, add style attribute with the width property set to the curImgW. To this for tableStyle as well and set that to imgViewerW.
-          let msdpi;
+          let msdpi, val, pdng, hasPadding;
+          let arr = [];
+          let aliasArray = ['ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd' ];
+          console.log('getAttributes Appobj is: ');
+          console.log(Appobj);
+          for (const alias of aliasArray ) {
+            val = Appobj[alias];
+            if (val === '') { val = 0;}
+            if (val !== 0 ) { val = val + 'px'; }
+            arr.push(val);
+          }
+          hasPadding = false;
+          for (let i = 0; i < arr.length; i++) {
+            if (arr[i] !== 0) {
+              hasPadding = true;
+              break;
+            }
+          }
+          console.log('hasPadding is: ' + hasPadding);
+          console.log('arr is: ');
+          console.log(arr);
+          pdng = 'padding: ' + arr.join(' ');
+
+
+
           msdpi = `width: ${Appobj['ccpTblWidthTfd']}px; `;
           msdpi.includes('%')  ? msdpi = msdpi.replace('%px', '%') : msdpi;
           str = msdpi;
-          // !VA Use an if condition 
+          // !VA If TBL Msdip checkbox is checked, set the return string to msdpi
           Appobj['ccpTblMsdpiChk'] ? str = msdpi : str = '';
+
+          // !VA 
+          if (hasPadding) { str = str + pdng ;}
+
+          console.log('str is: ' + str);
+
+
           // !VA There is no corrsponding appObj property for this so return false for the first parameter where the alias would normally go
           retObj = returnObject( false, str );
           return retObj;
@@ -1405,8 +1427,6 @@ var Witty = (function () {
           // !VA If the TBL width field value was a percent, remove the px on the units suffix
           msdpi.includes('%')  ? msdpi = msdpi.replace('%px', '%') : msdpi;
           maxwd = `max-width: ${Appobj['ccpTblMaxwdTfd']}px; `;
-          console.log('msdpi is: ' + msdpi);
-          console.log('maxwd is: ' + maxwd);
           if ( Appobj['ccpTblMsdpiChk']) {
             str = msdpi;
           } 
@@ -3534,10 +3554,6 @@ ${indent}<![endif]-->`;
       let retVal;
       // !VA Destructure userInputObj.
       let { appObjProp, evtTargetVal } = userInputObj;
-      console.log('userInputObj is: ');
-      console.log(userInputObj);
-
-
 
 
       // !VA Exception: For curImgW and curImgH, if user tabs out of the input field without entering a value, skip to the end of the function and override all input handling and error checking. This is only possible because these fields are empty by default. Any field that already has a value has to be error checked. 
@@ -3625,9 +3641,7 @@ ${indent}<![endif]-->`;
 
         // !VA Branch: 0913B
         // !VA THis is where we need to process the padding inputs
-        console.log('handleKeydown evt.target.id is: ' + evt.target.id);
-        console.log('evt.target.id.substring() is: ' + evt.target.id.substring( 8, 10));
-        evt.target.id.substring( 8, 10) === 'pd' ? userInputObj.appObjProp = 'ccpTdaPadngGrp' : evtTargetIdToAppobjProp(evt.target.id);
+        userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
         console.log('userInputObj is: ');
         console.log(userInputObj);
 
@@ -3638,11 +3652,10 @@ ${indent}<![endif]-->`;
         // console.log(userInputObj);
         // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp locally.  
         let { appObjProp } = userInputObj;
-        console.log('appObjProp is: ' + appObjProp);
+        // console.log('handleKeydown appObjProp is: ' + appObjProp);
         // !VA CCP-specific keydown handling. CCP input elements, unlike Toolbar elements, have no existing values and can be empty. So in order to error-check the current evtTargetVal and restore it to its prior value if the current evtTargetVal fails error-checking: 1) the prior Appobj property has to be temporarily stored and 2) the current evtTargetVal has to be error-checked and then written to Appobj. 
         /// !VA Branch: 0913A
         // !VA The above is not true. TBW and TBL width inputs require an input and have to be handled the same as the Toolbar input elements. So the Appobj properties whose corresponding input elements require an input are, so far:
-
         var required = [ 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'imgViewerW', 'curImgW', 'curImgH', 'sPhonesW', 'lPhonesW' ];
 
         if (required.includes( appObjProp )) {
@@ -3672,7 +3685,7 @@ ${indent}<![endif]-->`;
             console.log('ERROR in handleKeydown - unknown keypress');
           }
         } else {
-          console.log('Input NOT required');
+          // console.log('Input NOT required');
           if ( keydown === 9) {
             retVal = handleCcpInput(keydown, userInputObj);
             if (retVal === false ) {
@@ -3690,7 +3703,6 @@ ${indent}<![endif]-->`;
             console.log('ERROR in handleKeydown - unknown keypress');
           }
         }
-
       }
     }
 
@@ -3719,7 +3731,7 @@ ${indent}<![endif]-->`;
       // !VA Distinguish between elements that allow percent input, elements that allow string input and elements that allow numeric input. Percent inputs validate the percent value and return it with no further error checking. Numeric input elements have validation with error codes that display error messages. String inputs have no validation currently, but validation for hex color codes might be an option.
       let numericInputs, stringInputs, retVal, val, percentVal;
       percentInputs = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd']
-      numericInputs = [ 'imgViewerW', 'curImgW', 'curImgH',  'sPhonesW', 'lPhonesW', 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTdaBdradTfd' ];
+      numericInputs = [ 'imgViewerW', 'curImgW', 'curImgH',  'sPhonesW', 'lPhonesW', 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd' ];
       stringInputs = ['ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpImgLoctnTfd', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTblClassTfd', 'ccpTblBgclrTfd', 'ccpTbwClassTfd', 'ccpTbwBgclrTfd' ];
 
       // !VA Determine if the numeric portion of evtTargetVal; is a valid percent value 
@@ -3902,6 +3914,10 @@ ${indent}<![endif]-->`;
               appMessCode = 'err_img_wider_than_parent_table';
             } 
           }
+          break;
+        case (appObjProp.substring( 6, 8) === 'Pd') :
+          // !VA Padding - Input errors not yet trapped
+
           break;
         default:
           console.log('ERROR in checkNumericInput - unknown condition in case/select');
@@ -4324,7 +4340,6 @@ ${indent}<![endif]-->`;
     // !VA Branch: OVERHAUL0827A
     // !VA NOTE: This function is in appController the actions are distinct from the actions in configCCP. Those controls pertain to specific option configurations that functionally depend on a selected option. These options below only make other options available if a text input is entered. Perhaps an insignificant distinction, but a valid one - all the configCCP react to checkbox state changes, not input values.
     function handleTextInputEvent(evt) {
-      console.log('handleTextInputEvent running'); 
       let tar, icn, nextSibling, pdgElements, hasValue, flag;
       let configObj = {};
       let revealArray = [];
