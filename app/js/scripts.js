@@ -403,14 +403,20 @@ var Witty = (function () {
     // !VA If called from populateAppobj, returns the value of text input fields as hard-coded in the HTML. Otherwise, called by configCCP, which receives an array of aliases whose corresponding CCP element value is set to its corresponding Appobj value. 
     function reflectAppobj( reflectArray) { 
       // console.log('reflectArray is: ');
-      // console.log(reflectArray);
+      console.log(reflectArray);
       // console.log('reflectAppobj running'); 
       let el, isInit, retVal;
       for (const alias of reflectArray) {
         typeof(appController.getAppobj(alias)) === 'undefined' ? isInit = true : isInit = false;
+        // console.log('alias is: ' + alias);
         el = document.querySelector(ccpUserInput[alias].replace('tfd', 'ipt'));
         if (isInit) {
+          // !VA Branch: 0914B
+          // !VA Deleting the value on init should reset all input fields to empty strings, thereby exposing whatever preset value attributes in the HTML. This should actually make resetting input elements to empty in configDefault redundant. For later...
+          el.value = '';
+          console.log('el.value is: ' + el.value);
           retVal = el.value;
+          // console.log('isInit is: ' + isInit + '; retVal is: ' + retVal);
           return retVal;
         } else {
           el.value = appController.getAppobj( alias );
@@ -987,13 +993,20 @@ var Witty = (function () {
           // !VA Loop through all the ccpUserInput elements and add their values to Appobj. The last three characters ( 11 - last ) are the alias code that identify the input type
           // !VA Branch: OVERHAUL0828C
           // !VA  radioState and checkboxState are called here before Appobj has been initialized, so the key argument is 'undefined'. This causes checkboxState and radioState to return the attribute value of the queried element as hard-coded in the HTML, thus initializing Appobj. 
+
+
           for (const [key, value] of Object.entries(ccpUserInput)) {
             // !VA Write the text input element values to Appobj
             if (key.substring( 11 ) === 'Tfd') {
               // !VA Branch: OVERHAUL0904A
               // !VA Appobj[ key ] is undefined, causing reflectAppobj to return the hard-coded values in the HTML file. These are the Appobj initialization values. These values are currently all empty strings but that could change so the best place to get them is value attribute of the the HTML file, just like the other Appobj init functions below.
-              // if ( typeof(Appobj[key]) !== 'undefined' ) {console.log('HIT:' + key);}
+              // !VA Branch: 0914B
+              // !VA This is not what's happening at all. reflectAppobj isn't returning the HTML default, it's returning whatever happens to be in the input field at the time, so it's actually resetting nothing. The reset has to happen in configDefault. This should be reviewed - seems like it might be a waste or need to be rethought. One option is to first clear existing values, then get the value. That would leave us with the HTML presets. In the meantime, all the presets are in configDefault. 
               Appobj[ key ] = reflectAppobj( [ key ] );
+              // console.log('key is: ' + key);
+              // console.log('Appobj[key] is: ' + Appobj[key]);
+              // console.log('reflectAppobj( [ key ] is: ' + reflectAppobj( [ key ])); 
+
             }
             // !VA Write the Align/Valgn radio input element values to Appobj.
             if (key.substring( 11 ).includes('Rdo')) {
@@ -1007,13 +1020,11 @@ var Witty = (function () {
               // !VA Appobj[ key ] is undefined, causing checkboxState to return the hard-coded values in the HTML file. These are the Appobj initialization values. 
               Appobj[ key ] = checkboxState( [ key ] );
             }
-            if ( key.substring( 11 ).includes('Grp')) {
-              // Appobj[ key ] = getPadding();
-            }
           }
           
           console.log('populateCcpPropertiesAppobj is: ');
-          console.log(Appobj);        
+          console.log(Appobj); 
+   
         }
 
         if ( access === 'app') {
@@ -4605,6 +4616,8 @@ ${indent}<![endif]-->`;
 
 
       // !VA APPOBJ PROPERTIES
+      // !VA Branch: 0914B
+      // !VA NOTE: It might be redundant to set input elements to empty strings on init, since that is handled in reflectObject when called from populateCcpProperties. For later...
       Appobj['ccpTblWraprChk'] = false;
       Appobj['ccpTblHybrdChk'] = false;
       Appobj['ccpImgClassTfd'] = '';
@@ -4614,6 +4627,10 @@ ${indent}<![endif]-->`;
       Appobj['ccpImgTargtChk'] = false;
       Appobj['ccpTblClassTfd'] = '';
       Appobj['ccpTdaBgclrTfd'] = '';
+      // Appobj['ccpTdaPdtopTfd'] = '';
+      // Appobj['ccpTdaPdrgtTfd'] = '';
+      // Appobj['ccpTdaPdlftTfd'] = '';
+      // Appobj['ccpTdaPdbtmTfd'] = '';
       Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
       Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
       Appobj['ccpTblMaxwdTfd'] = '';
@@ -4625,6 +4642,7 @@ ${indent}<![endif]-->`;
       Appobj['ccpTbwAlignRdo'] = 'center';
 
       // !VA reflectAppobj METHOD: set the array of elements whose Appobj properties above are to be written to the CCP DOM
+      reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd', 'ccpTbwClassTfd' ];
       reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaBgclrTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd', 'ccpTbwClassTfd' ];
 
       // !VA revealElements METHOD:
