@@ -834,7 +834,7 @@ fieldset {
   }
   // VA! td and table options are three column, with the outer columns slightly wider than the center
   #td-options-left {
-    width: 240px;
+    width: 225px;
   }
   #table-options-left {
     width: 240px;
@@ -921,7 +921,7 @@ fieldset {
   left: -8px;
   justify-content: space-between;
   // VA! Compensate for whitespace created by hidden input element
-  width: 260px;
+  width: 276px;
   height: 44px;
 }
 
@@ -976,7 +976,7 @@ fieldset {
   width: 40px;
   // VA! Override the margin and padding in .ccp-btn
   margin: 0 !important;
-  padding: 5px !important;
+
 }
 
 // VA! Regular CCP inputs, i.e. i.e. width, max-width and anything that can take a hex value
@@ -1065,16 +1065,19 @@ fieldset {
 
 
 
-// VA! 08.19.20
+// VA! Branch 0917A
+// VA! PADDING elements
+
 .ccp-padng-grp {
   display: flex;
-  justify-content: flex-start;
+  flex-direction: column;
+  justify-content: center;
   position: absolute;
-  top: -8px;
-  right: 46px;
-  width: 128px;
-  height: 88px;
-  margin-left: 10px;
+  top: -4px;
+  right: 50px;
+  width: 130px;
+  height: 70px;
+  // margin-left: 10px;
   // VA! Prevent overlay by #td-options-center-row-2
   z-index: 102;
   pointer-events: auto;
@@ -1090,17 +1093,23 @@ fieldset {
 //   border: 1px solid blue;
 // }
 
+.ccp-padng-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
 // VA! Padding icon is a special case - it has no input element. If an active class it to be put on it to highlight user text input in any of the padding input fields, it has to be done separately here. 
-.ccp-padng-icn {
-  display: block;
-  position: absolute;
-  top: 30px;
-  left: 52px;
-  width: 25px;
-  height: 25px;
-  margin: 0 auto;
+#ccp-tda-padng-icn {
+
+  position: relative;
+  top: 18px;
+  right: 4px;
+  // left: 52px;
+  width: 26px;
+  height: 26px;
+
   // VA! background-image listed separately with all the other icons
-  background-size: 25px 25px;
+  background-size: 26px 26px;
   background-color: #000000;
   background-position: center center;
   // background-repeat: no-repeat;
@@ -1118,11 +1127,34 @@ fieldset {
   }
 }
 
+.ccp-padng-ctn {
+  margin: 3px;
+}
+
+
 // VA! Padding input position
-.ccp-pdtop-ipt { position: absolute; top: 0px; left: 44px; }
-.ccp-pdlft-ipt { position: absolute; top: 28px; left: 4px; }
-.ccp-pdrgt-ipt { position: absolute; top: 28px; left: 85px; }
-.ccp-pdbtm-ipt { position: absolute; top: 56px; left: 44px; }
+// .ccp-pdtop-ipt { position: absolute; top: 0px; left: 44px; }
+// .ccp-pdlft-ipt { position: absolute; top: 28px; left: 4px; }
+// .ccp-pdrgt-ipt { position: absolute; top: 28px; left: 85px; }
+// .ccp-pdbtm-ipt { position: absolute; top: 56px; left: 44px; }
+
+#ccp-tda-pdtop-ipt {background: url('../img/icon-padng-top.png') no-repeat;}
+#ccp-tda-pdrgt-ipt {background: url('../img/icon-padng-rgt.png') no-repeat;}
+#ccp-tda-pdbtm-ipt {background: url('../img/icon-padng-btm.png') no-repeat;}
+#ccp-tda-pdlft-ipt {background: url('../img/icon-padng-lft.png') no-repeat;}
+
+#ccp-tda-pdtop-ipt, #ccp-tda-pdrgt-ipt, #ccp-tda-pdbtm-ipt, #ccp-tda-pdlft-ipt  {
+  // width: 80px;
+  height: 28px;
+  // padding-left: 35px;
+  background-size: 8px auto;
+  background-position: 2px 10px;
+  padding-left: 12px !important;
+  text-align: left;
+  margin: 0 !important;
+}
+
+
 
 // VA! WRAPPER Icon Button
 // VA! Include wrapper checkbox icon container
@@ -1185,6 +1217,10 @@ fieldset {
   display: flex;
   flex-direction: row-reverse;
 }
+
+
+
+
 
 // VA! Default behavior for text input fields, radio input buttons and checkboxes.
 .ccp-txfld-ctn, .ccp-radio-ctn, .ccp-chkbx-ctn, .ccp-buttn-ctn {
@@ -1330,7 +1366,7 @@ fieldset {
 .ccp-vamid-lbl { background-image: url('../img/icon-valign-middle-blue.png');}
 .ccp-vabtm-lbl { background-image: url('../img/icon-valign-bottom-blue.png');}
 // VA! TD PADDING
-#ccp-tda-padng-icn { background-image: url('../img/icon-padding-blue.png');}
+#ccp-tda-padng-icn { background-image: url('../img/icon-padng-blue.png');}
 // VA! TD OPTIONS
 #ccp-tda-basic-lbl { background-image: url('../img/icon-td-basic-blue.png');}
 #ccp-tda-iswap-lbl { background-image: url('../img/icon-td-imgswap-blue.png');}

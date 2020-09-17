@@ -3505,6 +3505,7 @@ ${indent}<![endif]-->`;
 
     // !VA Called from handleKeydown to handle CCP element user input. Runs checkUserInput to check for error conditions. If checkUserInput returns a value, further actions (i.e. writing to Appobj) are handled in the blur handler of handleMouseEvents. If error checking fails, writes an error message to the console and returns control to handleKeydown to handle the input elements on error.
     function handleCcpInput(keydown, userInputObj) {
+      console.log('handleCcpInput running'); 
       // !VA priorVal is the Appobj property value that was replaced by the new evtTargetVal
       let retVal, priorVal, configObj;
       // !VA Destructure userInputObj.
@@ -3519,9 +3520,11 @@ ${indent}<![endif]-->`;
       // !VA If evtTargetVal is '', then it is falsy and checkUserInput will return false, even though the empty value is required to populate the Appobj property. So if evtTargetVal is empty, set retVal, appObjProp, userInputObj.evtTargetVal and the Appobj property to evtTargetVal, i.e. ''. 
       if (evtTargetVal === '') {
         userInputObj.evtTargetVal = Appobj[appObjProp] = retVal = evtTargetVal;
+        console.log('Mark1');
         console.log('handleCcpInput evtTargetVal is EMPTY ');
       }
       else {
+
         retVal = checkUserInput( userInputObj);
         // !VA If evtTargetVal is not empty, run the error-check
         if (retVal !== false) {
@@ -3544,6 +3547,8 @@ ${indent}<![endif]-->`;
         }
       }
       // !VA Return retVal: either '', an integer or false
+      console.log('Mark2');
+      console.log('retVal is: ' + retVal);
       return retVal;
     }
 
@@ -3685,9 +3690,16 @@ ${indent}<![endif]-->`;
             console.log('ERROR in handleKeydown - unknown keypress');
           }
         } else {
-          // console.log('Input NOT required');
+          console.log('Input NOT required');
           if ( keydown === 9) {
+            // !VA Branch: 0917A
+            // !VA Trying to understand why padding writes and error on blur when the input is empty
+            if ( evt.target.value === '' ) {console.log('HIT');}
+
+
             retVal = handleCcpInput(keydown, userInputObj);
+            console.log('Mark3');
+            console.log('retVal is: ' + retVal);
             if (retVal === false ) {
               this.value = Appobj[appObjProp];
               this.select();
