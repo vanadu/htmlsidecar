@@ -1680,7 +1680,7 @@ var Witty = (function () {
         container.appendChild(frag);
         // !VA Create the nodeList to pass to the Clipboard object. 
         outputNL = container.querySelectorAll('*');
-        // !VA Apply the indents and insert the tokens marking the position for inserting the MS conditional code.
+        // !VA Apply the indentffs and insert the tokens marking the position for inserting the MS conditional code.
         applyIndents(id, outputNL);
         // !VA Convert outputNL to a string (including tokens for inserting MS conditional code) for output to Clipboard object.
         clipboardStr = outputNL[0].outerHTML;
@@ -2399,7 +2399,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       console.log('hasWrapper is: ' + hasWrapper);
       // !VA If the Table wrapper checkbox is unchecked, then this is the outer table and any inner tables belong to the TD options' code block. Assign the tokens for ghostTag1 before/after the opening/closing table tag respectively.
       if (!hasWrapper) {
-        console.log('Mark1');
         // !VA Add the token for ghostOpen1 tag before the opening table tag
         indexPos = tbl.indexOf( openTag,  0 );
         tbl = ghostOpen1 + tbl.substring( indexPos, openTag.length) +  tbl.substring( openTag.length, tbl.length);
@@ -3433,6 +3432,8 @@ ${indent}<![endif]-->`;
     // !VA appController   
     // !VA Called from tbClickables event handler. Handles clicks on the Toolbar increment/decrement buttons and handles blur for Toolbar and ccpUserInput input elements, which facilitates error-checking and applying values on blur with the mouse, allowing users to mouse through inputs, entering values as they go without having to press TAB or ENTER. To do this, it dispatches a keydown keyboardEvent for the TAB key to the current input element to simulate the keypress. Also handles drop and dragover events, applying preventDefault.
     function handleMouseEvents(evt) {
+      console.clear();
+      console.log('handleMouseEvents running'); 
       // !VA elId adds the hash to evt.target.id
       let elId = '#' + evt.target.id;
       // !VA val is a temporary variable to mutate evt.target.value into Appobj.curImgW. retVal is the value returned by checkNumericInput, i.e. either an integer or false if validation fails. 
@@ -3471,10 +3472,14 @@ ${indent}<![endif]-->`;
           // !VA On blur with the mouse from input fields, dispatch a TAB keypress from the respective input to simulate a TAB keypress. 
           userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
           userInputObj.evtTargetVal = evt.target.value;
+          console.log('handleMouseEvents userInputObj is: ');
+          console.log(userInputObj);
+
           // !VA The userInputObj values have to be error-checked here to ensure that the TAB keypress isn't dispatched with invalid values in userInputObj. 
           retVal = checkUserInput( userInputObj );
           // !VA These are the cases where the TAB key is dispatched - error conditions and user-initiated changes. For these cases, handleKeydown and the respective input handler appears to run twice, but it doesn't appear to cause any errors because the second time the input value hasn't changed - and there doesn't appear to be any way to avoid it. For the other cases, handleKeydown only runs once.  
           if ( retVal === false  || Appobj[userInputObj.appObjProp] !== userInputObj.evtTargetVal) {
+
             // !VA Get the element to which the TAB keypress should be dispatched, i.e. the current element.
             document.querySelector( '#' + evt.target.id).dispatchEvent(
               new KeyboardEvent('keydown', {
@@ -3520,7 +3525,6 @@ ${indent}<![endif]-->`;
       // !VA If evtTargetVal is '', then it is falsy and checkUserInput will return false, even though the empty value is required to populate the Appobj property. So if evtTargetVal is empty, set retVal, appObjProp, userInputObj.evtTargetVal and the Appobj property to evtTargetVal, i.e. ''. 
       if (evtTargetVal === '') {
         userInputObj.evtTargetVal = Appobj[appObjProp] = retVal = evtTargetVal;
-        console.log('Mark1');
         console.log('handleCcpInput evtTargetVal is EMPTY ');
       }
       else {
@@ -3547,7 +3551,6 @@ ${indent}<![endif]-->`;
         }
       }
       // !VA Return retVal: either '', an integer or false
-      console.log('Mark2');
       console.log('retVal is: ' + retVal);
       return retVal;
     }
@@ -3647,8 +3650,9 @@ ${indent}<![endif]-->`;
         // !VA Branch: 0913B
         // !VA THis is where we need to process the padding inputs
         userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
-        console.log('userInputObj is: ');
-        console.log(userInputObj);
+        // !VA Branch: 0917A
+        // console.log('userInputObj is: ');
+        // console.log(userInputObj);
 
         // userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
         // !VA evtTargetVal is the value the user entered into the input element as integer.
@@ -3694,17 +3698,20 @@ ${indent}<![endif]-->`;
           if ( keydown === 9) {
             // !VA Branch: 0917A
             // !VA Trying to understand why padding writes and error on blur when the input is empty
-            if ( evt.target.value === '' ) {console.log('HIT');}
+
 
 
             retVal = handleCcpInput(keydown, userInputObj);
-            console.log('Mark3');
-            console.log('retVal is: ' + retVal);
+
             if (retVal === false ) {
               this.value = Appobj[appObjProp];
               this.select();
               evt.preventDefault();
-            }
+            // !VA Branch: 0917A
+            } 
+            // else if (retVal === '') {
+            //   if ( retVal === '' ) {console.log('HIT');}
+            // }
           } else if ( keydown === 13) {
             retVal = handleCcpInput(keydown, userInputObj);
             if (retVal === false) { 
@@ -3739,19 +3746,24 @@ ${indent}<![endif]-->`;
     // !VA Called from handleKeydown and handleMouseEvents. Separates numeric input from string input based on the Appobj property name included in two arrays. Numeric input is routed to checkNumericInput where values of type string are converted to integers. String inputs are routed to checkTextInput for valiation and error checking. 
     function checkUserInput(userInputObj) {
       // !VA Destructure userInputObj, making variables instead of constants
+
       let { appObjProp, evtTargetVal } = userInputObj;
+      console.log('checkUserInput appObjProp is: ' + appObjProp);
+      console.log('userInputObj.appObjProp.substring( 0 , 3 ) is: ' + userInputObj.appObjProp.substring( 0, 3 ));
       // !VA Distinguish between elements that allow percent input, elements that allow string input and elements that allow numeric input. Percent inputs validate the percent value and return it with no further error checking. Numeric input elements have validation with error codes that display error messages. String inputs have no validation currently, but validation for hex color codes might be an option.
-      let numericInputs, stringInputs, retVal, val, percentVal;
+      let numericInputs, stringInputs, retVal, percentVal, percentInputs;
       percentInputs = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd']
       numericInputs = [ 'imgViewerW', 'curImgW', 'curImgH',  'sPhonesW', 'lPhonesW', 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd' ];
       stringInputs = ['ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpImgLoctnTfd', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTblClassTfd', 'ccpTblBgclrTfd', 'ccpTbwClassTfd', 'ccpTbwBgclrTfd' ];
 
       // !VA Determine if the numeric portion of evtTargetVal; is a valid percent value 
       function checkPercent(val) {
+        console.log('checkPercent running'); 
+        let x, percentVal;
         // !VA Slice the percent sign off of evtTargetVal to test the rest of the value for valid percent
-        var val = evtTargetVal.slice( 0, -1 );
+        val = evtTargetVal.slice( 0, -1 );
         // !VA Test val for valid percent
-        var x = parseFloat(val);
+        x = parseFloat(val);
         // !VA Test if the value is in percentage range
         if (isNaN(x) || x < 0 || x > 100) {
           // !VA If it is out of range, return false
@@ -3760,9 +3772,9 @@ ${indent}<![endif]-->`;
         } else {
           // !VA If it is within the valid percentage range, add the percent character back at the end and return it - it now has the type 'string'
           console.log('valid percent');
-          var percentVal = x + '%';
+          percentVal = x + '%';
         }
-        return percentVal
+        return percentVal;
       }
       // !VA If the last char of evtTargetVal is a percent char, test if it is a valid percent value
       if ( evtTargetVal.substr(-1) === '%') {
@@ -3775,8 +3787,10 @@ ${indent}<![endif]-->`;
       // !VA If appObjProp is included in the numericInputs array (which includes all of the UI elements that require numeric input), then run checkNumericInput on the contents of userInputObj. Check numeric input returns false if the integer validation fails, otherwise it converts the numeric string to number where appropriate returns userInputObj.evtTargetVal as integer
       } else if (numericInputs.includes( appObjProp )) { 
         // !VA If the target is a CCP input and it is empty, don't do the validation. For CCP inputs, if the field is empty, the respective property won't get written to the clipboard, so an empty value has functional value. This is in contrast to the Toolbar inputs, where a value is required.
-        if ( userInputObj.appObjProp.substring( 3 , 6 ) === 'Ccp' && userInputObj.evtTargetVal === '' ) {
+        if ( userInputObj.appObjProp.substring( 0, 3 ) === 'ccp' && userInputObj.evtTargetVal === '' ) {
           // !VA The CCP input field is empty - do nothing.
+          // !VA Branch: 0917A
+          // console.log('Do nothing');
         }
         else if ( appObjProp === 'curImgW' && evtTargetVal === '' || appObjProp === 'curImgH' && evtTargetVal === '' ) {
           console.log('The CCP input field is empty - do nothing.');
