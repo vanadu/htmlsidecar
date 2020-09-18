@@ -1186,11 +1186,14 @@ var Witty = (function () {
         imgSrc: (function() {
           // !VA This value is get-only
           appObjProp = 'ccpImgLoctnTfd';
-          str = Appobj[appObjProp];
+
           // !VA Branch: implementCcpInput06 (062820)
           // !VA If the path input element is not empty, include Appobj.ccpImgLoctnTfd, otherwise just use the filename without the path
           Appobj.ccpImgLoctnTfd !== '' ? str = Appobj.ccpImgLoctnTfd  + Appobj.fileName : str = Appobj.fileName;
+          console.log('str is: ' + str);
           retObj = returnObject( appObjProp, str);
+          console.log('retObj is: ');
+          console.log(retObj);
           return retObj;
         })(),
         // !VA Branch: 0909A
@@ -1309,53 +1312,43 @@ var Witty = (function () {
           retObj = returnObject( appObjProp, Appobj.ccpImgLoctnTfd + '/' + (Appobj.fileName) );
           return retObj;
         })(),
-        tdPadding: (function () {
-          // var pdng = `${Appobj.ccpTdaPdtopTfd}; ${Appobj.ccpTdaPdRgtTfd}; ${Appobj.ccpTdaPdbtmTfd}; ${Appobj.ccpTdaPdlftTfd}; `;
-          // console.log('pdng is: ' + pdng);
-
-
-        })(),
         tdStyle: (function() {
-          console.clear();
-          // !VA If the TBL msdpi checkbox is checked, add style attribute with the width property set to the curImgW. To this for tableStyle as well and set that to imgViewerW.
+          // !VA This handles both the padding attribute and the MSDPI option. When the MSDPI option is checked, the width attribute has to be included in BOTH the inner TD and the inner TABLE style property and both of them have to be set to Appobj.curImgW.
           let msdpi, val, pdng, hasPadding;
           let arr = [];
+          // !VA Make array of the 4 padding aliases
           let aliasArray = ['ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd' ];
-          console.log('getAttributes Appobj is: ');
-          console.log(Appobj);
           for (const alias of aliasArray ) {
+            // !VA Write the Appobj property value. i.e. the current input value, to val
             val = Appobj[alias];
+            // !VA If the input value is '', i.e. empty, then replace the value with 0 for the clipboard output
             if (val === '') { val = 0;}
+            // !VA If the value is not 0, then add the units suffix
             if (val !== 0 ) { val = val + 'px'; }
+            // !VA Push the value onto an array for further processing
             arr.push(val);
           }
+          // !VA Set the hasPadding flag to false
           hasPadding = false;
+          // !VA Loop thru array until one of the items is not equal to 0. If that occurs, then the user has entered a value into one of the padding input fields, so set the hasPadding flag to true
           for (let i = 0; i < arr.length; i++) {
             if (arr[i] !== 0) {
               hasPadding = true;
               break;
             }
           }
-          console.log('hasPadding is: ' + hasPadding);
-          console.log('arr is: ');
-          console.log(arr);
+          // !VA Create the padding property. Join the array items, separating them with a space. These are the shorthand CSS values for the 4 padding properties. 
           pdng = 'padding: ' + arr.join(' ');
-
-
-
+          // !VA Create the width property for the MSDPI option
           msdpi = `width: ${Appobj['ccpTblWidthTfd']}px; `;
+          // !VA If the user has entered a percentage value for the TBL width attribute, strip the 'px' units off the value and include the percent char
           msdpi.includes('%')  ? msdpi = msdpi.replace('%px', '%') : msdpi;
           str = msdpi;
           // !VA If TBL Msdip checkbox is checked, set the return string to msdpi
           Appobj['ccpTblMsdpiChk'] ? str = msdpi : str = '';
-
-          // !VA 
+          // !VA if hasPadding is true, then the user has entered at least one value in the padding input fields, so append str with the pdng property.
           if (hasPadding) { str = str + pdng ;}
-
-          console.log('str is: ' + str);
-
-
-          // !VA There is no corrsponding appObj property for this so return false for the first parameter where the alias would normally go
+          // !VA There is no corrsponding appObj property for this so return false for the first parameter where the alias would normally go. The str parameter includes the msdpi/padding style attribute properties.
           retObj = returnObject( false, str );
           return retObj;
         })(),
@@ -1523,8 +1516,6 @@ var Witty = (function () {
       // !VA Return the Attributes defined above. 
       return Attributes;
     }
-
-    
 
     // !VA CBController public
     // !VA Omit a node attribute if the corresponding getAttributes Attribute is empty, i.e. the corresponding Appobj property/CCP element has no value. str is the Attribute object property. myNode is the current node, i.e. imgNode, tdNode, or tableNode. attr is the current attribute, i.e. className, alt, align etc. 
@@ -1936,26 +1927,20 @@ var Witty = (function () {
         let anchor = document.createElement('a');
         anchor.href = Attributes.imgAnchor.str;
         // !VA Create the style property for the user-entered string for the anchor element's text color as a text string within the style attribute - using the color property would either convert a hex value to RGB or fail if an invalid color value is entered.
-        textColorProp =  `color: ${Attributes.imgAnchorTxtclr.str}; `;
-        // !VA Branch: 0909A
-        // !VA Deprecating... there can't be any existing style attributes in a new node.
-        // !VA Get any existing style attributes
-        // styleAtt = anchor.getAttribute('style');
-        anchor.setAttribute('style', textColorProp);
-
-
+        // !VA If the Attribute exists, write the style property as text string to textColorProp, if not, leave textColorprop empty.
+        Attributes.imgAnchorTxtclr.str ? textColorProp =  `color: ${Attributes.imgAnchorTxtclr.str}; ` : textColorProp = '';  
+        // !VA If textColorProp is not empty, create the style attribute and set it to textColorProp
+        if (textColorProp) { anchor.setAttribute('style', textColorProp); }
+        // !VA If the target Attribute for the anchor is set (i.e. the Target icon is checked, create the target attribute of the anchor element and append it to the imgNode
         if ( Attributes.imgAnchorTargt.str ) { anchor.target = '_blank'; }
         anchor.appendChild(imgNode);
+        // !VA Append the anchor node to the node fragment.
         returnNodeFragment.appendChild(anchor);
       } else {
         // !VA Otherwise, set returnNodeFragment to imgNode without the anchor.
         returnNodeFragment.appendChild(imgNode);
       }
-      // !VA Branch: OVERHAUL0826A
-      // !VA Instead of the disabled instruction above...
-
-      // !VA Branch: OVERHAUL0826A
-      // !VA return the imgNode as node fragment;
+      // !VA return the imgNode as node fragment
       return returnNodeFragment;
     }
 
@@ -3432,7 +3417,6 @@ ${indent}<![endif]-->`;
     // !VA appController   
     // !VA Called from tbClickables event handler. Handles clicks on the Toolbar increment/decrement buttons and handles blur for Toolbar and ccpUserInput input elements, which facilitates error-checking and applying values on blur with the mouse, allowing users to mouse through inputs, entering values as they go without having to press TAB or ENTER. To do this, it dispatches a keydown keyboardEvent for the TAB key to the current input element to simulate the keypress. Also handles drop and dragover events, applying preventDefault.
     function handleMouseEvents(evt) {
-      console.clear();
       console.log('handleMouseEvents running'); 
       // !VA elId adds the hash to evt.target.id
       let elId = '#' + evt.target.id;
