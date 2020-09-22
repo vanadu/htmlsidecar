@@ -3426,10 +3426,10 @@ ${indent}<![endif]-->`;
     // !VA Branch: 0921A
     function handleMouseDown(evt) {
 
-      console.log('handleMouseDown running'); 
+      // console.log('handleMouseDown running'); 
       let retVal, keydown, tar;
-      console.log('evt is: ');
-      console.log(evt);
+      // console.log('evt is: ');
+      // console.log(evt);
 
       // if ( evt.target.value !== '' ) {
       //   console.log('HIT');
@@ -3503,8 +3503,8 @@ ${indent}<![endif]-->`;
     }
 
     // !VA Called from handleKeydown to handle CCP element user input. Runs checkUserInput to check for error conditions. If checkUserInput returns a value, further actions (i.e. writing to Appobj) are handled in the blur handler of handleMouseEvents. If error checking fails, writes an error message to the console and returns control to handleKeydown to handle the input elements on error.
-    function handleCcpInput(keydown, userInputObj) {
-      // console.log('handleCcpInput running'); 
+    function handleOptionalInput(keydown, userInputObj) {
+      // console.log('handleOptionalInput running'); 
       // !VA priorVal is the Appobj property value that was replaced by the new evtTargetVal
       let retVal, priorVal, configObj;
       // !VA Destructure userInputObj.
@@ -3514,7 +3514,7 @@ ${indent}<![endif]-->`;
       // !VA Save the current evtTargetVal to Appobj pending error checking. 
       Appobj[appObjProp] = evtTargetVal;
 
-      console.log('handleCcpInput appObjProp is: ');
+      console.log('handleOptionalInput appObjProp is: ');
       console.log(appObjProp);
 
       // !VA Error check the userInputObj, which contains the current Appobj property. If it passes error-checking, then retVal returns the value as type number
@@ -3523,7 +3523,7 @@ ${indent}<![endif]-->`;
       // !VA If evtTargetVal is '', then it is falsy and checkUserInput will return false, even though the empty value is required to populate the Appobj property. So if evtTargetVal is empty, set retVal, appObjProp, userInputObj.evtTargetVal and the Appobj property to evtTargetVal, i.e. ''. 
       if (evtTargetVal === '') {
         userInputObj.evtTargetVal = Appobj[appObjProp] = retVal = evtTargetVal;
-        console.log('handleCcpInput evtTargetVal is EMPTY ');
+        console.log('handleOptionalInput evtTargetVal is EMPTY ');
       }
       else {
 
@@ -3554,10 +3554,99 @@ ${indent}<![endif]-->`;
       return retVal;
     }
 
+
+
+    // !VA appController  
+    // !VA Branch: 0922A
+    // !VA One function to rule all user input
+    function handleUserInput(keydown, userInputObj) {
+      console.clear();
+      console.log('handleUserInput running'); 
+      let required, retVal, val, priorVal;
+      let tbrIptAliases = []
+      let imgIptAliases = [];
+      let ccpIptAliases = [];
+      let configObj = {};
+      let { appObjProp, evtTargetVal } = userInputObj;
+      // !VA Save the existing Appobj property value to priorVal
+      priorVal = Appobj[appObjProp];
+      console.log('handleUserInput userInputObj is: ');
+      console.log(userInputObj);
+
+      console.log('handleUserInput userInputObj is: ');
+      console.log(userInputObj);
+      tbrIptAliases = [ 'imgViewerW', 'curImgW', 'curImgH', 'sPhonesW', 'lPhonesW'];
+      imgIptAliases = [ 'curImgW', 'curImgH'];
+
+      // !VA Create an array of the Ccp input element aliases
+      for (const key of Object.keys(ccpUserInput)) {
+        if ( key.substring( 11, 14)  === 'Tfd') {
+          ccpIptAliases.push(key);
+        }
+      }
+      // !VA evtTargetVal is empty
+      if ( evtTargetVal === '') {
+        // !VA Conditions
+        // !VA If the target is curImgW or curImgH or a Ccp input, then the user has exited the field without entering a value, or has deleted the default value and exited the field. In this case, return the empty value without further action.
+        if ( imgIptAliases.includes( appObjProp) || (ccpIptAliases.includes( appObjProp ))) {
+          console.log('EMPTY VALUE IN curImgW, curImgH or a CCP Input');
+          // !VA If the target is a CCP input, set its Appobj property to empty. Don't do this for curImgW and curImgH - those Appobj properties cannot have an empty value
+          if ( ccpIptAliases.includes( appObjProp)) {
+            console.log('EMPTY VALUE IN CCP Input: Appobj[appObjProp = EMPTY');
+            evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = '';
+          }
+        }
+        // !VA Set retVal to an empty string and return it to handleKeydown
+        retVal = '';
+        // return retVal;
+
+      // !VA Else, if evtTargetVal has a value:
+      } else {
+        // !VA First, check the input
+        retVal = checkUserInput( userInputObj );
+        // !VA If the value is valid, i.e. checkUserInput did not return false
+        if (retVal !== false) {
+          // !VA If the target is a toolbar element, apply the input value
+          if ( tbrIptAliases.includes( appObjProp )) {
+            console.log('TOOLBAR INPUT: VALUE APPIED');
+            applyInputValue(userInputObj);
+          } else if ( ccpIptAliases.includes( appObjProp )) {
+            // !VA If the target is a Ccp element, set the Appobj property value and retVal to the value
+            console.log('CCP INPUT: VALUE APPIED');
+            evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = retVal;
+            console.log('Appobj[ appObjProp ] is: ' + Appobj[ appObjProp ]);
+          }
+
+        // !VA checkUserInput returned false, so the value is invalid
+        } else {
+          // !VA Conditions: 1) if the target is a toolbar input other than curImgW or curImgH, then restore the input value to its Appobj property. 2) If the target is curImgW or curImgH, restore the value to its Appobj property. Further handling will be done in handleKeydown. 3) If the target is a CCP input, restore it to priorVal. This is because CCP don't always reflect the Appobj value - at leas they didn't in earlier versions. I will have to keep an eye on that. 
+
+          // !VA All error conditions should be handled by handleKeydown, I think... 
+          // !VA I'm not sure what priorVal is for. I think CCP values are always written to DOM after checking now.
+          if ( tbrIptAliases.includes( appObjProp)) {
+            console.log('handleUserInput ERROR condition');
+              
+          }
+        }
+      }
+      return retVal;
+
+
+
+
+    }
+
+
+
+
+
+
+
+
     // !VA appController  
     // !VA Called from handleKeydown to handle Toolbar element user input. Runs checkUserInput to check for error conditions. If checkUserInput returns a value, runs applyInputValue to write the value to the corresponding Appobj property and update the dynamicElements dimensions. If error checking fails, writes an error message to the console and returns control to handleKeydown to handle the input elements on error.
-    function handleInputRequired(keydown, userInputObj) {
-      console.log('handleInputRequired running');
+    function handleRequiredInput(keydown, userInputObj) {
+      console.log('handleRequiredInput running');
       let retVal;
       // !VA Destructure userInputObj.
       let { appObjProp, evtTargetVal } = userInputObj;
@@ -3660,61 +3749,23 @@ ${indent}<![endif]-->`;
         // console.log(userInputObj);
         // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp locally.  
         let { appObjProp } = userInputObj;
-        // console.log('handleKeydown appObjProp is: ' + appObjProp);
-        // !VA CCP-specific keydown handling. CCP input elements, unlike Toolbar elements, have no existing values and can be empty. So in order to error-check the current evtTargetVal and restore it to its prior value if the current evtTargetVal fails error-checking: 1) the prior Appobj property has to be temporarily stored and 2) the current evtTargetVal has to be error-checked and then written to Appobj. 
-        /// !VA Branch: 0913A
-        // !VA The above is not true. TBW and TBL width inputs require an input and have to be handled the same as the Toolbar input elements. So the Appobj properties whose corresponding input elements require an input are, so far:
-        var required = [ 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'imgViewerW', 'curImgW', 'curImgH', 'sPhonesW', 'lPhonesW' ];
 
-        if (required.includes( appObjProp )) {
-          console.log('Input required');
-          // !VA Branch: review0720H (072020)
-          // !VA Comment this
-          if ( keydown === 9) {
-            retVal = handleInputRequired(keydown, userInputObj);
-            // !VA Handle error conditions
-            if (retVal === false ) {
-              // !VA The value of curImgW and curImgH has to be empty in order for the placeholder values to show, so stay in the input element and leave the cursor so the user can enter another value or TAB/ESC out. 
-              if (appObjProp === 'curImgW' || appObjProp === 'curImgH'  ) {
-                evt.preventDefault();
-              } else {
-                this.value = Appobj[appObjProp];
-                this.select();
-                evt.preventDefault();
-              }
-            }
-          } else if ( keydown === 13) {
-            retVal = handleInputRequired(keydown, userInputObj);
-            if (retVal === false ) {
+        // !VA Branch: 0922A
+        retVal = handleUserInput(keydown, userInputObj);
+        retVal === '' ? console.log('handleKeydown: retVal is EMPTY') : console.log('handleKeydown: retVal is: ' + retVal);
+        if ( retVal === false) {
+          if (keydown === 9) {
+
+            // !VA STOP. Problem here - need different handling for CCP and Toolbar elements. 
+            if ( appObjProp === 'curImgW' || appObjProp === 'curImgW') {
+              console.log('HIT');
+              this.select();
+              this.value = '';
+            } else {
               this.value = Appobj[appObjProp];
               this.select();
             }
-          } else {
-            console.log('ERROR in handleKeydown - unknown keypress');
-          }
-        } else {
-          // console.log('Input NOT required');
-          if ( keydown === 9) {
-            // !VA Branch: 0917A
-            // !VA Trying to understand why padding writes and error on blur when the input is empty
-            retVal = handleCcpInput(keydown, userInputObj);
-            if (retVal === false ) {
-              this.value = Appobj[appObjProp];
-              this.select();
-              evt.preventDefault();
-            // !VA Branch: 0917A
-            } 
-            // else if (retVal === '') {
-            //   if ( retVal === '' ) {console.log('HIT');}
-            // }
-          } else if ( keydown === 13) {
-            retVal = handleCcpInput(keydown, userInputObj);
-            if (retVal === false) { 
-              this.value = Appobj[appObjProp];
-              this.select();
-            }
-          } else {
-            console.log('ERROR in handleKeydown - unknown keypress');
+            evt.preventDefault();
           }
         }
       }
