@@ -3035,6 +3035,7 @@ ${indent}<![endif]-->`;
       // !VA Event handler for initializing event listeners 
       function addEventHandler(oNode, evt, oFunc, bCaptures) {
         // console.log('oNode is: ' + oNode);
+        // console.log('oNode.id is: ' + oNode.id);
         oNode.addEventListener(evt, oFunc, bCaptures);
       }
 
@@ -3099,6 +3100,8 @@ ${indent}<![endif]-->`;
       }
 
 
+      // addEventHandler(document.querySelector('#ipt-tbr-curimgw'), 'mousedown', handleMouseDown, false );
+
  
 
       // !VA KEYBOARD HANDLERS
@@ -3114,7 +3117,7 @@ ${indent}<![endif]-->`;
         addEventHandler((toolbarInputs[i]),'keyup',handleKeyup,false);
         addEventHandler((toolbarInputs[i]),'focus',handleFocus,false);
         // !VA Handle the mouse-initiated blurring of inputs in the blur handler of handleMouseEvents
-        addEventHandler((toolbarInputs[i]),'blur',handleMouseEvents,false);
+        addEventHandler((toolbarInputs[i]),'mousedown',handleMouseDown,false);
       }
 
       // !VA Branch: OVERHAUL0825C
@@ -3131,7 +3134,7 @@ ${indent}<![endif]-->`;
           addEventHandler(el,'keyup',handleKeyup,false);
           addEventHandler(el,'focus',handleFocus,false);
           // !VA Handle the mouse-initiated blurring of inputs in the blur handler of handleMouseEvents
-          addEventHandler(el,'blur',handleMouseEvents,false);
+          // addEventHandler(el,'mousedown',handleMouseEvents,false);
         }
         // !VA Add event listeners for the unlabelled child input elements of the padding input container.
         if (property.includes('Padng')) {
@@ -3148,7 +3151,7 @@ ${indent}<![endif]-->`;
             addEventHandler(nextSibling,'keydown',handleKeydown,false);
             addEventHandler(nextSibling,'keyup',handleKeyup,false);
             addEventHandler(nextSibling,'focus',handleFocus,false);
-            addEventHandler(nextSibling,'blur',handleMouseEvents,false);
+            // addEventHandler(nextSibling,'blur',handleMouseEvents,false);
             nextSibling = nextSibling.nextElementSibling;
           }
         }
@@ -3419,6 +3422,28 @@ ${indent}<![endif]-->`;
       }
     }
 
+
+    // !VA Branch: 0921A
+    function handleMouseDown(evt) {
+
+      console.log('handleMouseDown running'); 
+      let retVal, keydown, tar;
+      console.log('evt is: ');
+      console.log(evt);
+
+      // if ( evt.target.value !== '' ) {
+      //   console.log('HIT');
+      //   // this.select();
+      //   evt.preventDefault();
+
+      // } else {
+      //   return true;
+      // }
+    }
+
+
+
+
     // !VA appController   
     // !VA Called from tbClickables event handler. Handles clicks on the Toolbar increment/decrement buttons and handles blur for Toolbar and ccpUserInput input elements, which facilitates error-checking and applying values on blur with the mouse, allowing users to mouse through inputs, entering values as they go without having to press TAB or ENTER. To do this, it dispatches a keydown keyboardEvent for the TAB key to the current input element to simulate the keypress. Also handles drop and dragover events, applying preventDefault.
     function handleMouseEvents(evt) {
@@ -3454,42 +3479,18 @@ ${indent}<![endif]-->`;
             return;
           }
         }
-      // !VA Handle mouse-initiated blur events. This is called from the event handler for the respective input field. This facilitates error-checking and applying values on blur with the mouse, and allows users to mouse through inputs, entering values as they go without having to press TAB or ENTER.
 
-        // !VA Branch: 0918A
-        // !VA This is bad. There has to be a separate blur handler that handles both TAB and mouse-initiated blurs. Can't have these handlers running twice. That's mickey mouse shit.
+      }  else if ( event.type === 'mousedown') {
 
 
 
-      }  else if ( event.type === 'blur') {
-        // !VA First, select all the input elements - their mouse-initiated blur action will be handled here.
-        if (evt.target.id.substring( 14 ) === 'ipt') {
-          // !VA On blur with the mouse from input fields, dispatch a TAB keypress from the respective input to simulate a TAB keypress. 
-          userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
-          userInputObj.evtTargetVal = evt.target.value;
 
-          // !VA The userInputObj values have to be error-checked here to ensure that the TAB keypress isn't dispatched with invalid values in userInputObj. 
-          retVal = checkUserInput( userInputObj );
-          // !VA These are the cases where the TAB key is dispatched - error conditions and user-initiated changes. For these cases, handleKeydown and the respective input handler appears to run twice, but it doesn't appear to cause any errors because the second time the input value hasn't changed - and there doesn't appear to be any way to avoid it. For the other cases, handleKeydown only runs once.  
-          if ( retVal === false  || Appobj[userInputObj.appObjProp] !== userInputObj.evtTargetVal) {
 
-            // !VA Get the element to which the TAB keypress should be dispatched, i.e. the current element.
-            document.querySelector( '#' + evt.target.id).dispatchEvent(
-              new KeyboardEvent('keydown', {
-                key: 'Tab',
-                keyCode: 9, // example values.
-                code: 'Tab', // put everything you need in this object.
-                which: 9,
-                shiftKey: false, // you don't need to include values
-                ctrlKey: false,  // if you aren't going to use them.
-                metaKey: false   // these are here for example's sake.
-              })
-            );
-          }
-        // !VA The element was not an input element and so is not handled by the blur handler yet.
-        } else {
-          console.log('ERROR in handleMouseEvents - not an INPUT element');
-        }
+
+
+
+
+
       // !VA Handle drop events
       } else if ( event.type === 'drop') {
         evt.preventDefault;
