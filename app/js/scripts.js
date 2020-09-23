@@ -3753,12 +3753,17 @@ ${indent}<![endif]-->`;
         // !VA Branch: 0922A
         retVal = handleUserInput(keydown, userInputObj);
         retVal === '' ? console.log('handleKeydown: retVal is EMPTY') : console.log('handleKeydown: retVal is: ' + retVal);
+
+
+
         if ( retVal === false) {
           if (keydown === 9) {
-
+            // !VA Branch: 0922A
             // !VA STOP. Problem here - need different handling for CCP and Toolbar elements. 
-            if ( appObjProp === 'curImgW' || appObjProp === 'curImgW') {
-              console.log('HIT');
+            // !VA Enter good value in curImgW. ENTER - curImgW shows value.
+            // !VA TAB and ENTER handling look identical below.
+            if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
+              // console.log('HIT');
               this.select();
               this.value = '';
             } else {
@@ -3766,6 +3771,22 @@ ${indent}<![endif]-->`;
               this.select();
             }
             evt.preventDefault();
+          } else if ( keydown === 13) {
+            if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
+              console.log('Mark1 this.value is: ' + this.value);
+              this.select();
+              this.value = '';
+            } else {
+              this.value = Appobj[appObjProp];
+              this.select();
+            }
+          }
+        } else {
+          console.log('NOT FALSE');
+          if (keydown === 9) {
+            if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
+              this.value = '';
+            }
           }
         }
       }
@@ -3773,7 +3794,7 @@ ${indent}<![endif]-->`;
 
     // !VA appController  
     // !VA TODO: Why are there unused elements and what is actually happening here?
-    // !VA keyPress handler for the ESC key.  This has to be handled on keyup, so we need a separate handler for it.
+    // !VA keyPress handler for the ESC key.  This has to be` handled on keyup, so we need a separate handler for it.
     function handleKeyup(evt) {
       let keyup;
       // !VA Find out which key was struck
