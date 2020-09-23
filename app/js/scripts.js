@@ -3087,7 +3087,6 @@ ${indent}<![endif]-->`;
         }
       }
 
-      // !VA Branch: OVERHAUL0825C
       // !VA Add event handlers for ALL individual checkbox input elements. They are sorted out in handleCheckboxEvent called here. Note that Toolbar clicks and blur events on text input elements are handled separately in handleMouseEvents. Checkbox elements have a separate handler because calling it from handleMouseEvents would just add another clause and more complexity to handleMouseEvents.  
       let chkElements;
       for(let i in ccpUserInput) {
@@ -3100,24 +3099,26 @@ ${indent}<![endif]-->`;
       }
 
 
-      // addEventHandler(document.querySelector('#ipt-tbr-curimgw'), 'mousedown', handleMouseDown, false );
+      // document.querySelector('#app-container').addEventListener('click', mouseTest, true);
+      document.querySelector('#ipt-tbr-curimgw').addEventListener('blur', mouseTest, false);
 
- 
 
-      // !VA KEYBOARD HANDLERS
+      // !VA TOOLBAR AND CCP INPUT HANDLERS
       // -----------------------
       // !VA Branch: implementClipboard01 (071020)
-      // !VA Handle the Toolbar input elements separately from the Toolbar increment/decrement buttons because the buttons are handled by mouseclick or by default as mouseclicks when ENTER is pressed, so none of these handlers apply to those buttons.
-      // !VA Add event handlers for input toolbarElements. This could be merged with ccpInputs below but leave it for now.
+      // !VA Handle the Toolbar input elements separately from the Toolbar increment/decrement buttons because the buttons are handled by mouseclick or by default as mouseclicks when ENTER is pressed, so none of these handlers apply to those buttons. Also handle the CCP input
+
       const toolbarInputs = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrCurImgW, toolbarElements.iptTbrCurImgH, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW ];
       for (let i = 0; i < toolbarInputs.length; i++) {
         // !VA convert the ID string to the object inside the loop
         toolbarInputs[i] = document.querySelector(toolbarInputs[i]);
+        // !VA KEYBOARD HANDLERS
         addEventHandler((toolbarInputs[i]),'keydown',handleKeydown,false);
         addEventHandler((toolbarInputs[i]),'keyup',handleKeyup,false);
         addEventHandler((toolbarInputs[i]),'focus',handleFocus,false);
+        // !VA MOUSE HANDLERS
         // !VA Handle the mouse-initiated blurring of inputs in the blur handler of handleMouseEvents
-        addEventHandler((toolbarInputs[i]),'mousedown',handleMouseDown,false);
+        addEventHandler((toolbarInputs[i]),'blur',mouseTest,false);
       }
 
       // !VA Branch: OVERHAUL0825C
@@ -3129,10 +3130,12 @@ ${indent}<![endif]-->`;
         if (property.includes('Tfd')) {
           iptId = ccpUserInput[property].replace('tfd', 'ipt');
           el = document.querySelector(iptId);
+          // !VA KEYBOARD HANDLERS
           addEventHandler(el,'input',handleTextInputEvent,false);
           addEventHandler(el,'keydown',handleKeydown,false);
           addEventHandler(el,'keyup',handleKeyup,false);
           addEventHandler(el,'focus',handleFocus,false);
+          // !VA MOUSE HANDLERS
           // !VA Handle the mouse-initiated blurring of inputs in the blur handler of handleMouseEvents
           // addEventHandler(el,'mousedown',handleMouseEvents,false);
         }
@@ -3147,10 +3150,12 @@ ${indent}<![endif]-->`;
           // !VA Loop through the text input elements until there are no more.
           while(nextSibling) {
             // Add an input event listener for each of the child input element of the parent container
+            // !VA KEYBOARD HANDLER
             addEventHandler(nextSibling,'input',handleTextInputEvent,false);
             addEventHandler(nextSibling,'keydown',handleKeydown,false);
             addEventHandler(nextSibling,'keyup',handleKeyup,false);
             addEventHandler(nextSibling,'focus',handleFocus,false);
+            // !VA MOUSE HANDLERSz
             // addEventHandler(nextSibling,'blur',handleMouseEvents,false);
             nextSibling = nextSibling.nextElementSibling;
           }
@@ -3422,23 +3427,61 @@ ${indent}<![endif]-->`;
       }
     }
 
+    function loseFocus( el ) {
+      console.log('loseFocus running'); 
+      console.log('el is: ');
+      console.log(el);  
+      console.log('el.value is: ' + el.value);
+      setTimeout(() => {
+        el.focus();
+        
+      }, 100);
+      return;
+    }
+
 
     // !VA Branch: 0921A
-    function handleMouseDown(evt) {
+    function mouseTest(evt) {
+      // console.clear();
+      console.log('mouseTest running'); 
+      console.log('evt.target.id is: ' + evt.target.id);
+      let el, retVal, keydown;
+      let userInputObj = {};
+      el = evt.target;
+      console.log('el is: ');
+      console.log(el);
 
-      // console.log('handleMouseDown running'); 
-      let retVal, keydown, tar;
-      // console.log('evt is: ');
-      // console.log(evt);
+      userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
+      // !VA evtTargetVal is the value the user entered into the input element.
+      userInputObj.evtTargetVal = evt.target.value;
+      // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp locally.  
+      let { appObjProp } = userInputObj;
 
-      // if ( evt.target.value !== '' ) {
-      //   console.log('HIT');
-      //   // this.select();
-      //   evt.preventDefault();
+      retVal = handleUserInput(keydown, userInputObj);
+      console.log('retVal is: ' + retVal);
 
-      // } else {
-      //   return true;
-      // }
+      if (retVal === false) {
+        console.log('HANDLE ERROR');
+        // console.log('evt.relatedTarget is: ');
+        // console.log(evt.relatedTarget);
+        // console.log('this is: ');
+        // console.log(this);
+        // console.log('this.value is: ' + this.value);
+        // this.select();
+
+        // loseFocus( evt.target );
+        if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
+          this.value = '';
+        } else {
+          this.value = Appobj[ appObjProp ];
+        }
+      } else {
+        if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
+          this.value = '';
+        }
+      }
+      loseFocus( evt.target );
+      return;
     }
 
 
@@ -3480,18 +3523,6 @@ ${indent}<![endif]-->`;
           }
         }
 
-      }  else if ( event.type === 'mousedown') {
-
-
-
-
-
-
-
-
-
-
-      // !VA Handle drop events
       } else if ( event.type === 'drop') {
         evt.preventDefault;
         // !VA TODO: Revisit this
@@ -3562,14 +3593,6 @@ ${indent}<![endif]-->`;
       return retVal;
     }
 
-
-
-
-
-
-
-
-
     // !VA appController function
     // !VA NOTE: Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
     // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Calls checkUserInput which validates the input and returns either an integer or a string and passes the value to applyInputValue to write to Appobj and the DOM. Then, for curImgW/curImgH, sets the input value to '' so the placeholder shows through. For all other input elements, sets the input value to the respective Appobj property.
@@ -3626,15 +3649,13 @@ ${indent}<![endif]-->`;
       let keyup;
       // !VA Find out which key was struck
       keyup = evt.which || evt.keyCode || evt.key;
-      // !VA  On ESC, we want curImgW and curImgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the inspectorElements and there's no need to recalc the W and H each time the user makes and entry - that would just be confusing. For imgViewerW, sSphonesW and lPhonesW, revert to the previously displayed value if the user escapes out of the input field. The previously displayed value will be either 1) the default in the HTML placeholder attribute or 2) the localStorage value. So, the localStorage value is false, get the placeholder, otherwise get the localStorage value.
+      // !VA  On ESC, we want curImgW and curImgH to exit the field and go back to showing the placeholders defined in the CSS. This is because these values are already provided in the inspectorElements and there's no need to recalc the W and H each time the user makes an entry - that would just be confusing. For imgViewerW, sSphonesW and lPhonesW, revert to the previously displayed value if the user escapes out of the input field. The previously displayed value will be either 1) the default in the HTML placeholder attribute or 2) the localStorage value. So, the localStorage value is false, get the placeholder, otherwise get the localStorage value. This is handled in resetInputValue.
       // !VA Esc key
       if (keyup == 27 ) {
         // !VA We only need the property here, so no need to create an args object. We could actually just use the target but since we're standardizing on property names, let's stick with that. Get the property name from the id of this, i.e. the event target
         resetInputValue(evt);
       }
     }
-
-
 
     // !VA appController  
     // !VA Called from handleKeydown and handleMouseEvents. Separates numeric input from string input based on the Appobj property name included in two arrays. Numeric input is routed to checkNumericInput where values of type string are converted to integers. String inputs are routed to checkTextInput for valiation and error checking. 
