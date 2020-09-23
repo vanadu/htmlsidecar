@@ -3100,7 +3100,7 @@ ${indent}<![endif]-->`;
 
 
       // document.querySelector('#app-container').addEventListener('click', mouseTest, true);
-      document.querySelector('#ipt-tbr-curimgw').addEventListener('blur', mouseTest, false);
+      // document.querySelector('#ipt-tbr-curimgw').addEventListener('blur', handleMouseBlur, false);
 
 
       // !VA TOOLBAR AND CCP INPUT HANDLERS
@@ -3118,8 +3118,11 @@ ${indent}<![endif]-->`;
         addEventHandler((toolbarInputs[i]),'focus',handleFocus,false);
         // !VA MOUSE HANDLERS
         // !VA Handle the mouse-initiated blurring of inputs in the blur handler of handleMouseEvents
-        addEventHandler((toolbarInputs[i]),'blur',mouseTest,false);
+        addEventHandler((toolbarInputs[i]),'blur',handleMouseBlur,false);
+        // addEventHandler((toolbarInputs[i]),'mousedown',handleMouseBlur,false);
       }
+
+      // addEventHandler(document.querySelector('#app-container'),'mousedown',handleMouseBlur,false);
 
       // !VA Branch: OVERHAUL0825C
       // !VA Add input event listeners to run showElementOnInput for all labelled text input elements, i.e. elements whose alias ends in Tfd, and unlabelled child input elements of the padding group container. 
@@ -3137,7 +3140,7 @@ ${indent}<![endif]-->`;
           addEventHandler(el,'focus',handleFocus,false);
           // !VA MOUSE HANDLERS
           // !VA Handle the mouse-initiated blurring of inputs in the blur handler of handleMouseEvents
-          // addEventHandler(el,'mousedown',handleMouseEvents,false);
+          addEventHandler(el,'blur',handleMouseBlur,false);
         }
         // !VA Add event listeners for the unlabelled child input elements of the padding input container.
         if (property.includes('Padng')) {
@@ -3156,7 +3159,7 @@ ${indent}<![endif]-->`;
             addEventHandler(nextSibling,'keyup',handleKeyup,false);
             addEventHandler(nextSibling,'focus',handleFocus,false);
             // !VA MOUSE HANDLERSz
-            // addEventHandler(nextSibling,'blur',handleMouseEvents,false);
+            addEventHandler(nextSibling,'blur',handleMouseBlur,false);
             nextSibling = nextSibling.nextElementSibling;
           }
         }
@@ -3435,57 +3438,48 @@ ${indent}<![endif]-->`;
       setTimeout(() => {
         el.focus();
         
-      }, 100);
+      }, 5000);
       return;
     }
 
 
     // !VA Branch: 0921A
-    function mouseTest(evt) {
-      // console.clear();
-      console.log('mouseTest running'); 
+    function handleMouseBlur(evt) {
+      console.log('handleMouseBlur running'); 
       console.log('evt.target.id is: ' + evt.target.id);
-      let el, retVal, keydown;
+      let retVal;
       let userInputObj = {};
-      el = evt.target;
-      console.log('el is: ');
-      console.log(el);
-
       userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
       // !VA evtTargetVal is the value the user entered into the input element.
       userInputObj.evtTargetVal = evt.target.value;
       // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp locally.  
       let { appObjProp } = userInputObj;
-
-      retVal = handleUserInput(keydown, userInputObj);
-      console.log('retVal is: ' + retVal);
-
+      // !VA Get the return val from handlerUserInput - empty string, valid input or FALSE for error
+      retVal = handleUserInput(userInputObj);
+      // !VA If error, emulate preventDefault on the blur event, which does not support preventDefault. The goal is to select the target's value, which doesn't work with blur because the focus is already out of the field before the select() method can be called on the input element. To address this problem, shift focus away from the target element to an element which has no value, timeout 10ms, then shift it back to run the rest of the handler. The focus() method selects the input value by default. Alternatively, it should be possible to use focusout instead of blur, which does support preventDefault, but this works just as well for now.
       if (retVal === false) {
-        console.log('HANDLE ERROR');
-        // console.log('evt.relatedTarget is: ');
-        // console.log(evt.relatedTarget);
-        // console.log('this is: ');
-        // console.log(this);
-        // console.log('this.value is: ' + this.value);
-        // this.select();
-
-        // loseFocus( evt.target );
+        (function () {
+          // !VA Shift the focus to the main app container div. 
+          document.querySelector('#app-container').focus();
+          setTimeout(() => {
+            // !VA Shift the focus back to the target element.
+            evt.target.focus();
+          }, 10);
+        })();
+        // !VA Now run the rest of the error handler
         if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
           this.value = '';
         } else {
           this.value = Appobj[ appObjProp ];
+          this.select();
         }
+        // !VA If retVal is a valid value, set the value of the curImgW and curImgH inputs to empty so the placeholder text displays.
       } else {
         if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
           this.value = '';
         }
       }
-      loseFocus( evt.target );
-      return;
     }
-
-
-
 
     // !VA appController   
     // !VA Called from tbClickables event handler. Handles clicks on the Toolbar increment/decrement buttons and handles blur for Toolbar and ccpUserInput input elements, which facilitates error-checking and applying values on blur with the mouse, allowing users to mouse through inputs, entering values as they go without having to press TAB or ENTER. To do this, it dispatches a keydown keyboardEvent for the TAB key to the current input element to simulate the keypress. Also handles drop and dragover events, applying preventDefault.
@@ -3536,7 +3530,7 @@ ${indent}<![endif]-->`;
     // !VA appController  
     // !VA Called from handleKeydown to handle CCP element user input. Runs checkUserInput to check for error conditions and returns either an empty string, a valid value or FALSE to handleKeydown.
     // !VA NOTE: There was a priorVal variable earlier that stored evt.target.val for use with CCP inputs because at that time CCP inputs weren't immediately stored in Appobj. Keep an eye on that - currently all CCP values are stored to Appobj.
-    function handleUserInput(keydown, userInputObj) {
+    function handleUserInput( userInputObj ) {
       console.log('handleUserInput running'); 
       let retVal;
       let tbrIptAliases = [], imgIptAliases = [], ccpIptAliases = [];
@@ -3612,7 +3606,7 @@ ${indent}<![endif]-->`;
         let { appObjProp } = userInputObj;
         // !VA Branch: 0922A
         // !VA Call handleUserInput to validate the user input and process it based on the input type (i.e. Toolbar or CCP input). retVal will return either an empty string, a valid value, or FALSE if checkUserInput detects an input error.
-        retVal = handleUserInput(keydown, userInputObj);
+        retVal = handleUserInput(userInputObj);
         // retVal === '' ? console.log('handleKeydown: retVal is EMPTY') : console.log('handleKeydown: retVal is: ' + retVal);
         if ( retVal === false) {
           // !VA Handle the TAB and ENTER key which have the same action if retVal is false. If the target is curImgW or curImgH, select the bad value and replace it with an empty field to show the placeholders. Otherwise, select the bad value and replace it the Appobj property value. If the TAB key was pressed, prevent the default behavior, i.e. cancel the blur and keep the focus in the field so the user can enter a new value or keep the Appobj value and TAB again or ESC to exit the field.
