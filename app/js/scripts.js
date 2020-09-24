@@ -3098,16 +3098,9 @@ ${indent}<![endif]-->`;
         }
       }
 
-
-      // document.querySelector('#app-container').addEventListener('click', mouseTest, true);
-      // document.querySelector('#ipt-tbr-curimgw').addEventListener('blur', handleMouseBlur, false);
-
-
-      // !VA TOOLBAR AND CCP INPUT HANDLERS
       // -----------------------
       // !VA Branch: implementClipboard01 (071020)
-      // !VA Handle the Toolbar input elements separately from the Toolbar increment/decrement buttons because the buttons are handled by mouseclick or by default as mouseclicks when ENTER is pressed, so none of these handlers apply to those buttons. Also handle the CCP input
-
+      // !VA Handle the Toolbar input elements separately from the Toolbar increment/decrement buttons because the buttons are handled by mouseclick or by default as mouseclicks when ENTER is pressed, so none of these handlers apply to those buttons. Includes eventListener handlers for keyboard and mouse blur events.
       const toolbarInputs = [ toolbarElements.iptTbrImgViewerW, toolbarElements.iptTbrCurImgW, toolbarElements.iptTbrCurImgH, toolbarElements.iptTbrSPhonesW, toolbarElements.iptTbrLPhonesW ];
       for (let i = 0; i < toolbarInputs.length; i++) {
         // !VA convert the ID string to the object inside the loop
@@ -3118,14 +3111,10 @@ ${indent}<![endif]-->`;
         addEventHandler((toolbarInputs[i]),'focus',handleFocus,false);
         // !VA MOUSE HANDLERS
         // !VA Handle the mouse-initiated blurring of inputs in the blur handler of handleMouseEvents
-        addEventHandler((toolbarInputs[i]),'blur',handleMouseBlur,false);
-        // addEventHandler((toolbarInputs[i]),'mousedown',handleMouseBlur,false);
+        // addEventHandler((toolbarInputs[i]),'blur',handleMouseBlur,false);
       }
 
-      // addEventHandler(document.querySelector('#app-container'),'mousedown',handleMouseBlur,false);
-
-      // !VA Branch: OVERHAUL0825C
-      // !VA Add input event listeners to run showElementOnInput for all labelled text input elements, i.e. elements whose alias ends in Tfd, and unlabelled child input elements of the padding group container. 
+      // !VA Add input event listeners to run showElementOnInput for all labelled text input elements, i.e. elements whose alias ends in Tfd, and unlabelled child input elements of the padding group container. Includes keyboard and mouse blur event listeners
       // !VA Loop through all the properties of ccpUserInput
       for (const property in ccpUserInput) {
         var el, iptId, firstChld, nextSibling;
@@ -3139,33 +3128,11 @@ ${indent}<![endif]-->`;
           addEventHandler(el,'keyup',handleKeyup,false);
           addEventHandler(el,'focus',handleFocus,false);
           // !VA MOUSE HANDLERS
-          // !VA Handle the mouse-initiated blurring of inputs in the blur handler of handleMouseEvents
           addEventHandler(el,'blur',handleMouseBlur,false);
         }
-        // !VA Add event listeners for the unlabelled child input elements of the padding input container.
-        if (property.includes('Padng')) {
-          // !VA The first child of the padding container is the icon. 
-          // !VA 082520
-          // !VA There should be an alias for this - it gets used in at least two places
-          firstChld = document.querySelector('#ccp-tda-padng-icn');
-          // !VA The next sibling of the icon is the first text input element.
-          nextSibling = firstChld.nextElementSibling;
-          // !VA Loop through the text input elements until there are no more.
-          while(nextSibling) {
-            // Add an input event listener for each of the child input element of the parent container
-            // !VA KEYBOARD HANDLER
-            addEventHandler(nextSibling,'input',handleTextInputEvent,false);
-            addEventHandler(nextSibling,'keydown',handleKeydown,false);
-            addEventHandler(nextSibling,'keyup',handleKeyup,false);
-            addEventHandler(nextSibling,'focus',handleFocus,false);
-            // !VA MOUSE HANDLERSz
-            addEventHandler(nextSibling,'blur',handleMouseBlur,false);
-            nextSibling = nextSibling.nextElementSibling;
-          }
-        }
+        // !VA Add handler for the padding icon - turn it blue if a padding input has a value
+        addEventHandler(document.querySelector('#ccp-tda-padng-icn'),'blur',handleTextInputEvent,false);
       }
-
-
 
       // !VA HOVER HANDLERS
       // ------------------
@@ -3370,10 +3337,32 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController  
-    // !VA Handle behavior when an element gets the focus. Pertains only to keyboard input, actually, I'm not sure whether buttons or CCP elements need special handling. Takes no argument because this is used instead of the passed event.
+    // !VA Handle behavior when an element gets the focus. For all inputs except padding, this just selects the input. For padding, it cancels growing the current image by the left/right padding value. Otherwise, every time a left/right padding input is blurred, the current image would cumulatively grow by that amount. This resets the current image to its original size before any padding was applied.
     function handleFocus(evt) {
+      console.log('handleFocus running'); 
+      console.log('evt.target.id is: ' + evt.target.id);
+      let imgInputObj = { };
+      let propVal, val;
       // !VA Don't forget that it was the CSS user-select property that was causing the non-default input behavior in the Toolbar elements. That CSS property is disabled now, so all we have to do is this.select on focus for all alements
       this.select();
+      if (evt.target.id.substring( 8, 13 ) === 'pdlft' || evt.target.id.substring( 8, 13 ) === 'pdrgt') {
+        // !VA parseInt will return NaN if the string is empty, so skip padding handling unless there is a value in the left/right padding input element.
+        if (evt.target.value !== '') {
+          // !VA Set appObjProp value of the imgInputObj to curImgW - this is the current image whose width needs to be reset to the pre-padding value
+          imgInputObj.appObjProp = 'curImgW';
+          // !VA Set a temporary value to the current Appobj property for curImgW. This is the value that includes the padding value to subtract.
+          propVal = Appobj.curImgW;
+          // !VA Subtract the current padding value, i.e. evt.target.value from Appobj.curImgW. This returns Appobj.curImgW to the value it had before padding was added to it.
+          Appobj.curImgW = propVal + parseInt(evt.target.value);
+          // !VA Set the evtTargetVal property to the current Appobj.curImgW value
+          imgInputObj.evtTargetVal = Appobj.curImgW;
+          // !VA Update the current image width
+          appController.initupdateCurrentImage(imgInputObj);
+          // console.log('handleFocus - current image updated');
+          // !VA Set the padding input value to empty - this is the value that will be handled by handleMouseBlur or handleKeydown
+          evt.target.value = '';
+        }
+      }
     }
 
     // !VA appController   
@@ -3430,25 +3419,13 @@ ${indent}<![endif]-->`;
       }
     }
 
-    function loseFocus( el ) {
-      console.log('loseFocus running'); 
-      console.log('el is: ');
-      console.log(el);  
-      console.log('el.value is: ' + el.value);
-      setTimeout(() => {
-        el.focus();
-        
-      }, 5000);
-      return;
-    }
-
-
-    // !VA Branch: 0921A
+    // !VA appController  
+    // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. The IIFE emulates how preventDefault works on the TAB key if handleUserInput returns false, i.e. highlight the input value and keep the focus in the field so the user can accept the value or blur out of the input with mouse click or TAB.
     function handleMouseBlur(evt) {
       console.log('handleMouseBlur running'); 
-      console.log('evt.target.id is: ' + evt.target.id);
-      let retVal;
+      let retVal, propVal;
       let userInputObj = {};
+      let imgInputObj = {}
       userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
       // !VA evtTargetVal is the value the user entered into the input element.
       userInputObj.evtTargetVal = evt.target.value;
@@ -3456,7 +3433,40 @@ ${indent}<![endif]-->`;
       let { appObjProp } = userInputObj;
       // !VA Get the return val from handlerUserInput - empty string, valid input or FALSE for error
       retVal = handleUserInput(userInputObj);
-      // !VA If error, emulate preventDefault on the blur event, which does not support preventDefault. The goal is to select the target's value, which doesn't work with blur because the focus is already out of the field before the select() method can be called on the input element. To address this problem, shift focus away from the target element to an element which has no value, timeout 10ms, then shift it back to run the rest of the handler. The focus() method selects the input value by default. Alternatively, it should be possible to use focusout instead of blur, which does support preventDefault, but this works just as well for now.
+
+      // !VA Handle padding values - these are added to the width of the current image in the main image viewer. 
+      console.log('evt.target.id.substring( 9, 10 ) is: ' + evt.target.id.substring( 8, 13 ));
+      if (evt.target.id.substring( 8, 13 ) === 'pdlft' || evt.target.id.substring( 8, 13 ) === 'pdrgt') {
+        // !VA parseInt will return NaN if the string is empty, so skip padding handling unless there is a value in the left/right padding input element.
+        if (evt.target.value !== '') {
+          // !VA Set appObjProp value of the imgInputObj to curImgW - this is the current image width will grow by the left/right padding value
+          imgInputObj.appObjProp = 'curImgW';
+          // !VA Set a temporary value to the current Appobj property for curImgW. This is the value that includes the padding value to add.
+          propVal = Appobj.curImgW;
+          // !VA Add the current padding value, i.e. evt.target.value to Appobj.curImgW.
+          Appobj.curImgW = propVal + parseInt(-evt.target.value);
+          // !VA Set the evtTargetVal property to the current Appobj.curImgW value
+          imgInputObj.evtTargetVal = Appobj.curImgW;
+          // !VA Update the current image width
+          appController.initupdateCurrentImage(imgInputObj);
+          console.log('propVal is: ' + propVal);
+          Appobj['ccpTblWidthTfd'] = propVal;
+          var configObj = {};
+          configObj = { 
+            reflectAppobj: { reflect: [ 'ccpTblWidthTfd'] } 
+          };
+          UIController.configCCP( configObj);
+
+
+
+
+
+        }
+      }
+
+
+
+      // !VA If error, emulate preventDefault on the blur event, which does not support preventDefault. The goal is to select the target's value, which doesn't work with blur because the focus is already out of the field before the select() method can be invoked on the input element. To address this problem, shift focus away from the target element to an element which has no value (i.e. #app-container), timeout 10ms, then shift it back to run the rest of the handler. The focus() method selects the input value by default. Alternatively, it should be possible to use focusout instead of blur, which does support preventDefault, but this works just as well for now.
       if (retVal === false) {
         (function () {
           // !VA Shift the focus to the main app container div. 
@@ -3591,6 +3601,7 @@ ${indent}<![endif]-->`;
     // !VA NOTE: Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
     // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Calls checkUserInput which validates the input and returns either an integer or a string and passes the value to applyInputValue to write to Appobj and the DOM. Then, for curImgW/curImgH, sets the input value to '' so the placeholder shows through. For all other input elements, sets the input value to the respective Appobj property.
     function handleKeydown(evt) {
+      console.log('handleKeydown running'); 
       let retVal;
       // !VA Get the keypress
       let keydown = evt.which || evt.keyCode || evt.key;
@@ -4282,7 +4293,7 @@ ${indent}<![endif]-->`;
     // !VA Branch: OVERHAUL0827A
     // !VA NOTE: This function is in appController the actions are distinct from the actions in configCCP. Those controls pertain to specific option configurations that functionally depend on a selected option. These options below only make other options available if a text input is entered. Perhaps an insignificant distinction, but a valid one - all the configCCP react to checkbox state changes, not input values.
     function handleTextInputEvent(evt) {
-      let tar, icn, nextSibling, pdgElements, hasValue, flag;
+      let tar, icn, pdgElements, hasValue, flag;
       let configObj = {};
       let revealArray = [];
       hasValue = false;
@@ -4342,19 +4353,19 @@ ${indent}<![endif]-->`;
         }
       // !VA Now handle the unlabelled padding text input elements
       } else {
-        // !VA All we do here is highlight the 4--arrow icon if there's an input in any of the padding input fields.
-        // !VA icn is the 4-arrow pointer icon for padding
+        // !VA Highlight the padding icon if there's an input in any of the padding input fields.
+        // !VA icn is the padding icon 
         icn = document.querySelector('#ccp-tda-padng-icn');
         // !VA Collection of all the padding input elements
         pdgElements = document.getElementsByClassName('ccp-padng-ipt');
-        // !VA Set nextSibling to the first paddin input element in the collection
-        nextSibling = pdgElements[0];
-        // !VA Run the loop until one of the padding input elements has a value, then set the hasValue flag and exit to determine if any of the padding input elements have a value
-        while (nextSibling) {
-          if (nextSibling.value !== '') { hasValue = true; }
-          nextSibling = nextSibling.nextElementSibling;
-        }
         // !VA If any of the padding input elements have a value, highlight the icon. If not, remove the highlight.
+        hasValue === false;
+        for (const el of pdgElements) {
+          if (el.value !== '') { 
+            hasValue = true;
+            break;
+          }
+        }
         hasValue ? icn.classList.add('active') : icn.classList.remove('active');
       }
     }
