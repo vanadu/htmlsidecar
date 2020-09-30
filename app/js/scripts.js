@@ -3327,10 +3327,9 @@ ${indent}<![endif]-->`;
     // !VA appController  
     // !VA Handle behavior when an element gets the focus. For all inputs except padding, this just selects the input. For padding, it cancels growing the current image by the left/right padding value. Otherwise, every time a left/right padding input is blurred, the current image would cumulatively grow by that amount. This resets the current image to its original size before any padding was applied.
     function handleFocus(evt) {
-      console.log('handleFocus running'); 
-      console.log('evt.target.id is: ' + evt.target.id);
+      // console.log('handleFocus running'); 
       let imgInputObj = { };
-      let propVal, val;
+      let propVal;
       // !VA Don't forget that it was the CSS user-select property that was causing the non-default input behavior in the Toolbar elements. That CSS property is disabled now, so all we have to do is this.select on focus for all alements
       this.select();
       if (evt.target.id.substring( 8, 13 ) === 'pdlft' || evt.target.id.substring( 8, 13 ) === 'pdrgt') {
@@ -3410,12 +3409,9 @@ ${indent}<![endif]-->`;
     // !VA appController  
     // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. The IIFE emulates how preventDefault works on the TAB key if handleUserInput returns false, i.e. highlight the input value and keep the focus in the field so the user can accept the value or blur out of the input with mouse click or TAB.
     function handleMouseBlur(evt) {
-
-      console.log('handleMouseBlur running'); 
-      console.log('evt.target.id is: ' + evt.target.id);
+      // console.log('handleMouseBlur running'); 
       let retVal, propVal, tblWidth;
-      let userInputObj = {};
-      let imgInputObj = {};
+      let userInputObj = {}, configObj = {}, imgInputObj = {};
       userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
       // !VA evtTargetVal is the value the user entered into the input element.
       userInputObj.evtTargetVal = evt.target.value;
@@ -3423,55 +3419,27 @@ ${indent}<![endif]-->`;
       let { appObjProp } = userInputObj;
       // !VA Get the return val from handlerUserInput - empty string, valid input or FALSE for error
       retVal = handleUserInput(userInputObj);
-      console.log('retVal is: ' + retVal);
-      console.log('typeof(retVal) is: ' + typeof(retVal));
-
       // !VA Handle padding values - these are added to the width of the current image in the main image viewer. 
-      console.log('evt.target.id.substring( 9, 10 ) is: ' + evt.target.id.substring( 8, 13 ));
       if (evt.target.id.substring( 8, 13 ) === 'pdlft' || evt.target.id.substring( 8, 13 ) === 'pdrgt') {
         // !VA parseInt will return NaN if the string is empty, so skip padding handling unless there is a value in the left/right padding input element.
         if (evt.target.value !== '') {
-          console.log('HIT');
-          // !VA Branch: 0924B
-
-
-
           // !VA Get the sum of padding left and right. These values are pulled now from Appobj. 
           tblWidth = parseInt(Appobj.ccpTdaPdrgtTfd + Appobj.ccpTdaPdlftTfd);
-
-          console.log('typeof(Appobj.ccpTdaPdrgtTfd) is: ' + typeof(Appobj.ccpTdaPdrgtTfd));
-          console.log('typeof(Appobj.curImgW) is: ' + typeof(Appobj.curImgW));
-          console.log('typeof(tblWidth) is: ' + typeof(tblWidth));
-
           // !VA Set appObjProp value of the imgInputObj to curImgW - this is the current image width will grow by the left/right padding value
           imgInputObj.appObjProp = 'curImgW';
-          console.log('Mark1 imgInputObj is: ');
-          console.log(imgInputObj);
           // !VA Set a temporary value to the current Appobj property for curImgW. This is the value that includes the padding value to add.
           propVal = Appobj.curImgW;
           // !VA Add the current padding value, i.e. evt.target.value to Appobj.curImgW.
-          console.log('typeof(propVal) is: ' + typeof(propVal));
-
-
           Appobj.curImgW = propVal + parseInt(-evt.target.value);
           // !VA Set the evtTargetVal property to the current Appobj.curImgW value
           imgInputObj.evtTargetVal = Appobj.curImgW;
           // !VA Update the current image width
           appController.initupdateCurrentImage(imgInputObj);
-          console.log('typeof(tblWidth) is: ' + typeof(tblWidth));
           Appobj.ccpTblWidthTfd = Appobj.curImgW + tblWidth;
-
-          var configObj = {};
           configObj = { 
             reflectAppobj: { reflect: [ 'ccpTblWidthTfd'] } 
           };
           UIController.configCCP( configObj);
-
-          console.log('handleMouseblur Appobj is: ');
-          console.log(Appobj);
-
-
-
         }
       }
 
@@ -3552,7 +3520,7 @@ ${indent}<![endif]-->`;
     // !VA Called from handleKeydown to handle CCP element user input. Runs checkUserInput to check for error conditions and returns either an empty string, a valid value or FALSE to handleKeydown.
     // !VA NOTE: There was a priorVal variable earlier that stored evt.target.val for use with CCP inputs because at that time CCP inputs weren't immediately stored in Appobj. Keep an eye on that - currently all CCP values are stored to Appobj.
     function handleUserInput( userInputObj ) {
-      console.log('handleUserInput running'); 
+      // console.log('handleUserInput running'); 
       let retVal;
       let tbrIptAliases = [], imgIptAliases = [], ccpIptAliases = [];
       // let configObj = {};
@@ -3571,6 +3539,7 @@ ${indent}<![endif]-->`;
       }
       // !VA If evtTargetVal is empty, process it first so empty strings won't be passed to checkUserInput for error checking. This prevents checkUserInput from flagging empty strings as errors and returning false on them. 
       if ( evtTargetVal === '') {
+        console.log('Mark1');
         // !VA If the target is curImgW or curImgH or a Ccp input, then the user has exited the field without entering a value, or has deleted the default value and exited the field. In this case, return the empty value without further action.
         if ( imgIptAliases.includes( appObjProp) || (ccpIptAliases.includes( appObjProp ))) {
           // console.log('EMPTY VALUE IN curImgW, curImgH or a CCP Input');
@@ -3584,6 +3553,7 @@ ${indent}<![endif]-->`;
         retVal = '';
       // !VA If the target does have a value other than an empty string, it needs to be error-checked.
       } else {
+        console.log('Mark2');
         // !VA First, check the input and get the return value - it will either be a valid value or FALSE if the error check detected an input error.
         retVal = checkUserInput( userInputObj );
         // !VA If the value is valid, i.e. checkUserInput did not return false
@@ -3594,9 +3564,10 @@ ${indent}<![endif]-->`;
             applyInputValue(userInputObj);
           // !VA If the target is a CCP element, set the Appobj property value to the value returned from checkUserInput
           } else if ( ccpIptAliases.includes( appObjProp )) {
-            // console.log('CCP INPUT: VALUE APPIED');
+            console.log('CCP INPUT: VALUE APPLIED');
             evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = retVal;
-            // console.log('Appobj[ appObjProp ] is: ' + Appobj[ appObjProp ]);
+            console.log('appObjProp is: ' + appObjProp);
+            console.log('Appobj[ appObjProp ] is: ' + Appobj[ appObjProp ]);
           }
         // !VA Otherwise, checkUserInput returned false so the target value is invalid. Return FALSE to handleKeydown for TAB and ENTER key handling.
         } else {
@@ -3612,7 +3583,7 @@ ${indent}<![endif]-->`;
     // !VA NOTE: Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
     // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Calls checkUserInput which validates the input and returns either an integer or a string and passes the value to applyInputValue to write to Appobj and the DOM. Then, for curImgW/curImgH, sets the input value to '' so the placeholder shows through. For all other input elements, sets the input value to the respective Appobj property.
     function handleKeydown(evt) {
-      console.log('handleKeydown running'); 
+      // console.log('handleKeydown running'); 
       let retVal;
       // !VA Get the keypress
       let keydown = evt.which || evt.keyCode || evt.key;
@@ -3751,6 +3722,8 @@ ${indent}<![endif]-->`;
       const { appObjProp, evtTargetVal } = userInputObj;
       // !VA The code that will be passed to getAppMessageStrings
       let appMessCode, isErr, retVal;
+      // !VA Temporary variables
+      let foo, faa, baz;
       // !VA The flag indicating an error condition,
       isErr = false;
       // !VA TODO: Setting maxViewerWidth just for now
@@ -3873,8 +3846,19 @@ ${indent}<![endif]-->`;
           }
           break;
         case (appObjProp.substring( 6, 8) === 'Pd') :
-          // !VA Padding - Input errors not yet trapped
+          // !VA Branch: 0930A
+          // !VA Curly braces allow var declaration inside conditional
+          {
+            let pdngWidth, pdngHeight;
+            console.log('Appobj.ccpTdaPdrgtTfd is: ' + Appobj.ccpTdaPdrgtTfd);
+            pdngWidth = Appobj.ccpTdaPdrgtTfd + Appobj.ccpTdaPdlftTfd;
+            console.log('pdngWidth is: ' + pdngWidth);
+            console.log('check padding inputs...');
+            faa = Appobj.ccpTdaWidthTfd;
+            console.log('evtTargetVal is: ' + evtTargetVal);
 
+
+          }
           break;
         default:
           console.log('ERROR in checkNumericInput - unknown condition in case/select');
@@ -3909,17 +3893,11 @@ ${indent}<![endif]-->`;
     // !VA appController  
     // !VA Called from applyInputValue and handleMouseEvents. This function name is a misnomer here. More importantly than writing to Appobj, this function writes imgViewerW, sPhonesW and lPhonesW to localStorage and calculates the adjacent side of the curImgW/curImgH input, then runs calcViewerSize to resize the dynamicElements containers. NOTE: This function does things that are done elsewhere and does other things that it shouldn't do. Revisit this at some point but for now it works.
     function updateCurrentImage(userInputObj) {
-      console.log('updateCurrentImage running'); 
+      // console.log('updateCurrentImage running'); 
       // !VA Initialize vars for curImgH and curImgW in order to calculate one based on the value of the other * Appobj.aspect.
-      let curImgH, curImgW;
+      // let curImgH, curImgW;
       // !VA ES6 Destructure args into constants. userInputObj is passed in from the mouse/keyboard event handlers.
-
-      console.log('updateCurrentImage userInputObj is: ');
-      console.log(userInputObj);
-
       const { appObjProp, evtTargetVal } = userInputObj;
-      console.log('updateCurrentImage userInputObj is: ');
-      console.log(userInputObj);
       // !VA Handle the two cases: 1) appObjProp and evtTargetVal are used to write to Appobj, localStorage and the DOM. This applies to imgViewerW, sPhonesW and lPhonesH. 2) appObjProp and evtTargetVal are used to calculate the img's adacent dimension, then both the images' dimensions are written to Appobj. This applies to curImgW and curImgH. NOTE: For some reason, updateAppobj wrote curImgH to the DOM here - I'm not sure why that was done, but it shouldn't be. 
       // !VA appObjProp = imgViewerW, sPhonesW or lPhonesW
       if ( appObjProp === 'imgViewerW' || appObjProp === 'sPhonesW' || appObjProp === 'lPhonesW') {
@@ -3932,11 +3910,11 @@ ${indent}<![endif]-->`;
       } else if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
         // !VA Calculate the adjacent dimension of appObjProp based on the aspect ratio, then set the Appobj property of the dimension and its adjacent dimension
         if ( appObjProp === 'curImgW') {
-          Appobj.curImgH = curImgH =  Math.round(evtTargetVal * (1 / Appobj.aspect[0]));
-          Appobj.curImgW = curImgW = evtTargetVal;
+          Appobj.curImgH = Math.round(evtTargetVal * (1 / Appobj.aspect[0]));
+          Appobj.curImgW = evtTargetVal;
         } else if ( appObjProp === 'curImgH') {
-          Appobj.curImgW  = curImgW =  Math.round(evtTargetVal * (Appobj.aspect[0]));
-          Appobj.curImgH = curImgH = evtTargetVal;
+          Appobj.curImgW  = Math.round(evtTargetVal * (Appobj.aspect[0]));
+          Appobj.curImgH = evtTargetVal;
         }
       }
 
