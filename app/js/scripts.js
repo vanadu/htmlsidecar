@@ -1309,38 +1309,20 @@ var Witty = (function () {
           let msdpi, val, pdng, hasPadding;
 
 
-          // !VA Branch: 0918A
-          // !VA Update curImgW by subtracting the sum of left and right padding values
-          pdngWidth = Appobj['ccpTdaPdrgtTfd'] + Appobj['ccpTdaPdrgtTfd'];
-          // !VA Create userInputObj to pass to updateCurrentImage
-          let userInputObj = {}, configObj = {};
-          // !VA Set the property to the alias of the element to change, i.e. curImgW
-          userInputObj.appObjProp = 'curImgW';
-          // !VA Set the value of the element to change, i.e. the current Appobj.curImgW minus the sum of the padding left/right values
-          userInputObj.evtTargetVal = Appobj['curImgW'] - pdngWidth; 
-          // !VA Call updateCurrentImage to update the current image and the Inspectors.
-          appController.initupdateCurrentImage(userInputObj);
-
-
-          console.log('Appobj is: ');
-          console.log(Appobj['curImgW']);
-          // !VA Now update TBL and TDA Width - they no longer equal curImgW. 
-          Appobj['ccpTblWidthTfd'] = Appobj['curImgW'] + pdngWidth;
-          console.log('Appobj[] is: ');
-          console.log(Appobj['ccpTblWidthTfd']);
-          configObj = { 
-            reflectAppobj: { reflect: [ 'ccpTblWidthTfd'] } 
-          };
-          UIController.configCCP( configObj);
-            
 
 
 
           let arr = [];
           // !VA Make array of the 4 padding aliases
-          let aliasArray = ['ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdrgtTfd' ];
+          let aliasArray = ['ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd' ];
+          console.log('aliasArray is: ');
+          console.log(aliasArray);
 
+          for (const alias of aliasArray ) { 
+      
+            console.log('Appobj[alias] is: ' + Appobj[alias]);
 
+          }
 
 
 
@@ -1354,6 +1336,9 @@ var Witty = (function () {
             // !VA Push the value onto an array for further processing
             arr.push(val);
           }
+          console.log('arr is: ');
+          console.log(arr);
+
           // !VA Set the hasPadding flag to false
           hasPadding = false;
           // !VA Loop thru array until one of the items is not equal to 0. If that occurs, then the user has entered a value into one of the padding input fields, so set the hasPadding flag to true
@@ -1537,6 +1522,9 @@ var Witty = (function () {
     // !VA CBController   
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
     function buildOutputNodeList( id ) {
+      console.log('buildOutputNodeList running'); 
+      console.log('id is: ' + id);
+      // debugger;
       let selectedTdOption, hasAnchor, hasWrapper, Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
       // !VA Branch: OVERHAUL0908D
       // !VA Set hasAnchor if ccpImgAnchrTfd has a value
@@ -3423,11 +3411,11 @@ ${indent}<![endif]-->`;
     // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. The IIFE emulates how preventDefault works on the TAB key if handleUserInput returns false, i.e. highlight the input value and keep the focus in the field so the user can accept the value or blur out of the input with mouse click or TAB.
     function handleMouseBlur(evt) {
 
-      console.clear();
       console.log('handleMouseBlur running'); 
+      console.log('evt.target.id is: ' + evt.target.id);
       let retVal, propVal, tblWidth;
       let userInputObj = {};
-      let imgInputObj = {}
+      let imgInputObj = {};
       userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
       // !VA evtTargetVal is the value the user entered into the input element.
       userInputObj.evtTargetVal = evt.target.value;
@@ -3479,7 +3467,8 @@ ${indent}<![endif]-->`;
           };
           UIController.configCCP( configObj);
 
-
+          console.log('handleMouseblur Appobj is: ');
+          console.log(Appobj);
 
 
 
