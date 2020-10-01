@@ -3614,6 +3614,8 @@ ${indent}<![endif]-->`;
               this.select();
             }
           }
+          // !VA Branch: 0930A
+          // !VA This has got to go
           // !VA If TAB, cancel the blur and keep focus in the input field.
           if ( keydown === 9 ) { evt.preventDefault(); }
         } else {
