@@ -3096,10 +3096,10 @@ ${indent}<![endif]-->`;
         // !VA KEYBOARD HANDLERS
         addEventHandler((toolbarInputs[i]),'keydown',handleKeydown,false);
         addEventHandler((toolbarInputs[i]),'keyup',handleKeyup,false);
-        addEventHandler((toolbarInputs[i]),'focus',handleFocus,false);
+        // addEventHandler((toolbarInputs[i]),'focus',handleFocus,false);
         // !VA MOUSE HANDLERS
         // !VA Handle the mouse-initiated blurring of inputs in the blur handler of handleMouseEvents
-        // addEventHandler((toolbarInputs[i]),'blur',handleMouseBlur,false);
+        addEventHandler((toolbarInputs[i]),'blur',handleBlurEvent,false);
       }
 
       // !VA Add input event listeners to run showElementOnInput for all labelled text input elements, i.e. elements whose alias ends in Tfd, and unlabelled child input elements of the padding group container. Includes keyboard and mouse blur event listeners
@@ -3114,9 +3114,9 @@ ${indent}<![endif]-->`;
           addEventHandler(el,'input',handleTextInputEvent,false);
           addEventHandler(el,'keydown',handleKeydown,false);
           addEventHandler(el,'keyup',handleKeyup,false);
-          addEventHandler(el,'focus',handleFocus,false);
+          // addEventHandler(el,'focus',handleFocus,false);
           // !VA MOUSE HANDLERS
-          addEventHandler(el,'blur',handleMouseBlur,false);
+          addEventHandler(el,'blur',handleBlurEvent,false);
         }
         // !VA Add handler for the padding icon - turn it blue if a padding input has a value
         addEventHandler(document.querySelector('#ccp-tda-padng-icn'),'blur',handleTextInputEvent,false);
@@ -3346,7 +3346,7 @@ ${indent}<![endif]-->`;
           // !VA Update the current image width
           appController.initupdateCurrentImage(imgInputObj);
           // console.log('handleFocus - current image updated');
-          // !VA Set the padding input value to empty - this is the value that will be handled by handleMouseBlur or handleKeydown
+          // !VA Set the padding input value to empty - this is the value that will be handled by handleBlurEvent or handleKeydown
           evt.target.value = '';
         }
       }
@@ -3408,66 +3408,19 @@ ${indent}<![endif]-->`;
 
     // !VA appController  
     // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. The IIFE emulates how preventDefault works on the TAB key if handleUserInput returns false, i.e. highlight the input value and keep the focus in the field so the user can accept the value or blur out of the input with mouse click or TAB.
-    function handleMouseBlur(evt) {
-      // console.log('handleMouseBlur running'); 
-      let retVal, propVal, tblWidth;
-      let userInputObj = {}, configObj = {}, imgInputObj = {};
+    function handleBlurEvent(evt) {
+      console.log('handleBlurEvent running'); 
+      let userInputObj = {};
       userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
       // !VA evtTargetVal is the value the user entered into the input element.
       userInputObj.evtTargetVal = evt.target.value;
       // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp locally.  
-      let { appObjProp } = userInputObj;
+      // let { appObjProp } = userInputObj;
       // !VA Get the return val from handlerUserInput - empty string, valid input or FALSE for error
-      retVal = handleUserInput(userInputObj);
-      // !VA Handle padding values - these are added to the width of the current image in the main image viewer. 
-      if (evt.target.id.substring( 8, 13 ) === 'pdlft' || evt.target.id.substring( 8, 13 ) === 'pdrgt') {
-        // !VA parseInt will return NaN if the string is empty, so skip padding handling unless there is a value in the left/right padding input element.
-        if (evt.target.value !== '') {
-          // !VA Get the sum of padding left and right. These values are pulled now from Appobj. 
-          tblWidth = parseInt(Appobj.ccpTdaPdrgtTfd + Appobj.ccpTdaPdlftTfd);
-          // !VA Set appObjProp value of the imgInputObj to curImgW - this is the current image width will grow by the left/right padding value
-          imgInputObj.appObjProp = 'curImgW';
-          // !VA Set a temporary value to the current Appobj property for curImgW. This is the value that includes the padding value to add.
-          propVal = Appobj.curImgW;
-          // !VA Add the current padding value, i.e. evt.target.value to Appobj.curImgW.
-          Appobj.curImgW = propVal + parseInt(-evt.target.value);
-          // !VA Set the evtTargetVal property to the current Appobj.curImgW value
-          imgInputObj.evtTargetVal = Appobj.curImgW;
-          // !VA Update the current image width
-          appController.initupdateCurrentImage(imgInputObj);
-          Appobj.ccpTblWidthTfd = Appobj.curImgW + tblWidth;
-          configObj = { 
-            reflectAppobj: { reflect: [ 'ccpTblWidthTfd'] } 
-          };
-          UIController.configCCP( configObj);
-        }
-      }
+
+      handleBlur( evt.target );
 
 
-
-      // !VA If error, emulate preventDefault on the blur event, which does not support preventDefault. The goal is to select the target's value, which doesn't work with blur because the focus is already out of the field before the select() method can be invoked on the input element. To address this problem, shift focus away from the target element to an element which has no value (i.e. #app-container), timeout 10ms, then shift it back to run the rest of the handler. The focus() method selects the input value by default. Alternatively, it should be possible to use focusout instead of blur, which does support preventDefault, but this works just as well for now.
-      if (retVal === false) {
-        (function () {
-          // !VA Shift the focus to the main app container div. 
-          document.querySelector('#app-container').focus();
-          setTimeout(() => {
-            // !VA Shift the focus back to the target element.
-            evt.target.focus();
-          }, 10);
-        })();
-        // !VA Now run the rest of the error handler
-        if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
-          this.value = '';
-        } else {
-          this.value = Appobj[ appObjProp ];
-          this.select();
-        }
-        // !VA If retVal is a valid value, set the value of the curImgW and curImgH inputs to empty so the placeholder text displays.
-      } else {
-        if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
-          this.value = '';
-        }
-      }
     }
 
     // !VA appController   
@@ -3520,7 +3473,7 @@ ${indent}<![endif]-->`;
     // !VA Called from handleKeydown to handle CCP element user input. Runs checkUserInput to check for error conditions and returns either an empty string, a valid value or FALSE to handleKeydown.
     // !VA NOTE: There was a priorVal variable earlier that stored evt.target.val for use with CCP inputs because at that time CCP inputs weren't immediately stored in Appobj. Keep an eye on that - currently all CCP values are stored to Appobj.
     function handleUserInput( userInputObj ) {
-      // console.log('handleUserInput running'); 
+      console.log('handleUserInput running'); 
       let retVal;
       let tbrIptAliases = [], imgIptAliases = [], ccpIptAliases = [];
       // let configObj = {};
@@ -3539,7 +3492,6 @@ ${indent}<![endif]-->`;
       }
       // !VA If evtTargetVal is empty, process it first so empty strings won't be passed to checkUserInput for error checking. This prevents checkUserInput from flagging empty strings as errors and returning false on them. 
       if ( evtTargetVal === '') {
-        console.log('Mark1');
         // !VA If the target is curImgW or curImgH or a Ccp input, then the user has exited the field without entering a value, or has deleted the default value and exited the field. In this case, return the empty value without further action.
         if ( imgIptAliases.includes( appObjProp) || (ccpIptAliases.includes( appObjProp ))) {
           // console.log('EMPTY VALUE IN curImgW, curImgH or a CCP Input');
@@ -3599,12 +3551,11 @@ ${indent}<![endif]-->`;
         let { appObjProp } = userInputObj;
         // !VA Branch: 0922A
         // !VA Call handleUserInput to validate the user input and process it based on the input type (i.e. Toolbar or CCP input). retVal will return either an empty string, a valid value, or FALSE if checkUserInput detects an input error.
-        retVal = handleUserInput(userInputObj);
-        // retVal === '' ? console.log('handleKeydown: retVal is EMPTY') : console.log('handleKeydown: retVal is: ' + retVal);
-        if ( retVal === false) {
-          // !VA Handle the TAB and ENTER key which have the same action if retVal is false. If the target is curImgW or curImgH, select the bad value and replace it with an empty field to show the placeholders. Otherwise, select the bad value and replace it the Appobj property value. If the TAB key was pressed, prevent the default behavior, i.e. cancel the blur and keep the focus in the field so the user can enter a new value or keep the Appobj value and TAB again or ESC to exit the field.
-          if (keydown === 9 ||  keydown === 13) {
-            // !VA TAB and ENTER handling look identical below.
+        if (keydown === 13) {
+          console.log('ENTER key');
+          retVal = handleUserInput(userInputObj);
+          if ( retVal === false) { 
+
             if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
               // console.log('HIT');
               this.select();
@@ -3613,20 +3564,85 @@ ${indent}<![endif]-->`;
               this.value = Appobj[appObjProp];
               this.select();
             }
-          }
-          // !VA Branch: 0930A
-          // !VA This has got to go
-          // !VA If TAB, cancel the blur and keep focus in the input field.
-          if ( keydown === 9 ) { evt.preventDefault(); }
+          } 
+        } else if ( keydown === 9) {
+          console.log('TAB key');
+          // handleBlur( 'TAB', userInputObj );
+
+        }
+      }
+    }
+
+    // !VA Branch: 0930A
+    // !VA Try passing the event target...
+    function handleBlur( target ) {
+      console.clear();
+      console.log('handleBlur running'); 
+      let retVal, tblWidth, propVal;
+      let imgInputObj = {}, userInputObj = {}, configObj = {};
+      userInputObj.appObjProp = evtTargetIdToAppobjProp(target.id);
+      userInputObj.evtTargetVal = target.value;
+      console.log('userInputObj is: ');
+      console.log(userInputObj);
+      let { appObjProp, evtTargetVal } = userInputObj;
+      console.log('appObjProp is: ' + appObjProp);
+
+      retVal = handleUserInput(userInputObj);
+      // !VA Handle padding values - these are added to the width of the current image in the main image viewer. 
+      // !VA Branch: 0930A
+      // !VA Change from evt.target.id to alias
+      // if (appObjProp.length === 14) {
+      //   console.log('CCP element');
+      // } else {
+      //   console.log('Toolbar element');
+      // }
+      // console.log('appObjProp.substring(  6, 11 ) is: ' + appObjProp.substring( 6, 11  ));
+
+
+
+      if ( target.id.substring( 8 , 13 ) === 'pdrgt' || target.id.substring(  8 , 13 ) === 'pdlft') {
+        // !VA parseInt will return NaN if the string is empty, so skip padding handling unless there is a value in the left/right padding input element.
+        console.log('HIT');
+        if (evtTargetVal !== '') {
+          // !VA Get the sum of padding left and right. These values are pulled now from Appobj. 
+          tblWidth = parseInt(Appobj.ccpTdaPdrgtTfd + Appobj.ccpTdaPdlftTfd);
+          // !VA Set appObjProp value of the imgInputObj to curImgW - this is the current image width will grow by the left/right padding value
+          imgInputObj.appObjProp = 'curImgW';
+          // !VA Set a temporary value to the current Appobj property for curImgW. This is the value that includes the padding value to add.
+          propVal = Appobj.curImgW;
+          // !VA Add the current padding value, i.e. evt.target.value to Appobj.curImgW.
+          Appobj.curImgW = propVal + parseInt(-evtTargetVal);
+          // !VA Set the evtTargetVal property to the current Appobj.curImgW value
+          imgInputObj.evtTargetVal = Appobj.curImgW;
+          // !VA Update the current image width
+          appController.initupdateCurrentImage(imgInputObj);
+          Appobj.ccpTblWidthTfd = Appobj.curImgW + tblWidth;
+          configObj = { 
+            reflectAppobj: { reflect: [ 'ccpTblWidthTfd'] } 
+          };
+          UIController.configCCP( configObj);
+        }
+      }
+      // !VA If error, emulate preventDefault on the blur event, which does not support preventDefault. The goal is to select the target's value, which doesn't work with blur because the focus is already out of the field before the select() method can be invoked on the input element. To address this problem, shift focus away from the target element to an element which has no value (i.e. #app-container), timeout 10ms, then shift it back to run the rest of the handler. The focus() method selects the input value by default. Alternatively, it should be possible to use focusout instead of blur, which does support preventDefault, but this works just as well for now.
+      if (retVal === false) {
+        // !VA Shift the focus back to the target element.
+        setTimeout(() => {
+          target.focus();
+          target.select();
+        }, 10);
+
+
+        // !VA Now run the rest of the error handler
+        if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
+          target.value = '';
         } else {
-          // !VA If retVal is not FALSE, then the input is valid so allow the user to tab out of the field.
-          // console.log('NOT FALSE');
-          if (keydown === 9) {
-            // !VA If the target is curImgW or curImgH, then set the value of the field to empty before blurring. This allows the default placeholders to show. The reason for this is that the placeholders underscore the purpose of the field. Any changes to these fields result in immediate Inspector panel update. Showing the curImgW and curImgH values in these fields would just provide duplicate information.
-            if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
-              this.value = '';
-            }
-          }
+          target.value = Appobj[ appObjProp ];
+          target.select();
+        }
+        // !VA If retVal is a valid value, set the value of the curImgW and curImgH inputs to empty so the placeholder text displays.
+      } else {
+        if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
+          target.value = '';
         }
       }
     }
