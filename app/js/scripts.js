@@ -6,16 +6,22 @@
 /* !VA  
 TODO: Get the installed color theme in W10.
 
+// !VA Branch: 190720
+ERROR CHECKING
+==============
+Need a plan of action for error checking at this point since padding has been implemented and appears to work.
+In checkNumericInput:
+-Need a hasPadding function to use for conditionals in switch statements. This will be similar to the hasPadding routine in getAttributes.tdStyle. 
 
-TODO: Add tdaWidth and tdaHeight to defaultConfig
+
+
+
 
 
 
 
 
 */
-
-
 
 
 //SCRIPT START
@@ -1322,25 +1328,11 @@ var Witty = (function () {
         tdStyle: (function() {
           // !VA This handles both the padding attribute and the MSDPI option. When the MSDPI option is checked, the width attribute has to be included in BOTH the inner TD and the inner TABLE style property and both of them have to be set to Appobj.curImgW.
           let msdpi, val, pdng, hasPadding;
-
-
-
-
-
+          // !VA Determine if any of the padding inputs have a value and set a boolean hasPadding
           let arr = [];
           // !VA Make array of the 4 padding aliases
           let aliasArray = ['ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd' ];
-          console.log('aliasArray is: ');
-          console.log(aliasArray);
-
-          for (const alias of aliasArray ) { 
-      
-            console.log('Appobj[alias] is: ' + Appobj[alias]);
-
-          }
-
-
-
+          // !VA Loop through the padding aliases
           for (const alias of aliasArray ) {
             // !VA Write the Appobj property value. i.e. the current input value, to val
             val = Appobj[alias];
@@ -1351,9 +1343,6 @@ var Witty = (function () {
             // !VA Push the value onto an array for further processing
             arr.push(val);
           }
-          console.log('arr is: ');
-          console.log(arr);
-
           // !VA Set the hasPadding flag to false
           hasPadding = false;
           // !VA Loop thru array until one of the items is not equal to 0. If that occurs, then the user has entered a value into one of the padding input fields, so set the hasPadding flag to true
@@ -3484,8 +3473,6 @@ ${indent}<![endif]-->`;
           imgInputObj.evtTargetVal = Appobj.curImgW;
           // !VA Update the current image width
           appController.initupdateCurrentImage(imgInputObj);
-          console.log('Appobj.curImgW :>> ' + Appobj.curImgW);
-
           Appobj.ccpTblWidthTfd = Appobj.curImgW + tblWidth;
           configObj = { 
             reflectAppobj: { reflect: [ 'ccpTblWidthTfd'] } 
@@ -3623,10 +3610,8 @@ ${indent}<![endif]-->`;
             applyInputValue(userInputObj);
           // !VA If the target is a CCP element, set the Appobj property value to the value returned from checkUserInput
           } else if ( ccpIptAliases.includes( appObjProp )) {
-            console.log('CCP INPUT: VALUE APPLIED');
+            console.log('handleUserInput CCP INPUT: VALUE APPLIED');
             evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = retVal;
-            console.log('appObjProp is: ' + appObjProp);
-            console.log('Appobj[ appObjProp ] is: ' + Appobj[ appObjProp ]);
           }
         // !VA Otherwise, checkUserInput returned false so the target value is invalid. Return FALSE to handleKeydown for TAB and ENTER key handling.
         } else {
@@ -3772,8 +3757,12 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from checkUserInput. Runs validateInteger to return a value of type Number, then evaluates any error conditions on the input and passes any error codes generated to appController.handleAppMessages and returns false if there was an error, or the integer value of no error was detected.
     function checkNumericInput(userInputObj) {
+      console.clear();
+      console.log('checkNumericInput running');
+      console.log('Appobj:>> ');
+      console.log(Appobj);
+
       // !VA Destructure userInputObj
-      const { appObjProp, evtTargetVal } = userInputObj;
       // !VA The code that will be passed to getAppMessageStrings
       let appMessCode, isErr, retVal;
       // !VA Temporary variables
@@ -3784,7 +3773,42 @@ ${indent}<![endif]-->`;
       var maxViewerWidth = 800;
       // !VA If appObjProp refers to one of the CCP elements that require numeric input
       // !VA First, validate that the user-entered value is an integer. validateInteger returns false if the input is either not an integer or is not a string that can be converted to an integer. Otherwise, it returns the evtTargetVal as a number.
-      retVal = validateInteger(evtTargetVal);
+
+      // !VA What we need now is a callback to ensure that Appobj reflects the current state.
+
+      function doHomework(subject, callback) {
+        alert(`Starting my ${subject} homework.`);
+          callback();
+          
+      }
+      
+      doHomework('math', function() {
+        alert('Finished my homework');
+      });
+
+
+
+      // retVal = validateInteger(userInputObj.evtTargetVal);
+      // !VA Branch: 100720
+      // !VA userInputObj.evtTargetVal was passed in as string. Replace it with the validated integer in case it needs to be consoled or passed. Continue to use retVal as the current evt.target value.
+      userInputObj.evtTargetVal = retVal;
+      // !VA Now destructure to get appObjProp. For the value, continue to use retVal.
+      const { appObjProp } = userInputObj;
+      console.log('userInputObj :>> ');
+      console.log(userInputObj);
+      console.log('retVal :>> ' + retVal);
+      // !VA What we need now is a callback to ensure that Appobj reflects the current state.
+      // setTimeout(() => {
+        
+      //   console.log('Appobj.curImgW :>> ' + Appobj.curImgW);
+
+      // }, 100);
+        console.log('Appobj.curImgW :>> ' + Appobj.curImgW);
+
+
+
+
+
 
 
       // !VA If validateInteger returned false to retVal, then there is an error condition with the input value.
@@ -3798,6 +3822,8 @@ ${indent}<![endif]-->`;
         switch (true) {
         case (appObjProp === 'imgViewerW') :
           // !VA The user has selected a imgViewerW that's smaller than the currently displayed image. Undetermined how to deal with this but for now the current image is shrunk to the selected imgViewerW. But Appobj is not updated accordingly, needs to be fixed.
+          // !VA Branch: 100720
+          // !VA The above is incorrect, Appobj is in fact updated when shrinking image to new imgViewerW 
           if (evtTargetVal < Appobj.curImgW ) {
             // !VA Do nothing for now, see above.
           } else if (evtTargetVal > maxViewerWidth ) {
@@ -3900,104 +3926,12 @@ ${indent}<![endif]-->`;
           }
           break;
         case (appObjProp.substring( 6, 8) === 'Pd') :
-          // !VA Branch: 0930B
-          // !VA Problem here...
-          // !VA 100620
-          // !VA Curly braces allow var declaration inside conditional
-          /* !VA  
-          There are two conditions: WIDTH and HEIGHT
-          */
-          
-          {
-            let pad, otherPad, padWidth, padHeight;
-            console.clear();
-            console.log('checkNumericInput padding :>> ');
-            console.log('appObjProp :>> ' + appObjProp);
-            pad = appObjProp.substring( 8, 11);
-            console.log('pad :>> ' + pad);
-            // !VA Determine if the padding input pertains to height or width
-            // !VA Branch: 0930A
-            /* !VA  
-            These errors are NOT padding errors, but TDA input errors
-            IF TDA WIDTH
-              TDA WIDTH cannot be less than curImgW + PadWidth or greater than TBL WIDTH
+   
 
-            IF TDA HEIGHT
-              TDA HEIGHT cannot be less than curImgH + PadHeight
-
-            
-            Actually, the only padding input errors are if the total padding height or width causes curImg to have a height or width less than 1. Let's try that.
-            
-            Changing curImg W or H MUST reset padding to 0!
-            Why does entering curImgW value result in type string?
-            
-            */
-            console.log('Appobj.curImgW :>> ' + Appobj.curImgW);
-            console.log('typeof(Appobj.curImgW) :>> ' + typeof(Appobj.curImgW));
-
-            if (pad === 'top' || pad === 'btm') {
-              console.log('HEIGHT');
-              pad === 'top' ? otherPad = Appobj.ccpTdaPdbtmTfd : otherPad = Appobj.ccpTdaPdtopTfd;
-              // !VA If the Appobj property is empty, replace it with a 0. Empty values are interpreted as type string. This will cause a NaN down the road, so make it a number now.
-              if (otherPad === '') { otherPad = 0;}
-              padHeight = (retVal + otherPad);
-              // console.log('Appobj.ccpTdaWidthTfd :>> ' + Appobj.ccpTdaWidthTfd);
-              // console.log('Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
-              console.log('Appobj.curImgH :>> ' + Appobj.curImgH);
-              console.log('padHeight :>> ' + padHeight);
-              console.log('typeof(Appobj.curImgH) :>> ' + typeof(Appobj.curImgH));
-              console.log('typeof(padHeight) :>> ' + typeof(padHeight));
-              // !VA At this point, we are still in checkUserInput and the curImg hasn't yet been updated with the padding value. So if curImgH - padHeight < 0, error:
-              console.log('Appobj.curImgW - padHeight :>> ' + (Appobj.curImgW - padHeight));
-              if ((Appobj.curImgH - padHeight) <= 0) {
-                console.log('HANDLE THIS ERROR!');
-              }
+          // !VA See dev log
 
 
 
-
-
-
-            } else if (pad === 'lft' || pad === 'rgt') {
-              // !VA Branch: 0930A
-              // !VA This is fucked up. We cannot basically do these calcs because Appobj is at this point not yet current. Actually, that's not true, just keep in mind we're handling ONLY padding right now.
-              console.log('WIDTH');
-              pad === 'top' ? otherPad = Appobj.ccpTdaPdbtmTfd : otherPad = Appobj.ccpTdaPdtopTfd;
-              if (otherPad === '') { otherPad = 0;}
-              padWidth = (retVal + otherPad);
-              // !VA At this point, we are still in checkUserInput and the curImg hasn't yet been updated with the padding value. So if curImgW - padWidth < 0, error:
-              if ((Appobj.curImgW - padWidth) <= 0) {
-                console.log('HANDLE THIS ERROR!');
-              }
-              console.log('Appobj.ccpTdaWidthTfd :>> ' + Appobj.ccpTdaWidthTfd);
-              console.log('padWidth :>> ' + padWidth);
-              console.log('Appobj.curImgW :>> ' + Appobj.curImgW);
-              var tdaWidth;
-              var curImgW;
-              curImgW = Appobj.curImgW - padWidth;
-              console.log('curImgW :>> ' + curImgW);
-              Appobj.ccpTdaWidthTfd ? tdaWidth = Appobj.ccpTdaWidthTfd : tdaWidth = 0;
-              var totalWidth = tdaWidth + padWidth + curImgW;
-              console.log('totalWidth :>> ' + totalWidth);
-              if (Appobj.ccpTdaWidthTfd) {
-                if (tdaWidth < ( curImgW + padWidth)) {
-                  console.log('ERROR: TDA WIDTH CANNOT BE LESS THAN IMG PLUS PADDING');
-                }
-              }
-
-
-
-              if (totalWidth > Appobj.ccpTblWidthTfd) {
-                console.log('ERROR: PADDING VALUE RESULTS IN INVALID TBL WIDTH');
-
-              }
-            } else {
-              console.log('ERROR in checkNumericInput: unknown condition');
-            }
-
-
-
-          }
           break;
         default:
           console.log('ERROR in checkNumericInput - unknown condition in case/select');
@@ -4647,7 +4581,7 @@ ${indent}<![endif]-->`;
 
     // appController   
     // !VA Integer validation is used for all height/width input fields, including those in CCP. If the input value is not of type number, converts it and returns an integer.
-    function validateInteger(inputVal) {
+    function validateInteger(inputVal, callback) {
       let retVal;
       // !VA Handle the CCP input from the fields that should be returning integers. i.e. the numeric inputs in handleKeydown. If they are type string, then convert them to number. If the conversion fails, then throw an error - that means that the user didn't enter a valid numeric string. This returns false if parseInt fails, i.e. returns NaN. Otherwise, it returns the inputVal as integer.
       if (!parseInt(inputVal, 10) || inputVal % 1 !== 0 || inputVal < 0) {
