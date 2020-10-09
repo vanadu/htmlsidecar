@@ -5,6 +5,7 @@
 
 /* !VA  
 TODO: Get the installed color theme in W10.
+TODO: FIX BUG wher entering TD Height write TD WIdth to Appobj.
 
 // !VA Branch: 100920A
 Need to update Appobj and the UI after padding changes. Need a function for that since I don't think there currently is one. For the UI, there's reflectAppobj. So what we need is a function that recalculates Appobj based on padding changes and then uses reflectAppobj to update the UI with those changes. Where are padding changes written to Appobj?
@@ -3440,9 +3441,18 @@ ${indent}<![endif]-->`;
         padHeight = (evtTargetVal + otherPad);
         console.log('padHeight :>> ' + padHeight);
         console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
-        Appobj.ccpTdaHeigtTfd 
-        
 
+        // !VA STOPPED HERE
+        // !VA If there is a TD Height entry, recalculate it and write the new value to UI.
+
+
+
+
+        if (Appobj.ccpTdaHeigtTfd ) { Appobj.ccpTdaHeigtTfd = Appobj.ccpTdaHeigtTfd + padHeight };
+        console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
+        
+        console.log('Mark1 Appobj :>> ');
+        console.log(Appobj);
 
 
 
@@ -3670,6 +3680,8 @@ ${indent}<![endif]-->`;
             applyInputValue(userInputObj);
           // !VA If the target is a CCP element, set the Appobj property value to the value returned from checkUserInput
           } else if ( ccpIptAliases.includes( appObjProp )) {
+            console.log('Mark1 userInputObj :>> ');
+            console.log(userInputObj);
             console.log('handleUserInput CCP INPUT: VALUE APPLIED');
             evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = retVal;
           }
