@@ -1,4 +1,4 @@
-// !VA September 2020
+// !VA 10 2020
 // ===================
 // See WittyDevelopmentLog_09.09.20A.docx
 // See WittyFunctions_09.09.20.xlsx
@@ -6,7 +6,14 @@
 /* !VA  
 TODO: Get the installed color theme in W10.
 
-// !VA Branch: 190720
+// !VA Branch: 100920A
+Need to update Appobj and the UI after padding changes. Need a function for that since I don't think there currently is one. For the UI, there's reflectAppobj. So what we need is a function that recalculates Appobj based on padding changes and then uses reflectAppobj to update the UI with those changes. Where are padding changes written to Appobj?
+
+
+
+
+
+
 ERROR CHECKING
 ==============
 Need a plan of action for error checking at this point since padding has been implemented and appears to work.
@@ -3410,11 +3417,50 @@ ${indent}<![endif]-->`;
       }
     }
 
+    // !VA appController private
+    // !VA Branch: 100920A
+    // !VA Recalculates Appobj values based on user padding input. Handles error conditions based on that input if the input results in invalid container relationships, i.e. if a TD or TABLE Width is smaller than the element it contains.
+    function recalcAppobj(userInputObj) {
+      console.log('recalcAppobj running'); 
+      console.log('userInputObj :>> ');
+      console.log(userInputObj);
+      let pad, padWidth, padHeight;
+      // !VA Destructure userInputObj;
+      let { appObjProp, evtTargetVal } = userInputObj;
+      console.log('typeof(evtTargetVal) :>> ' + typeof(evtTargetVal));
+
+      pad = appObjProp.substring( 8, 11);
+      console.log('pad :>> ' + pad);
+      // !VA Adding top or bottom padding doesn't change the size of the image -- the container just resizes to accommodate the padding. The only value affected by this is TD Height because that's the only container height value Witty allows user input for. 
+      if ( pad === 'top' || pad === 'btm') {
+        // !VA Determine whether the evt.target is top or btm
+        pad === 'top' ? otherPad = Appobj.ccpTdaPdbtmTfd : otherPad = Appobj.ccpTdaPdtopTfd;
+        // !VA If the Appobj property is empty, replace it with a 0. Empty values are interpreted as type string. This will cause a NaN down the road, so make it a number now.
+        if (otherPad === '') { otherPad = 0;}
+        padHeight = (evtTargetVal + otherPad);
+        console.log('padHeight :>> ' + padHeight);
+        console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
+        Appobj.ccpTdaHeigtTfd 
+        
+
+
+
+
+      } else if ( pad === 'lft' || pad === 'rgt') {
+        // !VA Determine whether the evt.target is lft or rgt
+
+
+
+      } else {
+        console.log('ERROR in recalcAppobj -- unknown padding');
+      }
+
+    }
 
     // !VA appController  
     // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. The IIFE emulates how preventDefault works on the TAB key if handleUserInput returns false, i.e. highlight the input value and keep the focus in the field so the user can accept the value or blur out of the input with mouse click or TAB.
     function handleBlur(evt) {
-      console.log('handleBlur running'); 
+      // console.log('handleBlur running'); 
       // !VA Create the object to store the Appobj property and current input value
       let userInputObj = {};
       // !VA Create the object to store the current image width, and create the config object to pass to UIController
@@ -3426,8 +3472,6 @@ ${indent}<![endif]-->`;
       userInputObj.evtTargetVal = evt.target.value;
       // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp  and evtTargetVal locally.
       let { appObjProp, evtTargetVal } = userInputObj;
-      console.log('userInputObj is: ');
-      console.log(userInputObj);
       // !VA Get the return val from handlerUserInput - empty string, valid input or FALSE for error
       retVal = handleUserInput(userInputObj);
       // !VA Branch: 0930A
@@ -3437,7 +3481,7 @@ ${indent}<![endif]-->`;
       // } else {
       //   console.log('Toolbar element');
       // }
-
+      // !VA Branch: 100720
       // !VA Handle padding values - these are added to the width of the current image in the main image viewer. 
       // !VA Branch: 0930A
       // !VA A lot more needs to happen here than I thought. 
@@ -3447,14 +3491,26 @@ ${indent}<![endif]-->`;
       If a padding value is entered, the tdaWidth/tdaHeight field should appear with the curImgW/curImgH + padding pre-entered.
       The tblWidth value should reflect the tdaWidth value. Both tdaWidth and tblWidth can be changed by the user, but tdaWidth can't > tblWidth.
       No, if TDA Width and Height are exposed by default, then the user can leave them empty if desired - there is NO default value. Only if the user enters a value is it error checked. The only default visible value is in the TBL Width field.
-
-
-      
-      
-      
-      
-      
       */
+
+
+
+      // !VA Branch: 100920A
+      /* !VA  
+      I think I may have been on the wrong track. I've been handling errors before updating Appobj and the UI with changes precipitated by padding inputs. For instance: a change to padWidth results in a change to curImgW. That change has to be made to Appobj and reflected in the DOM before anything else can happen because further input errors are based on the new curImgW value.
+      First, let's disable the existing error handling and save it to paddingErrorHandling_100720A.txt
+
+      So if appObjProp is a padding input, run recalcAppobj.
+      */
+      if ( evt.target.id.substring( 8 , 10 ) === 'pd') {
+
+      recalcAppobj( userInputObj);
+
+      }
+
+
+      
+
 
 
 
@@ -3562,7 +3618,7 @@ ${indent}<![endif]-->`;
     // !VA Called from handleKeydown to handle CCP element user input. Runs checkUserInput to check for error conditions and returns either an empty string, a valid value or FALSE to handleKeydown.
     // !VA NOTE: There was a priorVal variable earlier that stored evt.target.val for use with CCP inputs because at that time CCP inputs weren't immediately stored in Appobj. Keep an eye on that - currently all CCP values are stored to Appobj.
     function handleUserInput( userInputObj ) {
-      console.log('handleUserInput running'); 
+      // console.log('handleUserInput running'); 
       let retVal;
       let tbrIptAliases = [], imgIptAliases = [], ccpIptAliases = [];
       // let configObj = {};
@@ -3594,8 +3650,12 @@ ${indent}<![endif]-->`;
         retVal = '';
       // !VA If the target does have a value other than an empty string, it needs to be error-checked.
       } else {
+
+
+
         // !VA First, check the input and get the return value - it will either be a valid value or FALSE if the error check detected an input error.
         retVal = checkUserInput( userInputObj );
+
         // !VA If the value is valid, i.e. checkUserInput did not return false
         if (retVal !== false) {
           // !VA Branch: 0930A
@@ -3658,7 +3718,7 @@ ${indent}<![endif]-->`;
             }
           } 
         } else if ( keydown === 9) {
-          console.log('TAB key');
+          // console.log('TAB key');
           // handleBlur( 'TAB', userInputObj );
 
         }
@@ -3687,7 +3747,6 @@ ${indent}<![endif]-->`;
     // !VA Called from handleKeydown and handleMouseEvents. Separates numeric input from string input based on the Appobj property name included in two arrays. Numeric input is routed to checkNumericInput where values of type string are converted to integers. String inputs are routed to checkTextInput for valiation and error checking. 
     function checkUserInput(userInputObj) {
       // !VA Destructure userInputObj, making variables instead of constants
-
       let { appObjProp, evtTargetVal } = userInputObj;
       // console.log('checkUserInput appObjProp is: ' + appObjProp);
       // console.log('userInputObj.appObjProp.substring( 0 , 3 ) is: ' + userInputObj.appObjProp.substring( 0, 3 ));
@@ -3757,10 +3816,8 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from checkUserInput. Runs validateInteger to return a value of type Number, then evaluates any error conditions on the input and passes any error codes generated to appController.handleAppMessages and returns false if there was an error, or the integer value of no error was detected.
     function checkNumericInput(userInputObj) {
-      console.clear();
-      console.log('checkNumericInput running');
-      console.log('Appobj:>> ');
-      console.log(Appobj);
+      // console.clear();
+      console.log(userInputObj);
 
       // !VA Destructure userInputObj
       // !VA The code that will be passed to getAppMessageStrings
@@ -3774,42 +3831,13 @@ ${indent}<![endif]-->`;
       // !VA If appObjProp refers to one of the CCP elements that require numeric input
       // !VA First, validate that the user-entered value is an integer. validateInteger returns false if the input is either not an integer or is not a string that can be converted to an integer. Otherwise, it returns the evtTargetVal as a number.
 
-      // !VA What we need now is a callback to ensure that Appobj reflects the current state.
 
-      function doHomework(subject, callback) {
-        alert(`Starting my ${subject} homework.`);
-          callback();
-          
-      }
-      
-      doHomework('math', function() {
-        alert('Finished my homework');
-      });
-
-
-
-      // retVal = validateInteger(userInputObj.evtTargetVal);
+      retVal = validateInteger(userInputObj.evtTargetVal);
       // !VA Branch: 100720
       // !VA userInputObj.evtTargetVal was passed in as string. Replace it with the validated integer in case it needs to be consoled or passed. Continue to use retVal as the current evt.target value.
       userInputObj.evtTargetVal = retVal;
       // !VA Now destructure to get appObjProp. For the value, continue to use retVal.
       const { appObjProp } = userInputObj;
-      console.log('userInputObj :>> ');
-      console.log(userInputObj);
-      console.log('retVal :>> ' + retVal);
-      // !VA What we need now is a callback to ensure that Appobj reflects the current state.
-      // setTimeout(() => {
-        
-      //   console.log('Appobj.curImgW :>> ' + Appobj.curImgW);
-
-      // }, 100);
-        console.log('Appobj.curImgW :>> ' + Appobj.curImgW);
-
-
-
-
-
-
 
       // !VA If validateInteger returned false to retVal, then there is an error condition with the input value.
       if (!retVal) {
@@ -3840,7 +3868,7 @@ ${indent}<![endif]-->`;
           // !VA Handle the imagewidth toolButton input
         case (appObjProp === 'curImgW') :
           // !VA If the new image width is greater than the viewer width, then show message. 
-          if (evtTargetVal > Appobj.imgViewerW ) {
+          if (retVal > Appobj.imgViewerW ) {
             // !VA errorHandler!
             isErr = true;
             appMessCode = 'err_imgW_GT_viewerW';
@@ -3862,7 +3890,7 @@ ${indent}<![endif]-->`;
           break;
         // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply - exclude rdoCcpTdExcludeimg from the error condition
         case (appObjProp === 'ccpTdaHeigtTfd' && !Appobj.rdoCcpTdExcludeimg ) :
-          if (evtTargetVal < Appobj.curImgH ) {
+          if (retVal < Appobj.curImgH ) {
             // !VA errorHandler!
             isErr = true;
             appMessCode = 'err_cell_smaller_than_image';
@@ -3874,19 +3902,19 @@ ${indent}<![endif]-->`;
             if ( Appobj.ccpTblWidthTfd === '' ) {
               console.log('Appobj.ccpTblWidthTfd is EMPTY');
             }
-            else if ( evtTargetVal > Appobj.ccpTblWidthTfd ) {
+            else if ( retVal > Appobj.ccpTblWidthTfd ) {
               isErr = true;
               appMessCode = 'err_table_cell_wider_than_parent_table';
             }
           } 
-          if ( evtTargetVal > Appobj.imgViewerW ) {
+          if ( retVal > Appobj.imgViewerW ) {
             isErr = true;
             appMessCode = 'err_cell_wider_than_parent_table';
           }
           break;
         case (appObjProp === 'ccpTblWidthTfd') :
           if (Appobj.rdoCcpTdExcludeimg) {
-            if (evtTargetVal > Appobj.imgViewerW) {
+            if (retVal > Appobj.imgViewerW) {
               isErr = true;
               console.log('larger than imgViewerW');
               appMessCode = 'err_table_wider_than_wrapper';
@@ -3896,7 +3924,7 @@ ${indent}<![endif]-->`;
               appMessCode = 'err_table_cell_wider_than_parent_table';
             }
           } else {
-            if (evtTargetVal < Appobj.curImgW ) {
+            if (retVal < Appobj.curImgW ) {
               // !VA errorHandler!
               isErr = true;
               appMessCode = 'err_img_wider_than_parent_table';
@@ -3908,7 +3936,7 @@ ${indent}<![endif]-->`;
           break;
         case (appObjProp === 'ccpTbwWidthTfd') :
           if (Appobj.rdoCcpTdExcludeimg) {
-            if (evtTargetVal > Appobj.imgViewerW) {
+            if (retVal > Appobj.imgViewerW) {
               isErr = true;
               console.log('');
               appMessCode = 'err_wrapper_table_wider_than_devicewidth';
@@ -3918,7 +3946,7 @@ ${indent}<![endif]-->`;
               appMessCode = 'err_parent_table_greater_than_wrapper';
             }
           } else {
-            if (evtTargetVal < Appobj.curImgW ) {
+            if (retVal < Appobj.curImgW ) {
               // !VA errorHandler!
               isErr = true;
               appMessCode = 'err_img_wider_than_parent_table';
@@ -3928,7 +3956,7 @@ ${indent}<![endif]-->`;
         case (appObjProp.substring( 6, 8) === 'Pd') :
    
 
-          // !VA See dev log
+          // !VA See paddingErrorHandling_100720A.txt
 
 
 
@@ -3947,6 +3975,7 @@ ${indent}<![endif]-->`;
       }
       // !VA If an error was detected, return false to the event handler to determine how the error will be displayed in the input field
       if (isErr) { retVal = false; }
+      console.log('retVal :>> ' + retVal);
       return retVal;
     }
 
