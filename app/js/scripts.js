@@ -431,9 +431,13 @@ var Witty = (function () {
     // !VA UIController private
     // !VA If called from populateAppobj, returns the value of text input fields as hard-coded in the HTML. Otherwise, called by configCCP, which receives an array of aliases whose corresponding CCP element value is set to its corresponding Appobj value. 
     function reflectAppobj( reflectArray) { 
-      // console.log('reflectArray is: ');
-      // console.log(reflectArray);
-      // console.log('reflectAppobj running'); 
+      // !VA Branch: 100920A
+      // !VA TEST: Check the data type of an array element
+      // if (reflectArray[0] === 'ccpTdaHeigtTfd') {
+      //   console.log('HIT');
+      //   console.log('reflectAppobj: typeof(reflectArray[0]) :>> ' + typeof(reflectArray[0]));
+      // }
+
       let el, isInit, retVal;
       for (const alias of reflectArray) {
         typeof(appController.getAppobj(alias)) === 'undefined' ? isInit = true : isInit = false;
@@ -3132,6 +3136,18 @@ ${indent}<![endif]-->`;
         addEventHandler(document.querySelector('#ccp-tda-padng-icn'),'blur',handleTextInputEvent,false);
       }
 
+      
+      // !VA Focus event handler to reset padding values.
+      const pdngInputs = [ ccpUserInput.ccpTdaPdtopTfd, ccpUserInput.ccpTdaPdbtmTfd,ccpUserInput.ccpTdaPdlftTfd, ccpUserInput.ccpTdaPdrgtTfd ];
+      for (let i = 0; i < pdngInputs.length; i++) {
+      // console.log('pdngInputs[i] :>> ' + pdngInputs[i]);
+        pdngInputs[i] = pdngInputs[i].replace('tfd', 'ipt');
+        pdngInputs[i] = document.querySelector(pdngInputs[i]);
+        addEventHandler((pdngInputs[i]),'focusin',resetPadding,false);
+
+      }
+
+
       // !VA HOVER HANDLERS
       // ------------------
       // !VA Add mouseover event handlers for Inspector clickable elements: Display Size, Small Phones and Large Phones values in the programmatically created SPAN tags
@@ -3418,52 +3434,94 @@ ${indent}<![endif]-->`;
       }
     }
 
+    function resetPadding(evt) {
+      console.log('resetPadding running'); 
+      console.clear();
+      if (evt.target.value !== '') {
+        console.log('evt.target.value :>> ' + evt.target.value);
+        console.log('typeof(evt.target.value) :>> ' + typeof(evt.target.value));
+        let userInputObj = {};
+        userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
+        userInputObj.evtTargetVal = parseInt(-evt.target.value);
+        console.log('userInputObj :>> ');
+        console.log(userInputObj);
+        recalcAppobj( userInputObj);
+        this.value = '';
+        this.select();
+      } else {
+        console.log('resetPadding - no value');
+      }
+    }
+
     // !VA appController private
     // !VA Branch: 100920A
     // !VA Recalculates Appobj values based on user padding input. Handles error conditions based on that input if the input results in invalid container relationships, i.e. if a TD or TABLE Width is smaller than the element it contains.
     function recalcAppobj(userInputObj) {
+      // console.clear();
       console.log('recalcAppobj running'); 
-      console.log('userInputObj :>> ');
+      // !VA Determine the type of Appobj properties
+      // for (const entry of Object.entries(Appobj)) {
+      //   console.log('entry :>> ' + entry);
+      //   console.log('typeof(entry[1]) :>> ' + typeof(entry[1]));
+      // }
+      /* !VA  
+      FIX: How is evtTargetVal a string here? The problem is that if retVal is empty, it will be type string. You ALWAYS need to populate it with parseInt. So the first thing we need to do is make sure all values are type number, i.e. replace empty strings with 0;
+
+      OK: Fix: top = 21, btm = 21 =>> TDH = 192. 
+      FIX: Width values accumulate on every blur. 
+
+      Need a function that:
+        for appObjProp, subtracts evtTargetVal from Appobj[appObjProp] and runs the rest of recalcAppobj
+        for all other padding elements, runs the rest of recalcAppobj
+
+
+
+
+      */
+      console.log('recalcAppobj userInputObj :>> ');
       console.log(userInputObj);
-      let pad, padWidth, padHeight;
+
+
       // !VA Destructure userInputObj;
       let { appObjProp, evtTargetVal } = userInputObj;
-      console.log('typeof(evtTargetVal) :>> ' + typeof(evtTargetVal));
+      // !VA First, create variables for each of the Appobj properties used in these calculations.
+      let padTop, padBtm, padLft, padRgt, tdaWidth, tdaHeigt, tblWidth;
+      let padWidth, padHeigt;
+      let aliasArray = [], configObj = {};
+      // !VA Convert all pertinent Appobj properties to variables and set their value to 0 if the corresponding property is empty. Otherwise calculations will return NaN. Do the same for evtTargetVal.
+      Appobj.ccpTdaPdtopTfd === '' ? padTop = 0 : padTop = Appobj.ccpTdaPdtopTfd;
+      Appobj.ccpTdaPdbtmTfd === '' ? padBtm = 0 : padBtm = Appobj.ccpTdaPdbtmTfd;
+      Appobj.ccpTdaPdrgtTfd === '' ? padRgt = 0 : padRgt = Appobj.ccpTdaPdrgtTfd;
+      Appobj.ccpTdaPdlftTfd === '' ? padLft = 0 : padLft = Appobj.ccpTdaPdlftTfd;
+      Appobj.ccpTdaWidthTfd === '' ? tdaWidth = 0 : tdaWidth = Appobj.ccpTdaWidthTfd;
+      Appobj.ccpTdaHeigtTfd === '' ? tdaHeigt = 0 : tdaHeigt = Appobj.ccpTdaHeigtTfd;
+      Appobj.ccpTblWidthTfd === '' ? tblWidth = 0 : tblWidth = Appobj.ccpTblWidthTfd;
+      if (evtTargetVal === '') { evtTargetVal = 0; }
+      
+      // !VA If the event target is padding top or padding bottom input
+      if ( appObjProp.includes('top') || appObjProp.includes('btm')) {
+        console.log('HEIGHT');
+        // !VA Set the TD HEIGHT Appobj property to the sum of the padding top, padding bottom and current image height. This will indicate to the user the MINIMUM height the TD can have. The user can then made it larger or set it to empty to override this item in the clipboard output.
+        Appobj.ccpTdaHeigtTfd = padTop + padBtm + Appobj.curImgH;
 
-      pad = appObjProp.substring( 8, 11);
-      console.log('pad :>> ' + pad);
-      // !VA Adding top or bottom padding doesn't change the size of the image -- the container just resizes to accommodate the padding. The only value affected by this is TD Height because that's the only container height value Witty allows user input for. 
-      if ( pad === 'top' || pad === 'btm') {
-        // !VA Determine whether the evt.target is top or btm
-        pad === 'top' ? otherPad = Appobj.ccpTdaPdbtmTfd : otherPad = Appobj.ccpTdaPdtopTfd;
-        // !VA If the Appobj property is empty, replace it with a 0. Empty values are interpreted as type string. This will cause a NaN down the road, so make it a number now.
-        if (otherPad === '') { otherPad = 0;}
-        padHeight = (evtTargetVal + otherPad);
-        console.log('padHeight :>> ' + padHeight);
-        console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
+      } else if ( appObjProp.includes('lft') || appObjProp.includes('rgt')) {
+        console.log('WIDTH');
 
-        // !VA STOPPED HERE
-        // !VA If there is a TD Height entry, recalculate it and write the new value to UI.
-
-
-
-
-        if (Appobj.ccpTdaHeigtTfd ) { Appobj.ccpTdaHeigtTfd = Appobj.ccpTdaHeigtTfd + padHeight };
-        console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
-        
-        console.log('Mark1 Appobj :>> ');
-        console.log(Appobj);
-
-
-
-      } else if ( pad === 'lft' || pad === 'rgt') {
-        // !VA Determine whether the evt.target is lft or rgt
-
-
+         
+        aliasArray = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd'];
 
       } else {
-        console.log('ERROR in recalcAppobj -- unknown padding');
+        console.log('ERROR in recalcAppobj - unknown appObjProp');
       }
+      
+
+      // !VA Update UI
+      aliasArray = [ 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
+      configObj = { 
+        reflectAppobj: { reflect: aliasArray } 
+      };
+      UIController.configCCP( configObj);
+
 
     }
 
@@ -3484,6 +3542,13 @@ ${indent}<![endif]-->`;
       let { appObjProp, evtTargetVal } = userInputObj;
       // !VA Get the return val from handlerUserInput - empty string, valid input or FALSE for error
       retVal = handleUserInput(userInputObj);
+      // !VA Branch: 100920A
+      // !VA Make sure evtTargetVal is a number
+      // console.log('Mark2');
+      // console.log('retVal :>> ' + retVal);
+      // console.log('typeof(retVal) :>> ' + typeof(retVal));
+
+
       // !VA Branch: 0930A
       // !VA TMP Utility function to determine if CCP or Toolbar element
       // if (appObjProp.length === 14) {
@@ -3491,27 +3556,6 @@ ${indent}<![endif]-->`;
       // } else {
       //   console.log('Toolbar element');
       // }
-      // !VA Branch: 100720
-      // !VA Handle padding values - these are added to the width of the current image in the main image viewer. 
-      // !VA Branch: 0930A
-      // !VA A lot more needs to happen here than I thought. 
-      /* !VA  
-      There is a lot of error handling that needs to take place before we even get to this point. But we have to determine what the desired UI configuration is first before we even start with the error handling.
-
-      If a padding value is entered, the tdaWidth/tdaHeight field should appear with the curImgW/curImgH + padding pre-entered.
-      The tblWidth value should reflect the tdaWidth value. Both tdaWidth and tblWidth can be changed by the user, but tdaWidth can't > tblWidth.
-      No, if TDA Width and Height are exposed by default, then the user can leave them empty if desired - there is NO default value. Only if the user enters a value is it error checked. The only default visible value is in the TBL Width field.
-      */
-
-
-
-      // !VA Branch: 100920A
-      /* !VA  
-      I think I may have been on the wrong track. I've been handling errors before updating Appobj and the UI with changes precipitated by padding inputs. For instance: a change to padWidth results in a change to curImgW. That change has to be made to Appobj and reflected in the DOM before anything else can happen because further input errors are based on the new curImgW value.
-      First, let's disable the existing error handling and save it to paddingErrorHandling_100720A.txt
-
-      So if appObjProp is a padding input, run recalcAppobj.
-      */
       if ( evt.target.id.substring( 8 , 10 ) === 'pd') {
 
       recalcAppobj( userInputObj);
@@ -3680,8 +3724,6 @@ ${indent}<![endif]-->`;
             applyInputValue(userInputObj);
           // !VA If the target is a CCP element, set the Appobj property value to the value returned from checkUserInput
           } else if ( ccpIptAliases.includes( appObjProp )) {
-            console.log('Mark1 userInputObj :>> ');
-            console.log(userInputObj);
             console.log('handleUserInput CCP INPUT: VALUE APPLIED');
             evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = retVal;
           }
