@@ -3434,17 +3434,22 @@ ${indent}<![endif]-->`;
       }
     }
 
+    // !VA appController private
+    // !VA Called from the eventHandler for the padding input elements. Resets the value of the target padding input and the corresponding Appobj property to empty string. Creates userInputObj from the evt.target.id, puts the evt.target.val in its evtTargetVal property and reverses the sign, then calls recalcAppobj with this userInputObj. This cancels   
     function resetPadding(evt) {
-      console.log('resetPadding running'); 
       console.clear();
+      console.log('resetPadding running'); 
+      // console.clear();
       if (evt.target.value !== '') {
-        console.log('evt.target.value :>> ' + evt.target.value);
-        console.log('typeof(evt.target.value) :>> ' + typeof(evt.target.value));
         let userInputObj = {};
+        // !VA Get the Appobj property of the target from the ID
         userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
+        // !VA Change the 
         userInputObj.evtTargetVal = parseInt(-evt.target.value);
         console.log('userInputObj :>> ');
         console.log(userInputObj);
+        Appobj[userInputObj.appObjProp] = '';
+        console.log('Appobj[appObjProp] :>> ' + Appobj[userInputObj.appObjProp]);
         recalcAppobj( userInputObj);
         this.value = '';
         this.select();
@@ -3453,7 +3458,7 @@ ${indent}<![endif]-->`;
       }
     }
 
-    // !VA appController private
+    // !VA appController private12  
     // !VA Branch: 100920A
     // !VA Recalculates Appobj values based on user padding input. Handles error conditions based on that input if the input results in invalid container relationships, i.e. if a TD or TABLE Width is smaller than the element it contains.
     function recalcAppobj(userInputObj) {
@@ -3470,16 +3475,19 @@ ${indent}<![endif]-->`;
       OK: Fix: top = 21, btm = 21 =>> TDH = 192. 
       FIX: Width values accumulate on every blur. 
 
-      Need a function that:
+
+        
+      
+
+
+
         for appObjProp, subtracts evtTargetVal from Appobj[appObjProp] and runs the rest of recalcAppobj
         for all other padding elements, runs the rest of recalcAppobj
-
-
-
 
       */
       console.log('recalcAppobj userInputObj :>> ');
       console.log(userInputObj);
+
 
 
       // !VA Destructure userInputObj;
@@ -3488,6 +3496,28 @@ ${indent}<![endif]-->`;
       let padTop, padBtm, padLft, padRgt, tdaWidth, tdaHeigt, tblWidth;
       let padWidth, padHeigt;
       let aliasArray = [], configObj = {};
+
+
+      // !VA       1) Make and object with pertinent keys and their values
+      let obj = {
+        pdTop: Appobj.ccpTdaPdtopTfd,
+        padBtm: Appobj.ccpTdaPdbtmTfd,
+        padRgt: Appobj.ccpTdaPdrgtTfd,
+        padLft: Appobj.ccpTdaPdlftTfd,
+        tdaWidth: Appobj.ccpTdaWidthTfd,
+        tdaHeigt: Appobj.ccpTdaHeigtTfd,
+        tblWidth: Appobj.ccpTblWidthTfd
+      };
+      console.log('obj :>> ');
+      console.log(obj);
+      // !VA If userInputObj.evtTargetVal is negative, then recalcAppobj was called from resetPadding, so replace the obj property corresponding to the event target with the value from resetPadding
+
+
+
+
+
+
+
       // !VA Convert all pertinent Appobj properties to variables and set their value to 0 if the corresponding property is empty. Otherwise calculations will return NaN. Do the same for evtTargetVal.
       Appobj.ccpTdaPdtopTfd === '' ? padTop = 0 : padTop = Appobj.ccpTdaPdtopTfd;
       Appobj.ccpTdaPdbtmTfd === '' ? padBtm = 0 : padBtm = Appobj.ccpTdaPdbtmTfd;
