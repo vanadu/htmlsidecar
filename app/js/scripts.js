@@ -3449,7 +3449,7 @@ ${indent}<![endif]-->`;
         Appobj[userInputObj.appObjProp] = '';
         console.log('Appobj[appObjProp] :>> ' + Appobj[userInputObj.appObjProp]);
         recalcAppobj( userInputObj);
-        this.value = '';
+        // this.value = '';
         this.select();
       } else {
         console.log('resetPadding - no value');
@@ -3507,7 +3507,20 @@ ${indent}<![endif]-->`;
       Appobj.ccpTblWidthTfd === '' ? tblWidth = 0 : tblWidth = Appobj.ccpTblWidthTfd;
       if (evtTargetVal === '') { evtTargetVal = 0; }
       
-      // !VA First, if the 
+      /* !VA 
+      TODO: HUGE PROBLEM: Blurring out => focusin, i.e. reset input to empty. That is fixed by not setting target value to '' in resetPadding. But...
+    
+
+      TODO: When curImgW is changed, the HEIGHT values aren't updated.
+      DONE: TDA Width doesn't display.
+      DONE: TBL Width displays curImgW, not curImgW + paddingW
+      TODO: When WIDTH/HEIGHT values are deleted, TDA values don't disappear - they should.
+      TODO: TDA WIDTH/HEIGHT should update onchange, not on blur. That is going to be a pain in the ass.
+      
+      
+      
+      
+      */
 
 
 
@@ -3516,7 +3529,14 @@ ${indent}<![endif]-->`;
       if ( appObjProp.includes('top') || appObjProp.includes('btm')) {
         console.log('HEIGHT');
         // !VA Set the TD HEIGHT Appobj property to the sum of the padding top, padding bottom and current image height. This will indicate to the user the MINIMUM height the TD can have. The user can then made it larger or set it to empty to override this item in the clipboard output.
+
+        // if ( padTop === '' || padBtm === '') { console.log('Mark2: NO VALUE');}
+        console.log('padTop :>> ' + padTop);
+        console.log('padBtm :>> ' + padBtm);
+
+        console.log('Appobj.curImgH :>> ' + Appobj.curImgH);
         Appobj.ccpTdaHeigtTfd = padTop + padBtm + Appobj.curImgH;
+
 
         aliasArray = [ 'ccpTdaHeigtTfd' ];
 
@@ -3539,6 +3559,7 @@ ${indent}<![endif]-->`;
         console.log('imgInputObj :>> ');
         console.log(imgInputObj);
         appController.initupdateCurrentImage(imgInputObj);
+        Appobj.ccpTdaWidthTfd = Appobj.ccpTblWidthTfd = Appobj.curImgW + padLft + padRgt;
 
 
 
@@ -3578,6 +3599,7 @@ ${indent}<![endif]-->`;
       // console.log('handleBlur running'); 
       // !VA Create the object to store the Appobj property and current input value
       let userInputObj = {};
+      let aliasArray;
       // !VA Create the object to store the current image width, and create the config object to pass to UIController
       let imgInputObj = {}, configObj = {};
       let retVal, tblWidth, propVal;
@@ -3605,7 +3627,21 @@ ${indent}<![endif]-->`;
       // }
       if ( evt.target.id.substring( 8 , 10 ) === 'pd') {
         // !VA If the blurred input is empty, do nothing. Otherwise, run recalcAppobj.
-        if (evt.target.value !== '') { recalcAppobj( userInputObj); }
+        if (evt.target.value !== '') { 
+          recalcAppobj( userInputObj); 
+        } 
+        // !VA Branch: 101320A
+        // !VA Trying to handle the case where the padding inputs are reset to empty - the TD width/height values should disappear. But that will be a problem if the user has already set a value there...
+        if (Appobj.ccpTdaPdtopTfd === '' && Appobj.ccpTdaPdbtmTfd === '') {
+          Appobj.ccpTdaHeigtTfd = '';
+          aliasArray = [ 'ccpTdaHeigtTfd'];
+          configObj = { 
+            reflectAppobj: { reflect: aliasArray } 
+          };
+          UIController.configCCP( configObj);
+
+
+        }
 
 
       }
