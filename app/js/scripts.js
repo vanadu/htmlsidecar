@@ -3435,11 +3435,9 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
-    // !VA Called from the eventHandler for the padding input elements. Resets the value of the target padding input and the corresponding Appobj property to empty string. Creates userInputObj from the evt.target.id, puts the evt.target.val in its evtTargetVal property and reverses the sign, then calls recalcAppobj with this userInputObj. This cancels   
+    // !VA Called from the eventHandler for the padding input elements. Resets the value of the target padding input and the corresponding Appobj property to empty string. Creates userInputObj from the evt.target.id, puts the evt.target.val in its evtTargetVal property and reverses the sign, then calls recalcAppobj with this userInputObj. This resets 
     function resetPadding(evt) {
-      console.clear();
       console.log('resetPadding running'); 
-      // console.clear();
       if (evt.target.value !== '') {
         let userInputObj = {};
         // !VA Get the Appobj property of the target from the ID
@@ -3496,26 +3494,7 @@ ${indent}<![endif]-->`;
       let padTop, padBtm, padLft, padRgt, tdaWidth, tdaHeigt, tblWidth;
       let padWidth, padHeigt;
       let aliasArray = [], configObj = {};
-
-
-      // !VA       1) Make and object with pertinent keys and their values
-      let obj = {
-        pdTop: Appobj.ccpTdaPdtopTfd,
-        padBtm: Appobj.ccpTdaPdbtmTfd,
-        padRgt: Appobj.ccpTdaPdrgtTfd,
-        padLft: Appobj.ccpTdaPdlftTfd,
-        tdaWidth: Appobj.ccpTdaWidthTfd,
-        tdaHeigt: Appobj.ccpTdaHeigtTfd,
-        tblWidth: Appobj.ccpTblWidthTfd
-      };
-      console.log('obj :>> ');
-      console.log(obj);
-      // !VA If userInputObj.evtTargetVal is negative, then recalcAppobj was called from resetPadding, so replace the obj property corresponding to the event target with the value from resetPadding
-
-
-
-
-
+      let imgInputObj = {};
 
 
       // !VA Convert all pertinent Appobj properties to variables and set their value to 0 if the corresponding property is empty. Otherwise calculations will return NaN. Do the same for evtTargetVal.
@@ -3528,15 +3507,52 @@ ${indent}<![endif]-->`;
       Appobj.ccpTblWidthTfd === '' ? tblWidth = 0 : tblWidth = Appobj.ccpTblWidthTfd;
       if (evtTargetVal === '') { evtTargetVal = 0; }
       
+      // !VA First, if the 
+
+
+
+
       // !VA If the event target is padding top or padding bottom input
       if ( appObjProp.includes('top') || appObjProp.includes('btm')) {
         console.log('HEIGHT');
         // !VA Set the TD HEIGHT Appobj property to the sum of the padding top, padding bottom and current image height. This will indicate to the user the MINIMUM height the TD can have. The user can then made it larger or set it to empty to override this item in the clipboard output.
         Appobj.ccpTdaHeigtTfd = padTop + padBtm + Appobj.curImgH;
 
+        aliasArray = [ 'ccpTdaHeigtTfd' ];
+
       } else if ( appObjProp.includes('lft') || appObjProp.includes('rgt')) {
         console.log('WIDTH');
+        // !VA Need to set padLft/padRgt to evtTargetVal
+        userInputObj.appObjProp === 'ccpTdaPdrgtTfd' ? padRgt = userInputObj.evtTargetVal : padLft = userInputObj.evtTargetVal;
 
+
+
+
+        console.log('padLft :>> ' + padLft);
+        console.log('padRgt :>> ' + padRgt);
+        console.log('userInputObj.evtTargetVal :>> ' + userInputObj.evtTargetVal);
+        imgInputObj.evtTargetVal = Appobj.curImgW - ( userInputObj.evtTargetVal );
+        Appobj.curImgW = imgInputObj.evtTargetVal;
+        console.log('Appobj.curImgW :>> ' + Appobj.curImgW);
+        console.log('imgInputObj.evtTargetVal :>> ' + imgInputObj.evtTargetVal);
+        imgInputObj.appObjProp = 'curImgW';
+        console.log('imgInputObj :>> ');
+        console.log(imgInputObj);
+        appController.initupdateCurrentImage(imgInputObj);
+
+
+
+        // // !VA Set appObjProp value of the imgInputObj to curImgW - this is the current image width that will shrink by the left/right padding value
+        // imgInputObj.appObjProp = 'curImgW';
+        // // !VA Set a temporary value to the current Appobj property for curImgW. This is the value that includes the padding value to add.
+        // propVal = Appobj.curImgW;
+        // // !VA Add the current padding value, i.e. evt.target.value to Appobj.curImgW.
+        // Appobj.curImgW = propVal + parseInt(-evtTargetVal);
+        // // !VA Set the evtTargetVal property to the current Appobj.curImgW value
+        // imgInputObj.evtTargetVal = Appobj.curImgW;
+        // // !VA Update the current image width
+        // appController.initupdateCurrentImage(imgInputObj);
+        // Appobj.ccpTblWidthTfd = Appobj.curImgW + tblWidth;
          
         aliasArray = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd'];
 
@@ -3546,7 +3562,8 @@ ${indent}<![endif]-->`;
       
 
       // !VA Update UI
-      aliasArray = [ 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
+      // aliasArray = [ 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
+      console.log('aliasArray :>> ' + aliasArray);
       configObj = { 
         reflectAppobj: { reflect: aliasArray } 
       };
@@ -3587,8 +3604,9 @@ ${indent}<![endif]-->`;
       //   console.log('Toolbar element');
       // }
       if ( evt.target.id.substring( 8 , 10 ) === 'pd') {
+        // !VA If the blurred input is empty, do nothing. Otherwise, run recalcAppobj.
+        if (evt.target.value !== '') { recalcAppobj( userInputObj); }
 
-      recalcAppobj( userInputObj);
 
       }
 
@@ -3602,22 +3620,11 @@ ${indent}<![endif]-->`;
         // !VA parseInt will return NaN if the string is empty, so skip padding handling unless there is a value in the left/right padding input element.
         if (evtTargetVal !== '') {
           // !VA Get the sum of padding left and right. These values are pulled now from Appobj. 
-          tblWidth = parseInt(Appobj.ccpTdaPdrgtTfd + Appobj.ccpTdaPdlftTfd);
-          // !VA Set appObjProp value of the imgInputObj to curImgW - this is the current image width will grow by the left/right padding value
-          imgInputObj.appObjProp = 'curImgW';
-          // !VA Set a temporary value to the current Appobj property for curImgW. This is the value that includes the padding value to add.
-          propVal = Appobj.curImgW;
-          // !VA Add the current padding value, i.e. evt.target.value to Appobj.curImgW.
-          Appobj.curImgW = propVal + parseInt(-evtTargetVal);
-          // !VA Set the evtTargetVal property to the current Appobj.curImgW value
-          imgInputObj.evtTargetVal = Appobj.curImgW;
-          // !VA Update the current image width
-          appController.initupdateCurrentImage(imgInputObj);
-          Appobj.ccpTblWidthTfd = Appobj.curImgW + tblWidth;
-          configObj = { 
-            reflectAppobj: { reflect: [ 'ccpTblWidthTfd'] } 
-          };
-          UIController.configCCP( configObj);
+
+          // configObj = { 
+          //   reflectAppobj: { reflect: [ 'ccpTblWidthTfd'] } 
+          // };
+          // UIController.configCCP( configObj);
         }
       }
       // !VA If error, emulate preventDefault on the blur event. Blur does not support preventDefault. Select the target's value. Select doesn't work with blur because the focus is already out of the field before the select() method can be invoked on the input element. To fix, set timeout 10ms, then shift it back to run the rest of the handler. The focus() method selects the input value by default. Alternatively, it should be possible to use focusout instead of blur, which does support preventDefault, but this works just as well for now.
