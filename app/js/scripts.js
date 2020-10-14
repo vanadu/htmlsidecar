@@ -1349,7 +1349,10 @@ var Witty = (function () {
             // !VA Write the Appobj property value. i.e. the current input value, to val
             val = Appobj[alias];
             // !VA If the input value is '', i.e. empty, then replace the value with 0 for the clipboard output
-            if (val === '') { val = 0;}
+            // !VA Branch: 101320A
+            // !VA Use Number(val) to ensure empty strings are converted to 0
+            // if (val === '') { val = 0;}
+            val = Number(val);
             // !VA If the value is not 0, then add the units suffix
             if (val !== 0 ) { val = val + 'px'; }
             // !VA Push the value onto an array for further processing
@@ -3435,6 +3438,7 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
+    // !VA Branch: 100920A
     // !VA Called from the eventHandler for the padding input elements. Resets the value of the target padding input and the corresponding Appobj property to empty string. Creates userInputObj from the evt.target.id, puts the evt.target.val in its evtTargetVal property and reverses the sign, then calls recalcAppobj with this userInputObj. This resets 
     function resetPadding(evt) {
       console.log('resetPadding running'); 
@@ -3456,7 +3460,7 @@ ${indent}<![endif]-->`;
       }
     }
 
-    // !VA appController private12  
+    // !VA appController private
     // !VA Branch: 100920A
     // !VA Recalculates Appobj values based on user padding input. Handles error conditions based on that input if the input results in invalid container relationships, i.e. if a TD or TABLE Width is smaller than the element it contains.
     function recalcAppobj(userInputObj) {
