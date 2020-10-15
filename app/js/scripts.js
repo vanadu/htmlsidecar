@@ -3443,44 +3443,39 @@ ${indent}<![endif]-->`;
 
     // !VA appController private
     // !VA Branch: 101420A
-    // !VA Called from eventHandlers. This function is necessary because the input event does not register input changes resulting from the focus event. On focus, the value of the input resets to '', i.e. empty. Consequently, all dependent inputs, i.e. the TD height and width and TBL width, as well as the curImg dimensions, have to recalc based on the on-focus empty value of the target input. 
+    // !VA Called from eventHandlers. This function is necessary to reset dependent input values (TD H, TD W and TBL W) to their prior value to prevent value accumulation in the inputs. For width padding inputs, evtTargetVal is passed as a negative value, resulting in curImgW growing by the absolute value of evtTargetVal. For height padding inputs, evtTargetVal is passed as a positive number, reducing the dependent TD Height value by evtTargetVal. 
     function handlePaddingFocus(evt) {
-      console.log('handlePaddingFocus running'); 
+      // console.log('handlePaddingFocus running'); 
       let userInputObj = {};
       // !VA Get the Appobj/ccpUserInput alias from the target id
       userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
-
-
+      // !VA Handle the padding width inputs. Pass evtTargetVal as negative value to handlePadding to unshrink curImgW on focus. 
       if  ( userInputObj.appObjProp.substring( 6 , 11 ) === 'Pdrgt' || userInputObj.appObjProp.substring( 6 , 11 ) === 'Pdlft') {
-        console.log('Mark1 userInputObj.appObjProp :>> ' + userInputObj.appObjProp);
-        // !VA evtTargetVal is the value the user entered into the input element.
-        var foo = Number(-evt.target.value);
-        console.log('foo :>> ' + foo);
-        userInputObj.evtTargetVal = foo;
+        // !VA evtTargetVal is the value the user entered into the input element to be passed to handlePadding as a negative value.
+        userInputObj.evtTargetVal = Number(-evt.target.value);
+      // !VA Handle the padding height inputs. Pass evtTargetVal as a positive value to handlePadding to add padding to the TD height.
       } else {
-        console.log('Mark2 userInputObj.appObjProp :>> ' + userInputObj.appObjProp);
         userInputObj.evtTargetVal = Number(evt.target.value);
       }
       handlePadding( 'handlePaddingFocus', userInputObj);
-
       // console.log('handlePaddingFocus running'); 
       // console.log('handlePaddingFocus Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
       // console.log('handlePaddingFocus Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
       // console.log('handlePaddingFocus Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
       // console.log('handlePaddingFocus Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
+      // !VA Select the input value on focus
       this.select();
     }
 
     // !VA appController private
     function handlePaddingInput(userInputObj) {
-      console.log('handlePaddingInput running');
+      // console.log('handlePaddingInput running');
       let { appObjProp, evtTargetVal } = userInputObj;
-      // !VA Here we do nothing except pass userInputObj from the input event. The input event handles padding height inputs.
-      // !VA evtTargetVal has already been converted to type 'number', so if it is not a number, then it is NaN. If it is NaN, exit the handler and let the error-check proceed on blur.
+      // !VA Here we do nothing except pass userInputObj from the input event. The input event handles padding height inputs. evtTargetVal has already been converted to type 'number', so if it is not a number, then it is NaN. If it is NaN, exit the handler and let the error-check proceed on blur.
       if (isNaN( evtTargetVal )) {
         return;
       } else {
-        // !VA If evtTargetVal is a number and the target element is a height padding input, then pass userInputObj to handlePadding for padding processing.
+        // !VA If evtTargetVal is a number and the target element is a height padding input, so pass userInputObj to handlePadding for padding processing.
         if  ( appObjProp.substring( 6 , 11 ) === 'Pdtop' || appObjProp.substring( 6 , 11 ) === 'Pdbtm') {
           // !VA Set the Appobj property of appObjProp. For padding width inputs, this is done in handleUserInput.
           Appobj[appObjProp] = evtTargetVal;
@@ -3495,28 +3490,27 @@ ${indent}<![endif]-->`;
 
     // !VA appController  
     // !VA Branch: 101520A
+    // !VA This actually does nothing except call handlePadding for padding width inputs. handlePadding could be called directly from handleBlur to handle width inputs, but this function serves as a foil to handlePaddingInput which handle height inputs. This function keeps structural symmetry.
     function handlePaddingBlur(userInputObj) {
-      console.log('handlePaddingBlur running'); 
-      // console.log('handlePaddingBlur userInputObj :>> ');
-      // console.log(userInputObj);
+      // console.log('handlePaddingBlur running'); 
       // !VA Here we do nothing except pass userInputObj from the blur event. The blur event handles padding width inputs.
       handlePadding('handlePaddingBlur', userInputObj);
-      
-
       // console.log('handlePaddingBlur Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
       // console.log('handlePaddingBlur Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
       // console.log('handlePaddingBlur Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
       // console.log('handlePaddingBlur Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
-
     }
 
+    // !VA appController private
+    // !VA Branch: 101520B
+    // !VA Handles padding inputs from handlePaddingBlur (for width padding inputs) and handlePaddingInput (for height padding inputs). The caller argument is a debug argument that passes the name of the calling function and can be removed from this and the callers for production.
     function handlePadding( caller, userInputObj ) {
       // console.clear();
-      console.log(`handlePadding called by ${caller} running`);
-      console.log('handlePadding Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
-      console.log('handlePadding Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
-      console.log('handlePadding Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
-      console.log('handlePadding Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
+      // console.log(`handlePadding called by ${caller} running`);
+      // console.log('handlePadding Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
+      // console.log('handlePadding Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
+      // console.log('handlePadding Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
+      // console.log('handlePadding Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
       let tmp, reflectArray;
       let imgInputObj = {}, configObj = {};
       // !VA Destructure userInputObj
@@ -3524,39 +3518,34 @@ ${indent}<![endif]-->`;
       evtTargetVal = Number(evtTargetVal);
       // !VA If appObjProp is lft/rgt, then userInputObj comes from handlePaddingBlur and curImgW is modified. Note: evtTargetVal is error-checked in handleBlur.
       if  ( appObjProp.substring( 6 , 11 ) === 'Pdrgt' || appObjProp.substring( 6 , 11 ) === 'Pdlft') {
-        console.log('appObjProp :>> ' + appObjProp);
-        // !VA Update curImg by the current event target's Appobj property value
-        // !VA Branch: 101520B
-        // !VA No, update it by the evtTargetVal, the Appobj propery is always positive. To reset curImgW to the prior state, the negative value from handlePaddingFocus needs to be used. 
-        imgInputObj.evtTargetVal = Appobj.curImgW - ( evtTargetValga);
-        // !VA Set Appobj.curImgW to imgInputObj to the shrunk image's width
+        // !VA Update curImg by the the current evtTargetVal. For width padding inputs, evtTargetVal is passed from handlePaddingFocus as negative value to unshrink curImgW. 
+        imgInputObj.evtTargetVal = Appobj.curImgW - evtTargetVal;
+        // !VA Set Appobj.curImgW to imgInputObj to the shrunk/unshrunk image's width
         Appobj.curImgW = imgInputObj.evtTargetVal;
         // !VA Now set the Appobj property of the current image element to be shrunk, i.e. curImgW.
         imgInputObj.appObjProp = 'curImgW';
-        // !VA Shrink the image
-        // !VA Branch: 101420A
-        // !VA updateCurrentImage sets Appobj.ccpTblWidthTfd to curImgW. Override that here to display the padding-dependent value for TBL width.
-        console.log('imgInputObj :>> ');
-        console.log(imgInputObj);
+        // !VA updateCurrentImage sets Appobj.ccpTblWidthTfd to curImgW in resizeContainers. Override that here to display the padding-dependent value for TBL width.
         tmp = Appobj.ccpTblWidthTfd;
+        // !VA Shrink the image. 
         appController.initupdateCurrentImage(imgInputObj);
-        console.log('tmp :>> ' + tmp);
+        // console.log('tmp :>> ' + tmp);
+        // !VA Restore Appobj.ccpTblWidthTfd to the temporarily stored override value 
         Appobj.ccpTdaWidthTfd = Appobj.ccpTblWidthTfd = tmp;
-        console.log('Appobj.curImgW is modified :>> ' + Appobj.curImgW);
+        // !VA Set the reflect array for TD W and TBL W
         reflectArray = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
       // !VA If appObjProp is top/btm, then userInputObj comes from handlePaddingInput and curImgW is NOT modified. Note: evtTargetVal is NaN-checked in handlePaddingInput, complete error-checking doesn't happen until the input is blurred.
       } else {
-        console.log('appObjProp :>> ' + appObjProp);
-        console.log('Appobj.curImgW is NOT Modified :>> ' + Appobj.curImgW);
+        // !VA Set the TD Height input to the curImgH plus the sum of the Appobj lft/rgt input properties.
         Appobj.ccpTdaHeigtTfd = Appobj.curImgH + Number(Appobj.ccpTdaPdtopTfd) + Number(Appobj.ccpTdaPdbtmTfd);
-        console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
-
+        // !VA Set the reflect array for TD Height
         reflectArray = [ 'ccpTdaHeigtTfd' ];
       }
+      // !VA Set the configObj for configCCP to reflect the Appobj properties in the CCP.
       configObj = {
         reflectAppobj: { reflect: reflectArray }
       };
-
+      // !VA Branch: 101520B
+      // !VA Only run configCCP if the current Appobj value is not empty, i.e. if the current padding input has a value. If appObjProp is empty, then the respective CCP input field value should also remain empty.
       if (Appobj[appObjProp] !== '') {
 
         UIController.configCCP( configObj );
@@ -3567,10 +3556,9 @@ ${indent}<![endif]-->`;
     // !VA appController  Branch 101520B
     // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. The IIFE emulates how preventDefault works on the TAB key if handleUserInput returns false, i.e. highlight the input value and keep the focus in the field so the user can accept the value or blur out of the input with mouse click or TAB.
     function handleBlur(evt) {
-      console.log('Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
       // console.log('handleBlur running'); 
       // !VA Create the object to store the Appobj property and current input value
-      let userInputObj = {};
+      let reflectArray, userInputObj = {}, configObj = {};
       let retVal;
       // !VA Get the Appobj/ccpUserInput alias from the target id
       userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
@@ -3579,23 +3567,31 @@ ${indent}<![endif]-->`;
       // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp  locally.
       let { appObjProp } = userInputObj;
       // !VA Get the return val from handlerUserInput - empty string, valid input or FALSE for error. Note; handleUserInput also sets the Appobj property of appObjProp if the input is valid.
-      retVal = handleUserInput(userInputObj);
-      // !VA Branch: 100920A
+      // !VA Users need to be able to enter zero to zero out the input. handleUserInput currently parses a 0 value as an error in order that it not be written to Appobj. So here, trap the 0 value, set the target's Appobj property to '', and reflect the empty Appobj property to the target input.
+      if ( Number(userInputObj.evtTargetVal) === 0) { 
+        Appobj[appObjProp] = '';
+        reflectArray = [ appObjProp ];
+        configObj = {
+          reflectAppobj: { reflect: reflectArray },
+        };
+        UIController.configCCP( configObj);
+      } else {
+        retVal = handleUserInput(userInputObj);
+      }
       // !VA Make sure evtTargetVal is a number before handling the padding blur.
       if (typeof(retVal) === 'number') {
-        console.log('handleBlur retVal is Number...');
+        // console.log('handleBlur retVal is Number...');
         userInputObj.evtTargetVal = retVal;
         if ( evt.target.id.substring( 8 , 10 ) === 'pd') {
           // !VA If the blurred input is empty, do nothing. Otherwise, handle padding.
           handlePaddingBlur( userInputObj );
         }
       } else {
-        console.log('handleBlur retVal is Not a Number...');
+        // console.log('handleBlur retVal is Not a Number...');
         // console.log('Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
         // console.log('Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
         // console.log('Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
         // console.log('Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
-
       }
 
       // !VA Branch: 0930A
@@ -4016,12 +4012,7 @@ ${indent}<![endif]-->`;
           }
           break;
         case (appObjProp.substring( 6, 8) === 'Pd') :
-   
-
           // !VA See paddingErrorHandling_100720A.txt
-
-
-
           break;
         default:
           console.log('ERROR in checkNumericInput - unknown condition in case/select');
@@ -4037,7 +4028,7 @@ ${indent}<![endif]-->`;
       }
       // !VA If an error was detected, return false to the event handler to determine how the error will be displayed in the input field
       if (isErr) { retVal = false; }
-      console.log('retVal :>> ' + retVal);
+      console.log('checkNumericInput retVal :>> ' + retVal);
       return retVal;
     }
 
