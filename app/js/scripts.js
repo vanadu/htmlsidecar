@@ -3146,7 +3146,8 @@ ${indent}<![endif]-->`;
       // console.log('pdngInputs[i] :>> ' + pdngInputs[i]);
         pdngInputs[i] = pdngInputs[i].replace('tfd', 'ipt');
         pdngInputs[i] = document.querySelector(pdngInputs[i]);
-        addEventHandler((pdngInputs[i]),'focusin',resetPadding,false);
+        addEventHandler((pdngInputs[i]),'input',handlePaddingInput,false);
+        addEventHandler((pdngInputs[i]),'focus',handlePaddingFocus,false);
 
       }
 
@@ -3437,99 +3438,182 @@ ${indent}<![endif]-->`;
       }
     }
 
-    // !VA appController private
-    // !VA Branch: 100920A
-    // !VA Called from the eventHandler for the padding input elements. Resets the value of the target padding input and the corresponding Appobj property to empty string. Creates userInputObj from the evt.target.id, puts the evt.target.val in its evtTargetVal property and reverses the sign, then calls recalcAppobj with this userInputObj. This resets 
-    function resetPadding(evt) {
-      console.log('resetPadding running'); 
-      if (evt.target.value !== '') {
-        let userInputObj = {};
-        // !VA Get the Appobj property of the target from the ID
-        userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
-        // !VA Change the sign of the evt.target.value and write it to evtTargetVal. This will be passed back to recalcAppobj to ...
-        userInputObj.evtTargetVal = parseInt(-evt.target.value);
-        console.log('userInputObj :>> ');
-        console.log(userInputObj);
-        Appobj[userInputObj.appObjProp] = '';
-        console.log('Appobj[appObjProp] :>> ' + Appobj[userInputObj.appObjProp]);
-        recalcAppobj( userInputObj);
-        // this.value = '';
-        this.select();
-      } else {
-        console.log('resetPadding - no value');
-      }
+    function updatePadding( arr ) {
+      console.log('updatePadding running'); 
+
+
+
     }
 
     // !VA appController private
-    // !VA Branch: 100920A
-    // !VA Recalculates Appobj values based on user padding input. Handles error conditions based on that input if the input results in invalid container relationships, i.e. if a TD or TABLE Width is smaller than the element it contains.
-    function recalcAppobj(userInputObj) {
-      // console.clear();
-      console.log('recalcAppobj running'); 
-      console.log('recalcAppobj userInputObj :>> ');
-      console.log(userInputObj);
-      // !VA Destructure userInputObj;
-      let { appObjProp, evtTargetVal } = userInputObj;
-      // !VA First, create variables for each of the Appobj properties used in these calculations.
-      let padTop, padBtm, padLft, padRgt, tdaWidth, tdaHeigt, tblWidth;
-      let aliasArray = [], configObj = {};
-      let imgInputObj = {};
-
-      evtTargetVal = Number(evtTargetVal);
-      /* !VA 
-      TODO: TDA WIDTH/HEIGHT should update onchange, not on blur. That is going to be a pain in the ass.
-      TODO: What is the whole point of padRft etc if Number(Appobj[appObjProp]) works just as well?
-      */
-
-
-
-
-      // !VA If the event target is padding top or padding bottom input
-      if ( appObjProp.includes('top') || appObjProp.includes('btm')) {
-        console.log('HEIGHT');
-        // !VA Set the TD HEIGHT Appobj property to the sum of the padding top, padding bottom and current image height. This will indicate to the user the MINIMUM height the TD can have. The user can then made it larger or set it to empty to override this item in the clipboard output.
-
-        console.log('Appobj.curImgH :>> ' + Appobj.curImgH);
-        Appobj.ccpTdaHeigtTfd = Number(Appobj.ccpTdaPdtopTfd) + Number(Appobj.ccpTdaPdbtmTfd) + Appobj.curImgH;
+    // !VA Branch: 101420A
+    // !VA This is necessary because the input event register input changes resulting from the focus event. So we need to reset the dependent inputs and curImg here.
+    function handlePaddingFocus(evt) {
+      console.log('handlePaddingFOcus running'); 
+      let reflectArray = [];
+      for (const entry of Object.entries(ccpUserInput)) {
+        if ('#' + evt.target.id === entry[1].replace( 'tfd', 'ipt') ) { appObjProp = entry[0];}
+      }
+      console.log('appObjProp :>> ' + appObjProp);
+      Appobj[appObjProp] = '';
+      console.log('Appobj[appObjProp] :>> ' + Appobj[appObjProp]);
+      // !VA This is where we add the prior input value back to the height/width
+      console.log('evt.target.value :>> ' + evt.target.value);
+      let focusVal = Number(evt.target.value);
+      console.log('focusVal :>> ' + focusVal);
+      if (evt.target.id.includes( 'top' ) || evt.target.id.includes('btm')) {
+        console.log('Height');
+        Appobj.ccpTdaHeigtTfd = Number(Appobj.ccpTdaHeigtTfd - focusVal);
+        // !VA If zero, replace with empty, otherwise the TD Height input will show the 0 as value. If zero, it should not show any value.
+        if (Appobj.ccpTdaHeigtTfd === 0 ) { Appobj.ccpTdaHeigtTfd = '' }
+        reflectArray = ['ccpTdaHeigtTfd'];
 
 
-        aliasArray = [ 'ccpTdaHeigtTfd' ];
+        
+      } else {
+        console.log('Width');
 
-      } else if ( appObjProp.includes('lft') || appObjProp.includes('rgt')) {
-        console.log('WIDTH');
-        // !VA Need to set padLft/padRgt to evtTargetVal
-        userInputObj.appObjProp === 'ccpTdaPdrgtTfd' ? padRgt = evtTargetVal : padLft = evtTargetVal;
+        // Appobj.ccpTdaWidthTfd = Appobj.ccpTblWidthTfd = Number(Appobj.ccpTdaHeigtTfd - focusVal);
 
-        console.log('Appobj.ccpTdaPdlftTfd  :>> ' + Number(Appobj.ccpTdaPdlftTfd) );
-        console.log('Appobj.ccpTdaPdrgtTfd  :>> ' + Number(Appobj.ccpTdaPdrgtTfd) );
-        console.log('evtTargetVal :>> ' + evtTargetVal);
-        // !VA imgInputObj is the appObjProp/evtTargetVal key/value pair that is passed to initupdateCurrentImage to shrink the curImgW by the padding width amount.
-        imgInputObj.evtTargetVal = Appobj.curImgW - ( evtTargetVal );
+
+
+        let imgInputObj = {};
+        imgInputObj.evtTargetVal = Appobj.curImgW + ( focusVal );
         // !VA Set Appobj.curImgW to imgInputObj now since curImgW will be updated next
         Appobj.curImgW = imgInputObj.evtTargetVal;
         // !VA Now set the Appobj property of the current image element to be shrunk - curImgW.
         imgInputObj.appObjProp = 'curImgW';
         // !VA Shrink the image
+        // !VA Branch: 101420A
+        // !VA Again, this is where resizeContainers sets TBL Width to curImgW. Override it.
+        var foo = Appobj.ccpTblWidthTfd;
         appController.initupdateCurrentImage(imgInputObj);
-        // !VA Set the TDA Width input and TBL Width input element value to the curImgW value plus the Appobj value of the right and left padding inputs. Use the Number method to convert empty strings to 0.
-        Appobj.ccpTdaWidthTfd = Appobj.ccpTblWidthTfd = Appobj.curImgW + Number(Appobj.ccpTdaPdrgtTfd) + Number(Appobj.ccpTdaPdlftTfd);
-        // !VA Set alias array to the Appobj property for the TD Width and TBL Width input elements - these are the elements that display the shrunken curImgW + the current padding value. This value is equal to the original curImgW, that is, the value displayed the Display Size inspector BEFORE the image was shrunk by the padding width.
-        aliasArray = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd'];
-      } else {
-        console.log('ERROR in recalcAppobj - unknown appObjProp');
-      }
-      
+        Appobj.ccpTblWidthTfd = foo;
 
-      // !VA Now reflect the current Appobj values for TD Height or TD Width/TBL Width to the respective elements.
-      // aliasArray = [ 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
-      console.log('aliasArray :>> ' + aliasArray);
-      configObj = { 
-        reflectAppobj: { reflect: aliasArray } 
+        console.log('Mark3');
+        console.log('Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
+        reflectArray = ['ccpTdaWidthTfd', 'ccpTblWidthTfd'];
+
+
+
+      }
+
+      configObj = {
+        reflectAppobj: { reflect: reflectArray },
       };
-      UIController.configCCP( configObj);
+      UIController.configCCP(configObj);
+
+
+      this.value = '';
+    }
+
+    // !VA appController private
+    function handlePaddingInput(evt) {
+      console.log('handlePaddingInput running'); 
+      console.log('evt.target.id :>> ' + evt.target.id);
+      let foo, thispad, otherpad, reflectArray, configObj = {};
+      let appObjProp;
+      let pdtop, pdbtm, pdlft, pdrgt;
+      console.log('handlePaddingInput Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
+      console.log('handlePaddingInput Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
+      console.log('handlePaddingInput Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
+      console.log('handlePaddingInput Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
+      // !VA Get the Appobj property of the event target
+      for (const entry of Object.entries(ccpUserInput)) {
+        if ('#' + evt.target.id === entry[1].replace( 'tfd', 'ipt') ) { appObjProp = entry[0];}
+      }
+      Appobj[appObjProp] = Number(evt.target.value);
+
+
+
+      if ( evt.target.id.substring( 8 , 13 ) === 'pdtop' || evt.target.id.substring(  8 , 13 ) === 'pdbtm') { 
+        console.log('handlePaddingInput: HEIGHT ');
+        Appobj.ccpTdaHeigtTfd = Number(Appobj.ccpTdaPdtopTfd) + Number(Appobj.ccpTdaPdbtmTfd) + Appobj.curImgH;
+        // !VA If zero, replace with empty, otherwise the TD Height input will show the 0 as value. If zero, it should not show any value.
+        if (Appobj.ccpTdaHeigtTfd === 0 ) { Appobj.ccpTdaHeigtTfd = '' }
+
+        reflectArray = [ 'ccpTdaHeigtTfd'];
+        
+      } else if (evt.target.id.substring( 8 , 13 ) === 'pdrgt' || evt.target.id.substring(  8 , 13 ) === 'pdlft') {
+        console.log('handlePaddingInput: WIDTH ');
+
+
+        // !VA curImgW - curPaddingWidth  
+        Appobj.ccpTdaWidthTfd = Appobj.ccpTblWidthTfd = Appobj.curImgW + Number(Appobj.ccpTdaPdrgtTfd) + Number(Appobj.ccpTdaPdlftTfd) - Number(evt.target.value);
+
+
+
+        // Appobj.ccpTdaWidthTfd = Appobj.ccpTblWidthTfd = Appobj.curImgW + Number(Appobj.ccpTdaPdrgtTfd) + Number(Appobj.ccpTdaPdlftTfd);
+
+        reflectArray = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd'];
+
+        
+      } else {
+        console.log('ERROR in handlePaddingInput - unknown padding input');
+      }
+
+      console.log('Mark1 Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
+      configObj = {
+        reflectAppobj: { reflect: reflectArray },
+      };
+      UIController.configCCP(configObj);
+
+
 
 
     }
+
+    function handlePaddingBlur(userInputObj) {
+      // console.clear();
+      console.log('handlePaddingBlur running'); 
+      
+      console.log('handlePaddingBlur userInputObj :>> ');
+      console.log(userInputObj);
+      let { appObjProp, evtTargetVal } = userInputObj;
+
+      Appobj[appObjProp] = Number(evtTargetVal);
+      console.log('Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
+      console.log('Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
+      console.log('Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
+      console.log('Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
+
+      if ( appObjProp.substring( 6 , 11 ) === 'Pdtop' || appObjProp.substring( 6 , 11 ) === 'Pdbtm') {  
+
+      } else if ( appObjProp.substring( 6 , 11 ) === 'Pdrgt' || appObjProp.substring( 6 , 11 ) === 'Pdlft')  {
+        console.log('handlePaddingBlur: WIDTH ');
+
+
+        let imgInputObj = {};
+        imgInputObj.evtTargetVal = Appobj.curImgW - ( Number(Appobj[appObjProp]));
+        // !VA Set Appobj.curImgW to imgInputObj now since curImgW will be updated next
+        Appobj.curImgW = imgInputObj.evtTargetVal;
+        // !VA Now set the Appobj property of the current image element to be shrunk - curImgW.
+        imgInputObj.appObjProp = 'curImgW';
+        // !VA Shrink the image
+        // !VA Branch: 101420A
+        // !VA This is where resizeContainers sets ccpTblWidthTfd curImgW. So override it.
+        var foo = Appobj.ccpTblWidthTfd;
+        appController.initupdateCurrentImage(imgInputObj);
+
+        Appobj.ccpTblWidthTfd = foo;
+        reflectArray = ['ccpTblWidthTfd'];
+        configObj = {
+          reflectAppobj: { reflect: reflectArray }
+        };
+        UIController.configCCP( configObj );
+
+
+      } else {
+        console.log('ERROR in handlePaddingBlur - unknown padding input');
+
+      }
+
+      // console.log('Mark2 Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
+
+      
+    }
+
+
 
     // !VA appController  
     // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. The IIFE emulates how preventDefault works on the TAB key if handleUserInput returns false, i.e. highlight the input value and keep the focus in the field so the user can accept the value or blur out of the input with mouse click or TAB.
@@ -3564,29 +3648,11 @@ ${indent}<![endif]-->`;
       //   console.log('Toolbar element');
       // }
       if ( evt.target.id.substring( 8 , 10 ) === 'pd') {
-        // !VA If the blurred input is empty, do nothing. Otherwise, run recalcAppobj.
+        // !VA If the blurred input is empty, do nothing. Otherwise, handle padding.
         if (evt.target.value !== '') { 
-          recalcAppobj( userInputObj); 
+          handlePaddingBlur( userInputObj );
+
         } 
-        // !VA Branch: 101320A
-        // !VA Trying to handle the case where the padding inputs are reset to empty - the TD width/height values should disappear. But that will be a problem if the user has already set a value there. But how often it happen that a user will add a padding and then remove it completely? If they do that, then it's likely they'd want to remove the TD Width/Height value as well. 
-        // !VA Describe this behavior, add to comments
-        if (Appobj.ccpTdaPdtopTfd === '' && Appobj.ccpTdaPdbtmTfd === '') {
-          Appobj.ccpTdaHeigtTfd = '';
-          aliasArray = [ 'ccpTdaHeigtTfd'];
-          configObj = { 
-            reflectAppobj: { reflect: aliasArray } 
-          };
-          UIController.configCCP( configObj);
-        }
-        if (Appobj.ccpTdaPdrgtTfd === '' && Appobj.ccpTdaPdlftTfd === '') {
-          Appobj.ccpTdaWidthTfd = '';
-          aliasArray = [ 'ccpTdaWidthTfd'];
-          configObj = { 
-            reflectAppobj: { reflect: aliasArray } 
-          };
-          UIController.configCCP( configObj);
-        }
 
       }
 
