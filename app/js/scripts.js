@@ -3444,11 +3444,14 @@ ${indent}<![endif]-->`;
     // !VA Branch: 101420A
     // !VA Called from eventHandlers. This function is necessary because the input event does not register input changes resulting from the focus event. On focus, the value of the input resets to '', i.e. empty. Consequently, all dependent inputs, i.e. the TD height and width and TBL width, as well as the curImg dimensions, have to recalc based on the on-focus empty value of the target input. 
     function handlePaddingFocus(evt) {
+
+      
       // console.log('handlePaddingFocus running'); 
       // console.log('handlePaddingFocus Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
       // console.log('handlePaddingFocus Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
       // console.log('handlePaddingFocus Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
       // console.log('handlePaddingFocus Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
+      this.select();
     }
 
     // !VA appController private
@@ -3497,18 +3500,36 @@ ${indent}<![endif]-->`;
       console.log('handlePadding Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
       console.log('handlePadding Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
       console.log('handlePadding Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
+      let tmp;
+      let imgInputObj = {};
       // !VA Destructure userInputObj
       let { appObjProp, evtTargetVal } = userInputObj;
       evtTargetVal = Number(evtTargetVal);
       // !VA If appObjProp is lft/rgt, then userInputObj comes from handlePaddingBlur and curImgW is modified. Note: evtTargetVal is error-checked in handleBlur.
       if  ( appObjProp.substring( 6 , 11 ) === 'Pdrgt' || appObjProp.substring( 6 , 11 ) === 'Pdlft') {
         console.log('appObjProp :>> ' + appObjProp);
-        Appobj.curImgW = Appobj.curImgW - evtTargetVal;
+        // !VA Shrink curImg by the current event target's Appobj property value
+        imgInputObj.evtTargetVal = Appobj.curImgW - ( Number(Appobj[appObjProp]));
+        // !VA Set Appobj.curImgW to imgInputObj to the shrunk image's width
+        Appobj.curImgW = imgInputObj.evtTargetVal;
+        // !VA Now set the Appobj property of the current image element to be shrunk, i.e. curImgW.
+        imgInputObj.appObjProp = 'curImgW';
+        // !VA Shrink the image
+        // !VA Branch: 101420A
+        // !VA updateCurrentImage sets Appobj.ccpTblWidthTfd to curImgW. Override that here to display the padding-dependent value for TBL width.
+        console.log('imgInputObj :>> ');
+        console.log(imgInputObj);
+        tmp = Appobj.ccpTblWidthTfd;
+        appController.initupdateCurrentImage(imgInputObj);
+        Appobj.ccpTblWidthTfd = tmp;
         console.log('Appobj.curImgW is modified :>> ' + Appobj.curImgW);
+
       // !VA If appObjProp is top/btm, then userInputObj comes from handlePaddingInput and curImgW is NOT modified. Note: evtTargetVal is NaN-checked in handlePaddingInput, complete error-checking doesn't happen until the input is blurred.
       } else {
         console.log('appObjProp :>> ' + appObjProp);
         console.log('Appobj.curImgW is NOT Modified :>> ' + Appobj.curImgW);
+        Appobj.ccpTdaHeightTfd = Appobj.curImgW + Appobj.ccpTdaPdrgtTfd + Appobj.ccpTdaPdlftTfd;
+        console.log('Appobj.ccpTdaHeightTfd :>> ' + Appobj.ccpTdaHeightTfd);
       }
     }
 
