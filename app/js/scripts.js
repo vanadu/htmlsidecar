@@ -431,6 +431,7 @@ var Witty = (function () {
     // !VA UIController private
     // !VA If called from populateAppobj, returns the value of text input fields as hard-coded in the HTML. Otherwise, called by configCCP, which receives an array of aliases whose corresponding CCP element value is set to its corresponding Appobj value. 
     function reflectAppobj( reflectArray) { 
+
       // !VA Branch: 100920A
       // !VA TEST: Check the data type of an array element
       // if (reflectArray[0] === 'ccpTdaHeigtTfd') {
@@ -835,7 +836,7 @@ var Witty = (function () {
       // !VA Called from init(). Set dev mode options: Display toolbar, curImg, filename, display/undisplay CCP. Then initialize the UI: get localStorage and show dynamic containers and toolbar.
       initUI: function(initMode) {
 
-        const delayInMilliseconds = 0;
+        const delayInMilliseconds = 500;
         // !VA Here we initialize DEV mode, i.e. reading a hardcoded image from the HTML file instead of loading one manually in production mode
         if (initMode === 'devmode') {
           // !VA Set a timeout to give the image time to load
@@ -3444,8 +3445,24 @@ ${indent}<![endif]-->`;
     // !VA Branch: 101420A
     // !VA Called from eventHandlers. This function is necessary because the input event does not register input changes resulting from the focus event. On focus, the value of the input resets to '', i.e. empty. Consequently, all dependent inputs, i.e. the TD height and width and TBL width, as well as the curImg dimensions, have to recalc based on the on-focus empty value of the target input. 
     function handlePaddingFocus(evt) {
+      console.log('handlePaddingFocus running'); 
+      let userInputObj = {};
+      // !VA Get the Appobj/ccpUserInput alias from the target id
+      userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
 
-      
+
+      if  ( userInputObj.appObjProp.substring( 6 , 11 ) === 'Pdrgt' || userInputObj.appObjProp.substring( 6 , 11 ) === 'Pdlft') {
+        console.log('Mark1 userInputObj.appObjProp :>> ' + userInputObj.appObjProp);
+        // !VA evtTargetVal is the value the user entered into the input element.
+        var foo = Number(-evt.target.value);
+        console.log('foo :>> ' + foo);
+        userInputObj.evtTargetVal = foo;
+      } else {
+        console.log('Mark2 userInputObj.appObjProp :>> ' + userInputObj.appObjProp);
+        userInputObj.evtTargetVal = Number(evt.target.value);
+      }
+      handlePadding( 'handlePaddingFocus', userInputObj);
+
       // console.log('handlePaddingFocus running'); 
       // console.log('handlePaddingFocus Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
       // console.log('handlePaddingFocus Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
@@ -3467,7 +3484,7 @@ ${indent}<![endif]-->`;
         if  ( appObjProp.substring( 6 , 11 ) === 'Pdtop' || appObjProp.substring( 6 , 11 ) === 'Pdbtm') {
           // !VA Set the Appobj property of appObjProp. For padding width inputs, this is done in handleUserInput.
           Appobj[appObjProp] = evtTargetVal;
-          handlePadding(userInputObj);
+          handlePadding('handlePaddingInput', userInputObj);
         }
       }
       // console.log('handlePaddingInput Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
@@ -3483,7 +3500,7 @@ ${indent}<![endif]-->`;
       // console.log('handlePaddingBlur userInputObj :>> ');
       // console.log(userInputObj);
       // !VA Here we do nothing except pass userInputObj from the blur event. The blur event handles padding width inputs.
-      handlePadding(userInputObj);
+      handlePadding('handlePaddingBlur', userInputObj);
       
 
       // console.log('handlePaddingBlur Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
@@ -3493,23 +3510,25 @@ ${indent}<![endif]-->`;
 
     }
 
-    function handlePadding( userInputObj ) {
+    function handlePadding( caller, userInputObj ) {
       // console.clear();
-      console.log('handlePadding running');
+      console.log(`handlePadding called by ${caller} running`);
       console.log('handlePadding Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
       console.log('handlePadding Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
       console.log('handlePadding Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
       console.log('handlePadding Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
-      let tmp;
-      let imgInputObj = {};
+      let tmp, reflectArray;
+      let imgInputObj = {}, configObj = {};
       // !VA Destructure userInputObj
       let { appObjProp, evtTargetVal } = userInputObj;
       evtTargetVal = Number(evtTargetVal);
       // !VA If appObjProp is lft/rgt, then userInputObj comes from handlePaddingBlur and curImgW is modified. Note: evtTargetVal is error-checked in handleBlur.
       if  ( appObjProp.substring( 6 , 11 ) === 'Pdrgt' || appObjProp.substring( 6 , 11 ) === 'Pdlft') {
         console.log('appObjProp :>> ' + appObjProp);
-        // !VA Shrink curImg by the current event target's Appobj property value
-        imgInputObj.evtTargetVal = Appobj.curImgW - ( Number(Appobj[appObjProp]));
+        // !VA Update curImg by the current event target's Appobj property value
+        // !VA Branch: 101520B
+        // !VA No, update it by the evtTargetVal, the Appobj propery is always positive. To reset curImgW to the prior state, the negative value from handlePaddingFocus needs to be used. 
+        imgInputObj.evtTargetVal = Appobj.curImgW - ( evtTargetValga);
         // !VA Set Appobj.curImgW to imgInputObj to the shrunk image's width
         Appobj.curImgW = imgInputObj.evtTargetVal;
         // !VA Now set the Appobj property of the current image element to be shrunk, i.e. curImgW.
@@ -3521,22 +3540,33 @@ ${indent}<![endif]-->`;
         console.log(imgInputObj);
         tmp = Appobj.ccpTblWidthTfd;
         appController.initupdateCurrentImage(imgInputObj);
-        Appobj.ccpTblWidthTfd = tmp;
+        console.log('tmp :>> ' + tmp);
+        Appobj.ccpTdaWidthTfd = Appobj.ccpTblWidthTfd = tmp;
         console.log('Appobj.curImgW is modified :>> ' + Appobj.curImgW);
-
+        reflectArray = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
       // !VA If appObjProp is top/btm, then userInputObj comes from handlePaddingInput and curImgW is NOT modified. Note: evtTargetVal is NaN-checked in handlePaddingInput, complete error-checking doesn't happen until the input is blurred.
       } else {
         console.log('appObjProp :>> ' + appObjProp);
         console.log('Appobj.curImgW is NOT Modified :>> ' + Appobj.curImgW);
-        Appobj.ccpTdaHeightTfd = Appobj.curImgW + Appobj.ccpTdaPdrgtTfd + Appobj.ccpTdaPdlftTfd;
-        console.log('Appobj.ccpTdaHeightTfd :>> ' + Appobj.ccpTdaHeightTfd);
+        Appobj.ccpTdaHeigtTfd = Appobj.curImgH + Number(Appobj.ccpTdaPdtopTfd) + Number(Appobj.ccpTdaPdbtmTfd);
+        console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
+
+        reflectArray = [ 'ccpTdaHeigtTfd' ];
       }
+      configObj = {
+        reflectAppobj: { reflect: reflectArray }
+      };
+
+      if (Appobj[appObjProp] !== '') {
+
+        UIController.configCCP( configObj );
+      }
+
     }
 
     // !VA appController  Branch 101520B
     // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. The IIFE emulates how preventDefault works on the TAB key if handleUserInput returns false, i.e. highlight the input value and keep the focus in the field so the user can accept the value or blur out of the input with mouse click or TAB.
     function handleBlur(evt) {
-      console.log('Mark1');
       console.log('Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
       // console.log('handleBlur running'); 
       // !VA Create the object to store the Appobj property and current input value
