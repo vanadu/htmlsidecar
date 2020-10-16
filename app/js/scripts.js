@@ -3494,6 +3494,10 @@ ${indent}<![endif]-->`;
     function handlePaddingBlur(userInputObj) {
       // console.log('handlePaddingBlur running'); 
       // !VA Here we do nothing except pass userInputObj from the blur event. The blur event handles padding width inputs.
+
+
+
+
       handlePadding('handlePaddingBlur', userInputObj);
       // console.log('handlePaddingBlur Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
       // console.log('handlePaddingBlur Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
@@ -3505,8 +3509,10 @@ ${indent}<![endif]-->`;
     // !VA Branch: 101520B
     // !VA Handles padding inputs from handlePaddingBlur (for width padding inputs) and handlePaddingInput (for height padding inputs). The caller argument is a debug argument that passes the name of the calling function and can be removed from this and the callers for production.
     function handlePadding( caller, userInputObj ) {
-      // console.clear();
-      // console.log(`handlePadding called by ${caller} running`);
+      console.clear();
+      console.log(`handlePadding called by ${caller} running`);
+      console.log('userInputObj :>> ');
+      console.log(userInputObj);
       // console.log('handlePadding Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
       // console.log('handlePadding Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
       // console.log('handlePadding Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
@@ -3535,6 +3541,10 @@ ${indent}<![endif]-->`;
         reflectArray = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
       // !VA If appObjProp is top/btm, then userInputObj comes from handlePaddingInput and curImgW is NOT modified. Note: evtTargetVal is NaN-checked in handlePaddingInput, complete error-checking doesn't happen until the input is blurred.
       } else {
+
+        // !VA Branch: 101520D
+        // !VA This is the problem again - using unshrunk curImgH
+        console.log('Mark1 Appobj.curImgH :>> ' + Appobj.curImgH);
         // !VA Set the TD Height input to the curImgH plus the sum of the Appobj lft/rgt input properties.
         Appobj.ccpTdaHeigtTfd = Appobj.curImgH + Number(Appobj.ccpTdaPdtopTfd) + Number(Appobj.ccpTdaPdbtmTfd);
         // !VA Set the reflect array for TD Height
@@ -3544,12 +3554,7 @@ ${indent}<![endif]-->`;
       configObj = {
         reflectAppobj: { reflect: reflectArray }
       };
-      // !VA Branch: 101520B
-      // !VA Only run configCCP if the current Appobj value is not empty, i.e. if the current padding input has a value. If appObjProp is empty, then the respective CCP input field value should also remain empty.
-      if (Appobj[appObjProp] !== '') {
-
-        UIController.configCCP( configObj );
-      }
+      UIController.configCCP( configObj );
 
     }
 
