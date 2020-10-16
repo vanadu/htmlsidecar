@@ -3513,10 +3513,10 @@ ${indent}<![endif]-->`;
       console.log(`handlePadding called by ${caller} running`);
       console.log('userInputObj :>> ');
       console.log(userInputObj);
-      // console.log('handlePadding Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
-      // console.log('handlePadding Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
-      // console.log('handlePadding Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
-      // console.log('handlePadding Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
+      console.log('handlePadding Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
+      console.log('handlePadding Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
+      console.log('handlePadding Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
+      console.log('handlePadding Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
       let tmp, reflectArray;
       let imgInputObj = {}, configObj = {};
       // !VA Destructure userInputObj
@@ -3524,6 +3524,7 @@ ${indent}<![endif]-->`;
       evtTargetVal = Number(evtTargetVal);
       // !VA If appObjProp is lft/rgt, then userInputObj comes from handlePaddingBlur and curImgW is modified. Note: evtTargetVal is error-checked in handleBlur.
       if  ( appObjProp.substring( 6 , 11 ) === 'Pdrgt' || appObjProp.substring( 6 , 11 ) === 'Pdlft') {
+        console.log('Mark1 Appobj.curImgH :>> ' + Appobj.curImgH + '; Appobj.curImgW :>> ' + Appobj.curImgW);
         // !VA Update curImg by the the current evtTargetVal. For width padding inputs, evtTargetVal is passed from handlePaddingFocus as negative value to unshrink curImgW. 
         imgInputObj.evtTargetVal = Appobj.curImgW - evtTargetVal;
         // !VA Set Appobj.curImgW to imgInputObj to the shrunk/unshrunk image's width
@@ -3537,14 +3538,21 @@ ${indent}<![endif]-->`;
         // console.log('tmp :>> ' + tmp);
         // !VA Restore Appobj.ccpTblWidthTfd to the temporarily stored override value 
         Appobj.ccpTdaWidthTfd = Appobj.ccpTblWidthTfd = tmp;
+
+        // !VA Set the TD Height input to the curImgH plus the sum of the Appobj lft/rgt input properties.
+        Appobj.ccpTdaHeigtTfd = Appobj.curImgH + Number(Appobj.ccpTdaPdtopTfd) + Number(Appobj.ccpTdaPdbtmTfd);
+
+
+
         // !VA Set the reflect array for TD W and TBL W
-        reflectArray = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
+        reflectArray = [ 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
       // !VA If appObjProp is top/btm, then userInputObj comes from handlePaddingInput and curImgW is NOT modified. Note: evtTargetVal is NaN-checked in handlePaddingInput, complete error-checking doesn't happen until the input is blurred.
-      } else {
+      } 
+      else if  ( appObjProp.substring( 6 , 11 ) === 'Pdtop' || appObjProp.substring( 6 , 11 ) === 'Pdbtm') {
 
         // !VA Branch: 101520D
         // !VA This is the problem again - using unshrunk curImgH
-        console.log('Mark1 Appobj.curImgH :>> ' + Appobj.curImgH);
+        console.log('Mark2 Appobj.curImgH :>> ' + Appobj.curImgH + '; Appobj.curImgW :>> ' + Appobj.curImgW);
         // !VA Set the TD Height input to the curImgH plus the sum of the Appobj lft/rgt input properties.
         Appobj.ccpTdaHeigtTfd = Appobj.curImgH + Number(Appobj.ccpTdaPdtopTfd) + Number(Appobj.ccpTdaPdbtmTfd);
         // !VA Set the reflect array for TD Height
