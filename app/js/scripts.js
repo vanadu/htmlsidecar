@@ -435,7 +435,6 @@ var Witty = (function () {
       // !VA Branch: 100920A
       // !VA TEST: Trace an array element
       // if (reflectArray.includes('ccpTdaHeigtTfd')) {
-      //   console.log('HIT');
       //   console.trace(reflectArray)
       // }
 
@@ -783,7 +782,6 @@ var Witty = (function () {
         } else if ( el.id.includes('chk')) {
           // console.log('el.children[1].tagName is: ' + el.children[1].tagName);
           flag ? el.children[0].disabled = true : el.children[0].disabled = false;
-          // debugger;
           flag ? el.children[1].classList.add('ccp-disable-lbl') : el.children[1].classList.remove('ccp-disable-lbl');
         } else {
           console.log('el is: ' + el);
@@ -1047,10 +1045,8 @@ var Witty = (function () {
               Appobj[ key ] = checkboxState( [ key ] );
             }
           }
-          
           console.log('populateCcpPropertiesAppobj is: ');
           console.log(Appobj); 
-   
         }
 
         if ( access === 'app') {
@@ -1065,6 +1061,7 @@ var Witty = (function () {
         } else {
           console.log('Error in populateAppobj: unknown argument - access');
         }
+
       },
 
 
@@ -1135,6 +1132,10 @@ var Witty = (function () {
         document.querySelector(inspectorElements.btnToggleCcp).style.display = 'block';
         // !VA Call evalInspectorAlerts with the Appobj argument to calculate which Inspector values don't meet HTML email specs.
         evalInspectorAlerts(Appobj);
+
+        
+
+
       },
 
       //UIController public
@@ -1545,7 +1546,6 @@ var Witty = (function () {
     function buildOutputNodeList( id ) {
       console.log('buildOutputNodeList running'); 
       console.log('id is: ' + id);
-      // debugger;
       let selectedTdOption, hasAnchor, hasWrapper, Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
       // !VA Branch: OVERHAUL0908D
       // !VA Set hasAnchor if ccpImgAnchrTfd has a value
@@ -2425,9 +2425,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // console.log('tableOpen1Index is: ' + tableOpen1Index);
         // console.log('tbl.substring( tableOpen1Index, tableOpen1Index + 6 ) is: ' + tbl.substring( tableOpen1Index, tableOpen1Index + 6 ));
         tbl = tbl.substring( 0, tableOpen1Index ) + ghostOpen1 +  tbl.substring( tableOpen1Index, tbl.length);
-        // console.log('foo is: ' + foo);
-        
-        var foo;
 
 
         var tableClose1Index, tableClose2Index;
@@ -3106,6 +3103,20 @@ ${indent}<![endif]-->`;
         }
       }
 
+      // !VA Branch: 101720A  
+      // !VA Add event handlers for CCP labels. This includes all the text input label icons and the padding icon.
+      let lblElements;
+      txfldElements = document.getElementsByClassName('ccp-txfld-lbl');
+      // txfldElements.push(document.getElementById('ccp-tda-padng-icn'));
+      console.log('txfldElements :>> ');
+      console.log(txfldElements);
+      for (const el of txfldElements) {
+        addEventHandler(el,'click',handleIconClick,false);
+      }
+      // !VA Add eventListener for padding icon - it will also be handled in handleIconClick
+      addEventHandler(document.getElementById('ccp-tda-padng-icn'), 'click', handleIconClick,false);
+
+
       // -----------------------
       // !VA Branch: implementClipboard01 (071020)
       // !VA Handle the Toolbar input elements separately from the Toolbar increment/decrement buttons because the buttons are handled by mouseclick or by default as mouseclicks when ENTER is pressed, so none of these handlers apply to those buttons. Includes eventListener handlers for keyboard and mouse blur events.
@@ -3502,8 +3513,8 @@ ${indent}<![endif]-->`;
       // console.log('handlePaddingFocus Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
       // console.log('handlePaddingFocus Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
 
-      // !VA 
-      console.log('handlePaddingFocus evt.target.value :>> ' + evt.target.value);
+      // !VA Branch: 101620B
+      // !VA This is the return value from getHasPadding - not used
       hasPadding = getHasPadding();
 
       // !VA Handle the padding width inputs. Pass evtTargetVal as negative value to handlePadding to unshrink curImgW on focus. 
@@ -3543,7 +3554,6 @@ ${indent}<![endif]-->`;
           handlePadding('handlePaddingInput', userInputObj);
         }
       }
-
       // console.log('handlePaddingInput Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
       // console.log('handlePaddingInput Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
       // console.log('handlePaddingInput Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
@@ -3554,13 +3564,12 @@ ${indent}<![endif]-->`;
     // !VA Branch: 101520A
     // !VA This actually does nothing except call handlePadding for padding width inputs. handlePadding could be called directly from handleBlur to handle width inputs, but this function serves as a foil to handlePaddingInput which handle height inputs. This function keeps structural symmetry.
     function handlePaddingBlur(userInputObj) {
+      // console.log('handlePaddingBlur running'); 
+      // console.log('handlePaddingBlur userInputObj :>> ');
+      // console.log(userInputObj);
 
-      console.log('handlePaddingBlur running'); 
-      console.log('handlePaddingBlur userInputObj :>> ');
-      console.log(userInputObj);
-
-
-
+      // !VA Branch: 101720A
+      // !VA Return from getHasPadding, not used
       hasPadding = getHasPadding();
       // !VA Here we do nothing except pass userInputObj from the blur event. The blur event handles padding width inputs.
       handlePadding('handlePaddingBlur', userInputObj);
@@ -3574,7 +3583,7 @@ ${indent}<![endif]-->`;
     // !VA Branch: 101520B
     // !VA Handles padding inputs from handlePaddingBlur (for width padding inputs) and handlePaddingInput (for height padding inputs). The caller argument is a debug argument that passes the name of the calling function and can be removed from this and the callers for production.
     function handlePadding( caller, userInputObj ) {
-      console.log(`handlePadding called by ${caller} running`);
+      // console.log(`handlePadding called by ${caller} running`);
       // console.log('userInputObj :>> ');
       // console.log(userInputObj);
       // console.log('handlePadding Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
@@ -3617,29 +3626,24 @@ ${indent}<![endif]-->`;
 
       // !VA Branch: 101620B
       // !VA If ccpTdaWidthTfd = curImgW or ccpTdaHeigtTfd = curImgH override them and set to ''. Dependent input values only show if they differ from the image size, i.e. if a padding is set.
-      console.log('handlePadding Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
-      console.log('handlePadding Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
-      console.log('handlePadding Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
-      console.log('handlePadding Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
+      // console.log('handlePadding Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
+      // console.log('handlePadding Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
+      // console.log('handlePadding Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
+      // console.log('handlePadding Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
       if (Appobj.ccpTdaPdtopTfd === '' &&  Appobj.ccpTdaPdbtmTfd === '') { Appobj.ccpTdaHeigtTfd = ''; }
       if (Appobj.ccpTdaPdrgtTfd === '' &&  Appobj.ccpTdaPdlftTfd === '') { Appobj.ccpTdaWidthTfd = ''; }
-
-      console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
-      console.log('Appobj.ccpTdaWidthTfd :>> ' + Appobj.ccpTdaWidthTfd);
-
-
+      // console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
+      // console.log('Appobj.ccpTdaWidthTfd :>> ' + Appobj.ccpTdaWidthTfd);
       configObj = {
         reflectAppobj: { reflect: reflectArray }
       };
       UIController.configCCP( configObj );
-
     }
 
     // !VA appController  Branch 101520B
     // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. This also handles the cases where the user enters 0 to blur, or leaves the input empty to blur, and the padding-specific handling of TD Width values. Note: the if conditions are questionable and probably need to be rewritten but it works for now.
     function handleBlur(evt) {
-      console.clear();
-      console.log('handleBlur running'); 
+      // console.log('handleBlur running'); 
       // !VA Create the object to store the Appobj property and current input value
       let reflectArray, userInputObj = {}, configObj = {};
       let retVal;
@@ -3655,9 +3659,7 @@ ${indent}<![endif]-->`;
       if ( Number(userInputObj.evtTargetVal) === 0 || userInputObj === '') { 
         // !VA If the target input value is 0, convert it to empty, set the Appobj property to empty and reflect that to the CCP.
         if (Number(userInputObj.evtTargetVal) === 0) {
-          console.log('HIT');
           Appobj[appObjProp] = '';
-          console.log('appObjProp :>> ' + appObjProp);
           reflectArray = [ appObjProp ];
           configObj = {
             reflectAppobj: { reflect: reflectArray },
@@ -3816,7 +3818,7 @@ ${indent}<![endif]-->`;
             applyInputValue(userInputObj);
           // !VA If the target is a CCP element, set the Appobj property value to the value returned from checkUserInput
           } else if ( ccpIptAliases.includes( appObjProp )) {
-            console.log('handleUserInput CCP INPUT: VALUE APPLIED');
+            // console.log('handleUserInput CCP INPUT: VALUE APPLIED');
             evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = retVal;
           }
         // !VA Otherwise, checkUserInput returned false so the target value is invalid. Return FALSE to handleKeydown for TAB and ENTER key handling.
@@ -3855,7 +3857,6 @@ ${indent}<![endif]-->`;
           if ( retVal === false) { 
 
             if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
-              // console.log('HIT');
               this.select();
               this.value = '';
             } else {
@@ -3948,7 +3949,6 @@ ${indent}<![endif]-->`;
       }           
       // !VA Currently no string validation implemented, so the function just returns the argument unchanged
       else if (stringInputs.includes( userInputObj.appObjProp )) {
-        console.log('String...');
         retVal = checkTextInput(userInputObj);
       }
       else {
@@ -3963,13 +3963,9 @@ ${indent}<![endif]-->`;
     // !VA Called from checkUserInput. Runs validateInteger to return a value of type Number, then evaluates any error conditions on the input and passes any error codes generated to appController.handleAppMessages and returns false if there was an error, or the integer value of no error was detected.
     function checkNumericInput(userInputObj) {
       // console.clear();
-      console.log(userInputObj);
-
       // !VA Destructure userInputObj
       // !VA The code that will be passed to getAppMessageStrings
       let appMessCode, isErr, retVal;
-      // !VA Temporary variables
-      let foo, faa, baz;
       // !VA The flag indicating an error condition,
       isErr = false;
       // !VA TODO: Setting maxViewerWidth just for now
@@ -4070,6 +4066,7 @@ ${indent}<![endif]-->`;
               appMessCode = 'err_table_cell_wider_than_parent_table';
             }
           } else {
+            console.log('retVal :>> ' + retVal);
             if (retVal < Appobj.curImgW ) {
               // !VA errorHandler!
               isErr = true;
@@ -4116,7 +4113,7 @@ ${indent}<![endif]-->`;
       }
       // !VA If an error was detected, return false to the event handler to determine how the error will be displayed in the input field
       if (isErr) { retVal = false; }
-      console.log('checkNumericInput retVal :>> ' + retVal);
+      // console.log('checkNumericInput retVal :>> ' + retVal);
       return retVal;
     }
 
@@ -4275,14 +4272,17 @@ ${indent}<![endif]-->`;
       };
       UIController.configCCP( configObj );
 
-      // !VA Branch: implementCcpInput01 (062120)
-      // !VA Why does this condition have no actions? Shouldn't write AppbojToDOM be called conditionally below?
-      // !VA If CCP is open, write tableWidth and tableWrapperWidth to the DOM elements. 
-      var ccpState = UICtrl.toggleCcp(false);
-      if (ccpState) { 
-        // !VA Branch: implementCcpInput09 (070220)
-        // !VA CAUTION: This doesn't seem to make sense - tableWidth and tableWrapperWidth aren't updated here. This clause has no content
-        // !VA If the CCP is open, update the CCP UI with the most recent changes to dynamicRegion values, then populateAppobj with CCP values last. writeAppobjToDOM takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the element alias as key and the Appobj value as value. Elements to update here are: tableWidth and tableWrapperWidth. If the CCP is not open, don't update its values.
+      // !VA Branch: 101720A
+      // !VA This is where the CCP DOM is complete - the last thing to happen is setting Appobj.ccpTblWidthTfd and AppobjTbwWidthTfd because these values are queried from curImg, which doesn't fully exist until now. This is probably a structural issue, but it is what it is for now. 
+      // !VA Loop through CCP text input label icons and add the class 'active' to those that have content to highlight them, i.e. display them in blue
+      var ipt, txfldLabels;
+      // !VA Collection of text input labels
+      txfldLabels = document.getElementsByClassName('ccp-txfld-lbl');
+      for (const el of txfldLabels) {
+        // !VA Replace 'lbl' with 'ipt' on the ID to get the sibling input elements.
+        ipt = document.querySelector('#' + el.id.replace('lbl', 'ipt'));
+        // !VA Add the active class to the input element to remove the filter on the sibling element icon and expose its native color, as defined in CSS.
+        if ( ipt.value !== '') { ipt.classList.add('active'); } 
       }
       // !VA Write the inspectors based on Appobj values
       UICtrl.writeInspectors(Appobj);
@@ -4438,6 +4438,45 @@ ${indent}<![endif]-->`;
       selectCheckbox( isChecked, alias );
     }
 
+    // !VA appController private
+    // !VA Branch: 101720A
+    // !VA Handle label clicks to remove any input field content and reset the icon highlight
+    function handleIconClick(evt) {
+      console.log('handleIconClick running');
+      console.log('evt.target.id :>> ' + evt.target.id); 
+      console.log('evt.target.value :>> ' + evt.target.value); 
+      let appObjProp, ipt, hasPadding;
+      appObjProp = elementIdToAppobjProp(evt.target.id);
+      if (evt.target.value !== '') {
+        if (evt.target.id !== 'ccp-tda-padng-icn') {
+          console.log('Has value, not padding');
+          console.log('Appobj[appObjProp] :>> ' + Appobj[appObjProp]);
+          Appobj[appObjProp] = '';
+          // !VA This should be done with configCCP - for later
+          ipt = document.getElementById(evt.target.htmlFor);
+          ipt.value = '';
+          ipt.classList.remove('active');
+        } else {
+          console.log('Has value, IS padding');
+          var pdgIpts = document.getElementsByClassName('ccp-padng-ipt');
+          console.log('pdgIpts :>> ');
+          console.log(pdgIpts);
+          // !VA This is where we need to add the padding width values back to Appobj.curImgW and remove the values from TD H and TD W
+          for (const el of pdgIpts) {
+            console.log('el.value :>> ' + el.value);
+            el.value = '';
+          }
+
+
+
+          document.getElementById(evt.target.id).classList.remove('active');
+
+
+        }
+      }
+
+
+    }
 
     // !VA appController private
     // !VA Branch: OVERHAUL0831A
@@ -5366,8 +5405,20 @@ ${indent}<![endif]-->`;
 
         // !VA Branch: OVERHAUL0906B
         // !VA On init, run the default config
-        var configObj = fetchConfigObj('default');
-        UIController.configCCP( configObj);
+        // !VA Branch: 101720A
+        // !VA Deprecated, I think this happens below
+        // var configObj = fetchConfigObj('default');
+        // console.log('configObj :>> ');
+        // console.log(configObj);
+
+
+
+        // UIController.configCCP( configObj);
+
+        // setTimeout(() => {
+          
+
+        // }, timeout);
 
 
         // !VA Pre-select the IMG EXCLD, TDA OPTNS and TBW WRAPR options so they open as selected by default on page load.
@@ -5392,7 +5443,6 @@ ${indent}<![endif]-->`;
         configObj = configDefault('default', true );
         UIController.configCCP(configObj);
           
-
 
         // !VA Set up event listeners
         setupEventListeners();
