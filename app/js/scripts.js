@@ -4462,16 +4462,27 @@ ${indent}<![endif]-->`;
           console.log('pdgIpts :>> ');
           console.log(pdgIpts);
           // !VA This is where we need to add the padding width values back to Appobj.curImgW and remove the values from TD H and TD W
-          for (const el of pdgIpts) {
-            console.log('el.value :>> ' + el.value);
-            el.value = '';
-          }
-
-
-
+          // !VA First, get padHeight an padWidth from current Appobj
+          // !VA Branch: 101720A
+          // !VA This is the same as running handlePadding with appObjProp = ccpTdaPdrgtTfd - see if it can be replaced with that, but it works for now. 
+        
+          let imgInputObj = {};
+          imgInputObj.appObjProp = 'curImgW';
+          imgInputObj.evtTargetVal = Appobj.curImgW + Number(Appobj.ccpTdaPdrgtTfd) + Number(Appobj.ccpTdaPdlftTfd);
+          appController.initupdateCurrentImage(imgInputObj);
+          // !VA Set the TD Height input to the curImgH plus the sum of the Appobj lft/rgt input properties.
+          Appobj.ccpTdaHeigtTfd = Appobj.ccpTdaWidthTfd = Appobj.ccpTdaPdrgtTfd = Appobj.ccpTdaPdlftTfd = Appobj.ccpTdaPdtopTfd = Appobj.ccpTdaPdbtmTfd = '';
+          // !VA Reset TBL W to Appobj.curImgW restored to pre-padding value
+          Appobj.ccpTblWidthTfd = Appobj.curImgW; 
+          // !VA Set the reflect array for TD H, TD W and TBL W
+          reflectArray = [ 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdbtmTfd', 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
+          configObj = {
+            reflectAppobj: { reflect: reflectArray }
+          };
+          // !VA Run the config
+          UIController.configCCP( configObj );
+          // !VA Remove the active class from the padding icon, i.e. the event target.
           document.getElementById(evt.target.id).classList.remove('active');
-
-
         }
       }
 
