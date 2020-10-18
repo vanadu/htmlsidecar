@@ -4272,18 +4272,21 @@ ${indent}<![endif]-->`;
       };
       UIController.configCCP( configObj );
 
-      // !VA Branch: 101720A
-      // !VA This is where the CCP DOM is complete - the last thing to happen is setting Appobj.ccpTblWidthTfd and AppobjTbwWidthTfd because these values are queried from curImg, which doesn't fully exist until now. This is probably a structural issue, but it is what it is for now. 
-      // !VA Loop through CCP text input label icons and add the class 'active' to those that have content to highlight them, i.e. display them in blue
-      var ipt, txfldLabels;
-      // !VA Collection of text input labels
-      txfldLabels = document.getElementsByClassName('ccp-txfld-lbl');
-      for (const el of txfldLabels) {
-        // !VA Replace 'lbl' with 'ipt' on the ID to get the sibling input elements.
-        ipt = document.querySelector('#' + el.id.replace('lbl', 'ipt'));
-        // !VA Add the active class to the input element to remove the filter on the sibling element icon and expose its native color, as defined in CSS.
-        if ( ipt.value !== '') { ipt.classList.add('active'); } 
-      }
+      (function highlightIconPresets() {
+        // !VA Branch: 101720A
+        // !VA Highlight icons whose inputs have preset values based on the default configuration. This is a named IIFE to make it easier to find and is located here because this is where the CCP DOM is complete, i.e. this is where Appobj.ccpTblWidthTfd and AppobjTbwWidthTfd are set because these values are queried from curImg, which doesn't fully exist until now. Highlighting icon presets at an earlier point in the program flow wouldn't pick up the TBL Width or TBW Width values. 
+        // !VA Loop through CCP text input label icons and add the class 'active' to those that have content to highlight them, i.e. display them in blue
+        var ipt, txfldLabels;
+        // !VA Collection of text input labels
+        txfldLabels = document.getElementsByClassName('ccp-txfld-lbl');
+          for (const el of txfldLabels) {
+            // !VA Replace 'lbl' with 'ipt' on the ID to get the sibling input elements.
+            ipt = document.querySelector('#' + el.id.replace('lbl', 'ipt'));
+            // !VA Add the active class to the input element to remove the filter on the sibling element icon and expose its native color, as defined in CSS.
+            if ( ipt.value !== '') { ipt.classList.add('active'); } 
+          }
+      })();
+
       // !VA Write the inspectors based on Appobj values
       UICtrl.writeInspectors(Appobj);
     }
@@ -4476,6 +4479,12 @@ ${indent}<![endif]-->`;
           Appobj.ccpTblWidthTfd = Appobj.curImgW; 
           // !VA Set the reflect array for TD H, TD W and TBL W
           reflectArray = [ 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdbtmTfd', 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
+
+          // !VA Unhighlight the TD Width and TD Height icons
+          document.querySelector(ccpUserInput.ccpTdaHeigtTfd.replace('tfd', 'ipt')).classList.remove('active');
+          document.querySelector(ccpUserInput.ccpTdaWidthTfd.replace('tfd', 'ipt')).classList.remove('active');
+
+
           configObj = {
             reflectAppobj: { reflect: reflectArray }
           };
