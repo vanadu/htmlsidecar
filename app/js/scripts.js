@@ -621,8 +621,22 @@ var Witty = (function () {
       } 
     }
 
-
-
+    // !VA UIController private
+    // !VA Use configCCP to apply/remove the highlight style to input elements, which then adds/removes the filter on the icon, as defined in the CSS. highlightIconPreets in resizeContainers sets the highlight on icons that have a default preset value. Individual icon highlights are set through configObj using the highlight method and the highlightArray array.
+    function highlightIcon( highlightArray ) {
+      console.log(highlightArray);
+      var ipt;
+      for (const el of highlightArray) {
+        if ( el.substring( 11, 14) === 'Tfd') {
+          ipt = document.querySelector(ccpUserInput[el].replace('tfd', 'ipt'));
+          if (ipt.value !== '') { 
+            ipt.classList.add('active');
+          } else {
+            ipt.classList.remove('active');
+          }
+        }
+      }
+    }
 
 
     // !VA UIController private  
@@ -946,6 +960,9 @@ var Witty = (function () {
         }
         if ( configObj.disableElements ) {
           disableElements( configObj.disableElements.flag, configObj.disableElements.disable );
+        }
+        if ( configObj.highlightIcon ) {
+          highlightIcon( configObj.highlightIcon.highlight );
         }
 
         return retVal;
@@ -3107,9 +3124,6 @@ ${indent}<![endif]-->`;
       // !VA Add event handlers for CCP labels. This includes all the text input label icons and the padding icon.
       let lblElements;
       txfldElements = document.getElementsByClassName('ccp-txfld-lbl');
-      // txfldElements.push(document.getElementById('ccp-tda-padng-icn'));
-      console.log('txfldElements :>> ');
-      console.log(txfldElements);
       for (const el of txfldElements) {
         addEventHandler(el,'click',handleIconClick,false);
       }
@@ -3508,14 +3522,15 @@ ${indent}<![endif]-->`;
       // !VA Get the Appobj/ccpUserInput alias from the target id
       userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
 
-      // console.log('handlePaddingFocus Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
-      // console.log('handlePaddingFocus Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
-      // console.log('handlePaddingFocus Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
-      // console.log('handlePaddingFocus Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
+      console.log('handlePaddingFocus running'); 
+      console.log('handlePaddingFocus Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
+      console.log('handlePaddingFocus Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
+      console.log('handlePaddingFocus Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
+      console.log('handlePaddingFocus Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
 
       // !VA Branch: 101620B
       // !VA This is the return value from getHasPadding - not used
-      hasPadding = getHasPadding();
+      // hasPadding = getHasPadding();
 
       // !VA Handle the padding width inputs. Pass evtTargetVal as negative value to handlePadding to unshrink curImgW on focus. 
       if  ( userInputObj.appObjProp.substring( 6 , 11 ) === 'Pdrgt' || userInputObj.appObjProp.substring( 6 , 11 ) === 'Pdlft') {
@@ -3525,13 +3540,20 @@ ${indent}<![endif]-->`;
       } else {
         userInputObj.evtTargetVal = Number(evt.target.value);
       }
-      handlePadding( 'handlePaddingFocus', userInputObj);
-      // console.log('handlePaddingFocus running'); 
-      // console.log('handlePaddingFocus Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
-      // console.log('handlePaddingFocus Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
-      // console.log('handlePaddingFocus Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
-      // console.log('handlePaddingFocus Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
+
+      console.log('handlePaddingInput userInputObj :>> ');
+      console.log(userInputObj);
       // !VA Select the input value on focus
+      this.select();
+
+      // !VA DO NOT RUN handlePadding here! Just restore curImgW and the dependent inputs and set padding values to ''. Otherwise, you'll get compounded updates to curImgW
+      handlePadding( 'handlePaddingFocus', userInputObj);
+      this.value = '';
+
+
+    }
+
+    function handlePaddingFocus2() {
       this.select();
     }
 
@@ -3562,14 +3584,35 @@ ${indent}<![endif]-->`;
 
     // !VA appController  
     // !VA Branch: 101520A
-    // !VA This actually does nothing except call handlePadding for padding width inputs. handlePadding could be called directly from handleBlur to handle width inputs, but this function serves as a foil to handlePaddingInput which handle height inputs. This function keeps structural symmetry.
+    // !VA Handles handlePadding could be called directly from handleBlur to handle width inputs, but this function serves as a foil to handlePaddingInput which handle height inputs. This function keeps structural symmetry.
     function handlePaddingBlur(userInputObj) {
       // console.log('handlePaddingBlur running'); 
       // console.log('handlePaddingBlur userInputObj :>> ');
       // console.log(userInputObj);
+      // !VA If both Appobj properties for padding width have no value, then set the dependent TD Width input value to empty and reflect that to the CCP.
+      // !VA Branch: 101820A
+      if ( Appobj.ccpTdaPdlftTfd !== '' || Appobj.ccpTdaPdrgtTfd !== '') {
+
+
+
+      }
+
+
+
+      // !VA  Note: Icon highlighting is handled in 
+      if ( Appobj.ccpTdaPdlftTfd === '' && Appobj.ccpTdaPdrgtTfd == '') {
+        Appobj.ccpTdaWidthTfd = '';
+        reflectArray = ['ccpTdaWidthTfd'];
+        configObj = {
+          reflectAppobj: { reflect: reflectArray },
+        };
+        UIController.configCCP( configObj);
+        console.log('HIT');
+      }
+
 
       // !VA Branch: 101720A
-      // !VA Return from getHasPadding, not used
+      // !VA getHasPadding highlights the padding icon if there's a value in any of the padding inputs.
       hasPadding = getHasPadding();
       // !VA Here we do nothing except pass userInputObj from the blur event. The blur event handles padding width inputs.
       handlePadding('handlePaddingBlur', userInputObj);
@@ -3583,7 +3626,7 @@ ${indent}<![endif]-->`;
     // !VA Branch: 101520B
     // !VA Handles padding inputs from handlePaddingBlur (for width padding inputs) and handlePaddingInput (for height padding inputs). The caller argument is a debug argument that passes the name of the calling function and can be removed from this and the callers for production.
     function handlePadding( caller, userInputObj ) {
-      // console.log(`handlePadding called by ${caller} running`);
+      console.log(`handlePadding called by ${caller} running`);
       // console.log('userInputObj :>> ');
       // console.log(userInputObj);
       // console.log('handlePadding Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
@@ -3612,9 +3655,25 @@ ${indent}<![endif]-->`;
         Appobj.ccpTdaWidthTfd = Appobj.ccpTblWidthTfd = tmp;
         // !VA Set the TD Height input to the curImgH plus the sum of the Appobj lft/rgt input properties.
         Appobj.ccpTdaHeigtTfd = Appobj.curImgH + Number(Appobj.ccpTdaPdtopTfd) + Number(Appobj.ccpTdaPdbtmTfd);
+
+        // !VA Branch: 101820A
+        console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
+        console.log('Appobj.ccpTdaWidthTfd :>> ' + Appobj.ccpTdaWidthTfd);
+        console.log('Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
+        console.log('Mark1');
+
+
+
+
+        
         // !VA Set the reflect array for TD H, TD W and TBL W
         reflectArray = [ 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
       // !VA If appObjProp is top/btm, then userInputObj comes from handlePaddingInput and curImgW is NOT modified. There is no dependency for curImgW on the height padding input values. Note: evtTargetVal is NaN-checked in handlePaddingInput, complete error-checking doesn't happen until the input is blurred.
+
+
+
+
+
       } 
       else if  ( appObjProp.substring( 6 , 11 ) === 'Pdtop' || appObjProp.substring( 6 , 11 ) === 'Pdbtm') {
         // !VA Set the TD Height input to the curImgH plus the sum of the Appobj lft/rgt input properties.
@@ -3631,7 +3690,7 @@ ${indent}<![endif]-->`;
       // console.log('handlePadding Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
       // console.log('handlePadding Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
       if (Appobj.ccpTdaPdtopTfd === '' &&  Appobj.ccpTdaPdbtmTfd === '') { Appobj.ccpTdaHeigtTfd = ''; }
-      if (Appobj.ccpTdaPdrgtTfd === '' &&  Appobj.ccpTdaPdlftTfd === '') { Appobj.ccpTdaWidthTfd = ''; }
+      if (Appobj.ccpTdaPdrgtTfd === '' &&  Appobj.ccpTdaPdlftTfd === '') { Appobj.ccpTdaWidthTfd = ''; }  
       // console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
       // console.log('Appobj.ccpTdaWidthTfd :>> ' + Appobj.ccpTdaWidthTfd);
       configObj = {
@@ -3668,15 +3727,7 @@ ${indent}<![endif]-->`;
         }
         // !VA Now that the zero case is handled and evtTargetVal is empty, handle the padding blur
         if ( evt.target.id.substring( 8 , 10 ) === 'pd') {
-          // !VA If both Appobj properties for padding width have no value, then set the dependent TD Width input value to empty and reflect that to the CCP.
-          if ( Appobj.ccpTdaPdtopTfd === '' && Appobj.ccpTdaPdtopTfd == '') {
-            Appobj.ccpTdaWidthTfd = '';
-            reflectArray = ['ccpTdaWidthTfd'];
-            configObj = {
-              reflectAppobj: { reflect: reflectArray },
-            };
-            UIController.configCCP( configObj);
-          }
+          handlePaddingBlur( userInputObj);
         } 
       } else {
         // !VA If the target value is not zero or empty, run the input error check to get retVal
@@ -4275,16 +4326,17 @@ ${indent}<![endif]-->`;
       (function highlightIconPresets() {
         // !VA Branch: 101720A
         // !VA Highlight icons whose inputs have preset values based on the default configuration. This is a named IIFE to make it easier to find and is located here because this is where the CCP DOM is complete, i.e. this is where Appobj.ccpTblWidthTfd and AppobjTbwWidthTfd are set because these values are queried from curImg, which doesn't fully exist until now. Highlighting icon presets at an earlier point in the program flow wouldn't pick up the TBL Width or TBW Width values. 
-        // !VA Loop through CCP text input label icons and add the class 'active' to those that have content to highlight them, i.e. display them in blue
-        var ipt, txfldLabels;
-        // !VA Collection of text input labels
-        txfldLabels = document.getElementsByClassName('ccp-txfld-lbl');
-          for (const el of txfldLabels) {
-            // !VA Replace 'lbl' with 'ipt' on the ID to get the sibling input elements.
-            ipt = document.querySelector('#' + el.id.replace('lbl', 'ipt'));
-            // !VA Add the active class to the input element to remove the filter on the sibling element icon and expose its native color, as defined in CSS.
-            if ( ipt.value !== '') { ipt.classList.add('active'); } 
+        let highlightArray = [];
+        for (const key of Object.keys(ccpUserInput)) {
+          // console.log('key :>> ' + key);
+          if (key.substring( 11, 14 ) === 'Tfd') {
+            highlightArray.push(key);
           }
+        }
+        configObj = {
+          highlightIcon: { highlight: highlightArray }
+        };
+        UIController.configCCP(configObj);
       })();
 
       // !VA Write the inspectors based on Appobj values
