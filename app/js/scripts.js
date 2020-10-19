@@ -437,7 +437,8 @@ var Witty = (function () {
       // if (reflectArray.includes('ccpTdaHeigtTfd')) {
       //   console.trace(reflectArray)
       // }
-
+      console.log('reflectAppobj reflectArray :>> ');
+      console.log(reflectArray);
 
 
       let el, isInit, retVal;
@@ -456,6 +457,8 @@ var Witty = (function () {
           el.value = appController.getAppobj( alias );
         }
       }
+      var foo = document.querySelector('#ccp-tda-heigt-ipt').value;
+      console.log('foo :>> ' + foo);
     }
 
     // !VA Branch: OVERHAUL0901A
@@ -503,7 +506,7 @@ var Witty = (function () {
 
         // !VA Branch: OVERHAUL0904A
         // !VA Added handling for Align/Valign Rdo elements
-        // !VA Branch: OVERHAUL0904A
+        // !VA Branch: OVERHAUL0904A 
         // !VA If the Appobj property of the alias is 'undefined', then the call comes from populateCcpProperties and the Appobj property hasn't been initialized yet. Set the isInit flag to true to get the value of the element corresponding to the alias and write it to Appobj to initialize
         typeof(appController.getAppobj(radioArray[i])) === 'undefined' ? isInit = true : isInit = false;
         // !VA If not isInit, then get the selected option from Appobj. 
@@ -624,14 +627,18 @@ var Witty = (function () {
     // !VA UIController private
     // !VA Use configCCP to apply/remove the highlight style to input elements, which then adds/removes the filter on the icon, as defined in the CSS. highlightIconPreets in resizeContainers sets the highlight on icons that have a default preset value. Individual icon highlights are set through configObj using the highlight method and the highlightArray array.
     function highlightIcon( highlightArray ) {
+      console.log('highlightIcon running'); 
+      console.log('highlightIcon highlightArray :>> ');
       console.log(highlightArray);
       var ipt;
       for (const el of highlightArray) {
         if ( el.substring( 11, 14) === 'Tfd') {
           ipt = document.querySelector(ccpUserInput[el].replace('tfd', 'ipt'));
           if (ipt.value !== '') { 
+            console.log('HAS VALUE');
             ipt.classList.add('active');
           } else {
+            console.log('NO VALUE');
             ipt.classList.remove('active');
           }
         }
@@ -3522,11 +3529,11 @@ ${indent}<![endif]-->`;
       // !VA Get the Appobj/ccpUserInput alias from the target id
       userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
 
-      console.log('handlePaddingFocus running'); 
-      console.log('handlePaddingFocus Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
-      console.log('handlePaddingFocus Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
-      console.log('handlePaddingFocus Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
-      console.log('handlePaddingFocus Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
+      // console.log('handlePaddingFocus running'); 
+      // console.log('handlePaddingFocus Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
+      // console.log('handlePaddingFocus Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
+      // console.log('handlePaddingFocus Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
+      // console.log('handlePaddingFocus Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
 
       // !VA Branch: 101620B
       // !VA This is the return value from getHasPadding - not used
@@ -3591,24 +3598,16 @@ ${indent}<![endif]-->`;
       // console.log(userInputObj);
       // !VA If both Appobj properties for padding width have no value, then set the dependent TD Width input value to empty and reflect that to the CCP.
       // !VA Branch: 101820A
-      if ( Appobj.ccpTdaPdlftTfd !== '' || Appobj.ccpTdaPdrgtTfd !== '') {
+      // if ( Appobj.ccpTdaPdlftTfd !== '' || Appobj.ccpTdaPdrgtTfd !== '') {
+      //   highlightArray = ['ccpTdaPdlftTfd', 'ccpTdaPdrgtTfd']
+
+
+      // }
 
 
 
-      }
 
 
-
-      // !VA  Note: Icon highlighting is handled in 
-      if ( Appobj.ccpTdaPdlftTfd === '' && Appobj.ccpTdaPdrgtTfd == '') {
-        Appobj.ccpTdaWidthTfd = '';
-        reflectArray = ['ccpTdaWidthTfd'];
-        configObj = {
-          reflectAppobj: { reflect: reflectArray },
-        };
-        UIController.configCCP( configObj);
-        console.log('HIT');
-      }
 
 
       // !VA Branch: 101720A
@@ -3657,29 +3656,44 @@ ${indent}<![endif]-->`;
         Appobj.ccpTdaHeigtTfd = Appobj.curImgH + Number(Appobj.ccpTdaPdtopTfd) + Number(Appobj.ccpTdaPdbtmTfd);
 
         // !VA Branch: 101820A
-        console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
-        console.log('Appobj.ccpTdaWidthTfd :>> ' + Appobj.ccpTdaWidthTfd);
-        console.log('Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
-        console.log('Mark1');
+        // console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
+        // console.log('Appobj.ccpTdaWidthTfd :>> ' + Appobj.ccpTdaWidthTfd);
+        // console.log('Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
+        // !VA Branch: 101820A
+        // !VA This works
+        if ( Appobj.ccpTdaPdlftTfd !== '' || Appobj.ccpTdaPdrgtTfd !== '') {
+          highlightArray = [ 'ccpTdaWidthTfd' ];
+        }
+        // !VA  Note: Icon highlighting is handled in 
+        if ( Appobj.ccpTdaPdlftTfd === '' && Appobj.ccpTdaPdrgtTfd == '') {
+          Appobj.ccpTdaWidthTfd = '';
+          reflectArray = ['ccpTdaWidthTfd'];
+          highlightArray = [ 'ccpTdaWidthTfd' ];
+        }
 
-
-
-
-        
         // !VA Set the reflect array for TD H, TD W and TBL W
-        reflectArray = [ 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
+        reflectArray = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
       // !VA If appObjProp is top/btm, then userInputObj comes from handlePaddingInput and curImgW is NOT modified. There is no dependency for curImgW on the height padding input values. Note: evtTargetVal is NaN-checked in handlePaddingInput, complete error-checking doesn't happen until the input is blurred.
-
-
-
 
 
       } 
       else if  ( appObjProp.substring( 6 , 11 ) === 'Pdtop' || appObjProp.substring( 6 , 11 ) === 'Pdbtm') {
         // !VA Set the TD Height input to the curImgH plus the sum of the Appobj lft/rgt input properties.
         Appobj.ccpTdaHeigtTfd = Appobj.curImgH + Number(Appobj.ccpTdaPdtopTfd) + Number(Appobj.ccpTdaPdbtmTfd);
-        // !VA Set the reflect array for TD Height
-        reflectArray = [ 'ccpTdaHeigtTfd' ];
+
+        // !VA Branch: 101820A
+
+        if ( Appobj.ccpTdaPdtopTfd !== '' || Appobj.ccpTdaPdbtmTfd !== '') {
+          highlightArray = [ 'ccpTdaHeigtTfd' ];
+          reflectArray = [ 'ccpTdaHeigtTfd' ];
+        }
+        // !VA  Note: Icon highlighting is handled in 
+        if ( Appobj.ccpTdaPdtopTfd === '' && Appobj.ccpTdaPdbtmTfd == '') {
+          Appobj.ccpTdaHeigtTfd = '';
+          reflectArray = ['ccpTdaHeigtTfd'];
+          highlightArray = [ 'ccpTdaHeigtTfd' ];
+        }
+
       }
       // !VA Set the configObj for configCCP to reflect the Appobj properties in the CCP.
 
@@ -3689,12 +3703,12 @@ ${indent}<![endif]-->`;
       // console.log('handlePadding Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
       // console.log('handlePadding Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
       // console.log('handlePadding Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
-      if (Appobj.ccpTdaPdtopTfd === '' &&  Appobj.ccpTdaPdbtmTfd === '') { Appobj.ccpTdaHeigtTfd = ''; }
-      if (Appobj.ccpTdaPdrgtTfd === '' &&  Appobj.ccpTdaPdlftTfd === '') { Appobj.ccpTdaWidthTfd = ''; }  
+
       // console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
       // console.log('Appobj.ccpTdaWidthTfd :>> ' + Appobj.ccpTdaWidthTfd);
       configObj = {
-        reflectAppobj: { reflect: reflectArray }
+        reflectAppobj: { reflect: reflectArray },
+        highlightIcon: { highlight: highlightArray }
       };
       UIController.configCCP( configObj );
     }
@@ -4303,6 +4317,8 @@ ${indent}<![endif]-->`;
       // !VA NOTE: This function only exists because Appobj has no property for viewportH or appH. This is a one-off call, so having a separate function for it is kind of wasteful. See if it can be done another way.
       UIController.writedynamicElementsDOM(Appobj, viewportH, appH);
 
+      // !VA Branch: 101820A
+      // !VA Why do I have to set this here, now?
       // !VA Set Appobj table width and wrapper table width now.
       Appobj.ccpTblWidthTfd = Appobj.curImgW;
       Appobj.ccpTbwWidthTfd = Appobj.imgViewerW;
@@ -4314,30 +4330,21 @@ ${indent}<![endif]-->`;
       // UIController.stashAppobjProperties(true, tableWidth, tableWrapperWidth);
       
       // !VA Called in resizeContainers after writedynamicElements, takes parameter list of CCP ID/value pairs, and updates the DOM with the passed parameters. It is the CCP DOM counterpart to updateAppobj, I think, since it only updates those DOM elements whose ID/Value passed in, rather than a blanket DOM update of all DOM. Renamed from writeDOMElementValues. writeCcpDOM takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the cross-object identifier (the value in the ccpUserInput object) as key and the Appobj value as value. 
-      // !VA NOTE: This needs to bypass handleCcpActions, since it's not a result of any ccpAction but rather a direct write through the user input in the dynamicElements. It also has to happen before initCCP, othewise Appobj won't initialize with values for table width and table wrapper width. 
+      // !VA NOTE: This has to happen before initCCP, othewise Appobj won't initialize with values for table width and table wrapper width. 
+
+      // !VA Branch: 101820A
+      // !VA Why do I have to do this now?
       // !VA Create the aliasArray to pass to configCCP
       aliasArray = [ 'ccpTblWidthTfd', 'ccpTbwWidthTfd'];
       // !VA reflectAppobj implements the Appobj properties in CCP elements so that the CCP reflects the current state of Appobj
       configObj = {
-        reflectAppobj: { reflect: aliasArray }
+        reflectAppobj: { reflect: aliasArray },
+        highlightIcon: { highlight: aliasArray }
+
       };
       UIController.configCCP( configObj );
 
-      (function highlightIconPresets() {
-        // !VA Branch: 101720A
-        // !VA Highlight icons whose inputs have preset values based on the default configuration. This is a named IIFE to make it easier to find and is located here because this is where the CCP DOM is complete, i.e. this is where Appobj.ccpTblWidthTfd and AppobjTbwWidthTfd are set because these values are queried from curImg, which doesn't fully exist until now. Highlighting icon presets at an earlier point in the program flow wouldn't pick up the TBL Width or TBW Width values. 
-        let highlightArray = [];
-        for (const key of Object.keys(ccpUserInput)) {
-          // console.log('key :>> ' + key);
-          if (key.substring( 11, 14 ) === 'Tfd') {
-            highlightArray.push(key);
-          }
-        }
-        configObj = {
-          highlightIcon: { highlight: highlightArray }
-        };
-        UIController.configCCP(configObj);
-      })();
+
 
       // !VA Write the inspectors based on Appobj values
       UICtrl.writeInspectors(Appobj);
@@ -4956,6 +4963,9 @@ ${indent}<![endif]-->`;
       reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd', 'ccpTbwClassTfd' ];
       // reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaBgclrTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd', 'ccpTbwClassTfd' ];
 
+      // !VA Branch: 101820A
+      highlightArray = [ 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd' ]
+
       // !VA revealElements METHOD:
       // !VA Since ccpImgAnchrTfd is configured here to have the value '#', set ccpImgTxclrTfd and ccpImgTargtChk to reveal
       revealArray = ['ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd'];
@@ -4971,7 +4981,8 @@ ${indent}<![endif]-->`;
         disableReset: { alias: 'default' },
         reflectAppobj: { reflect: reflectArray },
         checkboxState: { checked: checkedArray },
-        radioState: { radio: radioArray }
+        radioState: { radio: radioArray },
+        highlightIcon: { highlight: highlightArray}
       };
       return configObj;
     }
@@ -5473,6 +5484,11 @@ ${indent}<![endif]-->`;
 
 
         // !VA Populate the CCP with HTML defaults. tableWidth and tableWrapperWidth are undefined, they don't get written until resizeContainers.
+        // !VA Branch: 101820A
+        // !VA But that is also where highlightIcons needs to be run...maybe we can run highlighIconPresets here, then just run configCCP for highlightIcons in resizeContainers.
+
+
+
         UIController.populateAppobj(Appobj, 'ccp');
 
         // !VA Branch: OVERHAUL0906B
@@ -5510,6 +5526,28 @@ ${indent}<![endif]-->`;
         //   checkboxState: { checked: checkedArray },
         // };
         // UIController.configCCP(configObj);
+
+
+      // !VA Branch: 101820A
+      // !VA We don't need to put this here. All we need to do is put the default highlight presets in configDefault, then update the highlight presets when we update curImgW in resizeContainers.
+      // !VA The problem with putting this here is that it runs every time handlePadding runs because handlePadding calls resizeContainers to update curImgW. 
+// (function highlightIconPresets() {
+//   // !VA Branch: 101720A
+//   // !VA Highlight icons whose inputs have preset values based on the default configuration. This is a named IIFE to make it easier to find and is located here because this is where the CCP DOM is complete, i.e. this is where Appobj.ccpTblWidthTfd and AppobjTbwWidthTfd are set because these values are queried from curImg, which doesn't fully exist until now. Highlighting icon presets at an earlier point in the program flow wouldn't pick up the TBL Width or TBW Width values. 
+//   let highlightArray = [];
+//   for (const key of Object.keys(ccpUserInput)) {
+//     // console.log('key :>> ' + key);
+//     if (key.substring( 11, 14 ) === 'Tfd') {
+//       highlightArray.push(key);
+//     }
+//   }
+//   console.log('highlightIconPresets highlightArray :>> ');
+//   console.log(highlightArray);
+//   configObj = {
+//     highlightIcon: { highlight: highlightArray }
+//   };
+//   UIController.configCCP(configObj);
+// })();
 
         // !VA Set the default config on init
         configObj = configDefault('default', true );
