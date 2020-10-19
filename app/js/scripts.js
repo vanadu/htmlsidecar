@@ -437,10 +437,8 @@ var Witty = (function () {
       // if (reflectArray.includes('ccpTdaHeigtTfd')) {
       //   console.trace(reflectArray)
       // }
-      console.log('reflectAppobj reflectArray :>> ');
-      console.log(reflectArray);
-
-
+      // console.log('reflectAppobj reflectArray :>> ');
+      // console.log(reflectArray);
       let el, isInit, retVal;
       for (const alias of reflectArray) {
         typeof(appController.getAppobj(alias)) === 'undefined' ? isInit = true : isInit = false;
@@ -457,8 +455,6 @@ var Witty = (function () {
           el.value = appController.getAppobj( alias );
         }
       }
-      var foo = document.querySelector('#ccp-tda-heigt-ipt').value;
-      console.log('foo :>> ' + foo);
     }
 
     // !VA Branch: OVERHAUL0901A
@@ -563,11 +559,9 @@ var Witty = (function () {
       let el, mkcssReset = [], defaultArr, defaultReset = [], wraprArr,  wraprReset = [], resetArray;
       // !VA Only log if not init
       // if (alias !== 'default' ) { console.log('revealReset running'); }
-       
-
 
       // !VA There are three reset element matrices: mkcssReset includes all the Make CSS Button containers. That is obtained by getting the elements with classname 'ccp-mkcss-ctn' - it includes the Make CSS buttons and the curly braces that surround them. defaultReset includes the containers corresponding to the TD Options 'basic' configuration, and wraprReset includes the Wrapper Option elements.
-      defaultArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgMkcssGrp', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
+      defaultArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
       wraprArr = ['ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk', ];
 
 
@@ -602,10 +596,18 @@ var Witty = (function () {
         }
         break;
       case alias === 'ccpImgExcldRdo':
-        resetArray =  [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgItypeRdo', 'ccpTdaOptnsRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpImgCbhtmBtn'  ];
+        resetArray =  [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk','ccpTdaOptnsRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpImgCbhtmBtn'  ];
+        console.log('Mark1');
+        console.log('resetArray :>> ');
+        console.log(resetArray);
         for (const alias of resetArray ) {
           el = document.querySelector(ccpUserInput[alias]);
           el.classList.add('ccp-conceal-ctn');
+          if (el.id === 'ccp-img-txclr-tfd') {
+            if (el.classList.contains('ccp-conceal-ctn')) {
+              console.log('HIT 2 - Concealed');
+            }
+          }
         }
         break;
       case alias === 'ccpTblWraprChk':
@@ -622,23 +624,26 @@ var Witty = (function () {
 
         console.log('revealReset: condition not handled');
       } 
+      // var foo = document.querySelector('#ccp-img-txclr-tfd').classList.contains('ccp-conceal-ctn');
+      // console.log('foo :>> ' + foo);
+
     }
 
     // !VA UIController private
     // !VA Use configCCP to apply/remove the highlight style to input elements, which then adds/removes the filter on the icon, as defined in the CSS. highlightIconPreets in resizeContainers sets the highlight on icons that have a default preset value. Individual icon highlights are set through configObj using the highlight method and the highlightArray array.
     function highlightIcon( highlightArray ) {
-      console.log('highlightIcon running'); 
-      console.log('highlightIcon highlightArray :>> ');
+      // console.log('highlightIcon running'); 
+      // console.log('highlightIcon highlightArray :>> ');
       console.log(highlightArray);
       var ipt;
       for (const el of highlightArray) {
         if ( el.substring( 11, 14) === 'Tfd') {
           ipt = document.querySelector(ccpUserInput[el].replace('tfd', 'ipt'));
           if (ipt.value !== '') { 
-            console.log('HAS VALUE');
+            // console.log('HAS VALUE');
             ipt.classList.add('active');
           } else {
-            console.log('NO VALUE');
+            // console.log('NO VALUE');
             ipt.classList.remove('active');
           }
         }
@@ -689,6 +694,8 @@ var Witty = (function () {
     // !VA UIController private  
     // !VA Reveal and conceal individual CCP container elements with sequential animation. flag specifies if the reveal class cpp-hide-ctn is to be added or removed: true = add, false = remove. aliasArray is the array of elements to reveal/conceal. Called from UIController.configCCP. 
     function revealElements( flag, aliasArray) {
+      console.log('revealElements aliasArray :>> ');
+      console.log(aliasArray);
       let el,  elArray = [];
       // !VA Create the array of elements to reveal/conceal. 
       for (let i = 0; i < aliasArray.length; i++) {
@@ -704,6 +711,8 @@ var Witty = (function () {
             setTimeout(function () {
               // !VA If flag is false, remove the class
               if (!flag) {
+                // var baz = document.querySelector('#ccp-img-txclr-tfd').classList.contains('ccp-conceal-ctn');
+                // console.log('baz :>> ' + baz);
                 elArray[i].classList.remove('ccp-conceal-ctn');
               // !VA If flag is true, add the class
               } else if (flag) {
@@ -723,6 +732,8 @@ var Witty = (function () {
         // !VA Run the callback function with the elArray array as parameter. This runs revealElements to reveal/conceal each of the array elements.
         revealCcpElements(elArray);
       }
+      // var faa = document.querySelector('#ccp-img-txclr-tfd').classList.contains('ccp-conceal-ctn');
+      // console.log('faa :>> ' + faa);
     }
     // !VA UIController private
 
@@ -4352,6 +4363,11 @@ ${indent}<![endif]-->`;
     // !VA Branch: 0909A
     // !VA Returns the CCP configurations for each CCP UI element, i.e. the properties for configCCP methods.
     function fetchConfigObj( alias, option ) {
+
+      console.log('fetchConfigObj running'); 
+      console.log('fetchConfigObj alias :>> ' + alias);
+      console.log('fetchConfigObj option :>> ' + option);
+
       let configObj = [], flag;
       // !VA Set the CCP configuration for specific user selections
       switch(true) {
@@ -4382,6 +4398,7 @@ ${indent}<![endif]-->`;
         // } else {
         //   configObj = configOptns( alias, option );
         // }
+        console.log('HIT 4');
         configObj = configOptns( alias, option );
         break;
       case alias === 'ccpTblWraprChk' :
@@ -4450,6 +4467,8 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Execute the actions associated with selecting one of the binary Exclude Image options in the IMG section: excld or incld. Gets the configObj configuration to pass to UIController to configure the CCP UI. This function is called from the event listener for EXCLD and INCLD icons and can be run programmatically by passing in the option value or Appobj[alias]. 
     function selectImgExclude( option )  {
+      console.log('selectImgExclude running'); 
+      console.log('HIT 3');
       // !VA option is the selected option: excld or incld
       let alias, configObj = [ ];
       // !VA Hard-code alias for this handler
@@ -4687,6 +4706,7 @@ ${indent}<![endif]-->`;
         // !VA Show the options for the IMG anchor text input field
         } else if (tar.id === 'ccp-img-anchr-ipt') {
           // !VA The 2 elements that are dependent on the anchor input value
+          console.log('HIT 4');
           revealArray = makeAliasArray('ccpImgTxclrTfd', 'ccpImgTargtChk');
           // !VA If there's a value in the field, then flag is true, so highlight the icon
           flag ? tar.classList.add('active') : tar.classList.remove('active');
@@ -4926,6 +4946,12 @@ ${indent}<![endif]-->`;
     // !VA Branch: OVERHAUL0906B
     // !VA configs
     function configDefault( alias, option ) {
+      // !VA Branch: 101920A
+      // !VA Alias and option are not used yet. 
+      // console.log('configDefault alias :>> ' + alias);
+      // console.log('configDefault option :>> ' + option);
+      console.log('Appobj.ccpImgExcldRdo :>> ' + Appobj.ccpImgExcldRdo);
+
       let configObj, reflectArray, radioArray, revealArray, checkedArray;
 
 
@@ -4966,7 +4992,16 @@ ${indent}<![endif]-->`;
 
       // !VA revealElements METHOD:
       // !VA Since ccpImgAnchrTfd is configured here to have the value '#', set ccpImgTxclrTfd and ccpImgTargtChk to reveal
-      revealArray = ['ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd'];
+      // !VA Branch: 101920A
+      // !VA This is where anchor target and txfld keep reappearing on ImgExcld click. Problem is, we need it for configDefault. Why is configDefault running after handleRadioEvent?
+      console.log('101920A');
+      // !VA If the Appobj property for excldImg is set, then imgExcld is selected so the default config needs to NOT reveal the anchor txfld and anchor target CCP elements. Revealing them now would overwrite the excldImg config reveal settings.
+      if (Appobj.ccpImgExcldRdo = 'excld') {
+        revealArray = ['ccpTdaWidthTfd', 'ccpTdaHeigtTfd'];
+      } else {
+        revealArray = ['ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd'];
+      }
+
 
       // !VA radioState METHOD: set the elements whose selected value is to be set to the Appobj properties above.
       radioArray = [ 'ccpTdaAlignRdo' , 'ccpTdaValgnRdo', 'ccpTblAlignRdo', 'ccpTbwAlignRdo' ];
@@ -4988,6 +5023,8 @@ ${indent}<![endif]-->`;
     // !VA appController private
     function configExcld( alias, option) {
       let configObj, revealArray, revealFlag, radioArray;
+      // !VA Branch: 101920A
+      // // !VA This is the cause of imgExcld not hiding anchor txtclr and target. Running selectTdaOptions actually RUNS the function, which runs the default config, overwriting the imgExcld config. But we need to select the basic TD options when imgExcld is 
       selectTdaOptions('basic');
       // !VA Branch: 0909A
       // !VA Note: Appobj for ccpImgExcldRdo is set in handleRadioEvent
@@ -5005,6 +5042,10 @@ ${indent}<![endif]-->`;
         // revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgItypeRdo', ];
       } else {
         revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaOptnsRdo'  ];
+        // !VA Branch: 101920A
+        // !VA Here we have to add the anchor CCP elements if there's a value in the anchor input.
+
+
       }
       configObj = {
         // !VA revealReset conceals all the elements, i.e. hides the ones that aren't explicitly revealed with revealElements.
