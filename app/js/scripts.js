@@ -3555,7 +3555,9 @@ ${indent}<![endif]-->`;
 
       // !VA DO NOT RUN handlePadding here! Just restore curImgW and the dependent inputs and set padding values to ''. Otherwise, you'll get compounded updates to curImgW
       handlePadding( 'handlePaddingFocus', userInputObj);
-      this.value = '';
+      // !VA Branch: 101820B
+      // !VA This is the problem
+      // this.value = '';
 
 
     }
@@ -4333,18 +4335,14 @@ ${indent}<![endif]-->`;
       // !VA NOTE: This has to happen before initCCP, othewise Appobj won't initialize with values for table width and table wrapper width. 
 
       // !VA Branch: 101820A
-      // !VA Why do I have to do this now?
-      // !VA Create the aliasArray to pass to configCCP
+      // !VA Create the aliasArray to pass to configCCP. Include highlightIcon method - reflectAppobj adds those values to the TBL Width and TBW Width inputs so those icons have to be highlighted
       aliasArray = [ 'ccpTblWidthTfd', 'ccpTbwWidthTfd'];
       // !VA reflectAppobj implements the Appobj properties in CCP elements so that the CCP reflects the current state of Appobj
       configObj = {
         reflectAppobj: { reflect: aliasArray },
         highlightIcon: { highlight: aliasArray }
-
       };
       UIController.configCCP( configObj );
-
-
 
       // !VA Write the inspectors based on Appobj values
       UICtrl.writeInspectors(Appobj);
