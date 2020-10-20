@@ -597,17 +597,15 @@ var Witty = (function () {
         break;
       case alias === 'ccpImgExcldRdo':
         resetArray =  [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk','ccpTdaOptnsRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpImgCbhtmBtn'  ];
-        console.log('Mark1');
-        console.log('resetArray :>> ');
-        console.log(resetArray);
         for (const alias of resetArray ) {
           el = document.querySelector(ccpUserInput[alias]);
           el.classList.add('ccp-conceal-ctn');
-          if (el.id === 'ccp-img-txclr-tfd') {
-            if (el.classList.contains('ccp-conceal-ctn')) {
-              console.log('HIT 2 - Concealed');
-            }
-          }
+          // !VA Branch: 101920A
+          // if (el.id === 'ccp-img-txclr-tfd') {
+          //   if (el.classList.contains('ccp-conceal-ctn')) {
+          //     console.log('HIT 2 - Concealed');
+          //   }
+          // }
         }
         break;
       case alias === 'ccpTblWraprChk':
@@ -4398,7 +4396,6 @@ ${indent}<![endif]-->`;
         // } else {
         //   configObj = configOptns( alias, option );
         // }
-        console.log('HIT 4');
         configObj = configOptns( alias, option );
         break;
       case alias === 'ccpTblWraprChk' :
@@ -4468,7 +4465,6 @@ ${indent}<![endif]-->`;
     // !VA Execute the actions associated with selecting one of the binary Exclude Image options in the IMG section: excld or incld. Gets the configObj configuration to pass to UIController to configure the CCP UI. This function is called from the event listener for EXCLD and INCLD icons and can be run programmatically by passing in the option value or Appobj[alias]. 
     function selectImgExclude( option )  {
       console.log('selectImgExclude running'); 
-      console.log('HIT 3');
       // !VA option is the selected option: excld or incld
       let alias, configObj = [ ];
       // !VA Hard-code alias for this handler
@@ -4485,6 +4481,8 @@ ${indent}<![endif]-->`;
     // !VA Branch: OVERHAUL0831A
     // !VA Called from handleRadioEvent and init to select one of the TD OPTIONS (OPTNS) in the TD section: basic, iswap, swtch, bgimg, or vmlbt. Sets the reveal configuation of the TD OPTNS and the option in configObj and runs configCCP to apply the configuration. 
     function selectTdaOptions( option ) {
+      console.log('selectTdaOptions running'); 
+      console.log('option :>> ' + option);
       let alias, validOptions;
       let configObj = {};
       // !VA alias is hardcoded because this function is specific to this element.
@@ -4706,7 +4704,6 @@ ${indent}<![endif]-->`;
         // !VA Show the options for the IMG anchor text input field
         } else if (tar.id === 'ccp-img-anchr-ipt') {
           // !VA The 2 elements that are dependent on the anchor input value
-          console.log('HIT 4');
           revealArray = makeAliasArray('ccpImgTxclrTfd', 'ccpImgTargtChk');
           // !VA If there's a value in the field, then flag is true, so highlight the icon
           flag ? tar.classList.add('active') : tar.classList.remove('active');
@@ -5031,9 +5028,17 @@ ${indent}<![endif]-->`;
       // !VA revealFlag is false because elements are revealed by REMOVING the ccp-conceal-ctn class
       revealFlag = false;
 
+      // !VA Branch: 101920A
+      // !VA This config doesn't select TD basic, it needs to do that.
+      // !VA The imgExcld radio only works with TD Options set to 'basic'. So set the Appobj property.
+      Appobj.ccpTdaOptnsRdo = 'basic';
+
+
+
+
       // !VA radioState METHOD
-      // !VA Set the array of radio element states to set, i.e. the current element - do this for both incld and excld
-      radioArray = [ 'ccpImgExcldRdo' ];
+      // !VA Set the array of radio element states to set, i.e. the current element - do this for both incld and excld, and also set TD Options to 'basic' as per the Appobj property above.
+      radioArray = [ 'ccpImgExcldRdo', 'ccpTdaOptnsRdo' ];
       // !VA Toggleable config properties
       if ( option === 'excld') {
         // !VA revealElements METHOD
