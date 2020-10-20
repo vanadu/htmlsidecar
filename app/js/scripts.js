@@ -1446,7 +1446,10 @@ var Witty = (function () {
       var container = document.createElement('div');
 
       // !VA Handle the active tdoptions radio selection for the options that do NOT include an MS conditional code block. These options don't require special indent handling or post-processing of the clipboard output string, so extract the outputNL accordingly
-      if (selectedTdOption === 'basic' || selectedTdOption === 'excld' || selectedTdOption === 'swtch') {
+      // !VA Branch: 102020B
+      // !VA This TD option no longer exists, remove from condition
+      // if (selectedTdOption === 'basic' || selectedTdOption === 'excld' || selectedTdOption === 'swtch') {
+      if (selectedTdOption === 'basic' || selectedTdOption === 'swtch') {
         // !VA Deterimine which makeNode button was clicked and extract a nodeList fragment with only those nodes that correspond to the clicked button. The index position of the extracted fragments is determined by the length of the tableNodeFragment nodeList minus an integer to compensate for the 0-based nodeList indices.
         let rtlNodePos, extractPos;
         // !VA For the posswitch option: Get the position of the RTL node, if it exists. 
@@ -1470,9 +1473,10 @@ var Witty = (function () {
           if ( selectedTdOption === 'basic') { 
             // !VA We can hardcode this for now, but that will be a problem if any other options with other nodes are added.
             hasAnchor ? extractPos = nl.length - 3 : extractPos = nl.length - 2;
-            // frag = nl[extractPos];
-          } else if ( selectedTdOption === 'excld') {
-            extractPos = 5;
+            // !VA If imgExcld is selected, then extract nodes at position 5, i.e. without img or anchor
+            if ( appController.getAppobj('ccpImgExcldRdo') === 'excld') {
+              extractPos = 5;
+            }
             // !VA posswitch option is selected
           } else {
             // !VA The fragment is extracted starting at the position of the RTL node
@@ -1949,6 +1953,11 @@ var Witty = (function () {
       tableInner.appendChild(trInner);
       // !VA Get the inner TD from makeTdNode and append it to the nodeFragment
       tdNodeFragment = makeTdNode( id, Attributes );
+
+
+
+
+      
       // !VA If tdNodeFragment is null, then there was an error in makeTdNode, so console the error and return null to buildOutputNodeList to abort.
       try {
         trInner.appendChild(tdNodeFragment);
@@ -1956,6 +1965,9 @@ var Witty = (function () {
         console.log('Error in makeTableNode: tdNodeFragment is null: id is: ' + id);
         return;
       }
+
+
+
       // !VA If include table wrapper is checked, build the outer table and return it
       // !VA Only output the table class name attribute if Appobj has a value for it.
       omitIfEmpty( Attributes.tableWrapperClass.str, tableOuter, 'className');
@@ -3388,6 +3400,7 @@ ${indent}<![endif]-->`;
           }
         // !VA Otherwise, checkUserInput returned false so the target value is invalid. Return FALSE to handleKeydown for TAB and ENTER key handling.
         } else {
+          console.log('retVal is false returned from');
           // !VA Conditions: 1) if the target is a toolbar input other than curImgW or curImgH, then restore the input value to its Appobj property. 2) If the target is curImgW or curImgH, restore the value to its Appobj property. Further handling will be done in handleKeydown. 3) If the target is a CCP input, restore it to priorVal. This is because CCP don't always reflect the Appobj value - at leas they didn't in earlier versions. I will have to keep an eye on that. 
           console.log('handleUserInput: checkUserInput returned false; the user input was invalid');
         }
@@ -3612,39 +3625,52 @@ ${indent}<![endif]-->`;
           }
           break;
         case (appObjProp === 'ccpTblWidthTfd') :
-          if (Appobj.rdoCcpTdExcludeimg) {
+          console.log('HIT');
+          // !VA Branch: 102020B
+          // !VA Changed old reference to rdoCcpTdExcludeimg
+          // !VA If imgExcld 'excld' is checked then the TBL W input can't exceed the viewer width and cannot be less than the TD Width
+          if (Appobj.ccpImgExcldRdo === 'excld') {
             if (retVal > Appobj.imgViewerW) {
               isErr = true;
               console.log('larger than imgViewerW');
               appMessCode = 'err_table_wider_than_wrapper';
-            } else if ( evtTargetVal < Appobj.ccpTdaWidthTfd ) {
+            } else if ( retVal < Appobj.ccpTdaWidthTfd ) {
+              // !VA The value cannot be less than the TD Width value
               console.log('err_table_cell_wider_than_parent_table');
               isErr = true;
               appMessCode = 'err_table_cell_wider_than_parent_table';
             }
           } else {
+            // !VA If imgExcld 'incld' is checked, then retVal can't exceed Appobj.curImgW or be greater than the current imgViewer width
             console.log('retVal :>> ' + retVal);
+              console.log('Not excld');
             if (retVal < Appobj.curImgW ) {
               // !VA errorHandler!
               isErr = true;
               appMessCode = 'err_img_wider_than_parent_table';
-            } else if ( evtTargetVal > Appobj.imgViewerW ) {
+            } else if ( retVal > Appobj.imgViewerW ) {
               isErr = true;
               appMessCode = 'err_parent_table_wider_than_wrapper_table';
             }
           }
           break;
         case (appObjProp === 'ccpTbwWidthTfd') :
-          if (Appobj.rdoCcpTdExcludeimg) {
+          // !VA Branch: 102020B
+          // !VA This condition refers to old element alias
+          // if (Appobj.rdoCcpTdExcludeimg) {
+          // !VA If imgExcld 'excld' is checked, then:
+          if (Appobj.ccpImgExcldRdo === 'excld') {
+            // !VA retVal must be greater than TBL W and less than imgViewrW
             if (retVal > Appobj.imgViewerW) {
               isErr = true;
               console.log('');
               appMessCode = 'err_wrapper_table_wider_than_devicewidth';
-            } else if ( evtTargetVal < Appobj.ccpTblWidthTfd ) {
+            } else if ( retVal < Appobj.ccpTblWidthTfd ) {
               console.log('err_parent_table_greater_than_wrapper');
               isErr = true;
               appMessCode = 'err_parent_table_greater_than_wrapper';
             }
+          // !VA If imgExcld 'incld' is checked, then:
           } else {
             if (retVal < Appobj.curImgW ) {
               // !VA errorHandler!
@@ -3968,6 +3994,7 @@ ${indent}<![endif]-->`;
         if (evt.target.id !== 'ccp-tda-padng-icn') {
           Appobj[appObjProp] = '';
           // !VA This should be done with configCCP - for later
+          console.log('evt.target.htmlFor :>> ' + evt.target.htmlFor);
           ipt = document.getElementById(evt.target.htmlFor);
           ipt.value = '';
           ipt.classList.remove('active');
@@ -4352,7 +4379,7 @@ ${indent}<![endif]-->`;
       Appobj['ccpImgAnchrTfd'] = '#';
       Appobj['ccpImgTxclrTfd'] = '#0000FF';
       Appobj['ccpImgTargtChk'] = false;
-      // Appobj['ccpImgExcldRdo'] = 'incld';
+      Appobj['ccpImgExcldRdo'] = 'incld';
       Appobj['ccpTblClassTfd'] = '';
       Appobj['ccpTdaBgclrTfd'] = '';
       // Appobj['ccpTdaPdtopTfd'] = '';
@@ -4371,7 +4398,7 @@ ${indent}<![endif]-->`;
 
       // !VA reflectAppobj METHOD: set the array of elements whose Appobj properties above are to be written to the CCP DOM
       // !VA Why are there two of these? Commenting out the lower one for now.
-      reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd', 'ccpTbwClassTfd' ];
+      reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd', 'ccpTbwClassTfd' ];
 
       // !VA highlightIcon METHOD: Set the array of elements that should receive a highlight because their Appobj property indicates a preset value
       highlightArray = [ 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd' ]
@@ -4385,7 +4412,7 @@ ${indent}<![endif]-->`;
       }
 
       // !VA radioState METHOD: set the elements whose selected value is to be set to the Appobj properties above.
-      radioArray = [  'ccpTdaAlignRdo' , 'ccpTdaValgnRdo', 'ccpTblAlignRdo', 'ccpTbwAlignRdo' ];
+      radioArray = [  'ccpImgExcldRdo', 'ccpTdaAlignRdo' , 'ccpTdaValgnRdo', 'ccpTblAlignRdo', 'ccpTbwAlignRdo' ];
       // !VA checkboxState METHOD: set the checkboxes whose checked value is to be set to the Appobj properties above.
       checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpImgTargtChk'];
       // !VA Make the configuration object to pass to configCCP
@@ -4404,24 +4431,31 @@ ${indent}<![endif]-->`;
     // !VA appController private
     function configExcld( alias, option) {
       let configObj, revealArray, revealFlag, radioArray;
-      // // !VA Running selectTdaOptions also runs the default config, which overwrites the imgExcld config. But we need to select the basic TD options when imgExcld is selected. So go ahead and run selectTdaOptions, but include a condition later to handle the IMG Excld case.
-      selectTdaOptions('basic');
-      // !VA Note: Appobj for ccpImgExcldRdo is set in handleRadioEvent
+      // // !VA Running selectTdaOptions also runs the default config, which overwrites the imgExcld config. But we need to select the basic TD options when imgExcld is selected. So integrate default config options into this config.
+      // !VA Branch: 102020B
+      // !VA Don't run selectTdaOptions because it applies the defaultConfig, which overwrites some of these config options. Instead, just include the radioState method in the configObj to select the 'basic' TD option.
+      // selectTdaOptions('basic');
       // !VA revealFlag is false because elements are revealed by REMOVING the ccp-conceal-ctn class
       revealFlag = false;
       // !VA The imgExcld radio only works with TD Options set to 'basic'. So set the Appobj property.
       Appobj.ccpTdaOptnsRdo = 'basic';
       // !VA radioState METHOD
-      // !VA Set the array of radio element states to set, i.e. the current element - do this for both incld and excld, and also set TD Options to 'basic' as per the Appobj property above.
+      // !VA Set the array of radio element states to set, i.e. the current element - do this for both incld and excld. Also set TD Options to 'basic' as per the Appobj property above because imgExcld doesn't work with any of the other TD options.
       radioArray = [ 'ccpImgExcldRdo', 'ccpTdaOptnsRdo' ];
       // !VA Toggleable config properties
+      // !VA The imgExcld icon is selected
       if ( option === 'excld') {
         // !VA revealElements METHOD
         // !VA Set the array of elements to reveal
         revealArray  = [ 'ccpImgExcldRdo', 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo' ];
         // revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgItypeRdo', ];
       } else {
-        revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaOptnsRdo'  ];
+        // !VA The imgIncld icon is selected 
+        // !VA Set the array of elements to reveal. If the Anchor input is not empty, add the anchor-dependent options (text color and source attribute) to revealArray
+        revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaOptnsRdo'  ];
+        if (Appobj.ccpImgAnchrTfd !== '') {
+          revealArray.push('ccpImgTxclrTfd', 'ccpImgTargtChk');
+        }
       }
       configObj = {
         // !VA revealReset conceals all the elements, i.e. hides the ones that aren't explicitly revealed with revealElements.
