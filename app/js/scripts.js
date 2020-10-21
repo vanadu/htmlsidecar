@@ -3052,6 +3052,7 @@ ${indent}<![endif]-->`;
       let target, appObjProp, curLocalStorage;
       target = evt.target;
       appObjProp = evtTargetIdToAppobjProp(evt.target.id );
+      console.log('appObjProp :>> ' + appObjProp);
       // !VA If the event target is the curImgW or curImgH input fields, on ESC exit the field and restore the placeholder set in the HTML file.
       if (appObjProp === 'curImgW' || appObjProp === 'curImgH') {
         target.value = ('');
@@ -3079,7 +3080,7 @@ ${indent}<![endif]-->`;
 
     // !VA appController  
     // !VA Called from handleKeydown. Applies the user-entered input value in the Toolbar or CCP, i.e. writes the value to Appobj and, if Toolbar, runs updateCurrentImage which then runs calcViewerSize to update the dynamicElements with the new value.
-    // !VA NOTE: This is probably a functional dupe of updateCurrentImage
+    // !VA NOTE: This may be a functional dupe of updateCurrentImage
     function applyInputValue(userInputObj) {
       // !VA Destructure userInputObj into variables
       let { evtTargetVal, appObjProp } = userInputObj;
@@ -3350,7 +3351,7 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController  
-    // !VA Called from handleKeydown to handle CCP element user input. Runs checkUserInput to check for error conditions and returns either an empty string, a valid value or FALSE to handleKeydown.
+    // !VA Called from handleKeydown and handleBlur to handle CCP element user input. Runs checkUserInput to check for error conditions and returns either an empty string, a valid value or FALSE to the caller.
     // !VA NOTE: There was a priorVal variable earlier that stored evt.target.val for use with CCP inputs because at that time CCP inputs weren't immediately stored in Appobj. Keep an eye on that - currently all CCP values are stored to Appobj.
     function handleUserInput( userInputObj ) {
       let retVal;
@@ -3564,9 +3565,9 @@ ${indent}<![endif]-->`;
           // !VA The user has selected a imgViewerW that's smaller than the currently displayed image. Undetermined how to deal with this but for now the current image is shrunk to the selected imgViewerW. But Appobj is not updated accordingly, needs to be fixed.
           // !VA Branch: 100720
           // !VA The above is incorrect, Appobj is in fact updated when shrinking image to new imgViewerW 
-          if (evtTargetVal < Appobj.curImgW ) {
+          if (retVal < Appobj.curImgW ) {
             // !VA Do nothing for now, see above.
-          } else if (evtTargetVal > maxViewerWidth ) {
+          } else if (retVal > maxViewerWidth ) {
             // !VA TODO: review the maxViewerWidth issue, but for now set it to 800px - and the user-entered value exceeds this, so error.
             isErr = true;
             appMessCode = 'err_viewerW_GT_maxViewerWidth';
@@ -3642,8 +3643,6 @@ ${indent}<![endif]-->`;
             }
           } else {
             // !VA If imgExcld 'incld' is checked, then retVal can't exceed Appobj.curImgW or be greater than the current imgViewer width
-            console.log('retVal :>> ' + retVal);
-              console.log('Not excld');
             if (retVal < Appobj.curImgW ) {
               // !VA errorHandler!
               isErr = true;
@@ -4061,6 +4060,7 @@ ${indent}<![endif]-->`;
 
     // !VA appController private
     // !VA Convert an element ID (i.e. with the # prefix ) to its corresponding ccpUserInput/Appobj property. Only works for IDs that have a corresponding ccpUserInput property. For IDs that don't have a ccpUserInput property, try evtTargetIdToAppobjProperty. 
+    // !VA Branch: 101520D
     function elementIdToAppobjProp(id) {
       let appObjProp, val;
       val = id;
@@ -4429,6 +4429,7 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
+    // !VA Called from fetchConfigObj to get the IMG EXCLD-specific configObj configuration properties to the  configCCP function, which then applies DOM-level changes to the CCP. 
     function configExcld( alias, option) {
       let configObj, revealArray, revealFlag, radioArray;
       // // !VA Running selectTdaOptions also runs the default config, which overwrites the imgExcld config. But we need to select the basic TD options when imgExcld is selected. So integrate default config options into this config.
@@ -4466,6 +4467,7 @@ ${indent}<![endif]-->`;
       return configObj;
     }
     // !VA appController private
+    // !VA Called from fetchConfigObj to get the IMG Itype (fixed/fluid)-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
     // !VA Branch: 102020B
     // !VA Why is this never accessed?
     function configItype( alias, option) {
@@ -4482,6 +4484,7 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
+    // !VA Called from fetchConfigObj to get the TD Option radio group-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
     function configOptns( alias, option ) {
       let revealFlag, revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray;
       let configObj = {};
@@ -4635,7 +4638,7 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
-    // !VA CCP configuration for the Table Wrapper toggle
+    // !VA Called from fetchConfigObj to get the Table Wrapper checkbox icon-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
     function configWrapr( alias, isChecked ) {
       let configObj, revealFlag, revealArray;
 
@@ -4654,7 +4657,7 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
-        // !VA CCP configuration for the Hybrid toggle
+    // !VA Called from fetchConfigObj to get the HYBRD-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
     function configHybrd( alias, isChecked ) {
       let checkedArray, radioArray, reflectArray, revealFlag, revealArray, disableFlag, disableArray;
       let configObj = {};
