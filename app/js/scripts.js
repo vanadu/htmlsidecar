@@ -396,18 +396,24 @@ var Witty = (function () {
     // !VA UIController private
     // !VA If called from populateAppobj, returns the value of text input fields as hard-coded in the HTML. Otherwise, called by configCCP, which receives an array of aliases whose corresponding CCP element value is set to its corresponding Appobj value. 
     function reflectAppobj( reflectArray) { 
-      let el, isInit, retVal;
+      // !VA Branch: 102120A
+      let el, isInit, retVal, toolbarAliases;
       for (const alias of reflectArray) {
         typeof(appController.getAppobj(alias)) === 'undefined' ? isInit = true : isInit = false;
-        // console.log('alias is: ' + alias);
-        el = document.querySelector(ccpUserInput[alias].replace('tfd', 'ipt'));
-        if (isInit) {
-          // !VA TODO: Deleting the value on init should reset all input fields to empty strings, thereby exposing whatever preset value attributes in the HTML. This should actually make resetting input elements to empty in configDefault redundant. For later...
-          el.value = '';
-          retVal = el.value;
-          return retVal;
+        // !VA Ignore toolbar aliases here - they do not need to be reflected and probably should not have been passed in from handleBlur. For later. 
+        toolbarAliases = ['curImgW', 'curImgH', 'imgViewerW', 'sPhonesW', 'lPhonesH' ];
+        if (!toolbarAliases.includes( alias)) {
+          el = document.querySelector(ccpUserInput[alias].replace('tfd', 'ipt'));
+          if (isInit) {
+            // !VA TODO: Deleting the value on init should reset all input fields to empty strings, thereby exposing whatever preset value attributes in the HTML. This should actually make resetting input elements to empty in configDefault redundant. For later...
+            el.value = '';
+            retVal = el.value;
+            return retVal;
+          } else {
+            el.value = appController.getAppobj( alias );
+          }
         } else {
-          el.value = appController.getAppobj( alias );
+          return;
         }
       }
     }
@@ -2795,7 +2801,7 @@ ${indent}<![endif]-->`;
       }
 
       // !VA Add event handlers for CCP labels. This includes all the text input label icons and the padding icon.
-      let lblElements;
+      let txfldElements;
       txfldElements = document.getElementsByClassName('ccp-txfld-lbl');
       for (const el of txfldElements) {
         addEventHandler(el,'click',handleIconClick,false);
@@ -2813,13 +2819,13 @@ ${indent}<![endif]-->`;
         // !VA KEYBOARD HANDLERS
         addEventHandler((toolbarInputs[i]),'keydown',handleKeydown,false);
         addEventHandler((toolbarInputs[i]),'keyup',handleKeyup,false);
-        // addEventHandler((toolbarInputs[i]),'focus',handleFocus,false);
+        addEventHandler((toolbarInputs[i]),'focus',handleFocus,false);
         // !VA MOUSE HANDLERS
         // !VA Handle the mouse-initiated blurring of inputs in the blur handler of handleMouseEvents
         addEventHandler((toolbarInputs[i]),'blur',handleBlur,false);
       }
 
-      // !VA Add input event listeners to run showElementOnInput for all labelled text input elements, i.e. elements whose alias ends in Tfd, and unlabelled child input elements of the padding group container. Includes keyboard and mouse blur event listeners
+      // !VA Add input event listeners for input, keydown, keyup and blur events for all labelled text input elements, i.e. elements whose alias ends in Tfd. 
       // !VA Loop through all the properties of ccpUserInput
       for (const property in ccpUserInput) {
         var el, iptId;
@@ -2831,7 +2837,7 @@ ${indent}<![endif]-->`;
           addEventHandler(el,'input',handleTextInputEvent,false);
           addEventHandler(el,'keydown',handleKeydown,false);
           addEventHandler(el,'keyup',handleKeyup,false);
-          // addEventHandler(el,'focus',handleFocus,false);
+          addEventHandler(el,'focus',handleFocus,false);
           // !VA MOUSE HANDLERS
           addEventHandler(el,'blur',handleBlur,false);
         }
@@ -3082,6 +3088,7 @@ ${indent}<![endif]-->`;
     // !VA Called from handleKeydown. Applies the user-entered input value in the Toolbar or CCP, i.e. writes the value to Appobj and, if Toolbar, runs updateCurrentImage which then runs calcViewerSize to update the dynamicElements with the new value.
     // !VA NOTE: This may be a functional dupe of updateCurrentImage
     function applyInputValue(userInputObj) {
+      // !VA Branch: 102120A
       // !VA Destructure userInputObj into variables
       let { evtTargetVal, appObjProp } = userInputObj;
       let inputObj = {};
@@ -3089,7 +3096,8 @@ ${indent}<![endif]-->`;
       if ( evtTargetVal !== Appobj[appObjProp]) {
         Appobj[appObjProp] = evtTargetVal;
       } else {
-        console.log('ERROR in applyInputValue - evtTargetValue !== Appobj[appObjProp]. applyInputValue probably running successively');
+        console.log('applyInputValue evtTargetVal === Appobj[appObjProp');
+        // console.log('ERROR in applyInputValue - evtTargetValue !== Appobj[appObjProp]. applyInputValue probably running successively');
       }
       // !VA 3) For toolbarElements, create a new obj with evtTargetVal and appObjProp to pass to updateCurrentImage. updateCurrentImage writes new values to localStorage and resizes the dynamicElements based on the user input. updateCurrentImage contains the aspect ratio logic to get the adjacent dimension from a curImg value. 
       // !VA IMPORTANT: This works but it sucks. We're only running this now to set the localStorage and to get the adjacent side curImg dimensions. updateCurrentImage doesn't reflect what's being done in that function, and it should be reevaluated in any case. Also, the below condition with all the OR conditions isn't good - but for now, need to move on.
@@ -3102,7 +3110,7 @@ ${indent}<![endif]-->`;
 
     // !VA appController private
     // !VA Determines if a padding element has a value and returns a boolean. Note: this is an old function and should actually be in UIController since it accesses the DOM. It could be rewritten to use the padding Appobj properties and configCCP. Maybe later, not worth doing right now just out of module respect principle.
-    function getHasPadding() {
+    function highlightPaddingIcon() {
       let icn, pdgElements, hasPadding;
       // !VA Highlight the padding icon if there's an input in any of the padding input fields.
       // !VA icn is the padding icon 
@@ -3132,7 +3140,7 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from eventHandlers. This function is necessary to reset dependent input values (TD H, TD W and TBL W) to their prior value to prevent value accumulation in the inputs. For width padding inputs, evtTargetVal is passed as a negative value, resulting in curImgW growing by the absolute value of evtTargetVal. For height padding inputs, evtTargetVal is passed as a positive number, reducing the dependent TD Height value by evtTargetVal. 
     function handlePaddingFocus(evt) {
-      let hasPadding, userInputObj = {};
+      let userInputObj = {};
       // !VA Get the Appobj/ccpUserInput alias from the target id
       userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
       // !VA Handle the padding width inputs. Pass evtTargetVal as negative value to handlePadding to unshrink curImgW on focus. 
@@ -3151,9 +3159,10 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
+    // !VA Checks the input value for NaN then calls handlePadding if the target is a padding height input. evtTargetVal has already been converted to type 'number', so if it is not a number, then it is NaN. If it is NaN, exit the handler and let the error-check proceed on blur.
     function handlePaddingInput(userInputObj) {
       let { appObjProp, evtTargetVal } = userInputObj;
-      // !VA Here we do nothing except pass userInputObj from the input event. The input event handles padding height inputs. evtTargetVal has already been converted to type 'number', so if it is not a number, then it is NaN. If it is NaN, exit the handler and let the error-check proceed on blur.
+      // !VA Here we do nothing except pass userInputObj from the input event. The input event handles padding height inputs.
       if (isNaN( evtTargetVal )) {
         return;
       } else {
@@ -3167,10 +3176,10 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController  
-    // !VA NOTE: handlePadding could be called directly from handleBlur to handle width inputs, but this function serves as a foil to handlePaddingInput which handle height inputs. This function keeps structural symmetry.
+    // !VA NOTE: Runs highlightPaddingIcon to whenever a padding input is blurred and passes userInputObj to handlePadding. handlePadding could be called directly from handleBlur to handle width inputs, but this function serves as a foil to handlePaddingInput which handles height inputs. So the main purpose of this function is to maintain structural symmetry.
     function handlePaddingBlur(userInputObj) {
-      // !VA getHasPadding highlights the padding icon if there's a value in any of the padding inputs.
-      hasPadding = getHasPadding();
+      // !VA highlightPaddingIcon highlights the padding icon if there's a value in any of the padding inputs.
+      highlightPaddingIcon();
       // !VA Here we do nothing except pass userInputObj from the blur event. The blur event handles padding width inputs.
       handlePadding('handlePaddingBlur', userInputObj);
       // console.log('handlePaddingBlur Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
@@ -3183,7 +3192,7 @@ ${indent}<![endif]-->`;
     // !VA Handles padding inputs from handlePaddingBlur (for width padding inputs) and handlePaddingInput (for height padding inputs). The caller argument is a debug argument that passes the name of the calling function and can be removed from this and the callers for production.
     function handlePadding( caller, userInputObj ) {
       console.log(`handlePadding called by ${caller} running`);
-      let tmp, reflectArray;
+      let tmp, reflectArray, highlightArray;
       let imgInputObj = {}, configObj = {};
       // !VA Destructure userInputObj
       let { appObjProp, evtTargetVal } = userInputObj;
@@ -3199,7 +3208,7 @@ ${indent}<![endif]-->`;
         // !VA updateCurrentImage sets Appobj.ccpTblWidthTfd to curImgW in resizeContainers. Override that here to display the padding-dependent value for TBL width.
         tmp = Appobj.ccpTblWidthTfd;
         // !VA Shrink the image. 
-        appController.initupdateCurrentImage(imgInputObj);
+        appController.initUpdateCurrentImage(imgInputObj);
         // !VA Restore Appobj.ccpTblWidthTfd to the temporarily stored override value 
         Appobj.ccpTdaWidthTfd = Appobj.ccpTblWidthTfd = tmp;
         // !VA Set the TD Height input to the curImgH plus the sum of the Appobj lft/rgt input properties.
@@ -3244,7 +3253,13 @@ ${indent}<![endif]-->`;
       UIController.configCCP( configObj );
     }
 
-    // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. This also handles the cases where the user enters 0 to blur, or leaves the input empty to blur, and the padding-specific handling of TD Width values. Note: the if conditions are questionable and probably need to be rewritten but it works for now.
+    // !VA appController private
+    // !VA Select the input on focus. Maybe there's an easier way to do this.
+    function handleFocus(evt) {
+      evt.target.select();
+    }
+
+    // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. This also handles the cases where the user enters 0 to blur, or leaves the input empty to blur, and the padding-specific handling of TD Width values. Note: This emulates the preventDefault behavior of the TAB key. Remember that if you set preventDefault on the TAB key, the blur event will still fire on mouse out and the result will be that the blur is handled twice. Handling the blur here and NOT on the TAB keypress avoids that trap.
     function handleBlur(evt) {
       // !VA Create the object to store the Appobj property and current input value
       let reflectArray, userInputObj = {}, configObj = {};
@@ -3257,8 +3272,8 @@ ${indent}<![endif]-->`;
       let { appObjProp } = userInputObj;
       // !VA Get the return val from handlerUserInput - empty string, valid input or FALSE for error. Note; handleUserInput also sets the Appobj property of appObjProp if the input is valid.
       // !VA There are two ways to blur without a value. 1) The user enters a 0 and blurs or 2) the user deletes the existing value or blurs with an empty input. In both cases, if the target is a padding input, the dependent TD Width input value needs to be removed if BOTH padding inputs are empty. Handle both cases now. Note: The handler for removing the TD Height value if both padding inputs are empty is found in handlePaddingInput.  
-      // !VA If the target input value is 0 or empty
-      if ( Number(userInputObj.evtTargetVal) === 0 || userInputObj === '') { 
+      // !VA If the target input value is 0 or empty - NOTE: This does not trap curImgW nd curImgH, so they are unnecessarily passed to configCCP and have to be handled there. Not good, but not fixing for now.
+      if ( Number(userInputObj.evtTargetVal) === 0 ) { 
         // !VA If the target input value is 0, convert it to empty, set the Appobj property to empty and reflect that to the CCP.
         if (Number(userInputObj.evtTargetVal) === 0) {
           Appobj[appObjProp] = '';
@@ -3310,7 +3325,7 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController   
-    // !VA Called from tbClickables event handler. Handles clicks on the Toolbar increment/decrement buttons and handles blur for Toolbar and ccpUserInput input elements, which facilitates error-checking and applying values on blur with the mouse, allowing users to mouse through inputs, entering values as they go without having to press TAB or ENTER. To do this, it dispatches a keydown keyboardEvent for the TAB key to the current input element to simulate the keypress. Also handles drop and dragover events, applying preventDefault.
+    // !VA Called from tbClickables event handler. Handles clicks on the Toolbar increment/decrement buttons and handles blur for Toolbar and ccpUserInput input elements. NOTE: This used to be where blur on all inputs was handled but that is now in handleBlur where it belongs.
     function handleMouseEvents(evt) {
       // !VA elId adds the hash to evt.target.id
       let elId = '#' + evt.target.id;
@@ -3411,8 +3426,8 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController function
-    // !VA NOTE: Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances ot the next field.
-    // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Calls checkUserInput which validates the input and returns either an integer or a string and passes the value to applyInputValue to write to Appobj and the DOM. Then, for curImgW/curImgH, sets the input value to '' so the placeholder shows through. For all other input elements, sets the input value to the respective Appobj property.
+    // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Calls handleUserInput which validates the input and returns either an integer or a string and passes the value to applyInputValue to write to Appobj and the DOM. Then, for curImgW/curImgH, sets the input value to '' so the placeholder shows through. For all other input elements, sets the input value to the respective Appobj property.
+    // !VA NOTE: Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances to the next field.
     function handleKeydown(evt) {
       let retVal;
       // !VA Get the keypress
@@ -3432,7 +3447,6 @@ ${indent}<![endif]-->`;
           // console.log('ENTER key');
           retVal = handleUserInput(userInputObj);
           if ( retVal === false) { 
-
             if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
               this.select();
               this.value = '';
@@ -3442,15 +3456,11 @@ ${indent}<![endif]-->`;
             }
           } 
         } else if ( keydown === 9) {
+          // !VA NOTE: TAB key is handled by handleBlur, so do nothing here.
           // console.log('TAB key');
-          // handleBlur( 'TAB', userInputObj );
-
         }
       }
     }
-
-
-    
 
     // !VA appController  
     // !VA TODO: Why are there unused elements and what is actually happening here?
@@ -3712,7 +3722,7 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController  
-    // !VA Called from applyInputValue and handleMouseEvents. This function name is a misnomer here. More importantly than writing to Appobj, this function writes imgViewerW, sPhonesW and lPhonesW to localStorage and calculates the adjacent side of the curImgW/curImgH input, then runs calcViewerSize to resize the dynamicElements containers. NOTE: This function does things that are done elsewhere and does other things that it shouldn't do. Revisit this at some point but for now it works.
+    // !VA Called from applyInputValue and handleMouseEvents. Writes imgViewerW, sPhonesW and lPhonesW to localStorage and calculates the adjacent side of the curImgW/curImgH input, then runs calcViewerSize to resize the dynamicElements containers. NOTE: This function does things that are done elsewhere and does other things that it shouldn't do. Revisit this at some point but for now it works.
     function updateCurrentImage(userInputObj) {
       // !VA Initialize vars for curImgH and curImgW in order to calculate one based on the value of the other * Appobj.aspect.
       // let curImgH, curImgW;
@@ -3803,7 +3813,7 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController  
-    // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values which are passed in from calcViewerSize, then runs writedynamicElementsDOM(Appobj, viewportH, appH) to size the containers. NOTE: The complete Appobj is passed here although only imgViewer and curImg values are needed to resize the dynamicElements. 
+    // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values which are passed in from calcViewerSize, then runs writedynamicElementsDOM(Appobj, viewportH, appH) to size the containers. IMPORTANT: This is also where the Appobj properties for the Table Width and Table Wrapper Width input elements are initialized. NOTE: The complete Appobj is passed here although only imgViewer and curImg values are needed to resize the dynamicElements. 
     function resizeContainers()  {
       // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values which are passed in from calcViewerSize.
       // !VA Initial height is 450, as explicitly defined in calcViewerSize. TOo much hassle to try and get the value as defined in the CSS programmatically.
@@ -3857,7 +3867,7 @@ ${indent}<![endif]-->`;
     // !VA appController  
     // !VA Returns the CCP configurations for each CCP UI element, i.e. the properties for configCCP methods.
     function fetchConfigObj( alias, option ) {
-      let configObj = [], flag;
+      let configObj = [];
       // !VA Set the CCP configuration for specific user selections
       switch(true) {
       case alias === 'default' :
@@ -3870,7 +3880,7 @@ ${indent}<![endif]-->`;
         break;
       case alias === 'ccpImgItypeRdo' :
         // !VA Get the CCP configuration for the IMG Itype (fixed/fluid) radio switch
-        configObj =   type( alias, option );
+        configObj =   configItype( alias, option );
         break;
       case alias === 'ccpTdaOptnsRdo' :
         // !VA Get the configuration for the selected TD Option
@@ -3971,7 +3981,7 @@ ${indent}<![endif]-->`;
 
 
     // !VA appController private
-    // !VA Write the selected checkbox status to its corresponding Appobj property; is called from event listeners on the checkbox elements. 
+    // !VA Called from event listeners on the checkbox elements. Writes the selected checkbox status to its corresponding Appobj property and then runs selectCheckbox to execute the checkbox actions; . 
     function handleCheckboxEvent(evt) {
       let id, isChecked, alias;
       id = '#' + evt.target.id;
@@ -3985,34 +3995,36 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
-    // !VA Handle label clicks to remove any input field content and reset the icon highlight
+    // !VA Called from event handlers on CCP labels to remove any input field content and remove the 'active' class from the input element related to the clicked label icon.
     function handleIconClick(evt) {
-      let appObjProp, ipt, hasPadding;
+      let appObjProp, ipt, reflectArray;
+      let configObj = {};
       appObjProp = elementIdToAppobjProp(evt.target.id);
       if (evt.target.value !== '') {
         if (evt.target.id !== 'ccp-tda-padng-icn') {
           Appobj[appObjProp] = '';
           // !VA This should be done with configCCP - for later
-          console.log('evt.target.htmlFor :>> ' + evt.target.htmlFor);
           ipt = document.getElementById(evt.target.htmlFor);
           ipt.value = '';
           ipt.classList.remove('active');
         } else {
-          var pdgIpts = document.getElementsByClassName('ccp-padng-ipt');
+          // !VA Branch: 102120A
+          // !VA pdgIpts is not read, remove.
+          // pdgIpts = document.getElementsByClassName('ccp-padng-ipt');
           // !VA This is where we need to add the padding width values back to Appobj.curImgW and remove the values from TD H and TD W
           // !VA First, get padHeight an padWidth from current Appobj
           // !VA This is the same as running handlePadding with appObjProp = ccpTdaPdrgtTfd - see if it can be replaced with that, but it works for now. 
           let imgInputObj = {};
           imgInputObj.appObjProp = 'curImgW';
           imgInputObj.evtTargetVal = Appobj.curImgW + Number(Appobj.ccpTdaPdrgtTfd) + Number(Appobj.ccpTdaPdlftTfd);
-          appController.initupdateCurrentImage(imgInputObj);
+          appController.initUpdateCurrentImage(imgInputObj);
           // !VA Set the TD Height input to the curImgH plus the sum of the Appobj lft/rgt input properties.
           Appobj.ccpTdaHeigtTfd = Appobj.ccpTdaWidthTfd = Appobj.ccpTdaPdrgtTfd = Appobj.ccpTdaPdlftTfd = Appobj.ccpTdaPdtopTfd = Appobj.ccpTdaPdbtmTfd = '';
           // !VA Reset TBL W to Appobj.curImgW restored to pre-padding value
           Appobj.ccpTblWidthTfd = Appobj.curImgW; 
           // !VA Set the reflect array for TD H, TD W and TBL W
           reflectArray = [ 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdbtmTfd', 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
-          // !VA Unhighlight the TD Width and TD Height icons
+          // !VA Unhighlight the TD Width and TD Height icons - this should be done in the configCCP call
           document.querySelector(ccpUserInput.ccpTdaHeigtTfd.replace('tfd', 'ipt')).classList.remove('active');
           document.querySelector(ccpUserInput.ccpTdaWidthTfd.replace('tfd', 'ipt')).classList.remove('active');
           configObj = {
@@ -4060,7 +4072,8 @@ ${indent}<![endif]-->`;
 
     // !VA appController private
     // !VA Convert an element ID (i.e. with the # prefix ) to its corresponding ccpUserInput/Appobj property. Only works for IDs that have a corresponding ccpUserInput property. For IDs that don't have a ccpUserInput property, try evtTargetIdToAppobjProperty. 
-    // !VA Branch: 101520D
+    // !VA Branch: 102120A
+    // !VA If evtTargetIdToAppobjProperty does the same as this but also works on toolbar aliases, get rid of this and rename that to this.
     function elementIdToAppobjProp(id) {
       let appObjProp, val;
       val = id;
@@ -4090,10 +4103,9 @@ ${indent}<![endif]-->`;
     // !VA Handle the logic associated with user-initiated text input.  1) If the element has an icon associated, highlight the icon on user input 2) If the text element is a padding input, highlight the padding icon if any of the padding text input elements have user input 3) If the text input element is a class input, show the Make CSS buttons. 4) If the text input element is the IMG anchor input, show the IMG text color and IMG targt parent elements. NOTE: There are a lot of references to IDs here: consider adding aliases for the elements whose IDs are referenced literally.
     // !VA NOTE: This function is in appController the actions are distinct from the actions in configCCP. Those controls pertain to specific option configurations that functionally depend on a selected option. These options below only make other options available if a text input is entered. Perhaps an insignificant distinction, but a valid one - all the configCCP react to checkbox state changes, not input values.
     function handleTextInputEvent(evt) {
-      let tar, hasPadding, flag;
+      let tar, flag;
       let configObj = {};
       let revealArray = [];
-      hasValue = false;
       tar = evt.target;
       // !VA If the event was NOT triggered by a padding element...
       tar.value ? flag = true : flag = false;
@@ -4159,8 +4171,8 @@ ${indent}<![endif]-->`;
         // !VA But if evtTargetVal is 0, replace it with '', otherwise we get a 0 in Appobj.
         if (userInputObj.evtTargetVal === 0) { userInputObj.evtTargetVal = '';}
         handlePaddingInput(userInputObj);
-        // !VA Note: Padding icon highlighting is done in getHasPadding. It could be done here using Appobj properties and configCCP. Maybe later. 
-        hasPadding = getHasPadding();
+        // !VA Note: Padding icon highlighting is done in highlightPaddingIcon. It could be done here using Appobj properties and configCCP. Maybe later. 
+        highlightPaddingIcon();
       }
     }
 
@@ -4782,7 +4794,7 @@ ${indent}<![endif]-->`;
       // !VA appController public
       // !VA Branch: 102020B
       // !VA Outdated description
-      // !VA Access Appobj from outside appController. Called from getAttributes, ccpGetAttValue, ccpIfNoUserInput, getSelectedTdOptionFromAppobj, getImgSwapBlock. If alias is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is an Appobj property/ccpUserInput property, return the corresponding property value. If it is neither of the above, error condition
+      // !VA Access Appobj from outside appController. If alias is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is an Appobj property/ccpUserInput property, return the corresponding property value. If it is neither of the above, error condition
       getAppobj: function(alias) {
         let retval;
         if (typeof alias === 'undefined') {
@@ -4802,9 +4814,13 @@ ${indent}<![endif]-->`;
       // !VA Calls UIController.toggleCCP, which returns ccpState, a flag indicating if the CCP is open or closed. If it is open, runs batchAppobjToDOM(), which contains the logic for opening the CCP with the current state of the selected options reflected. batchAppobjToDOM only runs handleTdOptions for the rdoCcpTdImgswap option. All other element states and values carry over when the CCP is open and closed. NOTE: Need to confirm that the above statement is correct. If the flag is false, batchDOMToAppobj is run to save all the DOM settings to Appobj so they can be restored by batchAppobjToDOM. NOTE: I’m not sure this is required, at least there is no logic in batchDOMToAppobj currently
       // !VA NOTE: Not sure what us used for.
       initCcp: function () {
-        let ccpState;
+        // let ccpState;
         // !VA Get the current open/closed state of the CCP
-        ccpState = UIController.toggleCcp(true);
+        // !VA Branch: 102120A
+        // !VA ccpState is never accessed, deprecated.
+        // ccpState = UIController.toggleCcp(true);
+        UIController.toggleCcp(true);
+
       },
 
 
@@ -4817,7 +4833,8 @@ ${indent}<![endif]-->`;
       },
       // !VA DEV MODE END
      
-      initupdateCurrentImage: function(userInputObj) {
+      // !VA Pass-thru public function to provide cross-module access to updateCurrentImage
+      initUpdateCurrentImage: function(userInputObj) {
         updateCurrentImage(userInputObj);
       },
 
@@ -4825,7 +4842,7 @@ ${indent}<![endif]-->`;
       // !VA APP MESSAGES START
       // !VA Entry point for sorting the three types of messages. Target id is used for all three types. For tooltips, target id is in the event object passed in from the event handler. For msg and err, target id isn't passed because handleAppMessages only takes one parameter -- either the event for tooltips or the appMessCode for msg and err. Problem: Tooltips require the calling element's id because the tooltip shows on mouseenter and has to hide on mouseleave, and the id is required for the mouseleave eventListener. Solution: call showAppMessages with two parameters: targetid, which is either a string for tooltips or false for msg and err, and the second parameter is the appMessContent.
       handleAppMessages: function ( evt ) {
-        let appMessCode, appMessType, appMessContent, duration, appMessContainerId, tooltipTarget;
+        let appMessCode, appMessType, appMessContent, duration, appMessContainerId, tooltipTarget, timer;
         // !VA Duplicate evt into appMessCode - we could just receive the event as appMessCode but it's more transparent to do it explicitly
         appMessCode = evt;
         // !VA If appMessCode is an object, then it originated in an addEventListener, so it must be a tooltip because those are the only appMessages that originate there. Parse the target id from the event and convert it to a valid appMessCode, i.e. underscores instead of hyphens.
@@ -4862,6 +4879,8 @@ ${indent}<![endif]-->`;
         }
         // !VA If appMessType is err or msg, call setTimeout to set the duration of the message, i.e. time delay before the message is undisplayed.
         if ( appMessType === 'err' || appMessType === 'msg') {
+          // !VA Branch: 102120A
+          // !VA What is timer doing here? This doesn't need to be a named function, get rid of it.
           timer = setTimeout(() => {
             // !VA Read the appMessContent into the tooltip content element
             // !VA Call displayAppMessages with the isTrue parameter = false to undisplay the message after the timeout. 
@@ -4896,6 +4915,7 @@ ${indent}<![endif]-->`;
 
         // !VA Determine if the window is an isolate window, i.e. should be displayed with just the Witty app in window with fixed dimensions without header or tutorial content.
         let curUrl, initMode;
+        let configObj = {};
         // !VA If the value of the query string is true, then remove the header-container, isolate button and content from the DOM
         curUrl = window.location.href;
 
