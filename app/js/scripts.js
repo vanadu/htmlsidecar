@@ -1105,6 +1105,7 @@ var Witty = (function () {
       var Appobj = {};
       // !VA TODO: We don't need the entire Appobj here. What we should do is call rest parameters on what we need and then destructure the return array into separate variables. This needs to be done when getAttributes is reevaluated since there appears to be a lot of unnecessary DOM access here. But I don't know if it's faster to get all of Appobj or just target a specific Appobj property -- for later.
       Appobj = appController.getAppobj();
+
       let str, appObjProp, imgType, pdngWidth, Attributes, retObj;
       // !VA Create the array to return. First value is the id of the CCP element, second value is the string to write to the CCP element. If the first value is false, then the str isn't queried from a Ccp element, but rather is generated in the Attribute based on other conditions. For instance, the img style attribute is conditioned on the fluid/fixed option, but writes to the style attribute of the img tag.
       function returnObject(appObjProp, str ) {
@@ -2412,19 +2413,15 @@ ${indent}<![endif]-->`;
     // !VA CBController   
     // !VA Gets the values of the Inspector elements and formats them for the clipboard output.
     function handleInspectorClicks(targetid, modifierKey) {
+      console.log('handleInspectorClicks running'); 
       let Appobj = {};
       let clipboardStr, widthval, heightval;
-      var el = document.querySelector('#' + targetid);
-      el.onmouseover = isOver();
-      function isOver() {
-        console.log('isOver running');
-      }
       widthval = heightval = '';
-      // !VA Call getAppobj with rest parameters and destructure the return array into separate variables.
-      // !VA props is the array of rest parameters returned from getAppobj
-      let props;
-      props = appController.getAppobj2('curImgW', 'curImgH', 'sPhonesW', 'sPhonesH', 'lPhonesW', 'lPhonesH');
-      const { curImgW, curImgH, sPhonesW, sPhonesH, lPhonesW, lPhonesH } = props;
+      Appobj = appController.getAppobj();
+
+      // !VA Destructure what we need from Appobj
+      const { curImgW, curImgH, sPhonesW, sPhonesH, lPhonesW, lPhonesH } = Appobj;
+
       // !VA Get the value to output to Clipboard based on whether shift or ctrl is pressed
       function getVal( widthval, heightval, modifierKey ) {
         let str1, str2, val;
@@ -2500,6 +2497,8 @@ ${indent}<![endif]-->`;
       default:
         // code block
       } 
+      console.log('clipboardStr :>> ');
+      console.log(clipboardStr);
       writeClipboard(targetid, clipboardStr);
     }
     // !VA END CLIPBOARD FUNCTIONS
@@ -4752,48 +4751,12 @@ ${indent}<![endif]-->`;
     return {
 
 
-      // !VA Access Appobj from outside appController. If identifier is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is a property identifier, i.e. an Appobj property name, return the corresponding property value. 
-      // !VA Branch: implementCcpInput04 (062520)
-      // !VA getAppobj won't work here. The call comes before Appobj is populated. See https://stackoverflow.com/questions/62585279/javascript-object-both-has-properties-and-is-empty - which cost me about a day.
-      // !VA Branch: 102020B
-      // !VA This is still used in handleInspectorClicks, but I'm not sure any more why getAppobj wouldn't work in this case.
-      getAppobj2: function(...identifiers) {
-        console.log('getAppobj2 running');
-        let retval, arr;
-        Appobj = UIController.populateAppobj(Appobj, 'all');
-
-        if (typeof identifiers === 'undefined') {
-          console.log('UNDEFINED2');
-          retval = Appobj;
-        } else {
-
-          arr = Object.keys(Appobj);
-          for (let i = 0; i < arr.length; i++) {
-            // !VA If the first 8 characters of the Appobj property name is rdoCcpTd, then loop through the property names and find the one whose value is true. That is the selected tdoptions radio button. Then loop though the ccpUserInput element alias list and get the element ID of the selected tdoptions radio button, and call handleTdOptions with that ID as parameter.
-            // !VA TODO: Make this an arrow function with find, like below
-            // var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
-            if (key === identifiers[i]) {
-              retval = value;
-            }
-          }
-
-          for (let i = 0; i < identifiers.length; i++) {
-            for (const [key, value] of Object.entries(Appobj)) {
-              if (key === identifiers[i]) {
-                retval = value;
-              }
-            }
-          }
-        }
-        return retval;
-      },
-
-
       // !VA appController public
       // !VA Branch: 102020B
       // !VA Outdated description
       // !VA Access Appobj from outside appController. If alias is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is an Appobj property/ccpUserInput property, return the corresponding property value. If it is neither of the above, error condition
-      getAppobj: function(alias) {
+      getAppobj: function( alias ) {
+        console.log('getAppobj running'); 
         let retval;
         if (typeof alias === 'undefined') {
           retval = Appobj;
@@ -4818,7 +4781,6 @@ ${indent}<![endif]-->`;
         // !VA ccpState is never accessed, deprecated.
         // ccpState = UIController.toggleCcp(true);
         UIController.toggleCcp(true);
-
       },
 
 
