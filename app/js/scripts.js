@@ -3057,8 +3057,8 @@ ${indent}<![endif]-->`;
     function resetInputValue(evt) {
       let target, appObjProp, curLocalStorage;
       target = evt.target;
-      appObjProp = evtTargetIdToAppobjProp(evt.target.id );
-      console.log('appObjProp :>> ' + appObjProp);
+      appObjProp = elemIdToAppobjProp(evt.target.id );
+
       // !VA If the event target is the curImgW or curImgH input fields, on ESC exit the field and restore the placeholder set in the HTML file.
       if (appObjProp === 'curImgW' || appObjProp === 'curImgH') {
         target.value = ('');
@@ -3142,7 +3142,7 @@ ${indent}<![endif]-->`;
     function handlePaddingFocus(evt) {
       let userInputObj = {};
       // !VA Get the Appobj/ccpUserInput alias from the target id
-      userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
+      userInputObj.appObjProp = elemIdToAppobjProp(evt.target.id);
       // !VA Handle the padding width inputs. Pass evtTargetVal as negative value to handlePadding to unshrink curImgW on focus. 
       if  ( userInputObj.appObjProp.substring( 6 , 11 ) === 'Pdrgt' || userInputObj.appObjProp.substring( 6 , 11 ) === 'Pdlft') {
         // !VA evtTargetVal is the value the user entered into the input element to be passed to handlePadding as a negative value.
@@ -3265,7 +3265,7 @@ ${indent}<![endif]-->`;
       let reflectArray, userInputObj = {}, configObj = {};
       let retVal;
       // !VA Get the Appobj/ccpUserInput alias from the target id
-      userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
+      userInputObj.appObjProp = elemIdToAppobjProp(evt.target.id);
       // !VA evtTargetVal is the value the user entered into the input element.
       userInputObj.evtTargetVal = evt.target.value;
       // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp  locally.
@@ -3436,8 +3436,8 @@ ${indent}<![endif]-->`;
       const userInputObj = { };
       // !VA If TAB or ENTER
       if (keydown == 9 || keydown == 13) {
-        // !VA evtTargetIdToAppobjProp gets the Appobj key that corresponds to a given element ID. Write that Appobj property/ccpUserInput alias to the appObjProp property of the userInputObj object.
-        userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
+        // !VA elemIdToAppobjProp gets the Appobj key that corresponds to a given element ID. Write that Appobj property/ccpUserInput alias to the appObjProp property of the userInputObj object.
+        userInputObj.appObjProp = elemIdToAppobjProp(evt.target.id);
         // !VA evtTargetVal is the value the user entered into the input element.
         userInputObj.evtTargetVal = evt.target.value;
         // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp locally.  
@@ -3911,7 +3911,8 @@ ${indent}<![endif]-->`;
       // !VA Get event target's alias: get the element's name attribute set in the HTML and add the hash to the name attribute string, and add the -rdo suffix, resulting in the full ID string of the element's parent, i.e. the ccpUserInput alias.
       radioGroup = hash.concat(evt.target.getAttribute('name')).concat('-rdo');
       // !VA  Use the ID above to get the ccpUserInput alias/Appobj property name.
-      alias = elementIdToAppobjProp(radioGroup);
+      alias = elemIdToAppobjProp(radioGroup);
+
       // !VA Set the Appobj property to the target of the click event
       Appobj[alias] = evt.target.value;
       // !VA Route the alias to the respective function for selection. Appobj[alias] is the Appobj property corresponding to the clicked element. When called from here, the user-initiated event determines the selection. Elsewhere, the options can be set programatically.
@@ -3989,7 +3990,8 @@ ${indent}<![endif]-->`;
       // !VA Replace the element's suffix with the suffix of its parent
       id = id.replace('ipt', 'chk');
       // !VA Convert the ID to the corresponding ccpUserInput alias/Appobj property and set it to isChecked
-      alias = elementIdToAppobjProp(id);
+      alias = elemIdToAppobjProp(id);
+
       Appobj[alias] = isChecked;
       selectCheckbox( isChecked, alias );
     }
@@ -3999,7 +4001,6 @@ ${indent}<![endif]-->`;
     function handleIconClick(evt) {
       let appObjProp, ipt, reflectArray;
       let configObj = {};
-      appObjProp = elementIdToAppobjProp(evt.target.id);
       if (evt.target.value !== '') {
         if (evt.target.id !== 'ccp-tda-padng-icn') {
           Appobj[appObjProp] = '';
@@ -4008,9 +4009,6 @@ ${indent}<![endif]-->`;
           ipt.value = '';
           ipt.classList.remove('active');
         } else {
-          // !VA Branch: 102120A
-          // !VA pdgIpts is not read, remove.
-          // pdgIpts = document.getElementsByClassName('ccp-padng-ipt');
           // !VA This is where we need to add the padding width values back to Appobj.curImgW and remove the values from TD H and TD W
           // !VA First, get padHeight an padWidth from current Appobj
           // !VA This is the same as running handlePadding with appObjProp = ccpTdaPdrgtTfd - see if it can be replaced with that, but it works for now. 
@@ -4071,10 +4069,10 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
-    // !VA Convert an element ID (i.e. with the # prefix ) to its corresponding ccpUserInput/Appobj property. Only works for IDs that have a corresponding ccpUserInput property. For IDs that don't have a ccpUserInput property, try evtTargetIdToAppobjProperty. 
+    // !VA Convert an element ID (i.e. with the # prefix ) to its corresponding ccpUserInput/Appobj property. Only works for IDs that have a corresponding ccpUserInput property. For IDs that don't have a ccpUserInput property, try elemIdToAppobjProperty. 
     // !VA Branch: 102120A
-    // !VA If evtTargetIdToAppobjProperty does the same as this but also works on toolbar aliases, get rid of this and rename that to this.
-    function elementIdToAppobjProp(id) {
+    // !VA If elemIdToAppobjProperty does the same as this but also works on toolbar aliases, get rid of this and rename that to this.
+    function elementelemIdToAppobjProp(id) {
       let appObjProp, val;
       val = id;
       // !VA Better than the below - get the correspnding key in ccpUserInput from its property value, i.e. the id
@@ -4165,7 +4163,7 @@ ${indent}<![endif]-->`;
         // !VA Call handlePaddingInput with userInputObj. 
         let userInputObj = {};
         // !VA Get the Appobj/ccpUserInput alias from the target id
-        userInputObj.appObjProp = evtTargetIdToAppobjProp(evt.target.id);
+        userInputObj.appObjProp = elemIdToAppobjProp(evt.target.id);
         // !VA evtTargetVal is the value the user entered into the input element.
         userInputObj.evtTargetVal = Number(evt.target.value);
         // !VA But if evtTargetVal is 0, replace it with '', otherwise we get a 0 in Appobj.
@@ -4341,8 +4339,8 @@ ${indent}<![endif]-->`;
     //  !VA END ERROR HANDLING
 
     // !VA appController  
-    // !VA Get the Appobj property that corresponds to the ID of the DOM input element that sets it. 1) Removes the hypens in the ID string, converts the identifier string (the Appobj/ccpUserInput property name string) to lowercase, finds the match, and returns the aforementioned Appobj/ccpUserInput property name string.
-    function evtTargetIdToAppobjProp(id) {
+    // !VA Get the Appobj property that corresponds to the ID of the DOM input element that sets it. 1) Removes the hypens in the ID string, converts the identifier string (the Appobj/ccpUserInput property name string) to lowercase, finds the match, and returns the aforementioned Appobj/ccpUserInput property name string. NOTE: Thiss work on Toolbar aliases as well by searching the ID for the lowercase Appobj property name, i.e. curimgw is in ipt-tbr-curimgw.
+    function elemIdToAppobjProp(id) {
       let idStr, appObjProp, appobjArray;
       idStr = id;
       // !VA Replace the ipt with tfd, which is the code for the parent div, which is the element represented in Appobj
