@@ -499,12 +499,15 @@ var Witty = (function () {
     // !VA UIController private
     // !VA Resets (i.e. adds the ccp-conceal-ctn class) to the container elements for the CPP option section affected by the CCP control associated with the alias. 
     function revealReset( alias ) {
-      let el, mkcssReset = [], defaultArr, defaultReset = [], wraprArr,  wraprReset = [], resetArray;
+      let el, mkcssReset = [], defaultArr, defaultReset = [], iswapArr, iswapReset = [], wraprArr,  wraprReset = [], resetArray;
       // !VA Only log if not init
       // if (alias !== 'default' ) { console.log('revealReset running'); }
+      // console.log('revealReset alias :>> ' + alias);
 
       // !VA There are three reset element matrices: mkcssReset includes all the Make CSS Button containers. That is obtained by getting the elements with classname 'ccp-mkcss-ctn' - it includes the Make CSS buttons and the curly braces that surround them. defaultReset includes the containers corresponding to the TD Options 'basic' configuration, and wraprReset includes the Wrapper Option elements.
       defaultArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
+      // !VA iswapArr is identical to defaultArr except without ccpImgCbhtmBut - the CB HTML button is not availble for image swap.
+      iswapArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
       wraprArr = ['ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk', ];
 
 
@@ -516,6 +519,10 @@ var Witty = (function () {
       for (const alias of defaultArr) {
         el = document.querySelector(ccpUserInput[alias]);
         defaultReset.push(el);
+      }
+      for (const alias of iswapArr) {
+        el = document.querySelector(ccpUserInput[alias]);
+        iswapReset.push(el);
       }
       // !VA Array of Table Wrapper elements to reset
       for (const alias of wraprArr) {
@@ -533,6 +540,19 @@ var Witty = (function () {
           el.classList.add('ccp-conceal-ctn');
         }
         resetArray = defaultReset;
+        for (const el of resetArray) {
+          el.classList.add('ccp-conceal-ctn');
+          el.classList.remove('ccp-conceal-ctn');
+        }
+        break;
+      case alias === 'iswap':
+        // !VA For init, revea; the default configuration
+        // !VA Conceal all elements to reset them
+        // console.log('default reset running');
+        for (const el of document.getElementsByClassName('ccp-ctn')) {
+          el.classList.add('ccp-conceal-ctn');
+        }
+        resetArray = iswapReset;
         for (const el of resetArray) {
           el.classList.add('ccp-conceal-ctn');
           el.classList.remove('ccp-conceal-ctn');
@@ -617,6 +637,8 @@ var Witty = (function () {
     // !VA UIController private  
     // !VA Reveal and conceal individual CCP container elements with sequential animation. flag specifies if the reveal class cpp-hide-ctn is to be added or removed: true = add, false = remove. aliasArray is the array of elements to reveal/conceal. Called from UIController.configCCP. 
     function revealElements( flag, aliasArray) {
+      // console.log('aliasArray :>> ');
+      // console.log(aliasArray);
       let el,  elArray = [];
       // !VA Create the array of elements to reveal/conceal. 
       for (let i = 0; i < aliasArray.length; i++) {
@@ -1445,6 +1467,7 @@ var Witty = (function () {
       appController.getAppobj('ccpTblWraprChk')  ? hasWrapper = true : hasWrapper = false;
       // !VA Get the selected TD option
       selectedTdOption = appController.getAppobj('ccpTdaOptnsRdo');
+      console.log('selectedTdOption :>> ' + selectedTdOption);
       // !VA Get the Attributes from which Clipboard strings are built
       Attributes = getAttributes();
       // !VA Get the top node, i.e. tableNodeFragment. 
@@ -4348,7 +4371,7 @@ ${indent}<![endif]-->`;
     // !VA appController  
     // !VA CCP Configuration definitions for TD options and IMG excld radio. Note: alias and option parameters aren't accessed, including them as a console call and commenting out for now. This results in an error in the Outline view.
     function configDefault( alias, option ) {
-      console.log('configDefault alias :>> ' + alias +  '; option :>> ' + option);
+      // console.log('configDefault alias :>> ' + alias +  '; option :>> ' + option);
       // !VA Alias and option are not used yet, are included mainly for debug. 
       let configObj, reflectArray, radioArray, revealArray, checkedArray, highlightArray;
       // !VA APPOBJ PROPERTIES
@@ -4362,7 +4385,7 @@ ${indent}<![endif]-->`;
       } else {
         Appobj['ccpTdaOptnsRdo'] = option;
       }
-      console.log('Appobj[ccpTdaOptnsRdo] :>> ' + Appobj['ccpTdaOptnsRdo']);
+      // console.log('Appobj[ccpTdaOptnsRdo] :>> ' + Appobj['ccpTdaOptnsRdo']);
 
 
 
@@ -4480,6 +4503,7 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from fetchConfigObj to get the TD Option radio group-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
     function configOptns( alias, option ) {
+      // console.log('configOptns alias :>> ' + alias);  
       let revealFlag, revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray;
       let configObj = {};
       // !VA Option will never be basic or swtch here - they get their config from configDefault. That's not ideal, the call to configDefault should be made from here, not fetchConfigObj. For later.
@@ -4490,6 +4514,7 @@ ${indent}<![endif]-->`;
         // !VA Now handle the other TD Options
         switch(true) {
         case option === 'iswap':
+
           // !VA SET APPOBJ PROPERTIES FOR ISWAP
           // !VA Show the table wrapper options
           Appobj['ccpTblWraprChk'] = true;
@@ -4523,6 +4548,9 @@ ${indent}<![endif]-->`;
           // !VA Array of elements to be revealed. 
           revealArray = [ 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaOptnsRdo', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblMsdpiChk', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd','ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
           
+
+          // !VA Branch: 102220A
+          // !VA Should wrapper be shown by default?
           selectCheckbox( true, 'ccpTblWraprChk');
 
           // !VA disableElements METHOD
@@ -4538,7 +4566,8 @@ ${indent}<![endif]-->`;
             reflectAppobj: { reflect: reflectArray },
             radioState: { radio: radioArray },
             disableElements: { flag: disableFlag, disable: disableArray },
-            revealReset: { alias: 'default'},
+            // !VA the revealReset array, iswapArr,  is set in revealReset. It includes all elements that are revealed by default except ccpImgCbhtmlBut because the img tag can't be output to the cliboard with the iswap option. iswap requires a TD or higher.
+            revealReset: { alias: 'iswap'},
             revealElements:  { flag: revealFlag, reveal: revealArray }
           };
           break;
@@ -4743,7 +4772,7 @@ ${indent}<![endif]-->`;
       // !VA Outdated description
       // !VA Access Appobj from outside appController. If alias is 'undefined' i.e. not specified in the function call, then return the entire Appobj. If it is specified and is an Appobj property/ccpUserInput property, return the corresponding property value. If it is neither of the above, error condition
       getAppobj: function( alias ) {
-        console.log('getAppobj running'); 
+        // console.log('getAppobj running'); 
         let retval;
         if (typeof alias === 'undefined') {
           retval = Appobj;
