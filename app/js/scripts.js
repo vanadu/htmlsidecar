@@ -656,6 +656,9 @@ var Witty = (function () {
 
     // !VA UIController private. Resets the disabled attribute or ccp-disable-ctn class based on the alias of the elements whose selection triggers the disabling. Currently, the only parameter passed is 'default' and the alias parameter isn't accessed. This function actually loops through all the ccp-ctn elements in the document and resets the disable state/class for them. There's probably a better way to do this - that is a lot of elements to loop through to only catch a few of them.
     function disableReset( alias ) {
+      // !VA Branch: 102220A
+      // !VA alias is always 'default', so the parameter is superfluous. Adding a console call just to access it so the Outline error indicator will disappear
+      console.log('disableReset alias :>> ' + alias);
       let disableArray;
       document.querySelector('#ccp-tbl-wrapr-ipt').disabled = false;
       document.querySelector('#ccp-tbl-wrapr-lbl').classList.remove('ccp-disable-lbl');
@@ -957,8 +960,9 @@ var Witty = (function () {
           // !VA TODO: Convert this to Object.keys - ccpUserInput properties aren't used here.
           // !VA Loop through all the ccpUserInput elements and add their values to Appobj. The last three characters ( 11 - last ) are the alias code that identify the input type
           // !VA  radioState and checkboxState are called here before Appobj has been initialized, so the key argument is 'undefined'. This causes checkboxState and radioState to return the attribute value of the queried element as hard-coded in the HTML, thus initializing Appobj. 
-          for (const [key, value] of Object.entries(ccpUserInput)) {
-            // !VA Write the text input element values to Appobj
+          // !VA Branch: 102220A
+          // !VA Replace Object.entries with Object.keys, values not accessed here.
+          for (const key of Object.keys(ccpUserInput)) {
             if (key.substring( 11 ) === 'Tfd') {
               // !VA Appobj[ key ] is undefined, causing reflectAppobj to return the hard-coded values in the HTML file. These are the Appobj initialization values. These values are currently all empty strings but that could change so the best place to get them is value attribute of the the HTML file, just like the other Appobj init functions below.
               // !VA NOTE: This is not what's happening at all. reflectAppobj isn't returning the HTML default, it's returning whatever happens to be in the input field at the time, so it's actually resetting nothing. The reset has to happen in configDefault. This should be reviewed - seems like it might be a waste or need to be rethought. One option is to first clear existing values, then get the value. That would leave us with the HTML presets. In the meantime, all the presets are in configDefault. 
@@ -1093,7 +1097,7 @@ var Witty = (function () {
 
     // !VA CBController    functions
     // !VA NOTE: If we want to access any of the DOM IDs we have to call them from UIController where they're defined.
-    var inspectorElements = UIController.getInspectorElementIDs();
+    // var inspectorElements = UIController.getInspectorElementIDs();
     var ccpUserInput = UIController.getCcpUserInputIDs();
     var iptCcpMakeClips = UIController.getiptCcpMakeClips();
 
@@ -1106,7 +1110,7 @@ var Witty = (function () {
       // !VA TODO: We don't need the entire Appobj here. What we should do is call rest parameters on what we need and then destructure the return array into separate variables. This needs to be done when getAttributes is reevaluated since there appears to be a lot of unnecessary DOM access here. But I don't know if it's faster to get all of Appobj or just target a specific Appobj property -- for later.
       Appobj = appController.getAppobj();
 
-      let str, appObjProp, imgType, pdngWidth, Attributes, retObj;
+      let str, appObjProp, imgType, Attributes, retObj;
       // !VA Create the array to return. First value is the id of the CCP element, second value is the string to write to the CCP element. If the first value is false, then the str isn't queried from a Ccp element, but rather is generated in the Attribute based on other conditions. For instance, the img style attribute is conditioned on the fluid/fixed option, but writes to the style attribute of the img tag.
       function returnObject(appObjProp, str ) {
         let obj = {};
@@ -2171,24 +2175,24 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA GHOST FUNCTIONS
 
-    document.addEventListener("DOMContentLoaded", function() {
+//     document.addEventListener("DOMContentLoaded", function() {
 
-      var tbl = `
-<table class="devicewidth" role="presentation" data-ghost="tbw" width="600" cellspacing="0" cellpadding="0" border="0">
-  <tr>
-    <td valign="top" align="left">
-      <table data-ghost="tbl" role="presentation" width="200" cellspacing="0" cellpadding="0" border="0">
-        <tr>
-          <td valign="top" align="left">
-            <a href="#" style="color: #0000FF; " target="_blank"><img src="img/_200X150.png" style="display: block; width: 200px; height: 150px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;" width="200" height="150" border="0"></a>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-</table>
-      `;
-    });
+//       var tbl = `
+// <table class="devicewidth" role="presentation" data-ghost="tbw" width="600" cellspacing="0" cellpadding="0" border="0">
+//   <tr>
+//     <td valign="top" align="left">
+//       <table data-ghost="tbl" role="presentation" width="200" cellspacing="0" cellpadding="0" border="0">
+//         <tr>
+//           <td valign="top" align="left">
+//             <a href="#" style="color: #0000FF; " target="_blank"><img src="img/_200X150.png" style="display: block; width: 200px; height: 150px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;" width="200" height="150" border="0"></a>
+//           </td>
+//         </tr>
+//       </table>
+//     </td>
+//   </tr>
+// </table>
+//       `;
+//     });
 
     // !VA CBController private
     // !VA handle the buildNodeList clipboardStr output, define and place the tokens in the clipboardStr output and replace the tokens with the ghost tabs from getGhostTags or strip them out depending on the checked status of the Ghost checkbox icons passed in as bool parameters from the caller.
@@ -2923,8 +2927,6 @@ ${indent}<![endif]-->`;
       //about SVG and VML, they're not in the big list of MIME types I found 
       // !VA Need to handle this error
       if (!f.type.match('image.*')) {
-        // !VA TODO: try catch here
-        var target = "notimage";
         // !VA Below is the error handler - skipping for now
         // var isErr = errorHandler(target, 0, 0);
         return;
@@ -3483,7 +3485,7 @@ ${indent}<![endif]-->`;
       let { appObjProp, evtTargetVal } = userInputObj;
       // !VA Distinguish between elements that allow percent input, elements that allow string input and elements that allow numeric input. Percent inputs validate the percent value and return it with no further error checking. Numeric input elements have validation with error codes that display error messages. String inputs have no validation currently, but validation for hex color codes might be an option.
       let numericInputs, stringInputs, retVal, percentVal, percentInputs;
-      percentInputs = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd']
+      percentInputs = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd'],
       numericInputs = [ 'imgViewerW', 'curImgW', 'curImgH',  'sPhonesW', 'lPhonesW', 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd' ];
       stringInputs = ['ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpImgLoctnTfd', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTblClassTfd', 'ccpTblBgclrTfd', 'ccpTbwClassTfd', 'ccpTbwBgclrTfd' ];
 
@@ -3870,8 +3872,8 @@ ${indent}<![endif]-->`;
       // !VA Set the CCP configuration for specific user selections
       switch(true) {
       case alias === 'default' :
-        // !VA For initialization, resetArray includes aliases in mkcssReset, defaultReset and wraprReset 
-        configObj = configDefault( alias, option);
+        // !VA For initialization, resetArray includes aliases in mkcssReset, defaultReset and wraprReset Note: The option parameter was removed due to non-access in the function. 
+        configObj = configDefault( alias, option );
         break;
       case alias === 'ccpImgExcldRdo' :
         // !VA Get the CCP configuration for the IMG Exclude Image radio switch
@@ -4066,25 +4068,6 @@ ${indent}<![endif]-->`;
         console.log('Alias not yet handled in selectCheckbox');
       }    
     }
-
-    // !VA appController private
-    // !VA Convert an element ID (i.e. with the # prefix ) to its corresponding ccpUserInput/Appobj property. Only works for IDs that have a corresponding ccpUserInput property. For IDs that don't have a ccpUserInput property, try elemIdToAppobjProperty. 
-    // !VA Branch: 102120A
-    // !VA If elemIdToAppobjProperty does the same as this but also works on toolbar aliases, get rid of this and rename that to this.
-    function elementelemIdToAppobjProp(id) {
-      let appObjProp, val;
-      val = id;
-      // !VA Better than the below - get the correspnding key in ccpUserInput from its property value, i.e. the id
-      appObjProp = Object.keys(ccpUserInput).find(key => ccpUserInput[key] === val);
-      return appObjProp;
-    }
-
-    // !VA appController 
-    // !VA NOTE: This doesn't do anything because there's no reason to write DOM values to Appobj when the CCP is closed - the current values are preserved. So we are commenting out but not deprecating for now.
-    // function batchDOMToAppobj() {
-    //   let arr = [];
-    //   arr = Object.entries(Appobj);
-    // }
 
     // !VA appController  
     // !VA TODO: Review how useful this really is
@@ -4322,7 +4305,7 @@ ${indent}<![endif]-->`;
 
     // appController   
     // !VA Integer validation is used for all height/width input fields, including those in CCP. If the input value is not of type number, converts it and returns an integer.
-    function validateInteger(inputVal, callback) {
+    function validateInteger(inputVal) {
       let retVal;
       // !VA Handle the CCP input from the fields that should be returning integers. i.e. the numeric inputs in handleKeydown. If they are type string, then convert them to number. If the conversion fails, then throw an error - that means that the user didn't enter a valid numeric string. This returns false if parseInt fails, i.e. returns NaN. Otherwise, it returns the inputVal as integer.
       if (!parseInt(inputVal, 10) || inputVal % 1 !== 0 || inputVal < 0) {
@@ -4360,25 +4343,12 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController  
-    // !VA Returns the toolbarElements element alias of a corresponding Appobj property name. IMPORTANT - only works with or is necessary for Appobj properties for toolbarElements aliases. ccpUserInput element aliases are identical to their Appobj property name counterparts.
-    function appObjPropToAlias(propName) {
-      // !VA Get an array of toolbarElements aliases
-      let toolbarElemArr = Object.keys(toolbarElements);
-      let alias;
-      for (let i = 0; i < toolbarElemArr.length; i++) {
-        // !VA Need to initial cap the Appobj property name in order to find a match in the toolbarElements alias, so capitalize the first letter, then concatenate it the remainder of the characters
-        if (toolbarElemArr[i].includes( propName[0].toUpperCase()+propName.slice(1))) {
-          alias = toolbarElemArr[i];
-        }
-      }
-      return alias;
-    }
-
-    // !VA appController  
-    // !VA CCP Configuration definitions for TD options and IMG excld radio 
+    // !VA CCP Configuration definitions for TD options and IMG excld radio. Note: option parameter removed due to non-access in the function.
+    
     function configDefault( alias, option ) {
+      console.log('configDefault alias :>> ' + alias +  '; option :>> ' + option);
       // !VA Alias and option are not used yet, are included mainly for debug. 
-      let configObj, reflectArray, radioArray, revealArray, checkedArray;
+      let configObj, reflectArray, radioArray, revealArray, checkedArray, highlightArray;
       // !VA APPOBJ PROPERTIES
       // !VA NOTE: It might be redundant to set input elements to empty strings on init, since that is handled in reflectObject when called from populateCcpProperties. For later...
       Appobj['ccpTblWraprChk'] = false;
@@ -4410,7 +4380,7 @@ ${indent}<![endif]-->`;
       reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd', 'ccpTbwClassTfd' ];
 
       // !VA highlightIcon METHOD: Set the array of elements that should receive a highlight because their Appobj property indicates a preset value
-      highlightArray = [ 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd' ]
+      highlightArray = [ 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd' ];
 
       // !VA revealElements METHOD:
       // !VA If the Appobj property for excldImg is set, then imgExcld is selected, so the default config needs to NOT reveal the anchor txfld and anchor target CCP elements. Revealing them now would overwrite the excldImg config reveal settings.
@@ -4668,7 +4638,7 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from fetchConfigObj to get the HYBRD-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
     function configHybrd( alias, isChecked ) {
-      let checkedArray, radioArray, reflectArray, revealFlag, revealArray, disableFlag, disableArray;
+      let checkedArray, radioArray, reflectArray, revealFlag, revealArray;
       let configObj = {};
 
       // !VA APPOBJ PROPERTIES FOR CONFIGURING THE HYBRID OPTION
@@ -4727,7 +4697,9 @@ ${indent}<![endif]-->`;
 
       // !VA disableElements METHOD
       // !VA Set the flag to disable/enable elements. disableFlag is equal to isChecked - it has a different name here only for transparency's sake. 
-      disableFlag = isChecked;
+      // !VA Branch: 102220A
+      // !VA Deprecated, not accessed
+      // disableFlag = isChecked;
       // !VA Set the array of the elements to be disabled. 
       // !VA Leaving disabling out for now
       // disableArray =  [ 'ccpImgClassTfd', 'ccpTblClassTfd','ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblAlignRdo', 'ccpTblWraprChk', 'ccpTbwClassTfd','ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwAlignRdo' ];
@@ -4802,7 +4774,7 @@ ${indent}<![endif]-->`;
       // !VA APP MESSAGES START
       // !VA Entry point for sorting the three types of messages. Target id is used for all three types. For tooltips, target id is in the event object passed in from the event handler. For msg and err, target id isn't passed because handleAppMessages only takes one parameter -- either the event for tooltips or the appMessCode for msg and err. Problem: Tooltips require the calling element's id because the tooltip shows on mouseenter and has to hide on mouseleave, and the id is required for the mouseleave eventListener. Solution: call showAppMessages with two parameters: targetid, which is either a string for tooltips or false for msg and err, and the second parameter is the appMessContent.
       handleAppMessages: function ( evt ) {
-        let appMessCode, appMessType, appMessContent, duration, appMessContainerId, tooltipTarget, timer;
+        let appMessCode, appMessType, appMessContent, duration, appMessContainerId, tooltipTarget;
         // !VA Duplicate evt into appMessCode - we could just receive the event as appMessCode but it's more transparent to do it explicitly
         appMessCode = evt;
         // !VA If appMessCode is an object, then it originated in an addEventListener, so it must be a tooltip because those are the only appMessages that originate there. Parse the target id from the event and convert it to a valid appMessCode, i.e. underscores instead of hyphens.
@@ -4841,7 +4813,7 @@ ${indent}<![endif]-->`;
         if ( appMessType === 'err' || appMessType === 'msg') {
           // !VA Branch: 102120A
           // !VA What is timer doing here? This doesn't need to be a named function, get rid of it.
-          timer = setTimeout(() => {
+          setTimeout(() => {
             // !VA Read the appMessContent into the tooltip content element
             // !VA Call displayAppMessages with the isTrue parameter = false to undisplay the message after the timeout. 
             UIController.displayAppMessages(false, appMessContainerId, false );
