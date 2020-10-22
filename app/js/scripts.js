@@ -655,10 +655,11 @@ var Witty = (function () {
     // !VA UIController private
 
     // !VA UIController private. Resets the disabled attribute or ccp-disable-ctn class based on the alias of the elements whose selection triggers the disabling. Currently, the only parameter passed is 'default' and the alias parameter isn't accessed. This function actually loops through all the ccp-ctn elements in the document and resets the disable state/class for them. There's probably a better way to do this - that is a lot of elements to loop through to only catch a few of them.
+
     function disableReset( alias ) {
       // !VA Branch: 102220A
-      // !VA alias is always 'default', so the parameter is superfluous. Adding a console call just to access it so the Outline error indicator will disappear
-      console.log('disableReset alias :>> ' + alias);
+      // !VA NOTE: alias is always 'default', so it isn't accessed, including it as a console call and commenting out for now. This results in an error in the Outline view.
+      // console.log('disableReset alias :>> ' + alias);
       let disableArray;
       document.querySelector('#ccp-tbl-wrapr-ipt').disabled = false;
       document.querySelector('#ccp-tbl-wrapr-lbl').classList.remove('ccp-disable-lbl');
@@ -957,11 +958,13 @@ var Witty = (function () {
         }
         function populateCcpProperties(Appobj) {
           // !VA Now initialize Appobj with the CCP element values. This includes ALL CCP elements, including those that are displayed/undisplayed depending on which TDOption or imgType radio is selected. 
-          // !VA TODO: Convert this to Object.keys - ccpUserInput properties aren't used here.
           // !VA Loop through all the ccpUserInput elements and add their values to Appobj. The last three characters ( 11 - last ) are the alias code that identify the input type
           // !VA  radioState and checkboxState are called here before Appobj has been initialized, so the key argument is 'undefined'. This causes checkboxState and radioState to return the attribute value of the queried element as hard-coded in the HTML, thus initializing Appobj. 
           // !VA Branch: 102220A
           // !VA Replace Object.entries with Object.keys, values not accessed here.
+
+
+
           for (const key of Object.keys(ccpUserInput)) {
             if (key.substring( 11 ) === 'Tfd') {
               // !VA Appobj[ key ] is undefined, causing reflectAppobj to return the hard-coded values in the HTML file. These are the Appobj initialization values. These values are currently all empty strings but that could change so the best place to get them is value attribute of the the HTML file, just like the other Appobj init functions below.
@@ -4343,14 +4346,26 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController  
-    // !VA CCP Configuration definitions for TD options and IMG excld radio. Note: option parameter removed due to non-access in the function.
-    
+    // !VA CCP Configuration definitions for TD options and IMG excld radio. Note: alias and option parameters aren't accessed, including them as a console call and commenting out for now. This results in an error in the Outline view.
     function configDefault( alias, option ) {
       console.log('configDefault alias :>> ' + alias +  '; option :>> ' + option);
       // !VA Alias and option are not used yet, are included mainly for debug. 
       let configObj, reflectArray, radioArray, revealArray, checkedArray, highlightArray;
       // !VA APPOBJ PROPERTIES
       // !VA NOTE: It might be redundant to set input elements to empty strings on init, since that is handled in reflectObject when called from populateCcpProperties. For later...
+
+      // !VA Branch: 102220A
+      // !VA First, set ccpTdaOptnsRdo to the TD Options selection. This will always be the option parameter, except on init. On init, configDefault is called with alias = 'default'. On init, populateCcpProperties first populates  and option = true, so create a condition that excludes that case.
+
+      if (Appobj[alias] === 'default' ) { 
+        Appobj['ccpTdaOptnsRdo'] = '';
+      } else {
+        Appobj['ccpTdaOptnsRdo'] = option;
+      }
+      console.log('Appobj[ccpTdaOptnsRdo] :>> ' + Appobj['ccpTdaOptnsRdo']);
+
+
+
       Appobj['ccpTblWraprChk'] = false;
       Appobj['ccpTblHybrdChk'] = false;
       Appobj['ccpImgClassTfd'] = '';
@@ -4391,7 +4406,7 @@ ${indent}<![endif]-->`;
       }
 
       // !VA radioState METHOD: set the elements whose selected value is to be set to the Appobj properties above.
-      radioArray = [  'ccpImgExcldRdo', 'ccpTdaAlignRdo' , 'ccpTdaValgnRdo', 'ccpTblAlignRdo', 'ccpTbwAlignRdo' ];
+      radioArray = [  'ccpImgExcldRdo', 'ccpTdaAlignRdo' , 'ccpTdaValgnRdo', 'ccpTblAlignRdo', 'ccpTbwAlignRdo', 'ccpTdaOptnsRdo' ];
       // !VA checkboxState METHOD: set the checkboxes whose checked value is to be set to the Appobj properties above.
       checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpImgTargtChk'];
       // !VA Make the configuration object to pass to configCCP
@@ -4858,10 +4873,12 @@ ${indent}<![endif]-->`;
           document.querySelector('.content-section').style.display = 'none';
         } 
 
+        // !VA First, populate Appobj with dynamicRegions and fill CCP elements with empty values
         UIController.populateAppobj(Appobj, 'ccp');
 
-        // !VA Set the default config on init
-        configObj = configDefault('default', true );
+
+        // !VA Then set the CCP to configDefault on init. NOTE: the default parameter sets Appobj.ccpTdaOptnsRdo to an empty string, which forces populateCcpProperties to access the hard-coded value from the HTML file. That is the default, i.e. the 'basic' option. That is the mechanism for pre-selecting the 'basic' TD option on reload. Not ideal, but that is a carryover from before we were using configObj for configuration. At least I think that's the way it works :-)
+        configObj = configDefault('default', 'basic' );
         UIController.configCCP(configObj);
 
         // !VA Set up event listeners
