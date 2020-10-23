@@ -499,7 +499,8 @@ var Witty = (function () {
     // !VA UIController private
     // !VA Resets (i.e. adds the ccp-conceal-ctn class) to the container elements for the CPP option section affected by the CCP control associated with the alias. 
     function revealReset( alias ) {
-      let el, mkcssReset = [], defaultArr, defaultReset = [], iswapArr, iswapReset = [], wraprArr,  wraprReset = [], resetArray;
+
+      let el, mkcssReset = [], defaultArr, defaultReset = [], iswapArr, iswapReset = [], bgimgArr, bgimgReset = [], vmlbtArr, vmlbtReset = [], wraprArr,  wraprReset = [], resetArray;
       // !VA Only log if not init
       // if (alias !== 'default' ) { console.log('revealReset running'); }
       // console.log('revealReset alias :>> ' + alias);
@@ -508,6 +509,9 @@ var Witty = (function () {
       defaultArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
       // !VA iswapArr is identical to defaultArr except without ccpImgCbhtmBut - the CB HTML button is not availble for image swap.
       iswapArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
+      // !VA iswapArr is identical to defaultArr except without ccpImgCbhtmBut - the CB HTML button is not availble for image swap.
+      bgimgArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
+      vmlbtArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
       wraprArr = ['ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk', ];
 
 
@@ -523,6 +527,14 @@ var Witty = (function () {
       for (const alias of iswapArr) {
         el = document.querySelector(ccpUserInput[alias]);
         iswapReset.push(el);
+      }
+      for (const alias of bgimgArr) {
+        el = document.querySelector(ccpUserInput[alias]);
+        bgimgReset.push(el);
+      }
+      for (const alias of vmlbtArr) {
+        el = document.querySelector(ccpUserInput[alias]);
+        vmlbtReset.push(el);
       }
       // !VA Array of Table Wrapper elements to reset
       for (const alias of wraprArr) {
@@ -553,6 +565,32 @@ var Witty = (function () {
           el.classList.add('ccp-conceal-ctn');
         }
         resetArray = iswapReset;
+        for (const el of resetArray) {
+          el.classList.add('ccp-conceal-ctn');
+          el.classList.remove('ccp-conceal-ctn');
+        }
+        break;
+      case alias === 'bgimg':
+        // !VA For init, revea; the default configuration
+        // !VA Conceal all elements to reset them
+        // console.log('default reset running');
+        for (const el of document.getElementsByClassName('ccp-ctn')) {
+          el.classList.add('ccp-conceal-ctn');
+        }
+        resetArray = bgimgReset;
+        for (const el of resetArray) {
+          el.classList.add('ccp-conceal-ctn');
+          el.classList.remove('ccp-conceal-ctn');
+        }
+        break;
+      case alias === 'vmlbt':
+        // !VA For init, revea; the default configuration
+        // !VA Conceal all elements to reset them
+        // console.log('default reset running');
+        for (const el of document.getElementsByClassName('ccp-ctn')) {
+          el.classList.add('ccp-conceal-ctn');
+        }
+        resetArray = vmlbtReset;
         for (const el of resetArray) {
           el.classList.add('ccp-conceal-ctn');
           el.classList.remove('ccp-conceal-ctn');
@@ -1153,12 +1191,18 @@ var Witty = (function () {
         })(),
         imgWidth: (function() {
           appObjProp = 'curImgW';
+          if (Appobj.curImgW === 0 || Appobj.curImgW === '') {
+            alert('Attributes.imgWidth: bad curImgW is ' + Appobj.curImgW);
+          }
           str = Appobj[appObjProp];
           retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
         imgHeight: (function() {
           appObjProp = 'curImgH';
+          if (Appobj.curImgH === 0 || Appobj.curImgH === '') {
+            alert('Attributes.imgHeight: bad curImgH is ' + Appobj.curImgH);
+          }
           str = Appobj[appObjProp];
           retObj = returnObject(appObjProp, str);
           return retObj;
@@ -1269,7 +1313,7 @@ var Witty = (function () {
           // !VA TODO: Update this to support tokens, i.e. {{ value }}
           appObjProp = false;
           // !VA 
-          retObj = returnObject( appObjProp, Appobj.ccpImgLoctnTfd + '/' + (Appobj.fileName) );
+          retObj = returnObject( appObjProp, Appobj.ccpImgLoctnTfd + (Appobj.fileName) );
           return retObj;
         })(),
         tdStyle: (function() {
@@ -4607,7 +4651,7 @@ ${indent}<![endif]-->`;
             checkboxState:  { checked: checkedArray },
             disableReset: { alias: 'default' },
             reflectAppobj: { reflect: reflectArray },
-            revealReset: { alias: 'default'},
+            revealReset: { alias: 'bgimg'},
             revealElements: { flag: revealFlag, reveal: revealArray }
           };
           break;
@@ -4649,7 +4693,7 @@ ${indent}<![endif]-->`;
             checkboxState:  { checked: checkedArray },
             disableReset: { alias: 'default' },
             reflectAppobj: { reflect: reflectArray },
-            revealReset: { alias: 'default'},
+            revealReset: { alias: 'vmlbt'},
             revealElements: { flag: revealFlag, reveal: revealArray }
           };
           break;
