@@ -3159,9 +3159,11 @@ ${indent}<![endif]-->`;
     // !VA Called from handleKeydown. Applies the user-entered input value in the Toolbar or CCP, i.e. writes the value to Appobj and, if Toolbar, runs updateCurrentImage which then runs calcViewerSize to update the dynamicElements with the new value.
     // !VA NOTE: This may be a functional dupe of updateCurrentImage
     function applyInputValue(userInputObj) {
+      console.log('applyInputValue running'); 
       // !VA Branch: 102120A
       // !VA Destructure userInputObj into variables
       let { evtTargetVal, appObjProp } = userInputObj;
+      console.log('applyInputValue appObjProp :>> ' + appObjProp);
       let inputObj = {};
       // !VA If the target element value doesn't equal the existing Appobj value, then a new value was user-entered into the input element, so update Appobj with the new value. This is done in ALL cases, including curImgW and curImgH. Otherwise, evtTargetValue is unchanged, so do nothing, i.e. blur and leave the input value unchanged. An else clause is not necessary here, but it's included for possible error checking and console logging. 
       if ( evtTargetVal !== Appobj[appObjProp]) {
@@ -3177,6 +3179,19 @@ ${indent}<![endif]-->`;
         inputObj.appObjProp = appObjProp;
         updateCurrentImage(inputObj);
       }
+
+      console.log('appObjProp.substring( 0, 3 ) :>> ' + appObjProp.substring( 0, 3 ));
+
+      // !VA Branch: 102220A
+      // !VA Run calcCcpInputs on curImgW and curImgH to make sure the dependent CCP input values are consistent with other CCP input values.
+      if (appObjProp.includes('curImg')) {
+        calcCcpInputs( inputObj );
+      } else {
+        console.log('applyInputValue - unknown condition');
+      }
+
+
+
     }
 
     // !VA appController private
@@ -3345,8 +3360,8 @@ ${indent}<![endif]-->`;
       // !VA There are two ways to blur without a value. 1) The user enters a 0 and blurs or 2) the user deletes the existing value or blurs with an empty input. In both cases, if the target is a padding input, the dependent TD Width input value needs to be removed if BOTH padding inputs are empty. Handle both cases now. Note: The handler for removing the TD Height value if both padding inputs are empty is found in handlePaddingInput.  
       // !VA IMPORTANT - This doesn't apply to curImgW and curImgH. Those can never have a null or zero value. So condition the zero value handler to skip them
 
-      // !VA Skip straight to handleUserInput if appObjProp contains curImg
-      if (!appObjProp.includes('curImg')) {
+      // !VA Skip straight to handleUserInput if appObjProp is a Toolbar input, which cannot have a 0 or empty value
+      if (appObjProp.substring( 0, 3) === 'ccp') {
         if ( Number(userInputObj.evtTargetVal) === 0 ) { 
           // !VA If the target input value is 0, convert it to empty, set the Appobj property to empty and reflect that to the CCP.
           if (Number(userInputObj.evtTargetVal) === 0) {
@@ -3365,16 +3380,11 @@ ${indent}<![endif]-->`;
           // !VA If the target value is not zero or empty, run the input error check to get retVal
           retVal = handleUserInput(userInputObj);
         }
-      // !VA If appObjProp is curImgW or curImgH, run handleUserInput without the zero value handler
+      // !VA If appObjProp is a toolbar input, run handleUserInput without the zero value handler
       } else {
         // console.log('Zero value handler skipped');
         retVal = handleUserInput(userInputObj);
       }
-
-
-
-
-
 
       // !VA Now make sure retVal is number and set it to evtTargetval before handling the padding blur.
       if (typeof(retVal) === 'number') {
@@ -3406,8 +3416,6 @@ ${indent}<![endif]-->`;
           this.value = '';
         }
       }
-      console.log('Appobj.curImgW :>> ' + Appobj.curImgW);
-      console.log('Appobj.curImgH :>> ' + Appobj.curImgH);
       // !VA Branch: 102320A
       if (Appobj.curImgW === '' ) {
         alert('ERROR in handleBlur - Appobj.curImgW is empty ');
@@ -3503,11 +3511,17 @@ ${indent}<![endif]-->`;
             // console.log('TOOLBAR INPUT: VALUE APPIED');
             // !VA Replace userInputObj.evtTargetVal with retVal here, otherwise userInputObj.evtTargetVal will be passed to applyInputValue as type 'string'
             userInputObj.evtTargetVal = retVal;
+            // !VA Branch: 102220A
+            // !VA calcCcpInputs is run from applyInputValue for toolbar inputs
             applyInputValue(userInputObj);
           // !VA If the target is a CCP element, set the Appobj property value to the value returned from checkUserInput
           } else if ( ccpIptAliases.includes( appObjProp )) {
             // console.log('handleUserInput CCP INPUT: VALUE APPLIED');
             evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = retVal;
+            // !VA Branch: 102220A
+
+            calcCcpInputs( userInputObj );
+
           }
         // !VA Otherwise, checkUserInput returned false so the target value is invalid. Return FALSE to handleKeydown for TAB and ENTER key handling.
         } else {
@@ -3656,6 +3670,10 @@ ${indent}<![endif]-->`;
       userInputObj.evtTargetVal = retVal;
       // !VA Now destructure to get appObjProp. For the value, continue to use retVal.
       const { appObjProp } = userInputObj;
+      console.log('checkNumericInput appObjProp :>> ' + appObjProp);
+      console.log('Appobj.ccpTdaWidthTfd :>> ' + Appobj.ccpTdaWidthTfd);
+      console.log('Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
+
 
       // !VA If validateInteger returned false to retVal, then there is an error condition with the input value.
       if (!retVal) {
@@ -3690,6 +3708,8 @@ ${indent}<![endif]-->`;
             // !VA errorHandler!
             isErr = true;
             appMessCode = 'err_imgW_GT_viewerW';
+          } else {
+            calcCcpInputs(userInputObj);
           }
           break;
         // !VA TODO: Handle the imageheight toolButton input
@@ -3716,13 +3736,17 @@ ${indent}<![endif]-->`;
           break;
         // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply - exclude rdoCcpTdExcludeimg from the error condition
         case (appObjProp === 'ccpTdaWidthTfd') :
-          if (Appobj.rdoCcpTdExcludeimg) { 
+          if (Appobj.rdoCcpTdExcludeimg !== 'excld') {
+            console.log('BOO');
             if ( Appobj.ccpTblWidthTfd === '' ) {
               console.log('Appobj.ccpTblWidthTfd is EMPTY');
             }
             else if ( retVal > Appobj.ccpTblWidthTfd ) {
               isErr = true;
               appMessCode = 'err_table_cell_wider_than_parent_table';
+            } else if ( retVal < Appobj.curImgW ) {
+              isErr = true;
+              appMessCode = 'err_cell_smaller_than_image';
             }
           } 
           if ( retVal > Appobj.imgViewerW ) {
@@ -3731,7 +3755,6 @@ ${indent}<![endif]-->`;
           }
           break;
         case (appObjProp === 'ccpTblWidthTfd') :
-          console.log('HIT');
           // !VA Branch: 102020B
           // !VA Changed old reference to rdoCcpTdExcludeimg
           // !VA If imgExcld 'excld' is checked then the TBL W input can't exceed the viewer width and cannot be less than the TD Width
@@ -3740,12 +3763,7 @@ ${indent}<![endif]-->`;
               isErr = true;
               console.log('larger than imgViewerW');
               appMessCode = 'err_table_wider_than_wrapper';
-            } else if ( retVal < Appobj.ccpTdaWidthTfd ) {
-              // !VA The value cannot be less than the TD Width value
-              console.log('err_table_cell_wider_than_parent_table');
-              isErr = true;
-              appMessCode = 'err_table_cell_wider_than_parent_table';
-            }
+            } 
           } else {
             // !VA If imgExcld 'incld' is checked, then retVal can't exceed Appobj.curImgW or be greater than the current imgViewer width
             if (retVal < Appobj.curImgW ) {
@@ -3755,6 +3773,11 @@ ${indent}<![endif]-->`;
             } else if ( retVal > Appobj.imgViewerW ) {
               isErr = true;
               appMessCode = 'err_parent_table_wider_than_wrapper_table';
+            } else if ( retVal < Appobj.ccpTdaWidthTfd ) {
+              // !VA The value cannot be less than the TD Width value
+              console.log('err_table_cell_wider_than_parent_table');
+              isErr = true;
+              appMessCode = 'err_table_cell_wider_than_parent_table';
             }
           }
           break;
@@ -3815,6 +3838,66 @@ ${indent}<![endif]-->`;
       retVal = evtTargetVal;
       return retVal;
     }
+
+    // !VA appController private
+    // !VA This function calculates CCP input values based on curImgW, curImgH and other CCP input values. It also serves as secondary error checking, i.e. not checking the input per se but rather checking the input in relation to other Appobj properties which may or may not have been populated by the time checkNumericInput was run
+    function calcCcpInputs(userInputObj) {
+      console.log('calcCcpInputs running');
+      let isErr, appMessCode, reflectArray = [], configObj = {};
+      let { evtTargetVal, appObjProp } = userInputObj;
+      console.log('calcCcpInputs appObjProp :>> ' + appObjProp);
+      console.log('calcCcpInputs evtTargetVal :>> ' + evtTargetVal);
+      console.log('Appobj.ccpTdaWidthTfd :>> ' + Appobj.ccpTdaWidthTfd);
+      console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
+      console.log('Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
+
+
+      
+      switch(true) {
+      case (appObjProp === 'curImgW' || appObjProp === 'curImgH'):
+        if (Appobj.ccpTdaWidthTfd) {
+          if (evtTargetVal < Appobj.ccpTdaWidthTfd ) {
+            Appobj.ccpTblWidthTfd = Appobj.ccpTdaWidthTfd;
+            reflectArray = [ 'ccpTblWidthTfd' ];
+          }
+        }
+        break;
+      default:
+        // code block
+      } 
+
+      configObj = {
+        reflectAppobj: { reflect: reflectArray },
+      };
+      UIController.configCCP( configObj );
+
+
+      // console.log('ccpUserInput[appObjProp] :>> ' + ccpUserInput[appObjProp]);
+
+
+      // !VA Error condition - pass the appMessCode to handleAppMessages
+      if (isErr) {
+        // !VA IF Error pass the code to errorHandler to get the error message
+        appController.handleAppMessages( appMessCode );
+        // if (appObjProp.substring( 0, 3) === 'ccp') {
+
+        // }
+
+
+
+      } else {
+        // !VA If no error...
+        isErr = false;
+      }
+
+
+    }
+
+
+
+
+
+
 
     // !VA appController  
     // !VA Called from applyInputValue and handleMouseEvents. Writes imgViewerW, sPhonesW and lPhonesW to localStorage and calculates the adjacent side of the curImgW/curImgH input, then runs calcViewerSize to resize the dynamicElements containers. NOTE: This function does things that are done elsewhere and does other things that it shouldn't do. Revisit this at some point but for now it works.
