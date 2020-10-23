@@ -3343,25 +3343,38 @@ ${indent}<![endif]-->`;
       let { appObjProp } = userInputObj;
       // !VA Get the return val from handlerUserInput - empty string, valid input or FALSE for error. Note; handleUserInput also sets the Appobj property of appObjProp if the input is valid.
       // !VA There are two ways to blur without a value. 1) The user enters a 0 and blurs or 2) the user deletes the existing value or blurs with an empty input. In both cases, if the target is a padding input, the dependent TD Width input value needs to be removed if BOTH padding inputs are empty. Handle both cases now. Note: The handler for removing the TD Height value if both padding inputs are empty is found in handlePaddingInput.  
-      // !VA If the target input value is 0 or empty - NOTE: This does not trap curImgW nd curImgH, so they are unnecessarily passed to configCCP and have to be handled there. Not good, but not fixing for now.
-      if ( Number(userInputObj.evtTargetVal) === 0 ) { 
-        // !VA If the target input value is 0, convert it to empty, set the Appobj property to empty and reflect that to the CCP.
-        if (Number(userInputObj.evtTargetVal) === 0) {
-          Appobj[appObjProp] = '';
-          reflectArray = [ appObjProp ];
-          configObj = {
-            reflectAppobj: { reflect: reflectArray },
-          };
-          UIController.configCCP( configObj);
+      // !VA IMPORTANT - This doesn't apply to curImgW and curImgH. Those can never have a null or zero value. So condition the zero value handler to skip them
+
+      // !VA Skip straight to handleUserInput if appObjProp contains curImg
+      if (!appObjProp.includes('curImg')) {
+        if ( Number(userInputObj.evtTargetVal) === 0 ) { 
+          // !VA If the target input value is 0, convert it to empty, set the Appobj property to empty and reflect that to the CCP.
+          if (Number(userInputObj.evtTargetVal) === 0) {
+            Appobj[appObjProp] = '';
+            reflectArray = [ appObjProp ];
+            configObj = {
+              reflectAppobj: { reflect: reflectArray },
+            };
+            UIController.configCCP( configObj);
+          }
+          // !VA Now that the zero case is handled and evtTargetVal is empty, handle the padding blur
+          if ( evt.target.id.substring( 8 , 10 ) === 'pd') {
+            handlePaddingBlur( userInputObj);
+          } 
+        } else {
+          // !VA If the target value is not zero or empty, run the input error check to get retVal
+          retVal = handleUserInput(userInputObj);
         }
-        // !VA Now that the zero case is handled and evtTargetVal is empty, handle the padding blur
-        if ( evt.target.id.substring( 8 , 10 ) === 'pd') {
-          handlePaddingBlur( userInputObj);
-        } 
+      // !VA If appObjProp is curImgW or curImgH, run handleUserInput without the zero value handler
       } else {
-        // !VA If the target value is not zero or empty, run the input error check to get retVal
+        // console.log('Zero value handler skipped');
         retVal = handleUserInput(userInputObj);
       }
+
+
+
+
+
 
       // !VA Now make sure retVal is number and set it to evtTargetval before handling the padding blur.
       if (typeof(retVal) === 'number') {
@@ -3393,6 +3406,17 @@ ${indent}<![endif]-->`;
           this.value = '';
         }
       }
+      console.log('Appobj.curImgW :>> ' + Appobj.curImgW);
+      console.log('Appobj.curImgH :>> ' + Appobj.curImgH);
+      // !VA Branch: 102320A
+      if (Appobj.curImgW === '' ) {
+        alert('ERROR in handleBlur - Appobj.curImgW is empty ');
+      }
+      if (Appobj.curImgH === '' ) {
+        alert('ERROR in handleBlur - Appobj.curImgH is empty ');
+      }
+
+
     }
 
     // !VA appController   
