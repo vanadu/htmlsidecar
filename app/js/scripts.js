@@ -1504,6 +1504,7 @@ var Witty = (function () {
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
     function buildOutputNodeList( id ) {
       console.log('buildOutputNodeList running'); 
+      console.log('id :>> ' + id);
       let selectedTdOption, hasAnchor, hasWrapper, Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
       // !VA Set hasAnchor if ccpImgAnchrTfd has a value
       appController.getAppobj('ccpImgAnchrTfd')  ? hasAnchor = true : hasAnchor = false;
@@ -2413,6 +2414,8 @@ ${indent}<![endif]-->`;
     // function  makeCssRule( id, classname, wval, hval ) {
     // !VA Called from doClipboard. Generate clipboard strings for CSS output
     function makeCssRule( id ) {
+      console.log('makeCssRule running'); 
+
 
       let Attributes = [];
       Attributes = getAttributes();
@@ -2445,6 +2448,7 @@ ${indent}<![endif]-->`;
       switch(true) {
       // !VA Build the CSS clipboard output strings
       case (id.includes('img-cbdtp')):
+
         clipboardStr = `img.${Attributes.imgClass.str} { width: ${curImgW}px !important; height: ${curImgH}px !important; }`;
         break;
       case (id.includes('img-cbsph')):
@@ -3277,7 +3281,7 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Handles padding inputs from handlePaddingBlur (for width padding inputs) and handlePaddingInput (for height padding inputs). The caller argument is a debug argument that passes the name of the calling function and can be removed from this and the callers for production.
     function handlePadding( caller, userInputObj ) {
-      console.log(`handlePadding called by ${caller} running`);
+      // console.log(`handlePadding called by ${caller} running`);
       let tmp, reflectArray, highlightArray;
       let imgInputObj = {}, configObj = {};
       // !VA Destructure userInputObj
@@ -3437,6 +3441,7 @@ ${indent}<![endif]-->`;
       let userInputObj = { };
       // !VA Handle the click event
       if (evt.type === 'click') {
+        console.log('evt.target.id :>> ' + evt.target.id);
         // !VA Set userInputObj.appObjProp to curImgW because that is the Appobj property that the increment/decrement buttons modify
         userInputObj.appObjProp = 'curImgW';
         // !VA Get the 8 char identifier for Toolbar buttons. These are the increment/decrement buttons
@@ -3472,6 +3477,8 @@ ${indent}<![endif]-->`;
     // !VA Called from handleKeydown and handleBlur to handle CCP element user input. Runs checkUserInput to check for error conditions and returns either an empty string, a valid value or FALSE to the caller.
     // !VA NOTE: There was a priorVal variable earlier that stored evt.target.val for use with CCP inputs because at that time CCP inputs weren't immediately stored in Appobj. Keep an eye on that - currently all CCP values are stored to Appobj.
     function handleUserInput( userInputObj ) {
+      console.log('handleUserInput userInputObj :>> ');
+      console.log(userInputObj);
       let retVal;
       let tbrIptAliases = [], imgIptAliases = [], ccpIptAliases = [];
       // let configObj = {};
@@ -3538,7 +3545,7 @@ ${indent}<![endif]-->`;
     // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Calls handleUserInput which validates the input and returns either an integer or a string and passes the value to applyInputValue to write to Appobj and the DOM. Then, for curImgW/curImgH, sets the input value to '' so the placeholder shows through. For all other input elements, sets the input value to the respective Appobj property.
     // !VA NOTE: Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances to the next field.
     function handleKeydown(evt) {
-      let retVal;
+      let retVal, reflectArray = [], highlightArray = [], configObj = {};
       // !VA Get the keypress
       let keydown = evt.which || evt.keyCode || evt.key;
       // !VA userInputObj is the array containing the values needed to evaluate input based on whether the target is a Toolbar element or a CCP element. userInputObj includes the target's value and Appobj property/ccpUserInput alias.
@@ -3548,13 +3555,57 @@ ${indent}<![endif]-->`;
         // !VA elemIdToAppobjProp gets the Appobj key that corresponds to a given element ID. Write that Appobj property/ccpUserInput alias to the appObjProp property of the userInputObj object.
         userInputObj.appObjProp = elemIdToAppobjProp(evt.target.id);
         // !VA evtTargetVal is the value the user entered into the input element.
+
+
+        console.log('evt.target.value :>> ' + evt.target.value);
+    
         userInputObj.evtTargetVal = evt.target.value;
+        console.log('userInputObj.evtTargetVal :>> ' + userInputObj.evtTargetVal);
         // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp locally.  
         let { appObjProp } = userInputObj;
         // !VA Call handleUserInput to validate the user input and process it based on the input type (i.e. Toolbar or CCP input). retVal will return either an empty string, a valid value, or FALSE if checkUserInput detects an input error.
         if (keydown === 13) {
           // console.log('ENTER key');
-          retVal = handleUserInput(userInputObj);
+          console.log('handleKeydown userInputObj :>> ');
+          console.log(userInputObj);
+          console.log('retVal :>> ' + retVal);
+
+          // !VA Branch: 102240A
+          // !VA Handling zero values now on ENTER the same way they are handled in handleBlur. '
+          // !VA TODO: In fact, this is the exact same routine, so DRYify it in a private function. 
+
+
+          // !VA Skip straight to handleUserInput if appObjProp is a Toolbar input, which cannot have a 0 or empty value
+          if (appObjProp.substring( 0, 3) === 'ccp') {
+            if ( Number(userInputObj.evtTargetVal) === 0 ) { 
+              // !VA If the target input value is 0, convert it to empty, set the Appobj property to empty and reflect that to the CCP.
+              if (Number(userInputObj.evtTargetVal) === 0) {
+                Appobj[appObjProp] = '';
+                reflectArray = highlightArray = [ appObjProp ];
+                configObj = {
+                  highlightIcon: { highlight: highlightArray },
+                  reflectAppobj: { reflect: reflectArray }
+                };
+                UIController.configCCP( configObj);
+              }
+              // !VA Now that the zero case is handled and evtTargetVal is empty, handle the padding blur
+              if ( evt.target.id.substring( 8 , 10 ) === 'pd') {
+                handlePaddingBlur( userInputObj);
+              } 
+            } else {
+              // !VA If the target value is not zero or empty, run the input error check to get retVal
+              retVal = handleUserInput(userInputObj);
+            }
+          // !VA If appObjProp is a toolbar input, run handleUserInput without the zero value handler
+          } else {
+            // console.log('Zero value handler skipped');
+            retVal = handleUserInput(userInputObj);
+          }
+
+
+
+
+
           if ( retVal === false) { 
             if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
               this.select();
@@ -3842,14 +3893,14 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA This function calculates CCP input values based on curImgW, curImgH and other CCP input values. It also serves as secondary error checking, i.e. not checking the input per se but rather checking the input in relation to other Appobj properties which may or may not have been populated by the time checkNumericInput was run
     function calcCcpInputs(userInputObj) {
-      console.log('calcCcpInputs running');
+      // console.log('calcCcpInputs running');
       let isErr, appMessCode, reflectArray = [], configObj = {};
       let { evtTargetVal, appObjProp } = userInputObj;
-      console.log('calcCcpInputs appObjProp :>> ' + appObjProp);
-      console.log('calcCcpInputs evtTargetVal :>> ' + evtTargetVal);
-      console.log('Appobj.ccpTdaWidthTfd :>> ' + Appobj.ccpTdaWidthTfd);
-      console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
-      console.log('Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
+      // console.log('calcCcpInputs appObjProp :>> ' + appObjProp);
+      // console.log('calcCcpInputs evtTargetVal :>> ' + evtTargetVal);
+      // console.log('Appobj.ccpTdaWidthTfd :>> ' + Appobj.ccpTdaWidthTfd);
+      // console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
+      // console.log('Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
 
 
       
