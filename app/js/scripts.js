@@ -1736,11 +1736,23 @@ var Witty = (function () {
       let td_switchcontainerAttr, table_switchparentAttr, tr_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr, tr_switchchild1Attr, td_switchcontent1Attr, a_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, tr_switchchild2Attr, td_switchcontent2Attr; 
       // !VA Make the nodeList from the container passed in from makePosSwitchNodes to apply the attributes to.
       nodeList = container.querySelectorAll( '*' );
+      // !VA Branch: 102520A
+      console.log('nodeList :>> ');
+      console.log(nodeList);
       // !VA Build the objects that contain the attributes that will be set on the nodeList nodes.
       // !VA If the class input element under td options is empty, do nothing, otherwise add the class to the container TD and set the class attribute
       !Attributes.tdClass.str ? !Attributes.tdClass.str : nodeList[0].setAttribute('class', Attributes.tdClass.str);
       // !VA If the bkgrnd color input element under td options is empty, do nothing, otherwise add the bkgrnd color to the container TD and set the bgcolor attribute
       !Attributes.tdBgcolor.str ? !Attributes.tdBgcolor.str : nodeList[0].setAttribute('bgcolor', Attributes.tdBgcolor.str);
+
+
+      // !VA Branch: 102520A
+      // !VA Dealing with padding... 
+      if (Attributes.tdStyle.str) { nodeList[6].setAttribute( 'style', Attributes.tdStyle.str )}
+
+
+
+
       // !VA Add the rest of the attributes to the nodes
       td_switchcontainerAttr = {
         dir: 'rtl',
@@ -1766,6 +1778,7 @@ var Witty = (function () {
         class: 'stack-column-center'
       };
       table_switchchild1Attr = {
+        class: 'devicewidth',
         role: 'presentation',
         border: '0',
         width: '100%',
@@ -1783,9 +1796,11 @@ var Witty = (function () {
       };
       a_switchcontent1Attr = {
         href: '#',
-        color: 'red'
+        color: Attributes.imgAnchorTxtclr.str,
+        target: "_blank"
       };
       img_switchcontent1Attr = {
+        class: Attributes.imgClass.str,
         width: Attributes.imgWidth.str,
         height: Attributes.imgHeight.str,
         style: Attributes.imgStyle.str,
@@ -1798,6 +1813,7 @@ var Witty = (function () {
       };
       table_switchchild2Attr = {
         role: 'presentation',
+        class: 'devicewidth',
         border: '0',
         width: '100%',
         cellPadding: '0',
@@ -1814,6 +1830,14 @@ var Witty = (function () {
       };
       // !VA Create the array with the attribute objects. We use this array to cycle through the nodeList and apply the attributes to the individual nodes. I tried many ways to do this but was not able to assign these objects to the individual nodes any other way than to loop through them ensuring that the array and nodeList length were identical. If there is a way to assign attributes to nodes using the node ID as index, I'd like to learn that technique.
       nodeAttributes = [ td_switchcontainerAttr, table_switchparentAttr,  tr_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr,  tr_switchchild1Attr, td_switchcontent1Attr, a_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, tr_switchchild2Attr, td_switchcontent2Attr ];
+
+
+      // !VA Branch: 102520A
+      // !VA Adding text content to node 12, i.e. the non-image column content by adding a text node would create issues with the indent handler because the text node has no indent. Best to use the existing handler in applyIndents and just add text instead of a comment using the innerHTML property. 
+
+      // var plText = document.createTextNode('Replace this text with your content.\n');
+      // nodeList[12].appendChild(plText);
+
 
       // !VA Remove the anchor attributes from the array if the Include anchor checkbox is not checked. The a tag is at position 7 in the attributes array.
       // !VA Query Appobj for img anchor state
@@ -2218,8 +2242,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
               outputNL[i].insertAdjacentHTML('beforeend', getIndent(stackColumnIndentLevel));
             }
             // !VA We still need to add some indicator content to the terminating TD in this nodeList -- putting it in the makePosSwitchNode function itself would make it impossible to indent properly without some creative coding that's beyond my ability. So. we'll put it here, after the indent has been shrunk to be equal to the nextSibling's indent. It will always be added to the last node in the tree, i.e. the nodeList length - 1.
+            // !VA Branch: 102520A
+            // !VA If non-comment text is added to the posswitch TD, then this handler needs to be deleted. So commenting this out for now.
             if ( i === outputNL.length - 1) {
-              outputNL[i].innerHTML = '\n' + getIndent(stackColumnIndentLevel) + '  <!-- ADD YOUR CONTENT HERE --> \n' + getIndent(stackColumnIndentLevel);
+              outputNL[i].innerHTML = '\n' + getIndent(stackColumnIndentLevel) + 'Replace this placeholder text with your content to make the content appear at left of the image in desktop view and above the image in mobile view. \n' + getIndent(stackColumnIndentLevel);
             }
             try {
               !outputNL;
