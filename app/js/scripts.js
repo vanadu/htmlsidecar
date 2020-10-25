@@ -1778,7 +1778,7 @@ var Witty = (function () {
       };
       td_switchcontent1Attr = {
         dir: 'ltr',
-        align: 'left',
+        align: 'center',
         vAlign: 'top'
       };
       a_switchcontent1Attr = {
@@ -1809,7 +1809,7 @@ var Witty = (function () {
       };
       td_switchcontent2Attr = {
         dir: 'ltr',
-        align: 'left',
+        align: 'center',
         vAlign: 'top'
       };
       // !VA Create the array with the attribute objects. We use this array to cycle through the nodeList and apply the attributes to the individual nodes. I tried many ways to do this but was not able to assign these objects to the individual nodes any other way than to loop through them ensuring that the array and nodeList length were identical. If there is a way to assign attributes to nodes using the node ID as index, I'd like to learn that technique.
