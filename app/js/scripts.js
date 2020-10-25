@@ -3213,9 +3213,9 @@ ${indent}<![endif]-->`;
       console.log('appObjProp.substring( 0, 3 ) :>> ' + appObjProp.substring( 0, 3 ));
 
       // !VA Branch: 102220A
-      // !VA Run calcCcpInputs on curImgW and curImgH to make sure the dependent CCP input values are consistent with other CCP input values.
+      // !VA Run recalcAppob on curImgW and curImgH to make sure the dependent CCP input values are consistent with other CCP input values.
       if (appObjProp.includes('curImg')) {
-        calcCcpInputs( inputObj );
+        recalcAppob( inputObj );
       } else {
         console.log('applyInputValue - unknown condition');
       }
@@ -3322,6 +3322,7 @@ ${indent}<![endif]-->`;
         // !VA Now set the Appobj property of the current image element to be shrunk, i.e. curImgW.
         imgInputObj.appObjProp = 'curImgW';
         // !VA updateCurrentImage sets Appobj.ccpTblWidthTfd to curImgW in resizeContainers. Override that here to display the padding-dependent value for TBL width.
+        // !VA IMPORTANT: Note that TBL Width doesn't change - what changes is curImgW. 
         tmp = Appobj.ccpTblWidthTfd;
         // !VA Shrink the image. 
         appController.initUpdateCurrentImage(imgInputObj);
@@ -3545,7 +3546,7 @@ ${indent}<![endif]-->`;
             // !VA Replace userInputObj.evtTargetVal with retVal here, otherwise userInputObj.evtTargetVal will be passed to applyInputValue as type 'string'
             userInputObj.evtTargetVal = retVal;
             // !VA Branch: 102220A
-            // !VA calcCcpInputs is run from applyInputValue for toolbar inputs
+            // !VA recalcAppob is run from applyInputValue for toolbar inputs
             applyInputValue(userInputObj);
           // !VA If the target is a CCP element, set the Appobj property value to the value returned from checkUserInput
           } else if ( ccpIptAliases.includes( appObjProp )) {
@@ -3553,7 +3554,7 @@ ${indent}<![endif]-->`;
             evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = retVal;
             // !VA Branch: 102220A
 
-            calcCcpInputs( userInputObj );
+            recalcAppob( userInputObj );
 
           }
         // !VA Otherwise, checkUserInput returned false so the target value is invalid. Return FALSE to handleKeydown for TAB and ENTER key handling.
@@ -3627,10 +3628,6 @@ ${indent}<![endif]-->`;
             // console.log('Zero value handler skipped');
             retVal = handleUserInput(userInputObj);
           }
-
-
-
-
 
           if ( retVal === false) { 
             if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
@@ -3786,7 +3783,7 @@ ${indent}<![endif]-->`;
             isErr = true;
             appMessCode = 'err_imgW_GT_viewerW';
           } else {
-            calcCcpInputs(userInputObj);
+            recalcAppob(userInputObj);
           }
           break;
         // !VA TODO: Handle the imageheight toolButton input
@@ -3917,16 +3914,19 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
-    // !VA This function calculates CCP input values based on curImgW, curImgH and other CCP input values. It also serves as secondary error checking, i.e. not checking the input per se but rather checking the input in relation to other Appobj properties which may or may not have been populated by the time checkNumericInput was run
-    function calcCcpInputs(userInputObj) {
-      // console.log('calcCcpInputs running');
+    // !VA Called from checkNumericInput, applyInputValue, This function calculates CCP input values based on curImgW, curImgH and other CCP input values. It also serves as secondary error checking, i.e. not checking the input per se but rather checking the input in relation to other Appobj properties which may or may not have been populated by the time checkNumericInput was run.
+    // !VA IMPORTANT: Padding-related input value changes are handled in handlePadding.
+    function recalcAppob(userInputObj) {
+      console.log('recalcAppob running');
       let isErr, appMessCode, reflectArray = [], configObj = {};
       let { evtTargetVal, appObjProp } = userInputObj;
-      // console.log('calcCcpInputs appObjProp :>> ' + appObjProp);
-      // console.log('calcCcpInputs evtTargetVal :>> ' + evtTargetVal);
+      // console.log('recalcAppob appObjProp :>> ' + appObjProp);
+      // console.log('recalcAppob evtTargetVal :>> ' + evtTargetVal);
       // console.log('Appobj.ccpTdaWidthTfd :>> ' + Appobj.ccpTdaWidthTfd);
       // console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
       // console.log('Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
+      console.log('Appobj.sPhonesW :>> ' + Appobj.sPhonesW);
+      console.log('Appobj.lPhonesW :>> ' + Appobj.lPhonesW);
 
 
       
@@ -3937,6 +3937,18 @@ ${indent}<![endif]-->`;
             Appobj.ccpTblWidthTfd = Appobj.ccpTdaWidthTfd;
             reflectArray = [ 'ccpTblWidthTfd' ];
           }
+        }
+        break;
+      case (appObjProp === 'ccpTdaPdrgtTfd' || appObjProp === 'ccpTdaPdlftTfd'):
+        console.log('HIT');
+        // !VA Handle changes to the sPhonesW and lPhonesW input fields. When padding width inputs have values, sPhonesW and lPhonesW are reduced by the sum of those values. 
+        // !VA IMPORTANT: Recalc for sPhonesW and lPhonesW only show in the Inspectors. That's not the result I antipicated with this, but it's really optimal - it does not affect the localStorage values for sPhonesW and lPhonesW or the sPhonesW or lPhonesW Toolbar inputs. 
+        // !VA NOTE: Padding does not recalc TBL Width or TDA Width, although it does recalc TDA Height. For that reason, the reflect config for the TBL and TDA width and height inputs are in handlePadding, not here.
+        // !VA NOTE: Curly brackets allow variable definition in conditions
+        {
+          let padWidth = Appobj.ccpTdaPdrgtTfd + Appobj.ccpTdaPdlftTfd;
+          Appobj.sPhonesW = Appobj.sPhonesW - padWidth;
+          Appobj.lPhonesW = Appobj.lPhonesW - padWidth;
         }
         break;
       default:
