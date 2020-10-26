@@ -1741,16 +1741,13 @@ var Witty = (function () {
       console.log(nodeList);
       // !VA Build the objects that contain the attributes that will be set on the nodeList nodes.
       // !VA If the class input element under td options is empty, do nothing, otherwise add the class to the container TD and set the class attribute
-      !Attributes.tdClass.str ? !Attributes.tdClass.str : nodeList[0].setAttribute('class', Attributes.tdClass.str);
+      if (Attributes.tdClass.str) { nodeList[0].setAttribute('class', Attributes.tdClass.str); } 
       // !VA If the bkgrnd color input element under td options is empty, do nothing, otherwise add the bkgrnd color to the container TD and set the bgcolor attribute
-      !Attributes.tdBgcolor.str ? !Attributes.tdBgcolor.str : nodeList[0].setAttribute('bgcolor', Attributes.tdBgcolor.str);
-
-
+      if (Attributes.tdBgcolor.str) { nodeList[0].setAttribute('bgcolor', Attributes.tdBgcolor.str); }
       // !VA Branch: 102520A
-      // !VA Dealing with padding... 
-      if (Attributes.tdStyle.str) { nodeList[6].setAttribute( 'style', Attributes.tdStyle.str )}
-
-
+      // !VA Include the padding style property in the image column, i.e. nodeList[6]. 
+      if (Attributes.tdStyle.str) { nodeList[6].setAttribute( 'style', Attributes.tdStyle.str );}
+      // if (Attributes.imgStyle.str) { nodeList[6].setAttribute( 'class', Attributes.imgStyle.str ); }
 
 
       // !VA Add the rest of the attributes to the nodes
@@ -1765,7 +1762,6 @@ var Witty = (function () {
       table_switchparentAttr = {
         role: 'presentation',
         border: '0',
-        width: '100%',
         cellPadding: '0',
         cellSpacing: '0'
       };
@@ -1833,18 +1829,20 @@ var Witty = (function () {
 
 
       // !VA Branch: 102520A
-      // !VA Adding text content to node 12, i.e. the non-image column content by adding a text node would create issues with the indent handler because the text node has no indent. Best to use the existing handler in applyIndents and just add text instead of a comment using the innerHTML property. 
+      // !VA Delete the properties for which there is no Attributes value. First, add them to the object definition above, and then delete them. If you add them here, then they appear as the last property in the object, and thus are output at the end of the clipboard string instead of the beginning.
 
-      // var plText = document.createTextNode('Replace this text with your content.\n');
-      // nodeList[12].appendChild(plText);
-
+      if (!Attributes.imgClass.str) { delete img_switchcontent1Attr.class }
+      if (!Attributes.imgAnchorTargt.str) { delete a_switchcontent1Attr.target; }
+      if (!Attributes.imgAnchorTxtclr.str) { delete a_switchcontent1Attr.color; }
 
       // !VA Remove the anchor attributes from the array if the Include anchor checkbox is not checked. The a tag is at position 7 in the attributes array.
       // !VA Query Appobj for img anchor state
-      if ( appController.getAppobj('ccpImgAnchrTfd') === '') {
-        index = 7;
-        nodeAttributes.splice(index, 1);
-      }
+      // !VA Branch: 102520A
+      // !VA Deprecated, all this is in Attributes now.
+      // if ( appController.getAppobj('ccpImgAnchrTfd') === '') {
+      //   index = 7;
+      //   nodeAttributes.splice(index, 1);
+      // }
 
 
       // !VA Assign the attributes to the nodes using the length of the nodeAttribute array as index.
@@ -3915,21 +3913,22 @@ ${indent}<![endif]-->`;
 
     // !VA appController private
     // !VA Called from checkNumericInput, applyInputValue, This function calculates CCP input values based on curImgW, curImgH and other CCP input values. It also serves as secondary error checking, i.e. not checking the input per se but rather checking the input in relation to other Appobj properties which may or may not have been populated by the time checkNumericInput was run.
-    // !VA IMPORTANT: Padding-related input value changes are handled in handlePadding.
+    // !VA IMPORTANT: Padding-related TBL and TDA width/height input value changes are handled in handlePadding. Padding-related sPhoneW/lPhoneW values are handled here.
     function recalcAppob(userInputObj) {
       console.log('recalcAppob running');
       let isErr, appMessCode, reflectArray = [], configObj = {};
+      // !VA NOTE: Condition-specific variables are declared in the respective condition
       let { evtTargetVal, appObjProp } = userInputObj;
       // console.log('recalcAppob appObjProp :>> ' + appObjProp);
       // console.log('recalcAppob evtTargetVal :>> ' + evtTargetVal);
       // console.log('Appobj.ccpTdaWidthTfd :>> ' + Appobj.ccpTdaWidthTfd);
       // console.log('Appobj.ccpTdaHeigtTfd :>> ' + Appobj.ccpTdaHeigtTfd);
       // console.log('Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
-      console.log('Appobj.sPhonesW :>> ' + Appobj.sPhonesW);
-      console.log('Appobj.lPhonesW :>> ' + Appobj.lPhonesW);
+      // console.log('Appobj.sPhonesW :>> ' + Appobj.sPhonesW);
+      // console.log('Appobj.lPhonesW :>> ' + Appobj.lPhonesW);
 
 
-      
+      // !VA If the target is TD Width and it is greater than TBL Width, set TBL Width to TD Width. This is an override for TBL Width being populated with curImgW whenever curImgW is resized. If the user enters a TD Width that is greater than the TBL Width, the TBL Width must conform to the larger user-entered value.
       switch(true) {
       case (appObjProp === 'curImgW' || appObjProp === 'curImgH'):
         if (Appobj.ccpTdaWidthTfd) {
@@ -3939,12 +3938,11 @@ ${indent}<![endif]-->`;
           }
         }
         break;
-      case (appObjProp === 'ccpTdaPdrgtTfd' || appObjProp === 'ccpTdaPdlftTfd'):
-        console.log('HIT');
         // !VA Handle changes to the sPhonesW and lPhonesW input fields. When padding width inputs have values, sPhonesW and lPhonesW are reduced by the sum of those values. 
         // !VA IMPORTANT: Recalc for sPhonesW and lPhonesW only show in the Inspectors. That's not the result I antipicated with this, but it's really optimal - it does not affect the localStorage values for sPhonesW and lPhonesW or the sPhonesW or lPhonesW Toolbar inputs. 
         // !VA NOTE: Padding does not recalc TBL Width or TDA Width, although it does recalc TDA Height. For that reason, the reflect config for the TBL and TDA width and height inputs are in handlePadding, not here.
-        // !VA NOTE: Curly brackets allow variable definition in conditions
+        // !VA NOTE: Curly brackets allow variable definition in conditions, 
+      case (appObjProp === 'ccpTdaPdrgtTfd' || appObjProp === 'ccpTdaPdlftTfd'):
         {
           let padWidth = Appobj.ccpTdaPdrgtTfd + Appobj.ccpTdaPdlftTfd;
           Appobj.sPhonesW = Appobj.sPhonesW - padWidth;
@@ -3953,6 +3951,7 @@ ${indent}<![endif]-->`;
         break;
       default:
         // code block
+        console.log('ERROR in recalcAppobj - unknown switch/case condition');
       } 
 
       configObj = {
@@ -3960,33 +3959,19 @@ ${indent}<![endif]-->`;
       };
       UIController.configCCP( configObj );
 
-
-      // console.log('ccpUserInput[appObjProp] :>> ' + ccpUserInput[appObjProp]);
-
-
+      // !VA Branch: 102520A
+      // !VA I don't know if this error message handler even works
       // !VA Error condition - pass the appMessCode to handleAppMessages
       if (isErr) {
         // !VA IF Error pass the code to errorHandler to get the error message
         appController.handleAppMessages( appMessCode );
         // if (appObjProp.substring( 0, 3) === 'ccp') {
-
         // }
-
-
-
       } else {
         // !VA If no error...
         isErr = false;
       }
-
-
     }
-
-
-
-
-
-
 
     // !VA appController  
     // !VA Called from applyInputValue and handleMouseEvents. Writes imgViewerW, sPhonesW and lPhonesW to localStorage and calculates the adjacent side of the curImgW/curImgH input, then runs calcViewerSize to resize the dynamicElements containers. NOTE: This function does things that are done elsewhere and does other things that it shouldn't do. Revisit this at some point but for now it works.
@@ -4152,6 +4137,10 @@ ${indent}<![endif]-->`;
       case alias === 'ccpTdaOptnsRdo' :
         // !VA Get the configuration for the selected TD Option
         configObj = configOptns( alias, option );
+        console.log('fetchConfig Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
+        console.log('fetchConfig configObj :>> ');
+        console.log(configObj);
+
         break;
       case alias === 'ccpTblWraprChk' :
         // !VA Get the CCP configuration for the Include Wrapper checkbox icon
@@ -4743,11 +4732,14 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from fetchConfigObj to get the TD Option radio group-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
     function configOptns( alias, option ) {
+      console.log('configOptns running'); 
+      console.log('alias :>> ' + alias);
+      console.log('option :>> ' + option);
       // console.log('configOptns alias :>> ' + alias);  
       let revealFlag, revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray;
       let configObj = {};
       // !VA Option will never be basic or swtch here - they get their config from configDefault. That's not ideal, the call to configDefault should be made from here, not fetchConfigObj. For later.
-      if ( option === 'basic' || option === 'swtch') {
+      if ( option === 'basic') {
         // !VA For the TD Options basic and swtch, use the default CCP configuration
         configObj = configDefault( alias, option );
       } else {
@@ -4810,6 +4802,62 @@ ${indent}<![endif]-->`;
             revealReset: { alias: 'iswap'},
             revealElements:  { flag: revealFlag, reveal: revealArray }
           };
+          break;
+        
+        
+        
+        case option === 'swtch':
+          console.log('configOptns swtch');
+          console.log('configOptns Appobj.imgViewerW :>> ' + Appobj.imgViewerW);
+
+
+
+          // !VA SET APPOBJ PROPERTIES FOR ISWAP
+          // !VA Show the table wrapper options
+          Appobj['ccpTblWraprChk'] = false;
+          Appobj['ccpTblHybrdChk'] = false;
+          Appobj['ccpTblClassTfd'] = Appobj['ccpTbwClassTfd'] = 'devicewidth';
+          Appobj['ccpTblAlignRdo'] = 'center';
+          Appobj['ccpTbwAlignRdo'] = 'center';
+          Appobj['ccpTblWidthTfd'] = Appobj['imgViewerW'];
+          Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
+          Appobj['ccpTblMaxwdTfd'] = '';
+          Appobj['ccpTbwMaxwdTfd'] = '';
+
+                    // !VA reflectAppobj METHOD
+          // !VA Array of elements whose values are set to the Appobj properties above
+          reflectArray = [ 'ccpTdaBgclrTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
+
+          // !VA checkboxState METHOD
+          // !VA Array of checkboxes whose checked state is to be set based on the Appobj property setting above.
+          checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk'];
+
+          // !VA radioState METHOD
+          // !VA Array of radio groups whose selection state is set based on the Appobj property above. The reveal
+          radioArray = [ 'ccpTblAlignRdo' , 'ccpTbwAlignRdo' ];
+
+          // !VA revealElements METHOD
+          // !VA revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
+          revealFlag = false;
+          // !VA Array of elements to be revealed. 
+          revealArray = [ 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaOptnsRdo', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblMsdpiChk' ];
+
+          // !VA Branch: 102220A
+          // !VA Should wrapper be shown by default?
+          selectCheckbox( false, 'ccpTblWraprChk');
+
+          // !VA Set the configObj with the methods and properties to configure
+          configObj = {
+            checkboxState: { checked: checkedArray },
+            reflectAppobj: { reflect: reflectArray },
+            radioState: { radio: radioArray },
+            // disableElements: { flag: disableFlag, disable: disableArray },
+            // !VA the revealReset array, iswapArr,  is set in revealReset. It includes all elements that are revealed by default except ccpImgCbhtmlBut because the img tag can't be output to the cliboard with the iswap option. iswap requires a TD or higher.
+            revealReset: { alias: 'swtch'},
+            revealElements:  { flag: revealFlag, reveal: revealArray }
+          };
+
+
           break;
         case option === 'bgimg':
           // !VA APPOBJ PROPERTIES
@@ -4894,9 +4942,12 @@ ${indent}<![endif]-->`;
           };
           break;
         default:
-          console.log('ERROR in revealConfigs - Appobj property not recognized');
+          console.log('ERROR in configOptns - Appobj property not recognized');
         } 
       }
+      console.log('configObj :>> ');
+      console.log(configObj);
+      console.log('configOptns Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
       return configObj;
     }
 
