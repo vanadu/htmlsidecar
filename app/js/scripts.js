@@ -623,8 +623,17 @@ var Witty = (function () {
           el.classList.remove('ccp-conceal-ctn');
         }
         break;
+      // !VA Branch: 110120B
+      // !VA Trying to set the resetArray to defaultArr - better to stick with what I have for now.
+      // case alias === 'ccpImgExcldRdo':
+      //   resetArray =  defaultArr;
+      //   for (const alias of resetArray ) {
+      //     el = document.querySelector(ccpUserInput[alias]);
+      //     el.classList.add('ccp-conceal-ctn');
+      //   }
+      //   break;
       case alias === 'ccpImgExcldRdo':
-        resetArray =  [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk','ccpTdaOptnsRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpImgCbhtmBtn'  ];
+        resetArray =  [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk','ccpTdaOptnsRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpImgCbhtmBtn'  ];
         for (const alias of resetArray ) {
           el = document.querySelector(ccpUserInput[alias]);
           el.classList.add('ccp-conceal-ctn');
@@ -646,7 +655,7 @@ var Witty = (function () {
     }
 
     // !VA UIController private
-    // !VA Use configCCP to apply/remove the highlight style to input elements, which then adds/removes the filter on the icon, as defined in the CSS. highlightIconPreets in resizeContainers sets the highlight on icons that have a default preset value. Individual icon highlights are set through configObj using the highlight method and the highlightArray array.
+    // !VA Use configCCP to apply/remove the highlight style to input elements, which then adds/removes the filter on the icon, as defined in the CSS. highlightIconPresets in resizeContainers sets the highlight on icons that have a default preset value. Individual icon highlights are set through configObj using the highlight method and the highlightArray array.
     function highlightIcon( highlightArray ) {
       var ipt;
       for (const el of highlightArray) {
@@ -3493,7 +3502,6 @@ ${indent}<![endif]-->`;
       let userInputObj = { };
       // !VA Handle the click event
       if (evt.type === 'click') {
-        console.log('evt.target.id :>> ' + evt.target.id);
         // !VA Set userInputObj.appObjProp to curImgW because that is the Appobj property that the increment/decrement buttons modify
         userInputObj.appObjProp = 'curImgW';
         // !VA Get the 8 char identifier for Toolbar buttons. These are the increment/decrement buttons
@@ -3529,8 +3537,6 @@ ${indent}<![endif]-->`;
     // !VA Called from handleKeydown and handleBlur to handle CCP element user input. Runs checkUserInput to check for error conditions and returns either an empty string, a valid value or FALSE to the caller.
     // !VA NOTE: There was a priorVal variable earlier that stored evt.target.val for use with CCP inputs because at that time CCP inputs weren't immediately stored in Appobj. Keep an eye on that - currently all CCP values are stored to Appobj.
     function handleUserInput( userInputObj ) {
-      console.log('handleUserInput userInputObj :>> ');
-      console.log(userInputObj);
       let retVal;
       let tbrIptAliases = [], imgIptAliases = [], ccpIptAliases = [];
       // let configObj = {};
@@ -3540,11 +3546,7 @@ ${indent}<![endif]-->`;
       // !VA Array of 'irregular' Toolbar input element aliases, i.e. curImgW and curImgH. These have different input processing than the other Toolbar input elements.
       imgIptAliases = [ 'curImgW', 'curImgH'];
       // !VA Create an array of the CCP input element aliases
-      for (const key of Object.keys(ccpUserInput)) {
-        if ( key.substring( 11, 14)  === 'Tfd') {
-          ccpIptAliases.push(key);
-        }
-      }
+      ccpIptAliases = getInputArray();
       // !VA If evtTargetVal is empty, process it first so empty strings won't be passed to checkUserInput for error checking. This prevents checkUserInput from flagging empty strings as errors and returning false on them. 
       if ( evtTargetVal === '') {
         // !VA If the target is curImgW or curImgH or a Ccp input, then the user has exited the field without entering a value, or has deleted the default value and exited the field. In this case, return the empty value without further action.
@@ -3769,9 +3771,9 @@ ${indent}<![endif]-->`;
       userInputObj.evtTargetVal = retVal;
       // !VA Now destructure to get appObjProp. For the value, continue to use retVal.
       const { appObjProp } = userInputObj;
-      console.log('checkNumericInput appObjProp :>> ' + appObjProp);
-      console.log('Appobj.ccpTdaWidthTfd :>> ' + Appobj.ccpTdaWidthTfd);
-      console.log('Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
+      // console.log('checkNumericInput appObjProp :>> ' + appObjProp);
+      // console.log('Appobj.ccpTdaWidthTfd :>> ' + Appobj.ccpTdaWidthTfd);
+      // console.log('Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
 
 
       // !VA If validateInteger returned false to retVal, then there is an error condition with the input value.
@@ -3942,7 +3944,6 @@ ${indent}<![endif]-->`;
     // !VA Called from checkNumericInput, applyInputValue, This function calculates CCP input values based on curImgW, curImgH and other CCP input values. It also serves as secondary error checking, i.e. not checking the input per se but rather checking the input in relation to other Appobj properties which may or may not have been populated by the time checkNumericInput was run.
     // !VA IMPORTANT: Padding-related TBL and TDA width/height input value changes are handled in handlePadding. Padding-related sPhoneW/lPhoneW values are handled here.
     function recalcAppob(userInputObj) {
-      console.log('recalcAppob running');
       let isErr, appMessCode, reflectArray = [], configObj = {};
       // !VA NOTE: Condition-specific variables are declared in the respective condition
       let { evtTargetVal, appObjProp } = userInputObj;
@@ -4145,7 +4146,12 @@ ${indent}<![endif]-->`;
 
     // !VA appController  
     // !VA Returns the CCP configurations for each CCP UI element, i.e. the properties for configCCP methods.
+    // !VA Note: 
     function fetchConfigObj( alias, option ) {
+
+      console.clear();
+      console.log('fetchConfigObj Appobj :>> ');
+      console.log(Appobj);
       let configObj = [];
       // !VA Set the CCP configuration for specific user selections
       switch(true) {
@@ -4177,6 +4183,21 @@ ${indent}<![endif]-->`;
       default:
         console.log('ERROR in fetchConfigObj = Alias not recognized');
       } 
+      // !VA Branch: 110120B
+      // !VA 
+      // var highlightArray = [];
+      // for (const key of Object.keys(ccpUserInput)) {
+      //   if ( key.substring( 11, 14)  === 'Tfd') {
+      //     highlightArray.push(key);
+      //   }
+      // }
+      // console.log('highlightArray :>> ');
+      // console.log(highlightArray);
+      // configObj = {
+      //   highlightIcon: { highlight: highlightArray }
+      // };
+      // UIController.configCCP( configObj);
+
       return configObj;
     }
 
@@ -4719,21 +4740,44 @@ ${indent}<![endif]-->`;
       // !VA Toggleable config properties
       // !VA The imgExcld icon is selected
       if ( option === 'excld') {
+        // !VA Branch: 110120B
+        // !VA Appobj property values valid for the Excld option
+        Appobj.ccpTdaWidthTfd = '';
+        Appobj.ccpTdaHeigtTfd = '';
+        Appobj.ccpTdaBgclrTfd = '';
+        Appobj.ccpTdaTxclrTfd = '';
+        Appobj.ccpTdaBdradTfd = '';
+        Appobj.ccpTdaBdclrTfd = '';
+        Appobj.ccpTblWidthTfd = '';
+
+        // !VA reflectAppobj METHOD
+        // Set the array of elements whose Appobj properties are to be reflected in CCP
+        reflectArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTblWidthTfd' ];
         // !VA revealElements METHOD
         // !VA Set the array of elements to reveal
         revealArray  = [ 'ccpImgExcldRdo', 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo' ];
         // revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgItypeRdo', ];
       } else {
         // !VA The imgIncld icon is selected 
+        // !VA Appobj property values valid for the Excld 'incld' option
+        Appobj.ccpTblWidthTfd = Appobj.curImgW;
+        // !VA reflectAppobj METHOD
+        // Set the array of elements whose Appobj properties are to be reflected in CCP
+        reflectArray = ['ccpTblWidthTfd'];
         // !VA Set the array of elements to reveal. If the Anchor input is not empty, add the anchor-dependent options (text color and source attribute) to revealArray
         revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaOptnsRdo'  ];
         if (Appobj.ccpImgAnchrTfd !== '') {
           revealArray.push('ccpImgTxclrTfd', 'ccpImgTargtChk');
         }
       }
+      // !VA Get the highlightArray of all input elements to apply the highlight to any input elements whose Appobj property is not empty
+      highlightArray = getInputArray();
+      // configObj.highlightIcon = { highlight: highlightArray};
       configObj = {
         // !VA revealReset conceals all the elements, i.e. hides the ones that aren't explicitly revealed with revealElements.
+        highlightIcon: { highlight: highlightArray},
         radioState: { radio: radioArray },
+        reflectAppobj: { reflect: reflectArray },
         revealReset: { alias: alias },
         revealElements: { flag: revealFlag, reveal: revealArray }
       };
@@ -4749,7 +4793,11 @@ ${indent}<![endif]-->`;
       option === 'fluid' ?  Appobj['ccpImgClassTfd'] = 'img-fluid' : Appobj['ccpImgClassTfd'] = '';
       reflectArray = ['ccpImgClassTfd' ];
       radioArray = [ alias ];
+
+      // !VA Get the highlightArray of all input elements to apply the highlight to any input elements whose Appobj property is not empty
+      highlightArray = getInputArray();
       configObj = {
+        highlightIcon: { highlight: highlightArray},
         reflectAppobj: { reflect: reflectArray },
         radioState: { radio: radioArray } 
       };
@@ -4762,20 +4810,22 @@ ${indent}<![endif]-->`;
     // !VA Called from fetchConfigObj to get the TD Option radio group-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
     function configOptns( alias, option ) {
       // console.log('configOptns alias :>> ' + alias);  
-      let revealFlag, revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray;
+      let revealFlag, revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray, highlightArray;
       let configObj = {};
 
 
       // !VA Handle the TD Options CCP configurations
       switch(true) {
-      case option === 'basic':
+        case option === 'basic':
 
-      // !VA For the TD Options basic and swtch, use the default CCP configuration
-      configObj = configDefault( alias, option );
+        // !VA For the TD Options basic and swtch, use the default CCP configuration
+        configObj = configDefault( alias, option );
 
 
-      break;
-      case option === 'iswap':
+        break;
+
+
+        case option === 'iswap':
 
         // !VA SET APPOBJ PROPERTIES FOR ISWAP
         // !VA Show the table wrapper options
@@ -4834,7 +4884,7 @@ ${indent}<![endif]-->`;
         };
         break;
         
-      case option === 'swtch':
+        case option === 'swtch':
 
         // !VA Branch: 110120B
         // !VA TD posswitch option has the same config except TBL Width = imgViewerW.
@@ -4847,7 +4897,7 @@ ${indent}<![endif]-->`;
         // !VA Override default to set TBL Width to the viewer width for the TD posswitch option
         Appobj.ccpTblWidthTfd = Appobj.imgViewerW;
         break;
-      case option === 'bgimg':
+        case option === 'bgimg':
         // !VA APPOBJ PROPERTIES
         // !VA Table wrapper options not show by default
         Appobj['ccpTblWraprChk'] = false;
@@ -4887,7 +4937,7 @@ ${indent}<![endif]-->`;
           revealElements: { flag: revealFlag, reveal: revealArray }
         };
         break;
-      case option === 'vmlbt':
+        case option === 'vmlbt':
         // !VA APPOBJ PROPERTIES
         // !VA Table wrapper options not show by default
         Appobj['ccpTblWraprChk'] = false;
@@ -4929,10 +4979,29 @@ ${indent}<![endif]-->`;
           revealElements: { flag: revealFlag, reveal: revealArray }
         };
         break;
-      default:
-        console.log('ERROR in configOptns - Appobj property not recognized');
+        default:
+          console.log('ERROR in configOptns - Appobj property not recognized');
       } 
+
+      // !VA Branch: 110120B
+      // !VA Get the highlightArray of all input elements to apply the highlight to any input elements whose Appobj property is not empty
+      highlightArray = getInputArray();
+      // !VA Add the highlightIcon property to configObj and return
+      configObj.highlightIcon = { highlight: highlightArray};
       return configObj;
+    }
+
+    // !VA Branch: 110120B
+    // !VA Added
+    function getInputArray() {
+      console.log('getInputArray running');
+      const iptArray = [];
+      for (const key of Object.keys(ccpUserInput)) {
+        if ( key.substring( 11, 14)  === 'Tfd') {
+          iptArray.push(key);
+        }
+      }
+      return iptArray;
     }
 
     // !VA appController private
@@ -5023,8 +5092,11 @@ ${indent}<![endif]-->`;
       // !VA Leaving disabling out for now
       // disableArray =  [ 'ccpImgClassTfd', 'ccpTblClassTfd','ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblAlignRdo', 'ccpTblWraprChk', 'ccpTbwClassTfd','ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwAlignRdo' ];
 
+      // !VA Get the highlightArray of all input elements to apply the highlight to any input elements whose Appobj property is not empty
+      highlightArray = getInputArray();
       // !VA Create the configObj methods with the properties defined above.
       configObj = {
+        highlightIcon: { highlight: highlightArray },
         checkboxState: { checked: checkedArray },
         reflectAppobj: { reflect: reflectArray },
         radioState: { radio: radioArray },
