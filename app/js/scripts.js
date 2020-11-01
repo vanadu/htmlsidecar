@@ -493,14 +493,25 @@ var Witty = (function () {
     }
 
 
+    // !VA UIController private
+    // !VA Branch: 110120A Function added.
+    // !VA Remove multiple items from an array. Called from revealReset to remove aliases from the default revealArray
+    function removeFromArray(aliases, array ) {
+      let newArr = [];
+      for (let i = 0; i < aliases.length; i++) {
+        newArr = array.filter( alias => alias !== aliases[i]);
+      }
+      return newArr;
+    }
 
 
 
     // !VA UIController private
     // !VA Resets (i.e. adds the ccp-conceal-ctn class) to the container elements for the CPP option section affected by the CCP control associated with the alias. 
     function revealReset( alias ) {
-
-      let el, mkcssReset = [], defaultArr, defaultReset = [], iswapArr, iswapReset = [], swtchArr, swtchReset = [], bgimgArr, bgimgReset = [], vmlbtArr, vmlbtReset = [], wraprArr,  wraprReset = [], resetArray;
+      console.log('revealReset running'); 
+      console.log('alias :>> ' + alias);
+      let el, mkcssReset = [], excludeArr, defaultArr, defaultReset = [], iswapArr, iswapReset = [], bgimgArr, bgimgReset = [], vmlbtArr, vmlbtReset = [], wraprArr,  wraprReset = [], resetArray;
       // !VA Only log if not init
       // if (alias !== 'default' ) { console.log('revealReset running'); }
       // console.log('revealReset alias :>> ' + alias);
@@ -508,16 +519,11 @@ var Witty = (function () {
       // !VA There are three reset element matrices: mkcssReset includes all the Make CSS Button containers. That is obtained by getting the elements with classname 'ccp-mkcss-ctn' - it includes the Make CSS buttons and the curly braces that surround them. defaultReset includes the containers corresponding to the TD Options 'basic' configuration, and wraprReset includes the Wrapper Option elements.
       defaultArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
 
-      // !VA iswapArr is identical to defaultArr except without ccpImgCbhtmBut - the CB HTML button is not availble for image swap.
-      iswapArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
+      // !VA iswapArr, bgimgArr and vmlbt are identical to defaultArr except without ccpImgCbhtmBtn - the CB HTML button is not availble those options because they output complete MS Conditional code blocks in which the IMG is included.
+      excludeArr = ['ccpImgCbhtmBtn'];
+      iswapArr = bgimgArr = vmlbtArr = removeFromArray(excludeArr, defaultArr);
 
-      // !VA Branch: 110120A
-      // !VA swtchArr is identical to defaultArr, why is it necessary?
-      swtchArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ]
-
-      // !VA iswapArr is identical to defaultArr except without ccpImgCbhtmBut - the CB HTML button is not availble for image swap.
-      bgimgArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
-      vmlbtArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
+      // !VA Config for the TBL wrapper
       wraprArr = ['ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk', ];
 
 
@@ -4748,208 +4754,188 @@ ${indent}<![endif]-->`;
       return configObj;
     }
 
-    // !VA appController private
-    // !VA Remove multiple items from an array. Usage:
-    // var aliasesToRemove = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd'];
-    // var foo = removeFromArray( aliasesToRemove, configObj.reflectAppobj.reflect);
-    // console.log('foo :>> ');
-    // console.log(foo);
-    function removeFromArray(aliases, array ) {
-      console.log('removeFromArray running'); 
-      let newArr = [];
-      for (let i = 0; i < aliases.length; i++) {
-        console.log('aliases[i] is: ' +  aliases[i]);
-        newArr = array.filter( alias => alias !== 'ccpImgClassTfd');
-      }
-      // !VA Log the aliases in the new array
-      for (const aliases of newArr) {
-        console.log('Aliases after :>> ' + aliases);
-      }
-    }
+
 
     // !VA appController private
     // !VA Called from fetchConfigObj to get the TD Option radio group-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
     function configOptns( alias, option ) {
-      console.clear();
       console.log('configOptns running'); 
       console.log('alias :>> ' + alias);
       console.log('option :>> ' + option);
       // console.log('configOptns alias :>> ' + alias);  
       let revealFlag, revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray;
       let configObj = {};
-      // !VA Option will never be basic or swtch here - they get their config from configDefault. That's not ideal, the call to configDefault should be made from here, not fetchConfigObj. For later.
-      if ( option === 'basic') {
-        // !VA For the TD Options basic and swtch, use the default CCP configuration
+
+
+      // !VA Handle the TD Options CCP configurations
+      switch(true) {
+      case option === 'basic':
+
+      // !VA For the TD Options basic and swtch, use the default CCP configuration
+      configObj = configDefault( alias, option );
+
+
+      break;
+      case option === 'iswap':
+
+        // !VA SET APPOBJ PROPERTIES FOR ISWAP
+        // !VA Show the table wrapper options
+        Appobj['ccpTblWraprChk'] = true;
+        Appobj['ccpTblHybrdChk'] = false;
+        // !VA APPOBJ PROPERTIES
+        Appobj['ccpImgClassTfd'] = 'mobileshow';
+        Appobj['ccpTblClassTfd'] = Appobj['ccpTbwClassTfd'] = 'devicewidth';
+        Appobj['ccpTblAlignRdo'] = 'center';
+        Appobj['ccpTbwAlignRdo'] = 'center';
+        Appobj['ccpTdaBgclrTfd'] = '';
+        Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
+        Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
+        Appobj['ccpTblMaxwdTfd'] = '';
+        Appobj['ccpTbwMaxwdTfd'] = '';
+
+        // !VA reflectAppobj METHOD
+        // !VA Array of elements whose values are set to the Appobj properties above
+        reflectArray = ['ccpImgClassTfd','ccpTdaBgclrTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
+        
+        // !VA checkboxState METHOD
+        // !VA Array of checkboxes whose checked state is to be set based on the Appobj property setting above.
+        checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk'];
+
+        // !VA radioState METHOD
+        // !VA Array of radio groups whose selection state is set based on the Appobj property above. The reveal
+        radioArray = [ 'ccpTblAlignRdo' , 'ccpTbwAlignRdo' ];
+
+        // !VA revealElements METHOD
+        // !VA revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
+        revealFlag = false;
+        // !VA Array of elements to be revealed. 
+        revealArray = [ 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaOptnsRdo', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblMsdpiChk', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd','ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+        
+
+        // !VA Branch: 102220A
+        // !VA Should wrapper be shown by default?
+        selectCheckbox( true, 'ccpTblWraprChk');
+
+        // !VA disableElements METHOD
+        // !VA disableFlag is always true. This isn't a toggle. Elements stay disabled until a different option with a different config is selected.
+        // !VA Only disabling IMG class for now.
+        disableFlag = true;
+        // disableArray =  [ 'ccpImgClassTfd', 'ccpTblClassTfd','ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblAlignRdo' ];
+        disableArray =  [ 'ccpImgClassTfd' ];
+
+        // !VA Set the configObj with the methods and properties to configure
+        configObj = {
+          checkboxState: { checked: checkedArray },
+          reflectAppobj: { reflect: reflectArray },
+          radioState: { radio: radioArray },
+          disableElements: { flag: disableFlag, disable: disableArray },
+          // !VA the revealReset array, iswapArr,  is set in revealReset. It includes all elements that are revealed by default except ccpImgCbhtmlBut because the img tag can't be output to the cliboard with the iswap option. iswap requires a TD or higher.
+          revealReset: { alias: 'iswap'},
+          revealElements:  { flag: revealFlag, reveal: revealArray }
+        };
+        break;
+        
+      case option === 'swtch':
+
+        // !VA Set TD Width and TD Height to empty. These aren't included in configDefault so they need to be specified here and added to configDefault.
+        Appobj.ccpTdaWidthTfd = '';
+        Appobj.ccpTdaHeigtTfd = '';
+        // !VA Get the default config
         configObj = configDefault( alias, option );
-      } else {
-        // !VA Now handle the other TD Options
-        switch(true) {
-        case option === 'iswap':
+        // !VA Add TD Width and TD Height to the default reflect array
+        configObj.reflectAppobj.reflect.push('ccpTdaWidthTfd', 'ccpTdaHeigtTfd');
+        // !VA Override default to set TBL Width to the viewer width for the TD posswitch option
+        Appobj.ccpTblWidthTfd = Appobj.imgViewerW;
+        // // !VA Debug: Log the reflect array
+        // for (const alias of configObj.reflectAppobj.reflect) {
+        //   console.log('Aliases after :>> ' + alias);
+        // }
+        break;
+      case option === 'bgimg':
+        // !VA APPOBJ PROPERTIES
+        // !VA Table wrapper options not show by default
+        Appobj['ccpTblWraprChk'] = false;
+        Appobj['ccpTblHybrdChk'] = false;
+        Appobj['ccpImgClassTfd'] = '';
+        Appobj['ccpTblClassTfd'] = '';
+        Appobj['ccpTdaWidthTfd'] = Appobj['curImgW'];
+        Appobj['ccpTdaHeigtTfd'] = Appobj['curImgH'];
+        Appobj['ccpTdaBgclrTfd'] = '#7bceeb';
+        Appobj['ccpTbwClassTfd'] = 'devicewidth';
+        Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
+        Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
+        Appobj['ccpTblMaxwdTfd'] = '';
+        Appobj['ccpTbwMaxwdTfd'] = '';
 
-          // !VA SET APPOBJ PROPERTIES FOR ISWAP
-          // !VA Show the table wrapper options
-          Appobj['ccpTblWraprChk'] = true;
-          Appobj['ccpTblHybrdChk'] = false;
-          // !VA APPOBJ PROPERTIES
-          Appobj['ccpImgClassTfd'] = 'mobileshow';
-          Appobj['ccpTblClassTfd'] = Appobj['ccpTbwClassTfd'] = 'devicewidth';
-          Appobj['ccpTblAlignRdo'] = 'center';
-          Appobj['ccpTbwAlignRdo'] = 'center';
-          Appobj['ccpTdaBgclrTfd'] = '';
-          Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
-          Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
-          Appobj['ccpTblMaxwdTfd'] = '';
-          Appobj['ccpTbwMaxwdTfd'] = '';
+        // !VA reflectAppobj METHOD
+        // !VA Array of elements whose values are set to the Appobj properties above
+        reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
 
-          // !VA reflectAppobj METHOD
-          // !VA Array of elements whose values are set to the Appobj properties above
-          reflectArray = ['ccpImgClassTfd','ccpTdaBgclrTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
-          
-          // !VA checkboxState METHOD
-          // !VA Array of checkboxes whose checked state is to be set based on the Appobj property setting above.
-          checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk'];
+        // !VA revealElements METHOD
+        // !VA revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
+        revealFlag = false;
+        // !VA Array of elements to be revealed.
+        revealArray = [ 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaOptnsRdo', 'ccpTblMaxwdTfd' ];
+        // !VA If the Include Wrapper icon is unchecked, use arr for revealArray. If it is checked, merge arr with the Table Wrapper options to create revealArray
 
-          // !VA radioState METHOD
-          // !VA Array of radio groups whose selection state is set based on the Appobj property above. The reveal
-          radioArray = [ 'ccpTblAlignRdo' , 'ccpTbwAlignRdo' ];
+        // !VA checkboxState METHOD
+        // !VA Array of checkbox elements whose checked state to set
+        checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk' ];
 
-          // !VA revealElements METHOD
-          // !VA revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
-          revealFlag = false;
-          // !VA Array of elements to be revealed. 
-          revealArray = [ 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaOptnsRdo', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblMsdpiChk', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd','ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
-          
+        // !VA Set the configObj with the methods and properties to configure
+        configObj = {
+          checkboxState:  { checked: checkedArray },
+          disableReset: { alias: 'default' },
+          reflectAppobj: { reflect: reflectArray },
+          revealReset: { alias: 'bgimg'},
+          revealElements: { flag: revealFlag, reveal: revealArray }
+        };
+        break;
+      case option === 'vmlbt':
+        // !VA APPOBJ PROPERTIES
+        // !VA Table wrapper options not show by default
+        Appobj['ccpTblWraprChk'] = false;
+        Appobj['ccpTblHybrdChk'] = false;
+        Appobj['ccpImgClassTfd'] = '';
+        Appobj['ccpTblClassTfd'] = '';
+        Appobj['ccpTdaWidthTfd'] = Appobj['curImgW'];
+        Appobj['ccpTdaHeigtTfd'] = Appobj['curImgH'];
+        Appobj['ccpTdaBgclrTfd'] = '#556270';
+        Appobj['ccpTdaTxclrTfd'] = '#FFFFFF';
+        Appobj['ccpTdaBdclrTfd'] = '#1e3650';
+        Appobj['ccpTdaBdradTfd'] = 4;
+        Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
+        Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
+        Appobj['ccpTblMaxwdTfd'] = '';
+        Appobj['ccpTbwMaxwdTfd'] = '';
 
-          // !VA Branch: 102220A
-          // !VA Should wrapper be shown by default?
-          selectCheckbox( true, 'ccpTblWraprChk');
 
-          // !VA disableElements METHOD
-          // !VA disableFlag is always true. This isn't a toggle. Elements stay disabled until a different option with a different config is selected.
-          // !VA Only disabling IMG class for now.
-          disableFlag = true;
-          // disableArray =  [ 'ccpImgClassTfd', 'ccpTblClassTfd','ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblAlignRdo' ];
-          disableArray =  [ 'ccpImgClassTfd' ];
-
-          // !VA Set the configObj with the methods and properties to configure
-          configObj = {
-            checkboxState: { checked: checkedArray },
-            reflectAppobj: { reflect: reflectArray },
-            radioState: { radio: radioArray },
-            disableElements: { flag: disableFlag, disable: disableArray },
-            // !VA the revealReset array, iswapArr,  is set in revealReset. It includes all elements that are revealed by default except ccpImgCbhtmlBut because the img tag can't be output to the cliboard with the iswap option. iswap requires a TD or higher.
-            revealReset: { alias: 'iswap'},
-            revealElements:  { flag: revealFlag, reveal: revealArray }
-          };
-          break;
+        // !VA reflectAppobj METHOD
+        // !VA Array of elements whose values are set to the Appobj properties above
+        reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd',  'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTdaBdradTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
         
-        
-        
-        case option === 'swtch':
+        // !VA checkboxState METHOD
+        // !VA Array of checkbox elements whose checked state to set
+        checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk' ];
 
-          // !VA Set TD Width and TD Height to empty. These aren't included in configDefault so they need to be specified here and added to configDefault.
-          Appobj.ccpTdaWidthTfd = '';
-          Appobj.ccpTdaHeigtTfd = '';
-          // !VA Override default to set TBL Width to the viewer width for the TD posswitch option
-          Appobj.ccpTblWidthTfd = Appobj.imgViewerW;
-          console.log('Appobj.ccpTblWidthTfd :>> ');
-          console.log(Appobj.ccpTblWidthTfd);
+        // !VA revealElements METHOD
+        // !VA revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
+        revealFlag = false;
+        // !VA Array of elements to be revealed.
+        revealArray = [ 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTdaBdradTfd' ];
 
-          // !VA Get the default config
-          configObj = configDefault( alias, option );
-          // !VA Add TD Width and TD Height to the default reflect array
-          configObj.reflectAppobj.reflect.push('ccpTdaWidthTfd', 'ccpTdaHeigtTfd');
-          // // !VA Debug: Log the reflect array
-          // for (const alias of configObj.reflectAppobj.reflect) {
-          //   console.log('Aliases after :>> ' + alias);
-          // }
-          break;
-        case option === 'bgimg':
-          // !VA APPOBJ PROPERTIES
-          // !VA Table wrapper options not show by default
-          Appobj['ccpTblWraprChk'] = false;
-          Appobj['ccpTblHybrdChk'] = false;
-          Appobj['ccpImgClassTfd'] = '';
-          Appobj['ccpTblClassTfd'] = '';
-          Appobj['ccpTdaWidthTfd'] = Appobj['curImgW'];
-          Appobj['ccpTdaHeigtTfd'] = Appobj['curImgH'];
-          Appobj['ccpTdaBgclrTfd'] = '#7bceeb';
-          Appobj['ccpTbwClassTfd'] = 'devicewidth';
-          Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
-          Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
-          Appobj['ccpTblMaxwdTfd'] = '';
-          Appobj['ccpTbwMaxwdTfd'] = '';
-
-          // !VA reflectAppobj METHOD
-          // !VA Array of elements whose values are set to the Appobj properties above
-          reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
-
-          // !VA revealElements METHOD
-          // !VA revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
-          revealFlag = false;
-          // !VA Array of elements to be revealed.
-          revealArray = [ 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaOptnsRdo', 'ccpTblMaxwdTfd' ];
-          // !VA If the Include Wrapper icon is unchecked, use arr for revealArray. If it is checked, merge arr with the Table Wrapper options to create revealArray
-
-          // !VA checkboxState METHOD
-          // !VA Array of checkbox elements whose checked state to set
-          checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk' ];
-
-          // !VA Set the configObj with the methods and properties to configure
-          configObj = {
-            checkboxState:  { checked: checkedArray },
-            disableReset: { alias: 'default' },
-            reflectAppobj: { reflect: reflectArray },
-            revealReset: { alias: 'bgimg'},
-            revealElements: { flag: revealFlag, reveal: revealArray }
-          };
-          break;
-        case option === 'vmlbt':
-          // !VA APPOBJ PROPERTIES
-          // !VA Table wrapper options not show by default
-          Appobj['ccpTblWraprChk'] = false;
-          Appobj['ccpTblHybrdChk'] = false;
-          Appobj['ccpImgClassTfd'] = '';
-          Appobj['ccpTblClassTfd'] = '';
-          Appobj['ccpTdaWidthTfd'] = Appobj['curImgW'];
-          Appobj['ccpTdaHeigtTfd'] = Appobj['curImgH'];
-          Appobj['ccpTdaBgclrTfd'] = '#556270';
-          Appobj['ccpTdaTxclrTfd'] = '#FFFFFF';
-          Appobj['ccpTdaBdclrTfd'] = '#1e3650';
-          Appobj['ccpTdaBdradTfd'] = 4;
-          Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
-          Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
-          Appobj['ccpTblMaxwdTfd'] = '';
-          Appobj['ccpTbwMaxwdTfd'] = '';
-
-
-          // !VA reflectAppobj METHOD
-          // !VA Array of elements whose values are set to the Appobj properties above
-          reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd',  'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTdaBdradTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
-          
-          // !VA checkboxState METHOD
-          // !VA Array of checkbox elements whose checked state to set
-          checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk' ];
-
-          // !VA revealElements METHOD
-          // !VA revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
-          revealFlag = false;
-          // !VA Array of elements to be revealed.
-          revealArray = [ 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTdaBdradTfd' ];
-
-          // !VA Set the configObj with the methods and properties to configure
-          configObj = {
-            checkboxState:  { checked: checkedArray },
-            disableReset: { alias: 'default' },
-            reflectAppobj: { reflect: reflectArray },
-            revealReset: { alias: 'vmlbt'},
-            revealElements: { flag: revealFlag, reveal: revealArray }
-          };
-          break;
-        default:
-          console.log('ERROR in configOptns - Appobj property not recognized');
-        } 
-      }
+        // !VA Set the configObj with the methods and properties to configure
+        configObj = {
+          checkboxState:  { checked: checkedArray },
+          disableReset: { alias: 'default' },
+          reflectAppobj: { reflect: reflectArray },
+          revealReset: { alias: 'vmlbt'},
+          revealElements: { flag: revealFlag, reveal: revealArray }
+        };
+        break;
+      default:
+        console.log('ERROR in configOptns - Appobj property not recognized');
+      } 
       console.log('configObj :>> ');
       console.log(configObj);
       console.log('configOptns Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
