@@ -509,8 +509,6 @@ var Witty = (function () {
     // !VA UIController private
     // !VA Resets (i.e. adds the ccp-conceal-ctn class) to the container elements for the CPP option section affected by the CCP control associated with the alias. 
     function revealReset( alias ) {
-      console.log('revealReset running'); 
-      console.log('alias :>> ' + alias);
       let el, mkcssReset = [], excludeArr, defaultArr, defaultReset = [], iswapArr, iswapReset = [], bgimgArr, bgimgReset = [], vmlbtArr, vmlbtReset = [], wraprArr,  wraprReset = [], resetArray;
       // !VA Only log if not init
       // if (alias !== 'default' ) { console.log('revealReset running'); }
@@ -4284,6 +4282,7 @@ ${indent}<![endif]-->`;
       let configObj = {};
       if (evt.target.value !== '') {
         if (evt.target.id !== 'ccp-tda-padng-icn') {
+          console.log('evt.target.id :>> ' + evt.target.id);
           Appobj[appObjProp] = '';
           // !VA This should be done with configCCP - for later
           ipt = document.getElementById(evt.target.htmlFor);
@@ -4643,33 +4642,36 @@ ${indent}<![endif]-->`;
 
 
 
-      Appobj['ccpTblWraprChk'] = false;
-      Appobj['ccpTblHybrdChk'] = false;
-      Appobj['ccpImgClassTfd'] = '';
-      Appobj['ccpImgLoctnTfd'] = 'img/';
-      Appobj['ccpImgAnchrTfd'] = '#';
-      Appobj['ccpImgTxclrTfd'] = '#0000FF';
-      Appobj['ccpImgTargtChk'] = false;
-      Appobj['ccpImgExcldRdo'] = 'incld';
-      Appobj['ccpTblClassTfd'] = '';
-      Appobj['ccpTdaBgclrTfd'] = '';
-      // Appobj['ccpTdaPdtopTfd'] = '';
-      // Appobj['ccpTdaPdrgtTfd'] = '';
-      // Appobj['ccpTdaPdlftTfd'] = '';
-      // Appobj['ccpTdaPdbtmTfd'] = '';
-      Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
-      Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
-      Appobj['ccpTblMaxwdTfd'] = '';
-      Appobj['ccpTbwMaxwdTfd'] = '';
-      Appobj['ccpTbwClassTfd'] = 'devicewidth';
-      Appobj['ccpTdaAlignRdo'] = 'left';
-      Appobj['ccpTdaValgnRdo'] = 'top';
-      Appobj['ccpTblAlignRdo'] = 'center';
-      Appobj['ccpTbwAlignRdo'] = 'center';
+      Appobj.ccpTblWraprChk = false;
+      Appobj.ccpTblHybrdChk = false;
+      Appobj.ccpImgClassTfd = '';
+      Appobj.ccpImgLoctnTfd = 'img/';
+      Appobj.ccpImgAnchrTfd = '#';
+      Appobj.ccpImgTxclrTfd = '#0000FF';
+      Appobj.ccpImgTargtChk = false;
+      Appobj.ccpImgExcldRdo = 'incld';
+      Appobj.ccpTblClassTfd = '';
+      Appobj.ccpTdaBgclrTfd = '';
+      Appobj.ccpTdaWidthTfd = '';
+      Appobj.ccpTdaHeigtTfd = '';
+      
+      // Appobj.ccpTdaPdtopTfd = '';
+      // Appobj.ccpTdaPdrgtTfd = '';
+      // Appobj.ccpTdaPdlftTfd = '';
+      // Appobj.ccpTdaPdbtmTfd = '';
+      Appobj.ccpTblWidthTfd = Appobj.curImgW;
+      Appobj.ccpTbwWidthTfd = Appobj.imgViewerW;
+      Appobj.ccpTblMaxwdTfd = '';
+      Appobj.ccpTbwMaxwdTfd = '';
+      Appobj.ccpTbwClassTfd = 'devicewidth';
+      Appobj.ccpTdaAlignRdo = 'left';
+      Appobj.ccpTdaValgnRdo = 'top';
+      Appobj.ccpTblAlignRdo = 'center';
+      Appobj.ccpTbwAlignRdo = 'center';
 
       // !VA reflectAppobj METHOD: set the array of elements whose Appobj properties above are to be written to the CCP DOM
       // !VA Why are there two of these? Commenting out the lower one for now.
-      reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd', 'ccpTbwClassTfd' ];
+      reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd', 'ccpTbwClassTfd' ];
 
       // !VA highlightIcon METHOD: Set the array of elements that should receive a highlight because their Appobj property indicates a preset value
       highlightArray = [ 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd' ];
@@ -4759,9 +4761,6 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from fetchConfigObj to get the TD Option radio group-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
     function configOptns( alias, option ) {
-      console.log('configOptns running'); 
-      console.log('alias :>> ' + alias);
-      console.log('option :>> ' + option);
       // console.log('configOptns alias :>> ' + alias);  
       let revealFlag, revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray;
       let configObj = {};
@@ -4837,19 +4836,16 @@ ${indent}<![endif]-->`;
         
       case option === 'swtch':
 
-        // !VA Set TD Width and TD Height to empty. These aren't included in configDefault so they need to be specified here and added to configDefault.
-        Appobj.ccpTdaWidthTfd = '';
-        Appobj.ccpTdaHeigtTfd = '';
+        // !VA Branch: 110120B
+        // !VA TD posswitch option has the same config except TBL Width = imgViewerW.
+        // Appobj.ccpTdaWidthTfd = '';
+        // Appobj.ccpTdaHeigtTfd = '';
         // !VA Get the default config
         configObj = configDefault( alias, option );
         // !VA Add TD Width and TD Height to the default reflect array
-        configObj.reflectAppobj.reflect.push('ccpTdaWidthTfd', 'ccpTdaHeigtTfd');
+        // configObj.reflectAppobj.reflect.push('ccpTdaWidthTfd', 'ccpTdaHeigtTfd');
         // !VA Override default to set TBL Width to the viewer width for the TD posswitch option
         Appobj.ccpTblWidthTfd = Appobj.imgViewerW;
-        // // !VA Debug: Log the reflect array
-        // for (const alias of configObj.reflectAppobj.reflect) {
-        //   console.log('Aliases after :>> ' + alias);
-        // }
         break;
       case option === 'bgimg':
         // !VA APPOBJ PROPERTIES
@@ -4936,9 +4932,6 @@ ${indent}<![endif]-->`;
       default:
         console.log('ERROR in configOptns - Appobj property not recognized');
       } 
-      console.log('configObj :>> ');
-      console.log(configObj);
-      console.log('configOptns Appobj.ccpTblWidthTfd :>> ' + Appobj.ccpTblWidthTfd);
       return configObj;
     }
 
