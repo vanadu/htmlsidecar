@@ -3376,9 +3376,15 @@ ${indent}<![endif]-->`;
         // !VA Shrink the image. 
         appController.initUpdateCurrentImage(imgInputObj);
         // !VA Restore Appobj.ccpTblWidthTfd to the temporarily stored override value 
-        Appobj.ccpTdaWidthTfd = Appobj.ccpTblWidthTfd = tmp;
-        // !VA Set the TD Height input to the curImgH plus the sum of the Appobj lft/rgt input properties.
+        Appobj.ccpTblWidthTfd = tmp;
+        // !VA Branch: 110220B
+        // !VA Set the TD Width input to the curImgW plus the sum of the Appobj lft/rgt input properties.'
+        Appobj.ccpTdaWidthTfd = Appobj.curImgW + Number(Appobj.ccpTdaPdrgtTfd) + Number(Appobj.ccpTdaPdlftTfd);
+
+        // !VA Set the TD Height input to the curImgH plus the sum of the Appobj top/btm input properties.'
+        console.log('HIT');
         Appobj.ccpTdaHeigtTfd = Appobj.curImgH + Number(Appobj.ccpTdaPdtopTfd) + Number(Appobj.ccpTdaPdbtmTfd);
+        
 
         // !VA The handlers below apply the highlight if there is either an input in either of the width padding inputs or remove the highlight if there is no input in either of the width input fields.
         if ( Appobj.ccpTdaPdlftTfd !== '' || Appobj.ccpTdaPdrgtTfd !== '') {
