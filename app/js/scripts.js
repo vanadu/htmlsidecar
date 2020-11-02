@@ -403,6 +403,7 @@ var Witty = (function () {
         // !VA Ignore toolbar aliases here - they do not need to be reflected and probably should not have been passed in from handleBlur. For later. 
         toolbarAliases = ['curImgW', 'curImgH', 'imgViewerW', 'sPhonesW', 'lPhonesH' ];
         if (!toolbarAliases.includes( alias)) {
+
           el = document.querySelector(ccpUserInput[alias].replace('tfd', 'ipt'));
           if (isInit) {
             // !VA TODO: Deleting the value on init should reset all input fields to empty strings, thereby exposing whatever preset value attributes in the HTML. This should actually make resetting input elements to empty in configDefault redundant. For later...
@@ -2032,6 +2033,11 @@ var Witty = (function () {
           tdInner.width = Attributes.tdWidth.str;
           tdInner.height = Attributes.tdHeight.str;
         }
+        // !VA tdInner.align
+        omitIfEmpty( Attributes.tdAlign.str, tdInner, 'align');
+        // if (Attributes.tdClass.str) { tdInner.className = Attributes.tdClass.str; }
+        // !VA tdInner.vAlign
+        omitIfEmpty( Attributes.tdValign.str, tdInner, 'vAlign');
         // !VA TODO: If the height entered doesn't match the height of the loaded image, then the user probably has forgotten to load the image used for the button background, so the code output will probably not be what the user expects. Output the code, but show an alert in the message bar. This is going to require making a different clipboard message for alerts. It will also require somehow informing the Clipboard object that two different messages can be displayed onsuccess - one success message and one alert message. That will require passing an error status along with tdNodeFragment and tableNodeFragment, which will require returning an array rather than just the node fragment. 
         if (document.querySelector(ccpUserInput.ccpTdaHeigtTfd).value !== Attributes.imgHeight.str) {
           // !VA TODO: This error message throws an error...
@@ -2191,11 +2197,20 @@ var Witty = (function () {
       let vmlButtonStr, linebreak, tdHeight, tdWidth;
       linebreak = '\n';
       // !VA Defaults for height and width are set in showTdOptions, so get the values from the inputs
-      tdHeight = document.querySelector(ccpUserInput.ccpTdaHeigtTfd).value;
-      tdWidth = document.querySelector(ccpUserInput.ccpTdaWidthTfd).value;
+      // !VA Branch: 110120C
+      // !VA Use Appobj
+      // tdHeight = document.querySelector(ccpUserInput.ccpTdaHeigtTfd).value;
+      // tdWidth = document.querySelector(ccpUserInput.ccpTdaWidthTfd).value;
+      // tdHeight = appController.getAppobj('ccpTdaHeigtTfd');
+      // tdWidth = appController.getAppobj('ccpTdaWidthTfd');
+      tdWidth = Attributes.tdWidth.str;
+      console.log('tdWidth :>> ');
+      console.log(tdWidth);
+      // console.log('tdHeight :>> ' + tdHeight);
+
       // !VA Define the innerHTML of the vmlbutton code
-      vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:${tdHeight}px;v-text-anchor:middle;width:${tdWidth}px;" arcsize="10%" strokecolor="#1e3650" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc.str}" color="#556270" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Show me the button!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="#"
-style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});border:1px solid #1e3650;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:${tdHeight}px;text-align:center;text-decoration:none;width:${tdWidth}px;-webkit-text-size-adjust:none;mso-hide:all;">Show me the button!</a></div>`;
+      vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:${Attributes.tdHeight.str}px;v-text-anchor:middle;width:${Attributes.tdWidth.str}px;" arcsize="10%" strokecolor="#1e3650" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc.str}" color="#556270" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Button Text!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="#"
+style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});border:1px solid #1e3650;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:${Attributes.tdHeight.str}px;text-align:center;text-decoration:none;width:${Attributes.tdWidth.str}px;-webkit-text-size-adjust:none;mso-hide:all;">Button Text!</a></div>`;
       try {
         !vmlButtonStr;
       } catch (error) {
@@ -4183,21 +4198,8 @@ ${indent}<![endif]-->`;
       default:
         console.log('ERROR in fetchConfigObj = Alias not recognized');
       } 
-      // !VA Branch: 110120B
-      // !VA 
-      // var highlightArray = [];
-      // for (const key of Object.keys(ccpUserInput)) {
-      //   if ( key.substring( 11, 14)  === 'Tfd') {
-      //     highlightArray.push(key);
-      //   }
-      // }
-      // console.log('highlightArray :>> ');
-      // console.log(highlightArray);
-      // configObj = {
-      //   highlightIcon: { highlight: highlightArray }
-      // };
-      // UIController.configCCP( configObj);
 
+      console.log('Appobj.ccpTdaAlignRdo :>> ' + Appobj.ccpTdaAlignRdo);
       return configObj;
     }
 
@@ -4277,7 +4279,11 @@ ${indent}<![endif]-->`;
       // !VA Get the config
       configObj = fetchConfigObj( alias, option );
       // !VA Run the CCP UI configuration
+      console.log('selectTdaOptions configObj :>> ');
+      console.log(configObj); 
       UIController.configCCP( configObj );
+
+      console.log('Appobj.ccpTdaAlignRdo :>> ' + Appobj.ccpTdaAlignRdo);
     }
 
 
@@ -4817,16 +4823,11 @@ ${indent}<![endif]-->`;
       // !VA Handle the TD Options CCP configurations
       switch(true) {
         case option === 'basic':
-
         // !VA For the TD Options basic and swtch, use the default CCP configuration
         configObj = configDefault( alias, option );
-
-
         break;
 
-
         case option === 'iswap':
-
         // !VA SET APPOBJ PROPERTIES FOR ISWAP
         // !VA Show the table wrapper options
         Appobj['ccpTblWraprChk'] = true;
@@ -4950,6 +4951,10 @@ ${indent}<![endif]-->`;
         Appobj['ccpTdaTxclrTfd'] = '#FFFFFF';
         Appobj['ccpTdaBdclrTfd'] = '#1e3650';
         Appobj['ccpTdaBdradTfd'] = 4;
+        // !VA Branch: 110120C
+        // !VA Adding
+        Appobj['ccpTdaAlignRdo'] = 'center';
+        Appobj['ccpTdaValgnRdo'] = 'middle';
         Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
         Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
         Appobj['ccpTblMaxwdTfd'] = '';
@@ -4958,11 +4963,17 @@ ${indent}<![endif]-->`;
 
         // !VA reflectAppobj METHOD
         // !VA Array of elements whose values are set to the Appobj properties above
-        reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd',  'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTdaBdradTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
+        reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaHeigtTfd',  'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTdaBdradTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
+
+        
         
         // !VA checkboxState METHOD
         // !VA Array of checkbox elements whose checked state to set
         checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk' ];
+
+        // !VA radioState METHOD
+        // !VA Array of radio elements whose checked state to set
+        radioArray = [ 'ccpTdaAlignRdo', 'ccpTdaValgnRdo' ];
 
         // !VA revealElements METHOD
         // !VA revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
@@ -4972,6 +4983,7 @@ ${indent}<![endif]-->`;
 
         // !VA Set the configObj with the methods and properties to configure
         configObj = {
+          radioState: { radio: radioArray },
           checkboxState:  { checked: checkedArray },
           disableReset: { alias: 'default' },
           reflectAppobj: { reflect: reflectArray },
@@ -4982,6 +4994,14 @@ ${indent}<![endif]-->`;
         default:
           console.log('ERROR in configOptns - Appobj property not recognized');
       } 
+
+
+      // !VA Branch: 110120C
+      console.log('Appobj :>> ');
+      console.log(Appobj);
+      console.log('reflectArray :>> ');
+      console.log(reflectArray);
+
 
       // !VA Branch: 110120B
       // !VA Get the highlightArray of all input elements to apply the highlight to any input elements whose Appobj property is not empty
