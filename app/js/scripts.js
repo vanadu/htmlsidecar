@@ -4888,16 +4888,19 @@ ${indent}<![endif]-->`;
         case option === 'swtch':
 
         // !VA Branch: 110120B
-        // !VA TD posswitch option has the same config except TBL Width = imgViewerW.
-        // Appobj.ccpTdaWidthTfd = '';
-        // Appobj.ccpTdaHeigtTfd = '';
+        // !VA TD posswitch option has the same config except TBL Width = imgViewerW. NOTE: That is the default config. Users can change 
         // !VA Get the default config
         configObj = configDefault( alias, option );
-        // !VA Add TD Width and TD Height to the default reflect array
-        // configObj.reflectAppobj.reflect.push('ccpTdaWidthTfd', 'ccpTdaHeigtTfd');
         // !VA Override default to set TBL Width to the viewer width for the TD posswitch option
         Appobj.ccpTblWidthTfd = Appobj.imgViewerW;
+        // !VA TD posswitch must align center in RTL TD. That could be hardcoded in makeTdNode if different Align and Valign are required for the child TDs, but apply these settings to all TDs in the posswitch TDs for now.
+        Appobj.ccpTdaAlignRdo = 'center';
+        Appobj.ccpTdaValgnRdo = 'middle';
+        Appobj.ccpTblClassTfd = 'devicewidth';
         break;
+
+
+        
         case option === 'bgimg':
         // !VA APPOBJ PROPERTIES
         // !VA Table wrapper options not show by default
