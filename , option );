@@ -1,0 +1,623 @@
+[33mcd257bc[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32m110220A[m[33m, [m[1;32m110120C[m[33m)[m Merge to master
+[33m5061fe3[m[33m ([m[1;32m110120B[m[33m)[m Lots of fixes, see branch name in dev log
+[33mefe9c7c[m Fixes, see Dev Doc
+[33meab67d2[m[33m ([m[1;32m110120A[m[33m)[m TD swtch issues complete
+[33m3f10228[m Before removing main clause from configOptns
+[33m95a7f1a[m[33m ([m[1;32m102520B[m[33m)[m Logging out...
+[33mf0bd499[m[33m ([m[1;32m102520A[m[33m)[m Posswitch issues in progress, rename calcCcpInputs to recalcAppobj
+[33m1e749a5[m Posswitch updates
+[33md1e12a9[m More posswitch issues
+[33m468c84f[m[33m ([m[1;32m102420A[m[33m)[m Pos switch debugging
+[33m679e9ba[m[33m ([m[1;32m102320A[m[33m)[m calcCcpInputs
+[33mc220685[m curImgW and curImgH returning empty string fixed in handleBlur
+[33mdb9e683[m[33m ([m[1;32m102220D[m[33m)[m Merging to next branch
+[33mc176dde[m[33m ([m[1;32m102220C[m[33m)[m iswap now hides ccpImgCbhtmBut
+[33m9d5698b[m[33m ([m[1;32m102210B[m[33m)[m Fixed TD options not resetting to 'basic' on reload
+[33mdf7c04d[m[33m ([m[1;32m102220A[m[33m)[m Fixed vscode outline errors
+[33mefed91e[m[33m ([m[1;32m102120B[m[33m)[m Appobj2 deprecated and deleted, handleInspectorClicks works
+[33mde9769a[m[33m ([m[1;32m102120A[m[33m)[m Merging and rebranching
+[33m46afe9b[m Fixed reflectArray toolbar input bug
+[33m37436b1[m[33m ([m[1;32m102020C[m[33m)[m Before merge to master
+[33m28e8f8d[m[33m ([m[1;32m102020B[m[33m)[m Branch bug fixes
+[33m9b4d1c6[m[33m ([m[1;32m102020A[m[33m)[m Merging and rebranching
+[33md4fc82a[m[33m ([m[1;32m101920A[m[33m)[m Before merge to master
+[33m5776711[m imgExcld bugs
+[33m9639e5f[m[33m ([m[1;32m101820B[m[33m)[m Before merging to master
+[33m92cb948[m Icon highlighting works, I think
+[33m47bbdec[m[33m ([m[1;32m101820A[m[33m)[m highlightIcon and highlightIconPreset
+[33mc399f36[m Bug fixing in icon highlighting
+[33me28e75d[m[33m ([m[1;32m101720A[m[33m)[m Padding icon reset works
+[33ma4c4607[m Icon highlight handling in progress
+[33m24055da[m[33m ([m[1;32m101620B[m[33m)[m Padding appears to work...cross fingers!
+[33mc98bfd5[m[33m ([m[1;32m101620A[m[33m)[m Issue with height padding inputs not updating on width padding input seems fixed
+[33m352c458[m[33m ([m[1;32m101520D[m[33m)[m Before merge to master from 101520D
+[33m0cf23f5[m[33m ([m[1;32m101520C[m[33m)[m Before fixing padding height not updating properly on padding width blur
+[33m24936c0[m[33m ([m[1;32m101520B[m[33m)[m Padding appears to work. Merging to master and rebranching to test
+[33m97f02a4[m Working on handlePaddingFocus
+[33m30ec147[m Working on handlePadding
+[33mc016efb[m[33m ([m[1;32m101520A[m[33m)[m Before branch 101520B
+[33m4747841[m[33m ([m[1;32m101420A[m[33m)[m handlePaddingInput, handlePaddingBlur, handlePaddingFocus. Padding height fail after width input
+[33me21cb8c[m Testing recalcAppobj, resetPadding
+[33me5ba2c5[m[33m ([m[1;32m101320A[m[33m)[m Padding appears to work - next, testing
+[33m6b23477[m Before branch to 101320A
+[33mb27b861[m[33m ([m[1;32m100920A[m[33m)[m resetPadding and recalcAppobj work well enough to debug, I think. Merging to master
+[33maa2de7e[m resetPadding
+[33m7d41901[m recalcAppobj
+[33m4d6f098[m TD Height in recalcAppobj
+[33mcdb7221[m Working on recalcAppobj
+[33m2490c50[m[33m ([m[1;32m100720A[m[33m)[m Before merge to master
+[33mbc7e007[m[33m ([m[1;32m0930B[m[33m)[m Padding error handling
+[33m5ac7fa9[m handleBlurEvent and handleBlur
+[33mb4341c0[m Add blur test files
+[33m1f05eee[m Added blur test files
+[33m35915ca[m[33m ([m[1;32m0930A[m[33m)[m Before branch to 0930B to deal yet again with double blur on TAB
+[33m3e93f06[m[33m ([m[1;32m0928A[m[33m)[m Fixed CSS shorthand output and CB output issues
+[33mb56030c[m[33m ([m[1;32m0924B[m[33m)[m ccpTblWidth reflects padding value - CB button issues
+[33m5d7b5ba[m[33m ([m[1;32m0924A[m[33m)[m Working on padding
+[33ma8eaf1f[m[33m ([m[1;32m0923B[m[33m)[m After months of teeth gnashing, the mouse blur handler works as intended...I think
+[33m18cefcf[m Making progress with mouse blur
+[33mf819921[m[33m ([m[1;32m0923A[m[33m)[m Merging to master
+[33m5168b49[m Commented new keydown/handleUserInput code
+[33me924e64[m[33m ([m[1;32m0922B[m[33m)[m Key event handling appears to work
+[33m32c466c[m[33m ([m[1;32m0922A[m[33m)[m Lots of changes to event handling
+[33m07258f6[m Before switching branches
+[33mbab2533[m[33m ([m[1;32m0918A[m[33m)[m Before merge to master
+[33m7e2e60e[m Fix anchr text color writing to CB when empty
+[33m76ca2cf[m[33m ([m[1;32m0917A[m[33m)[m Bug fix with padding an empty input
+[33mf09f44f[m New padding input layout
+[33m70004b3[m Before branch 0917A
+[33m99a7ee3[m After merge 0915A
+[33m80c949f[m[33m ([m[1;32m0915A[m[33m)[m Padding implemented in tdStyle:
+[33mf2b05c9[m[33m ([m[1;32m0914B[m[33m)[m More issues with init - see reflectAppobj, configDefault and populateCcpProperties
+[33m81e41f4[m Added aliases for all the padding input elements.
+[33m34323bb[m[33m ([m[1;32m0914A[m[33m)[m Pre demo bug fixes
+[33m232bfe6[m[33m ([m[1;32m0913B[m[33m)[m Msdpi and misc bug fixes
+[33m088a0f3[m[33m ([m[1;32m0913A[m[33m)[m Moving to next branch
+[33m233d040[m Cleanup getAttributes
+[33m8250a4d[m Fixed tab out on empty field issues
+[33m044b25a[m Before branch to 0913A
+[33mc963d4b[m[33m ([m[1;32m0912A[m[33m)[m Finished ghost tables...hopefully really this time
+[33m9f0f155[m Added more bool1/bool2 ghost configs
+[33m8b45d1b[m[33m ([m[1;32m0911B[m[33m)[m ghost tables appear to be fixed...
+[33m1d35e58[m[33m ([m[1;32m0911A[m[33m)[m More bug fixes before next branch
+[33mf66beca[m Minor fixed before I start dealing with the ghost fixes.
+[33m10df8ea[m Before branch 0911A
+[33m4c02d50[m Commit from linux
+[33m5f5e0f2[m[33m ([m[1;32m0910A[m[33m)[m Ghost tables working
+[33mb013942[m Ghost open and close tokens
+[33mccdd665[m[33m ([m[1;32m0909C[m[33m)[m Output ghost table to clipboard
+[33m3394288[m Routine for adding ghost table to table added
+[33m6203a2c[m[33m ([m[1;32m0909B[m[33m)[m Implement anchor options
+[33m7c39073[m Starting anchor options
+[33m1016b35[m[33m ([m[1;32m0909A[m[33m)[m Moving to next branch
+[33m4d874cf[m[33m ([m[1;32mghost01[m[33m)[m First commit in overhaul integration
+[33m5e1290f[m ghost table works
+[33mbfe8868[m[33m ([m[1;32mreview0720I[m[33m)[m Before merge to master
+[33mc2881df[m[33m ([m[1;32mreview0720H[m[33m)[m Before branch to review0720I
+[33me6d357c[m Set tab order with tabindex
+[33mb541507[m Before branch to review0720H
+[33mf8f3482[m added omitIfEmpty to tableWrapperWidth and tableWrapperClass
+[33m53b70b3[m[33m ([m[1;32mreview0720G[m[33m)[m Updates to parent and wrapper table output and input element handling. Merging to master
+[33mf704c75[m Before global tableTagWrapper => tableWrapper
+[33m7b372df[m[33m ([m[1;32mreview0720F[m[33m)[m excludeimg input error checking implemented
+[33m1296b52[m DRYified the getAttributes align properties
+[33m00f6c85[m Before branch to review0720F
+[33m3e76e39[m[33m ([m[1;32mfixEventHandling04[m[33m)[m handleCcpInputs appears to work, merging to master
+[33m01f6501[m handleKeydown2 renamed to handleKeydown - start handleCcpInputs
+[33m578206b[m handleTbrInput and handleMouseEvents tested and functioning properly
+[33m06318aa[m Branch to fixEventHandling04
+[33m7d6c727[m handleTbrInput works, including the blur in handleMouseEvents
+[33mffda8f2[m[33m ([m[1;32mreview0720E[m[33m)[m Merging to master before branch to handlefixEventHandling03
+[33m55d6635[m[33m ([m[1;32mfixEventHandling02[m[33m)[m Event handling works...I think
+[33m579e305[m Before branch to fixEventHandling02
+[33m4a03608[m[33m ([m[1;32mreview0720D[m[33m)[m Before fixing duplicate error checking on TAB
+[33m3ce92fc[m CSS output works for tdoptions
+[33mf0dbc56[m Fixing CSS output, branching to review0720D
+[33ma8fce83[m[33m ([m[1;32mreview0720C[m[33m)[m Excludeimg height/width works
+[33m129875d[m Aborting this branch, merging to master, rebranching
+[33mf10600e[m[33m ([m[1;32mreview0720B[m[33m)[m Before merge to master
+[33mf1fbb67[m[33m ([m[1;32mreview0720A[m[33m)[m Updated functions doc, getAttributes updates
+[33m46d729f[m Before branch to review071320A
+[33mec2436a[m[33m ([m[1;32mfixEventHandling01[m[33m)[m Event handling works, console and comment cleanup
+[33m6bbcdf2[m Before trying to fix the event handling chaos
+[33mc33eb14[m[33m ([m[1;32mimplementClipboard02[m[33m)[m BUG: handleBlur and curImgW and curImgW -- stopping here
+[33m6f02f70[m[33m ([m[1;32mimplementClipboard01[m[33m)[m Toolbar increment buttons working
+[33m54b0310[m Stopping here, getAttributes imgClass
+[33mc11d0f7[m[33m ([m[1;32mdoEventHandlers01[m[33m)[m Event handlers done more or less...merging to master
+[33m7e46e0b[m Fix undefined in viewerW
+[33m336a617[m Ugh
+[33m10a8762[m More handleFocus
+[33mb487490[m handleFocus changes
+[33m73808f2[m Before branch to doEventHandlers01
+[33mf32dc99[m event handler fixes, before branch to implementCcpInput11
+[33me9f27a7[m[33m ([m[1;32mimplementCcpInput10[m[33m)[m 07.06.20 Start
+[33mfdd2738[m Reverted to old handleBlur scheme
+[33m9a66144[m Fixed error handling and localStorage on TAB - branching to implementCcpInput10
+[33mcc889d3[m[33m ([m[1;32mimplementCcpInput09[m[33m)[m handleBlur complete - merging to master
+[33me39afae[m handleBlur finishing up hopefully
+[33mdd09f78[m handleBlur works mostly -- stopping here
+[33m9a2c3fd[m Before branch to new implementCcpInput09
+[33m4f6ca92[m[33m ([m[1;32mimplementCcpInput08[m[33m)[m Before branch to implementCcpInput09, making writeAppobjToDOM accept just property name instead of keyval pair
+[33m710632e[m Nomenclature changes as per implementCcpInput08 complete, testing now
+[33md1a3364[m[33m ([m[1;32mimplementCcpInput07[m[33m)[m Before renaming containers and Appobj properties
+[33m6161706[m Blur on imgW and imgH works, everything else is foobar
+[33m7b208e9[m Created WittyFunctions_06.30.20.docx, updated all function code descriptions
+[33mf493bd8[m[33m ([m[1;32mimplementCcpInput06[m[33m)[m finished handleNumericInput and handleTextInput, merging to master
+[33m4ca8734[m checkNumericInput complete, continue in handleTabKey
+[33m88ea5b5[m Handling CCP input still in progress
+[33m127a265[m Handling CCP input in progress
+[33m76be579[m[33m ([m[1;32mimplementCcpIhput05[m[33m)[m Structural Appobj implementation complete, merging to master
+[33m47b14ee[m Fix undefined tableWidth and tableWrapperWidth
+[33m26e075b[m Changes to init, initUI dev mode etc.
+[33mfeea6cb[m Before standardizing batchAppobjToDOM and populateAppobj
+[33m0e8992f[m Revisiting initCcp populateAppobj and batchAppobjToDOM
+[33ma629e99[m[33m ([m[1;32mimplementimplementCcpInput04[m[33m)[m After empty object with getAppobj issue
+[33m1701ded[m[33m ([m[1;32mimplementCcpInput03[m[33m)[m getUserSelections purged
+[33ma5898e9[m Before purging getUserSelections
+[33m27c86b8[m Replaced uSels strings with Appobj property names
+[33m06d0bd2[m[33m ([m[1;32mimplementCcpInput02[m[33m)[m Change getAppobj to accept rest parameters
+[33ma9f07ab[m Before branch to implementCcpInput02
+[33m78aec6c[m Cleanup, fix bugs
+[33m06250db[m[33m ([m[1;32mimplementCcpInput01[m[33m)[m Cleanup and commenting
+[33mee59568[m calcViewerSize updated
+[33m51811ca[m Before updating calcViewerSize
+[33m551c451[m Created write ToolbarInputToAppobj
+[33m1120049[m Rewrite elementIdToAppobjProp so it works for all Appobj properties
+[33m8e26fda[m[33m ([m[1;32mimplementAppobj08[m[33m)[m getUserSelections updated, now working on CCP user input in handleKeyDown
+[33m56280da[m Appdata purged
+[33m7caddf5[m Appdata scrubbed - before getting rid if it completely
+[33m4e747b1[m[33m ([m[1;32mimplementAppobj07[m[33m)[m Removed Appobj argument in handleCcpActions
+[33m52b3931[m Replaced handleCcpActions - setvalue with writeAppobjToDOM
+[33m24e1850[m Before branch to implementAppobj7
+[33m9e331a4[m[33m ([m[1;32mimplementAppobj06[m[33m)[m Fluid imgtype works, merging to master
+[33m028cabb[m Fluid options works mostly except checkbox disable
+[33mf97aeb3[m[33m ([m[1;32mimplementAppobj05[m[33m)[m Cleaned up JS errors, Td options work, merging to master
+[33m80f4561[m Td options presets work
+[33m8825782[m Disable elements in imgswap complete, stopping in handleTdOptions
+[33m4ccf07e[m Fixed table width and table wrapper width values not showing in the CCP
+[33m5b80c3e[m working on batchAppobjToDOM
+[33m35abdd8[m True/false flag added to handleCcpActions3, showIncludeWrapperOptions fixed on init
+[33mbf501d2[m before adding true/false flag to handleCcpActions3
+[33m92ae230[m Fix checkbox Appobj values on populateAppobj init
+[33m772d3e4[m[33m ([m[1;32mtmp[m[33m, [m[1;32mimplementAppobj04[m[33m)[m before branch to tmp
+[33m74634f9[m Checkboxes work properly now
+[33m9af977b[m Include anchor checkbox works...the right way!
+[33m04a0823[m Checkboxes work now
+[33m4526d25[m handleCcpActions works - now making more mods to handleCcpActions3 and handleImgType3
+[33m9f5505a[m Reconfigure handleImgType in progress
+[33m3d35982[m Going back to writeCcpDOM, discarding writeCcpDOM2
+[33m0209750[m initCCP fixed for dev
+[33ma99639d[m Fixed devmode CCP open issue
+[33m23f94f3[m Added toggle flag to UIController.toggleCcp
+[33m24194d1[m Reconfigure writeCcpDOM
+[33m49a81ac[m Cleaned up, branch to implementAppobj04
+[33m34b5151[m[33m ([m[1;32mimplementAppobj03[m[33m)[m Dynamic regions work with Appobj, merging to master
+[33m14f8362[m DOM access in resizeViewers
+[33me4b01f0[m Converting DOM to Appobj in calcViewerSize
+[33m8d80196[m Wasted time...need to concentrate on updating Appobj
+[33mb24a1d6[m Bug fix with Appobj.viewerW in populateAppobj
+[33ma34e567[m[33m ([m[1;32mimplementAppobj02[m[33m)[m populateAppobj works up to resizeContainers
+[33m2b1eb91[m Implementing populateAppobj still
+[33m52ce0a8[m populateAppobj moved to UIController
+[33ma950a00[m Initialized CCP with Appobj, created handleCcpInput to handle CCP clicks
+[33m7a6783c[m[33m ([m[1;32mimplementAppobj01[m[33m)[m Inspectors and toolbar works without Appdata - merging to master
+[33m0f5eabd[m Added populateAppobj to calcViewerSize as IIFE
+[33m5544c72[m App archived, start replacing Appdata with Appobj
+[33m6f90d43[m After updating Word review doc
+[33m56c2eb7[m Wrangling
+[33m77f3f7a[m Before Appobj
+[33m586497d[m[33m ([m[1;32mreviewCcpOnchange[m[33m)[m Merging to master -- yet another big RETHINK required
+[33m620aad5[m Setting UI display/disable status for tdoptions - see Stopped here
+[33m3289c22[m Before converting if/thens ternaries where applicable
+[33m3f250d3[m CSS adjustments
+[33mcc8b28b[m Added disabling to table options for fluid imgtype
+[33mcc3d765[m[33m ([m[1;32mmilestoneCleanup053020[m[33m)[m Mileshote Cleanup 053020 complete
+[33mdcaa550[m Cleanup in progress...
+[33m6f3f544[m Before branching to milestoneCleanup053020
+[33me668530[m Stopped here...handleCcpActions in toggleImgType
+[33m0350476[m Disable/enable TD buttons if imgType is fluid
+[33me735a87[m[33m ([m[1;32mrethinkImgTypeLogic[m[33m)[m Making progress with new logic
+[33m57476d9[m Before branch to rethinkImgTypeLogic
+[33mecec650[m Before checkout a5062fa
+[33mae5cc09[m[33m ([m[1;32mwriteAttributesToCcp[m[33m)[m Before merge writeAttributesToCcp to master
+[33m5e1e823[m ImgType toggle finally works
+[33me56042b[m Fixed updateCcp running twice in dev mode
+[33mc9c2548[m 052920 Start - fixed devmode
+[33m25b8977[m Stopped here
+[33md8cdc05[m Starting on updateCcp
+[33mdf524ed[m initCcp issues
+[33ma5062fa[m Before branch to writeAttributesToCcp]
+[33mdfd5299[m Added imgType to Attributes, added imgType logic to uSels
+[33mc2ad43b[m handled fixed/fluid radio button clicks
+[33m6ed976e[m[33m ([m[1;32mreconfigureGetAttributes[m[33m)[m Replaced all calls to getAttributes with passed argument
+[33m4ac6b1e[m Change getAttributes return values to objects instead of arrays
+[33m9fa5706[m Filtered Attributes by object id
+[33m9574cb6[m Transformed getAttributes attributes into arrays
+[33m915dc02[m[33m ([m[1;32mreconfigCCPDisplay[m[33m)[m Fix to getAttribute values
+[33m5579859[m getAttribute values work with fluid option in Clipboard output
+[33mf362364[m working on adding ccpElement variable to getAttributes
+[33mc6bf190[m[33m ([m[1;32mmakeFluidOption[m[33m)[m Branching to reconfigCCPDisplay
+[33m038d7c8[m Grappling with value display in CCP
+[33maef62e5[m updating JS for fluid option
+[33md0cd17c[m HTML changes
+[33m54c042f[m Before makeFluidOption branch
+[33m24130a2[m[33m ([m[1;32mheaderUpdates[m[33m)[m Header updates complete
+[33mf763969[m[33m ([m[1;32mupdateCCPTableOptions[m[33m)[m CCP table options updated
+[33me67296e[m Before branch updateCCPTableOptions
+[33m625c09a[m Fixed issue with X's displaying on No Image
+[33m6c2f120[m Upgraded to gulp 4.0.2
+[33ma39e673[m Purge all dev garbage, rename src to app
+[33m88d71fe[m[33m ([m[1;32mcleanupAppMessages[m[33m)[m AppMessages work and are relatively DRY...only the add/remove eventListener functions are duplicated
+[33mb87bb4d[m Before branch to cleanupAppMessages
+[33m1f1530c[m Messages and tooltips work, but messy and need to be commented
+[33me5152a0[m[33m ([m[1;32mimplementModifierTooltips[m[33m)[m Modifier tooltips complete.
+[33mbaea482[m[33m ([m[1;32mtryAltToolTips[m[33m)[m altToolTips approach works...needs details
+[33mfc3157b[m Trying ALT+CTRL hold/release to display/hide tooltip
+[33mdd10c48[m Before branch to tryAltTooltips
+[33m065d6c0[m[33m ([m[1;32mreconfigureMessages2[m[33m)[m Messages reconfigured, but tooltip implementation sucks
+[33ma4dd10b[m[33m ([m[1;32mreconfigureMessages2q[m[33m, [m[1;32mreconfigureMessages[m[33m)[m Simplified configuration -- tooltips work
+[33mb252a8d[m Partially working...still have no system
+[33m2e114c2[m 051620 before branch reconfigureMessages
+[33m6e62d0d[m Tooltips complete with animation
+[33m095f341[m Tooltips defined up to table options
+[33m14d3cbd[m Adding ccpUserInput tooltips
+[33m99b79ee[m 051520 Start
+[33m6699a55[m[33m ([m[1;32mstartToolTips[m[33m)[m Tooltips work, still need CCP tooltip strings
+[33ma3786df[m Completed Inspector clipboard functionality
+[33m01f361c[m 051420 Start
+[33m634e4bb[m[33m ([m[1;32minspectorClipboardOutput[m[33m)[m Simple click on inspector output to Clipboard works
+[33mc92b1f0[m Inspectors display properly, alerts don't work
+[33m51650c4[m Renamed Inspector elements and vars, added spn elements to inspectorElements array
+[33m7963e42[m Evaluated and resolved old TODOS
+[33ma2b3a07[m[33m ([m[1;32mrethinkEventHandling[m[33m)[m Reconfigured handleKeyup to stop excessive getAppdata calls on every key event
+[33m322e0f7[m 051220 Start - rethinking event handling
+[33m91174f0[m Cleanup and annotate 5.11.20
+[33mf55d613[m 051020 Stop
+[33m87d3a01[m[33m ([m[1;32mfinishVmlButton[m[33m)[m vmlbutton with options finished, mostly
+[33mac0a060[m Added error if no height or width entry for vmlbutton
+[33m92ec3ba[m Before branch to finishVmlButton
+[33m5d60f1e[m Cleanup and comment display/hide TD options code
+[33m6462c45[m[33m ([m[1;32mtryShowHideTDOptions[m[33m)[m Show/hide TD options works
+[33m26664ab[m 051020Start - vmlbutton
+[33m3fbf1bd[m[33m ([m[1;32mimplementPhonesLocalStorage[m[33m)[m Implement phones local storage and reconfigure dev mode complete
+[33m71616ca[m trying to fold initDev into initUI
+[33m0dbeae4[m Before branch to implementPhonesLocalStorage
+[33mbed8d94[m 050922 Start
+[33m833f73d[m Added tag to CSS selector in output
+[33m2796c9e[m[33m ([m[1;32mtryLocalStorage[m[33m)[m localStorage for viewerW implemented
+[33md7f6766[m Fixed imgswap codeBlock
+[33m657838b[m[33m ([m[1;32mimplementVMLButton[m[33m)[m Before merging implementVMLButton to master:
+[33m7a3f80a[m Width and height works in vmlbutton
+[33m8dbc6d1[m Before branch to implementVMLButton  - mostly already implemented, forgot to branch
+[33m15134be[m Before branch to implementVMLButtons
+[33m859c320[m Reconfigure and reposition msg container
+[33mad46306[m Finished isolate app routines
+[33mf77507a[m Isolate app routines added in init: and isolateApp
+[33mfa9578d[m Added isolate button to open app in new window
+[33m0b3af10[m Rearranged the CCP options to optimize screen real estate
+[33m2b1777c[m Fixed Chrome display issues
+[33mbf20617[m[33m ([m[1;32mimplementExcludeImg[m[33m)[m TD option exclude img works
+[33m2ea1eaa[m Before branch to implementExcludeImg
+[33me6252e8[m Update CCP layout in progress
+[33mb5fc34e[m 05.04.20 Start - before branch to addExcludeImg050420
+[33m9a2b855[m 05.03.20 Start
+[33m6c97cc5[m[33m ([m[1;32mtryTextStringIndents[m[33m)[m Inserting MS conditional comments as strings works
+[33mb2d3b32[m Before adding class to parent TD
+[33mc913227[m Before branch to tryTextStringIndents
+[33m0724d2d[m[33m ([m[1;32mfixCommentNodeIndents050220[m[33m)[m fixCommentNodes
+[33m102372e[m Figured it out...mostly
+[33md10b592[m Added content placeholder to posswitch
+[33ma971237[m Commented buildOutputNodeList and applyIndents
+[33ma25bcb3[m[33m ([m[1;32mimplementPosswitch043020[m[33m)[m posswitch works, finally (I think)
+[33mc07c0e5[m posswitch OK except img and a
+[33me000074[m Merged bgimage and imgswap into one routine in buildNodeList
+[33meaaaae0[m[33m ([m[1;32mImplementBgimage042820[m[33m)[m Bgimage implemented - same minor indent issue as imgSwap - merging to master
+[33ma57a6fe[m Before ImplementBgimage042820
+[33m6b1c600[m[33m ([m[1;32mimplementImgSwap[m[33m)[m imgSwap works except rogue indent still doesn't work. Merging to master
+[33m6332904[m imgSwap works, except for indent afterbegin of parent TD of the conditional code block
+[33mde69ccb[m Returned imgSwapBlock isn't a commentNode - it's a string
+[33m89a6e00[m[33m ([m[1;32mconvertNodeListToArray042620[m[33m)[m 042720: Basic Indent Scheme Reconfigured. Merging to master
+[33mf6209ed[m 042720: Simplified Indent Scheme for Basic TD Works
+[33m5c2047a[m 042620 Start - handle IMG and A indents
+[33m25a5b9e[m Initial rethink works
+[33m0dd0c3d[m 04.25.20 Start
+[33mf0067ef[m Quit 042420
+[33m842f078[m Before branch to rethinkIndents042420
+[33mb9a8925[m[33m ([m[1;32mfixPosSwitch041220[m[33m)[m Saved to witty_branch, merging to master. Need to rethink everything
+[33m83bb6c9[m[33m ([m[1;32mfixPosSwitchIndents[m[33m)[m Start 041220 - mergin to master
+[33m1593b1e[m Start 041120
+[33mfa81aa4[m Still trying to figure it out, see 945
+[33m82d061a[m TD Include anchor options work again
+[33mcf56e82[m 032920 Start
+[33m2baf5ec[m posswitch works for makeTD
+[33m35af8ca[m Very confused...
+[33m6bb4260[m cleaned up console output
+[33mdf77ed1[m 032620 Start
+[33mfe46847[m[33m ([m[1;32mfixTableOutput[m[33m)[m Merging to master
+[33md0185f4[m 032320 Start - Everything works, but small issues with MS conditional indents
+[33mb9442d4[m[33m ([m[1;32mfixPosSwitch[m[33m)[m Everything works except TABLE, so merging with master
+[33md3c7f68[m 032020 End
+[33mb29cc7a[m posswitch td button works, but now imgswap and bgimage are broken!
+[33m7194a2a[m Found the posswitch problem!
+[33m5befa3b[m Renamed index and indentLevel to activeNodeStartIndex and indentStartPosition
+[33mb2b3ead[m 031620 Start - Cleared all console.logs in prep for posswitch work
+[33m5c0615d[m 031520 Start
+[33m15228ca[m[33m ([m[1;32mseparateIndentFunctions[m[33m)[m Before merging separateIndentFunctions with master
+[33m58908d4[m Override tdoptions selection for IMG button click
+[33mb8fba54[m[33m ([m[1;32mreconfigIndents031320[m[33m)[m 031420A: basic, imgswap, bgimage works mostly, merging to master
+[33m874f1fb[m 031420 Start - Do bgimage comment section
+[33m57e01b3[m IMG and TD buttons work for basic and imgswap
+[33m10b8063[m Everything works up to imgswap/TD.
+[33m08b396a[m[33m ([m[1;32m031320A[m[33m)[m Got comments to work in the imgswap block
+[33m9668af7[m basic indents work...now
+[33m2996584[m Img special handling indent works
+[33ma202a7f[m Basic td indents work
+[33me68615f[m Indents and correponding node indices work
+[33m7612274[m nodeList for tableNodeFragment created in parseTopNode
+[33mac46c57[m 031320 Start - before branch to parseUserSelection
+[33ma0e1316[m Branching to tryFragments031220
+[33mc18dc97[m[33m ([m[1;32mgetUserSelection[m[33m)[m 03.12.20 Start: All Img and Td options work, saving to disk, returning to master
+[33md584523[m Everything works now except tables...now comes the hard part
+[33mebbd4e5[m Start 03.11.20 img and td basic work
+[33m65e036d[m Stopped here 03.10.20
+[33maecd27a[m Before branch to getUserSelection
+[33mad64ad6[m Start 03.10.20 before branch to indentFunction
+[33mc38f61b[m[33m ([m[1;32mbgimageIndents[m[33m)[m Bgimage indents work
+[33m2151a1e[m Before branch to bgimageIndents
+[33m2e3b13b[m[33m ([m[1;32mmobileSwapIndents[m[33m)[m mobile swap td indents work
+[33m76d6dd3[m mobile swap function complete
+[33m39eb203[m 030920A start
+[33m4a140ef[m Basic TD output works for all outputs
+[33m675d811[m Stopped 030720
+[33m4167519[m[33m ([m[1;32mindents030620A[m[33m)[m Added applyIndent function
+[33mb7454bb[m New indent scheme works for all cases with basic td  option
+[33mfe0ce03[m Before branch to indents030620A
+[33mfbed462[m[33m ([m[1;32maddConditionalToIndents[m[33m)[m Before reset to master for reconfiguring indents AGAIN
+[33m7e645bd[m Before branch to addConditionalToIndents
+[33mc827c37[m 03.06.20 Start - add image swap
+[33m6c1c71f[m Background image code indents OK now
+[33ma9ec5e9[m[33m ([m[1;32m030502Start[m[33m)[m Indents finally work, except for background image
+[33mb582aa3[m Indent adjustments
+[33m61f610a[m[33m ([m[1;32mfixDoIndentsAgain[m[33m)[m this is as close as these indents are EVER going to get
+[33m282bcba[m[33m ([m[1;32mmorePosSwitchNodesAttributes[m[33m)[m PosSwitchNodes functionality FINALLY works, except for minor doIndents issues
+[33m4fc35c2[m Latest greatest
+[33m637fc5e[m After merging setPosSwitchNodeAttributes to master
+[33m6d36cf0[m[33m ([m[1;32msetPosSwitchNodeAttributes[m[33m)[m fixes to testTuesday test function -- ok to merge to master
+[33m5e51030[m See testTuesday() for solution to multiple siblings issue
+[33mde3a96f[m Modified makePosSwitchNodes for different sibling descendent counts
+[33mda1b8bd[m before branch to setPosSwitchNodeAttributes
+[33m1e7d533[m Before branch tryAddingElements
+[33m24413ba[m Before branch to moreIndentHell
+[33m2f2c977[m Correction: 03.02.20 Start
+[33m384a77f[m 03.01.20 Start - fixed anchor indents
+[33m800dfa1[m[33m ([m[1;32maddAnchorToImg[m[33m)[m Anchor tag added to img options
+[33mf4874e6[m Added percent char filter to CSS output
+[33m86e511f[m[33m ([m[1;32mfixCssRuleOutput[m[33m)[m CSS output works
+[33m768732f[m[33m ([m[1;32maddTdHeightInput[m[33m)[m td height input added
+[33mad58af2[m Before branch to addTdHeightInput
+[33m6e17e31[m 03.01.20 Start
+[33m1bd08b1[m Background image indents work now
+[33m4d612ca[m interim save
+[33maff522e[m[33m ([m[1;32mtryDoIndent4[m[33m)[m Indents finally work...
+[33ma0e19fd[m Making progress with doIndent3 but still not right
+[33mde9bfd4[m 02.28.20 Start
+[33md1627a7[m[33m ([m[1;32mfinishPosSwitchTd2[m[33m)[m All PosSwitch elements created
+[33m333e111[m[33m ([m[1;32mfinishPosSwitchTD[m[33m)[m Cleaned up doIndents
+[33mb14dd9d[m[33m ([m[1;32mreconfigDoIndents[m[33m)[m 02.27.20 Start
+[33mb146e67[m Looping indents works
+[33m35f569c[m before reconfigureBeautify
+[33m5251335[m[33m ([m[1;32maddPositionSwitchTD[m[33m)[m RTLPositionSwitch works
+[33mab4cacc[m Problems with the RTL position switch
+[33m6c01448[m Before branch to addPositionSwitchTD
+[33m6b06127[m[33m ([m[1;32mtestIndentJS[m[33m)[m HTML  Beautify implemented and commented out for now
+[33me26fe34[m 02.26.20 Start
+[33m0ab8bfe[m[33m ([m[1;32mradioButtonsOnTdOptions[m[33m)[m Radio buttons work
+[33mb9a4215[m Before change to radio buttons on TD options
+[33me759931[m role=presentation added to tables output
+[33mdfb1485[m td Bgimage code indents work for table and table wrapper
+[33m5483f0b[m 02.25.20 Start - td Bgimage indents
+[33m3947576[m[33m ([m[1;32mrestructureClipboard[m[33m)[m Clipboard reconfigured except Bgimage = checked
+[33m61c5e87[m 02.24.20 Start - clipboard restructured, start doIndents
+[33m3d3f4c9[m[33m ([m[1;32mfixToolbarMobileInputs[m[33m)[m Before merging fixToolbarMobileInputs with master
+[33m687df0b[m Before branch to fixWoolbarMobileInputs
+[33m38a6620[m 02.23.20 Start
+[33m741f140[m[33m ([m[1;32mrenameClipboardElements[m[33m)[m Clipboard elements renamed
+[33m1a891bd[m Make HTML tags renamed
+[33ma78de18[m Before folding test.js and test.hmtl into script.js and index.html
+[33ma271b93[m getCheckboxSelection added
+[33mad6737a[m 02.20.20 Start: getAlignAttribute added
+[33m93cb2e5[m Clipboard output  reconfigure complete!
+[33m3f6142c[m 02.19.2020 Start: Moving td attributes to getAttributes
+[33m5458ad5[m End 02.18.20 - put image attributes in getAttributes()
+[33m52a00ca[m HTML Clipboard buttons work, indents don't
+[33m07ae18c[m Img and Td output is correct under new Clipboard configuration
+[33m008e59b[m 02.18.20 Start - Reconfiguring Clipboard functionality
+[33m5388557[m Reconfiguring the Clipboard functionality
+[33m889f152[m Start 02.17.20
+[33mac13e5c[m Fixed table output indents -- hacked but working
+[33m5fd288c[m Rejiggered header
+[33m2007901[m 02.16.20 Start
+[33m35c9e65[m Added content, header layout mods
+[33mc4e50f1[m 02.12.20 Start - content to drop area
+[33me35db69[m 01.14.20 Start - Fix wrapper table, CSS adjustments
+[33m14accc2[m More CB fixes
+[33m6786171[m Fixes to CB CSS button output
+[33m3b894df[m Fixed Include wrapper table checkbox
+[33m1998dd9[m 01.11.20 Start
+[33m7f63067[m Fix ccp option columns vertical alignment in Chrome
+[33m87537ed[m[33m ([m[1;32mCCPFlexboxOverhaul[m[33m)[m CCPFlexboxOverhaul complete
+[33ma7d7ea6[m CCPFlexboxOverhaul in progress
+[33m953d9d7[m Before branch to CCPFlexboxOverhaul
+[33m2503408[m Adjustments to Inpector panel CSS
+[33m5b2067a[m[33m ([m[1;32mInspectorPanelFlexboxOverhaul[m[33m)[m InspectorPanelFlexboxOverhaul complete
+[33m0108f96[m[33m ([m[1;32mToolbarFlexboxOverhaul[m[33m)[m Tool Flexbox Overhaul Complete
+[33md848f9e[m Updated CCP HTML, JS, and SCSS with new naming scheme including checkboxes.
+[33m09992c4[m 01.08.20 - Start
+[33m2165085[m Batch rename done, mostly works
+[33m38acce8[m Batch rename aliases, scripts-batch-02.js
+[33mff7caca[m Renaming with S&R Scripts in progress
+[33mfa586d0[m Naming Scheme Changes 1
+[33mb94eeb2[m 01.03.20A - ESLint fixes
+[33m08d7185[m All clipboard buttons work
+[33m753feb9[m Half of CB buttons work
+[33mf8cf572[m 062119CBMods2 complete for now - it works and is DRYer than before
+[33m03bd818[m Can't get the function to run...see notes at top of JS.
+[33mb1b8750[m Clipboards 1-3 work
+[33m2a814a2[m working...
+[33mab66caf[m getAppdata recoded - branching to 062119CBMods2
+[33mc371d28[m Before branch 062119_CBMods
+[33md23d270[m Correction: 06.21.19 Start
+[33m9f6e8b3[m 06.20.19 Start
+[33m60a34a2[m Fix flashAppMessage to include status messages and cleanup
+[33mc7cf393[m Before merge 0619FixPhonesInput
+[33m86055c0[m Before 0619FixPhonesInput
+[33m42a34d7[m After fixAppMessages merge
+[33mef3e14b[m Error messages and event handling work
+[33m0bd87ca[m More changes to Tab and Enter handling
+[33mc4f6f41[m Fixed Enter, Tab and Esc
+[33m754394a[m 06.18.19 start
+[33m0d1eae5[m intermediate commit
+[33mddf6304[m before revisitArguments merge
+[33m2fe92d7[m Before branch revisitArguments
+[33m0416ef2[m Merged checkUserInput
+[33m24434dd[m checkUserInput works
+[33md48b549[m Before branch to checkUserInput
+[33mb3144e4[m 06.17.19 Start
+[33m8e4674b[m 061419 Start
+[33m87ee897[m Cleanup after merge
+[33mace1ecc[m TB buttons work, merging with master
+[33m96a9459[m handleMouseEvents, handleToolbarInput, updateAppdata works.
+[33m16b8d9e[m Enter key works
+[33mb01e65b[m Start 061219. Esc works, implemented elementIdToAppdataProp in handleKeyup
+[33mf6bdfca[m ESC works as desired
+[33mf129485[m 061219 start - viewerW input works with ESC
+[33m4567a28[m Commit 1
+[33m04d2071[m isNewImgFunction complete
+[33m1f4d255[m After 061119 merge
+[33m432d0c9[m 061119Start done
+[33m2697db8[m Branching to 061119Start
+[33m2e8f9cb[m Last commit before 061119Start
+[33m3709435[m Before branch to fixInputBehavior
+[33mde335b8[m More post-rename UI fixes
+[33m8eb659c[m UI elements renamed
+[33ma8c478a[m Renamed, but CB is now broken
+[33md425bc4[m Before branch to EventHandlingTest
+[33m43c5226[m Fixed filename issues
+[33ma315a0d[m Flowchart and adjustments
+[33m7e8998c[m ImgWriteHTMLToCB button works
+[33m3521918[m Fix CCP class inputs
+[33mff4ad40[m Checkboxes implemented
+[33m705ba6f[m 060819 Start
+[33m8e52fc6[m Added CCP toggle, CCP functionality
+[33mba1f68f[m viewerW/H issues fixed
+[33m3f6adf4[m Start 060719
+[33m663f62f[m error handling issues
+[33m3c1c02d[m Cleanup and fixes
+[33m07809a9[m setDimAlerts fixed
+[33m1ce7cbb[m Cleanup after merge
+[33m896661d[m Fixed handleUserAction
+[33m4e9d37e[m Making progress
+[33m17a0d3b[m Fixed temporary problem
+[33mce22f71[m Still working on it...
+[33mcbed204[m DoContainerHeights fixes
+[33ma59e9ff[m Purge complete
+[33m9dd74b6[m Prepare 060519Purge - add labels and backup to 060519.js
+[33m2eda901[m Rename whitty to witty, prepare for 069519Purge
+[33m2b46c14[m Load img and dimViewers works, user and dev
+[33m174968e[m Rewrite: stopped here
+[33maea9450[m Prepare branch rewrite060419
+[33m8922494[m Aborted MoveCalcsToAppController, switched back to master with minor edits
+[33m4e45391[m Shorten the clipboard function names and make them more descriptive and extensible
+[33m4828469[m 06.01.19 start
+[33m0b00b19[m Updates to flowchart notes
+[33me3f90bb[m Flowchart, added Swap item to toolbar
+[33mea1634a[m 05/30 Stop
+[33m75444da[m Fixed app message display bug
+[33mcf57a87[m Finished CCP mods
+[33m063e0c8[m Before branch to 'add_td_and_table_ccp_buttons'
+[33m40b4381[m 05/30 start
+[33m71921be[m Redesigned CCP CSS icons
+[33m10a4acb[m 5/29B - minor fixes
+[33m1612eed[m 5/29 start
+[33me83db15[m Done restyling CCP
+[33m5d0880e[m Reworking CPP CSS
+[33mbb559b7[m trying to use SSH for repo
+[33m8af38c8[m Before CCP CSS Changes
+[33m63ddb2d[m Removed tmp repo needed for move to github
+[33m776e859[m renamed index and js to *.html and *.js
+[33m3803537[m Switched to arnie on ubuntu
+[33m3174952[m chagned table width to input field with default imgW
+[33maf8081d[m Wrapper table options work
+[33m6c7dba1[m Put 'include wrapper table' options in col 3 of CCP
+[33ma40aa43[m Some testing of output
+[33m81c4f52[m Table wrapper works
+[33m81da4ec[m Show hide wrapper width done
+[33m3dfc9c3[m Finished styling new table options
+[33mcd39b2d[m 5/14A - Adjust CCP CSS
+[33m307a360[m Added relPath att to stig's bg
+[33m99d66e3[m Implemented bgcolor and stig's background image
+[33mc270689[m 5/13B
+[33mb9fcae5[m Didn't look thru clipboards, but fixed flash message issues
+[33m27b43c9[m Changed to app-message-container and -display
+[33m5c425b5[m 5/13A start
+[33mb32f189[m Error viewer works above toolbar
+[33me57e653[m Repositioned error container above toolbuttons
+[33m8dc2e70[m V1 error message functionality works
+[33m9a082ff[m Small and large phone CSS clipboard output working
+[33md781a81[m Log messages to console on clipboard success
+[33mdf4c1a5[m Show CSS clipboard output buttons, img CSS clipboard output
+[33m6a9513c[m More clipboard output fixes
+[33m22f511c[m Recoded clipboard output for complete tags not arrays
+[33m7d79f20[m Moved CCP init to separate function
+[33m89c8c02[m Updates to table options
+[33mb274e8e[m Table and TD tags work, but it's messy...
+[33m3ea8b22[m Removed old console calls
+[33md414d81[m Folded all imgTag functions into the object definitions
+[33m3f3e633[m Img tag clipboard output is done...whew!
+[33m7ef96a6[m Styled and toggled style attribute checkbox in CCP
+[33mbb14724[m 5/9A More img clipboard output
+[33m2e1d484[m imgTag written to clipboard.
+[33m76100a6[m 5/8A Working on clipboard output
+[33m0ed2245[m Clipboard output start - see Stop here
+[33mbdf61b7[m Display CCP
+[33m6e164b1[m Fixed icons on toolbutton  input fields
+[33m434824a[m Fixed toolButtons
+[33m4bf367e[m Added errorHandler, fixed input focus issue.
+[33ma4971e3[m Finished handleTBInput
+[33mfb02094[m Created handleTBInput to handle the TB input fields
+[33maa30848[m updateCustomH works
+[33m35cdd21[m Fixed the missing top and bottom padding on viewerH
+[33m17f2b12[m Fixed viewerW issue - removed evalViewerWidths
+[33m61837e7[m Uncovering lots of bugs...need to look at old verison logic
+[33me3449d4[m Added window onload to dev mode for Firefox
+[33mf957636[m Fixed input blur and renamed toolButton elements
+[33mcb30dea[m Before branch to renameUIElements
+[33m0c8178d[m CustomW input works, need to test
+[33mee0b616[m viewerH input field works
+[33me7258e6[m updateAppData continued
+[33m8eecc34[m Lots of progress on event handlers
+[33m75d14e9[m added test.html with scaffold for event handling
+[33mc390e5c[m Start scaffolding event handling
+[33m9b70de3[m Fixed remove curImg on new drop in DEV mode
+[33maad4be9[m Fixed dropping new images on DEV image
+[33mdaae39b[m just garbage - go back
+[33mc0d13dd[m Fixed dim alerts
+[33m606fbad[m Working on dim alerts still
+[33maa242dc[m Working on dim alerts
+[33m606fb95[m Overwriting existing curImg in handleFileSelect fixed
+[33ma833bd0[m Added onload to getElementProperties
+[33m8d9e59b[m Commented today's code changes
+[33m87597c2[m Works now with FileReader objects
+[33m8fa18de[m Ready to merge to master
+[33m881d6e5[m 5/2 All test files work in DEV mode
+[33md083124[m 05/02A: refreshAppUI
+[33mb76dd05[m STOPPED HERE...adjustHeights function
+[33mbadcf85[m Reworking init start
+[33m614943c[m STOP HERE...
+[33mdf632e4[m FileReader object loaded
+[33m7963ab9[m Works in DEV mode and USER mode with no image
+[33m6159392[m After creating local ..._bak.js
+[33mac5aec1[m STOPPED HERE
+[33m6aa10c3[m Working on InitializedDOM with no dev or user img
+[33m0d00a95[m remove gitignore files
+[33m553027a[m First commit of clean create-html-project
