@@ -396,9 +396,12 @@ var Witty = (function () {
     // !VA UIController private
     // !VA If called from populateAppobj, returns the value of text input fields as hard-coded in the HTML. Otherwise, called by configCCP, which receives an array of aliases whose corresponding CCP element value is set to its corresponding Appobj value. 
     function reflectAppobj( reflectArray) { 
-      // !VA Branch: 102120A
+      // console.log('reflectAppobj running');
+      // console.trace(reflectArray) 
       let el, isInit, retVal, toolbarAliases;
       for (const alias of reflectArray) {
+        // if (alias === 'ccpTbwClassTfd') { console.log('HIT');}
+        console.log('alias :>> ' + alias);
         typeof(appController.getAppobj(alias)) === 'undefined' ? isInit = true : isInit = false;
         // !VA Ignore toolbar aliases here - they do not need to be reflected and probably should not have been passed in from handleBlur. For later. 
         toolbarAliases = ['curImgW', 'curImgH', 'imgViewerW', 'sPhonesW', 'lPhonesH' ];
@@ -1062,19 +1065,27 @@ var Witty = (function () {
 
 
 
+          // !VA Branch: 110320A
+          // !VA Review this, it may have been made obsolete by configDefault. I removed all the direct calls to the configCCP methods. If there are no repercussions deprecate this annoying resource hog.
           for (const key of Object.keys(ccpUserInput)) {
             if (key.substring( 11 ) === 'Tfd') {
               // !VA Appobj[ key ] is undefined, causing reflectAppobj to return the hard-coded values in the HTML file. These are the Appobj initialization values. These values are currently all empty strings but that could change so the best place to get them is value attribute of the the HTML file, just like the other Appobj init functions below.
               // !VA NOTE: This is not what's happening at all. reflectAppobj isn't returning the HTML default, it's returning whatever happens to be in the input field at the time, so it's actually resetting nothing. The reset has to happen in configDefault. This should be reviewed - seems like it might be a waste or need to be rethought. One option is to first clear existing values, then get the value. That would leave us with the HTML presets. In the meantime, all the presets are in configDefault. 
-              Appobj[ key ] = reflectAppobj( [ key ] );
+              // !VA Branch: 110320A
+              // !VA This is why ccpTbwClassTfd isn't showing devicewidth on init. What is the purpose of this actually? 
+              // Appobj[ key ] = reflectAppobj( [ key ] );
             }
             // !VA Write the Align/Valgn radio input element values to Appobj.
             if (key.substring( 11 ).includes('Rdo')) {
               // !VA Appobj[ key ] is undefined, causing radioState to return the hard-coded values in the HTML file. These are the Appobj initialization values. 
-              Appobj[ key ] = radioState( [ key ]);
+              // !VA Branch: 110320A
+              // !VA Testing removal...
+              // Appobj[ key ] = radioState( [ key ]);
             }
             if ( key.substring( 11 ).includes('Chk')) {
               // !VA Appobj[ key ] is undefined, causing checkboxState to return the hard-coded values in the HTML file. These are the Appobj initialization values. 
+              // !VA Branch: 110320A
+              // !VA Testing removal;
               Appobj[ key ] = checkboxState( [ key ] );
             }
           }
@@ -4207,7 +4218,7 @@ ${indent}<![endif]-->`;
         configObj = configExcld( alias, option );
         break;
       case alias === 'ccpImgItypeRdo' :
-        // !VA Get the CCP configuration for the IMG Itype (fixed/fluid) radio switch
+        // !VA Get the CCfP configuration for the IMG Itype (fixed/fluid) radio switch
         configObj =   configItype( alias, option );
         break;
       case alias === 'ccpTdaOptnsRdo' :
@@ -4840,7 +4851,8 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from fetchConfigObj to get the TD Option radio group-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
     function configOptns( alias, option ) {
-      // console.log('configOptns alias :>> ' + alias);  
+      console.log('configOptns alias :>> ' + alias);  
+      console.log('configOptns option :>> ' + option);  
       let revealFlag, revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray, highlightArray;
       let configObj = {};
 
@@ -4850,6 +4862,10 @@ ${indent}<![endif]-->`;
         case option === 'basic':
         // !VA For the TD Options basic and swtch, use the default CCP configuration
         configObj = configDefault( alias, option );
+        console.log('configOptns configObj :>> ');
+        console.log(configObj);
+
+
         break;
 
         case option === 'iswap':
@@ -5301,7 +5317,11 @@ ${indent}<![endif]-->`;
 
 
         // !VA Then set the CCP to configDefault on init. NOTE: the default parameter sets Appobj.ccpTdaOptnsRdo to an empty string, which forces populateCcpProperties to access the hard-coded value from the HTML file. That is the default, i.e. the 'basic' option. That is the mechanism for pre-selecting the 'basic' TD option on reload. Not ideal, but that is a carryover from before we were using configObj for configuration. At least I think that's the way it works :-)
+        Appobj.ccpTbwClassTfd = 'devicewidth';
+        console.log('Appobj.ccpTbwClassTfd :>> ' + Appobj.ccpTbwClassTfd);
         configObj = configDefault('default', 'basic' );
+        console.log('init: configObj :>> ');
+        console.log(configObj);
         UIController.configCCP(configObj);
 
         // !VA Set up event listeners
