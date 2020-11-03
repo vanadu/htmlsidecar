@@ -3483,28 +3483,110 @@ ${indent}<![endif]-->`;
     //   return paddingDelta;
     // }
 
-    function showPaddingDependencies(paddingWidth, paddingHeight) {
+    function calcPaddingDependencies( pNew, pDeltaW, pDeltaH) {
       let lft, rgt, top, btm;
-      console.log('paddingWidth :>> ' + paddingWidth);
-      console.log('paddingHeight :>> ' + paddingHeight);
-      // !VA Calcs
-      Appobj.curImgW = Appobj.curImgW - paddingWidth;
-      Appobj.curImgH = Math.round(Appobj.curImgW * (1 / Appobj.aspect[0]));
-      Appobj.sPhonesW = Appobj.sPhonesW - paddingWidth;
-      Appobj.sPhonesH = Math.round(Appobj.sPhonesW * (1 / Appobj.aspect[0]));
-      Appobj.lPhonesW = Appobj.lPhonesW - paddingWidth;
-      Appobj.lPhonesH = Math.round(Appobj.lPhonesW * (1 / Appobj.aspect[0]));
-      // !VA Branch: 110220D
-      // !VA Goddam properties are strings...what a PITA!
+      console.log('pDeltaW :>> ' + pDeltaW);
+      console.log('pDeltaH :>> ' + pDeltaH);
 
-      Appobj.ccpTdaPdrgtTfd === '' ? rgt = 0 : rgt = parseInt(Appobj.ccpTdaPdrgtTfd);
-      Appobj.ccpTdaPdlftTfd === '' ? lft = 0 : lft = parseInt(Appobj.ccpTdaPdlftTfd);
-      Appobj.ccpTdaPdtopTfd === '' ? top = 0 : top = parseInt(Appobj.ccpTdaPdtopTfd);
-      Appobj.ccpTdaPdbtmTfd === '' ? btm = 0 : btm = parseInt(Appobj.ccpTdaPdbtmTfd);
+      
+      // !VA Calculate padding dependencies from the deltas of the current and new padding.
+      Appobj.curImgW = Appobj.curImgW - pDeltaW;
+      Appobj.curImgH = Math.round(Appobj.curImgW * (1 / Appobj.aspect[0]));
+      Appobj.sPhonesW = Appobj.sPhonesW - pDeltaW;
+      Appobj.sPhonesH = Math.round(Appobj.sPhonesW * (1 / Appobj.aspect[0]));
+      Appobj.lPhonesW = Appobj.lPhonesW - pDeltaW;
+      Appobj.lPhonesH = Math.round(Appobj.lPhonesW * (1 / Appobj.aspect[0]));
+      // !VA Put the post-change padding values in local variables - these are the post-change Appobj values from getPaddingNew()
+      rgt = pNew[1], lft = pNew[3];
+      top = pNew[0], btm = pNew[2];
+      // !VA TD Width reflects the post-change curImgW plus the post-change padding width
       Appobj.ccpTdaWidthTfd = Appobj.curImgW + lft + rgt;
+      // !VA TD Height reflects the post-change curImgH plus the post-change padding height
       Appobj.ccpTdaHeigtTfd = Appobj.curImgH + top + btm;
       console.log(` Appobj.curImgW :>> ${Appobj.curImgW};\n Appobj.curImgH :>> ${Appobj.curImgH};\n Appobj.sPhonesW :>> ${Appobj.sPhonesW}; \n Appobj.sPhonesH :>> ${Appobj.sPhonesH}; \n Appobj.lPhonesW :>> ${Appobj.lPhonesW}; \n Appobj.lPhonesH :>> ${Appobj.lPhonesH}; \n Appobj.ccpTdaWidthTfd :>> ${Appobj.ccpTdaWidthTfd}; \n Appobj.ccpTdaHeigtTfd :>> ${Appobj.ccpTdaHeigtTfd};`);
-      
+      return;
+    }
+
+    function configPadding(appObjProp) {
+      console.log('updatePaddingDependencies running');
+
+      // !VA If any other option than IMG Excld is selected, then resize curImg and recalc padding based on the padding inputs.
+      if (Appobj.ccpImgExcldRdo !== 'excld') {
+
+        // !VA If appObjProp is lft/rgt, then curImgW is modified, so handle the top/btm padding inputs at the tail of this condition, otherwise they will not be updated when curImgW is updated. 
+        // !VA Branch: 110320A
+        // !VA I don't know if this still applies...
+        // !VA Note: evtTargetVal is error-checked in handleBlur.
+        if  ( appObjProp.substring( 6 , 11 ) === 'Pdrgt' || appObjProp.substring( 6 , 11 ) === 'Pdlft') {
+
+
+          // !VA Create an object to pass to updateCurrentImage
+          let imgInputObj = [];
+          // !VA Set Appobj.curImgW to imgInputObj to the shrunk/unshrunk image's width
+          imgInputObj.evtTargetVal = Appobj.curImgW;
+          // !VA Now set the Appobj property of the current image element to be shrunk, i.e. curImgW.
+          imgInputObj.appObjProp = 'curImgW';
+          // !VA updateCurrentImage sets Appobj.ccpTblWidthTfd to curImgW in resizeContainers. Override that here to display the padding-dependent value for TBL width.
+          // !VA IMPORTANT: Note that TBL Width doesn't change - what changes is curImgW. 
+          tmp = Appobj.ccpTblWidthTfd;
+          appController.initUpdateCurrentImage(imgInputObj);
+          // !VA Restore Appobj.ccpTblWidthTfd to the temporarily stored override value 
+          Appobj.ccpTblWidthTfd = tmp;
+          // !VA Update the Inspectors for sPhones and lPhones. 
+          document.querySelector(inspectorValues.insSmallPhonesWidthValue).innerHTML = Appobj.sPhonesW;
+          document.querySelector(inspectorValues.insLargePhonesWidthValue).innerHTML = Appobj.lPhonesW;
+          document.querySelector(inspectorValues.insSmallPhonesHeightValue).innerHTML = Appobj.sPhonesH;
+          document.querySelector(inspectorValues.insLargePhonesHeightValue).innerHTML = Appobj.lPhonesH;
+
+          // !VA The handlers below apply the highlight if there is either an input in either of the width padding inputs or remove the highlight if there is no input in either of the width input fields.
+          if ( Appobj.ccpTdaPdlftTfd !== '' || Appobj.ccpTdaPdrgtTfd !== '') {
+            highlightArray = [ 'ccpTdaWidthTfd' ];
+          }
+          // !VA In this case, also reflect the ccpTdaWidthTfd value
+          if ( Appobj.ccpTdaPdlftTfd === '' && Appobj.ccpTdaPdrgtTfd == '') {
+            Appobj.ccpTdaWidthTfd = '';
+            reflectArray = ['ccpTdaWidthTfd'];
+            highlightArray = [ 'ccpTdaWidthTfd' ];
+          }
+          // !VA Set the reflect array for TD H, TD W and TBL W
+          reflectArray = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
+
+        // !VA If appObjProp is top/btm, then userInputObj comes from handlePaddingInput and curImgW is NOT modified. There is no dependency for curImgW on the height padding input values. Note: evtTargetVal is NaN-checked in handlePaddingInput, complete error-checking doesn't happen until the input is blurred.
+        } 
+        else if  ( appObjProp.substring( 6 , 11 ) === 'Pdtop' || appObjProp.substring( 6 , 11 ) === 'Pdbtm') {
+
+          // !VA Apply the highlight if there is either an input in either of the height padding inputs or remove the highlight if there is no input in either of the height input fields.
+          // !VA Branch: 110220C
+          // !VA This is poor style because the highlight is applied in both cases. The only actual condition here is if ccpTdaHeigtTfd is reflected. For later..
+          if ( Appobj.ccpTdaPdtopTfd !== '' || Appobj.ccpTdaPdbtmTfd !== '') {
+            highlightArray = [ 'ccpTdaHeigtTfd' ];
+            reflectArray = [ 'ccpTdaHeigtTfd' ];
+          }
+          // !VA In this case, also reflect the ccpTdaHeigtTfd value
+          if ( Appobj.ccpTdaPdtopTfd === '' && Appobj.ccpTdaPdbtmTfd == '') {
+            Appobj.ccpTdaHeigtTfd = '';
+            reflectArray = ['ccpTdaHeigtTfd'];
+            highlightArray = [ 'ccpTdaHeigtTfd' ];
+          }
+
+        } else {
+          console.log('ERROR in handlePadding - unknown condition');
+        }
+      // !VA For IMG Excld option, override curImg sizing and padding recalculation because there effectively is no curImg to resize/recalc
+      } else {
+        // !VA Branch: 110220C
+        // !VA Disable all autocalc of padding for now in IMG EXCLD mode by setting Appobj TD width and height to empty.
+        Appobj.ccpTdaWidthTfd = Appobj.ccpTdaHeigtTfd = '';
+        highlightArray = [ 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd' ];
+        reflectArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd'];
+      }
+      // !VA Build the config obj and run configCCP to apply the config
+      configObj = {
+        reflectAppobj: { reflect: reflectArray },
+        highlightIcon: { highlight: highlightArray }
+      };
+      UIController.configCCP( configObj );
+
     }
 
     function arrayStringToInteger(arr) {
@@ -3513,11 +3595,6 @@ ${indent}<![endif]-->`;
         arr[i] === '' ? arr[i] = 0 : arr[i] = parseInt(arr[i]);
       }
       return arr;
-    }
-
-    function propStringToInteger(str) {
-      str === '' ? str = 0 : str = parseInt(str);
-      return int;
     }
 
     function getPaddingNew( paddingAliases, userInputObj) {
@@ -3535,7 +3612,6 @@ ${indent}<![endif]-->`;
       }
       paddingNew = arrayStringToInteger(paddingNew);
       return paddingNew;
-
     }
 
 
@@ -3544,26 +3620,29 @@ ${indent}<![endif]-->`;
     function handlePaddingChange(evt) {
       console.clear();
       console.log('handlePaddingChange running'); 
-      let paddingWidth, paddingHeight, paddingAliases = [], paddingCurrent = [];
-      paddingAliases = ['ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd' ];
+      let pWidth, pHeight, pAliases = [], pCurrent = [], pNew;
+      pAliases = ['ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd' ];
       const userInputObj = { };
       userInputObj.appObjProp = elemIdToAppobjProp(evt.target.id);
       userInputObj.evtTargetVal = evt.target.value;
       let { appObjProp, evtTargetVal } = userInputObj;
-      for (const alias of paddingAliases) {
-        paddingCurrent.push(Appobj[alias]);
+      for (const alias of pAliases) {
+        pCurrent.push(Appobj[alias]);
       }
-      paddingCurrent = arrayStringToInteger(paddingCurrent);
-      // !VA 1) Get current padding
-      paddingNew = getPaddingNew(paddingAliases, userInputObj);
-      // !VA 
-      paddingWidth = -(paddingCurrent[1] + paddingCurrent[3]) + (paddingNew[1] + paddingNew[3]);
-      paddingHeight = -(paddingCurrent[0] + paddingCurrent[2]) + (paddingNew[0] + paddingNew[2]);
-      // !VA Set Appobj
+      // !VA Get the current padding before the change event as integer array
+      pCurrent = arrayStringToInteger(pCurrent);
+      // !VA Get the new padding after the change event
+      pNew = getPaddingNew(pAliases, userInputObj);
+      // !VA pWidth/pHeight is the delta of the current padding width/height and the new padding width/height.
+      pDeltaW = -(pCurrent[1] + pCurrent[3]) + (pNew[1] + pNew[3]);
+      pDeltaH = -(pCurrent[0] + pCurrent[2]) + (pNew[0] + pNew[2]);
+      // !VA Set Appobj for the change event target
       Appobj[appObjProp] = evtTargetVal;
 
-
-      showPaddingDependencies( paddingWidth, paddingHeight);
+      // !VA Calculate the padding dependences: curImgW, curImgH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, Appobj.ccpTdaWidthTfd, Appobj.ccpTdaHeigtTfd
+      calcPaddingDependencies( pNew, pDeltaW, pDeltaH);
+      // !VA Update 
+      configPadding(appObjProp);
 
 
     }
