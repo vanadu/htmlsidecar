@@ -2995,13 +2995,11 @@ ${indent}<![endif]-->`;
         }
       }
       
-      // !VA Focus event handler to reset padding values.
+      // !VA Change event handler to reset padding values.
       const pdngInputs = [ ccpUserInput.ccpTdaPdtopTfd, ccpUserInput.ccpTdaPdbtmTfd,ccpUserInput.ccpTdaPdlftTfd, ccpUserInput.ccpTdaPdrgtTfd ];
       for (let i = 0; i < pdngInputs.length; i++) {
         pdngInputs[i] = pdngInputs[i].replace('tfd', 'ipt');
         pdngInputs[i] = document.querySelector(pdngInputs[i]);
-        // !VA Branch: 110220D
-        // addEventHandler((pdngInputs[i]),'focus',handlePaddingFocus,false);
         addEventHandler((pdngInputs[i]),'change',handlePaddingChange,false);
       }
 
@@ -3260,9 +3258,7 @@ ${indent}<![endif]-->`;
         inputObj.appObjProp = appObjProp;
         updateCurrentImage(inputObj);
       }
-
       console.log('appObjProp.substring( 0, 3 ) :>> ' + appObjProp.substring( 0, 3 ));
-
       // !VA Branch: 102220A
       // !VA Run recalcAppobj on curImgW and curImgH to make sure the dependent CCP input values are consistent with other CCP input values.
       if (appObjProp.includes('curImg')) {
@@ -3270,9 +3266,7 @@ ${indent}<![endif]-->`;
       } else {
         console.log('applyInputValue - unknown condition');
       }
-
-
-
+      return;
     }
 
     // !VA appController private
@@ -3305,190 +3299,9 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
-    // !VA Called from eventHandlers. This function is necessary to reset dependent input values (TD H, TD W and TBL W) to their prior value to prevent value accumulation in the inputs. For width padding inputs, evtTargetVal is passed as a negative value, resulting in curImgW growing by the absolute value of evtTargetVal. For height padding inputs, evtTargetVal is passed as a positive number, reducing the dependent TD Height value by evtTargetVal. 
-    function handlePaddingFocus(evt) {
-      let userInputObj = {};
-      // !VA Get the Appobj/ccpUserInput alias from the target id
-      userInputObj.appObjProp = elemIdToAppobjProp(evt.target.id);
-      // !VA Handle the padding width inputs. Pass evtTargetVal as negative value to handlePadding to unshrink curImgW on focus. 
-      if  ( userInputObj.appObjProp.substring( 6 , 11 ) === 'Pdrgt' || userInputObj.appObjProp.substring( 6 , 11 ) === 'Pdlft') {
-        // !VA evtTargetVal is the value the user entered into the input element to be passed to handlePadding as a negative value.
-        userInputObj.evtTargetVal = Number(-evt.target.value);
-      // !VA Handle the padding height inputs. Pass evtTargetVal as a positive value to handlePadding to add padding to the TD height.
-      } else {
-        userInputObj.evtTargetVal = Number(evt.target.value);
-      }
-      // !VA Select the input value on focus
-      this.select();
-      // !VA NOTE: Compounded curImgW updates could happen here, keep an eye on it
-      // !VA Branch: 110220D
-      // !VA Revisit padding
-      // handlePadding( 'handlePaddingFocus', userInputObj);
-
-    }
-
-    // !VA appController private
-    // !VA Checks the input value for NaN then calls handlePadding if the target is a padding height input. evtTargetVal has already been converted to type 'number', so if it is not a number, then it is NaN. If it is NaN, exit the handler and let the error-check proceed on blur.
-    function handlePaddingInput(userInputObj) {
-      let { appObjProp, evtTargetVal } = userInputObj;
-      // !VA Here we do nothing except pass userInputObj from the input event. The input event handles padding height inputs.
-      if (isNaN( evtTargetVal )) {
-        return;
-      } else {
-        // !VA If evtTargetVal is a number and the target element is a height padding input, so pass userInputObj to handlePadding for padding processing.
-        if  ( appObjProp.substring( 6 , 11 ) === 'Pdtop' || appObjProp.substring( 6 , 11 ) === 'Pdbtm') {
-          // !VA Set the Appobj property of appObjProp. For padding width inputs, this is done in handleUserInput.
-          Appobj[appObjProp] = evtTargetVal;
-          // !VA Branch: 110220D
-          // !VA Revisit padding
-          // handlePadding('handlePaddingInput', userInputObj);
-        }
-      }
-    }
-
-    // !VA appController  
-    // !VA NOTE: Runs highlightPaddingIcon to whenever a padding input is blurred and passes userInputObj to handlePadding. handlePadding could be called directly from handleBlur to handle width inputs, but this function serves as a foil to handlePaddingInput which handles height inputs. So the main purpose of this function is to maintain structural symmetry.
-    function handlePaddingBlur(userInputObj) {
-      // !VA highlightPaddingIcon highlights the padding icon if there's a value in any of the padding inputs.
-      highlightPaddingIcon();
-      // !VA Here we do nothing except pass userInputObj from the blur event. The blur event handles padding width inputs.
-      // !VA Branch: 110220D
-      // !VA Revisit padding
-      // handlePadding('handlePaddingBlur', userInputObj);
-      // console.log('handlePaddingBlur Appobj.ccpTdaPdtopTfd :>> ' + Appobj.ccpTdaPdtopTfd);
-      // console.log('handlePaddingBlur Appobj.ccpTdaPdbtmTfd :>> ' + Appobj.ccpTdaPdbtmTfd);
-      // console.log('handlePaddingBlur Appobj.ccpTdaPdrgtTfd :>> ' + Appobj.ccpTdaPdrgtTfd);
-      // console.log('handlePaddingBlur Appobj.ccpTdaPdlftTfd :>> ' + Appobj.ccpTdaPdlftTfd);
-    }
-
-    // !VA appController private
-    // !VA Handles padding inputs from handlePaddingBlur (for width padding inputs) and handlePaddingInput (for height padding inputs). The caller argument is a debug argument that passes the name of the calling function and can be removed from this and the callers for production.
-    function handlePadding( caller, userInputObj ) {
-      console.log(`handlePadding called by ${caller} running`);
-      console.log('userInputObj :>> ');
-      console.log(userInputObj);
-      let tmp, reflectArray, highlightArray;
-      let imgInputObj = {}, configObj = {};
-      // !VA Destructure userInputObj
-      let { appObjProp, evtTargetVal } = userInputObj;
-      evtTargetVal = Number(evtTargetVal);
-
-      // !VA Branch: 110220C
-      // !VA If any other option than IMG Excld is selected, then resize curImg and recalc padding based on the padding inputs.
-      // !VA Branch: 110220D This should be handled at the source, not in the padding handler
-      if (Appobj.ccpImgExcldRdo !== 'excld') {
-        if  ( appObjProp.substring( 6 , 11 ) === 'Pdrgt' || appObjProp.substring( 6 , 11 ) === 'Pdlft') {
-
-          // !VA For option other than IMG Excld, do curImg resizing and padding recalculation
-  
-          // !VA If appObjProp is lft/rgt, then userInputObj comes from handlePaddingBlur and curImgW is modified, so handle the top/btm padding inputs at the tail of this condition, otherwise they will not be updated when curImgW is updated. Note: evtTargetVal is error-checked in handleBlur.
-
-          // !VA Update curImg by the the current evtTargetVal. For width padding inputs, evtTargetVal is passed from handlePaddingFocus as negative value to unshrink curImgW. 
-          imgInputObj.evtTargetVal = Appobj.curImgW - evtTargetVal;
-          // !VA Branch: 110220C
-          // !VA Also update sPhonesW, sPhonesH, lPhonesW and lPhonesH
-          Appobj.sPhonesW = Appobj.sPhonesW - evtTargetVal;
-          Appobj.lPhonesW = Appobj.lPhonesW - evtTargetVal;
-          Appobj.sPhonesH =  Math.round(Appobj.sPhonesW / Appobj.aspect[0]);
-          Appobj.lPhonesH =  Math.round(Appobj.lPhonesW / Appobj.aspect[0]);
-
-
-          // !VA Branch: 110220C
-          // !VA Terrible style, but gotta get this done. And I'm still not sure why sPhonesH and lPhonesH are updating automatically here, but they are. 
-          document.querySelector(inspectorValues.insSmallPhonesWidthValue).innerHTML = Appobj.sPhonesW;
-          document.querySelector(inspectorValues.insLargePhonesWidthValue).innerHTML = Appobj.lPhonesW;
-  
-          // !VA Set Appobj.curImgW to imgInputObj to the shrunk/unshrunk image's width
-          Appobj.curImgW = imgInputObj.evtTargetVal;
-          // !VA Now set the Appobj property of the current image element to be shrunk, i.e. curImgW.
-          imgInputObj.appObjProp = 'curImgW';
-          // !VA updateCurrentImage sets Appobj.ccpTblWidthTfd to curImgW in resizeContainers. Override that here to display the padding-dependent value for TBL width.
-          // !VA IMPORTANT: Note that TBL Width doesn't change - what changes is curImgW. 
-          tmp = Appobj.ccpTblWidthTfd;
-          // !VA Shrink the image. 
-          appController.initUpdateCurrentImage(imgInputObj);
-          // !VA Restore Appobj.ccpTblWidthTfd to the temporarily stored override value 
-          Appobj.ccpTblWidthTfd = tmp;
-          // !VA Branch: 110220B
-          // !VA Set the TD Width input to the curImgW plus the sum of the Appobj lft/rgt input properties.'
-          Appobj.ccpTdaWidthTfd = Appobj.curImgW + Number(Appobj.ccpTdaPdrgtTfd) + Number(Appobj.ccpTdaPdlftTfd);
-  
-          // !VA Set the TD Height input to the curImgH plus the sum of the Appobj top/btm input properties.'
-          Appobj.ccpTdaHeigtTfd = Appobj.curImgH + Number(Appobj.ccpTdaPdtopTfd) + Number(Appobj.ccpTdaPdbtmTfd);
-          // !VA The handlers below apply the highlight if there is either an input in either of the width padding inputs or remove the highlight if there is no input in either of the width input fields.
-          if ( Appobj.ccpTdaPdlftTfd !== '' || Appobj.ccpTdaPdrgtTfd !== '') {
-            highlightArray = [ 'ccpTdaWidthTfd' ];
-          }
-          // !VA In this case, also reflect the ccpTdaWidthTfd value
-          if ( Appobj.ccpTdaPdlftTfd === '' && Appobj.ccpTdaPdrgtTfd == '') {
-            Appobj.ccpTdaWidthTfd = '';
-            reflectArray = ['ccpTdaWidthTfd'];
-            highlightArray = [ 'ccpTdaWidthTfd' ];
-          }
-          // !VA Set the reflect array for TD H, TD W and TBL W
-          reflectArray = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
-        // !VA If appObjProp is top/btm, then userInputObj comes from handlePaddingInput and curImgW is NOT modified. There is no dependency for curImgW on the height padding input values. Note: evtTargetVal is NaN-checked in handlePaddingInput, complete error-checking doesn't happen until the input is blurred.
-        } 
-        else if  ( appObjProp.substring( 6 , 11 ) === 'Pdtop' || appObjProp.substring( 6 , 11 ) === 'Pdbtm') {
-          // !VA Set the TD Height input to the curImgH plus the sum of the Appobj lft/rgt input properties.
-          Appobj.ccpTdaHeigtTfd = Appobj.curImgH + Number(Appobj.ccpTdaPdtopTfd) + Number(Appobj.ccpTdaPdbtmTfd);
-
-          // !VA The handlers below apply the highlight if there is either an input in either of the height padding inputs or remove the highlight if there is no input in either of the height input fields.
-          // !VA Branch: 110220C
-          // !VA This is poor style because the highlight is applied in both cases. The only actual condition here is if ccpTdaHeigtTfd is reflected. For later..
-          if ( Appobj.ccpTdaPdtopTfd !== '' || Appobj.ccpTdaPdbtmTfd !== '') {
-            highlightArray = [ 'ccpTdaHeigtTfd' ];
-            reflectArray = [ 'ccpTdaHeigtTfd' ];
-          }
-          // !VA In this case, also reflect the ccpTdaHeigtTfd value
-          if ( Appobj.ccpTdaPdtopTfd === '' && Appobj.ccpTdaPdbtmTfd == '') {
-            Appobj.ccpTdaHeigtTfd = '';
-            reflectArray = ['ccpTdaHeigtTfd'];
-            highlightArray = [ 'ccpTdaHeigtTfd' ];
-          }
-        } else {
-          console.log('ERROR in handlePadding - unknown condition');
-        }
-      // !VA For IMG Excld option, override curImg sizing and padding recalculation because there effectively is no curImg to resize/recalc
-      } else {
-        // !VA Branch: 110220C
-        // !VA Disable all autocalc of padding for now in IMG EXCLD mode by setting Appobj TD width and height to empty.
-        Appobj.ccpTdaWidthTfd = Appobj.ccpTdaHeigtTfd = '';
-        highlightArray = [ 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd' ];
-        reflectArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd'];
-      }
-
-      configObj = {
-        reflectAppobj: { reflect: reflectArray },
-        highlightIcon: { highlight: highlightArray }
-      };
-      UIController.configCCP( configObj );
-    }
-
-
-
-    // !VA Nice try, but a waste of time...deprecate
-    // function getPaddingDelta( paddingAliases, paddingCurrent ) {
-    //   console.log('getPaddingDelta running'); 
-    //   let paddingAppobj = []; paddingDelta = [];
-    //   for (const alias of paddingAliases) {
-    //     paddingAppobj.push( Appobj[alias]);
-    //   }
-    //   paddingAppobj = arrayStringToInteger(paddingAppobj);
-    //   for (let i = 0; i < paddingAppobj.length; i++) {
-    //     if ( paddingAppobj[i] !== paddingCurrent[i]) {
-    //       paddingDelta = [ paddingAliases[i], ( paddingAppobj[i] - paddingCurrent[i])];
-    //     }
-    //   }
-    //   return paddingDelta;
-    // }
-
-    function calcPaddingDependencies( pNew, pDeltaW, pDeltaH) {
+    // !VA Called from handlePaddingChange. Recalculates all the padding dependencies: curImgW, curImgH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, Appobj.ccpTdaWidthTfd, Appobj.ccpTdaHeigtTfd and writes the changes to Appobj. 
+    function recalcPadding( pNew, pDeltaW ) {
       let lft, rgt, top, btm;
-      console.log('pDeltaW :>> ' + pDeltaW);
-      console.log('pDeltaH :>> ' + pDeltaH);
-
-      
       // !VA Calculate padding dependencies from the deltas of the current and new padding.
       Appobj.curImgW = Appobj.curImgW - pDeltaW;
       Appobj.curImgH = Math.round(Appobj.curImgW * (1 / Appobj.aspect[0]));
@@ -3507,19 +3320,16 @@ ${indent}<![endif]-->`;
       return;
     }
 
+    // !VA appController private
+    // !VA Called from handlePaddingChange. Sets and runs the CCP configuration and updates Inspectors for padding-dependent elements.
     function configPadding(appObjProp) {
-      console.log('updatePaddingDependencies running');
+      console.log('configPadding running');
 
       // !VA If any other option than IMG Excld is selected, then resize curImg and recalc padding based on the padding inputs.
       if (Appobj.ccpImgExcldRdo !== 'excld') {
 
         // !VA If appObjProp is lft/rgt, then curImgW is modified, so handle the top/btm padding inputs at the tail of this condition, otherwise they will not be updated when curImgW is updated. 
-        // !VA Branch: 110320A
-        // !VA I don't know if this still applies...
-        // !VA Note: evtTargetVal is error-checked in handleBlur.
         if  ( appObjProp.substring( 6 , 11 ) === 'Pdrgt' || appObjProp.substring( 6 , 11 ) === 'Pdlft') {
-
-
           // !VA Create an object to pass to updateCurrentImage
           let imgInputObj = [];
           // !VA Set Appobj.curImgW to imgInputObj to the shrunk/unshrunk image's width
@@ -3533,12 +3343,14 @@ ${indent}<![endif]-->`;
           // !VA Restore Appobj.ccpTblWidthTfd to the temporarily stored override value 
           Appobj.ccpTblWidthTfd = tmp;
           // !VA Update the Inspectors for sPhones and lPhones. 
+          // !VA TODO: This is an un-DRY direct DOM access from appController and should be passed to UIController, but it is a single occurrence so leave it as is for now.
           document.querySelector(inspectorValues.insSmallPhonesWidthValue).innerHTML = Appobj.sPhonesW;
           document.querySelector(inspectorValues.insLargePhonesWidthValue).innerHTML = Appobj.lPhonesW;
           document.querySelector(inspectorValues.insSmallPhonesHeightValue).innerHTML = Appobj.sPhonesH;
           document.querySelector(inspectorValues.insLargePhonesHeightValue).innerHTML = Appobj.lPhonesH;
 
           // !VA The handlers below apply the highlight if there is either an input in either of the width padding inputs or remove the highlight if there is no input in either of the width input fields.
+          // !VA TODO: This is poor style because the highlight is applied in both cases. The only actual condition here is if ccpTdaHeigtTfd is reflected. For later.
           if ( Appobj.ccpTdaPdlftTfd !== '' || Appobj.ccpTdaPdrgtTfd !== '') {
             highlightArray = [ 'ccpTdaWidthTfd' ];
           }
@@ -3551,13 +3363,11 @@ ${indent}<![endif]-->`;
           // !VA Set the reflect array for TD H, TD W and TBL W
           reflectArray = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
 
-        // !VA If appObjProp is top/btm, then userInputObj comes from handlePaddingInput and curImgW is NOT modified. There is no dependency for curImgW on the height padding input values. Note: evtTargetVal is NaN-checked in handlePaddingInput, complete error-checking doesn't happen until the input is blurred.
+        // !VA If appObjProp is top/btm, then curImgW is NOT modified. There is no dependency for curImgW on the height padding input values. 
         } 
         else if  ( appObjProp.substring( 6 , 11 ) === 'Pdtop' || appObjProp.substring( 6 , 11 ) === 'Pdbtm') {
-
           // !VA Apply the highlight if there is either an input in either of the height padding inputs or remove the highlight if there is no input in either of the height input fields.
-          // !VA Branch: 110220C
-          // !VA This is poor style because the highlight is applied in both cases. The only actual condition here is if ccpTdaHeigtTfd is reflected. For later..
+          // !VA TODO: This is poor style because the highlight is applied in both cases. The only actual condition here is if ccpTdaHeigtTfd is reflected. For later.
           if ( Appobj.ccpTdaPdtopTfd !== '' || Appobj.ccpTdaPdbtmTfd !== '') {
             highlightArray = [ 'ccpTdaHeigtTfd' ];
             reflectArray = [ 'ccpTdaHeigtTfd' ];
@@ -3568,7 +3378,6 @@ ${indent}<![endif]-->`;
             reflectArray = ['ccpTdaHeigtTfd'];
             highlightArray = [ 'ccpTdaHeigtTfd' ];
           }
-
         } else {
           console.log('ERROR in handlePadding - unknown condition');
         }
@@ -3586,70 +3395,79 @@ ${indent}<![endif]-->`;
         highlightIcon: { highlight: highlightArray }
       };
       UIController.configCCP( configObj );
-
     }
 
+    // !VA appController private
+    // !VA Called from getPaddingNew and handlePaddingChange. Convert an array of property values of type String to integers.
     function arrayStringToInteger(arr) {
       for (let i = 0; i < arr.length; i++) {
-        console.log('arr[i] is: ' +  arr[i]);
         arr[i] === '' ? arr[i] = 0 : arr[i] = parseInt(arr[i]);
       }
       return arr;
     }
 
+    // !VA appController private
+    // !VA Called from handlePaddingChange. Gets the post-change array of padding values.
     function getPaddingNew( paddingAliases, userInputObj) {
-      console.log('getPaddingNew running'); 
       let index, paddingNew = [];
+      // !VA Destructure userInputObj to local variables
       let { appObjProp, evtTargetVal } = userInputObj;
-      console.log('getPaddingNew appObjProp :>> ' + appObjProp);
+      // !VA Get the index of the event target, i.e. the current user input - in the alias array.
       index = paddingAliases.indexOf(appObjProp);
-      console.log('index :>> ' + index);
+      // !VA Get the array of pre-change padding Appobj properties 
       for (const alias of paddingAliases) {
         paddingNew.push(Appobj[alias]);
       }
+      // !VA Update the Appobj property corresponding to the event target, i.e. the current user input, with the post-change value. Result: Array of post-change padding Appobj properties
       if (index !== -1) {
         paddingNew[index] = evtTargetVal;
       }
+      // !VA Convert the array of Appobj properties of type String to an array of integers and return
       paddingNew = arrayStringToInteger(paddingNew);
       return paddingNew;
     }
 
-
-    // !VA Branch: 110220D
-
+    // !VA appController private
+    // !VA Called from setupEventListeners change event. Collects pre-change and post-change padding values to generate delta which is used to restore padding dependencies to pre-change state before each change is implemented. This prevents accumulation of changes in curImg each time a padding value is entered.
     function handlePaddingChange(evt) {
-      console.clear();
-      console.log('handlePaddingChange running'); 
       let pWidth, pHeight, pAliases = [], pCurrent = [], pNew;
-      pAliases = ['ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd' ];
-      const userInputObj = { };
-      userInputObj.appObjProp = elemIdToAppobjProp(evt.target.id);
-      userInputObj.evtTargetVal = evt.target.value;
-      let { appObjProp, evtTargetVal } = userInputObj;
-      for (const alias of pAliases) {
-        pCurrent.push(Appobj[alias]);
+      
+      // !VA The value entered has already been error-checked in handleKeydown, so if it is invalid, the error will display and the cursor will stay in the field. But since handlePaddingChange is called directly from the change eventListener, an invalid value will sneak through here. So test the evt.target.value for NaN, and if it is, return out.
+      if (isNaN(Number(evt.target.value))) {
+        console.log('NaN ERROR in handlePaddingChange: returning out...');
+        return;
+      // !VA If evt.target.value is a valid numeric string, continue.
+      } else {
+        // !VA Array of the padding aliases.
+        pAliases = ['ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd' ];
+        // !VA Create userInputObj containing change event target value and corresponding Appobj property name
+        const userInputObj = { };
+        // !VA Get the property name from the target id.
+        userInputObj.appObjProp = elemIdToAppobjProp(evt.target.id);
+        userInputObj.evtTargetVal = evt.target.value;
+        // !VA Destructure to local variables
+        let { appObjProp, evtTargetVal } = userInputObj;
+        // !VA Create array of padding Appobj properties from the alias array
+        for (const alias of pAliases) {
+          pCurrent.push(Appobj[alias]);
+        }
+        // !VA Get the current padding before the change event as integer array
+        pCurrent = arrayStringToInteger(pCurrent);
+        // !VA Get the new padding after the change event
+        pNew = getPaddingNew(pAliases, userInputObj);
+        // !VA pDeltaW is the delta of the current padding width and the new padding width. NOTE: Height values are calculated from the padding width, so pDeltaH is not required. 
+        pDeltaW = -(pCurrent[1] + pCurrent[3]) + (pNew[1] + pNew[3]);
+        // pDeltaH = -(pCurrent[0] + pCurrent[2]) + (pNew[0] + pNew[2]);
+  
+        // !VA Set Appobj for the change event target
+        Appobj[appObjProp] = evtTargetVal;
+        // !VA Recalculate all the padding dependences: curImgW, curImgH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, Appobj.ccpTdaWidthTfd, Appobj.ccpTdaHeigtTfd. 
+        recalcPadding( pNew, pDeltaW );
+        // !VA Update the UI with the recalculated padding dependencies.
+        configPadding(appObjProp);
+        return;
       }
-      // !VA Get the current padding before the change event as integer array
-      pCurrent = arrayStringToInteger(pCurrent);
-      // !VA Get the new padding after the change event
-      pNew = getPaddingNew(pAliases, userInputObj);
-      // !VA pWidth/pHeight is the delta of the current padding width/height and the new padding width/height.
-      pDeltaW = -(pCurrent[1] + pCurrent[3]) + (pNew[1] + pNew[3]);
-      pDeltaH = -(pCurrent[0] + pCurrent[2]) + (pNew[0] + pNew[2]);
-      // !VA Set Appobj for the change event target
-      Appobj[appObjProp] = evtTargetVal;
-
-      // !VA Calculate the padding dependences: curImgW, curImgH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, Appobj.ccpTdaWidthTfd, Appobj.ccpTdaHeigtTfd
-      calcPaddingDependencies( pNew, pDeltaW, pDeltaH);
-      // !VA Update 
-      configPadding(appObjProp);
-
-
     }
-
-
-
-
 
     // !VA appController private
     // !VA Select the input on focus. Maybe there's an easier way to do this.
@@ -3669,10 +3487,7 @@ ${indent}<![endif]-->`;
       // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp  locally.
       let { appObjProp } = userInputObj;
       // !VA Get the return val from handlerUserInput - empty string, valid input or FALSE for error. Note; handleUserInput also sets the Appobj property of appObjProp if the input is valid.
-      // !VA There are two ways to blur without a value. 1) The user enters a 0 and blurs or 2) the user deletes the existing value or blurs with an empty input. In both cases, if the target is a padding input, the dependent TD Width input value needs to be removed if BOTH padding inputs are empty. Handle both cases now. Note: The handler for removing the TD Height value if both padding inputs are empty is found in handlePaddingInput.  
-      // !VA IMPORTANT - This doesn't apply to curImgW and curImgH. Those can never have a null or zero value. So condition the zero value handler to skip them
-
-      // !VA Skip straight to handleUserInput if appObjProp is a Toolbar input, which cannot have a 0 or empty value
+      // !VA There are two ways to blur without a value. 1) The user enters a 0 and blurs or 2) the user deletes the existing value or blurs with an empty input. This doesn't apply to curImgW and curImgH which can never have a null or zero value. So condition the zero value handler to skip them
       if (appObjProp.substring( 0, 3) === 'ccp') {
         if ( Number(userInputObj.evtTargetVal) === 0 ) { 
           // !VA If the target input value is 0, convert it to empty, set the Appobj property to empty and reflect that to the CCP.
@@ -3684,12 +3499,6 @@ ${indent}<![endif]-->`;
             };
             UIController.configCCP( configObj);
           }
-          // !VA Now that the zero case is handled and evtTargetVal is empty, handle the padding blur
-          if ( evt.target.id.substring( 8 , 10 ) === 'pd') {
-            // !VA Branch: 110220D
-            // !VA Revisit padding
-            // handlePaddingBlur( userInputObj);
-          } 
         } else {
           // !VA If the target value is not zero or empty, run the input error check to get retVal
           retVal = handleUserInput(userInputObj);
@@ -3700,16 +3509,6 @@ ${indent}<![endif]-->`;
         retVal = handleUserInput(userInputObj);
       }
 
-      // !VA Now make sure retVal is number and set it to evtTargetval before handling the padding blur.
-      if (typeof(retVal) === 'number') {
-        userInputObj.evtTargetVal = retVal;
-        // !VA If retVal is a number (i.e. not empty) and the target is a padding input, run handlePaddingBlur. 
-        if ( evt.target.id.substring( 8 , 10 ) === 'pd') {
-          // !VA Branch: 110220D
-          // !VA Revisit padding
-          // handlePaddingBlur( userInputObj );
-        }
-      } 
       // !VA If retVal returns false, then there is a validation error, so emulate preventDefault on the blur event. Blur does not support preventDefault. Select the target's value. Select doesn't work with blur because the focus is already out of the field before the select() method can be invoked on the input element. To fix, set timeout 10ms, then shift it back to run the rest of the handler. The focus() method selects the input value by default. Alternatively, it should be possible to use focusout instead of blur, which does support preventDefault, but this works just as well for now.
       if (retVal === false) {
         // !VA Shift the focus back to the target element.
@@ -3788,7 +3587,6 @@ ${indent}<![endif]-->`;
     // !VA Called from handleKeydown and handleBlur to handle CCP element user input. Runs checkUserInput to check for error conditions and returns either an empty string, a valid value or FALSE to the caller.
     // !VA NOTE: There was a priorVal variable earlier that stored evt.target.val for use with CCP inputs because at that time CCP inputs weren't immediately stored in Appobj. Keep an eye on that - currently all CCP values are stored to Appobj.
     function handleUserInput( userInputObj ) {
-      
       let retVal;
       let tbrIptAliases = [], imgIptAliases = [], ccpIptAliases = [];
       // let configObj = {};
@@ -3832,9 +3630,8 @@ ${indent}<![endif]-->`;
             // console.log('handleUserInput CCP INPUT: VALUE APPLIED');
             evtTargetVal = userInputObj.evtTargetVal = Appobj[appObjProp] = retVal;
             // !VA Branch: 102220A
-
             recalcAppobj( userInputObj );
-
+            return;
           }
         // !VA Otherwise, checkUserInput returned false so the target value is invalid. Return FALSE to handleKeydown for TAB and ENTER key handling.
         } else {
@@ -3863,7 +3660,6 @@ ${indent}<![endif]-->`;
         // !VA evtTargetVal is the value the user entered into the input element.
     
         userInputObj.evtTargetVal = evt.target.value;
-        console.log('handleKeydown userInputObj.evtTargetVal :>> ' + userInputObj.evtTargetVal);
         // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp locally.  
         let { appObjProp } = userInputObj;
         // !VA Call handleUserInput to validate the user input and process it based on the input type (i.e. Toolbar or CCP input). retVal will return either an empty string, a valid value, or FALSE if checkUserInput detects an input error.
@@ -3891,12 +3687,6 @@ ${indent}<![endif]-->`;
                 };
                 UIController.configCCP( configObj);
               }
-              // !VA Now that the zero case is handled and evtTargetVal is empty, handle the padding blur
-              if ( evt.target.id.substring( 8 , 10 ) === 'pd') {
-                // !VA Branch: 110220D
-                // !VA Revisit padding
-                // handlePaddingBlur( userInputObj);
-              } 
             } else {
               // !VA If the target value is not zero or empty, run the input error check to get retVal
               retVal = handleUserInput(userInputObj);
@@ -4686,7 +4476,6 @@ ${indent}<![endif]-->`;
         }
       // !VA Now handle the unlabelled padding text input elements
       } else {
-        // !VA Call handlePaddingInput with userInputObj. 
         let userInputObj = {};
         // !VA Get the Appobj/ccpUserInput alias from the target id
         userInputObj.appObjProp = elemIdToAppobjProp(evt.target.id);
@@ -4694,10 +4483,6 @@ ${indent}<![endif]-->`;
         userInputObj.evtTargetVal = Number(evt.target.value);
         // !VA But if evtTargetVal is 0, replace it with '', otherwise we get a 0 in Appobj.
         if (userInputObj.evtTargetVal === 0) { userInputObj.evtTargetVal = '';}
-        // !VA Branch: 110220D
-        // Revisit padding        
-        // handlePaddingInput(userInputObj);
-        // !VA Note: Padding icon highlighting is done in highlightPaddingIcon. It could be done here using Appobj properties and configCCP. Maybe later. 
         highlightPaddingIcon();
       }
     }
