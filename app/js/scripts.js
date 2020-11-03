@@ -3375,6 +3375,7 @@ ${indent}<![endif]-->`;
 
       // !VA Branch: 110220C
       // !VA If any other option than IMG Excld is selected, then resize curImg and recalc padding based on the padding inputs.
+      // !VA Branch: 110220D This should be handled at the source, not in the padding handler
       if (Appobj.ccpImgExcldRdo !== 'excld') {
         if  ( appObjProp.substring( 6 , 11 ) === 'Pdrgt' || appObjProp.substring( 6 , 11 ) === 'Pdlft') {
 
@@ -3466,26 +3467,21 @@ ${indent}<![endif]-->`;
 
 
 
-
-    function getPaddingDelta( paddingAliases, paddingCurrent ) {
-      console.log('getPaddingDelta running'); 
-      let paddingAppobj = []; paddingDelta = [];
-      for (const alias of paddingAliases) {
-        paddingAppobj.push( Appobj[alias]);
-      }
-      paddingAppobj = arrayStringToInteger(paddingAppobj);
-      for (let i = 0; i < paddingAppobj.length; i++) {
-        if ( paddingAppobj[i] !== paddingCurrent[i]) {
-          paddingDelta = [ paddingAliases[i], ( paddingAppobj[i] - paddingCurrent[i])];
-        }
-      }
-      return paddingDelta;
-    }
-
-
-
-
-
+    // !VA Nice try, but a waste of time...deprecate
+    // function getPaddingDelta( paddingAliases, paddingCurrent ) {
+    //   console.log('getPaddingDelta running'); 
+    //   let paddingAppobj = []; paddingDelta = [];
+    //   for (const alias of paddingAliases) {
+    //     paddingAppobj.push( Appobj[alias]);
+    //   }
+    //   paddingAppobj = arrayStringToInteger(paddingAppobj);
+    //   for (let i = 0; i < paddingAppobj.length; i++) {
+    //     if ( paddingAppobj[i] !== paddingCurrent[i]) {
+    //       paddingDelta = [ paddingAliases[i], ( paddingAppobj[i] - paddingCurrent[i])];
+    //     }
+    //   }
+    //   return paddingDelta;
+    // }
 
     function showPaddingDependencies(paddingWidth, paddingHeight) {
       let lft, rgt, top, btm;
@@ -3500,6 +3496,7 @@ ${indent}<![endif]-->`;
       Appobj.lPhonesH = Math.round(Appobj.lPhonesW * (1 / Appobj.aspect[0]));
       // !VA Branch: 110220D
       // !VA Goddam properties are strings...what a PITA!
+
       Appobj.ccpTdaPdrgtTfd === '' ? rgt = 0 : rgt = parseInt(Appobj.ccpTdaPdrgtTfd);
       Appobj.ccpTdaPdlftTfd === '' ? lft = 0 : lft = parseInt(Appobj.ccpTdaPdlftTfd);
       Appobj.ccpTdaPdtopTfd === '' ? top = 0 : top = parseInt(Appobj.ccpTdaPdtopTfd);
@@ -3516,6 +3513,11 @@ ${indent}<![endif]-->`;
         arr[i] === '' ? arr[i] = 0 : arr[i] = parseInt(arr[i]);
       }
       return arr;
+    }
+
+    function propStringToInteger(str) {
+      str === '' ? str = 0 : str = parseInt(str);
+      return int;
     }
 
     function getPaddingNew( paddingAliases, userInputObj) {
@@ -3554,57 +3556,16 @@ ${indent}<![endif]-->`;
       paddingCurrent = arrayStringToInteger(paddingCurrent);
       // !VA 1) Get current padding
       paddingNew = getPaddingNew(paddingAliases, userInputObj);
-      // !VA 2) Get padding delta
-      paddingDelta = getPaddingDelta( paddingAliases, paddingNew );
-
-      console.log('paddingCurrent :>> ');
-      console.log(paddingCurrent);
-      console.log('paddingNew :>> ');
-      console.log(paddingNew);
-      console.log('paddingDelta :>> ');
-      console.log(paddingDelta);
-
-      console.log('Update dependencies...');
-     
-      // var sum= paddingCurrent.reduce(function (a, b) {return a + b;}, 0);
-      // console.log('sum :>> ' + sum);
-      // !VA The delta has to be the opposite of the evt target, i.e. the OTHER element, otherwise you're adding back the wrong thing! 
-      // !VA I do not understand why this works,  but it brings the rignt numbers. It works because paddingWidth always only reflects the newly entered evtTargetVal, not BOTH the vals. To 
+      // !VA 
       paddingWidth = -(paddingCurrent[1] + paddingCurrent[3]) + (paddingNew[1] + paddingNew[3]);
       paddingHeight = -(paddingCurrent[0] + paddingCurrent[2]) + (paddingNew[0] + paddingNew[2]);
-
-      // !VA Parting note...
+      // !VA Set Appobj
       Appobj[appObjProp] = evtTargetVal;
 
 
       showPaddingDependencies( paddingWidth, paddingHeight);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-      // if ( paddingDelta[0].includes('lft') || paddingDelta[0].includes('rgt')) {
-      //   console.log('WIDTH');
-
-      // } else if (paddingDelta[0].includes('top') || paddingDelta[0].includes('btm')) {
-      //   console.log('HEIGHT');
-      // } else {
-      //   console.log('ERROR in handlePaddingChange - unknown condition');
-      // }
-
-      // currentPaddingWidth = currentPadding[1] + currentPadding[3];
-      // currentPaddingHeight = currentPadding[0] + currentPadding[2];
-      // console.log('currentPaddingHeight :>> ' + currentPaddingHeight);
-      // console.log('currentPaddingWidth :>> ' + currentPaddingWidth);
     }
 
 
