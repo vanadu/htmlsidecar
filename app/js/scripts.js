@@ -401,7 +401,7 @@ var Witty = (function () {
       let el, isInit, retVal, toolbarAliases;
       for (const alias of reflectArray) {
         // if (alias === 'ccpTbwClassTfd') { console.log('HIT');}
-        console.log('alias :>> ' + alias);
+        // console.log('alias :>> ' + alias);
         typeof(appController.getAppobj(alias)) === 'undefined' ? isInit = true : isInit = false;
         // !VA Ignore toolbar aliases here - they do not need to be reflected and probably should not have been passed in from handleBlur. For later. 
         toolbarAliases = ['curImgW', 'curImgH', 'imgViewerW', 'sPhonesW', 'lPhonesH' ];
