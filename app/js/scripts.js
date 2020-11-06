@@ -1067,6 +1067,8 @@ var Witty = (function () {
 
           // !VA Branch: 110320A
           // !VA Review this, it may have been made obsolete by configDefault. I removed all the direct calls to the configCCP methods. If there are no repercussions deprecate this annoying resource hog.
+          // !VA Branch: 110520A
+          // !VA Even if no values are assigned, all the ccpUserInput aliases have to be defined here as Appobj properties otherwise they will be undefined when accessed later.
           for (const key of Object.keys(ccpUserInput)) {
             if (key.substring( 11 ) === 'Tfd') {
               // !VA Appobj[ key ] is undefined, causing reflectAppobj to return the hard-coded values in the HTML file. These are the Appobj initialization values. These values are currently all empty strings but that could change so the best place to get them is value attribute of the the HTML file, just like the other Appobj init functions below.
@@ -1074,19 +1076,27 @@ var Witty = (function () {
               // !VA Branch: 110320A
               // !VA This is why ccpTbwClassTfd isn't showing devicewidth on init. What is the purpose of this actually? 
               // Appobj[ key ] = reflectAppobj( [ key ] );
+              // !VA Branch: 110520A
+              // !VA The purpose of this is simply to define all the ccpUserInput aliases as Appobj.properties. We don't need to reflect all their values to do that.
+              Appobj[ key ] = '';
             }
             // !VA Write the Align/Valgn radio input element values to Appobj.
             if (key.substring( 11 ).includes('Rdo')) {
               // !VA Appobj[ key ] is undefined, causing radioState to return the hard-coded values in the HTML file. These are the Appobj initialization values. 
               // !VA Branch: 110320A
               // !VA Testing removal...
+              // !VA Branch: 110520A
               // Appobj[ key ] = radioState( [ key ]);
+              // !VA Can't remove...testing setting them all to false and letting configDefault take over the rest
+              Appobj[ key ] = false;
             }
             if ( key.substring( 11 ).includes('Chk')) {
               // !VA Appobj[ key ] is undefined, causing checkboxState to return the hard-coded values in the HTML file. These are the Appobj initialization values. 
               // !VA Branch: 110320A
               // !VA Testing removal;
-              Appobj[ key ] = checkboxState( [ key ] );
+              // Appobj[ key ] = checkboxState( [ key ] );
+              // !VA Can't remove...testing setting them all to false and letting configDefault take over the rest
+              Appobj[ key ] = false;
             }
           }
           console.log('populateCcpPropertiesAppobj is: ');
@@ -1418,14 +1428,18 @@ var Witty = (function () {
           // !VA NOTE: The dependency between maxwidth and width is unclear. If there is a maxwidth, then width has to be a percent value. That's no yet implemented.
           // !VA imgType is fixed or fluid, depending on IMG itype, i.e. TBL width or 100%. 
           // !VA Not sure whether this should be Appobj[appObjProp] or Appobj['curImgW'] - keep an eye on it.
-          imgType === 'fixed' ? str = Appobj[appObjProp] : str = '100%';
+          Appobj.ccpImgItypeRdo === 'fixed' ? str = Appobj[appObjProp] : str = '100%';
           retObj = returnObject( appObjProp, str );
+          console.log('retObj :>> ');
+          console.log(retObj);
           return retObj;
         })(),
         tableBgcolor: (function() {
           appObjProp = 'ccpTblBgclrTfd';
           str = Appobj[appObjProp];
           retObj = returnObject(appObjProp, str);
+          console.log('tableBgcolor retObj :>> ');
+          console.log(retObj);
           return retObj;
         })(),
         tableAlign: (function() {
@@ -1504,6 +1518,8 @@ var Witty = (function () {
           appObjProp = 'ccpTbwBgclrTfd';
           str = Appobj[appObjProp];
           retObj = returnObject(appObjProp, str);
+          console.log('tableWrapperBgcolor retObj :>> ');
+          console.log(retObj);
           return retObj;
         })(),
         tableWrapperGhost: (function() {
@@ -3333,15 +3349,22 @@ ${indent}<![endif]-->`;
 
     // !VA appController private
     // !VA Called from handlePaddingChange. Sets and runs the CCP configuration and updates Inspectors for padding-dependent elements.
+    // !VA Branch: 110520A
+    // !VA Overriding curImg resizing for IMG excld and TD vmlbt and bgimg 
     function configPadding(appObjProp) {
       console.log('configPadding running');
+      console.log('appObjProp :>> ' + appObjProp);
+      // !VA If any other option than IMG Excld,  is selected, then resize curImg and recalc padding based on the padding inputs.
+      // !VA Branch: 110520A
+      // !VA Need to include vmlbt in this condition and possibly bgimg
 
-      // !VA If any other option than IMG Excld is selected, then resize curImg and recalc padding based on the padding inputs.
-      if (Appobj.ccpImgExcldRdo !== 'excld') {
+      if (Appobj.ccpImgExcldRdo !== 'excld' || Appobj.ccpTdaOptnsRdo !== 'vmlbt') {
 
         // !VA If appObjProp is lft/rgt, then curImgW is modified, so handle the top/btm padding inputs at the tail of this condition, otherwise they will not be updated when curImgW is updated. 
         if  ( appObjProp.substring( 6 , 11 ) === 'Pdrgt' || appObjProp.substring( 6 , 11 ) === 'Pdlft') {
-          // !VA Create an object to pass to updateCurrentImage
+          // !VA Branch: 110520A
+          // !VA Override 
+          // !VA Create an ob ject to pass to updateCurrentImage
           let imgInputObj = [];
           // !VA Set Appobj.curImgW to imgInputObj to the shrunk/unshrunk image's width
           imgInputObj.evtTargetVal = Appobj.curImgW;
@@ -3441,6 +3464,7 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from setupEventListeners change event. Collects pre-change and post-change padding values to generate delta which is used to restore padding dependencies to pre-change state before each change is implemented. This prevents accumulation of changes in curImg each time a padding value is entered.
     function handlePaddingChange(evt) {
+      console.log('handlePaddingChange running'); 
       let pWidth, pHeight, pAliases = [], pCurrent = [], pNew;
       
       // !VA The value entered has already been error-checked in handleKeydown, so if it is invalid, the error will display and the cursor will stay in the field. But since handlePaddingChange is called directly from the change eventListener, an invalid value will sneak through here. So test the evt.target.value for NaN, and if it is, return out.
@@ -3455,6 +3479,7 @@ ${indent}<![endif]-->`;
         const userInputObj = { };
         // !VA Get the property name from the target id.
         userInputObj.appObjProp = elemIdToAppobjProp(evt.target.id);
+        console.log('userInputObj.appObjProp :>> ' + userInputObj.appObjProp);
         userInputObj.evtTargetVal = evt.target.value;
         // !VA Destructure to local variables
         let { appObjProp, evtTargetVal } = userInputObj;
@@ -3488,6 +3513,8 @@ ${indent}<![endif]-->`;
 
     // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. This also handles the cases where the user enters 0 to blur, or leaves the input empty to blur, and the padding-specific handling of TD Width values. Note: This emulates the preventDefault behavior of the TAB key. Remember that if you set preventDefault on the TAB key, the blur event will still fire on mouse out and the result will be that the blur is handled twice. Handling the blur here and NOT on the TAB keypress avoids that trap.
     function handleBlur(evt) {
+      console.log('handleBlur running'); 
+
       // !VA Create the object to store the Appobj property and current input value
       let reflectArray, userInputObj = {}, configObj = {};
       let retVal;
@@ -3497,6 +3524,9 @@ ${indent}<![endif]-->`;
       userInputObj.evtTargetVal = evt.target.value;
       // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp  locally.
       let { appObjProp } = userInputObj;
+      // !VA Branch: 110520A
+      console.log('userInputObj :>> ');
+      console.log(userInputObj);
       // !VA Get the return val from handlerUserInput - empty string, valid input or FALSE for error. Note; handleUserInput also sets the Appobj property of appObjProp if the input is valid.
       // !VA There are two ways to blur without a value. 1) The user enters a 0 and blurs or 2) the user deletes the existing value or blurs with an empty input. This doesn't apply to curImgW and curImgH which can never have a null or zero value. So condition the zero value handler to skip them
       if (appObjProp.substring( 0, 3) === 'ccp') {
@@ -4665,22 +4695,28 @@ ${indent}<![endif]-->`;
     // !VA appController  
     // !VA Get the Appobj property that corresponds to the ID of the DOM input element that sets it. 1) Removes the hypens in the ID string, converts the identifier string (the Appobj/ccpUserInput property name string) to lowercase, finds the match, and returns the aforementioned Appobj/ccpUserInput property name string. NOTE: Thiss work on Toolbar aliases as well by searching the ID for the lowercase Appobj property name, i.e. curimgw is in ipt-tbr-curimgw.
     function elemIdToAppobjProp(id) {
+      console.log('elemIdToAppobjProp running'); 
+      console.log('id :>> ' + id);
       let idStr, appObjProp, appobjArray;
       idStr = id;
       // !VA Replace the ipt with tfd, which is the code for the parent div, which is the element represented in Appobj
       idStr = idStr.replace('ipt', 'tfd');
       // !VA Strip all the hypens out of the ID (str)
       idStr = idStr.replace(/-/g,'');
+      console.log('idStr :>> ' + idStr);
       // !VA Loop through the Object.keys array 
       appobjArray = Object.keys(Appobj);
       for (let i = 0; i < appobjArray.length; i++) {
+        // console.log('appobjArray[i].toLowerCase() :>> ' + appobjArray[i].toLowerCase());
         // !VA If the lowercase Appobj property name is contained in the id, then put the original Appobj property name match into appobjProp.
         // !VA TODO: Make this an arrow function with find, like below
         // var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
         if (idStr.includes(appobjArray[i].toLowerCase())) {
           appObjProp = appobjArray[i];
+          console.log('HIT');
         }
       }
+      console.log('Mark1 appObjProp :>> ' + appObjProp);
       return appObjProp;
     }
 
@@ -4710,31 +4746,35 @@ ${indent}<![endif]-->`;
       Appobj.ccpImgClassTfd = '';
       Appobj.ccpImgLoctnTfd = 'img/';
       Appobj.ccpImgAnchrTfd = '#';
+      Appobj.ccpImgItypeRdo = 'fixed';
       Appobj.ccpImgTxclrTfd = '#0000FF';
       Appobj.ccpImgTargtChk = false;
       Appobj.ccpImgExcldRdo = 'incld';
-      Appobj.ccpTblClassTfd = '';
-      Appobj.ccpTdaBgclrTfd = '';
+      // Appobj.ccpTdaBgclrTfd = '';
       Appobj.ccpTdaWidthTfd = '';
       Appobj.ccpTdaHeigtTfd = '';
+      Appobj.ccpTdaAlignRdo = 'left';
+      Appobj.ccpTdaValgnRdo = 'top';
       
       // Appobj.ccpTdaPdtopTfd = '';
       // Appobj.ccpTdaPdrgtTfd = '';
       // Appobj.ccpTdaPdlftTfd = '';
       // Appobj.ccpTdaPdbtmTfd = '';
+      Appobj.ccpTblClassTfd = '';
       Appobj.ccpTblWidthTfd = Appobj.curImgW;
-      Appobj.ccpTbwWidthTfd = Appobj.imgViewerW;
+      // Appobj.ccpTblBgclrTfd = '';
       Appobj.ccpTblMaxwdTfd = '';
-      Appobj.ccpTbwMaxwdTfd = '';
-      Appobj.ccpTbwClassTfd = 'devicewidth';
-      Appobj.ccpTdaAlignRdo = 'left';
-      Appobj.ccpTdaValgnRdo = 'top';
       Appobj.ccpTblAlignRdo = 'center';
+      Appobj.ccpTbwClassTfd = 'devicewidth';
+      Appobj.ccpTbwWidthTfd = Appobj.imgViewerW;
+      Appobj.ccpTbwMaxwdTfd = '';
+      // Appobj.ccpTbwBgclrTfd = '';
       Appobj.ccpTbwAlignRdo = 'center';
 
       // !VA reflectAppobj METHOD: set the array of elements whose Appobj properties above are to be written to the CCP DOM
       // !VA Why are there two of these? Commenting out the lower one for now.
-      reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd', 'ccpTbwClassTfd' ];
+      // reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd',  'ccpTbwBgclrTfd' ];
+      reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd' ];
 
       // !VA highlightIcon METHOD: Set the array of elements that should receive a highlight because their Appobj property indicates a preset value
       highlightArray = [ 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd' ];
@@ -4748,7 +4788,7 @@ ${indent}<![endif]-->`;
       }
 
       // !VA radioState METHOD: set the elements whose selected value is to be set to the Appobj properties above.
-      radioArray = [  'ccpImgExcldRdo', 'ccpTdaAlignRdo' , 'ccpTdaValgnRdo', 'ccpTblAlignRdo', 'ccpTbwAlignRdo', 'ccpTdaOptnsRdo' ];
+      radioArray = [  'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpTdaAlignRdo' , 'ccpTdaValgnRdo', 'ccpTblAlignRdo', 'ccpTbwAlignRdo', 'ccpTdaOptnsRdo' ];
       // !VA checkboxState METHOD: set the checkboxes whose checked value is to be set to the Appobj properties above.
       checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpImgTargtChk'];
       // !VA Make the configuration object to pass to configCCP
