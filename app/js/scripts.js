@@ -512,168 +512,68 @@ var Witty = (function () {
 
     // !VA UIController private
     // !VA Resets (i.e. adds the ccp-conceal-ctn class) to the container elements for the CPP option section affected by the CCP control associated with the alias. 
+    // !VA Branch: 110720A
+    // !VA Rewriting this whole schmear...
     function revealReset( alias ) {
+      // console.clear();
+      console.log('revealReset running'); 
+      console.log('revealReset alias :>> ' + alias);
+
+
+
+
       let el, mkcssReset = [], excludeArr, defaultArr, defaultReset = [], iswapArr, iswapReset = [], bgimgArr, bgimgReset = [], vmlbtArr, vmlbtReset = [], wraprArr,  wraprReset = [], resetArray;
+      // !VA Branch: 110720A
+      let concealArr = [], concealArr2 = [];
       // !VA Only log if not init
       // if (alias !== 'default' ) { console.log('revealReset running'); }
       // console.log('revealReset alias :>> ' + alias);
 
-      // !VA There are three reset element matrices: mkcssReset includes all the Make CSS Button containers. That is obtained by getting the elements with classname 'ccp-mkcss-ctn' - it includes the Make CSS buttons and the curly braces that surround them. defaultReset includes the containers corresponding to the TD Options 'basic' configuration, and wraprReset includes the Wrapper Option elements.
-      defaultArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
-
-      // !VA iswapArr, bgimgArr and vmlbt are identical to defaultArr except without ccpImgCbhtmBtn - the CB HTML button is not availble those options because they output complete MS Conditional code blocks in which the IMG is included.
-      excludeArr = ['ccpImgCbhtmBtn'];
-      iswapArr = bgimgArr = vmlbtArr = removeFromArray(excludeArr, defaultArr);
-
-      // !VA Config for the TBL wrapper
-      wraprArr = ['ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk', ];
-
-
-      // !VA Array of Make CSS buttons to reset
-      for (const el of document.getElementsByClassName('ccp-mkcss-ctn')) {
-        mkcssReset.push(el);
-      }
+      // !VA Branch: 110720A
+      // !VA First, create the default reset array
+      defaultArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
       // !VA Array of default elements to reset
       for (const alias of defaultArr) {
         el = document.querySelector(ccpUserInput[alias]);
-        defaultReset.push(el);
+        el.classList.remove('ccp-conceal-ctn');
+        console.log('el.id :>> ' + el.id);
+        // defaultReset.push(el);
       }
-      for (const alias of iswapArr) {
-        el = document.querySelector(ccpUserInput[alias]);
-        iswapReset.push(el);
-      }
-      for (const alias of bgimgArr) {
-        el = document.querySelector(ccpUserInput[alias]);
-        bgimgReset.push(el);
-      }
-      for (const alias of vmlbtArr) {
-        el = document.querySelector(ccpUserInput[alias]);
-        vmlbtReset.push(el);
-      }
-      // !VA Array of Table Wrapper elements to reset
-      for (const alias of wraprArr) {
-        el = document.querySelector(ccpUserInput[alias]);
-        wraprReset.push(el);
+      // !VA Conceal the Make CSS button groups for all configurations
+      // concealArr = ['ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp',  ];
+      for (const el of document.getElementsByClassName('ccp-mkcss-ctn')) {
+        // mkcssReset.push(el);
+        el.classList.add('ccp-conceal-ctn');
       }
 
+      // !VA Branch: 110720A
+      // !VA In this approach, the default reveal config is always revealed and the individual options reveal or conceal deviations from this. 
+      // !VA Branch: 110720A
+      // !VA This whole thing is unnecessary - the default config is in configDefault
 
-      switch(true) {
-      case alias === 'default':
-        // !VA For init, reveal the default configuration
-        // !VA Conceal all elements to reset them
-        // console.log('default reset running');
-        for (const el of document.getElementsByClassName('ccp-ctn')) {
-          el.classList.add('ccp-conceal-ctn');
-        }
-        resetArray = defaultReset;
-        for (const el of resetArray) {
-          el.classList.add('ccp-conceal-ctn');
-          el.classList.remove('ccp-conceal-ctn');
-        }
-        break;
-      case alias === 'iswap':
-        // !VA For init, revea; the default configuration
-        // !VA Conceal all elements to reset them
-        // console.log('default reset running');
-        for (const el of document.getElementsByClassName('ccp-ctn')) {
-          el.classList.add('ccp-conceal-ctn');
-        }
-        resetArray = iswapReset;
-        for (const el of resetArray) {
-          el.classList.add('ccp-conceal-ctn');
-          el.classList.remove('ccp-conceal-ctn');
-        }
-        break;
-
-      // !VA Branch: 110120A
-      // !VA Trying it with defaultArr first
-      case alias === 'swtch':
-        // !VA For init, revea; the default configuration
-        // !VA Conceal all elements to reset them
-        // console.log('default reset running');
-        for (const el of document.getElementsByClassName('ccp-ctn')) {
-          el.classList.add('ccp-conceal-ctn');
-        }
-        resetArray = defaultArr;
-        for (const el of resetArray) {
-          el.classList.add('ccp-conceal-ctn');
-          el.classList.remove('ccp-conceal-ctn');
-        }
-        break;
-
-      case alias === 'bgimg':
-        // !VA For init, revea; the default configuration
-        // !VA Conceal all elements to reset them
-        // console.log('default reset running');
-        for (const el of document.getElementsByClassName('ccp-ctn')) {
-          el.classList.add('ccp-conceal-ctn');
-        }
-        resetArray = bgimgReset;
-        for (const el of resetArray) {
-          el.classList.add('ccp-conceal-ctn');
-          el.classList.remove('ccp-conceal-ctn');
-        }
-        break;
-      case alias === 'vmlbt':
-        // !VA For init, revea; the default configuration
-        // !VA Conceal all elements to reset them
-        // console.log('default reset running');
-        for (const el of document.getElementsByClassName('ccp-ctn')) {
-          el.classList.add('ccp-conceal-ctn');
-        }
-        resetArray = vmlbtReset;
-        for (const el of resetArray) {
-          el.classList.add('ccp-conceal-ctn');
-          el.classList.remove('ccp-conceal-ctn');
-        }
-        break;
-      // !VA Branch: 110120B
-      // !VA Trying to set the resetArray to defaultArr - better to stick with what I have for now.
-      // case alias === 'ccpImgExcldRdo':
-      //   resetArray =  defaultArr;
-      //   for (const alias of resetArray ) {
-      //     el = document.querySelector(ccpUserInput[alias]);
-      //     el.classList.add('ccp-conceal-ctn');
-      //   }
+      // switch(true) {
+      // case alias === 'default':
+      //   console.log('Mark1');
+      //   // !VA Hide the TBW options by default
+      //   concealArr = ['ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk'];
+      //   // concealArr.push(...concealArr2);
+      //   console.log('concealArr :>> ');
+      //   console.log(concealArr);
       //   break;
-      case alias === 'ccpImgExcldRdo':
-        resetArray =  [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk','ccpTdaOptnsRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpImgCbhtmBtn'  ];
-        for (const alias of resetArray ) {
-          el = document.querySelector(ccpUserInput[alias]);
-          el.classList.add('ccp-conceal-ctn');
-        }
-        break;
-      case alias === 'ccpTblWraprChk':
-        // !VA For init, reveal the default configuration
-        resetArray = wraprReset;
-        break;
-      case alias === 'ccpTblHybrdChk':
-        // !VA For init, reveal the default configuration
-        resetArray = wraprReset;
-        break;
-      default:
-        console.log('revealReset: case not handled');
-        // !VA Reveal the table wrapper config
-        console.log('revealReset: condition not handled');
-      } 
-    }
+      // default:
+      //   console.log('revealReset: case not handled');
+      //   // !VA Reveal the table wrapper config
+      //   console.log('revealReset: condition not handled');
+      // } 
 
-    // !VA UIController private
-    // !VA Use configCCP to apply/remove the highlight style to input elements, which then adds/removes the filter on the icon, as defined in the CSS. highlightIconPresets in resizeContainers sets the highlight on icons that have a default preset value. Individual icon highlights are set through configObj using the highlight method and the highlightArray array.
-    function highlightIcon( highlightArray ) {
-      var ipt;
-      for (const el of highlightArray) {
-        if ( el.substring( 11, 14) === 'Tfd') {
-          ipt = document.querySelector(ccpUserInput[el].replace('tfd', 'ipt'));
-          if (ipt.value !== '') { 
-            ipt.classList.add('active');
-          } else {
-            ipt.classList.remove('active');
-          }
-        }
-      }
-    }
 
+      // for (const alias of concealArr) {
+      //   el = document.querySelector(ccpUserInput[alias]);
+      //   // el.classList.add('ccp-conceal-ctn');
+      //   // console.log('el.id :>> ' + el.id);
+      //   // defaultReset.push(el);
+      // }
+    }
 
     // !VA UIController private  
     // !VA Reveal and conceal CCP parent containers with sequential animation. flag specifies if the reveal class cpp-hide-ctn is to be added or removed: true = add, false = remove. aliasArray is the array of elements to reveal/conceal. Called from UIController.configCCP. 
@@ -726,17 +626,22 @@ var Witty = (function () {
       // !VA revealElements isThe function that will be run sequentially with a 50ms delay
       function revealCcpElements(elArray) {
         // !VA Iterate through the child element array of the current aliasArray item
+        // !VA Branch: 110720A
+        // !VA Flipping the flags 
         for (var i = 0; i < elArray.length; i++) {
           // !VA Pause between each iteration 
           (function (i) {
             setTimeout(function () {
               // !VA If flag is false, remove the class
               if (!flag) {
-                elArray[i].classList.remove('ccp-conceal-ctn');
+                // !VA Branch: 110720A
+                // elArray[i].classList.remove('ccp-conceal-ctn');
+                elArray[i].classList.add('ccp-conceal-ctn');
               // !VA If flag is true, add the class
               } else if (flag) {
                 // console.log('chldrn[i] is: ' + chldrn[i]);
-                elArray[i].classList.add('ccp-conceal-ctn');
+                // elArray[i].classList.add('ccp-conceal-ctn');
+                elArray[i].classList.remove('ccp-conceal-ctn');
               } else {
               // !VA If the action isn't recognized, log an error
                 console.log('ERROR in revealParent - unknown action');
@@ -752,7 +657,22 @@ var Witty = (function () {
         revealCcpElements(elArray);
       }
     }
+
     // !VA UIController private
+    // !VA Use configCCP to apply/remove the highlight style to input elements, which then adds/removes the filter on the icon, as defined in the CSS. highlightIconPresets in resizeContainers sets the highlight on icons that have a default preset value. Individual icon highlights are set through configObj using the highlight method and the highlightArray array.
+    function highlightIcon( highlightArray ) {
+      var ipt;
+      for (const el of highlightArray) {
+        if ( el.substring( 11, 14) === 'Tfd') {
+          ipt = document.querySelector(ccpUserInput[el].replace('tfd', 'ipt'));
+          if (ipt.value !== '') { 
+            ipt.classList.add('active');
+          } else {
+            ipt.classList.remove('active');
+          }
+        }
+      }
+    }
 
     // !VA UIController private. Resets the disabled attribute or ccp-disable-ctn class based on the alias of the elements whose selection triggers the disabling. Currently, the only parameter passed is 'default' and the alias parameter isn't accessed. This function actually loops through all the ccp-ctn elements in the document and resets the disable state/class for them. There's probably a better way to do this - that is a lot of elements to loop through to only catch a few of them.
 
@@ -1568,7 +1488,6 @@ var Witty = (function () {
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
     function buildOutputNodeList( id ) {
       console.log('buildOutputNodeList running'); 
-      console.log('id :>> ' + id);
       let selectedTdOption, hasAnchor, hasWrapper, Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
       // !VA Set hasAnchor if ccpImgAnchrTfd has a value
       appController.getAppobj('ccpImgAnchrTfd')  ? hasAnchor = true : hasAnchor = false;
@@ -4234,8 +4153,6 @@ ${indent}<![endif]-->`;
     // !VA Returns the CCP configurations for each CCP UI element, i.e. the properties for configCCP methods.
     // !VA Note: 
     function fetchConfigObj( alias, option ) {
-      console.log('fetchConfigObj Appobj :>> ');
-      console.log(Appobj);
       let configObj = [];
       // !VA Set the CCP configuration for specific user selections
       switch(true) {
@@ -4378,7 +4295,6 @@ ${indent}<![endif]-->`;
       let configObj = {};
       if (evt.target.value !== '') {
         if (evt.target.id !== 'ccp-tda-padng-icn') {
-          console.log('evt.target.id :>> ' + evt.target.id);
           Appobj[appObjProp] = '';
           // !VA This should be done with configCCP - for later
           ipt = document.getElementById(evt.target.htmlFor);
@@ -4703,43 +4619,38 @@ ${indent}<![endif]-->`;
       idStr = idStr.replace('ipt', 'tfd');
       // !VA Strip all the hypens out of the ID (str)
       idStr = idStr.replace(/-/g,'');
-      console.log('idStr :>> ' + idStr);
       // !VA Loop through the Object.keys array 
       appobjArray = Object.keys(Appobj);
       for (let i = 0; i < appobjArray.length; i++) {
-        // console.log('appobjArray[i].toLowerCase() :>> ' + appobjArray[i].toLowerCase());
+        // console.log('appobjArray[i].toLowerCase() :>> ' + appobjArray[ i].toLowerCase());
         // !VA If the lowercase Appobj property name is contained in the id, then put the original Appobj property name match into appobjProp.
         // !VA TODO: Make this an arrow function with find, like below
         // var ret = Object.keys(IDtoProp).find(key => IDtoProp[key] === str);
         if (idStr.includes(appobjArray[i].toLowerCase())) {
           appObjProp = appobjArray[i];
-          console.log('HIT');
         }
       }
-      console.log('Mark1 appObjProp :>> ' + appObjProp);
       return appObjProp;
     }
 
     // !VA appController  
     // !VA CCP Configuration definitions for TD options and IMG excld radio. Note: alias and option parameters aren't accessed, including them as a console call and commenting out for now. This results in an error in the Outline view.
     function configDefault( alias, option ) {
-      // console.log('configDefault alias :>> ' + alias +  '; option :>> ' + option);
+      console.log('configDefault alias :>> ' + alias +  '; option :>> ' + option);
       // !VA Alias and option are not used yet, are included mainly for debug. 
-      let configObj, reflectArray, radioArray, revealArray, checkedArray, highlightArray;
+      let configObj, reflectArray, revealArray, highlightArray, radioArray, checkedArray;
       // !VA APPOBJ PROPERTIES
       // !VA NOTE: It might be redundant to set input elements to empty strings on init, since that is handled in reflectObject when called from populateCcpProperties. For later...
 
       // !VA Branch: 102220A
       // !VA First, set ccpTdaOptnsRdo to the TD Options selection. This will always be the option parameter, except on init. On init, configDefault is called with alias = 'default'. On init, populateCcpProperties first populates  and option = true, so create a condition that excludes that case.
-
+      
       if (Appobj[alias] === 'default' ) { 
         Appobj['ccpTdaOptnsRdo'] = '';
       } else {
         Appobj['ccpTdaOptnsRdo'] = option;
       }
       // console.log('Appobj[ccpTdaOptnsRdo] :>> ' + Appobj['ccpTdaOptnsRdo']);
-
-
 
       Appobj.ccpTblWraprChk = false;
       Appobj.ccpTblHybrdChk = false;
@@ -4780,11 +4691,16 @@ ${indent}<![endif]-->`;
       highlightArray = [ 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd' ];
 
       // !VA revealElements METHOD:
+      // !VA Branch: 110720A
+      // !VA Review this
       // !VA If the Appobj property for excldImg is set, then imgExcld is selected, so the default config needs to NOT reveal the anchor txfld and anchor target CCP elements. Revealing them now would overwrite the excldImg config reveal settings.
       if (Appobj.ccpImgExcldRdo === 'excld') {
         revealArray = ['ccpTdaWidthTfd', 'ccpTdaHeigtTfd'];
       } else {
-        revealArray = ['ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd'];
+        // !VA Branch: 110720A
+        // !VA revealReset flag flipped
+        // revealArray = ['ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd'];
+        revealArray = [''];
       }
 
       // !VA radioState METHOD: set the elements whose selected value is to be set to the Appobj properties above.
@@ -4807,7 +4723,7 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from fetchConfigObj to get the IMG EXCLD-specific configObj configuration properties to the  configCCP function, which then applies DOM-level changes to the CCP. 
     function configExcld( alias, option) {
-      let configObj, revealArray, revealFlag, radioArray;
+      let configObj, reflectArray, highlightArray, revealArray, revealFlag, radioArray;
       // // !VA Running selectTdaOptions also runs the default config, which overwrites the imgExcld config. But we need to select the basic TD options when imgExcld is selected. So integrate default config options into this config.
       // !VA Branch: 102020B
       // !VA Don't run selectTdaOptions because it applies the defaultConfig, which overwrites some of these config options. Instead, just include the radioState method in the configObj to select the 'basic' TD option.
@@ -4891,24 +4807,20 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from fetchConfigObj to get the TD Option radio group-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
     function configOptns( alias, option ) {
-      console.log('configOptns alias :>> ' + alias);  
-      console.log('configOptns option :>> ' + option);  
       let revealFlag, revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray, highlightArray;
       let configObj = {};
 
 
       // !VA Handle the TD Options CCP configurations
       switch(true) {
-        case option === 'basic':
+      case option === 'basic':
         // !VA For the TD Options basic and swtch, use the default CCP configuration
         configObj = configDefault( alias, option );
         console.log('configOptns configObj :>> ');
         console.log(configObj);
-
-
         break;
 
-        case option === 'iswap':
+      case option === 'iswap':
         // !VA SET APPOBJ PROPERTIES FOR ISWAP
         // !VA Show the table wrapper options
         Appobj['ccpTblWraprChk'] = true;
@@ -4939,9 +4851,12 @@ ${indent}<![endif]-->`;
         // !VA revealElements METHOD
         // !VA revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
         revealFlag = false;
-        // !VA Array of elements to be revealed. 
-        revealArray = [ 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaOptnsRdo', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblMsdpiChk', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd','ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
-        
+        // !VA Branch: 110720A changed revealed to concealed below
+        // !VA Array of elements to be concealed. 
+        // revealArray = [ 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaOptnsRdo', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblMsdpiChk', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd','ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+        revealArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd'];
+
+
 
         // !VA Branch: 102220A
         // !VA Should wrapper be shown by default?
@@ -4966,7 +4881,7 @@ ${indent}<![endif]-->`;
         };
         break;
         
-        case option === 'swtch':
+      case option === 'swtch':
 
         // !VA Branch: 110120B
         // !VA TD posswitch option has the same config except TBL Width = imgViewerW. NOTE: That is the default config. Users can change 
@@ -4982,7 +4897,7 @@ ${indent}<![endif]-->`;
 
 
         
-        case option === 'bgimg':
+      case option === 'bgimg':
         // !VA APPOBJ PROPERTIES
         // !VA Table wrapper options not show by default
         Appobj['ccpTblWraprChk'] = false;
@@ -5022,7 +4937,7 @@ ${indent}<![endif]-->`;
           revealElements: { flag: revealFlag, reveal: revealArray }
         };
         break;
-        case option === 'vmlbt':
+      case option === 'vmlbt':
         // !VA APPOBJ PROPERTIES
         // !VA Table wrapper options not show by default
         Appobj['ccpTblWraprChk'] = false;
@@ -5075,8 +4990,8 @@ ${indent}<![endif]-->`;
           revealElements: { flag: revealFlag, reveal: revealArray }
         };
         break;
-        default:
-          console.log('ERROR in configOptns - Appobj property not recognized');
+      default:
+        console.log('ERROR in configOptns - Appobj property not recognized');
       } 
 
 
@@ -5355,10 +5270,19 @@ ${indent}<![endif]-->`;
         // !VA First, populate Appobj with dynamicRegions and fill CCP elements with empty values
         UIController.populateAppobj(Appobj, 'ccp');
 
+        // !VA Branch: 110720A
+        // !VA Initializing all CCP elements as concealed on init, letting the default config handle the reveal. 
+        // !VA Since this is init, access the DOM directly here from appController. 
+        var foo = [];
+        foo = document.getElementsByClassName('ccp-ctn');
+        for (const el of foo) {
+          el.classList.add('ccp-conceal-ctn');
+        }
 
         // !VA Then set the CCP to configDefault on init. NOTE: the default parameter sets Appobj.ccpTdaOptnsRdo to an empty string, which forces populateCcpProperties to access the hard-coded value from the HTML file. That is the default, i.e. the 'basic' option. That is the mechanism for pre-selecting the 'basic' TD option on reload. Not ideal, but that is a carryover from before we were using configObj for configuration. At least I think that's the way it works :-)
+        // !VA Branch: 110720A
+        // !VA I don't think the above applies any more. That routine was removed from populateCcpProperties.
         Appobj.ccpTbwClassTfd = 'devicewidth';
-        console.log('Appobj.ccpTbwClassTfd :>> ' + Appobj.ccpTbwClassTfd);
         configObj = configDefault('default', 'basic' );
         console.log('init: configObj :>> ');
         console.log(configObj);
