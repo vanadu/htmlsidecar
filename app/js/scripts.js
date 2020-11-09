@@ -515,10 +515,9 @@ var Witty = (function () {
     // !VA Branch: 110720A
     // !VA Rewriting this whole schmear...
     function revealReset( alias ) {
-      // console.clear();
       console.log('revealReset running'); 
-      console.log('revealReset alias :>> ' + alias);
-
+      // console.log('revealReset alias :>> ' + alias);
+      // console.trace(alias);
       let el, incldArr, excludeArr, defaultArr, iswapArr, bgimgArr, vmlbtArr, wraprArr,  resetArr;
       // !VA Branch: 110720A
       let concealArr = [], concealArr2 = [];
@@ -544,8 +543,6 @@ var Witty = (function () {
       case alias === 'vmlbt':
         vmlbtArr = ['ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd' ];
         resetArr.push(...vmlbtArr);
-        console.log('Mark2 resetArr :>> ');
-        console.log(resetArr);
         break;
       case alias === 'incld':
         // !VA 
@@ -553,6 +550,11 @@ var Witty = (function () {
       default:
         // code block
       } 
+
+  
+      console.log('Mark1 resetArr :>> ');
+      console.log(resetArr);
+
 
       // !VA Branch: 110720A
       // !VA This needs to be a separate function
@@ -562,6 +564,7 @@ var Witty = (function () {
           setTimeout(function () {
             if ( resetArr[i] ) { 
               el = document.querySelector(ccpUserInput[resetArr[i]]);
+              // console.log('revealReset el.id :>> ' + el.id);
               el.classList.remove('ccp-conceal-ctn'); 
               // console.log('elArray[i].id :>> ' + elArray[i].id);
             }
@@ -612,7 +615,13 @@ var Witty = (function () {
     // !VA Reveal and conceal CCP parent containers with sequential animation. flag specifies if the reveal class cpp-hide-ctn is to be added or removed: true = add, false = remove. aliasArray is the array of elements to reveal/conceal. Called from UIController.configCCP. 
     // !VA Note: The only reason so far that this exists is to target the CSS Make buttons via their parent element. They can't be targeted directly because they're not in the ccpElementInput object and it would complicate things unduly to add them to that object when they're already in their own alias object.
     // !VA Note: the setTimeout loop could probably be done better with a for-in on the chldrn collection, but this works fine.
+    // !VA Branch: 110920A
+    // !VA Deprecating...
     function revealParent( flag, aliasArray) {
+      console.log('revealParent running'); 
+      console.log('revealParent flag :>> ' + flag);
+      console.log('revealParent aliasArray :>> ');
+      console.log(aliasArray);
       let chldrn;
       // !VA revealChildren isThe function that will be run sequentially with a 50ms delay
       function revealChildren(chldrn) {
@@ -645,61 +654,125 @@ var Witty = (function () {
       }
     }
 
+    function delayReveal( el ) {
+      console.log('delayReveal running'); 
+      console.log('el :>> ' + el);
+      let i;
+      (function (i) {
+        setTimeout(function () {
+          // !VA If flag is false, remove the class
+          el.classList.remove('ccp-conceal-ctn');
+        // !VA Pause 25 milliseconds between iterations
+        }, 1000 * i);
+      })(i);
+        
+    }
+
     // !VA UIController private  
     // !VA Reveal and conceal individual CCP container elements with sequential animation. flag specifies if the reveal class cpp-hide-ctn is to be added or removed: true = add, false = remove. aliasArray is the array of elements to reveal/conceal. Called from UIController.configCCP. 
     function revealElements( flag, aliasArray) {
-      // console.log('revealElements aliasArray :>> ');
-      // console.log(aliasArray);
-      // console.log('aliasArray :>> ');
-      // console.log(aliasArray);
-      let el,  elArray = [];
-      // !VA Create the array of elements to reveal/conceal. 
-      for (let i = 0; i < aliasArray.length; i++) {
-        el = document.querySelector(ccpUserInput[aliasArray[i]]);
-        elArray.push(el);
-      }
-      // !VA revealElements isThe function that will be run sequentially with a 50ms delay
-      function revealCcpElements(elArray) {
-        // console.log('elArray :>> ');
-        // console.log(elArray);
-        // !VA Iterate through the child element array of the current aliasArray item
-        // !VA Branch: 110720A
-        // !VA Flipping the flags 
-        for (var i = 0; i < elArray.length; i++) {
-          // !VA Pause between each iteration 
-          (function (i) {
-            setTimeout(function () {
-              // !VA If flag is false, remove the class
-              if (!flag) {
-                // !VA Branch: 110720A
-                // elArray[i].classList.remove('ccp-conceal-ctn');
-                // !VA Branch: 110720A
-                // !VA Added if exists handler
-                if ( elArray[i] ) { 
-                  elArray[i].classList.add('ccp-conceal-ctn'); 
-                  // console.log('elArray[i].id :>> ' + elArray[i].id);
+      // console.clear();
+      console.log('revealElements aliasArray :>> ');
+
+
+
+      // !VA For Make CSS buttons, handle the children of the aliased element in ccpUserInput;
+      if (aliasArray.toString().includes('Mkcss')){
+        console.log('Parents');
+        // !VA revealChildren isThe function that will be run sequentially with a 50ms delay
+        function revealChildren(chldrn) {
+          // !VA Iterate through the child element array of the current aliasArray item
+          for (var i = 0; i < chldrn.length; i++) {
+            // !VA Pause between each iteration 
+            (function (i) {
+              setTimeout(function () {
+                // !VA If flag is false, remove the class
+                if (!flag) {
+                  chldrn[i].classList.remove('ccp-conceal-ctn');
+                // !VA If flag is true, add the class
+                } else if (flag) {
+                  chldrn[i].classList.add('ccp-conceal-ctn');
+                } else {
+                // !VA If the action isn't recognized, log an error
+                  console.log('ERROR in revealParent - unknown action');
                 }
-              // !VA If flag is true, add the class
-              } else if (flag) {
-                // console.log('chldrn[i] is: ' + chldrn[i]);
-                // elArray[i].classList.add('ccp-conceal-ctn');
-                // !VA Branch: 110720A
-                // !VA Added if exists handler
-                if (elArray[i]) {elArray[i].classList.remove('ccp-conceal-ctn');}
-              } else {
-              // !VA If the action isn't recognized, log an error
-                console.log('ERROR in revealParent - unknown action');
-              }
-            // !VA Pause 25 milliseconds between iterations
-            }, 25 * i);
-          })(i);
+              // !VA Pause 25 milliseconds between iterations
+              }, 25 * i);
+            })(i);
+          }
         }
+        // !VA Loop through the passed-in aliasArray and for each array item:
+        for (let i = 0; i < aliasArray.length; i++) {
+          // !VA Get collection of child elements of the element corresponding to the current alias
+          chldrn = document.querySelector(ccpUserInput[aliasArray[i]]).children;
+          // !VA Run the callback function with the chldrn collection as parameter. This runs revealChildren to reveal/conceal each of the child elements in the collection.
+          revealChildren(chldrn);
+        }
+
+      // !VA For all other elements, reset the CCP to the defaultArr, merge the array of elements to reveal into the default config array and then do the reveal
+      } else {
+        console.log('Elements');
+
+        ccpArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTdaBdclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+
+
+
+        // !VA First, create the default reset array
+        defaultArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
+        // !VA Array of default elements to reset
+        
+        // !VA If the aliasArray elements are not in the defaultArr, then add them to the defaultArr. Otherwise, remove them from the defaultArr. Then, loop through the updated defaultArr and update the status of ccp-conceal-ctn for each element. 
+        
+        // !VA Loop through ALL the CCP elements.
+
+
+
+        // !VA Loop through ALL the CCP elements, check each CCP element against the defaultArr array and if the defaultArr represents a change, implement the change. Does that make sense?
+        let revealArray = [];
+        revealArray = defaultArr;
+        console.log('defaultArr :>> ');
+        console.log(defaultArr);
+        var foo;
+
+        for (const alias of aliasArray) {
+          console.log('alias in aliasArray :>> ' + alias);
+          if (revealArray.includes(alias)) {
+            revealArray = revealArray.filter(item => item !== alias);
+          } else {
+            revealArray.push(alias);
+          }
+        }
+        console.log('revealArray :>> ');
+        console.log(revealArray);
+        for (const alias of ccpArr) {
+          el = document.querySelector(ccpUserInput[alias]);
+          if (revealArray.includes(alias)) {
+            console.log('el.id revealed :>> ' + el.id);
+            el.classList.remove('ccp-conceal-ctn');
+            console.log('el.classList :>> ' + el.classList);
+            
+            
+          } else {
+            
+            console.log('el.id concealed :>> ' + el.id);
+            el.classList.add('ccp-conceal-ctn');
+            console.log('el.classList :>> ' + el.classList);
+
+            // console.log('NO HIT');
+            // el = document.querySelector(ccpUserInput[alias]);
+            // console.log('el.id :>> ' + el.id);
+            // el.classList.add('ccp-conceal-ctn');
+
+          }
+        }
+        debugger;
+
+
+
+
+
       }
-      // !VA Loop through the passed-in aliasArray and for each array item:
-      for (let i = 0; i < aliasArray.length; i++) {
-        // !VA Run the callback function with the elArray array as parameter. This runs revealElements to reveal/conceal each of the array elements.
-        revealCcpElements(elArray);
-      }
+
     }
 
     // !VA UIController private
@@ -949,9 +1022,11 @@ var Witty = (function () {
         if ( configObj.checkboxState ) {
           checkboxState( configObj.checkboxState.checked );
         }
-        if ( configObj.revealParent ) {
-          retVal = revealParent( configObj.revealParent.flag, configObj.revealParent.reveal );
-        }
+        // !VA Branch: 110920A
+        // !VA Deprecating...
+        // if ( configObj.revealParent ) {
+        //   retVal = revealParent( configObj.revealParent.flag, configObj.revealParent.reveal );
+        // }
         if ( configObj.disableReset) {
           disableReset( configObj.disableReset.alias );
         }
@@ -4229,7 +4304,6 @@ ${indent}<![endif]-->`;
         console.log('ERROR in fetchConfigObj = Alias not recognized');
       } 
 
-      console.log('Appobj.ccpTdaAlignRdo :>> ' + Appobj.ccpTdaAlignRdo);
       return configObj;
     }
 
@@ -4309,8 +4383,8 @@ ${indent}<![endif]-->`;
       // !VA Get the config
       configObj = fetchConfigObj( alias, option );
       // !VA Run the CCP UI configuration
-      console.log('selectTdaOptions configObj :>> ');
-      console.log(configObj); 
+      // console.log('selectTdaOptions configObj :>> ');
+      // console.log(configObj); 
       UIController.configCCP( configObj );
     }
 
@@ -4433,7 +4507,7 @@ ${indent}<![endif]-->`;
           flag ? tar.classList.add('active') : tar.classList.remove('active');
           // !VA If there's a value in the field and flag is true, then set the revealParent flag to false to remove the conceal class and reveal the elements.
           configObj = {
-            revealParent: { flag: !flag, reveal: revealArray }
+            revealElements: { flag: !flag, reveal: revealArray }
           };
           UIController.configCCP( configObj );
         // !VA TD class input shows Make CSS buttons
@@ -4444,7 +4518,7 @@ ${indent}<![endif]-->`;
           flag ? tar.classList.add('active') : tar.classList.remove('active');
           // !VA If there's a value in the field and flag is true, then set the revealParent flag to false to remove the conceal class and reveal the elements.
           configObj = {
-            revealParent: { flag: !flag, reveal: revealArray }
+            revealElements: { flag: !flag, reveal: revealArray }
           };
           UIController.configCCP( configObj );
           // !VA TBL class input shows Make CSS buttons
@@ -4453,9 +4527,9 @@ ${indent}<![endif]-->`;
           revealArray = makeAliasArray('ccpTblMkcssGrp');
           // !VA If there's a value in the field, then flag is true, so highlight the icon
           flag ? tar.classList.add('active') : tar.classList.remove('active');
-          // !VA If there's a value in the field and flag is true, then set the revealParent flag to false to remove the conceal class and reveal the elements.
+          // !VA If there's a value in the field and flag is true, then set the revealElements flag to false to remove the conceal class and reveal the elements.
           configObj = {
-            revealParent: { flag: !flag, reveal: revealArray }
+            revealElements: { flag: !flag, reveal: revealArray }
           };
           UIController.configCCP( configObj );
         // !VA Show the options for the IMG anchor text input field
@@ -4464,7 +4538,7 @@ ${indent}<![endif]-->`;
           revealArray = makeAliasArray('ccpImgTxclrTfd', 'ccpImgTargtChk');
           // !VA If there's a value in the field, then flag is true, so highlight the icon
           flag ? tar.classList.add('active') : tar.classList.remove('active');
-          // !VA If there's a value in the field and flag is true, then set the revealParent flag to false to remove the conceal class and reveal the elements.
+          // !VA If there's a value in the field and flag is true, then set the revealElements flag to false to remove the conceal class and reveal the elements.
           configObj = {
             revealElements: { flag: !flag, reveal: revealArray }
           };
@@ -4653,8 +4727,8 @@ ${indent}<![endif]-->`;
     // !VA appController  
     // !VA Get the Appobj property that corresponds to the ID of the DOM input element that sets it. 1) Removes the hypens in the ID string, converts the identifier string (the Appobj/ccpUserInput property name string) to lowercase, finds the match, and returns the aforementioned Appobj/ccpUserInput property name string. NOTE: Thiss work on Toolbar aliases as well by searching the ID for the lowercase Appobj property name, i.e. curimgw is in ipt-tbr-curimgw.
     function elemIdToAppobjProp(id) {
-      console.log('elemIdToAppobjProp running'); 
-      console.log('id :>> ' + id);
+      // console.log('elemIdToAppobjProp running'); 
+      // console.log('id :>> ' + id);
       let idStr, appObjProp, appobjArray;
       idStr = id;
       // !VA Replace the ipt with tfd, which is the code for the parent div, which is the element represented in Appobj
@@ -4785,6 +4859,7 @@ ${indent}<![endif]-->`;
       // !VA Toggleable config properties
       // !VA The imgExcld icon is selected
       if ( option === 'excld') {
+        console.log('Mark4');
         // !VA Branch: 110120B
         // !VA Appobj property values valid for the Excld option
         Appobj.ccpTdaWidthTfd = '';
@@ -4822,7 +4897,112 @@ ${indent}<![endif]-->`;
       highlightArray = getInputArray();
       // configObj.highlightIcon = { highlight: highlightArray};
       configObj = {
-        // !VA revealReset conceals all the elements, i.e. hides the ones that aren't explicitly revealed with revealElements.
+        // !VA revealReset conc    function revealElements( flag, aliasArray) {
+      // console.clear();
+      console.log('revealElements aliasArray :>> ');
+      console.log(aliasArray);
+      let chldrn;
+      let el,  elArray = [];
+      let defaultArr;
+
+      // !VA For Make CSS buttons, handle the children of the aliased element in ccpUserInput;
+      if (aliasArray.toString().includes('Mkcss')){
+        console.log('Parents');
+        // !VA revealChildren isThe function that will be run sequentially with a 50ms delay
+        function revealChildren(chldrn) {
+          // !VA Iterate through the child element array of the current aliasArray item
+          for (var i = 0; i < chldrn.length; i++) {
+            // !VA Pause between each iteration 
+            (function (i) {
+              setTimeout(function () {
+                // !VA If flag is false, remove the class
+                if (!flag) {
+                  chldrn[i].classList.remove('ccp-conceal-ctn');
+                // !VA If flag is true, add the class
+                } else if (flag) {
+                  chldrn[i].classList.add('ccp-conceal-ctn');
+                } else {
+                // !VA If the action isn't recognized, log an error
+                  console.log('ERROR in revealParent - unknown action');
+                }
+              // !VA Pause 25 milliseconds between iterations
+              }, 25 * i);
+            })(i);
+          }
+        }
+        // !VA Loop through the passed-in aliasArray and for each array item:
+        for (let i = 0; i < aliasArray.length; i++) {
+          // !VA Get collection of child elements of the element corresponding to the current alias
+          chldrn = document.querySelector(ccpUserInput[aliasArray[i]]).children;
+          // !VA Run the callback function with the chldrn collection as parameter. This runs revealChildren to reveal/conceal each of the child elements in the collection.
+          revealChildren(chldrn);
+        }
+
+      // !VA For all other elements, reset the CCP to the defaultArr, merge the array of elements to reveal into the default config array and then do the reveal
+      } else {
+        console.log('Elements');
+
+        ccpArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTdaBdclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+
+
+
+        // !VA First, create the default reset array
+        defaultArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
+        // !VA Array of default elements to reset
+        
+        // !VA If the aliasArray elements are not in the defaultArr, then add them to the defaultArr. Otherwise, remove them from the defaultArr. Then, loop through the updated defaultArr and update the status of ccp-conceal-ctn for each element. 
+        
+        // !VA Loop through ALL the CCP elements.
+
+
+
+        // !VA Loop through ALL the CCP elements, check each CCP element against the defaultArr array and if the defaultArr represents a change, implement the change. Does that make sense?
+        let revealArray = [];
+        revealArray = defaultArr;
+        console.log('defaultArr :>> ');
+        console.log(defaultArr);
+        var foo;
+
+        for (const alias of aliasArray) {
+          console.log('alias in aliasArray :>> ' + alias);
+          if (revealArray.includes(alias)) {
+            revealArray = revealArray.filter(item => item !== alias);
+          } else {
+            revealArray.push(alias);
+          }
+        }
+        console.log('revealArray :>> ');
+        console.log(revealArray);
+        for (const alias of ccpArr) {
+          el = document.querySelector(ccpUserInput[alias]);
+          if (revealArray.includes(alias)) {
+            console.log('el.id revealed :>> ' + el.id);
+            el.classList.remove('ccp-conceal-ctn');
+            console.log('el.classList :>> ' + el.classList);
+            
+            
+          } else {
+            
+            console.log('el.id concealed :>> ' + el.id);
+            el.classList.add('ccp-conceal-ctn');
+            console.log('el.classList :>> ' + el.classList);
+
+            // console.log('NO HIT');
+            // el = document.querySelector(ccpUserInput[alias]);
+            // console.log('el.id :>> ' + el.id);
+            // el.classList.add('ccp-conceal-ctn');
+
+          }
+        }
+        debugger;
+
+
+
+
+
+      }
+
+    }eals all the elements, i.e. hides the ones that aren't explicitly revealed with revealElements.
         highlightIcon: { highlight: highlightArray},
         checkboxState:  { checked: checkedArray },
         radioState: { radio: radioArray },
@@ -4861,8 +5041,7 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from fetchConfigObj to get the TD Option radio group-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
     function configOptns( alias, option ) {
-      console.log('configOptns running'); 
-      console.log(`alias :>> ${alias}; option :>> ${option}`);
+      console.log(`configOptns - alias :>> ${alias}; option :>> ${option}`);
       let revealFlag, revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray, highlightArray;
       let configObj = {};
 
@@ -4875,9 +5054,11 @@ ${indent}<![endif]-->`;
         // !VA Set the flag to conceal items in revealArray
         option = false;
         // !VA revealElements METHOD - Elements to conceal
-        revealArray = [ 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+        // !VA Branch: 110920A
+        // !VA None of these apply anymore - this is the default config. So remove the revealElements method from the config
+        // revealArray = [ 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
         // !VA Overwrite the default revealArray in the configObj called from configDefault
-        configObj.revealElements = { reveal: revealArray };
+        // configObj.revealElements = { reveal: revealArray };
         break;
       case option === 'iswap':
         // !VA SET APPOBJ PROPERTIES FOR ISWAP
@@ -4912,8 +5093,12 @@ ${indent}<![endif]-->`;
         revealFlag = false;
         // !VA Branch: 110720A changed revealed to concealed below
         // !VA Array of elements to be concealed. 
+        // !VA Branch: 110920A
+        // !VA The only change from the default config is concealing TD Width and TD Height
 
-        revealArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd'];
+        // revealArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd'];
+        revealArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd']
+
 
         // !VA Branch: 102220A
         // !VA Should wrapper be shown by default?
@@ -4933,7 +5118,6 @@ ${indent}<![endif]-->`;
           radioState: { radio: radioArray },
           disableElements: { flag: disableFlag, disable: disableArray },
           // !VA the revealReset array, iswapArr,  is set in revealReset. It includes all elements that are revealed by default except ccpImgCbhtmlBut because the img tag can't be output to the cliboard with the iswap option. iswap requires a TD or higher.
-          revealReset: { alias: 'iswap'},
           revealElements:  { flag: revealFlag, reveal: revealArray }
         };
         break;
@@ -4977,7 +5161,7 @@ ${indent}<![endif]-->`;
         reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
 
         // !VA revealElements METHOD - Elements to conceal
-        revealArray = [ 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd'];
+        revealArray = [];
 
         // !VA checkboxState METHOD
         // !VA Array of checkbox elements whose checked state to set
@@ -5030,7 +5214,8 @@ ${indent}<![endif]-->`;
         // !VA revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
         revealFlag = false;
         // !VA Array of elements to be revealed.
-        // revealArray = [ 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTdaBdradTfd' ];
+        // !VA revealElements METHOD - Elements to conceal
+        revealArray = [ 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', ];
 
         // !VA Set the configObj with the methods and properties to configure
         configObj = {
@@ -5038,8 +5223,7 @@ ${indent}<![endif]-->`;
           checkboxState:  { checked: checkedArray },
           disableReset: { alias: 'default' },
           reflectAppobj: { reflect: reflectArray },
-          revealReset: { alias: 'vmlbt'}
-          // revealElements: { flag: revealFlag, reveal: revealArray }
+          revealElements: { flag: revealFlag, reveal: revealArray }
         };
         break;
       default:
@@ -5081,7 +5265,7 @@ ${indent}<![endif]-->`;
 
       // !VA Create the configObj with the methods and properties to pass to configCCP to configure the CCP when Table Wrapper is checked/unchecked.
       configObj = {
-        revealReset: { alias: alias },
+        // revealReset: { alias: alias },
         revealElements: { flag: revealFlag, reveal: revealArray }
       };
       return configObj;
@@ -5164,7 +5348,7 @@ ${indent}<![endif]-->`;
         checkboxState: { checked: checkedArray },
         reflectAppobj: { reflect: reflectArray },
         radioState: { radio: radioArray },
-        revealReset: { alias: 'default'},
+        // revealReset: { alias: 'default'},
         revealElements: { flag: revealFlag, reveal: revealArray },
         // !VA Leaving disabling out for now.
         // disableElements: { flag: disableFlag, disable: disableArray },
