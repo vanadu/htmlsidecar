@@ -515,7 +515,7 @@ var Witty = (function () {
     // !VA Branch: 110720A
     // !VA Rewriting this whole schmear...
     function revealReset( alias ) {
-      console.log('revealReset running'); 
+      // console.log('revealReset running'); 
       // console.log('revealReset alias :>> ' + alias);
       // console.trace(alias);
       let el, incldArr, excludeArr, defaultArr, iswapArr, bgimgArr, vmlbtArr, wraprArr,  resetArr;
@@ -551,10 +551,6 @@ var Witty = (function () {
         // code block
       } 
 
-  
-      console.log('Mark1 resetArr :>> ');
-      console.log(resetArr);
-
 
       // !VA Branch: 110720A
       // !VA This needs to be a separate function
@@ -589,7 +585,6 @@ var Witty = (function () {
 
       // switch(true) {
       // case alias === 'default':
-      //   console.log('Mark1');
       //   // !VA Hide the TBW options by default
       //   concealArr = ['ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk'];
       //   // concealArr.push(...concealArr2);
@@ -668,39 +663,52 @@ var Witty = (function () {
         
     }
 
+    // !VA Run on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Loaded, running');
+      document.querySelector('#ccp-img-incld-ipt').click();
+    });
+
+
+    function revealElements2( aliasArray ) {
+      console.log('revealElements2 - aliasArray :>> ');
+      console.log(aliasArray);
+
+    }
+
     // !VA UIController private  
     // !VA Reveal and conceal individual CCP container elements with sequential animation. flag specifies if the reveal class cpp-hide-ctn is to be added or removed: true = add, false = remove. aliasArray is the array of elements to reveal/conceal. Called from UIController.configCCP. 
     function revealElements( flag, aliasArray) {
       // console.clear();
-      console.log('revealElements aliasArray :>> ');
-
+      let chldrn, ccpArr, defaultArr, el;
+      function revealChildren(chldrn) {
+        // !VA Iterate through the child element array of the current aliasArray item
+        for (var i = 0; i < chldrn.length; i++) {
+          // !VA Pause between each iteration 
+          (function (i) {
+            setTimeout(function () {
+              // !VA If flag is false, remove the class
+              if (!flag) {
+                chldrn[i].classList.remove('ccp-conceal-ctn');
+              // !VA If flag is true, add the class
+              } else if (flag) {
+                chldrn[i].classList.add('ccp-conceal-ctn');
+              } else {
+              // !VA If the action isn't recognized, log an error
+                console.log('ERROR in revealParent - unknown action');
+              }
+            // !VA Pause 25 milliseconds between iterations
+            }, 25 * i);
+          })(i);
+        }
+      }
 
 
       // !VA For Make CSS buttons, handle the children of the aliased element in ccpUserInput;
       if (aliasArray.toString().includes('Mkcss')){
-        console.log('Parents');
+        // console.log('LOG Parents');
         // !VA revealChildren isThe function that will be run sequentially with a 50ms delay
-        function revealChildren(chldrn) {
-          // !VA Iterate through the child element array of the current aliasArray item
-          for (var i = 0; i < chldrn.length; i++) {
-            // !VA Pause between each iteration 
-            (function (i) {
-              setTimeout(function () {
-                // !VA If flag is false, remove the class
-                if (!flag) {
-                  chldrn[i].classList.remove('ccp-conceal-ctn');
-                // !VA If flag is true, add the class
-                } else if (flag) {
-                  chldrn[i].classList.add('ccp-conceal-ctn');
-                } else {
-                // !VA If the action isn't recognized, log an error
-                  console.log('ERROR in revealParent - unknown action');
-                }
-              // !VA Pause 25 milliseconds between iterations
-              }, 25 * i);
-            })(i);
-          }
-        }
+
         // !VA Loop through the passed-in aliasArray and for each array item:
         for (let i = 0; i < aliasArray.length; i++) {
           // !VA Get collection of child elements of the element corresponding to the current alias
@@ -711,7 +719,7 @@ var Witty = (function () {
 
       // !VA For all other elements, reset the CCP to the defaultArr, merge the array of elements to reveal into the default config array and then do the reveal
       } else {
-        console.log('Elements');
+        // console.log('LOG Elements');
 
         ccpArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTdaBdclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
 
@@ -730,33 +738,32 @@ var Witty = (function () {
         // !VA Loop through ALL the CCP elements, check each CCP element against the defaultArr array and if the defaultArr represents a change, implement the change. Does that make sense?
         let revealArray = [];
         revealArray = defaultArr;
-        console.log('defaultArr :>> ');
-        console.log(defaultArr);
+        // console.log('defaultArr :>> ');
+        // console.log(defaultArr);
         var foo;
 
         for (const alias of aliasArray) {
-          console.log('alias in aliasArray :>> ' + alias);
           if (revealArray.includes(alias)) {
             revealArray = revealArray.filter(item => item !== alias);
           } else {
             revealArray.push(alias);
           }
         }
-        console.log('revealArray :>> ');
-        console.log(revealArray);
+        // console.log('revealArray :>> ');
+        // console.log(revealArray);
         for (const alias of ccpArr) {
           el = document.querySelector(ccpUserInput[alias]);
           if (revealArray.includes(alias)) {
-            console.log('el.id revealed :>> ' + el.id);
+            // console.log('el.id revealed :>> ' + el.id);
             el.classList.remove('ccp-conceal-ctn');
-            console.log('el.classList :>> ' + el.classList);
+            // console.log('el.classList :>> ' + el.classList);
             
             
           } else {
             
-            console.log('el.id concealed :>> ' + el.id);
+            // console.log('el.id concealed :>> ' + el.id);
             el.classList.add('ccp-conceal-ctn');
-            console.log('el.classList :>> ' + el.classList);
+            // console.log('el.classList :>> ' + el.classList);
 
             // console.log('NO HIT');
             // el = document.querySelector(ccpUserInput[alias]);
@@ -765,14 +772,7 @@ var Witty = (function () {
 
           }
         }
-        debugger;
-
-
-
-
-
       }
-
     }
 
     // !VA UIController private
@@ -1013,9 +1013,12 @@ var Witty = (function () {
         if ( configObj.revealElements ) {
           revealElements( configObj.revealElements.flag, configObj.revealElements.reveal );
         }
-        if ( configObj.concealElements ) {
-          revealElements( configObj.concealElements.flag, configObj.concealElements.conceal );
+        if ( configObj.revealElements2 ) {
+          revealElements2( configObj.revealElements.reveal );
         }
+        // if ( configObj.concealElements ) {
+        //   revealElements( configObj.concealElements.flag, configObj.concealElements.conceal );
+        // }
         if ( configObj.radioState ) {
           radioState( configObj.radioState.radio );
         }
@@ -1732,7 +1735,7 @@ var Witty = (function () {
         container.appendChild(frag);
         // !VA Create the nodeList to pass to the Clipboard object. 
         outputNL = container.querySelectorAll('*');
-        // !VA Apply the indentffs and insert the tokens marking the position for inserting the MS conditional code.
+        // !VA Apply the indents and insert the tokens identifying the position for inserting the MS conditional code.
         applyIndents(id, outputNL);
         // !VA Convert outputNL to a string (including tokens for inserting MS conditional code) for output to Clipboard object.
         clipboardStr = outputNL[0].outerHTML;
@@ -1774,7 +1777,7 @@ var Witty = (function () {
       sibling2Ids = [ 'container', 'td_switchsibling2', 'table_switchchild2', 'tr_switchchild2', 'td_switchcontent2' ];
       sibling2Elements = [ 'div', 'td', 'table', 'tr', 'td'];
       // !VA We have to handle the Include anchor tag case here because once the nodeList is created, it's a hack to modify it. So we remove the a tag from the arrays before creating the nodeList and setting the node attributes. We'll have to remove the corresponding a tag index from the nodeAttributes array as well otherwise the loop assigning the attributes to the nodeList will break. Note: this is a HACK! But this whole makePosSwitchNodes thing is a hack anyway so lets' make it simple human-readable.
-      // !VA Get the checkmark target
+      // !VA Get the checkbox target
       // !VA Query Appobj for ccpImgAnchr property. If the property value === '', then there is no entry, so do not include the anchor node in the sibling1 arrays.
       if ( appController.getAppobj('ccpImgAnchrTfd') === '') {
         index = 5;
@@ -2856,7 +2859,7 @@ ${indent}<![endif]-->`;
           // !VA Replace checkmrk with label
           labelid = labelid.replace(/checkmrk/g, 'label');
         } else {
-          // !VA If it's not a checkmark, just append -label to the id to get the label id
+          // !VA If it's not a checkbox, just append -label to the id to get the label id
           labelid = labelid + '-label';
         }
         // !VA get the element with the labelid
@@ -2918,7 +2921,7 @@ ${indent}<![endif]-->`;
           // !VA Replace checkmrk with label
           labelid = labelid.replace(/checkmrk/g, 'label');
         } else {
-          // !VA If it's not a checkmark, just append -label to the id to get the label id
+          // !VA If it's not a checkbox, just append -label to the id to get the label id
           labelid = labelid + '-label';
         }
         // !VA get the element with the labelid
@@ -4839,6 +4842,7 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from fetchConfigObj to get the IMG EXCLD-specific configObj configuration properties to the  configCCP function, which then applies DOM-level changes to the CCP. 
     function configExcld( alias, option) {
+      console.log('configExcld running'); 
       let configObj = {}, reflectArray, highlightArray, revealArray, revealFlag, radioArray, checkedArray;
       // // !VA Running selectTdaOptions also runs the default config, which overwrites the imgExcld config. But we need to select the basic TD options when imgExcld is selected. So integrate default config options into this config.
       // !VA Branch: 102020B
@@ -4859,7 +4863,6 @@ ${indent}<![endif]-->`;
       // !VA Toggleable config properties
       // !VA The imgExcld icon is selected
       if ( option === 'excld') {
-        console.log('Mark4');
         // !VA Branch: 110120B
         // !VA Appobj property values valid for the Excld option
         Appobj.ccpTdaWidthTfd = '';
@@ -4888,24 +4891,21 @@ ${indent}<![endif]-->`;
         // !VA revealElements METHOD - Elements to conceal
         revealArray = [ 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
 
-
-        console.log('Mark3 configObj :>> ');
-        console.log(configObj);
-
       }
       // !VA Get the highlightArray of all input elements to apply the highlight to any input elements whose Appobj property is not empty
       highlightArray = getInputArray();
       // configObj.highlightIcon = { highlight: highlightArray};
+      
       configObj = {
         highlightIcon: { highlight: highlightArray},
         checkboxState:  { checked: checkedArray },
         radioState: { radio: radioArray },
         reflectAppobj: { reflect: reflectArray },
-        revealElements: { flag: revealFlag, reveal: revealArray }
+        revealElements: { flag: revealFlag, reveal: revealArray },
+        revealElements2: { reveal: revealArray }
       };
+
       if ( option === 'incld') { configObj.revealReset = { alias: 'incld' }; }
-      console.log('Mark3 configObj :>> ');
-      console.log(configObj);
       return configObj;
     }
 
