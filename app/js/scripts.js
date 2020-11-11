@@ -3795,6 +3795,25 @@ ${indent}<![endif]-->`;
             appMessCode = 'err_cell_wider_than_parent_table';
           }
           break;
+        case (appObjProp === 'ccpTdaHeigtTfd') :
+          console.log('HIT :>> ' + HIT);
+          // if (Appobj.rdoCcpTdExcludeimg !== 'excld') {
+          //   if ( Appobj.ccpTblWidthTfd === '' ) {
+          //     console.log('checkNumericInput - Appobj.ccpTblWidthTfd is EMPTY');
+          //   }
+          //   else if ( retVal > Appobj.ccpTblWidthTfd ) {
+          //     isErr = true;
+          //     appMessCode = 'err_table_cell_wider_than_parent_table';
+          //   } else if ( retVal < Appobj.curImgW ) {
+          //     isErr = true;
+          //     appMessCode = 'err_cell_smaller_than_image';
+          //   }
+          // } 
+          if ( retVal > Appobj.imgViewerW ) {
+            isErr = true;
+            appMessCode = 'err_cell_wider_than_parent_table';
+          }
+          break;
         case (appObjProp === 'ccpTblWidthTfd') :
           // !VA Branch: 102020B
           // !VA Changed old reference to rdoCcpTdExcludeimg
