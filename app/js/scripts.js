@@ -653,22 +653,27 @@ var Witty = (function () {
       }
     }
 
-    function delayReveal( el ) {
-      console.log('delayReveal running'); 
-      console.log('el :>> ' + el);
-      let i;
-      (function (i) {
-        setTimeout(function () {
-          // !VA If flag is false, remove the class
-          el.classList.remove('ccp-conceal-ctn');
-        // !VA Pause 25 milliseconds between iterations
-        }, 1000 * i);
-      })(i);
+    // !VA UIController private
+    // !VA Toggle the table wrapper option based on the checkbox selection
+    function toggleWrapr(flag) {
+      let el, clss;
+      // !VA Array of table wrapper aliases
+      const wraprArr =  [ 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd',  'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+      // !VA Conceal class name
+      clss = 'ccp-conceal-ctn';
+      // !VA Loop through wraprArr and apply/remove the conceal class
+      for (const alias of wraprArr) {
+        el = document.querySelector(ccpUserInput[alias]);
+        flag ? el.classList.remove(clss) : el.classList.add(clss);
+      }
     }
 
     // !VA UIController private  
     // !VA Reveal and conceal individual CCP container elements with sequential animation. flag specifies if the reveal class cpp-hide-ctn is to be added or removed: true = add, false = remove. aliasArray is the array of elements to reveal/conceal. Called from UIController.configCCP. 
     function revealElements( flag, aliasArray) {
+      console.log('revealElements running'); 
+      console.log('aliasArray :>> ');
+      console.log(aliasArray);
       let chldrn, ccpArr, defaultArr, el, revealArray = [];
       function revealCcpChildren(chldrn) {
         // !VA Iterate through the child element array of the current aliasArray item
@@ -1005,8 +1010,8 @@ var Witty = (function () {
         if ( configObj.revealElements ) {
           revealElements( configObj.revealElements.flag, configObj.revealElements.reveal );
         }
-        if ( configObj.revealElements2 ) {
-          revealElements2( configObj.revealElements.reveal );
+        if ( configObj.toggleWrapr ) {
+          toggleWrapr( configObj.toggleWrapr.toggle );
         }
         // if ( configObj.concealElements ) {
         //   revealElements( configObj.concealElements.flag, configObj.concealElements.conceal );
@@ -4288,7 +4293,7 @@ ${indent}<![endif]-->`;
       case alias === 'ccpTblWraprChk' :
 
         // !VA Get the CCP configuration for the Include Wrapper checkbox icon
-        configObj = configWrapr( alias, option );
+        configObj = configWrapr( option );
         break;
       case alias === 'ccpTblHybrdChk' :
         // !VA Get the configObj, i.e. the methods and properties to pass to configCCP for configuring the CCP for the Hybrid option.
@@ -5172,47 +5177,13 @@ ${indent}<![endif]-->`;
 
     // !VA appController private
     // !VA Called from fetchConfigObj to get the Table Wrapper checkbox icon-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
-    function configWrapr( alias, isChecked ) {
-      // console.log('configWrapr running'); 
-      let configObj, revealFlag, revealArray = [];
-      const wraprArr =  [ 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd',  'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
-
-
-      // !VA revealElements METHOD
-      // !VA revealFlag is the opposite of isChecked because the revealElements method REMOVES the ccp-conceal-ctn class to reveal elements
-      revealFlag = isChecked;
-      // !VA Set the array of elements to reveal when Table Wrapper is checked. These correspond to the Table Wrapper option group.
-
-      // !VA Get the current revealArray for the given TD option and concatenate it with the array of TBL Wrapr aliases. 
-      // !VA If IMG Excld is 'incld', then get the revealArray for the TD Options.
-      if ( Appobj.ccpImgExcld === 'incld')  {
-        if ( Appobj.ccpTdaOptnsRdo === 'vmlbt') {  
-          revealArray = fetchRevealArray( 'vmlbt'); 
-        } else if (Appobj.ccpTdaOptnsRdo === 'vmlbt' ) {
-          revealArray = fetchRevealArray( 'iswap');
-        } else {
-          revealArray = [];
-        }
-        // !VA Branch: 111020B
-        // !VA This should be where the Hybrd options for the TBL Wrapr are set, I think 
-        if (Appobj.ccpTblWraprChk) { revealArray = revealArray.concat(wraprArr); }
-
-      // !VA Otherwise, set the revealArray for the 'excld' option
-      } else {
-        revealArray = fetchRevealArray( 'excld');
-      }
-
-      // !VA If the TBL Wrapr checkbox is checked, concatenate the revealArray for the given TD option above with the TBL Wrapr alias array.
-      if (Appobj.ccpTblWraprChk) { revealArray = revealArray.concat(wraprArr); }
-
-      // Appobj.ccpTblWraprChk  ? 
-      //   revealArray = revealArray.concat(wraprArr) :
-      //   revealArray = [ ];
-
-
+    function configWrapr( isChecked ) {
+      let configObj = [], flag;
+      // !VA if the TBL Wrapr checkbox is checked, set the boolean flag
+      isChecked ? flag = true : flag = false;
       // !VA Create the configObj to pass to configCcp.
       configObj = {
-        revealElements: { flag: revealFlag, reveal: revealArray }
+        toggleWrapr: { toggle: flag }
       };
       return configObj;
     }
