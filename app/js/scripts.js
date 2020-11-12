@@ -29,10 +29,10 @@ var Witty = (function () {
   // });
 
   // !VA Test function to identify the target of the mouseclick
-  // window.onclick = e => {
-  //   console.log('Clicked element');
-  //   console.log(e.target);
-  // };
+  window.onclick = e => {
+    console.log('Clicked element');
+    console.log(e.target);
+  };
 
   // !VA Click on Witty logo to run test function
   // var testbut = document.querySelector('#testme');
@@ -3253,6 +3253,7 @@ ${indent}<![endif]-->`;
       // !VA If any other option than IMG Excld,  is selected, then resize curImg and recalc padding based on the padding inputs.
       // !VA TODO: Need to include vmlbt in this condition and possibly bgimg
       if (Appobj.ccpImgExcldRdo !== 'excld' || Appobj.ccpTdaOptnsRdo !== 'vmlbt') {
+
         // !VA If appObjProp is lft/rgt, then curImgW is modified, so handle the top/btm padding inputs at the tail of this condition, otherwise they will not be updated when curImgW is updated. 
         if  ( appObjProp.substring( 6 , 11 ) === 'Pdrgt' || appObjProp.substring( 6 , 11 ) === 'Pdlft') {
           // !VA Create an object to pass to updateCurrentImage
@@ -3308,6 +3309,7 @@ ${indent}<![endif]-->`;
         }
       // !VA For IMG Excld option, override curImg sizing and padding recalculation because there effectively is no curImg to resize/recalc
       } else {
+        console.log('Excld mode');
         // !VA Branch: 110220C
         // !VA Disable all autocalc of padding for now in IMG EXCLD mode by setting Appobj TD width and height to empty.
         Appobj.ccpTdaWidthTfd = Appobj.ccpTdaHeigtTfd = '';
@@ -3384,10 +3386,13 @@ ${indent}<![endif]-->`;
         pDeltaW = -(pCurrent[1] + pCurrent[3]) + (pNew[1] + pNew[3]);
         // !VA Set Appobj for the change event target
         Appobj[appObjProp] = evtTargetVal;
-        // !VA Recalculate all the padding dependences: curImgW, curImgH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, Appobj.ccpTdaWidthTfd, Appobj.ccpTdaHeigtTfd. 
-        recalcPadding( pNew, pDeltaW );
-        // !VA Update the UI with the recalculated padding dependencies.
-        configPadding(appObjProp);
+        // !VA If IMG Excld is not selected, run recalcPadding and configPadding to recalculate and implement padding dependencies. If IMG Excld is selected, return out.
+        if (Appobj.ccpImgExcldRdo !== 'excld') {
+          // !VA Recalculate all the padding dependences: curImgW, curImgH, sPhonesW, sPhonesH, lPhonesW, lPhonesH, Appobj.ccpTdaWidthTfd, Appobj.ccpTdaHeigtTfd. 
+          recalcPadding( pNew, pDeltaW );
+          // !VA Update the UI with the recalculated padding dependencies.
+          configPadding(appObjProp);
+        }
         return;
       }
     }
@@ -3769,14 +3774,6 @@ ${indent}<![endif]-->`;
           console.log('Error handling for imagewidth input not implemented!');
           break;
         // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply - exclude rdoCcpTdExcludeimg from the error condition
-        case (appObjProp === 'ccpTdaHeigtTfd' && !Appobj.rdoCcpTdExcludeimg ) :
-          if (retVal < Appobj.curImgH ) {
-            // !VA errorHandler!
-            isErr = true;
-            appMessCode = 'err_cell_smaller_than_image';
-          }
-          break;
-        // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply - exclude rdoCcpTdExcludeimg from the error condition
         case (appObjProp === 'ccpTdaWidthTfd') :
           if (Appobj.rdoCcpTdExcludeimg !== 'excld') {
             if ( Appobj.ccpTblWidthTfd === '' ) {
@@ -3795,23 +3792,17 @@ ${indent}<![endif]-->`;
             appMessCode = 'err_cell_wider_than_parent_table';
           }
           break;
+        // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply - exclude rdoCcpTdExcludeimg from the error condition
         case (appObjProp === 'ccpTdaHeigtTfd') :
-          console.log('HIT :>> ' + HIT);
-          // if (Appobj.rdoCcpTdExcludeimg !== 'excld') {
-          //   if ( Appobj.ccpTblWidthTfd === '' ) {
-          //     console.log('checkNumericInput - Appobj.ccpTblWidthTfd is EMPTY');
-          //   }
-          //   else if ( retVal > Appobj.ccpTblWidthTfd ) {
-          //     isErr = true;
-          //     appMessCode = 'err_table_cell_wider_than_parent_table';
-          //   } else if ( retVal < Appobj.curImgW ) {
-          //     isErr = true;
-          //     appMessCode = 'err_cell_smaller_than_image';
-          //   }
-          // } 
-          if ( retVal > Appobj.imgViewerW ) {
+
+          if (Appobj.ccpImgExcldRdo === 'excld') {
+            isErr = false;
+          } else if ( retVal < Appobj.curImgH ) {
+
             isErr = true;
-            appMessCode = 'err_cell_wider_than_parent_table';
+            appMessCode = 'err_cell_smaller_than_image';
+          } else {
+            console.log('ERROR in checkNumericInput - unknown ccpTdaHeigtTfd condition');
           }
           break;
         case (appObjProp === 'ccpTblWidthTfd') :
@@ -3903,45 +3894,63 @@ ${indent}<![endif]-->`;
       let isErr, appMessCode, reflectArray = [], configObj = {};
       // !VA NOTE: Condition-specific variables are declared in the respective condition
       let { evtTargetVal, appObjProp } = userInputObj;
+
+      // !VA Branch: 110920A
+      // !VA If IMG Excld is selection, return out - Excld mode ignores all curImg recalc
+      if (Appobj.ccpImgExcldRdo === 'excld') {
+
+        console.log('HIT');
+        console.log('Appobj.ccpImgExcldRdo :>> ' + Appobj.ccpImgExcldRdo);
+        return;
+
+      } else {
+
+
+
       // !VA If the target is TD Width and it is greater than TBL Width, set TBL Width to TD Width. This is an override for TBL Width being populated with curImgW whenever curImgW is resized. If the user enters a TD Width that is greater than the TBL Width, the TBL Width must conform to the larger user-entered value.
       switch(true) {
-      case (appObjProp === 'curImgW' || appObjProp === 'curImgH'):
-        if (Appobj.ccpTdaWidthTfd) {
-          if (evtTargetVal < Appobj.ccpTdaWidthTfd ) {
-            Appobj.ccpTblWidthTfd = Appobj.ccpTdaWidthTfd;
-            reflectArray = [ 'ccpTblWidthTfd' ];
+        case (appObjProp === 'curImgW' || appObjProp === 'curImgH'):
+          if (Appobj.ccpTdaWidthTfd) {
+            if (evtTargetVal < Appobj.ccpTdaWidthTfd ) {
+              Appobj.ccpTblWidthTfd = Appobj.ccpTdaWidthTfd;
+              reflectArray = [ 'ccpTblWidthTfd' ];
+            }
           }
+          break;
+          // !VA Handle changes to the sPhonesW and lPhonesW input fields. When padding width inputs have values, sPhonesW and lPhonesW are reduced by the sum of those values. 
+          // !VA IMPORTANT: Recalc for sPhonesW and lPhonesW only show in the Inspectors. That's not the result I antipicated with this, but it's really optimal - it does not affect the localStorage values for sPhonesW and lPhonesW or the sPhonesW or lPhonesW Toolbar inputs. 
+          // !VA NOTE: Padding does not recalc TBL Width or TDA Width, although it does recalc TDA Height. For that reason, the reflect config for the TBL and TDA width and height inputs are in handlePadding, not here.
+          // !VA NOTE: Curly brackets allow variable definition in conditions, 
+        case (appObjProp === 'ccpTdaPdrgtTfd' || appObjProp === 'ccpTdaPdlftTfd'):
+          console.log('ALERT in recalcAppobj - unaccessed appObjProp');
+          break;
+        default:
+          // code block
+          console.log('ERROR in recalcAppobj - unknown switch/case condition');
+        } 
+  
+        configObj = {
+          reflectAppobj: { reflect: reflectArray },
+        };
+        UIController.configCCP( configObj );
+  
+        // !VA Branch: 102520A
+        // !VA I don't know if this error message handler even works
+        // !VA Error condition - pass the appMessCode to handleAppMessages
+        if (isErr) {
+          // !VA IF Error pass the code to errorHandler to get the error message
+          appController.handleAppMessages( appMessCode );
+          // if (appObjProp.substring( 0, 3) === 'ccp') {
+          // }
+        } else {
+          // !VA If no error...
+          isErr = false;
         }
-        break;
-        // !VA Handle changes to the sPhonesW and lPhonesW input fields. When padding width inputs have values, sPhonesW and lPhonesW are reduced by the sum of those values. 
-        // !VA IMPORTANT: Recalc for sPhonesW and lPhonesW only show in the Inspectors. That's not the result I antipicated with this, but it's really optimal - it does not affect the localStorage values for sPhonesW and lPhonesW or the sPhonesW or lPhonesW Toolbar inputs. 
-        // !VA NOTE: Padding does not recalc TBL Width or TDA Width, although it does recalc TDA Height. For that reason, the reflect config for the TBL and TDA width and height inputs are in handlePadding, not here.
-        // !VA NOTE: Curly brackets allow variable definition in conditions, 
-      case (appObjProp === 'ccpTdaPdrgtTfd' || appObjProp === 'ccpTdaPdlftTfd'):
-        console.log('ALERT in recalcAppobj - unaccessed appObjProp');
-        break;
-      default:
-        // code block
-        console.log('ERROR in recalcAppobj - unknown switch/case condition');
-      } 
 
-      configObj = {
-        reflectAppobj: { reflect: reflectArray },
-      };
-      UIController.configCCP( configObj );
 
-      // !VA Branch: 102520A
-      // !VA I don't know if this error message handler even works
-      // !VA Error condition - pass the appMessCode to handleAppMessages
-      if (isErr) {
-        // !VA IF Error pass the code to errorHandler to get the error message
-        appController.handleAppMessages( appMessCode );
-        // if (appObjProp.substring( 0, 3) === 'ccp') {
-        // }
-      } else {
-        // !VA If no error...
-        isErr = false;
       }
+
+
     }
 
     // !VA appController  
@@ -4571,6 +4580,11 @@ ${indent}<![endif]-->`;
       // !VA APPOBJ PROPERTIES
       // !VA NOTE: It might be redundant to set input elements to empty strings on init, since that is handled in reflectObject when called from populateCcpProperties. For later...
 
+      // !VA Branch: 111120C
+      document.querySelector('#ccp-tda-txcnt-tfd').classList.remove('ccp-conceal-ctn')
+
+
+
       // !VA Branch: 102220A
       // !VA First, set ccpTdaOptnsRdo to the TD Options selection. This will always be the option parameter, except on init. On init, configDefault is called with alias = 'default'. On init, populateCcpProperties first populates  and option = true, so create a condition that excludes that case.
       
@@ -4680,11 +4694,15 @@ ${indent}<![endif]-->`;
         Appobj.ccpTdaBdradTfd = '';
         Appobj.ccpTdaBdclrTfd = '';
         Appobj.ccpTblWidthTfd = '';
+        Appobj.ccpTdaPdtopTfd = '';
+        Appobj.ccpTdaPdrgtTfd = '';
+        Appobj.ccpTdaPdlftTfd = '';
+        Appobj.ccpTdaPdbtmTfd = '';
 
 
         // !VA reflectAppobj METHOD
         // Set the array of elements whose Appobj properties are to be reflected in CCP
-        reflectArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTblWidthTfd' ];
+        reflectArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTblWidthTfd' ];
         // !VA revealElements METHOD
         revealArray = fetchRevealArray('excld');
         revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn', 'ccpTdaOptnsRdo' ];
