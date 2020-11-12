@@ -254,6 +254,7 @@ var Witty = (function () {
       ccpTdaSwtchPar: '#ccp-tda-swtch-par',
       ccpTdaBgimgPar: '#ccp-tda-bgimg-par',
       ccpTdaVmlbtPar: '#ccp-tda-vmlbt-par',
+      ccpTdaTxcntTfd: '#ccp-tda-txcnt-tfd',
       ccpTblMkcssGrp: '#ccp-tbl-mkcss-grp',
       ccpTblCbhtmBtn: '#ccp-tbl-cbhtm-btn',
       ccpTblCbdtpBtn: '#ccp-tbl-cbdtp-btn',
@@ -403,6 +404,9 @@ var Witty = (function () {
         // !VA Ignore toolbar aliases here - they do not need to be reflected and probably should not have been passed in from handleBlur. For later. 
         toolbarAliases = ['curImgW', 'curImgH', 'imgViewerW', 'sPhonesW', 'lPhonesH' ];
         if (!toolbarAliases.includes( alias)) {
+          // !VA Branch: 111120C
+          // !VA Fix this
+          var Appobj;
 
           el = document.querySelector(ccpUserInput[alias].replace('tfd', 'ipt'));
           if (isInit) {
@@ -577,6 +581,17 @@ var Witty = (function () {
     // !VA Reveal and conceal individual CCP container elements with sequential animation. flag specifies if the reveal class cpp-hide-ctn is to be added or removed: true = add, false = remove. aliasArray is the array of elements to reveal/conceal. Called from UIController.configCCP. 
     function revealElements( flag, aliasArray) {
       let chldrn, ccpArr, defaultArr, el, revealArray = [];
+
+      // !VA Branch: 111120D
+      // !VA Trying to process both children and elements in one aliasArray
+      console.log('aliasArray :>> ');
+      console.log(aliasArray);
+
+
+
+
+
+
       // !VA Reveal elements containing children, i.e. the Make CSS buttons within the parent container
       function revealCcpChildren(chldrn) {
         // !VA Iterate through the child element array of the current aliasArray item
@@ -638,7 +653,7 @@ var Witty = (function () {
       // !VA TODO: This handler could be pared down even further to exclude those other elements which are always revealed, i.e. TBL options, and any other options not affected by the IMG EXCLD option. 
       } else {
         // !VA Array of ALL CCP elements to compare against the revealArray of the elements to reveal based on the current configObj configuration.
-        ccpArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn', 'ccpImgMkcssGrp', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaPdparGrp', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTdaBdclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+        ccpArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn', 'ccpImgMkcssGrp', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaPdparGrp', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaTxcntTfd', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTdaBdclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
 
         // VA! Default elements to reveal/conceal. This corresponds to the elements revealed by configDefault at initialization. 
         defaultArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaPdparGrp', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
@@ -1043,6 +1058,8 @@ var Witty = (function () {
         } else {
           console.log('Error in populateAppobj: unknown argument - access');
         }
+        console.log('Appobj :>> ');
+        console.log(Appobj);
       },
 
 
@@ -1294,6 +1311,24 @@ var Witty = (function () {
           retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
+        tdBorderColor: (function() {
+          appObjProp = 'ccpTdaBdclrTfd';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
+          return retObj;
+        })(),
+        tdBorderRadius: (function() {
+          appObjProp = 'ccpTdaBdradTfd';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
+          return retObj;
+        })(),
+        tdTextColor: (function() {
+          appObjProp = 'ccpTdaTxclrTfd';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
+          return retObj;
+        })(),
         tdBackground: (function() {
           // !VA TODO: Update this to support tokens, i.e. {{ value }}
           appObjProp = false;
@@ -1341,6 +1376,13 @@ var Witty = (function () {
           if (hasPadding) { str = str + pdng ;}
           // !VA There is no corrsponding appObj property for this so return false for the first parameter where the alias would normally go. The str parameter includes the msdpi/padding style attribute properties.
           retObj = returnObject( false, str );
+          return retObj;
+        })(),
+        tdTextContent: (function() {
+          console.log('Appobj.ccpTdaTxcntTfd :>> ' + Appobj.ccpTdaTxcntTfd);
+          appObjProp = 'ccpTdaTxcntTfd';
+          str = Appobj[appObjProp];
+          retObj = returnObject(appObjProp, str);
           return retObj;
         })(),
         // !VA TABLE attributes
@@ -1909,7 +1951,7 @@ var Witty = (function () {
       if (Attributes.tdBgcolor.str) { tdInner.bgColor = Attributes.tdBgcolor.str; }
       // !VA Now add the attributes included only with the default Td configuration
       switch(true) {
-      // !VA If the 'td with options' or 'td with options (exclude img) radio buttons are checked...
+      // !VA Handle the TD Options selections
       case (selectedTdOption === 'basic'):
         // !VA tdInner.className
         omitIfEmpty( Attributes.tdClass.str, tdInner, 'className');
@@ -1991,6 +2033,16 @@ var Witty = (function () {
       default:
         console.log('Some error has occurred in makeTdNode');
       } 
+      // var isExcld = appController.getAppobj('ccpImgExcldRdo');
+      // console.log('isExcld :>> ');
+      // console.log(isExcld);
+      if (appController.getAppobj('ccpImgExcldRdo') === 'excld') {
+        console.log('HIT');
+        tdInner.innerHTML = `${Attributes.tdTextContent.str}\n`;
+
+      }
+
+
       // !VA Set the node fragment to the TD node
       tdNodeFragment.appendChild(tdInner);
 
@@ -2147,8 +2199,8 @@ var Witty = (function () {
       // !VA Get the width of the TD from getAttributes
       // tdWidth = Attributes.tdWidth.str;
       // !VA Define the innerHTML of the vmlbutton code
-      vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:${Attributes.tdHeight.str}px;v-text-anchor:middle;width:${Attributes.tdWidth.str}px;" arcsize="10%" strokecolor="#1e3650" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc.str}" color="#556270" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Button Text!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="#"
-style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});border:1px solid #1e3650;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:${Attributes.tdHeight.str}px;text-align:center;text-decoration:none;width:${Attributes.tdWidth.str}px;-webkit-text-size-adjust:none;mso-hide:all;">Button Text!</a></div>`;
+      vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:${Attributes.tdHeight.str}px;v-text-anchor:middle;width:${Attributes.tdWidth.str}px;" arcsize="10%" strokecolor="${Attributes.tdBorderColor.str}" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc.str}" color="#556270" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Button Text!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="#"
+style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});border:1px solid ${Attributes.tdBorderColor.str};border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:${Attributes.tdHeight.str}px;text-align:center;text-decoration:none;width:${Attributes.tdWidth.str}px;-webkit-text-size-adjust:none;mso-hide:all;">Button Text!</a></div>`;
       try {
         !vmlButtonStr;
       } catch (error) {
@@ -2232,7 +2284,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             // !VA Branch: 102520A
             // !VA If non-comment text is added to the posswitch TD, then this handler needs to be deleted. So commenting this out for now.
             if ( i === outputNL.length - 1) {
-              outputNL[i].innerHTML = '\n' + getIndent(stackColumnIndentLevel) + 'Replace this placeholder text with your content to make the content appear at left of the image in desktop view and above the image in mobile view. \n' + getIndent(stackColumnIndentLevel);
+              outputNL[i].innerHTML = '\n' + getIndent(stackColumnIndentLevel) + 'Replace this placeholder text with your content. \n' + getIndent(stackColumnIndentLevel);
             }
             try {
               !outputNL;
@@ -3650,7 +3702,7 @@ ${indent}<![endif]-->`;
       let numericInputs, stringInputs, retVal, percentVal, percentInputs;
       percentInputs = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd'],
       numericInputs = [ 'imgViewerW', 'curImgW', 'curImgH',  'sPhonesW', 'lPhonesW', 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd' ];
-      stringInputs = ['ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpImgLoctnTfd', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTblClassTfd', 'ccpTblBgclrTfd', 'ccpTbwClassTfd', 'ccpTbwBgclrTfd' ];
+      stringInputs = ['ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpTdaTxcntTfd', 'ccpImgLoctnTfd', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTblClassTfd', 'ccpTblBgclrTfd', 'ccpTbwClassTfd', 'ccpTbwBgclrTfd' ];
 
       // !VA Determine if the numeric portion of evtTargetVal; is a valid percent value 
       function checkPercent(val) {
@@ -3775,13 +3827,13 @@ ${indent}<![endif]-->`;
           break;
         // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply - exclude rdoCcpTdExcludeimg from the error condition
         case (appObjProp === 'ccpTdaWidthTfd') :
-          if (Appobj.rdoCcpTdExcludeimg !== 'excld') {
+          if ( retVal > Appobj.ccpTblWidthTfd ) {
+            isErr = true;
+            appMessCode = 'err_table_cell_wider_than_parent_table';
+          }
+          if (Appobj.ccpImgExcldRdo !== 'excld') {
             if ( Appobj.ccpTblWidthTfd === '' ) {
               console.log('checkNumericInput - Appobj.ccpTblWidthTfd is EMPTY');
-            }
-            else if ( retVal > Appobj.ccpTblWidthTfd ) {
-              isErr = true;
-              appMessCode = 'err_table_cell_wider_than_parent_table';
             } else if ( retVal < Appobj.curImgW ) {
               isErr = true;
               appMessCode = 'err_cell_smaller_than_image';
@@ -3899,13 +3951,8 @@ ${indent}<![endif]-->`;
       // !VA If IMG Excld is selection, return out - Excld mode ignores all curImg recalc
       if (Appobj.ccpImgExcldRdo === 'excld') {
 
-        console.log('HIT');
-        console.log('Appobj.ccpImgExcldRdo :>> ' + Appobj.ccpImgExcldRdo);
         return;
-
       } else {
-
-
 
       // !VA If the target is TD Width and it is greater than TBL Width, set TBL Width to TD Width. This is an override for TBL Width being populated with curImgW whenever curImgW is resized. If the user enters a TD Width that is greater than the TBL Width, the TBL Width must conform to the larger user-entered value.
       switch(true) {
@@ -4580,11 +4627,6 @@ ${indent}<![endif]-->`;
       // !VA APPOBJ PROPERTIES
       // !VA NOTE: It might be redundant to set input elements to empty strings on init, since that is handled in reflectObject when called from populateCcpProperties. For later...
 
-      // !VA Branch: 111120C
-      document.querySelector('#ccp-tda-txcnt-tfd').classList.remove('ccp-conceal-ctn')
-
-
-
       // !VA Branch: 102220A
       // !VA First, set ccpTdaOptnsRdo to the TD Options selection. This will always be the option parameter, except on init. On init, configDefault is called with alias = 'default'. On init, populateCcpProperties first populates  and option = true, so create a condition that excludes that case.
       
@@ -4613,6 +4655,7 @@ ${indent}<![endif]-->`;
       // Appobj.ccpTdaPdrgtTfd = '';
       // Appobj.ccpTdaPdlftTfd = '';
       // Appobj.ccpTdaPdbtmTfd = '';
+      Appobj.ccpTdaTxcntTfd = 'Eaque voluptatum assumenda et facilis atque odio sed magnam.',
       Appobj.ccpTblClassTfd = '';
       Appobj.ccpTblWidthTfd = Appobj.curImgW;
       // Appobj.ccpTblBgclrTfd = '';
@@ -4702,10 +4745,10 @@ ${indent}<![endif]-->`;
 
         // !VA reflectAppobj METHOD
         // Set the array of elements whose Appobj properties are to be reflected in CCP
-        reflectArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTblWidthTfd' ];
+        reflectArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaTxcntTfd', 'ccpTblWidthTfd' ];
         // !VA revealElements METHOD
         revealArray = fetchRevealArray('excld');
-        revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn', 'ccpTdaOptnsRdo' ];
+        revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn', 'ccpTdaOptnsRdo', 'ccpTdaTxcntTfd' ];
         // revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgItypeRdo', ];
 
       } else {
@@ -4716,7 +4759,7 @@ ${indent}<![endif]-->`;
         // Set the array of elements whose Appobj properties are to be reflected in CCP
         reflectArray = ['ccpTblWidthTfd'];
         // !VA revealElements METHOD - Elements to conceal
-        revealArray = [ 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd' ];
+        revealArray = [  ];
 
       }
       // !VA Get the highlightArray of all input elements to apply the highlight to any input elements whose Appobj property is not empty
@@ -4731,7 +4774,7 @@ ${indent}<![endif]-->`;
         revealElements: { flag: revealFlag, reveal: revealArray },
       };
 
-      if ( option === 'incld') { configObj.revealReset = { alias: 'incld' }; }
+      // if ( option === 'incld') { configObj.revealReset = { alias: 'incld' }; }
       return configObj;
     }
 
@@ -4740,18 +4783,26 @@ ${indent}<![endif]-->`;
     // !VA Branch: 102020B
     // !VA Why is this never accessed?
     function configItype( alias, option) {
-      let configObj, reflectArray, radioArray, highlightArray;
+      console.log('configItype running'); 
+      console.log('option :>> ' + option);
+      let configObj, reflectArray, radioArray, highlightArray, revealArray, revealFlag;
       // !VA REFLECT APPOBJ to TEXT INPUT FIELDS
       option === 'fluid' ?  Appobj['ccpImgClassTfd'] = 'img-fluid' : Appobj['ccpImgClassTfd'] = '';
+      // !VA REVEAL the Make CSS buttons if fluid
+      revealArray = [ 'ccpImgMkcssGrp'];
+      option === 'fluid' ?  revealFlag = false : revealFlag = true;
+      // console.log('revealArray :>> ');
+      // console.log(revealArray);
+
       reflectArray = ['ccpImgClassTfd' ];
       radioArray = [ alias ];
-
       // !VA Get the highlightArray of all input elements to apply the highlight to any input elements whose Appobj property is not empty
       highlightArray = getInputArray();
       configObj = {
         highlightIcon: { highlight: highlightArray},
         reflectAppobj: { reflect: reflectArray },
-        radioState: { radio: radioArray } 
+        radioState: { radio: radioArray },
+        revealElements: { flag: revealFlag, reveal: revealArray }
       };
       return configObj;
     }
@@ -4785,6 +4836,7 @@ ${indent}<![endif]-->`;
         Appobj.ccpTblHybrdChk = false;
         // !VA APPOBJ PROPERTIES
         Appobj.ccpImgClassTfd = 'mobileshow';
+        Appobj.ccpImgItypeRdo = 'fixed';
         Appobj.ccpTblClassTfd = Appobj.ccpTbwClassTfd = 'devicewidth';
         Appobj.ccpTblAlignRdo = 'center';
         Appobj.ccpTbwAlignRdo = 'center';
@@ -4796,7 +4848,7 @@ ${indent}<![endif]-->`;
 
         // !VA reflectAppobj METHOD
         // !VA Array of elements whose values are set to the Appobj properties above
-        reflectArray = ['ccpImgClassTfd','ccpTdaBgclrTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
+        reflectArray = ['ccpImgClassTfd', 'ccpImgItypeRdo', 'ccpTdaBgclrTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
         
         // !VA checkboxState METHOD
         // !VA Array of checkboxes whose checked state is to be set based on the Appobj property setting above.
@@ -4815,8 +4867,11 @@ ${indent}<![endif]-->`;
         // !VA The only change from the default config is concealing TD Width and TD Height
 
         // revealArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd'];
-        revealArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd',  'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk'];
+        revealArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd',  'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk', 'ccpImgMkcssGrp', 'ccpTblMkcssGrp'];
 
+        // !VA radioState METHOD
+        // !VA Array of radio elements whose checked state to set
+        radioArray = [ 'ccpImgItypeRdo' ];
 
         // !VA Branch: 102220A
         // !VA Should wrapper be shown by default?
@@ -4869,6 +4924,7 @@ ${indent}<![endif]-->`;
         Appobj['ccpTblHybrdChk'] = false;
         Appobj['ccpImgClassTfd'] = '';
         Appobj['ccpTblClassTfd'] = '';
+        Appobj.ccpImgItypeRdo = 'fixed';
         Appobj['ccpTdaWidthTfd'] = Appobj['curImgW'];
         Appobj['ccpTdaHeigtTfd'] = Appobj['curImgH'];
         Appobj['ccpTdaBgclrTfd'] = '#7bceeb';
@@ -4880,10 +4936,14 @@ ${indent}<![endif]-->`;
 
         // !VA reflectAppobj METHOD
         // !VA Array of elements whose values are set to the Appobj properties above
-        reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdparGrp', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
+        reflectArray = ['ccpImgClassTfd', 'ccpImgItypeRdo', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdparGrp', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
 
         // !VA revealElements METHOD - Elements to conceal
         revealArray = fetchRevealArray('bgimg');
+
+        // !VA radioState METHOD
+        // !VA Array of radio elements whose checked state to set
+        radioArray = [ 'ccpImgItypeRdo' ];
 
         // !VA checkboxState METHOD
         // !VA Array of checkbox elements whose checked state to set
@@ -4891,6 +4951,7 @@ ${indent}<![endif]-->`;
 
         // !VA Set the configObj with the methods and properties to configure
         configObj = {
+          radioState: { radio: radioArray },
           checkboxState:  { checked: checkedArray },
           disableReset: { alias: 'default' },
           reflectAppobj: { reflect: reflectArray },
@@ -4903,6 +4964,7 @@ ${indent}<![endif]-->`;
         Appobj['ccpTblWraprChk'] = false;
         Appobj['ccpTblHybrdChk'] = false;
         Appobj['ccpImgClassTfd'] = '';
+        Appobj.ccpImgItypeRdo = 'fixed';
         Appobj['ccpTblClassTfd'] = '';
         Appobj['ccpTdaWidthTfd'] = Appobj['curImgW'];
         Appobj['ccpTdaHeigtTfd'] = Appobj['curImgH'];
@@ -4922,7 +4984,7 @@ ${indent}<![endif]-->`;
 
         // !VA reflectAppobj METHOD
         // !VA Array of elements whose values are set to the Appobj properties above
-        reflectArray = ['ccpImgClassTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaHeigtTfd',  'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTdaBdradTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
+        reflectArray = ['ccpImgClassTfd', 'ccpImgItypeRdo', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaHeigtTfd',  'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTdaBdradTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
         
         // !VA checkboxState METHOD
         // !VA Array of checkbox elements whose checked state to set
@@ -4930,7 +4992,7 @@ ${indent}<![endif]-->`;
 
         // !VA radioState METHOD
         // !VA Array of radio elements whose checked state to set
-        radioArray = [ 'ccpTdaAlignRdo', 'ccpTdaValgnRdo' ];
+        radioArray = [ 'ccpImgItypeRdo', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo' ];
 
         // !VA revealElements METHOD
         // !VA revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.

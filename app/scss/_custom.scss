@@ -837,6 +837,8 @@ fieldset {
       height: 45px;
       width: 514px;
       resize: none;
+      // wrap: hard;
+      z-index: 100;
     }
   }
 
