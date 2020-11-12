@@ -29,10 +29,10 @@ var Witty = (function () {
   // });
 
   // !VA Test function to identify the target of the mouseclick
-  window.onclick = e => {
-    console.log('Clicked element');
-    console.log(e.target);
-  };
+  // window.onclick = e => {
+  //   console.log('Clicked element');
+  //   console.log(e.target);
+  // };
 
   // !VA Click on Witty logo to run test function
   // var testbut = document.querySelector('#testme');
