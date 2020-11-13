@@ -510,9 +510,10 @@ var Witty = (function () {
     // }
 
     function revealReset( alias ) {
+      console.log('revealReset running'); 
       let el, defaultArr, iswapArr, resetArr;
       // !VA First, create the default reset array
-      defaultArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaPdparGrp', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
+      defaultArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaPdparGrp', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblBgclrTfd', 'ccpTblMaxwdTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
       // !VA Array of default elements to reset
       resetArr = defaultArr;
 
@@ -561,7 +562,23 @@ var Witty = (function () {
     function toggleWrapr(flag) {
       let el, clss;
       // !VA Array of table wrapper aliases
-      const wraprArr =  [ 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd',  'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+      let wraprArr;
+      wraprArr =  [ 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd',  'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+      // !VA There are conditions in which ccpTbwMaxwdTfd should not be revealed, so in those cases remove that alias from the array
+      var foo = appController.getAppobj('ccpTdaOptnsRdo');
+      console.log('foo :>> ' + foo);
+      if (appController.getAppobj('ccpTdaOptnsRdo') === 'swtch') {
+        console.log('SWTCH selected');
+        wraprArr = wraprArr.filter( alias => alias !== 'ccpTbwMaxwdTfd');
+        console.log('wraprArr :>> ');
+        console.log(wraprArr);
+
+
+      }
+
+
+
+
       // !VA Conceal class name
       clss = 'ccp-conceal-ctn';
       // !VA Loop through wraprArr and apply/remove the conceal class
@@ -581,17 +598,9 @@ var Witty = (function () {
     // !VA Reveal and conceal individual CCP container elements with sequential animation. flag specifies if the reveal class cpp-hide-ctn is to be added or removed: true = add, false = remove. aliasArray is the array of elements to reveal/conceal. Called from UIController.configCCP. 
     function revealElements( flag, aliasArray) {
       let chldrn, ccpArr, defaultArr, el, revealArray = [];
-
+      console.trace(`revealElements aliasArray: ${aliasArray}`);
       // !VA Branch: 111120D
       // !VA Trying to process both children and elements in one aliasArray
-      console.log('aliasArray :>> ');
-      console.log(aliasArray);
-
-
-
-
-
-
       // !VA Reveal elements containing children, i.e. the Make CSS buttons within the parent container
       function revealCcpChildren(chldrn) {
         // !VA Iterate through the child element array of the current aliasArray item
@@ -625,12 +634,19 @@ var Witty = (function () {
               if (revealArray.includes(ccpArr[i])) {
                 // !VA Get DOM elements for the aliases to reveal
                 el = document.querySelector(ccpUserInput[ccpArr[i]]);
+                // !VA Branch: 111320A
+                if (el.id.includes('maxwd')) {
+                  console.log('REVEAL el.id :>> ' + el.id);
+                }
                 el.classList.remove('ccp-conceal-ctn');
               // !VA If the current alias in the ccpArr is NOT in the array of elements to be revealed/concealed, then conceal it.
               } else {
                 // !VA Get DOM elements for the aliases to conceal
                 el = document.querySelector(ccpUserInput[ccpArr[i]]);
                 el.classList.add('ccp-conceal-ctn');
+                if (el.id.includes('maxwd')) {
+                  console.log('CONCEAL el.id :>> ' + el.id);
+                }
               }
             // !VA Pause 15 milliseconds between iterations
             }, 10 * i);
@@ -1365,13 +1381,20 @@ var Witty = (function () {
           }
           // !VA Create the padding property. Join the array items, separating them with a space. These are the shorthand CSS values for the 4 padding properties. 
           pdng = 'padding: ' + arr.join(' ');
-          // !VA Create the width property for the MSDPI option
-          msdpi = `width: ${Appobj['ccpTblWidthTfd']}px; `;
-          // !VA If the user has entered a percentage value for the TBL width attribute, strip the 'px' units off the value and include the percent char
-          msdpi.includes('%')  ? msdpi = msdpi.replace('%px', '%') : msdpi;
-          str = msdpi;
-          // !VA If TBL Msdip checkbox is checked, set the return string to msdpi
-          Appobj['ccpTblMsdpiChk'] ? str = msdpi : str = '';
+
+          // !VA Branch: 111320A
+          // !VA Exclude TD Options swtch here, MSDPI for poswitch is handled in  setPosSwitchNodeAttributes
+          if (Appobj.ccpTdaOptnsRdo !== 'swtch') {
+            // !VA Create the width property for the MSDPI option
+            msdpi = `width: ${Appobj['ccpTblWidthTfd']}px; `;
+            // !VA If the user has entered a percentage value for the TBL width attribute, strip the 'px' units off the value and include the percent char
+            msdpi.includes('%')  ? msdpi = msdpi.replace('%px', '%') : msdpi;
+            str = msdpi;
+            // !VA If TBL Msdip checkbox is checked, set the return string to msdpi
+            Appobj['ccpTblMsdpiChk'] ? str = msdpi : str = '';
+          }
+
+
           // !VA if hasPadding is true, then the user has entered at least one value in the padding input fields, so append str with the pdng property.
           if (hasPadding) { str = str + pdng ;}
           // !VA There is no corrsponding appObj property for this so return false for the first parameter where the alias would normally go. The str parameter includes the msdpi/padding style attribute properties.
@@ -1423,17 +1446,23 @@ var Witty = (function () {
           appObjProp = false;
           // !VA If the TBL msdpi checkbox is checked, add style attribute with the width property set to the curImgW. To this for TdStyle as well.
           let msdpi, maxwd;
+          // !VA Branch: 111320A
+          // !VA Exclude TD Options swtch here. MSDPI for poswitch is handled in setPosSwitchNodeAttributes and there is no style property for max-width defined in setPosSwitchNodeAttributes, so that condition isn't applicable for TD swtch.
+
+          // !VA For all other options than TD Swtch, merge the msdpi and maxwd styles if both are present
           // !VA Set the msdpi string to the TBL width field value 
-          msdpi = `width: ${Appobj['ccpTblWidthTfd']}px; `;
-          // !VA If the TBL width field value was a percent, remove the px on the units suffix
-          msdpi.includes('%')  ? msdpi = msdpi.replace('%px', '%') : msdpi;
-          maxwd = `max-width: ${Appobj['ccpTblMaxwdTfd']}px; `;
-          if ( Appobj['ccpTblMsdpiChk']) {
-            str = msdpi;
-          } 
-          if ( Appobj['ccpTblMaxwdTfd']) {
-            str = msdpi + maxwd;
-          }
+            msdpi = `width: ${Appobj['ccpTblWidthTfd']}px; `;
+            // !VA If the TBL width field value was a percent, remove the px on the units suffix
+            msdpi.includes('%')  ? msdpi = msdpi.replace('%px', '%') : msdpi;
+            maxwd = `max-width: ${Appobj['ccpTblMaxwdTfd']}px; `;
+            if ( Appobj['ccpTblMsdpiChk']) {
+              str = msdpi;
+            } 
+            if (Appobj.ccpTdaOptnsRdo !== 'swtch') {
+              if ( Appobj['ccpTblMaxwdTfd']) {
+                str = msdpi + maxwd;
+              }
+            }
           // !VA There is no corrsponding appObj property for this so return false for the first parameter where the alias would normally go
           retObj = returnObject( false, str );
           return retObj;
@@ -1773,6 +1802,8 @@ var Witty = (function () {
       // if (Attributes.imgStyle.str) { nodeList[6].setAttribute( 'class', Attributes.imgStyle.str ); }
 
 
+      
+
       // !VA Add the rest of the attributes to the nodes
       td_switchcontainerAttr = {
         dir: 'rtl',
@@ -1797,10 +1828,12 @@ var Witty = (function () {
         class: 'stack-column-center'
       };
       table_switchchild1Attr = {
+        // !VA Branch: 111320A
+        // width: '100%',
+        width: Attributes.imgWidth.str,
         class: 'devicewidth',
         role: 'presentation',
         border: '0',
-        width: '100%',
         cellPadding: '0',
         cellSpacing: '0'
       };
@@ -1849,6 +1882,15 @@ var Witty = (function () {
       };
       // !VA Create the array with the attribute objects. We use this array to cycle through the nodeList and apply the attributes to the individual nodes. I tried many ways to do this but was not able to assign these objects to the individual nodes any other way than to loop through them ensuring that the array and nodeList length were identical. If there is a way to assign attributes to nodes using the node ID as index, I'd like to learn that technique.
       nodeAttributes = [ td_switchcontainerAttr, table_switchparentAttr,  tr_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr,  tr_switchchild1Attr, td_switchcontent1Attr, a_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, tr_switchchild2Attr, td_switchcontent2Attr ];
+
+
+      // !VA Branch: 111320A
+      // !VA If the TBL Msdpi is checked, add curImgW i.e. Attributes.imgWidth.str to the style attribute of the parent TBL node of the image. 
+      if (appController.getAppobj('ccpTblMsdpiChk')) {
+        table_switchchild1Attr.style = td_switchcontent1Attr.style = `width: ${Attributes.imgWidth.str}px;`;
+      };
+
+
 
 
       // !VA Branch: 102520A
@@ -4621,7 +4663,7 @@ ${indent}<![endif]-->`;
     // !VA appController  
     // !VA CCP Configuration definitions for TD options and IMG excld radio. Note: alias and option parameters aren't accessed, including them as a console call and commenting out for now. This results in an error in the Outline view.
     function configDefault( alias, option ) {
-      // console.log('configDefault alias :>> ' + alias +  '; option :>> ' + option);
+      console.log('configDefault alias :>> ' + alias +  '; option :>> ' + option);
       // !VA Alias and option are not used yet, are included mainly for debug. 
       let configObj, reflectArray, revealArray, highlightArray, radioArray, checkedArray;
       // !VA APPOBJ PROPERTIES
@@ -4670,6 +4712,7 @@ ${indent}<![endif]-->`;
       // !VA reflectAppobj METHOD: set the array of elements whose Appobj properties above are to be written to the CCP DOM
       // !VA Why are there two of these? Commenting out the lower one for now.
       // reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd',  'ccpTbwBgclrTfd' ];
+      console.log('Mark1');
       reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd' ];
 
       // !VA highlightIcon METHOD: Set the array of elements that should receive a highlight because their Appobj property indicates a preset value
@@ -4910,29 +4953,33 @@ ${indent}<![endif]-->`;
         option = false;
   
         // !VA Branch: 111020B
-        revealArray = fetchRevealArray('swtch');
-
-
         // !VA Overwrite the default revealArray in the configObj called from configDefault
+        revealArray = fetchRevealArray('swtch');
         configObj.revealElements = { reveal: revealArray };
+        delete configObj.revealReset;
+        console.log('swtch configObj :>> ');
+        console.log(configObj);
+
+
+
         break;
         
       case option === 'bgimg':
         // !VA APPOBJ PROPERTIES
         // !VA Table wrapper options not show by default
-        Appobj['ccpTblWraprChk'] = false;
-        Appobj['ccpTblHybrdChk'] = false;
-        Appobj['ccpImgClassTfd'] = '';
-        Appobj['ccpTblClassTfd'] = '';
+        Appobj.ccpTblWraprChk = false;
+        Appobj.ccpTblHybrdChk = false;
+        Appobj.ccpImgClassTfd = '';
+        Appobj.ccpTblClassTfd = '';
         Appobj.ccpImgItypeRdo = 'fixed';
-        Appobj['ccpTdaWidthTfd'] = Appobj['curImgW'];
-        Appobj['ccpTdaHeigtTfd'] = Appobj['curImgH'];
-        Appobj['ccpTdaBgclrTfd'] = '#7bceeb';
-        Appobj['ccpTbwClassTfd'] = 'devicewidth';
-        Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
-        Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
-        Appobj['ccpTblMaxwdTfd'] = '';
-        Appobj['ccpTbwMaxwdTfd'] = '';
+        Appobj.ccpTdaWidthTfd = Appobj.curImgW;
+        Appobj.ccpTdaHeigtTfd = Appobj.curImgH;
+        Appobj.ccpTdaBgclrTfd = '#7bceeb';
+        Appobj.ccpTbwClassTfd = 'devicewidth';
+        Appobj.ccpTblWidthTfd = Appobj.curImgW;
+        Appobj.ccpTbwWidthTfd = Appobj.imgViewerW;
+        Appobj.ccpTblMaxwdTfd = '';
+        Appobj.ccpTbwMaxwdTfd = '';
 
         // !VA reflectAppobj METHOD
         // !VA Array of elements whose values are set to the Appobj properties above
@@ -4961,25 +5008,25 @@ ${indent}<![endif]-->`;
       case option === 'vmlbt':
         // !VA APPOBJ PROPERTIES
         // !VA Table wrapper options not show by default
-        Appobj['ccpTblWraprChk'] = false;
-        Appobj['ccpTblHybrdChk'] = false;
-        Appobj['ccpImgClassTfd'] = '';
+        Appobj.ccpTblWraprChk = false;
+        Appobj.ccpTblHybrdChk = false;
+        Appobj.ccpImgClassTfd = '';
         Appobj.ccpImgItypeRdo = 'fixed';
-        Appobj['ccpTblClassTfd'] = '';
-        Appobj['ccpTdaWidthTfd'] = Appobj['curImgW'];
-        Appobj['ccpTdaHeigtTfd'] = Appobj['curImgH'];
-        Appobj['ccpTdaBgclrTfd'] = '#556270';
-        Appobj['ccpTdaTxclrTfd'] = '#FFFFFF';
-        Appobj['ccpTdaBdclrTfd'] = '#1e3650';
-        Appobj['ccpTdaBdradTfd'] = 4;
+        Appobj.ccpTblClassTfd = '';
+        Appobj.ccpTdaWidthTfd = Appobj.curImgW;
+        Appobj.ccpTdaHeigtTfd = Appobj.curImgH;
+        Appobj.ccpTdaBgclrTfd = '#556270';
+        Appobj.ccpTdaTxclrTfd = '#FFFFFF';
+        Appobj.ccpTdaBdclrTfd = '#1e3650';
+        Appobj.ccpTdaBdradTfd = 4;
         // !VA Branch: 110120C
         // !VA Adding
-        Appobj['ccpTdaAlignRdo'] = 'center';
-        Appobj['ccpTdaValgnRdo'] = 'middle';
-        Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
-        Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
-        Appobj['ccpTblMaxwdTfd'] = '';
-        Appobj['ccpTbwMaxwdTfd'] = '';
+        Appobj.ccpTdaAlignRdo = 'center';
+        Appobj.ccpTdaValgnRdo = 'middle';
+        Appobj.ccpTblWidthTfd = Appobj.curImgW;
+        Appobj.ccpTbwWidthTfd = Appobj.imgViewerW;
+        Appobj.ccpTblMaxwdTfd = '';
+        Appobj.ccpTbwMaxwdTfd = '';
 
 
         // !VA reflectAppobj METHOD
@@ -5042,7 +5089,10 @@ ${indent}<![endif]-->`;
       let revealArray;
 
       if (option === 'iswap') {
-        revealArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd',  'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk'];
+        revealArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd',  'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk']; }
+      else if (option === 'swtch') {
+        revealArray = [ 'ccpTblMaxwdTfd' ];
+        // revealArray = [  ];
       } else if ( option === 'vmlbt') {
         revealArray = [  'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo','ccpImgCbhtmBtn', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaPdparGrp' ]; }
       else if (option === 'bgimg') {
@@ -5085,40 +5135,40 @@ ${indent}<![endif]-->`;
       // !VA If Hybrid is checked, set these options
       if (isChecked) {
         // !VA Set the Wrapper checkbox Appobj property to true if the Hybrid checkbox is checked
-        Appobj['ccpTblWraprChk'] = true;
-        Appobj['ccpImgClassTfd'] = 'img-fluid';
-        Appobj['ccpTdaOptnsRdo'] = 'basic';
-        Appobj['ccpTdaBgclrTfd'] = '';
-        Appobj['ccpTdaWidthTfd'] = '';
-        Appobj['ccpTdaHeigtTfd'] = '';
-        Appobj['ccpTblClassTfd'] = '';
-        Appobj['ccpTbwClassTfd'] = 'responsive-table';
-        Appobj['ccpTblAlignRdo'] = '';
-        Appobj['ccpTbwAlignRdo'] = 'center';
-        Appobj['ccpTblWidthTfd'] = '100%';
-        Appobj['ccpTbwWidthTfd'] = '100%';
-        Appobj['ccpTblMaxwdTfd'] = Appobj['curImgW'];
-        Appobj['ccpTbwMaxwdTfd'] = Appobj['imgViewerW'];
+        Appobj.ccpTblWraprChk = true;
+        Appobj.ccpImgClassTfd = 'img-fluid';
+        Appobj.ccpTdaOptnsRdo = 'basic';
+        Appobj.ccpTdaBgclrTfd = '';
+        Appobj.ccpTdaWidthTfd = '';
+        Appobj.ccpTdaHeigtTfd = '';
+        Appobj.ccpTblClassTfd = '';
+        Appobj.ccpTbwClassTfd = 'responsive-table';
+        Appobj.ccpTblAlignRdo = '';
+        Appobj.ccpTbwAlignRdo = 'center';
+        Appobj.ccpTblWidthTfd = '100%';
+        Appobj.ccpTbwWidthTfd = '100%';
+        Appobj.ccpTblMaxwdTfd = Appobj.curImgW;
+        Appobj.ccpTbwMaxwdTfd = Appobj['imgViewerW'];
         
       // !VA If Hybrid is unchecked, reset to default options
       } else {
         // !VA Set the Wrapper checkbox Appobj property to false if the Hybrid checkbox is unchecked
-        Appobj['ccpTblWraprChk'] = false;
+        Appobj.ccpTblWraprChk = false;
         // !VA APPOBJ PROPERTIES
         // !VA REFLECT APPOBJ to TEXT INPUT FIELDS
-        Appobj['ccpImgClassTfd'] = '';
-        Appobj['ccpTdaOptnsRdo'] = 'basic';
-        Appobj['ccpTdaBgclrTfd'] = '';
-        Appobj['ccpTdaWidthTfd'] = '';
-        Appobj['ccpTdaHeigtTfd'] = '';
-        Appobj['ccpTblClassTfd'] = '';
-        Appobj['ccpTbwClassTfd'] = 'devicewidth';
-        Appobj['ccpTblAlignRdo'] = '';
-        Appobj['ccpTbwAlignRdo'] = 'center';
-        Appobj['ccpTblWidthTfd'] = Appobj['curImgW'];
-        Appobj['ccpTbwWidthTfd'] = Appobj['imgViewerW'];
-        Appobj['ccpTblMaxwdTfd'] = '';
-        Appobj['ccpTbwMaxwdTfd'] = '';
+        Appobj.ccpImgClassTfd = '';
+        Appobj.ccpTdaOptnsRdo = 'basic';
+        Appobj.ccpTdaBgclrTfd = '';
+        Appobj.ccpTdaWidthTfd = '';
+        Appobj.ccpTdaHeigtTfd = '';
+        Appobj.ccpTblClassTfd = '';
+        Appobj.ccpTbwClassTfd = 'devicewidth';
+        Appobj.ccpTblAlignRdo = '';
+        Appobj.ccpTbwAlignRdo = 'center';
+        Appobj.ccpTblWidthTfd = Appobj.curImgW;
+        Appobj.ccpTbwWidthTfd = Appobj.imgViewerW;
+        Appobj.ccpTblMaxwdTfd = '';
+        Appobj.ccpTbwMaxwdTfd = '';
       }
 
       // !VA checkboxState METHOD
