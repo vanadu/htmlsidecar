@@ -5002,6 +5002,8 @@ ${indent}<![endif]-->`;
         // !VA Branch: 111020B
         // revealArray = [ 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaPdparGrp' ];
         revealArray = fetchRevealArray('vmlbt');
+        console.log('revealArray :>> ');
+        console.log(revealArray);
 
         // !VA Set the configObj with the methods and properties to configure
         configObj = {
@@ -5036,13 +5038,15 @@ ${indent}<![endif]-->`;
 
 
     function fetchRevealArray( option ) {
-      // console.log('fetchReflectArray option :>> ' + option);
+      console.log('fetchReflectArray option :>> ' + option);
       let revealArray;
 
       if (option === 'iswap') {
         revealArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd',  'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk'];
       } else if ( option === 'vmlbt') {
-        revealArray = [ 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaPdparGrp' ];
+        revealArray = [  'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo','ccpImgCbhtmBtn', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaPdparGrp' ]; }
+      else if (option === 'bgimg') {
+        revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn' ];
       } else if ( option === 'excld') {
         revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn', 'ccpTdaOptnsRdo' ];
       } else if ( option === 'incld') {
