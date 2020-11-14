@@ -1645,7 +1645,7 @@ var Witty = (function () {
             outputNL[0].insertAdjacentHTML('afterbegin', '/ghostOpn1/');
             outputNL[0].insertAdjacentHTML('beforeend', '/ghostCls1/');
             outputNL[2].insertAdjacentHTML('afterbegin', '/ghostOpn2/');
-            outputNL[2].insertAdjacentHTML('beforeend', 'ghostCls2/');
+            outputNL[2].insertAdjacentHTML('beforeend', '/ghostCls2/');
           } else if (selectedTdOption === 'swtch') {
             outputNL[0].insertAdjacentHTML('afterbegin', '/ghostOpn1/');
             outputNL[0].insertAdjacentHTML('beforeend', '/ghostCls1/');
@@ -2416,74 +2416,60 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       wrapperChecked = appController.getAppobj('ccpTblWraprChk');
       console.log('wrapperChecked :>> ' + wrapperChecked);
       if (!wrapperChecked) {
-        // !VA Add the token for ghostOpn1 tag before the opening table tag
-        // indexPos = tbl.indexOf( openTag,  0 );
-        // tbl = ghostOpn1 + tbl.substring( indexPos, openTag.length) +  tbl.substring( openTag.length, tbl.length);
-        // !VA Add the token for ghostCls1 tag - it goes at the end of the tbl string.
-        // tbl = tbl + ghostCls1;
+
+
+        // const tokens = [ ghostOpn1, ghostCls1, ghostOpn2, ghostCls2 ];
+        const tokens = [ ghostOpn1, ghostCls1, ghostOpn2, ghostCls2 ];
+
+        // const tokens = [ ghostOpn1 ];
+        var curPos, targetPos, i;
         
+        for (const token of tokens) {
+          curPos = 0;
+          while (curPos !== -1 ) {
+            // curPos === -1 ? true : console.log('token :>> ' + token);
+            token.includes('Opn') ? tag = openTag : tag = closeTag;
+            // curPos === -1 ? true : console.log('tag :>> ' + tag);
 
-        // !VA Branch: 111320C
-        // !VA Now all we have to do is move the ghost tokens to the front of the respective tag
-        // var foo;
-        // // !VA Find the opening token indes
-        // foo = tbl.indexOf( '/ghostOpn1/');
-        // // !VA Search forward for the index of the opening table tag.
-        // var pos = tbl.lastIndexOf( openTag, foo);
-        // console.log('foo :>> ' + foo);
-        // console.log('pos :>> ' + pos);
-
-        // var a = tbl.slice(0, foo);
-        // console.log('a :>> ' + a);
+            // !VA curPos is the position of the current token to be moved
+            curPos = tbl.indexOf(token, curPos + 1);
+            // curPos === -1 ? true : console.log('curPos :>> ' + curPos);
 
 
-        // b = tbl.slice( foo + 11 );
-        // console.log('b :>> ' + b);
+            // !VA targetPos is the target position of the move operation
+            if ( tag.includes('Opn')) {
+              targetPos = tbl.lastIndexOf( tag, curPos);
+            } else {
+              targetPos = tbl.indexOf( tag, curPos);
+            }
+            // targetPos === -1 ? true : console.log('targetPos :>> ' + targetPos);
+            // !VA 
 
-        // a = ghostOpn1 + a;
-
-        // tbl = a + b;
-        var foo, pos;
-        foo = 0;
-        // for (let i = 0; i < 3; i++) {
-        //   foo = tbl.indexOf(ghostOpn1, foo + 1);
-        //   // foo = foo + ghostOpn1.length;
-        //   console.log('foo :>> ' + foo);
-        //   console.log('i :>> ' + i);
-        // }
-
-
-        while (foo !== -1 ) {
-
-        // !VA Now need a function that loops through, gets the pos of each token
-
-
-        foo = tbl.indexOf(ghostOpn1, foo + 1);
-          if ( foo !== -1) {
-            console.log('foo :>> ' + foo);
-            a = tbl.slice(0, foo);
-            console.log('a :>> ');
-            console.log(a);
-            b = tbl.slice( foo + ghostOpn1.length  );
-
-            console.log('b :>> ');
-            console.log(b);
-
-            a = ghostOpn1 + a;
-            tbl = a + b;
-            // !VA Search forward for the index of the opening table tag.
-            pos = tbl.lastIndexOf( openTag, foo);
-            console.log('pos :>> ' + pos);
+            // !VA If indexOf returns -1, then there are no more occurrences of the token in the table string so skip to end of routine. Otherwise, continue processing.
+            if ( curPos !== -1) {
+              // !VA a is the section of the table string before the current open/close tag, i.e. the target position of the move operation
+              a = tbl.slice(0, curPos);
+              // console.log('a :>> ');
+              // console.log(a);
+              // !VA b is the section of the table string after and not including the current token.
+              b = tbl.slice( curPos + token.length  );
+  
+              // console.log('b :>> ');
+              // console.log(b);
+              
+              // !VA Insert the current token before the current open/close tag, i.e. the target of the move operation
+              token.includes('Opn') ? a = token + a : b = b + token;
+              // !VA Concatenate a and b to form the complete modified table string
+              tbl = a + b;
 
 
+            }
           }
-
-
-
         }
 
         console.log('tbl :>> ');
         console.log(tbl);
+
 
       } 
 
