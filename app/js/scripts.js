@@ -2406,8 +2406,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     function applyGhostTable(tbl, bool1, bool2) {
       console.clear();
       console.log('applyGhostTable running'); 
-      console.log('TOP tbl :>> ');
-      console.log(tbl);
+      // console.log('TOP tbl :>> ');
+      // console.log(tbl);
       let openTag, closeTag, ghostOpn1, ghostCls1, ghostOpn2, ghostCls2, openTBLPos,  closeTBLPos, closeTBWPos;
       let indexPos, ghostTags = [], wrapperChecked;
       // !VA Define the tokens to use as placeholders before the replace operation
@@ -2416,72 +2416,115 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       openTag = '<table', closeTag = '</table>';
       // !VA Get the ghost tags and their indents
       ghostTags = getGhostTags();
-      console.log(`bool1 (tableGhost:):>> ${bool1}; bool2 (tableWrapperGhost): ${bool2}`);
-
+      // console.log(`bool1 (tableGhost:):>> ${bool1}; bool2 (tableWrapperGhost): ${bool2}`);
       wrapperChecked = appController.getAppobj('ccpTblWraprChk');
-      console.log('wrapperChecked :>> ' + wrapperChecked);
-
+      // console.log('wrapperChecked :>> ' + wrapperChecked);
       let curPos, targetPos, tokens;
-
       if (!wrapperChecked) {
         // tokens = [ ghostOpn1, ghostCls1, ghostOpn2, ghostCls2 ];
-        tokens = [ ghostOpn1, ghostCls1 ]; }
+        tokens = [ ghostOpn1, ghostOpn2 ]; }
       else {
         // tokens = [ ghostOpn1, ghostCls1, ghostOpn2, ghostCls2 ];
         tokens = [ ghostOpn2, ghostOpn1, ghostCls2, ghostCls1 ]; 
       }
-      let tokenIndex, tagIndex;
+      tokenIdx, tagIdx;
       tbl2 = tbl;
+      token = ghostOpn2;
+      tokenIndex = 0;
+
+      function transposeTokens(str, token, tokenIdx, tagIdx) {
+        console.log('transposeTokens running'); 
+        console.log(`token :>> ${token}; tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}; `);
+
+        // !VA sub1 is the string from the beginning to the tagIndex.
+        sub1 = str.substring( 0, tagIdx );
+        console.log('sub1 :>> ' + sub1);
+        // !VA sub2 is the string from the tag index to the end of the token.
+        sub2 = str.substring( tagIdx, tokenIdx + token.length);
+        console.log('sub2 :>> ' + sub2);
+        // !VA Now add the token to the front of sub2
+        sub2 = token + sub2;
+        console.log('sub2 :>> ' + sub2);
+        // !VA Now delete the token from the tail of sub2
+        sub2 = sub2.substring( 0, sub2.length - token.length );
+        console.log('sub2 :>> ' + sub2);
+        // !VA sub3 strips the original token and returns the rest of the str
+        sub3 = str.substring( tokenIdx + token.length, tbl2.length);
+        console.log('sub3 :>> ' + sub3);
+        // !VA Concatenate the substrings
+        str = sub1 + sub2 + sub3;
+        console.log('str :>> ');
+        console.log(str); 
+        return str;       
+      }
+      
+
+      var hasIndex, tokenIdx, tagIdx;
+      str = tbl;
+      for (const token of tokens) {
+        if (token.includes('Opn')) { 
+          tokenOpn = true;
+          tag = openTag;
+        }
+        else {
+          tokenOpn = false;
+          tag = closeTag;
+        }  
+        do {
+          // if (tokenIdx === -1) { break; } 
+          if (tokenOpn) {
+            tokenIdx = str.indexOf( token, tokenIdx + 1);
+            tagIdx = str.lastIndexOf( tag, tokenIdx);
+
+            if (tokenIdx !== -1 ) { 
+              hasIndex = false;
+              str = transposeTokens( str, token, tokenIdx, tagIdx );
+            }
 
 
-      token = ghostOpn1;
-      tag = openTag;
-      console.log('token :>> ' + token);
-      tokenIndex = tbl2.indexOf( token );
-      console.log('tokenIndex :>> ' + tokenIndex);
-      tagIndex = tbl2.lastIndexOf( tag, tokenIndex )
-      console.log('tagIndex :>> ' + tagIndex);
-      str1 = tbl2.substring( 0, tagIndex);
-      str2 = tbl2.substring(tagIndex, tokenIndex + token.length );
-      str3 = tbl2.substring( tokenIndex + token.length, tbl2.length);
-      console.log('str1 :>> ');
-      console.log(str1);
-      console.log('str2 :>> ');
-      console.log(str2);
-      console.log('str3 :>> ');
-      console.log(str3);
-      str2 = str2.substring( 0, str2.length - token.length);
-      console.log('str2 :>> ');
-      console.log(str2);
-      str2 = token + str2;
-      console.log('str2 :>> ');
-      console.log(str2);
-      tbl2 = str1 + str2 + str3;
-      console.log('tbl2 :>> ');
-      console.log(tbl2);
+          } 
+        
+
+        }
+        while ( hasIndex !== false);
+
+        
+      }
+      tbl = str;
+
+      // tokenIndex = tbl2.indexOf( token, tokenIndex );
+      // console.log('tokenIndex A :>> ' + tokenIndex);
+      // tokenIndex = tokenIndex + 1;
+      // tokenIndex = tbl.indexOf( token, tokenIndex );
+      // console.log('tokenIndex B :>> ' + tokenIndex);
+    
+    
+
+
+
 
 
       // !VA Now that the tokens are in place, replace them with the ghost tags or strip them out based on the bool values.
       if (bool1) {
-        // tbl = tbl.replace(ghostOpn1,  ghostTags[0]);
+        tbl = tbl.replace(ghostOpn1,  ghostTags[0]);
         // tbl = tbl.replace(ghostCls1, ghostTags[1]);
       } else {
-        // tbl = tbl.replace(ghostOpn1,'');
+        tbl = tbl.replace(ghostOpn1,'');
         // tbl = tbl.replace(ghostCls1, '');
       }
       if (bool2) {
-        // tbl = tbl.replace(ghostOpn2, ghostTags[2]);
+        tbl = tbl.replace(ghostOpn2, ghostTags[2]);
         // tbl = tbl.replace(ghostCls2, ghostTags[3]);
       } else {
-        // tbl = tbl.replace(ghostOpn2,'');
+        tbl = tbl.replace(ghostOpn2,'');
         // tbl = tbl.replace(ghostCls2, '');
       }
       // !VA Now strip out the data-ghost attributes.
-      // tbl = tbl.replace(' data-ghost="tbl"', '');
-      // tbl = tbl.replace(' data-ghost="tbw"', '');
+      tbl = tbl.replace(' data-ghost="tbl"', '');
+      tbl = tbl.replace(' data-ghost="tbw"', '');
       // !VA Return this to buildOutputNodeList clipboardStr
-      // console.log('Return tbl :>> ');
-      // console.log(tbl);
+      console.log('Return tbl :>> ');
+      console.log(tbl);
       return tbl;
     }
 
