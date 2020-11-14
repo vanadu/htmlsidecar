@@ -2431,81 +2431,57 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         tokens = [ ghostOpn2, ghostOpn1, ghostCls2, ghostCls1 ]; 
       }
       let tokenIndex, tagIndex;
-      tblNoToken = tbl;
-      for (token of tokens) {
-        curPos = 0;
-        tokenIndex = 0;
-        while ( tbl.indexOf( token ) !== -1 ) {
-          console.log('token :>> ' + token);
-          if (token.includes('Opn')) {
-            tag = openTag;
-            // console.log('tag :>> ' + tag); 
-            tokenIndex = tblNoToken.indexOf( token );
-            // console.log('tokenIndex :>> ' + tokenIndex); 
-            tagIndex = tblNoToken.lastIndexOf( tag, tokenIndex )
-            substrToToken = tblNoToken.substring ( 0 , tokenIndex );
-
-            // console.log('substrToToken :>> ' + substrToToken);
-            // console.log('tbl.length :>> ' + tbl.length);
-            // console.log('token.length :>> ' + token.length); 
-            substrFromToken = tblNoToken.substring( tokenIndex + token.length, tbl.length);
-            // console.log('substrFromToken :>> ' + substrFromToken);
-            tblNoToken = substrToToken + substrFromToken;
-            // console.log('tblNoToken :>> ');
-            // console.log(tblNoToken);
-  
-            beforeTag = tblNoToken.substring( 0, tagIndex );
-            console.log('beforeTag :>> ' + beforeTag);
-            afterTag = tblNoToken.substring( tagIndex, tblNoToken.length );
-            console.log('afterTag :>> ' + afterTag);
-            beforeTag = beforeTag + token;
-            tblNoToken = beforeTag + afterTag;
-            console.log('tblNoToken :>> ');
-            console.log(tblNoToken);
+      tbl2 = tbl;
 
 
-
-          } else {
-            console.log('working on it');
-          }
-
-
-
-
-
-
-
-
-          break;
-        }
-      }
-      tbl = tblNoToken;
-      // console.log('tbl :>> ');
-      // console.log(tbl);
-
+      token = ghostOpn1;
+      tag = openTag;
+      console.log('token :>> ' + token);
+      tokenIndex = tbl2.indexOf( token );
+      console.log('tokenIndex :>> ' + tokenIndex);
+      tagIndex = tbl2.lastIndexOf( tag, tokenIndex )
+      console.log('tagIndex :>> ' + tagIndex);
+      str1 = tbl2.substring( 0, tagIndex);
+      str2 = tbl2.substring(tagIndex, tokenIndex + token.length );
+      str3 = tbl2.substring( tokenIndex + token.length, tbl2.length);
+      console.log('str1 :>> ');
+      console.log(str1);
+      console.log('str2 :>> ');
+      console.log(str2);
+      console.log('str3 :>> ');
+      console.log(str3);
+      str2 = str2.substring( 0, str2.length - token.length);
+      console.log('str2 :>> ');
+      console.log(str2);
+      str2 = token + str2;
+      console.log('str2 :>> ');
+      console.log(str2);
+      tbl2 = str1 + str2 + str3;
+      console.log('tbl2 :>> ');
+      console.log(tbl2);
 
 
       // !VA Now that the tokens are in place, replace them with the ghost tags or strip them out based on the bool values.
       if (bool1) {
-        tbl = tbl.replace(ghostOpn1,  ghostTags[0]);
+        // tbl = tbl.replace(ghostOpn1,  ghostTags[0]);
         // tbl = tbl.replace(ghostCls1, ghostTags[1]);
       } else {
-        tbl = tbl.replace(ghostOpn1,'');
+        // tbl = tbl.replace(ghostOpn1,'');
         // tbl = tbl.replace(ghostCls1, '');
       }
       if (bool2) {
-        tbl = tbl.replace(ghostOpn2, ghostTags[2]);
+        // tbl = tbl.replace(ghostOpn2, ghostTags[2]);
         // tbl = tbl.replace(ghostCls2, ghostTags[3]);
       } else {
-        tbl = tbl.replace(ghostOpn2,'');
+        // tbl = tbl.replace(ghostOpn2,'');
         // tbl = tbl.replace(ghostCls2, '');
       }
       // !VA Now strip out the data-ghost attributes.
-      tbl = tbl.replace(' data-ghost="tbl"', '');
-      tbl = tbl.replace(' data-ghost="tbw"', '');
+      // tbl = tbl.replace(' data-ghost="tbl"', '');
+      // tbl = tbl.replace(' data-ghost="tbw"', '');
       // !VA Return this to buildOutputNodeList clipboardStr
-      console.log('Return tbl :>> ');
-      console.log(tbl);
+      // console.log('Return tbl :>> ');
+      // console.log(tbl);
       return tbl;
     }
 
