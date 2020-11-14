@@ -69,14 +69,14 @@ var Witty = (function () {
   //   </tr>
   // </table>`;
     
-  //   var ghostOpen = 
+  //   var ghostOpn = 
   // `<!--[if (gte mso 9)|(IE)]>
   // <table align="center" border="0" cellspacing="0" cellpadding="0" width="200">
   // <tr>
   // <td align="center" valign="top" width="200">
   // <![endif]-->\n`;
 
-  //   var ghostClose = 
+  //   var ghostCls = 
   // `\n<!--[if (gte mso 9)|(IE)]>
   // </td>
   // </tr>
@@ -105,8 +105,8 @@ var Witty = (function () {
   // replStr = tbl.substr( 0, index + dataAttLength);
   // // !VA If the Ghost checkbox icon is checked, i.e. bool is true, then prepend the ghost table to the table, and add the closing ghost tag after the closing table tag
   // if (bool) { 
-  //   tbl = tbl.replace( replStr, `${ghostOpen}${replStr}`); 
-  //   tbl = tbl.replace( '</table>', `</table>${ghostClose}`)
+  //   tbl = tbl.replace( replStr, `${ghostOpn}${replStr}`); 
+  //   tbl = tbl.replace( '</table>', `</table>${ghostCls}`)
 
   // }
   // // !VA Remove the data attribute string
@@ -1430,7 +1430,6 @@ var Witty = (function () {
           appObjProp = 'ccpTblGhostChk';
           str = Appobj[appObjProp];
           retObj = returnObject( appObjProp, str );
-          console.log('tableGhost: retObj.str :>> ' + retObj.str);
           return retObj;
         })(),
         tableStyle: (function() {
@@ -1635,11 +1634,30 @@ var Witty = (function () {
 
         // !VA Create the outputNL nodeList to pass to the Clipboard object
         outputNL = container.querySelectorAll('*');
+        // !VA Branch: 111320C
+        // !VA Ghost for basic and swtch
 
+        if (Attributes.tableGhost.str) {
+          
+          console.log('Mark1, SWTCH & BASIC outputNL :>> ');
+          console.log(outputNL);
+          if (selectedTdOption === 'basic') {
+            outputNL[0].insertAdjacentHTML('afterbegin', '/ghostOpn1/');
+            outputNL[0].insertAdjacentHTML('beforeend', '/ghostCls1/');
+            outputNL[2].insertAdjacentHTML('afterbegin', '/ghostOpn2/');
+            outputNL[2].insertAdjacentHTML('beforeend', 'ghostCls2/');
+          } else if (selectedTdOption === 'swtch') {
+            outputNL[0].insertAdjacentHTML('afterbegin', '/ghostOpn1/');
+            outputNL[0].insertAdjacentHTML('beforeend', '/ghostCls1/');
+            outputNL[5].insertAdjacentHTML('afterbegin', '/ghostOpn2/');
+            outputNL[5].insertAdjacentHTML('beforeend', '/ghostCls2/');
+            outputNL[7].insertAdjacentHTML('afterbegin', '/ghostOpn2/');
+            outputNL[7].insertAdjacentHTML('beforeend', '//ghostCls2/');
+          }
+        }
 
         // !VA Run applyIndents to apply indents to outputNL
         applyIndents( id, outputNL );
-
 
         // !VA Convert the nodeList to text for output to the clipboard.
         clipboardStr = outputNL[0].outerHTML;
@@ -1679,6 +1697,17 @@ var Witty = (function () {
         container.appendChild(frag);
         // !VA Create the nodeList to pass to the Clipboard object. 
         outputNL = container.querySelectorAll('*');
+
+        // !VA Branch: 111320C
+        // !VA Ghost for vmlbt, bgimg, iswap
+        console.log('MS Conditionals - outputNL :>> ');
+        console.log(outputNL);
+
+
+
+
+
+
         // !VA Apply the indents and insert the tokens identifying the position for inserting the MS conditional code.
         applyIndents(id, outputNL);
         // !VA Convert outputNL to a string (including tokens for inserting MS conditional code) for output to Clipboard object.
@@ -1699,8 +1728,8 @@ var Witty = (function () {
       if (clipboardStr.includes('data-ghost')) {
         clipboardStr = configGhostTable(clipboardStr, Attributes.tableGhost.str, Attributes.tableWrapperGhost.str);
       }
-      console.log('buildOutputNodeList clipboardStr is: ');
-      console.log(clipboardStr);
+      // console.log('buildOutputNodeList clipboardStr is: ');
+      // console.log(clipboardStr);
       // !VA Write clipboardStr to the Clipboard
       writeClipboard( id, clipboardStr );
     }
@@ -1889,13 +1918,7 @@ var Witty = (function () {
         td_switchcontainerAttr.style = `width: ${Attributes.tableWidth.str}px;`;
       };
 
-      if (appController.getAppobj('ccpTblGhostChk')) {
-        console.log('TABLE GHOST CHECKED');
 
-
-      } else {
-        console.log('TABLE GHOST UNCHECKED');
-      }
 
 
       // !VA Branch: 102520A
@@ -1905,21 +1928,6 @@ var Witty = (function () {
       if (!Attributes.imgAnchorTxtclr.str) { delete a_switchcontent1Attr.color; }
 
 
-      if (appController.getAppobj('ccpTblGhostChk')) {
-        console.log('TABLE GHOST CHECKED');
-        nodeList[0].insertAdjacentHTML('afterbegin', "alsdkfaslkdfja;sldkfjasldkfja;sldfkj");
-        nodeList[0].insertAdjacentHTML('beforeend', "alsdkfaslkdfja;sldkfjasldkfja;sldfkj");
-        
-        var foo = nodeList[0].classList;
-        console.log('foo :>> ' + foo);;
-
-
-
-
-
-      } else {
-        console.log('TABLE GHOST UNCHECKED');
-      }
 
 
 
@@ -1929,12 +1937,6 @@ var Witty = (function () {
           nodeList[i].setAttribute( entries[0], entries[1]);
         }
       }
-
-      // !VA Branch: 111320B
-      // console.log('nodeList :>> ');
-      // console.log(nodeList);
-
-
 
       // !VA Now we no longer need the IDs, so we can delete them.
       for (let i = 0; i < nodeList.length; i++) {
@@ -2399,75 +2401,116 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CBController private
     // !VA handle the buildNodeList clipboardStr output, define and place the tokens in the clipboardStr output and replace the tokens with the ghost tabs from getGhostTags or strip them out depending on the checked status of the Ghost checkbox icons passed in as bool parameters from the caller.
     function configGhostTable(tbl, bool1, bool2) {
-      let openTag, closeTag, ghostOpen1, ghostClose1, ghostOpen2, ghostClose2, openTBLPos,  closeTBLPos, closeTBWPos;
-      let indexPos, ghostTags = [], hasWrapper;
+      console.clear();
+      console.log('configGhostTable running'); 
+      let openTag, closeTag, ghostOpn1, ghostCls1, ghostOpn2, ghostCls2, openTBLPos,  closeTBLPos, closeTBWPos;
+      let indexPos, ghostTags = [], wrapperChecked;
       // !VA Define the tokens to use as placeholders before the replace operation
-      ghostOpen1 = '/ghostOpen1/', ghostClose1 = '/ghostClose1/', ghostOpen2 = '/ghostOpen2/', ghostClose2 = '/ghostClose2/';
+      ghostOpn1 = '/ghostOpn1/', ghostCls1 = '/ghostCls1/', ghostOpn2 = '/ghostOpn2/', ghostCls2 = '/ghostCls2/';
       // !VA Define the opening and closing table tags
       openTag = '<table', closeTag = '</table>';
       // !VA Get the ghost tags and their indents
       ghostTags = getGhostTags();
-      // !VA Get the state of the Table Wrapper checkbox icon
-      hasWrapper = appController.getAppobj('ccpTblWraprChk');
-      // !VA If the Table wrapper checkbox is unchecked, then this is the outer table and any inner tables belong to the TD options' code block. Assign the tokens for ghostTag1 before/after the opening/closing table tag respectively.
-      if (!hasWrapper) {
-        // !VA Add the token for ghostOpen1 tag before the opening table tag
-        indexPos = tbl.indexOf( openTag,  0 );
-        tbl = ghostOpen1 + tbl.substring( indexPos, openTag.length) +  tbl.substring( openTag.length, tbl.length);
-        // !VA Add the token for ghostClose1 tag - it goes at the end of the tbl string.
-        tbl = tbl + ghostClose1;
+      console.log(`bool1 (tableGhost:):>> ${bool1}; bool2 (tableWrapperGhost): ${bool2}`);
 
-      // !VA If the Table wrapper checkbox is checked, then ghostOpen2 and ghostClose2 apply to the outer table and ghostOpen1 and ghostClose1 apply to the inner table, i.e. the child table of the outer table. Note that any indexOf searches for inner table tags have to go in reverse direction, i.e. from the end of the string towards the beginning, otherwise they will end up in any tables existing in the TD Options code blocks.
-      } else {
-        // !VA If the TBL ghost checkbox is checked, add the ghostOpen1 and ghostClose1 tokens
-        if ( bool1 ) {
-          // !VA Search for the opening TBL tag starting from the position of the data-ghost attribute in reverse direction
-          openTBLPos = tbl.lastIndexOf( openTag, tbl.indexOf('data-ghost="tbl"'));
-          // !VA Insert the ghostOpen1 token at the position of the opening TBL tag.
-          tbl = tbl.substring( 0, openTBLPos ) + ghostOpen1 +  tbl.substring( openTBLPos, tbl.length);
-          // !VA Search for the last closing tag in the table starting backwards for the end of the table. That is the TBW closing tag.
-          closeTBWPos = tbl.lastIndexOf( closeTag, tbl.length );
-          // !VA Search for the closing TBL tag starting backwards from the start position of the last closing tag, i.e. the TBW closing tag position minus the length of the closing tag.
-          closeTBLPos = tbl.lastIndexOf( closeTag , closeTBWPos - closeTag.length );
-          // !VA Add the ghostClose1 token a at the end position of the TBL closing tag.
-          tbl = tbl.substring( 0, closeTBLPos + closeTag.length) + ghostClose1 + tbl.substring( closeTBLPos + closeTag.length, tbl.length);
-        }
-        // !VA If the TBL ghost checkbox is checked, add the ghostOpen2 and ghostClose2 tokens
-        if ( bool2 ) {
-          // !VA Add the token for ghostOpen2 tag before the opening table tag
-          indexPos = tbl.indexOf( openTag,  0 );
-          tbl = ghostOpen2 + tbl.substring( indexPos, openTag.length) +  tbl.substring( openTag.length, tbl.length);
-          // !VA Add the token for ghostClose2 tag - it goes at the end of the tbl string.
-          tbl = tbl + ghostClose2;
-        }
-      }
+      wrapperChecked = appController.getAppobj('ccpTblWraprChk');
+      console.log('wrapperChecked :>> ' + wrapperChecked);
+      if (!wrapperChecked) {
+        // !VA Add the token for ghostOpn1 tag before the opening table tag
+        // indexPos = tbl.indexOf( openTag,  0 );
+        // tbl = ghostOpn1 + tbl.substring( indexPos, openTag.length) +  tbl.substring( openTag.length, tbl.length);
+        // !VA Add the token for ghostCls1 tag - it goes at the end of the tbl string.
+        // tbl = tbl + ghostCls1;
+        
 
+        // !VA Branch: 111320C
+        // !VA Now all we have to do is move the ghost tokens to the front of the respective tag
+        // var foo;
+        // // !VA Find the opening token indes
+        // foo = tbl.indexOf( '/ghostOpn1/');
+        // // !VA Search forward for the index of the opening table tag.
+        // var pos = tbl.lastIndexOf( openTag, foo);
+        // console.log('foo :>> ' + foo);
+        // console.log('pos :>> ' + pos);
+
+        // var a = tbl.slice(0, foo);
+        // console.log('a :>> ' + a);
+
+
+        // b = tbl.slice( foo + 11 );
+        // console.log('b :>> ' + b);
+
+        // a = ghostOpn1 + a;
+
+        // tbl = a + b;
+        var foo, pos;
+        foo = 0;
+        // for (let i = 0; i < 3; i++) {
+        //   foo = tbl.indexOf(ghostOpn1, foo + 1);
+        //   // foo = foo + ghostOpn1.length;
+        //   console.log('foo :>> ' + foo);
+        //   console.log('i :>> ' + i);
+        // }
+
+
+        while (foo !== -1 ) {
+
+        // !VA Now need a function that loops through, gets the pos of each token
+
+
+        foo = tbl.indexOf(ghostOpn1, foo + 1);
+          if ( foo !== -1) {
+            console.log('foo :>> ' + foo);
+            a = tbl.slice(0, foo);
+            console.log('a :>> ');
+            console.log(a);
+            b = tbl.slice( foo + ghostOpn1.length  );
+
+            console.log('b :>> ');
+            console.log(b);
+
+            a = ghostOpn1 + a;
+            tbl = a + b;
+            // !VA Search forward for the index of the opening table tag.
+            pos = tbl.lastIndexOf( openTag, foo);
+            console.log('pos :>> ' + pos);
+
+
+          }
+
+
+
+        }
+
+        console.log('tbl :>> ');
+        console.log(tbl);
+
+      } 
 
 
 
       // !VA Now that the tokens are in place, replace them with the ghost tags or strip them out based on the bool values.
-      if (bool1) {
-        tbl = tbl.replace(ghostOpen1,  ghostTags[0]);
-        tbl = tbl.replace(ghostClose1, ghostTags[1]);
-      } else {
-        tbl = tbl.replace(ghostOpen1,'');
-        tbl = tbl.replace(ghostClose1, '');
-      }
-      if (bool2) {
-        tbl = tbl.replace(ghostOpen2, ghostTags[2]);
-        tbl = tbl.replace(ghostClose2, ghostTags[3]);
-      } else {
-        tbl = tbl.replace(ghostOpen2,'');
-        tbl = tbl.replace('/ghostClose2/', '');
-      }
-      // !VA Now strip out the data-ghost attributes.
-      tbl = tbl.replace(' data-ghost="tbl"', '');
-      tbl = tbl.replace(' data-ghost="tbw"', '');
+      // if (bool1) {
+      //   tbl = tbl.replace(ghostOpn1,  ghostTags[0]);
+      //   tbl = tbl.replace(ghostCls1, ghostTags[1]);
+      // } else {
+      //   tbl = tbl.replace(ghostOpn1,'');
+      //   tbl = tbl.replace(ghostCls1, '');
+      // }
+      // if (bool2) {
+      //   tbl = tbl.replace(ghostOpn2, ghostTags[2]);
+      //   tbl = tbl.replace(ghostCls2, ghostTags[3]);
+      // } else {
+      //   tbl = tbl.replace(ghostOpn2,'');
+      //   tbl = tbl.replace('/ghostCls2/', '');
+      // }
+      // // !VA Now strip out the data-ghost attributes.
+      // tbl = tbl.replace(' data-ghost="tbl"', '');
+      // tbl = tbl.replace(' data-ghost="tbw"', '');
       // !VA Return this to buildOutputNodeList clipboardStr
 
-      // !VA Branch: 111320B
-      // console.log('tbl :>> ');
-      // console.log(tbl);
+
+
 
 
       return tbl;
@@ -2476,13 +2519,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CBController private
     // !VA Returns the strings for opening and closing ghost table tag as a two-item array with indents on the inner table based on the status of the Table Wrapper checkbox icon.
     function getGhostTags() {
-      let ghostOpen1, ghostClose1, ghostOpen2, ghostClose2, hasWrapper, indent;
+      let ghostOpn1, ghostCls1, ghostOpn2, ghostCls2, hasWrapper, indent;
       let ghosttags = [];
       // !VA Get the status of the Table Wrapper checkbox - it determines whether indents are applied to the inner table or not.
       hasWrapper = appController.getAppobj('ccpTblWraprChk');
       hasWrapper ? indent = '      ' : indent = '';
       // !VA Define the opening and closing ghost tags for the inner table
-      ghostOpen1 = 
+      ghostOpn1 = 
       // !VA The first opening inner table tag gets no indent
 `<!--[if (gte mso 9)|(IE)]>
 ${indent}<table align="center" border="0" cellspacing="0" cellpadding="0" width="${appController.getAppobj('curImgW')}">
@@ -2490,7 +2533,7 @@ ${indent}<tr>
 ${indent}<td align="center" valign="top" width="${appController.getAppobj('curImgW')}">
 ${indent}<![endif]-->`;
 
-      ghostClose1 = 
+      ghostCls1 = 
 `\n${indent}<!--[if (gte mso 9)|(IE)]>
 ${indent}</td>
 ${indent}</tr>
@@ -2498,14 +2541,14 @@ ${indent}</table>
 ${indent}<![endif]-->`;
 
       // !VA Define the opening and closing ghost tags for the outer table.
-      ghostOpen2 = 
+      ghostOpn2 = 
 `<!--[if (gte mso 9)|(IE)]>
 <table align="center" border="0" cellspacing="0" cellpadding="0" width="${appController.getAppobj('imgViewerW')}">
 <tr>
 <td align="center" valign="top" width="${appController.getAppobj('imgViewerW')}">
 <![endif]-->\n`;
 
-      ghostClose2 = 
+      ghostCls2 = 
 `\n<!--[if (gte mso 9)|(IE)]>
 </td>
 </tr>
@@ -2513,7 +2556,7 @@ ${indent}<![endif]-->`;
 <![endif]-->`;
 
       // !VA Build the array of ghost tags to return to configGhostTags
-      ghosttags = [ ghostOpen1, ghostClose1, ghostOpen2, ghostClose2 ];
+      ghosttags = [ ghostOpn1, ghostCls1, ghostOpn2, ghostCls2 ];
       return ghosttags;
     }
 
