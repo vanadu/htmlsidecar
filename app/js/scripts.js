@@ -2479,32 +2479,33 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           break;
         }
       }
+      tbl = tblNoToken;
       // console.log('tbl :>> ');
       // console.log(tbl);
 
 
 
       // !VA Now that the tokens are in place, replace them with the ghost tags or strip them out based on the bool values.
-      // if (bool1) {
-      //   tbl = tbl.replace(ghostOpn1,  ghostTags[0]);
-      //   tbl = tbl.replace(ghostCls1, ghostTags[1]);
-      // } else {
-      //   tbl = tbl.replace(ghostOpn1,'');
-      //   tbl = tbl.replace(ghostCls1, '');
-      // }
-      // if (bool2) {
-      //   tbl = tbl.replace(ghostOpn1, ghostTags[2]);
-      //   tbl = tbl.replace(ghostCls2, ghostTags[3]);
-      // } else {
-      //   tbl = tbl.replace(ghostOpn1,'');
-      //   tbl = tbl.replace(ghostCls2, '');
-      // }
-      // // !VA Now strip out the data-ghost attributes.
-      // tbl = tbl.replace(' data-ghost="tbl"', '');
-      // tbl = tbl.replace(' data-ghost="tbw"', '');
+      if (bool1) {
+        tbl = tbl.replace(ghostOpn1,  ghostTags[0]);
+        // tbl = tbl.replace(ghostCls1, ghostTags[1]);
+      } else {
+        tbl = tbl.replace(ghostOpn1,'');
+        // tbl = tbl.replace(ghostCls1, '');
+      }
+      if (bool2) {
+        tbl = tbl.replace(ghostOpn2, ghostTags[2]);
+        // tbl = tbl.replace(ghostCls2, ghostTags[3]);
+      } else {
+        tbl = tbl.replace(ghostOpn2,'');
+        // tbl = tbl.replace(ghostCls2, '');
+      }
+      // !VA Now strip out the data-ghost attributes.
+      tbl = tbl.replace(' data-ghost="tbl"', '');
+      tbl = tbl.replace(' data-ghost="tbw"', '');
       // !VA Return this to buildOutputNodeList clipboardStr
-      // console.log('Return tbl :>> ');
-      // console.log(tbl);
+      console.log('Return tbl :>> ');
+      console.log(tbl);
       return tbl;
     }
 
