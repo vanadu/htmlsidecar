@@ -1615,7 +1615,7 @@ var Witty = (function () {
           // !VA basic or excludeimg option is selected 
           // !VA We can hardcode the 'rdoCcpTdBasic' and 'rdoCcpTdPosswitch' positions for now, but these will have to be revisited if any new options are added that change the outputNL indices. 
           // !VA If the Appobj property for the Include table wrapper icon is true
-          if (appController.getAppobj('ccpTblWraprChk')) {
+          if (hasWrapper) {
             // !VA The Include wrapper table option is selected, so the entire nodeList is extracted
             extractPos = 0;
           } else {
@@ -1636,24 +1636,14 @@ var Witty = (function () {
         outputNL = container.querySelectorAll('*');
         // !VA Branch: 111320C
         // !VA Ghost for basic and swtch
-
+        // !VA Not sure why this only runs for TBL Make HTML Button
         if (Attributes.tableGhost.str) {
-          
+          console.log('hasWrapper :>> ' + hasWrapper);
           console.log('Mark1, SWTCH & BASIC outputNL :>> ');
-          console.log(outputNL);
           if (selectedTdOption === 'basic') {
-            outputNL[0].insertAdjacentHTML('afterbegin', '/ghostOpn1/');
-            outputNL[0].insertAdjacentHTML('beforeend', '/ghostCls1/');
-            outputNL[2].insertAdjacentHTML('afterbegin', '/ghostOpn2/');
-            outputNL[2].insertAdjacentHTML('beforeend', '/ghostCls2/');
-          } else if (selectedTdOption === 'swtch') {
-            outputNL[0].insertAdjacentHTML('afterbegin', '/ghostOpn1/');
-            outputNL[0].insertAdjacentHTML('beforeend', '/ghostCls1/');
-            outputNL[5].insertAdjacentHTML('afterbegin', '/ghostOpn2/');
-            outputNL[5].insertAdjacentHTML('beforeend', '/ghostCls2/');
-            outputNL[7].insertAdjacentHTML('afterbegin', '/ghostOpn2/');
-            outputNL[7].insertAdjacentHTML('beforeend', '//ghostCls2/');
+            outputNL = configGhostTable( 'basic', hasWrapper, outputNL);
           }
+
         }
 
         // !VA Run applyIndents to apply indents to outputNL
@@ -1724,9 +1714,11 @@ var Witty = (function () {
         // !VA Replace the tokens in clipboardStr that were added in applyIndents with the respective codeBlock
         clipboardStr = clipboardStr.replace('/replacestart//replaceend/', codeBlock + '\n');
       } 
-      // !VA If clipboardStr contains the ghost tokens, then call configGhostTable to add the ghost tags. Otherwise, don't since the ghost tokens screw up the IMG and TD clipboard output.
+      // !VA If clipboardStr contains the ghost tokens, then call applyGhostTable to add the ghost tags. Otherwise, don't since the ghost tokens screw up the IMG and TD clipboard output.
       if (clipboardStr.includes('data-ghost')) {
-        clipboardStr = configGhostTable(clipboardStr, Attributes.tableGhost.str, Attributes.tableWrapperGhost.str);
+        // console.log('Mark2 clipboardStr :>> ');
+        // console.log(clipboardStr);
+        clipboardStr = applyGhostTable(clipboardStr, Attributes.tableGhost.str, Attributes.tableWrapperGhost.str);
       }
       // console.log('buildOutputNodeList clipboardStr is: ');
       // console.log(clipboardStr);
@@ -2193,6 +2185,7 @@ var Witty = (function () {
       // !VA Deleting the below - it appears to be a dupe of the same statement above
       // if (Attributes.tableStyle.str) { tableInner.setAttribute('style', Attributes.tableStyle.str ); }
       // !VA If ccpTbwGhostChk is checked, set the data-ghost attribute
+      console.log('Attributes.tableWrapperGhost.str :>> ' + Attributes.tableWrapperGhost.str);
       if (Attributes.tableWrapperGhost.str) { tableOuter.setAttribute('data-ghost', 'tbw'); }
       // !VA Append the outer tr to the wrapper
       tableOuter.appendChild(trOuter);
@@ -2379,30 +2372,42 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA GHOST FUNCTIONS
 
-//     document.addEventListener("DOMContentLoaded", function() {
+    
+    // !VA CBController private
+    // !VA Branch: 111320C
+    // !VA 
+    function configGhostTable(option, hasWrapper, nodeList) {
+      console.clear();
 
-//       var tbl = `
-// <table class="devicewidth" role="presentation" data-ghost="tbw" width="600" cellspacing="0" cellpadding="0" border="0">
-//   <tr>
-//     <td valign="top" align="left">
-//       <table data-ghost="tbl" role="presentation" width="200" cellspacing="0" cellpadding="0" border="0">
-//         <tr>
-//           <td valign="top" align="left">
-//             <a href="#" style="color: #0000FF; " target="_blank"><img src="img/_200X150.png" style="display: block; width: 200px; height: 150px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;" width="200" height="150" border="0"></a>
-//           </td>
-//         </tr>
-//       </table>
-//     </td>
-//   </tr>
-// </table>
-//       `;
-//     });
+      ghostOpn1 = '/ghostOpn1/', ghostCls1 = '/ghostCls1/', ghostOpn2 = '/ghostOpn2/', ghostCls2 = '/ghostCls2/';
+
+      if (option === 'basic') {
+        if (hasWrapper) {
+          nodeList[0].insertAdjacentHTML('afterbegin', ghostOpn2);
+          nodeList[0].insertAdjacentHTML('beforeend', ghostCls2);
+          nodeList[3].insertAdjacentHTML('afterbegin', ghostOpn1);
+          nodeList[3].insertAdjacentHTML('beforeend', ghostCls1);
+        } else {
+          nodeList[0].insertAdjacentHTML('afterbegin', ghostOpn1);
+          nodeList[0].insertAdjacentHTML('beforeend', ghostCls1);
+        }
+      }
+
+      console.log('configGhostTable nodeList :>> ');
+      console.log(nodeList);
+      return nodeList;
+    }
+
+
+
 
     // !VA CBController private
     // !VA handle the buildNodeList clipboardStr output, define and place the tokens in the clipboardStr output and replace the tokens with the ghost tabs from getGhostTags or strip them out depending on the checked status of the Ghost checkbox icons passed in as bool parameters from the caller.
-    function configGhostTable(tbl, bool1, bool2) {
+    function applyGhostTable(tbl, bool1, bool2) {
       console.clear();
-      console.log('configGhostTable running'); 
+      console.log('applyGhostTable running'); 
+      console.log('TOP tbl :>> ');
+      console.log(tbl);
       let openTag, closeTag, ghostOpn1, ghostCls1, ghostOpn2, ghostCls2, openTBLPos,  closeTBLPos, closeTBWPos;
       let indexPos, ghostTags = [], wrapperChecked;
       // !VA Define the tokens to use as placeholders before the replace operation
@@ -2415,63 +2420,67 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       wrapperChecked = appController.getAppobj('ccpTblWraprChk');
       console.log('wrapperChecked :>> ' + wrapperChecked);
+
+      let curPos, targetPos, tokens;
+
       if (!wrapperChecked) {
+        // tokens = [ ghostOpn1, ghostCls1, ghostOpn2, ghostCls2 ];
+        tokens = [ ghostOpn1, ghostCls1 ]; }
+      else {
+        // tokens = [ ghostOpn1, ghostCls1, ghostOpn2, ghostCls2 ];
+        tokens = [ ghostOpn2, ghostOpn1, ghostCls2, ghostCls1 ]; 
+      }
+      let tokenIndex, tagIndex;
+      tblNoToken = tbl;
+      for (token of tokens) {
+        curPos = 0;
+        tokenIndex = 0;
+        while ( tbl.indexOf( token ) !== -1 ) {
+          console.log('token :>> ' + token);
+          if (token.includes('Opn')) {
+            tag = openTag;
+            // console.log('tag :>> ' + tag); 
+            tokenIndex = tblNoToken.indexOf( token );
+            // console.log('tokenIndex :>> ' + tokenIndex); 
+            tagIndex = tblNoToken.lastIndexOf( tag, tokenIndex )
+            substrToToken = tblNoToken.substring ( 0 , tokenIndex );
 
-
-        // const tokens = [ ghostOpn1, ghostCls1, ghostOpn2, ghostCls2 ];
-        const tokens = [ ghostOpn1, ghostCls1, ghostOpn2, ghostCls2 ];
-
-        // const tokens = [ ghostOpn1 ];
-        var curPos, targetPos, i;
-        
-        for (const token of tokens) {
-          curPos = 0;
-          while (curPos !== -1 ) {
-            // curPos === -1 ? true : console.log('token :>> ' + token);
-            token.includes('Opn') ? tag = openTag : tag = closeTag;
-            // curPos === -1 ? true : console.log('tag :>> ' + tag);
-
-            // !VA curPos is the position of the current token to be moved
-            curPos = tbl.indexOf(token, curPos + 1);
-            // curPos === -1 ? true : console.log('curPos :>> ' + curPos);
-
-
-            // !VA targetPos is the target position of the move operation
-            if ( tag.includes('Opn')) {
-              targetPos = tbl.lastIndexOf( tag, curPos);
-            } else {
-              targetPos = tbl.indexOf( tag, curPos);
-            }
-            // targetPos === -1 ? true : console.log('targetPos :>> ' + targetPos);
-            // !VA 
-
-            // !VA If indexOf returns -1, then there are no more occurrences of the token in the table string so skip to end of routine. Otherwise, continue processing.
-            if ( curPos !== -1) {
-              // !VA a is the section of the table string before the current open/close tag, i.e. the target position of the move operation
-              a = tbl.slice(0, curPos);
-              // console.log('a :>> ');
-              // console.log(a);
-              // !VA b is the section of the table string after and not including the current token.
-              b = tbl.slice( curPos + token.length  );
+            // console.log('substrToToken :>> ' + substrToToken);
+            // console.log('tbl.length :>> ' + tbl.length);
+            // console.log('token.length :>> ' + token.length); 
+            substrFromToken = tblNoToken.substring( tokenIndex + token.length, tbl.length);
+            // console.log('substrFromToken :>> ' + substrFromToken);
+            tblNoToken = substrToToken + substrFromToken;
+            // console.log('tblNoToken :>> ');
+            // console.log(tblNoToken);
   
-              // console.log('b :>> ');
-              // console.log(b);
-              
-              // !VA Insert the current token before the current open/close tag, i.e. the target of the move operation
-              token.includes('Opn') ? a = token + a : b = b + token;
-              // !VA Concatenate a and b to form the complete modified table string
-              tbl = a + b;
+            beforeTag = tblNoToken.substring( 0, tagIndex );
+            console.log('beforeTag :>> ' + beforeTag);
+            afterTag = tblNoToken.substring( tagIndex, tblNoToken.length );
+            console.log('afterTag :>> ' + afterTag);
+            beforeTag = beforeTag + token;
+            tblNoToken = beforeTag + afterTag;
+            console.log('tblNoToken :>> ');
+            console.log(tblNoToken);
 
 
-            }
+
+          } else {
+            console.log('working on it');
           }
+
+
+
+
+
+
+
+
+          break;
         }
-
-        console.log('tbl :>> ');
-        console.log(tbl);
-
-
-      } 
+      }
+      // console.log('tbl :>> ');
+      // console.log(tbl);
 
 
 
@@ -2484,21 +2493,18 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       //   tbl = tbl.replace(ghostCls1, '');
       // }
       // if (bool2) {
-      //   tbl = tbl.replace(ghostOpn2, ghostTags[2]);
+      //   tbl = tbl.replace(ghostOpn1, ghostTags[2]);
       //   tbl = tbl.replace(ghostCls2, ghostTags[3]);
       // } else {
-      //   tbl = tbl.replace(ghostOpn2,'');
-      //   tbl = tbl.replace('/ghostCls2/', '');
+      //   tbl = tbl.replace(ghostOpn1,'');
+      //   tbl = tbl.replace(ghostCls2, '');
       // }
       // // !VA Now strip out the data-ghost attributes.
       // tbl = tbl.replace(' data-ghost="tbl"', '');
       // tbl = tbl.replace(' data-ghost="tbw"', '');
       // !VA Return this to buildOutputNodeList clipboardStr
-
-
-
-
-
+      // console.log('Return tbl :>> ');
+      // console.log(tbl);
       return tbl;
     }
 
@@ -2517,7 +2523,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 ${indent}<table align="center" border="0" cellspacing="0" cellpadding="0" width="${appController.getAppobj('curImgW')}">
 ${indent}<tr>
 ${indent}<td align="center" valign="top" width="${appController.getAppobj('curImgW')}">
-${indent}<![endif]-->`;
+${indent}<![endif]-->\n${indent}`;
 
       ghostCls1 = 
 `\n${indent}<!--[if (gte mso 9)|(IE)]>
@@ -4772,6 +4778,14 @@ ${indent}<![endif]-->`;
       // Appobj.ccpTbwBgclrTfd = '';
       Appobj.ccpTbwAlignRdo = 'center';
 
+      // !VA Branch: 111320C
+      // !VA check ghost checkboxes for dev
+      Appobj.ccpTblGhostChk = true;
+      Appobj.ccpTbwGhostChk = true;
+
+
+
+
       // !VA reflectAppobj METHOD: set the array of elements whose Appobj properties above are to be written to the CCP DOM
       // !VA Why are there two of these? Commenting out the lower one for now.
       // reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd',  'ccpTbwBgclrTfd' ];
@@ -4796,7 +4810,11 @@ ${indent}<![endif]-->`;
       // !VA radioState METHOD: set the elements whose selected value is to be set to the Appobj properties above.
       radioArray = [  'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpTdaAlignRdo' , 'ccpTdaValgnRdo', 'ccpTblAlignRdo', 'ccpTbwAlignRdo', 'ccpTdaOptnsRdo' ];
       // !VA checkboxState METHOD: set the checkboxes whose checked value is to be set to the Appobj properties above.
-      checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpImgTargtChk'];
+
+
+      // !VA Branch: 111320C
+      // !VA check ghost checkboxes for dev
+      checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpImgTargtChk', 'ccpTblGhostChk', 'ccpTbwGhostChk' ];
       // !VA Make the configuration object to pass to configCCP
       configObj = {
         revealReset: { alias: 'default'},
@@ -4927,13 +4945,7 @@ ${indent}<![endif]-->`;
         configObj = configDefault( alias, option );
         // !VA Set the flag to conceal items in revealArray
         option = false;
-        // !VA revealElements METHOD - Elements to conceal
-        // !VA Branch: 110920A
-        // !VA None of these apply anymore - this is the default config. So remove the revealElements method from the config
-        // revealArray = [ 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
-        // !VA Overwrite the default revealArray in the configObj called from configDefault
-        // configObj.revealElements = { reveal: revealArray };
-        break;
+
       case option === 'iswap':
         // !VA SET APPOBJ PROPERTIES FOR ISWAP
         // !VA Show the table wrapper options
@@ -5106,8 +5118,6 @@ ${indent}<![endif]-->`;
         // !VA Branch: 111020B
         // revealArray = [ 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaPdparGrp' ];
         revealArray = fetchRevealArray('vmlbt');
-        console.log('revealArray :>> ');
-        console.log(revealArray);
 
         // !VA Set the configObj with the methods and properties to configure
         configObj = {
@@ -5125,6 +5135,7 @@ ${indent}<![endif]-->`;
       highlightArray = getInputArray();
       // !VA Add the highlightIcon property to configObj and return
       configObj.highlightIcon = { highlight: highlightArray};
+
       return configObj;
     }
 
@@ -5150,7 +5161,7 @@ ${indent}<![endif]-->`;
         revealArray = [ 'ccpTblMaxwdTfd' ];
         // revealArray = [  ];
       } else if ( option === 'vmlbt') {
-        revealArray = [  'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo','ccpImgCbhtmBtn', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaPdparGrp' ]; }
+        revealArray = [  'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo','ccpImgCbhtmBtn', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaPdparGrp', 'ccpTblGhostChk', 'ccpTblMsdpiChk' ]; }
       else if (option === 'bgimg') {
         revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn' ];
       } else if ( option === 'excld') {
