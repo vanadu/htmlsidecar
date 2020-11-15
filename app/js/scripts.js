@@ -2422,7 +2422,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       let curPos, targetPos, tokens;
       if (!wrapperChecked) {
         // tokens = [ ghostOpn1, ghostCls1, ghostOpn2, ghostCls2 ];
-        tokens = [ ghostOpn1, ghostOpn2 ]; }
+        tokens = [ ghostOpn1, ghostCls1 ]; }
       else {
         // tokens = [ ghostOpn1, ghostCls1, ghostOpn2, ghostCls2 ];
         tokens = [ ghostOpn2, ghostOpn1, ghostCls2, ghostCls1 ]; 
@@ -2434,34 +2434,58 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
       function transposeTokens(str, token, tokenIdx, tagIdx) {
         console.log('transposeTokens running'); 
-        console.log(`token :>> ${token}; tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}; `);
 
+        let sub1, sub2, sub3;
+
+        if (token.includes('Opn')) {
         // !VA sub1 is the string from the beginning to the tagIndex.
-        sub1 = str.substring( 0, tagIdx );
-        console.log('sub1 :>> ' + sub1);
-        // !VA sub2 is the string from the tag index to the end of the token.
-        sub2 = str.substring( tagIdx, tokenIdx + token.length);
-        console.log('sub2 :>> ' + sub2);
-        // !VA Now add the token to the front of sub2
-        sub2 = token + sub2;
-        console.log('sub2 :>> ' + sub2);
-        // !VA Now delete the token from the tail of sub2
-        sub2 = sub2.substring( 0, sub2.length - token.length );
-        console.log('sub2 :>> ' + sub2);
-        // !VA sub3 strips the original token and returns the rest of the str
-        sub3 = str.substring( tokenIdx + token.length, tbl2.length);
-        console.log('sub3 :>> ' + sub3);
-        // !VA Concatenate the substrings
-        str = sub1 + sub2 + sub3;
-        console.log('str :>> ');
-        console.log(str); 
+          sub1 = str.substring( 0, tagIdx );
+          // console.log('sub1 :>> ' + sub1);
+          // !VA sub2 is the string from the tag index to the end of the token.
+          sub2 = str.substring( tagIdx, tokenIdx + token.length);
+          // console.log('sub2 :>> ' + sub2);
+          // !VA Now add the token to the front of sub2
+          sub2 = token + sub2;
+          // console.log('sub2 :>> ' + sub2);
+          // !VA Now delete the token from the tail of sub2
+          sub2 = sub2.substring( 0, sub2.length - token.length );
+          // console.log('sub2 :>> ' + sub2);
+          // !VA sub3 strips the original token and returns the rest of the str
+          sub3 = str.substring( tokenIdx + token.length, tbl2.length);
+          // console.log('sub3 :>> ' + sub3);
+          // !VA Concatenate the substrings
+          str = sub1 + sub2 + sub3;
+          // console.log('str :>> ');
+          // console.log(str); 
+        } else {
+
+          // !VA STOPPING HERE, ghostCls still not right
+          console.log(`token :>> ${token}; tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}; `);
+          console.log('closing token');
+          sub1 = str.substring( str, tokenIdx );
+          console.log('sub1 :>> ' + sub1);
+          sub2 = str.substring( tokenIdx, tagIdx + tag.length);
+          sub2 = sub2.substring( token.length, sub2.length);
+          sub3 = str.substring( tokenIdx + token.length, str.length );
+          console.log('sub2 :>> ' + sub2);
+          // !VA This is wrong
+          // sub3 = str.lastIndexOf( tokenIdx + token.length, str.length);
+          // str = sub1 + sub2 + token + sub3;
+          str = sub1 + sub2 + token;
+          console.log('tokenIdx :>> ' + tokenIdx);
+          console.log('str :>> ');
+          console.log(str);
+        }
+
+
         return str;       
-      }
+      } 
       
 
       var hasIndex, tokenIdx, tagIdx;
       str = tbl;
       for (const token of tokens) {
+        console.log('token :>> ' + token);
         if (token.includes('Opn')) { 
           tokenOpn = true;
           tag = openTag;
@@ -2471,8 +2495,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           tag = closeTag;
         }  
         do {
-          // if (tokenIdx === -1) { break; } 
+          tokenIdx = 0;
           if (tokenOpn) {
+            console.log('OPEN');
             tokenIdx = str.indexOf( token, tokenIdx + 1);
             tagIdx = str.lastIndexOf( tag, tokenIdx);
 
@@ -2481,9 +2506,20 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
               str = transposeTokens( str, token, tokenIdx, tagIdx );
             }
 
-
-          } 
-        
+          }
+          tokenIdx = 0;
+          if (!tokenOpn) {
+            
+            console.log('CLOSE');
+            tokenIdx = str.lastIndexOf( token, str.length - tag.length);
+            console.log('tokenIdx :>> ' + tokenIdx);
+            tagIdx = str.indexOf( tag, tokenIdx);
+            console.log('tagIdx :>> ' + tagIdx);
+            if (tokenIdx !== -1 ) { 
+              hasIndex = false;
+              str = transposeTokens( str, token, tokenIdx, tagIdx );
+            }
+          }
 
         }
         while ( hasIndex !== false);
@@ -2524,8 +2560,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       tbl = tbl.replace(' data-ghost="tbw"', '');
       // !VA Return this to buildOutputNodeList clipboardStr
       console.log('Return tbl :>> ');
-      console.log(tbl);
-      return tbl;
+      // console.log(tbl);
+      // return tbl;
     }
 
     // !VA CBController private
