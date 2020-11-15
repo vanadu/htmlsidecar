@@ -1549,7 +1549,6 @@ var Witty = (function () {
     // !VA CBController   
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
     function buildOutputNodeList( id ) {
-      console.log('buildOutputNodeList running'); 
       let selectedTdOption, hasAnchor, hasWrapper, Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
       // !VA Set hasAnchor if ccpImgAnchrTfd has a value
       appController.getAppobj('ccpImgAnchrTfd')  ? hasAnchor = true : hasAnchor = false;
@@ -1634,16 +1633,17 @@ var Witty = (function () {
 
         // !VA Create the outputNL nodeList to pass to the Clipboard object
         outputNL = container.querySelectorAll('*');
-        // !VA Branch: 111320C
-        // !VA Ghost for basic and swtch
+
+        // !VA Branch: 111520A
+        // !VA 
         // !VA Not sure why this only runs for TBL Make HTML Button
         if (Attributes.tableGhost.str) {
           console.log('hasWrapper :>> ' + hasWrapper);
-          console.log('Mark1, SWTCH & BASIC outputNL :>> ');
-          if (selectedTdOption === 'basic') {
+          if (selectedTdOption === 'basic' ) {
             outputNL = configGhostTable( 'basic', hasWrapper, outputNL);
+          } else if (selectedTdOption === 'swtch') {
+            outputNL = configGhostTable( 'swtch', hasWrapper, outputNL);
           }
-
         }
 
         // !VA Run applyIndents to apply indents to outputNL
@@ -1694,8 +1694,16 @@ var Witty = (function () {
         console.log(outputNL);
 
 
-
-
+        // !VA Branch: 111520A
+        if (Attributes.tableGhost.str) {
+          console.log('hasWrapper :>> ' + hasWrapper);
+          console.log('Mark1, SWTCH & BASIC outputNL :>> ');
+          if (selectedTdOption === 'bgimg') {
+            outputNL = configGhostTable( 'bgimg', hasWrapper, outputNL);
+          } else if (selectedTdOption === 'iswap') {
+            outputNL = configGhostTable( 'iswap', hasWrapper, outputNL);
+          }
+        }
 
 
         // !VA Apply the indents and insert the tokens identifying the position for inserting the MS conditional code.
@@ -1718,11 +1726,11 @@ var Witty = (function () {
       if (clipboardStr.includes('data-ghost')) {
         // console.log('Mark2 clipboardStr :>> ');
         // console.log(clipboardStr);
-        clipboardStr = applyGhostTable(clipboardStr, Attributes.tableGhost.str, Attributes.tableWrapperGhost.str);
+        clipboardStr = applyGhostTable(clipboardStr, Attributes.tableGhost.str, Attributes.tableWrapperGhost.str, selectedTdOption );
       }
       // console.log('buildOutputNodeList clipboardStr is: ');
       // console.log(clipboardStr);
-      // !VA Write clipboardStr to the Clipboard0
+      // !VA Write clipboardStr to the Clipboard
       writeClipboard( id, clipboardStr );
     }
 
@@ -2203,8 +2211,6 @@ var Witty = (function () {
       // !VA Pass the outer table to the tableNodeFragment and return it.
       tableNodeFragment.appendChild(tableOuter);
       // !VA Branch: 111320B
-      console.log('tableNodeFragment :>> ');
-      console.log(tableNodeFragment);
       return tableNodeFragment;
     }
     // !VA  END NODE FUNCTIONS
@@ -2377,11 +2383,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA Branch: 111320C
     // !VA 
     function configGhostTable(option, hasWrapper, nodeList) {
-      console.clear();
-
+      // console.log('configGhostTable running'); 
+      // console.log(`option :>> ${option}; hasWrapper :>> ${hasWrapper}`);
+      // !VA The tokens used as placeholders for the ghost tables
       ghostOpn1 = '/ghostOpn1/', ghostCls1 = '/ghostCls1/', ghostOpn2 = '/ghostOpn2/', ghostCls2 = '/ghostCls2/';
-
-      if (option === 'basic') {
+      // !VA Place the placeholders in the nodes before the respective opening and closing table tags. Can not put them in the correct positions now because the 'beforebegin' and 'afterend' parameters are used by applyIndents and TMK there is no way to append or modify the adjacentHTML once it has been written to the node. The ghost tokens will be moved to the correct position in transposeTokens. 
+      if (option === 'basic' || option === 'bgimg' || option === 'iswap' ) {
         if (hasWrapper) {
           nodeList[0].insertAdjacentHTML('afterbegin', ghostOpn2);
           nodeList[0].insertAdjacentHTML('beforeend', ghostCls2);
@@ -2391,10 +2398,27 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           nodeList[0].insertAdjacentHTML('afterbegin', ghostOpn1);
           nodeList[0].insertAdjacentHTML('beforeend', ghostCls1);
         }
+      } else if ( option === 'swtch') {
+        console.log('configGhostTable swtch running'); 
+        console.log('nodeList :>> ');
+        console.log(nodeList);
+        if (hasWrapper) {
+          nodeList[0].insertAdjacentHTML('afterbegin', ghostOpn2);
+          nodeList[0].insertAdjacentHTML('beforeend', ghostCls2);
+          nodeList[3].insertAdjacentHTML('afterbegin', ghostOpn2);
+          nodeList[3].insertAdjacentHTML('beforeend', ghostCls2);
+          nodeList[9].insertAdjacentHTML('afterbegin', ghostOpn1);
+          nodeList[9].insertAdjacentHTML('beforeend', ghostCls1);
+        } else {
+          nodeList[0].insertAdjacentHTML('afterbegin', ghostOpn2);
+          nodeList[0].insertAdjacentHTML('beforeend', ghostCls2);
+          nodeList[6].insertAdjacentHTML('afterbegin', ghostOpn1);
+          nodeList[6].insertAdjacentHTML('beforeend', ghostCls1);
+        }
       }
 
-      console.log('configGhostTable nodeList :>> ');
-      console.log(nodeList);
+      // console.log('configGhostTable nodeList :>> ');
+      // console.log(nodeList);
       return nodeList;
     }
 
@@ -2403,11 +2427,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     // !VA CBController private
     // !VA handle the buildNodeList clipboardStr output, define and place the tokens in the clipboardStr output and replace the tokens with the ghost tabs from getGhostTags or strip them out depending on the checked status of the Ghost checkbox icons passed in as bool parameters from the caller.
-    function applyGhostTable(tbl, bool1, bool2) {
-      console.clear();
-      console.log('applyGhostTable running'); 
+    function applyGhostTable(tbl, bool1, bool2, option) {
+
+      console.log('applyGhostTable running');
+      console.log(`option :>> ${option};`);
       // console.log('TOP tbl :>> ');
       // console.log(tbl);
+
       let openTag, closeTag, ghostOpn1, ghostCls1, ghostOpn2, ghostCls2, openTBLPos,  closeTBLPos, closeTBWPos;
       let indexPos, ghostTags = [], wrapperChecked;
       // !VA Define the tokens to use as placeholders before the replace operation
@@ -2415,7 +2441,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Define the opening and closing table tags
       openTag = '<table', closeTag = '</table>';
       // !VA Get the ghost tags and their indents
-      ghostTags = getGhostTags();
+      ghostTags = getGhostTags(option);
       // console.log(`bool1 (tableGhost:):>> ${bool1}; bool2 (tableWrapperGhost): ${bool2}`);
       wrapperChecked = appController.getAppobj('ccpTblWraprChk');
       // console.log('wrapperChecked :>> ' + wrapperChecked);
@@ -2432,17 +2458,18 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       token = ghostOpn2;
       tokenIndex = 0;
 
-      function transposeTokens(str, token, tokenIdx, tagIdx) {
+      function transposeTokens(tbl, token, tokenIdx, tagIdx) {
         console.log('transposeTokens running'); 
+        console.log(`tbl :>> ${tbl};`);
 
         let sub1, sub2, sub3;
 
         if (token.includes('Opn')) {
         // !VA sub1 is the string from the beginning to the tagIndex.
-          sub1 = str.substring( 0, tagIdx );
+          sub1 = tbl.substring( 0, tagIdx );
           // console.log('sub1 :>> ' + sub1);
           // !VA sub2 is the string from the tag index to the end of the token.
-          sub2 = str.substring( tagIdx, tokenIdx + token.length);
+          sub2 = tbl.substring( tagIdx, tokenIdx + token.length);
           // console.log('sub2 :>> ' + sub2);
           // !VA Now add the token to the front of sub2
           sub2 = token + sub2;
@@ -2451,49 +2478,45 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           sub2 = sub2.substring( 0, sub2.length - token.length );
           // console.log('sub2 :>> ' + sub2);
           // !VA sub3 strips the original token and returns the rest of the str
-          sub3 = str.substring( tokenIdx + token.length, tbl2.length);
+          sub3 = tbl.substring( tokenIdx + token.length, tbl.length);
           // console.log('sub3 :>> ' + sub3);
           // !VA Concatenate the substrings
-          str = sub1 + sub2 + sub3;
-          // console.log('str :>> ');
-          // console.log(str); 
+          tbl = sub1 + sub2 + sub3;
+
         } else {
           // !VA STOPPING HERE, ghostCls still not right
-          console.log(`token :>> ${token}; tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}; `);
-          sub1 = str.substring( str, tokenIdx );
+          // console.log(`TOKEN :>> ${token}; tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}; `);
+          // !VA substring 1 includes up to the token index position
+          sub1 = tbl.substring( tbl, tokenIdx );
           console.log(`TOKEN: ${token} - sub1 :>>  ${sub1}`);
-          sub2 = str.substring( tokenIdx, tagIdx + tag.length);
+          // !VA substring 2 is from the token index position up to the tag index plus the tag length, that is, the position to which the token will move.
+          sub2 = tbl.substring( tokenIdx, tagIdx + tag.length);
+          // !VA Remove the existing token from substring 2
           sub2 = sub2.substring( token.length, sub2.length);
           console.log(`$TOKEN: ${token} - sub2 :>> "${sub2}"`);
-          sub3 = str.slice( tokenIdx, -1);
-          sub3 = str.substring( str.length - (str.length - tagIdx - tag.length), str.length );
-          // var foo = (str.length - ( str.length - tagIdx - tag.length));
-          // console.log(`foo :>> ${foo};`);
-          // var baz = str.length - tagIdx - tag.length;
-          // console.log(`baz :>> ${baz};`);
-          // sub3 = str.substring( tagIdx - tag.length, str.length );
-          console.log(`TOKEN: ${token}; STR.LENGTH: ${str.length}; TOKENIDX: ${tokenIdx}; TAGIDX: ${tagIdx}; - sub3 :>> "${sub3}"`);
-          // !VA This is wrong
-
-          // sub3 = str.lastIndexOf( tokenIdx + token.length, str.length);
-          // str = sub1 + sub2 + token + sub3;
-          str = sub1 + sub2 + token + sub3;
+          // !VA The two sub3 statements below output the same number for the position argument, but the slice method results in a str that is off by 1 character. I don't know why the current sub3 works, but it does. Come back to this when I have a lot of extra time on my hands. 
+          // sub3 = str.slice( tagIdx + tag.length + 1, -1);
+          sub3 = tbl.substring( str.length - (tbl.length - tagIdx - tag.length), tbl.length );
+          // !VA The below is where I try to figure out the difference between the two sub3 statements above.
+          // var foo = (v.length - ( tbl.length - tagIdx - tag.length));
+          // console.log(`TOKEN: ${token}; foo :>> ${foo};`);
+          // var baz = tagIdx + tag.length;
+          // console.log(`TOKEN: ${token}; baz :>> ${baz};`);
+          // sub3 = tbl.substring( tagIdx - tag.length, tbl.length );
+          // console.log(`TOKEN: ${token}; tbl.LENGTH: ${tbl.length}; TOKENIDX: ${tokenIdx}; TAGIDX: ${tagIdx}; - sub3 :>> "${sub3}"`);
+          // !VA Concatenate the substrings to build the string and return.
+          tbl = sub1 + sub2 + token + sub3;
           console.log(`$TOKEN: ${token} - tokenIdx :>> ${tokenIdx};`);
-          console.log(`TOKEN: ${token} str :>> "${str}"`);
-          // console.log(str);
-
-
+          console.log(`TOKEN: ${token} tbl :>> "${tbl}"`);
         }
-
-
-        return str;       
+        return tbl;
       } 
       
 
       var hasIndex, tokenIdx, tagIdx;
       str = tbl;
       for (const token of tokens) {
-        console.log('token :>> ' + token);
+        // console.log('token :>> ' + token);
         if (token.includes('Opn')) { 
           tokenOpn = true;
           tag = openTag;
@@ -2505,49 +2528,36 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         do {
           tokenIdx = 0;
           if (tokenOpn) {
-            console.log('OPEN');
-            tokenIdx = str.indexOf( token, tokenIdx + 1);
-            tagIdx = str.lastIndexOf( tag, tokenIdx);
-
+            // console.log('OPEN');
+            // !VA Loop here but only on bgimg option
+            tokenIdx = tbl.indexOf( token, tokenIdx + 1);
+            tagIdx = tbl.lastIndexOf( tag, tokenIdx);
+            console.log(`tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}`);
             if (tokenIdx !== -1 ) { 
               hasIndex = false;
-              str = transposeTokens( str, token, tokenIdx, tagIdx );
+              console.log(`Mark1A tbl :>> ${tbl};`);
+              tbl = transposeTokens( tbl, token, tokenIdx, tagIdx );
+              console.log(`Mark1B tbl :>> ${tbl};`);
             }
-
-          }
-          tokenIdx = 0;
-          if (!tokenOpn) {
-            
-            tokenIdx = str.lastIndexOf( token, str.length - tag.length);
-            console.log('tokenIdx :>> ' + tokenIdx);
-            tagIdx = str.indexOf( tag, tokenIdx);
-            console.log('tagIdx :>> ' + tagIdx);
+          } else  {
+            console.log(`Mark2 tbl :>> ${tbl};`);
+            tokenIdx = tbl.lastIndexOf( token, tbl.length - tag.length);
+            // console.log('tokenIdx :>> ' + tokenIdx);
+            tagIdx = tbl.indexOf( tag, tokenIdx);
+            // console.log('tagIdx :>> ' + tagIdx);
             if (tokenIdx !== -1 ) { 
               hasIndex = false;
-              str = transposeTokens( str, token, tokenIdx, tagIdx );
+              tbl = transposeTokens( tbl, token, tokenIdx, tagIdx );
             }
           }
-
+          // !VA Branch: 111520A
+          // !VA Return out on error
+          // console.log('Error, returning out');
+          // return;
         }
         while ( hasIndex !== false);
-
-        
       }
-      tbl = str;
 
-      // tokenIndex = tbl2.indexOf( token, tokenIndex );
-      // console.log('tokenIndex A :>> ' + tokenIndex);
-      // tokenIndex = tokenIndex + 1;
-      // tokenIndex = tbl.indexOf( token, tokenIndex );
-      // console.log('tokenIndex B :>> ' + tokenIndex);
-    
-    
-
-
-
-
-
-      // !VA Now that the tokens are in place, replace them with the ghost tags or strip them out based on the bool values.
       if (bool1) {
         tbl = tbl.replace(ghostOpn1,  ghostTags[0]);
         tbl = tbl.replace(ghostCls1, ghostTags[1]);
@@ -2566,26 +2576,38 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       tbl = tbl.replace(' data-ghost="tbl"', '');
       tbl = tbl.replace(' data-ghost="tbw"', '');
       // !VA Return this to buildOutputNodeList clipboardStr
-      console.log('Return tbl :>> ');
+      // console.log('Return tbl :>> ');
       // console.log(tbl);
       return tbl;
     }
 
     // !VA CBController private
     // !VA Returns the strings for opening and closing ghost table tag as a two-item array with indents on the inner table based on the status of the Table Wrapper checkbox icon.
-    function getGhostTags() {
+    function getGhostTags(option) {
+      console.log(`getGhostTags option :>> ${option};`);
       let ghostOpn1, ghostCls1, ghostOpn2, ghostCls2, hasWrapper, indent;
       let ghosttags = [];
       // !VA Get the status of the Table Wrapper checkbox - it determines whether indents are applied to the inner table or not.
       hasWrapper = appController.getAppobj('ccpTblWraprChk');
       hasWrapper ? indent = '      ' : indent = '';
-      // !VA Define the opening and closing ghost tags for the inner table
+
+      // !VA Branch: 111520A
+      let Attributes;
+      Attributes = getAttributes();
+      console.log('NOW');
+      console.log(`Attributes.tableWidth.str :>> ${Attributes.tableWidth.str};`);
+
+
+
+      // !VA Define the opening and closing ghost tags for the inner tablesd
       ghostOpn1 = 
       // !VA The first opening inner table tag gets no indent
+      // !VA Branch: 111520A
+      // !VA Changed from appController.getAppobj('curImgW') to Attributes.tableWidth.str to accomodate reflected value in swtch option. Keep an eye on it.
 `<!--[if (gte mso 9)|(IE)]>
-${indent}<table align="center" border="0" cellspacing="0" cellpadding="0" width="${appController.getAppobj('curImgW')}">
+${indent}<table align="center" border="0" cellspacing="0" cellpadding="0" width="${Attributes.tableWidth.str}">
 ${indent}<tr>
-${indent}<td align="center" valign="top" width="${appController.getAppobj('curImgW')}">
+${indent}<td align="center" valign="top" width="${Attributes.tableWidth.str}">
 ${indent}<![endif]-->\n${indent}`;
 
       ghostCls1 = 
@@ -4341,7 +4363,6 @@ ${indent}<![endif]-->`;
         configObj = configOptns( alias, option );
         break;
       case alias === 'ccpTblWraprChk' :
-
         // !VA Get the CCP configuration for the Include Wrapper checkbox icon
         configObj = configWrapr( option );
         break;
@@ -4500,7 +4521,15 @@ ${indent}<![endif]-->`;
       // !VA Handle the selected checkbox
       case alias === 'ccpTblWraprChk':
         // !VA Set the flag based on the isChecked parameter. This will be the 'option' parameter in fetchConfigObj
+        console.log('Mark1 ');
+        console.log(`selectCheckbox alias :>> ${alias};`);
+        console.log(`selectCheckbox isChecked :>> ${isChecked};`);
         configObj = fetchConfigObj(  alias, isChecked );
+
+        console.log('selectCheckbox Appobj :>> ');
+        console.log(Appobj);
+
+
         UIController.configCCP( configObj);
         break;
       case alias === 'ccpTblHybrdChk':
@@ -4998,18 +5027,21 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from fetchConfigObj to get the TD Option radio group-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
     function configOptns( alias, option ) {
-      // console.log(`configOptns - alias :>> ${alias}; option :>> ${option}`);
       let revealFlag, revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray, highlightArray;
       let configObj = {};
+
+
       // !VA Handle the TD Options CCP configurations
       switch(true) {
       case option === 'basic':
         // !VA For the TD Options basic and swtch, use the default CCP configuration
         configObj = configDefault( alias, option );
         // !VA Set the flag to conceal items in revealArray
-        option = false;
+        revealFlag = false;
+        break;
 
       case option === 'iswap':
+
         // !VA SET APPOBJ PROPERTIES FOR ISWAP
         // !VA Show the table wrapper options
         Appobj.ccpTblWraprChk = true;
