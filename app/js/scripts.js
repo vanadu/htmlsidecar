@@ -1722,7 +1722,7 @@ var Witty = (function () {
       }
       // console.log('buildOutputNodeList clipboardStr is: ');
       // console.log(clipboardStr);
-      // !VA Write clipboardStr to the Clipboard
+      // !VA Write clipboardStr to the Clipboard0
       writeClipboard( id, clipboardStr );
     }
 
@@ -2458,23 +2458,31 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           // console.log('str :>> ');
           // console.log(str); 
         } else {
-
           // !VA STOPPING HERE, ghostCls still not right
           console.log(`token :>> ${token}; tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}; `);
-          console.log('closing token');
           sub1 = str.substring( str, tokenIdx );
-          console.log('sub1 :>> ' + sub1);
+          console.log(`TOKEN: ${token} - sub1 :>>  ${sub1}`);
           sub2 = str.substring( tokenIdx, tagIdx + tag.length);
           sub2 = sub2.substring( token.length, sub2.length);
-          sub3 = str.substring( tokenIdx + token.length, str.length );
-          console.log('sub2 :>> ' + sub2);
+          console.log(`$TOKEN: ${token} - sub2 :>> "${sub2}"`);
+          sub3 = str.slice( tokenIdx, -1);
+          sub3 = str.substring( str.length - (str.length - tagIdx - tag.length), str.length );
+          // var foo = (str.length - ( str.length - tagIdx - tag.length));
+          // console.log(`foo :>> ${foo};`);
+          // var baz = str.length - tagIdx - tag.length;
+          // console.log(`baz :>> ${baz};`);
+          // sub3 = str.substring( tagIdx - tag.length, str.length );
+          console.log(`TOKEN: ${token}; STR.LENGTH: ${str.length}; TOKENIDX: ${tokenIdx}; TAGIDX: ${tagIdx}; - sub3 :>> "${sub3}"`);
           // !VA This is wrong
+
           // sub3 = str.lastIndexOf( tokenIdx + token.length, str.length);
           // str = sub1 + sub2 + token + sub3;
-          str = sub1 + sub2 + token;
-          console.log('tokenIdx :>> ' + tokenIdx);
-          console.log('str :>> ');
-          console.log(str);
+          str = sub1 + sub2 + token + sub3;
+          console.log(`$TOKEN: ${token} - tokenIdx :>> ${tokenIdx};`);
+          console.log(`TOKEN: ${token} str :>> "${str}"`);
+          // console.log(str);
+
+
         }
 
 
@@ -2510,7 +2518,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           tokenIdx = 0;
           if (!tokenOpn) {
             
-            console.log('CLOSE');
             tokenIdx = str.lastIndexOf( token, str.length - tag.length);
             console.log('tokenIdx :>> ' + tokenIdx);
             tagIdx = str.indexOf( tag, tokenIdx);
@@ -2543,17 +2550,17 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Now that the tokens are in place, replace them with the ghost tags or strip them out based on the bool values.
       if (bool1) {
         tbl = tbl.replace(ghostOpn1,  ghostTags[0]);
-        // tbl = tbl.replace(ghostCls1, ghostTags[1]);
+        tbl = tbl.replace(ghostCls1, ghostTags[1]);
       } else {
         tbl = tbl.replace(ghostOpn1,'');
-        // tbl = tbl.replace(ghostCls1, '');
+        tbl = tbl.replace(ghostCls1, '');
       }
       if (bool2) {
         tbl = tbl.replace(ghostOpn2, ghostTags[2]);
-        // tbl = tbl.replace(ghostCls2, ghostTags[3]);
+        tbl = tbl.replace(ghostCls2, ghostTags[3]);
       } else {
         tbl = tbl.replace(ghostOpn2,'');
-        // tbl = tbl.replace(ghostCls2, '');
+        tbl = tbl.replace(ghostCls2, '');
       }
       // !VA Now strip out the data-ghost attributes.
       tbl = tbl.replace(' data-ghost="tbl"', '');
@@ -2561,7 +2568,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Return this to buildOutputNodeList clipboardStr
       console.log('Return tbl :>> ');
       // console.log(tbl);
-      // return tbl;
+      return tbl;
     }
 
     // !VA CBController private
