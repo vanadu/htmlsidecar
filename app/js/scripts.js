@@ -397,6 +397,7 @@ var Witty = (function () {
     // !VA UIController private
     // !VA If called from populateAppobj, returns the value of text input fields as hard-coded in the HTML. Otherwise, called by configCCP, which receives an array of aliases whose corresponding CCP element value is set to its corresponding Appobj value. 
     function reflectAppobj( reflectArray) { 
+
       let el, isInit, retVal, toolbarAliases;
 
       for (const alias of reflectArray) {
@@ -588,24 +589,32 @@ var Witty = (function () {
       }
     }
 
-    function resetMkcss() {
-      
+    function resetMkcss(caller, bool) {
+      console.log(`reset Mkcss caller :>> ${caller};`);
       const mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ];
       const classArray = [ 'ccpImgClassTfd', 'ccpTdaClassTfd', 'ccpTblClassTfd' ];
-      let foo, el, hasVal;
+      let el, chldrn;
 
 
       for (let i = 0; i < mkcssArray.length; i++) {
-        console.log('mkcssArray[i] is: ' +  mkcssArray[i]);
+        console.log('resetMkcss mkcssArray[i] is: ' +  mkcssArray[i]);
         el =document.querySelector(ccpUserInput[mkcssArray[i]]);
-        console.log(`classArray[i] :>> ${classArray[i]};`);
-        if (appController.getAppobj(classArray[i])) {
-          console.log('HIT');
-          el.classList.remove('ccp-conceal-ctn');
-
-        } else {
-          el.classList.add('ccp-conceal-ctn');
+        console.log(`resetMkcss el :>> ${el};`);
+        console.log(`resetMkcss classArray[i] :>> ${classArray[i]};`);
+        chldrn = el.children;
+        console.log(`resetMkcss chldrn :>> ${chldrn};`);
+        for (const chld of chldrn) {
+          chld.classList.add('ccp-conceal-ctn');
         }
+
+        
+        // if (appController.getAppobj(classArray[i])) {
+        //   console.log('HIT');
+        //   el.classList.remove('ccp-conceal-ctn');
+
+        // } else {
+        //   el.classList.add('ccp-conceal-ctn');
+        // }
       }
 
     }
@@ -614,31 +623,21 @@ var Witty = (function () {
     // !VA UIController private  
     // !VA Reveal and conceal individual CCP container elements with sequential animation. flag specifies if the reveal class cpp-hide-ctn is to be added or removed: true = add, false = remove. aliasArray is the array of elements to reveal/conceal. Called from UIController.configCCP. 
     function revealElements( caller, flag, aliasArray) {
-      // console.clear();
-      console.log(`revealElements caller :>> ${caller}; revealElements: aliasArray :>> ${aliasArray}; flag :>> ${flag};`);
+      console.log(`revealElements caller :>> ${caller}; flag :>> ${flag}; revealElements: aliasArray :>> ${aliasArray}; `);
       let el;
-      var foo = appController.getAppobj('ccpImgClassTfd');
-      console.log('foo :>> ');
-      console.log(foo);
-
 
       for (const alias of aliasArray) {
-        console.log(`alias :>> ${alias};`);
+
         if (alias.includes('Mkcss')) {
-          console.log('This is a Make CSS button');
-          console.log(`MKCSS alias :>> ${alias};`);
+          console.log(`revealElements MKCSS alias :>> ${alias};`);
           el = document.querySelector(ccpUserInput[alias]);
           chldrn = el.children;
-
           revealCcpChildren(flag, chldrn);
 
-
-
         } else {
-          console.log(`ELEMENT alias :>> ${alias};`);
-          console.log('This is a regular alement');
-
-          console.log('HANDLING ELEMENTS');
+          // console.log(`ELEMENT alias :>> ${alias};`);
+          // console.log('This is a regular alement');
+          // console.log('HANDLING ELEMENTS');
 
           // !VA Array of ALL CCP elements to compare against the revealArray of the elements to reveal based on the current configObj configuration.
           ccpArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn', 'ccpImgMkcssGrp', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaPdparGrp', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaTxcntTfd', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTdaBdclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
@@ -665,7 +664,7 @@ var Witty = (function () {
               revealArray.push(alias);
             }
           }
-          console.log(`NOW revealArray :>> ${revealArray};`); 
+          // console.log(`NOW revealArray :>> ${revealArray};`); 
           // !VA Run the delay animation handler
           revealCcpElements(revealArray, ccpArr);
 
@@ -1033,7 +1032,7 @@ var Witty = (function () {
           highlightIcon( configObj.highlightIcon.highlight );
         }
         if ( configObj.resetMkcss) {
-          resetMkcss( configObj.resetMkcss.reset );
+          resetMkcss( configObj.resetMkcss.caller, configObj.resetMkcss.reset );
         }
 
         return retVal;
@@ -4559,42 +4558,69 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
-    // !VA Called from event handlers on CCP labels to remove any input field content and remove the 'active' class from the input element related to the clicked label icon.
+    // !VA Called from event handlers on CCP labels to remove any input field content, remove the 'active' class from the input element related to the clicked label icon, and remove ccp-conceal-ctn class from the Make CSS buttons.NOTE: evt.target.value will always be undefined because the target element is a label. To get a value, target the input element, i.e. the htmlFor of the target label. 
     function handleIconClick(evt) {
-      let appObjProp, ipt, reflectArray;
+      console.clear();
+      console.log(`handleIconClick evt.target.id :>> ${evt.target.id};`);
+      let appObjProp, evtTargetId, ipt, reflectArray;
       let configObj = {};
-      if (evt.target.value !== '') {
-        if (evt.target.id !== 'ccp-tda-padng-icn') {
-          Appobj[appObjProp] = '';
-          // !VA This should be done with configCCP - for later
-          ipt = document.getElementById(evt.target.htmlFor);
-          ipt.value = '';
-          ipt.classList.remove('active');
-        } else {
-          // !VA This is where we need to add the padding width values back to Appobj.curImgW and remove the values from TD H and TD W
-          // !VA First, get padHeight an padWidth from current Appobj
-          // !VA This is the same as running handlePadding with appObjProp = ccpTdaPdrgtTfd - see if it can be replaced with that, but it works for now. 
-          let imgInputObj = {};
-          imgInputObj.appObjProp = 'curImgW';
-          imgInputObj.evtTargetVal = Appobj.curImgW + Number(Appobj.ccpTdaPdrgtTfd) + Number(Appobj.ccpTdaPdlftTfd);
-          appController.initUpdateCurrentImage(imgInputObj);
-          // !VA Set the TD Height input to the curImgH plus the sum of the Appobj lft/rgt input properties.
-          Appobj.ccpTdaHeigtTfd = Appobj.ccpTdaWidthTfd = Appobj.ccpTdaPdrgtTfd = Appobj.ccpTdaPdlftTfd = Appobj.ccpTdaPdtopTfd = Appobj.ccpTdaPdbtmTfd = '';
-          // !VA Reset TBL W to Appobj.curImgW restored to pre-padding value
-          Appobj.ccpTblWidthTfd = Appobj.curImgW; 
-          // !VA Set the reflect array for TD H, TD W and TBL W
-          reflectArray = [ 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdbtmTfd', 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
-          // !VA Unhighlight the TD Width and TD Height icons - this should be done in the configCCP call
-          document.querySelector(ccpUserInput.ccpTdaHeigtTfd.replace('tfd', 'ipt')).classList.remove('active');
-          document.querySelector(ccpUserInput.ccpTdaWidthTfd.replace('tfd', 'ipt')).classList.remove('active');
-          configObj = {
-            reflectAppobj: { reflect: reflectArray }
-          };
-          // !VA Run the config
-          UIController.configCCP( configObj );
-          // !VA Remove the active class from the padding icon, i.e. the event target.
-          document.getElementById(evt.target.id).classList.remove('active');
+      // !VA get the id of the target label element
+      evtTargetId = evt.target.id;
+      // !VA Get the Appobj alias of the corresponding input element of the label
+      appObjProp = elemIdToAppobjProp(evtTargetId.replace('lbl', 'ipt'));
+      // !VA If the target element is NOT the padding icon
+      if (evt.target.id !== 'ccp-tda-padng-icn') {
+        // !VA Set the Appobj property of the input to empty, i.e. the value after the icon click.
+        Appobj[appObjProp] = '';
+        // !VA Reflect the Appobj value to and highlight the appObjProp element. NOTE: appObjProp element is set in CSS to highlight its sibling label element.
+        reflectArray = [ appObjProp ];
+        highlightArray = [ appObjProp ];
+        // !VA Set reflect and highlight in configObj
+        configObj = {
+          reflectAppobj: { reflect: reflectArray },
+          highlightIcon: { highlight: highlightArray },
         }
+        // !VA If the target is a label for a Class input element, also handle the conceal of the associated Make CSS buttons
+        if (appObjProp.includes('Class')) {
+          // !VA Replace the ClassTfd string to get the Make CSS button group alias
+          mkcssProp = appObjProp.replace('ClassTfd', 'MkcssGrp');
+          // !VA Set the reveal flag to add the ccp-conceal-ctn style to the Make CSS group, thereby concealing its children when revealElements is run.
+          revealFlag = true;
+          // !VA Set the alias of the Make CSS buttons to conceal
+          revealArray = [ mkcssProp ];
+          // !VA Add the revealElements to the config 
+          configObj.revealElements = { caller: 'handleIconClick', flag: revealFlag, reveal: revealArray }
+        }
+        // !VA Run the configuration
+        UIController.configCCP( configObj);
+
+
+      } else {
+        console.log('handleIconClick PADDING');
+
+        // !VA This is where we need to add the padding width values back to Appobj.curImgW and remove the values from TD H and TD W
+        // !VA First, get padHeight an padWidth from current Appobj
+        // !VA This is the same as running handlePadding with appObjProp = ccpTdaPdrgtTfd - see if it can be replaced with that, but it works for now. 
+        let imgInputObj = {};
+        imgInputObj.appObjProp = 'curImgW';
+        imgInputObj.evtTargetVal = Appobj.curImgW + Number(Appobj.ccpTdaPdrgtTfd) + Number(Appobj.ccpTdaPdlftTfd);
+        appController.initUpdateCurrentImage(imgInputObj);
+        // !VA Set the TD Height input to the curImgH plus the sum of the Appobj lft/rgt input properties.
+        Appobj.ccpTdaHeigtTfd = Appobj.ccpTdaWidthTfd = Appobj.ccpTdaPdrgtTfd = Appobj.ccpTdaPdlftTfd = Appobj.ccpTdaPdtopTfd = Appobj.ccpTdaPdbtmTfd = '';
+        // !VA Reset TBL W to Appobj.curImgW restored to pre-padding value
+        Appobj.ccpTblWidthTfd = Appobj.curImgW; 
+        // !VA Set the reflect array for TD H, TD W and TBL W
+        reflectArray = [ 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdbtmTfd', 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
+        // !VA Unhighlight the TD Width and TD Height icons - this should be done in the configCCP call
+        document.querySelector(ccpUserInput.ccpTdaHeigtTfd.replace('tfd', 'ipt')).classList.remove('active');
+        document.querySelector(ccpUserInput.ccpTdaWidthTfd.replace('tfd', 'ipt')).classList.remove('active');
+        configObj = {
+          reflectAppobj: { reflect: reflectArray }
+        };
+        // !VA Run the config
+        UIController.configCCP( configObj );
+        // !VA Remove the active class from the padding icon, i.e. the event target.
+        document.getElementById(evt.target.id).classList.remove('active');
       }
     }
 
@@ -4935,7 +4961,7 @@ ${indent}<![endif]-->`;
       Appobj.ccpImgTargtChk = false;
       Appobj.ccpImgExcldRdo = 'incld';
       // Appobj.ccpTdaBgclrTfd = '';
-      Appobj.ccpTdaWidthTfd = '';
+      Appobj.ccpTdaWidthTfd = ''; 
       Appobj.ccpTdaHeigtTfd = '';
       Appobj.ccpTdaBgclrTfd = '';
       Appobj.ccpTdaAlignRdo = 'left';
@@ -4945,7 +4971,7 @@ ${indent}<![endif]-->`;
       // Appobj.ccpTdaPdrgtTfd = '';
       // Appobj.ccpTdaPdlftTfd = '';
       // Appobj.ccpTdaPdbtmTfd = '';
-      Appobj.ccpTdaTxcntTfd = 'Eaque voluptatum assumenda et facilis atque odio sed magnam.',
+      Appobj.ccpTdaTxcntTfd = '<p>Eaque voluptatum assumenda et facilis atque odio sed magnam.</p>',
       Appobj.ccpTblClassTfd = '';
       Appobj.ccpTblWidthTfd = Appobj.curImgW;
       // Appobj.ccpTblBgclrTfd = '';
@@ -5061,7 +5087,7 @@ ${indent}<![endif]-->`;
         // Set the array of elements whose Appobj properties are to be reflected in CCP
         reflectArray = ['ccpTblWidthTfd'];
         // !VA revealElements METHOD - Elements to conceal
-        revealArray = [  ];
+        revealArray = fetchRevealArray('incld');
 
       }
       // !VA Get the highlightArray of all input elements to apply the highlight to any input elements whose Appobj property is not empty
@@ -5069,13 +5095,14 @@ ${indent}<![endif]-->`;
       // configObj.highlightIcon = { highlight: highlightArray};
       
       configObj = {
+        resetMkcss: {caller: 'configExcld', reset: true},
         highlightIcon: { highlight: highlightArray},
         checkboxState:  { checked: checkedArray },
         radioState: { radio: radioArray },
         reflectAppobj: { reflect: reflectArray },
         revealElements: { caller: 'configExcld', flag: revealFlag, reveal: revealArray },
       };
-
+      configObj.resetMkcss = {caller: 'configOptns', reset: true}
       // if ( option === 'incld') { configObj.revealReset = { alias: 'incld' }; }
       return configObj;
     }
@@ -5137,11 +5164,6 @@ ${indent}<![endif]-->`;
       let revealFlag, revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray, highlightArray;
       let configObj = {};
 
-
-
-
-
-
       // !VA Handle the TD Options CCP configurations
       switch(true) {
       case option === 'basic':
@@ -5149,11 +5171,6 @@ ${indent}<![endif]-->`;
         configObj = configDefault( alias, option );
         // !VA Set the flag to conceal items in revealArray
         revealFlag = false;
-
-        // !VA Branch: 111620A
-        // console.log('Mark1 configObj :>> ');
-        // console.log(configObj);
-
 
         break;
 
@@ -5215,7 +5232,9 @@ ${indent}<![endif]-->`;
 
         // !VA Set the configObj with the methods and properties to configure
         configObj = {
-          resetMkcss: {reset: true},
+          // !VA Branch: 111720A
+          // !VA This should be called by all options, adding it to configObj down below.
+          resetMkcss: {caller: 'configOptns', reset: true},
           checkboxState: { checked: checkedArray },
           reflectAppobj: { reflect: reflectArray },
           radioState: { radio: radioArray },
@@ -5348,9 +5367,10 @@ ${indent}<![endif]-->`;
       highlightArray = getInputArray();
       // !VA Add the highlightIcon property to configObj and return
       configObj.highlightIcon = { highlight: highlightArray};
+      configObj.resetMkcss = {caller: 'configOptns', reset: true}
 
       // !VA Branch: 111620A
-      // console.log(`configOptns option :>> ${option}; configObj.revealElements.reveal.length :>> ${configObj.revealElements.reveal.length};`);
+      console.log(`configOptns option :>> ${option}; configObj.revealElements.reveal.length :>> ${configObj.revealElements.reveal.length};`);
 
 
       return configObj;
