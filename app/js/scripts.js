@@ -641,20 +641,47 @@ var Witty = (function () {
 
           // !VA Array of ALL CCP elements to compare against the revealArray of the elements to reveal based on the current configObj configuration.
           ccpArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn', 'ccpImgMkcssGrp', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaPdparGrp', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaTxcntTfd', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTdaBdclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+
   
           // VA! Default elements to reveal/conceal. This corresponds to the elements revealed by configDefault at initialization. 
           defaultArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgMkcssGrp', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaPdparGrp', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
   
           // !VA Initialize revealArray to defaultArray. Aliases will be added to or removed from revealArray based on the parameter array passed in from configObj. The result is an array of aliases to be revealed, whereby alias not in the list is concealed.
+
+
+          // console.clear();
+          // !VA Branch: 111820A
+          // !VA First generate a collection of all the ccp elements based on the REVEALED ccp-ctn class
+          // !VA If we get the whole collection of ctn elements, we have to remove the concealed ones. Also, we shouldn't include any of the mkcss elements because they are handled elsewhere. Ideally we'd work with aliases at this point and not create elements until later.
+
+
+          for (const id of testArray) {
+            
+            el = document.querySelector(id);
+            cList = el.classList;
+            if (cList.toString().includes('ccp-conceal-ctn')) {
+              console.log(`el.id :>> ${el.id};`);
+
+
+            }
+
+
+          }
+
+
+
+
+
+
           revealArray = defaultArr;
   
           // !VA Branch: 111020B
           // !VA revealArray or defaultArray below?
-  
+          
   
           // !VA For each element in the passed-in aliasArray
           for (const alias of aliasArray) {
-  
+
             // !VA If the passed-in alias is already present in revealArray, then remove it.
             if (revealArray.includes(alias)) {
               revealArray = revealArray.filter(item => item !== alias);
@@ -729,25 +756,6 @@ var Witty = (function () {
           })(i);
         }
       }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 
     function revealMkcssGroup(mkcssAlias, classAlias) {
@@ -2625,9 +2633,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             console.log(`tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}`);
             if (tokenIdx !== -1 ) { 
               hasIndex = false;
-              console.log(`Mark1A tbl :>> ${tbl};`);
+              // console.log(`Mark1A tbl :>> ${tbl};`);
               tbl = transposeTokens( tbl, token, tokenIdx, tagIdx );
-              console.log(`Mark1B tbl :>> ${tbl};`);
+              // console.log(`Mark1B tbl :>> ${tbl};`);
             }
           } else  {
             console.log(`Mark2 tbl :>> ${tbl};`);
@@ -4701,10 +4709,6 @@ ${indent}<![endif]-->`;
           // !VA If there's a value in the field, then flag is true, so highlight the icon
           flag ? tar.classList.add('active') : tar.classList.remove('active');
           // !VA If there's a value in the field and flag is true, then set the revealParent flag to false to remove the conceal class and reveal the elements.
-
-          // !VA Branch: 111620A
-          // !VA THIS IS NOT WORKING
-          console.log(`Mark1 flag :>> ${flag};`);
           configObj = {
             revealElements: { caller: 'handeTextInputEvent', flag: !flag, reveal: revealArray }
           };
@@ -4719,10 +4723,6 @@ ${indent}<![endif]-->`;
           configObj = {
             revealElements: { caller: 'handleTextInputEvent', flag: !flag, reveal: revealArray }
           };
-
-
-
-
           UIController.configCCP( configObj );
           // !VA TBL class input shows Make CSS buttons
         } else if (tar.id === 'ccp-tbl-class-ipt') {
@@ -4737,7 +4737,7 @@ ${indent}<![endif]-->`;
           UIController.configCCP( configObj );
         // !VA Show the options for the IMG anchor text input field
         } else if (tar.id === 'ccp-img-anchr-ipt') {
-          console.log('HIT');
+          console.log('Handling IMG ANCHR input');
           // !VA The 2 elements that are dependent on the anchor input value
           revealArray = makeAliasArray('ccpImgTxclrTfd', 'ccpImgTargtChk');
           // !VA If there's a value in the field, then flag is true, so highlight the icon
