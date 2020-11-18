@@ -658,15 +658,22 @@ var Witty = (function () {
             // !VA If the passed-in alias is already present in revealArray, then remove it.
             if (revealArray.includes(alias)) {
               revealArray = revealArray.filter(item => item !== alias);
+              console.log('ALIASES REMOVED: revealArray :>> ');
+              // console.log(revealArray);
             // !VA Otherwise, if the passed-in alias is not present in revealArray, add it.
             } else {
               // console.log('DOES NOT INCLUDE');
               revealArray.push(alias);
+              // console.log('ALIASES ADDED: revealArray :>> ');
             }
           }
           // console.log(`NOW revealArray :>> ${revealArray};`); 
           // !VA Run the delay animation handler
           revealCcpElements(revealArray, ccpArr);
+
+          console.log('revealArray :>> ');
+          console.log(revealArray);
+          console.log(`document.querySelector('#ccp-img-txclr-tfd').classList; :>> ${document.querySelector('#ccp-img-txclr-tfd').classList};`);
 
         }
       }
@@ -4580,6 +4587,15 @@ ${indent}<![endif]-->`;
           reflectAppobj: { reflect: reflectArray },
           highlightIcon: { highlight: highlightArray },
         }
+
+        // !VA 
+
+        if (appObjProp.includes('Anchr')) {
+
+          revealFlag = false;
+          revealArray = [ 'ccpImgTxclrTfd', 'ccpImgTargtChk']
+        }
+
         // !VA If the target is a label for a Class input element, also handle the conceal of the associated Make CSS buttons
         if (appObjProp.includes('Class')) {
           // !VA Replace the ClassTfd string to get the Make CSS button group alias
@@ -4588,9 +4604,10 @@ ${indent}<![endif]-->`;
           revealFlag = true;
           // !VA Set the alias of the Make CSS buttons to conceal
           revealArray = [ mkcssProp ];
-          // !VA Add the revealElements to the config 
-          configObj.revealElements = { caller: 'handleIconClick', flag: revealFlag, reveal: revealArray }
+
         }
+        // !VA Add the revealElements to the config 
+        configObj.revealElements = { caller: 'handleIconClick', flag: revealFlag, reveal: revealArray }
         // !VA Run the configuration
         UIController.configCCP( configObj);
 
@@ -4722,6 +4739,7 @@ ${indent}<![endif]-->`;
           UIController.configCCP( configObj );
         // !VA Show the options for the IMG anchor text input field
         } else if (tar.id === 'ccp-img-anchr-ipt') {
+          console.log('HIT');
           // !VA The 2 elements that are dependent on the anchor input value
           revealArray = makeAliasArray('ccpImgTxclrTfd', 'ccpImgTargtChk');
           // !VA If there's a value in the field, then flag is true, so highlight the icon
