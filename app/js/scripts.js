@@ -618,7 +618,6 @@ var Witty = (function () {
       console.clear();
       console.log(`revealElements caller :>> ${caller}; flag :>> ${flag}; revealElements: revealArray :>> ${revealArray}; `);
       let el, revealedArray = [];
-      var foo;
       console.log('revealElements initArray :>> ');
       console.log(initArray);
       console.log('revealElements revealArray :>> ');
@@ -1654,6 +1653,7 @@ var Witty = (function () {
     // !VA CBController   
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
     function buildOutputNodeList( id ) {
+      console.log(`buildOutputNodeList id :>> ${id};`);
       let selectedTdOption, hasAnchor, hasWrapper, Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
       // !VA Set hasAnchor if ccpImgAnchrTfd has a value
       appController.getAppobj('ccpImgAnchrTfd')  ? hasAnchor = true : hasAnchor = false;
@@ -1666,6 +1666,9 @@ var Witty = (function () {
       // !VA Get the top node, i.e. tableNodeFragment. 
       tableNodeFragment = makeTableNode( id, Attributes );
       // !VA Create the full nodeList from the tableNodeFragment. If tableNodeFragment is null, return to abort without creating Clipboard object.
+
+      // !VA Branch: 111920B
+      console.log(`buildOutputNodeList tableNodeFragment  :>> ${tableNodeFragment };`);
       try {
         nl = tableNodeFragment.querySelectorAll('*');
       } catch (e) {
@@ -2053,6 +2056,7 @@ var Witty = (function () {
     // !VA CBController   
     // !VA Builds the imgNode that is appended to the tdNode, that is in turn appended to the tableNode to generate the clipboard output. The individual attributes of the node (i.e. class, alt, etc) are received in the Attributes argument, which is originally created in getAttributes and called in buildOutputNodeList. Each property of the Attributes object contains any logic required to create the Attribute, but the logic of WHETHER the Attribute is to be included in the imgNode is 
     function makeImgNode ( id, Attributes ) {
+      console.log(`makeImgNode id :>> ${id};`);
       // !VA Id is passed but not used here,  because we're only building the node.
       let imgNode, returnNodeFragment, textColorProp;
       // !VA Create the image node
@@ -2095,12 +2099,14 @@ var Witty = (function () {
         returnNodeFragment.appendChild(imgNode);
       }
       // !VA return the imgNode as node fragment
+      console.log(`makeImgNode returnNodeFragment :>> ${returnNodeFragment};`);
       return returnNodeFragment;
     }
 
     // !VA Make the TD node
     // !VA CBController   
     function makeTdNode( id, Attributes ) {
+      console.log(`makeTdNode id :>> ${id};`);
       // !VA Variables for error handling - need to include this in the return value so the Clipboard object can differentiate between alert and success messages. 
       let isErr;
       // !VA Query Appobj to get the selected TD option
@@ -2229,6 +2235,7 @@ var Witty = (function () {
     // !VA Make the table node, including parent and wrapper table if selected
     // !VA CBController   
     function makeTableNode( id, Attributes ) {
+      console.log(`makeTableNode id :>> ${id};`);
       // !VA Variables for parent and wrapper table, parent and wrapper tr, and wrapper td. Parent td is called from makeTdNode and is appended to tdNodeFragment. tableNodeFragment is the node that contains the entire nodelist which is returned to buildOutputNodeList
       let tableOuter, trOuter, tdOuter, tableInner, trInner, tdNodeFragment, tableNodeFragment;
       tableNodeFragment = document.createDocumentFragment();
@@ -2262,9 +2269,6 @@ var Witty = (function () {
       tableInner.appendChild(trInner);
       // !VA Get the inner TD from makeTdNode and append it to the nodeFragment
       tdNodeFragment = makeTdNode( id, Attributes );
-
-
-
 
       
       // !VA If tdNodeFragment is null, then there was an error in makeTdNode, so console the error and return null to buildOutputNodeList to abort.
@@ -2313,7 +2317,10 @@ var Witty = (function () {
       tdOuter.appendChild(tableInner);
       // !VA Pass the outer table to the tableNodeFragment and return it.
       tableNodeFragment.appendChild(tableOuter);
-      // !VA Branch: 111320B
+      // !VA Branch: 111920B
+      console.log(`makeTableNode tableNodeFragment :>> ${tableNodeFragment};`);
+
+
       return tableNodeFragment;
     }
     // !VA  END NODE FUNCTIONS
@@ -2963,7 +2970,8 @@ ${indent}<![endif]-->`;
         }
         // !VA Run the Clipboard building routine based on the click target. 
         switch(true) {
-        case targetid.includes('cbhtm') :
+        
+        case targetid.includes('cbhtm') || targetid.includes('ipt'):
         // case targetid.includes('tag') || targetid.includes('fluid') || targetid.includes('fixed') :
           buildOutputNodeList (targetid);
           break;
@@ -3824,6 +3832,7 @@ ${indent}<![endif]-->`;
     // !VA appController   
     // !VA Called from tbClickables event handler. Handles clicks on the Toolbar increment/decrement buttons and handles blur for Toolbar and ccpUserInput input elements. NOTE: This used to be where blur on all inputs was handled but that is now in handleBlur where it belongs.
     function handleMouseEvents(evt) {
+      // console.log('handleMouseEvents running'); 
       // !VA elId adds the hash to evt.target.id
       let elId = '#' + evt.target.id;
       // !VA val is a temporary variable to mutate evt.target.value into Appobj.curImgW. retVal is the value returned by checkNumericInput, i.e. either an integer or false if validation fails. 
@@ -3920,6 +3929,8 @@ ${indent}<![endif]-->`;
     // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Calls handleUserInput which validates the input and returns either an integer or a string and passes the value to applyInputValue to write to Appobj and the DOM. Then, for curImgW/curImgH, sets the input value to '' so the placeholder shows through. For all other input elements, sets the input value to the respective Appobj property.
     // !VA NOTE: Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances to the next field.
     function handleKeydown(evt) {
+      console.log('handleKeydown running');
+      console.log(`evt.target.id :>> ${evt.target.id};`);
       let retVal, reflectArray = [], highlightArray = [], configObj = {};
       // !VA Get the keypress
       let keydown = evt.which || evt.keyCode || evt.key;
@@ -3936,7 +3947,7 @@ ${indent}<![endif]-->`;
         let { appObjProp } = userInputObj;
         // !VA Call handleUserInput to validate the user input and process it based on the input type (i.e. Toolbar or CCP input). retVal will return either an empty string, a valid value, or FALSE if checkUserInput detects an input error.
         if (keydown === 13) {
-          // console.log('ENTER key');
+          console.log('ENTER key');
           // !VA Handling zero values now on ENTER the same way they are handled in handleBlur. '
           // !VA TODO: In fact, this is the exact same routine, so DRYify it in a private function. 
           // !VA Skip straight to handleUserInput if appObjProp is a Toolbar input, which cannot have a 0 or empty value
@@ -3970,6 +3981,21 @@ ${indent}<![endif]-->`;
               this.select();
             }
           } 
+          // !VA Branch: 111920B
+          if (evt.getModifierState('Shift')) {
+            console.log('SHIFT pressed');
+            CBController.doClipboard(evt);
+          } else if ( evt.getModifierState('Control')) {
+            console.log('CTRL pressed');
+          } else if ( evt.getModifierState('Alt')) {
+            console.log('ALT pressed');
+          } else {
+            console.log('No modifier pressed');
+          }
+
+
+          // CBController.doClipboard(evt);
+
         } else if ( keydown === 9) {
           // !VA NOTE: TAB key is handled by handleBlur, so do nothing here.
           // console.log('TAB key');
@@ -4596,13 +4622,12 @@ ${indent}<![endif]-->`;
         configObj = {
           reflectAppobj: { reflect: reflectArray },
           highlightIcon: { highlight: highlightArray },
-        }
-        // !VA Branch: 111820B
-        // !VA This doesn't work
+        };
+        // !VA Handle the reveal state of the IMG Anchr dependent elements: ccpImgTxclrTfd' and 'ccpImgTargtChk
         if (appObjProp.includes('Anchr')) {
-          revealFlag = false;
-          revealArray = [ 'ccpImgTxclrTfd', 'ccpImgTargtChk']
-          configObj.revealElements = { caller: 'handleIconClick', flag: revealFlag, reveal: revealArray }
+          revealFlag = true;
+          revealArray = [ 'ccpImgTxclrTfd', 'ccpImgTargtChk'];
+          configObj.revealElements = { caller: 'handleIconClick', flag: revealFlag, initArray: fetchRevealArray('init'), revealArray: revealArray };
         }
 
         // !VA If the target is a label for a Class input element, also handle the conceal of the associated Make CSS buttons
@@ -4614,7 +4639,7 @@ ${indent}<![endif]-->`;
           // !VA Set the alias of the Make CSS buttons to conceal
           mkcssArray = [ mkcssProp ];
           // !VA Add the revealMkcss elements to the config
-          configObj.revealMkcss = { caller: 'handleIconClick', flag: true, revealArray: mkcssArray }
+          configObj.revealMkcss = { caller: 'handleIconClick', flag: true, initArray: fetchRevealArray('init'), revealArray: mkcssArray };
         }
 
         // !VA Add the revealElements to the config 
@@ -4738,10 +4763,11 @@ ${indent}<![endif]-->`;
           // !VA The 2 elements that are dependent on the anchor input value
           revealArray = makeAliasArray('ccpImgTxclrTfd', 'ccpImgTargtChk');
           // !VA If there's a value in the field, then flag is true, so highlight the icon
-          flag ? tar.classList.add('active') : tar.classList.remove('active');
-          // !VA If there's a value in the field and flag is true, then set the revealElements flag to false to remove the conceal class and reveal the elements.
+          flag ? tar.classList.remove('active') : tar.classList.add('active');
+          // !VA If there's a value in the field and flag is true, then set the revealElements to the dependent elements of the IMG Anchr input, i.e. ccpImgTxclrTfd and ccpImgTargtChk. If there is no value in the field, pass and empty arry to revealElements to restore the default configuration, i.e. reveal ccpImgTxclrTfd and ccpImgTargtChk.  
+          flag ? revealArray = makeAliasArray('ccpImgTxclrTfd', 'ccpImgTargtChk') : revealArray = [];
           configObj = {
-            revealElements: { caller: 'handleTextInputEvent', flag: !flag, reveal: revealArray }
+            revealElements: { caller: 'handleTextInputEvent', flag: flag, initArray: fetchRevealArray('init'), revealArray: revealArray }
           };
           UIController.configCCP( configObj );
         } else {
