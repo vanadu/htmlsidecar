@@ -395,31 +395,35 @@ var Witty = (function () {
 
 
     // !VA UIController private
+    // !VA Branch: 111920A
+    // !VA I'm not sure if this is still true. I think now the default reflect configuration comes from configDefault.
     // !VA If called from populateAppobj, returns the value of text input fields as hard-coded in the HTML. Otherwise, called by configCCP, which receives an array of aliases whose corresponding CCP element value is set to its corresponding Appobj value. 
     function reflectAppobj( reflectArray) { 
-
+      // console.log('reflectAppobj running'); 
       let el, isInit, retVal, toolbarAliases;
-
+      // !VA Loop through all the aliases in the reflectArray parameter
       for (const alias of reflectArray) {
-        // console.log('alias :>> ' + alias);
+        // !VA If there is no corresponding Appobj property for the alias, set isInit to true, otherwise false
         typeof(appController.getAppobj(alias)) === 'undefined' ? isInit = true : isInit = false;
         // !VA Ignore toolbar aliases here - they do not need to be reflected and probably should not have been passed in from handleBlur. For later. 
         toolbarAliases = ['curImgW', 'curImgH', 'imgViewerW', 'sPhonesW', 'lPhonesH' ];
         if (!toolbarAliases.includes( alias)) {
-          // !VA Branch: 111120C
-          // !VA Fix this
-          var Appobj;
-
+          // !VA Handle the CCP inputs. Ignore the toolbar inputs, they will never be 'reflected' since they are immutably called from the curImg and imgViewer.
           el = document.querySelector(ccpUserInput[alias].replace('tfd', 'ipt'));
           if (isInit) {
+            // !VA Branch: 111920A
+            // !VA Not sure whether this is still applicable.
             // !VA TODO: Deleting the value on init should reset all input fields to empty strings, thereby exposing whatever preset value attributes in the HTML. This should actually make resetting input elements to empty in configDefault redundant. For later...
             el.value = '';
             retVal = el.value;
+            // !VA If initializing, return an empty string for the property value
             return retVal;
+          // !VA Otherwise, set the element value to the current Appobj value.
           } else {
             el.value = appController.getAppobj( alias );
           }
         } else {
+          // !VA If the alias is a toolbar alias, just return - 
           return;
         }
       }
@@ -511,6 +515,11 @@ var Witty = (function () {
     //   return newArr;
     // }
 
+    // !VA UIController private
+    // !VA Resets all the reveal aliases to the default array
+    // !VA Branch: 111920A
+    // !VA I'm not sure this will survive this branch's review of the reveal functionality
+
     function revealReset( alias ) {
       let el, defaultArr, iswapArr, resetArr;
       // !VA First, create the default reset array
@@ -565,93 +574,53 @@ var Witty = (function () {
       // !VA Array of table wrapper aliases
       let wraprArr;
       wraprArr =  [ 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd',  'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
-      // !VA There are conditions in which ccpTbwMaxwdTfd should not be revealed, so in those cases remove that alias from the array
+      // !VA There are conditions, i.e. the TD swtch option, in which ccpTbwMaxwdTfd should not be revealed, so in those cases remove that alias from the array
       if (appController.getAppobj('ccpTdaOptnsRdo') === 'swtch') {
-        console.log('SWTCH selected');
+        // console.log('SWTCH selected');
         wraprArr = wraprArr.filter( alias => alias !== 'ccpTbwMaxwdTfd');
-        console.log('wraprArr :>> ');
-        console.log(wraprArr);
-
-
+        // console.log('wraprArr :>> ');
+        // console.log(wraprArr);
       }
       // !VA Conceal class name
       clss = 'ccp-conceal-ctn';
       // !VA Loop through wraprArr and apply/remove the conceal class
-      // for (const alias of wraprArr) {
-      for (var i = 0; i < wraprArr.length; i++) {
+      for (let i = 0; i < wraprArr.length; i++) {
         (function (i) {
           setTimeout(function () {
             el = document.querySelector(ccpUserInput[wraprArr[i]]);
             flag ? el.classList.remove(clss) : el.classList.add(clss);
-          // !VA Pause 25 milliseconds between iterations
+          // !VA Pause 35 milliseconds between iterations
           }, 35 * i);
         })(i);
       }
     }
 
-    function resetMkcss(caller, bool) {
-      console.log(`reset Mkcss caller :>> ${caller};`);
-      const mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ];
-      const classArray = [ 'ccpImgClassTfd', 'ccpTdaClassTfd', 'ccpTblClassTfd' ];
-      let el, chldrn;
-
-
-      for (let i = 0; i < mkcssArray.length; i++) {
-        console.log('resetMkcss mkcssArray[i] is: ' +  mkcssArray[i]);
-        el =document.querySelector(ccpUserInput[mkcssArray[i]]);
-        console.log(`resetMkcss el :>> ${el};`);
-        console.log(`resetMkcss classArray[i] :>> ${classArray[i]};`);
-        chldrn = el.children;
-        console.log(`resetMkcss chldrn :>> ${chldrn};`);
-        for (const chld of chldrn) {
-          chld.classList.add('ccp-conceal-ctn');
-        }
-
-        
-        // if (appController.getAppobj(classArray[i])) {
-        //   console.log('HIT');
-        //   el.classList.remove('ccp-conceal-ctn');
-
-        // } else {
-        //   el.classList.add('ccp-conceal-ctn');
-        // }
-      }
-
-    }
 
     // !VA UIController private
-    // !VA Branch: 111820B
     // !VA Resets or reveals Make CSS buttons. flag determines whether to reveal/conceal, true is conceal, false is reveal. mkcssArray is the array of elements to reveal/conceal. if aliasArray is an empty array, then reset all Make CSS buttons to concealed. There should be no condition where both a reset and a reveal/conceal of a specific element is required.
-
     function revealMkcss(caller, flag, revealArray) {
       let el, chldrn;
-      console.log(`revealMkcss caller :>> ${caller}; flag :>> ${flag}; revealArray :>> ${revealArray}`);
-      
+      // console.log(`revealMkcss caller :>> ${caller}; flag :>> ${flag}; revealArray :>> ${revealArray}`);
+      // !VA Loop through the revealArray of aliases, get the DOM element for the Make CSS parent group alias 
       for (let i = 0; i < revealArray.length; i++) {
-        console.log('revealArray[i] is: ' +  revealArray[i]);
-        el =document.querySelector(ccpUserInput[revealArray[i]]);
-        console.log(`revealMkcss el :>> ${el};`);
-        // console.log(`revealMkcss classArray[i] :>> ${classArray[i]};`);
+        el = document.querySelector(ccpUserInput[revealArray[i]]);
+        // !VA Get the children of the current element and run the routine to conceal/reveal the children
         chldrn = el.children;
-        console.log(`revealMkcss chldrn :>> ${chldrn};`);
         revealCcpChildren(flag, chldrn);
       }
 
       function revealCcpChildren(flag, chldrn) {
-        console.log(`revealCcpChildren flag :>> ${flag}; chldrn :>> ${chldrn}`);
-
-        // !VA Iterate through the child element array of the current aliasArray item
+        // console.log(`revealCcpChildren flag :>> ${flag}; chldrn :>> ${chldrn}`);
+        // !VA Iterate through the child element array of the current revealArray item
         for (var i = 0; i < chldrn.length; i++) {
           // !VA Pause between each iteration 
           (function (i) {
             setTimeout(function () {
               // !VA If flag is false, remove the class
               if (!flag) {
-                console.log('REMOVE');
                 chldrn[i].classList.remove('ccp-conceal-ctn');
               // !VA If flag is true, add the class
               } else if (flag) {
-                console.log('ADD');
                 chldrn[i].classList.add('ccp-conceal-ctn');
               } else {
               // !VA If the action isn't recognized, log an error
@@ -694,7 +663,6 @@ var Witty = (function () {
           // !VA Initialize revealArray to defaultArray. Aliases will be added to or removed from revealArray based on the parameter array passed in from configObj. The result is an array of aliases to be revealed, whereby alias not in the list is concealed.
 
 
-          // console.clear();
           // !VA Branch: 111820A
           // !VA First generate a collection of all the ccp elements based on the REVEALED ccp-ctn class
           // !VA If we get the whole collection of ctn elements, we have to remove the concealed ones. Also, we shouldn't include any of the mkcss elements because they are handled elsewhere. Ideally we'd work with aliases at this point and not create elements until later.
@@ -4574,9 +4542,8 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from event handlers on CCP labels to remove any input field content, remove the 'active' class from the input element related to the clicked label icon, and remove ccp-conceal-ctn class from the Make CSS buttons.NOTE: evt.target.value will always be undefined because the target element is a label. To get a value, target the input element, i.e. the htmlFor of the target label. 
     function handleIconClick(evt) {
-      console.clear();
-      console.log(`handleIconClick evt.target.id :>> ${evt.target.id};`);
-      let appObjProp, evtTargetId, ipt, reflectArray, mkcssArray;
+      // console.log(`handleIconClick evt.target.id :>> ${evt.target.id};`);
+      let appObjProp, evtTargetId, reflectArray, mkcssArray, highlightArray, revealArray, revealFlag, mkcssProp;
       let configObj = {};
       // !VA get the id of the target label element
       evtTargetId = evt.target.id;
@@ -4586,7 +4553,7 @@ ${indent}<![endif]-->`;
       if (evt.target.id !== 'ccp-tda-padng-icn') {
         // !VA Set the Appobj property of the input to empty, i.e. the value after the icon click.
         Appobj[appObjProp] = '';
-        // !VA Reflect the Appobj value to and highlight the appObjProp element. NOTE: appObjProp element is set in CSS to highlight its sibling label element.
+        // !VA Reflect the Appobj value to and highlight the appObjProp element. NOTE: appObjProp element is set in CSS to highlight its sibling label element, i.e. the icon.
         reflectArray = [ appObjProp ];
         highlightArray = [ appObjProp ];
         // !VA Set reflect and highlight in configObj
@@ -4595,6 +4562,7 @@ ${indent}<![endif]-->`;
           highlightIcon: { highlight: highlightArray },
         }
         // !VA Branch: 111820B
+        // !VA This doesn't work
         if (appObjProp.includes('Anchr')) {
           revealFlag = false;
           revealArray = [ 'ccpImgTxclrTfd', 'ccpImgTargtChk']
@@ -4693,28 +4661,22 @@ ${indent}<![endif]-->`;
     // !VA Handle the logic associated with user-initiated text input.  1) If the element has an icon associated, highlight the icon on user input 2) If the text element is a padding input, highlight the padding icon if any of the padding text input elements have user input 3) If the text input element is a class input, show the Make CSS buttons. 4) If the text input element is the IMG anchor input, show the IMG text color and IMG targt parent elements. NOTE: There are a lot of references to IDs here: consider adding aliases for the elements whose IDs are referenced literally.
     // !VA NOTE: This function is in appController the actions are distinct from the actions in configCCP. Those controls pertain to specific option configurations that functionally depend on a selected option. These options below only make other options available if a text input is entered. Perhaps an insignificant distinction, but a valid one - all the configCCP react to checkbox state changes, not input values.
     function handleTextInputEvent(evt) {
-      console.log('handleTextInputEvent running'); 
-      let tar, flag;
-      let configObj = {};
-      let resetFlag, revealArray = [], mkcssArray = [];
-      let classArray = [ 'ccp-img-class-ipt', 'ccp-tda-class-ipt', 'ccp-img-class-ipt'];
+      // console.log('handleTextInputEvent running'); 
+      let tar, flag, configObj = {}, revealArray = [], mkcssArray = [];
 
-      let classObj = {};
       // !VA classObj is used to match Make CSS button element aliases with their respective class input ID.
-      classObj = {
+      const classObj = {
         ccpImgMkcssGrp: 'ccp-img-class-ipt',
         ccpTdaMkcssGrp: 'ccp-tda-class-ipt',
         ccpTblMkcssGrp: 'ccp-tbl-class-ipt'
-      }
+      };
       // !VA Get the event target to a variable 'tar'
       tar = evt.target;
-
-      // !VA If there is a value in the input element, then flag = false, i.e. ccp-conceal-ctn is NOT applied and the dependent elements are revealed. If there is no value, ccp-conceal-ctn is applied and the dependent elements are concealed.
+      // !VA If there is a value in the input element, then flag = false, if there is no value, flag is true.
       tar.value ? flag = false : flag = true;
-      
-      // !VA If the event was NOT triggered by a padding element...
+      // !VA Handle all cases where the event target is NOT  a padding element.
       if (!tar.id.includes('tda-pd')) {
-        // !VA Handle the reveal/conveal of the Make CSS buttons for the respective Class inputs.If the input has a value, add the active class, otherwise remove it. The active class on the input applies the properties to the adjacent sibling, i.e. the label, as defined in the CSS.
+        // !VA Handle the reveal/conveal of the Make CSS buttons for the respective Class inputs.If the input has a value, add the active class, otherwise remove it. The active class on the input applies the highlight properties to the adjacent sibling icon, i.e. the label, as defined in the CSS.
         // !VA If the target id is in the list of values in classObj, then it is a class input, so process the reveal/conceal property if the corresponding Make CSS buttons.
         if ( Object.values(classObj).toString().includes( tar.id )) {
           // !VA Loop through the key/value pairs in classObj
@@ -5156,36 +5118,23 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from fetchConfigObj to get the TD Option radio group-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
     function configOptns( alias, option ) {
-      let revealFlag, revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray, highlightArray;
+      let revealFlag, revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray, highlightArray, mkcssArray;
       let configObj = {};
-
-      // !VA Branch: 111820B
-      // !VA First, turn off all the Make CSS buttons
-      // configObj.revealMkcss =  {caller: 'configOptns', flag: true, mkcssArray: [] },
-      // UIController.configCCP(configObj);
-
-
-
-
-
 
       // !VA Handle the TD Options CCP configurations
       switch(true) {
       case option === 'basic':
         // !VA For the TD Options basic and swtch, use the default CCP configuration
         configObj = configDefault( alias, option );
-        console.log('Mark1 configObj :>> ');
-        console.log(configObj);
         // !VA Set the flag to conceal items in revealArray
+        // !VA Branch: 111920A
+        // !VA Why is the revealFlag being set here?
         revealFlag = false;
-        mkssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ]
-        configObj.revealMkcss =  {caller: 'configOptns', flag: true, revealArray: mkssArray }
-
-
+        mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ]
+        configObj.revealMkcss =  {caller: 'configOptns', flag: true, revealArray: mkcssArray };
         break;
 
       case option === 'iswap':
-
         // !VA SET APPOBJ PROPERTIES FOR ISWAP
         // !VA Show the table wrapper options
         Appobj.ccpTblWraprChk = true;
@@ -5202,46 +5151,32 @@ ${indent}<![endif]-->`;
         Appobj.ccpTblMaxwdTfd = '';
         Appobj.ccpTbwMaxwdTfd = '';
 
-        // !VA reflectAppobj METHOD
-        // !VA Array of elements whose values are set to the Appobj properties above
+        // !VA reflectAppobj METHOD: Array of elements whose values are set to the Appobj properties above
         reflectArray = ['ccpImgClassTfd', 'ccpImgItypeRdo', 'ccpTdaBgclrTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
-        
-        // !VA checkboxState METHOD
-        // !VA Array of checkboxes whose checked state is to be set based on the Appobj property setting above.
+        // !VA checkboxState METHOD: Array of checkboxes whose checked state is to be set based on the Appobj property setting above.
         checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk'];
-
-        // !VA radioState METHOD
-        // !VA Array of radio groups whose selection state is set based on the Appobj property above. The reveal
+        // !VA radioState METHOD: Array of radio groups whose selection state is set based on the Appobj property above. The reveal
         radioArray = [ 'ccpTblAlignRdo' , 'ccpTbwAlignRdo' ];
-
-        // !VA revealElements METHOD
-        // !VA revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
+        // !VA Branch: 111920A
+        // !VA I'm not sure this description still applies
+        // !VA revealElements METHOD: revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
         revealFlag = false;
         // !VA Branch: 110720A changed revealed to concealed below
         // !VA Array of elements to be concealed. 
         // !VA Branch: 110920A
         // !VA The only change from the default config is concealing TD Width and TD Height
-
-        // revealArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd'];
         revealArray = fetchRevealArray('iswap');
-
-        // !VA radioState METHOD
-        // !VA Array of radio elements whose checked state to set
+        // !VA radioState METHOD: Array of radio elements whose checked state to set
         radioArray = [ 'ccpImgItypeRdo' ];
-
         // !VA Branch: 102220A
         // !VA Should wrapper be shown by default?
         selectCheckbox( true, 'ccpTblWraprChk');
-
-        // !VA disableElements METHOD
-        // !VA disableFlag is always true. This isn't a toggle. Elements stay disabled until a different option with a different config is selected.
+        // !VA disableElements METHOD: disableFlag is always true. This isn't a toggle. Elements stay disabled until a different option with a different config is selected.
         // !VA Only disabling IMG class for now.
         disableFlag = false;
-        // disableArray =  [ 'ccpImgClassTfd', 'ccpTblClassTfd','ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblAlignRdo' ];
         disableArray =  [ 'ccpImgClassTfd' ];
-
+        // !VA revealMkcss METHOD: Conceal/reveal Make CSS buttons
         mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTblMkcssGrp'];
-
         // !VA Set the configObj with the methods and properties to configure
         configObj = {
           revealMkcss: {caller: 'configOptns', flag: false, revealArray: mkcssArray},
@@ -5249,6 +5184,8 @@ ${indent}<![endif]-->`;
           reflectAppobj: { reflect: reflectArray },
           radioState: { radio: radioArray },
           disableElements: { flag: disableFlag, disable: disableArray },
+          // !VA Branch: 111920A
+          // !VA Review if this comment still applies
           // !VA the revealReset array, iswapArr,  is set in revealReset. It includes all elements that are revealed by default except ccpImgCbhtmlBut because the img tag can't be output to the cliboard with the iswap option. iswap requires a TD or higher.
           revealElements:  { caller: 'configOptns', flag: revealFlag, reveal: revealArray }
         };
@@ -5256,35 +5193,42 @@ ${indent}<![endif]-->`;
         
       case option === 'swtch':
         // !VA Branch: 110120B
-        // !VA TD posswitch option has the same config except TBL Width = imgViewerW. NOTE: That is the default config. Users can change 
+        // !VA TD posswitch option has the same config except TBL Width = imgViewerW. NOTE: That is the default config. 
         // !VA Get the default config
         configObj = configDefault( alias, option );
         // !VA Override default to set TBL Width to the viewer width for the TD posswitch option
         Appobj.ccpTblWidthTfd = Appobj.imgViewerW;
         // !VA TD posswitch must align center in RTL TD. That could be hardcoded in makeTdNode if different Align and Valign are required for the child TDs, but apply these settings to all TDs in the posswitch TDs for now.
+        // !VA Branch: 111920A
+        // !VA Review if the align/valign options apply to both parent and wrapper table
         Appobj.ccpTdaAlignRdo = 'center';
         Appobj.ccpTdaValgnRdo = 'middle';
         Appobj.ccpTblClassTfd = 'devicewidth';
         // !VA Set the flag to conceal items in revealArray
-        option = false;
-  
-        // !VA Branch: 111020B
-        // !VA Overwrite the default revealArray in the configObj called from configDefault
-        // !VA Branch: 111820B
-        // !VA Where is the Mkcss reset/reveal?
-
+        // !VA Branch: 111920A
+        // !VA This is wrong -- the flag is 'flag', not 'option'
+        // option = false;
+        // !VA checkboxState METHOD: set the checkboxes whose checked value is to be set to the Appobj properties above.
+        checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpImgTargtChk' ];
+        // !VA radioState METHOD: Array of radio elements whose checked state to set
+        radioArray = [ 'ccpImgItypeRdo' ];
+        // !VA Set the array for the revealMkcss METHOD: 
         mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp'];
-
+        // !VA Get the revealArray for the revealElements METHOD.
         revealArray = fetchRevealArray('swtch');
         configObj = {
           revealMkcss: {caller: 'configOptns', flag: true, revealArray: mkcssArray},
           checkboxState: { checked: checkedArray },
           radioState: { radio: radioArray },
-          disableElements: { flag: disableFlag, disable: disableArray },
+          // disableElements: { flag: disableFlag, disable: disableArray },
+          // !VA Branch: 111920A
+          // !VA Review the use of revealReset.
           // !VA the revealReset array, iswapArr,  is set in revealReset. It includes all elements that are revealed by default except ccpImgCbhtmlBut because the img tag can't be output to the cliboard with the iswap option. iswap requires a TD or higher.
           revealElements:  { caller: 'configOptns', flag: revealFlag, reveal: revealArray }
         };
-        delete configObj.revealReset;
+        // !VA Branch: 111920A
+        // !VA This doesn't do anything. configObj is now defined for each option condition separately
+        // delete configObj.revealReset;
         break;
         
       case option === 'bgimg':
@@ -5304,23 +5248,16 @@ ${indent}<![endif]-->`;
         Appobj.ccpTblMaxwdTfd = '';
         Appobj.ccpTbwMaxwdTfd = '';
 
-        // !VA reflectAppobj METHOD
-        // !VA Array of elements whose values are set to the Appobj properties above
+        // !VA reflectAppobj METHOD: Array of elements whose values are set to the Appobj properties above
         reflectArray = ['ccpImgClassTfd', 'ccpImgItypeRdo', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdparGrp', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
-
         // !VA revealElements METHOD - Elements to conceal
         revealArray = fetchRevealArray('bgimg');
-
-        // !VA radioState METHOD
-        // !VA Array of radio elements whose checked state to set
+        // !VA radioState METHOD: Array of radio elements whose checked state to set
         radioArray = [ 'ccpImgItypeRdo' ];
-
-        // !VA checkboxState METHOD
-        // !VA Array of checkbox elements whose checked state to set
+        // !VA checkboxState METHOD: Array of checkbox elements whose checked state to set
         checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk' ];
-
-
-        mkssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ]
+        // !VA revealMkcss METHOD: conceal/reveal Make CSS buttons
+        mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ]
         // !VA Set the configObj with the methods and properties to configure
         configObj = {
           revealMkcss: {caller: 'configOptns', flag: true, revealArray: mkcssArray},
@@ -5345,39 +5282,26 @@ ${indent}<![endif]-->`;
         Appobj.ccpTdaTxclrTfd = '#FFFFFF';
         Appobj.ccpTdaBdclrTfd = '#1e3650';
         Appobj.ccpTdaBdradTfd = 4;
-        // !VA Branch: 110120C
-        // !VA Adding
         Appobj.ccpTdaAlignRdo = 'center';
         Appobj.ccpTdaValgnRdo = 'middle';
         Appobj.ccpTblWidthTfd = Appobj.curImgW;
         Appobj.ccpTbwWidthTfd = Appobj.imgViewerW;
         Appobj.ccpTblMaxwdTfd = '';
         Appobj.ccpTbwMaxwdTfd = '';
-
-
-        // !VA reflectAppobj METHOD
-        // !VA Array of elements whose values are set to the Appobj properties above
+        // !VA reflectAppobj METHOD: Array of elements whose values are set to the Appobj properties above
         reflectArray = ['ccpImgClassTfd', 'ccpImgItypeRdo', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaHeigtTfd',  'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTdaBdradTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
-        
-        // !VA checkboxState METHOD
-        // !VA Array of checkbox elements whose checked state to set
+        // !VA checkboxState METHOD: Array of checkbox elements whose checked state to set
         checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk' ];
-
-        // !VA radioState METHOD
-        // !VA Array of radio elements whose checked state to set
+        // !VA  radioState METHOD: Array of radio elements whose checked state to set
         radioArray = [ 'ccpImgItypeRdo', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo' ];
-
-        // !VA revealElements METHOD
-        // !VA revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
+        // !VA revealElements METHOD: revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
+        // !VA Branch: 111920A
+        // !VA Check if revealFlag is still applicable
         revealFlag = false;
         // !VA Array of elements to be revealed.
-        // !VA revealElements METHOD - Elements to conceal
-        // !VA Branch: 111020B
-        // revealArray = [ 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaPdparGrp' ];
         revealArray = fetchRevealArray('vmlbt');
-
-        mkssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ]
-
+        // !VA revealMkcss METHOD: conceal/reveal Make CSS buttons
+        mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ]
         // !VA Set the configObj with the methods and properties to configure
         configObj = {
           revealMkcss: {caller: 'configOptns', flag: true, revealArray: mkcssArray},
@@ -5395,13 +5319,13 @@ ${indent}<![endif]-->`;
       highlightArray = getInputArray();
       // !VA Add the highlightIcon property to configObj and return
       configObj.highlightIcon = { highlight: highlightArray};
-
-      console.log(`configOptns option :>> ${option}; configObj.revealElements.reveal.length :>> ${configObj.revealElements.reveal.length};`);
+      // console.log(`configOptns option :>> ${option}; configObj.revealElements.reveal.length :>> ${configObj.revealElements.reveal.length};`);
       return configObj;
     }
 
+    // !VA appController private
     // !VA Branch: 110120B
-    // !VA Added
+    // !VA Returns an array of input element aliases
     function getInputArray() {
       const iptArray = [];
       for (const key of Object.keys(ccpUserInput)) {
@@ -5412,10 +5336,10 @@ ${indent}<![endif]-->`;
       return iptArray;
     }
 
-
+    // !VA appController private
+    // !VA Returns the revealArray for all the options based on the five-character option code. The only option not included here is 'basic', which gets its revealArray from configDefault
     function fetchRevealArray( option ) {
       let revealArray;
-
       if (option === 'iswap') {
         revealArray = [ 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd',  'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];  
         // revealArray = [  ];  
@@ -5439,8 +5363,6 @@ ${indent}<![endif]-->`;
       return revealArray;
     }
 
-
-
     // !VA appController private
     // !VA Called from fetchConfigObj to get the Table Wrapper checkbox icon-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
     function configWrapr( isChecked ) {
@@ -5459,7 +5381,6 @@ ${indent}<![endif]-->`;
     function configHybrd( alias, isChecked ) {
       let checkedArray, radioArray, reflectArray, revealFlag, revealArray, highlightArray;
       let configObj = {};
-
       // !VA APPOBJ PROPERTIES FOR CONFIGURING THE HYBRID OPTION
       // !VA If Hybrid is checked, set these options
       if (isChecked) {
@@ -5500,36 +5421,18 @@ ${indent}<![endif]-->`;
         Appobj.ccpTbwMaxwdTfd = '';
       }
 
-      // !VA checkboxState METHOD
-      // !VA Set the Wrapper and Hybrid checkbox as properties of the checkboxState method. These two checkboxes will have checked state set by the Appobj property set above.
+      // !VA checkboxState METHOD: Set the Wrapper and Hybrid checkbox as properties of the checkboxState method. These two checkboxes will have checked state set by the Appobj property set above.
       checkedArray = ['ccpTblWraprChk', 'ccpTblHybrdChk'];
-
-      // !VA reflectElements METHOD
-      // !VA Set the array of the elements whose CCP value should be set according to the REFLECT PROPERTIES set above
+      // !VA reflectElements METHOD: Set the array of the elements whose CCP value should be set according to the REFLECT PROPERTIES set above
       reflectArray = ['ccpImgClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
-
-      // !VA radioState METHOD
-      // !VA Set the properties of the radioState method whose selected option is set according to its Appobj properties set in the APPOBJ PROPERTIES section above
+      // !VA radioState METHOD: Set the properties of the radioState method whose selected option is set according to its Appobj properties set in the APPOBJ PROPERTIES section above
       radioArray = [ 'ccpTblAlignRdo' , 'ccpTbwAlignRdo', 'ccpTdaOptnsRdo' ];
-
-      // !VA revealElements METHOD
-      // !VA Set the reveal flag. The reveal flag is the opposite of the isChecked property because the ccp-conceal-ctn class is REMOVED in order to reveal the elements.
+      // !VA revealElements METHOD: Set the reveal flag. The reveal flag is the opposite of the isChecked property because the ccp-conceal-ctn class is REMOVED in order to reveal the elements.
+      // !VA Branch: 111920A
+      // !VA Check if the revealFlag is applicable
       revealFlag = !isChecked;
-      // !VA Set the array of the elements to be revealed  according to the APPOBJ PROPERTIES set above. IMPORTANT: These correspond to the Table Wrapper options. They are being set manually here instead of calling configWrapr to set the configuration for transparency and simplicity's sake. 
-      // !VA Branch: 111020B
       // !VA Call the revealArray from fetchRevealArray
-      // revealArray = [  'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd','ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
       revealArray = fetchRevealArray('hybrd');
-
-      // !VA disableElements METHOD
-      // !VA Set the flag to disable/enable elements. disableFlag is equal to isChecked - it has a different name here only for transparency's sake. 
-      // !VA Branch: 102220A
-      // !VA Deprecated, not accessed
-      // disableFlag = isChecked;
-      // !VA Set the array of the elements to be disabled. 
-      // !VA Leaving disabling out for now
-      // disableArray =  [ 'ccpImgClassTfd', 'ccpTblClassTfd','ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblAlignRdo', 'ccpTblWraprChk', 'ccpTbwClassTfd','ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwAlignRdo' ];
-
       // !VA Get the highlightArray of all input elements to apply the highlight to any input elements whose Appobj property is not empty
       highlightArray = getInputArray();
       // !VA Create the configObj methods with the properties defined above.
@@ -5540,11 +5443,7 @@ ${indent}<![endif]-->`;
         radioState: { radio: radioArray },
         // revealReset: { alias: 'default'},
         revealElements: { caller: 'configHybrd', flag: revealFlag, reveal: revealArray },
-        // !VA Leaving disabling out for now.
-        // disableElements: { flag: disableFlag, disable: disableArray },
-        // disableReset: { alias: 'default'}
       };
-
       return configObj;
     }
 
