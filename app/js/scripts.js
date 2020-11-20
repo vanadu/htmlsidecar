@@ -504,9 +504,7 @@ var Witty = (function () {
 
 
     // !VA UIController private
-    // !VA Branch: 111120C
-    // !VA Deprecating
-    // !VA Remove multiple items from an array. Called from revealReset to remove aliases from the default revealArray
+    // !VA Remove multiple items from an array. Called from revealReset to remove aliases from the default revealArray. Unused but leaving here because it might be useful.
     // function removeFromArray(aliases, array ) {
     //   let newArr = [];
     //   for (let i = 0; i < aliases.length; i++) {
@@ -516,10 +514,9 @@ var Witty = (function () {
     // }
 
     // !VA UIController private
-    // !VA Resets all the reveal aliases to the default array
-    // !VA Branch: 111920A
-    // !VA I'm not sure this will survive this branch's review of the reveal functionality
-
+    // !VA Resets all the reveal aliases to the default array. Called only once at initialization 
+    // !VA Branch: 112020A
+    // !VA This should be folded into revealElements which includes exactly the same function.
     function revealInit( initArray ) {
       // console.log('revealInit running'); 
       let el;
@@ -536,13 +533,6 @@ var Witty = (function () {
           }, 25 * i);
         })(i);
       }
-
-      // !VA Branch: 111920B
-      // !VA This was folded into revealMkcss
-      // !VA Conceal the Make CSS button groups for all configurations
-      // for (const el of document.getElementsByClassName('ccp-mkcss-ctn')) {
-      //   el.classList.add('ccp-conceal-ctn');
-      // }
     }
 
     // !VA UIController private
@@ -624,7 +614,7 @@ var Witty = (function () {
       console.log(revealArray);
 
       // !VA Reveal Reset
-      // !VA Reset all the CCP elements to concealed
+      // !VA Reset all the CCP elements to concealed. NOTE: All ccp-ctn elements are concealed at init, and then the default config in configDefault is applied. This conceal routine resets all the elements affected by the default config to concealed. The initialization state is then restored in the subsequent routine.
       for (const entry of Object.entries(ccpUserInput)) {
         // console.log(`entries[1].substring( 9, 14) :>> ${entries[1].substring(  9, 14 )};`);
         // !VA Select all the revealable CCP element IDs
@@ -634,16 +624,13 @@ var Witty = (function () {
           el.classList.add('ccp-conceal-ctn');
         }
       }
-
       // !VA Reveal the initArray elements - this results in the default reveal configuation as defined in configDefault
       for (let i = 0; i < initArray.length; i++) {
         el = document.querySelector( ccpUserInput[initArray[i]]);
         console.log(`HERE el.id :>> ${el.id};`);
         el.classList.remove('ccp-conceal-ctn'); 
       }
-
-
-
+      
       // !VA Now reveal/conceal the revealArray elements. This routine toggles the reveal status of the current revealElement on and off based on the current reveal/conceal state. If it is currently revealed, this routine conceals it and visa versa.
 
       // !VA Loop through ccpUserInput
@@ -653,7 +640,6 @@ var Witty = (function () {
         if (entries[1].includes('tfd') || entries[1].includes('chk') || entries[1].includes('rdo') || entries[1].substring(9, 14 ) === 'cbhtm') {
           // !VA Get the revealable elements
           el = document.querySelector(entries[1]);
-          foo = el.classList;
           // console.log(`REVEALABLE el.id :>> ${el.id}; foo :>> ${foo};`);
 
           // !VA If the revealable element is currently revealed, conceal it
@@ -695,7 +681,6 @@ var Witty = (function () {
               if (revealArray.includes(revealedArray[i])) {
                 // !VA Get DOM elements for the aliases to reveal
                 el = document.querySelector(ccpUserInput[revealedArray[i]]);
-                // !VA Branch: 111320A
                 el.classList.add('ccp-conceal-ctn');
               // !VA If the current alias in the ccpArr is NOT in the array of elements to be revealed/concealed, then conceal it.
               } else {
@@ -709,81 +694,6 @@ var Witty = (function () {
         }
       }
     }
-
-    
-    // !VA Branch: 111920B
-    function revealElementsOLD( caller, flag, aliasArray) {
-      // console.log(`revealElements caller :>> ${caller}; flag :>> ${flag}; revealElements: aliasArray :>> ${aliasArray}; `);
-      let el, ccpArr, defaultArr, revealArray;
-      for (const alias of aliasArray) {
-        if (alias.includes('Mkcss')) {
-          console.log(`revealElements MKCSS alias :>> ${alias};`);
-          el = document.querySelector(ccpUserInput[alias]);
-          chldrn = el.children;
-          revealCcpChildren(flag, chldrn);
-
-        } else {
-          // console.log(`ELEMENT alias :>> ${alias};`);
-          // console.log('This is a regular alement');
-          // console.log('HANDLING ELEMENTS');
-
-          // !VA Array of ALL CCP elements to compare against the revealArray of the elements to reveal based on the current configObj configuration.
-          ccpArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaPdparGrp', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaTxcntTfd', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTdaBdclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
-  
-          // VA! Default elements to reveal/conceal. This corresponds to the elements revealed by configDefault at initialization. 
-          defaultArr = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaPdparGrp', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
-
-          revealArray = defaultArr;
-  
-          // !VA For each element in the passed-in aliasArray
-          for (const alias of aliasArray) {
-            // !VA If the passed-in alias is already present in revealArray, then remove it.
-            if (revealArray.includes(alias)) {
-              revealArray = revealArray.filter(item => item !== alias);
-              // console.log('ALIASES REMOVED: revealArray :>> ');
-              // console.log(revealArray);
-            // !VA Otherwise, if the passed-in alias is not present in revealArray, add it.
-            } else {
-              // console.log('DOES NOT INCLUDE');
-              revealArray.push(alias);
-              // console.log('ALIASES ADDED: revealArray :>> ');
-            }
-          }
-          // console.log(`NOW revealArray :>> ${revealArray};`); 
-          // !VA Run the delay animation handler
-          revealCcpElements(revealArray, ccpArr);
-          // console.log(`document.querySelector('#ccp-img-txclr-tfd').classList; :>> ${document.querySelector('#ccp-img-txclr-tfd').classList};`);
-        }
-      }
-
-      // !VA Reveal elements not containing children.
-      function revealCcpElements(revealArray, ccpArr) {
-        // !VA Iterate through the array containing all the revealable elements (ccpArr).
-        for (var i = 0; i < ccpArr.length; i++) {
-          // !VA Pause between each iteration 
-          (function (i) {
-            setTimeout(function () {
-              // !VA Now check each alias in the array of CCP elements (i.e. only those elements that can be concealed/revealed. This doesn't include UI items which are always present, i.e. the TBL Wrapr checkbox, etc). If the CCP element is already revealed, conceal it and if it is concealed, reveal it. In other words, toggle the reveal/conceal status based on the presence of the alias in the alias array passed in from configObj.
-              if (revealArray.includes(ccpArr[i])) {
-                // !VA Get DOM elements for the aliases to reveal
-                el = document.querySelector(ccpUserInput[ccpArr[i]]);
-                // !VA Branch: 111320A
-                el.classList.remove('ccp-conceal-ctn');
-              // !VA If the current alias in the ccpArr is NOT in the array of elements to be revealed/concealed, then conceal it.
-              } else {
-                // !VA Get DOM elements for the aliases to conceal
-                el = document.querySelector(ccpUserInput[ccpArr[i]]);
-                el.classList.add('ccp-conceal-ctn');
-              }
-            // !VA Pause 15 milliseconds between iterations
-            }, 10 * i);
-          })(i);
-        }
-      }
-    }
-
-
-
 
     // !VA UIController private
     // !VA Use configCCP to apply/remove the highlight style to input elements, which then adds/removes the filter on the icon, as defined in the CSS. highlightIconPresets in resizeContainers sets the highlight on icons that have a default preset value. Individual icon highlights are set through configObj using the highlight method and the highlightArray array.
@@ -1035,11 +945,6 @@ var Witty = (function () {
         if ( configObj.checkboxState ) {
           checkboxState( configObj.checkboxState.checked );
         }
-        // !VA Branch: 110920A
-        // !VA Deprecating...
-        // if ( configObj.revealParent ) {
-        //   retVal = revealParent( configObj.revealParent.flag, configObj.revealParent.reveal );
-        // }
         if ( configObj.disableReset) {
           disableReset( configObj.disableReset.alias );
         }
@@ -1116,10 +1021,6 @@ var Witty = (function () {
           // !VA Now initialize Appobj with the CCP element values. This includes ALL CCP elements, including those that are displayed/undisplayed depending on which TDOption or imgType radio is selected. 
           // !VA Loop through all the ccpUserInput elements and add their values to Appobj. The last three characters ( 11 - last ) are the alias code that identify the input type
           // !VA  radioState and checkboxState are called here before Appobj has been initialized, so the key argument is 'undefined'. This causes checkboxState and radioState to return the attribute value of the queried element as hard-coded in the HTML, thus initializing Appobj. 
-          // !VA Branch: 102220A
-          // !VA Replace Object.entries with Object.keys, values not accessed here.
-
-
 
           // !VA Branch: 110320A
           // !VA Review this, it may have been made obsolete by configDefault. I removed all the direct calls to the configCCP methods. If there are no repercussions deprecate this annoying resource hog.
@@ -1477,7 +1378,6 @@ var Witty = (function () {
           // !VA Create the padding property. Join the array items, separating them with a space. These are the shorthand CSS values for the 4 padding properties. 
           pdng = 'padding: ' + arr.join(' ');
 
-          // !VA Branch: 111320A
           // !VA Exclude TD Options swtch here, MSDPI for poswitch is handled in  setPosSwitchNodeAttributes
           if (Appobj.ccpTdaOptnsRdo !== 'swtch') {
             // !VA Create the width property for the MSDPI option
@@ -1542,21 +1442,20 @@ var Witty = (function () {
           let msdpi, maxwd;
           // !VA Branch: 111320A
           // !VA Exclude TD Options swtch here. MSDPI for poswitch is handled in setPosSwitchNodeAttributes and there is no style property for max-width defined in setPosSwitchNodeAttributes, so that condition isn't applicable for TD swtch.
-
           // !VA For all other options than TD Swtch, merge the msdpi and maxwd styles if both are present
           // !VA Set the msdpi string to the TBL width field value 
-            msdpi = `width: ${Appobj['ccpTblWidthTfd']}px; `;
-            // !VA If the TBL width field value was a percent, remove the px on the units suffix
-            msdpi.includes('%')  ? msdpi = msdpi.replace('%px', '%') : msdpi;
-            maxwd = `max-width: ${Appobj['ccpTblMaxwdTfd']}px; `;
-            if ( Appobj['ccpTblMsdpiChk']) {
-              str = msdpi;
-            } 
-            if (Appobj.ccpTdaOptnsRdo !== 'swtch') {
-              if ( Appobj['ccpTblMaxwdTfd']) {
-                str = msdpi + maxwd;
-              }
+          msdpi = `width: ${Appobj['ccpTblWidthTfd']}px; `;
+          // !VA If the TBL width field value was a percent, remove the px on the units suffix
+          msdpi.includes('%')  ? msdpi = msdpi.replace('%px', '%') : msdpi;
+          maxwd = `max-width: ${Appobj['ccpTblMaxwdTfd']}px; `;
+          if ( Appobj['ccpTblMsdpiChk']) {
+            str = msdpi;
+          } 
+          if (Appobj.ccpTdaOptnsRdo !== 'swtch') {
+            if ( Appobj['ccpTblMaxwdTfd']) {
+              str = msdpi + maxwd;
             }
+          }
           // !VA There is no corrsponding appObj property for this so return false for the first parameter where the alias would normally go
           retObj = returnObject( false, str );
           return retObj;
@@ -1679,9 +1578,6 @@ var Witty = (function () {
       var container = document.createElement('div');
 
       // !VA Handle the active tdoptions radio selection for the options that do NOT include an MS conditional code block. These options don't require special indent handling or post-processing of the clipboard output string, so extract the outputNL accordingly
-      // !VA Branch: 102020B
-      // !VA This TD option no longer exists, remove from condition
-      // if (selectedTdOption === 'basic' || selectedTdOption === 'excld' || selectedTdOption === 'swtch') {
       if (selectedTdOption === 'basic' || selectedTdOption === 'swtch') {
         // !VA Deterimine which makeNode button was clicked and extract a nodeList fragment with only those nodes that correspond to the clicked button. The index position of the extracted fragments is determined by the length of the tableNodeFragment nodeList minus an integer to compensate for the 0-based nodeList indices.
         let rtlNodePos, extractPos;
@@ -1743,8 +1639,7 @@ var Witty = (function () {
         outputNL = container.querySelectorAll('*');
 
         // !VA Branch: 111520A
-        // !VA 
-        // !VA Not sure why this only runs for TBL Make HTML Button
+        // !VA If the TBL Ghost checkbox is checked, fetch the ghost table config for the TD options handled in this condition. TD options bgimg and iswap are handled in their respective conditions below.
         if (Attributes.tableGhost.str) {
           console.log('hasWrapper :>> ' + hasWrapper);
           if (selectedTdOption === 'basic' ) {
@@ -1796,13 +1691,10 @@ var Witty = (function () {
         // !VA Create the nodeList to pass to the Clipboard object. 
         outputNL = container.querySelectorAll('*');
 
-        // !VA Branch: 111320C
         // !VA Ghost for vmlbt, bgimg, iswap
         console.log('MS Conditionals - outputNL :>> ');
         console.log(outputNL);
-
-
-        // !VA Branch: 111520A
+        // !VA If the TBL Ghost checkbox is checked, fetch the ghost table config for the TD options handled in this condition. TD options basic and swtch are handled in their respective conditions below.
         if (Attributes.tableGhost.str) {
           if (selectedTdOption === 'bgimg') {
             outputNL = configGhostTable( 'bgimg', hasWrapper, outputNL);
@@ -1920,19 +1812,13 @@ var Witty = (function () {
       let td_switchcontainerAttr, table_switchparentAttr, tr_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr, tr_switchchild1Attr, td_switchcontent1Attr, a_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, tr_switchchild2Attr, td_switchcontent2Attr; 
       // !VA Make the nodeList from the container passed in from makePosSwitchNodes to apply the attributes to.
       nodeList = container.querySelectorAll( '*' );
-      // !VA Branch: 102520A
       // !VA Build the objects that contain the attributes that will be set on the nodeList nodes.
       // !VA If the class input element under td options is empty, do nothing, otherwise add the class to the container TD and set the class attribute
       if (Attributes.tdClass.str) { nodeList[0].setAttribute('class', Attributes.tdClass.str); } 
       // !VA If the bkgrnd color input element under td options is empty, do nothing, otherwise add the bkgrnd color to the container TD and set the bgcolor attribute
       if (Attributes.tdBgcolor.str) { nodeList[0].setAttribute('bgcolor', Attributes.tdBgcolor.str); }
-      // !VA Branch: 102520A
       // !VA Include the padding style property in the image column, i.e. nodeList[6]. 
       if (Attributes.tdStyle.str) { nodeList[6].setAttribute( 'style', Attributes.tdStyle.str );}
-      // if (Attributes.imgStyle.str) { nodeList[6].setAttribute( 'class', Attributes.imgStyle.str ); }
-
-
-      
 
       // !VA Add the rest of the attributes to the nodes
       td_switchcontainerAttr = {
@@ -1958,8 +1844,6 @@ var Witty = (function () {
         class: 'stack-column-center'
       };
       table_switchchild1Attr = {
-        // !VA Branch: 111320A
-        // width: '100%',
         width: Attributes.imgWidth.str,
         class: 'devicewidth',
         role: 'presentation',
@@ -2013,29 +1897,17 @@ var Witty = (function () {
       // !VA Create the array with the attribute objects. We use this array to cycle through the nodeList and apply the attributes to the individual nodes. I tried many ways to do this but was not able to assign these objects to the individual nodes any other way than to loop through them ensuring that the array and nodeList length were identical. If there is a way to assign attributes to nodes using the node ID as index, I'd like to learn that technique.
       nodeAttributes = [ td_switchcontainerAttr, table_switchparentAttr,  tr_switchparentAttr, td_switchsibling1Attr, table_switchchild1Attr,  tr_switchchild1Attr, td_switchcontent1Attr, a_switchcontent1Attr, img_switchcontent1Attr, td_switchsibling2Attr, table_switchchild2Attr, tr_switchchild2Attr, td_switchcontent2Attr ];
 
-
-      // !VA Branch: 111320A
-      // !VA Branch: 111320B
       // !VA If the TBL Msdpi is checked, add curImgW i.e. Attributes.imgWidth.str to the style attribute of the parent TBL node of the image, it's child TD and to the child TD of the top-level table node, which is handled in getAttributes. The child TD has to be handled here because there is no correpsonding node in makeTdNode.
       if (appController.getAppobj('ccpTblMsdpiChk')) {
         // !VA Add the the style property and attributes to the content table and td node.
         table_switchchild1Attr.style = td_switchcontent1Attr.style = `width: ${Attributes.imgWidth.str}px;`;
         // !VA Add the style property and attributes to the top-level TD - the top-level parent table is handled in getAttributes.
         td_switchcontainerAttr.style = `width: ${Attributes.tableWidth.str}px;`;
-      };
-
-
-
-
-      // !VA Branch: 102520A
+      }
       // !VA Delete the properties for which there is no Attributes value. First, add them to the object definition above, and then delete them. If you add them here, then they appear as the last property in the object, and thus are output at the end of the clipboard string instead of the beginning.
       if (!Attributes.imgClass.str) { delete img_switchcontent1Attr.class; }
       if (!Attributes.imgAnchorTargt.str) { delete a_switchcontent1Attr.target; }
       if (!Attributes.imgAnchorTxtclr.str) { delete a_switchcontent1Attr.color; }
-
-
-
-
 
       // !VA Assign the attributes to the nodes using the length of the nodeAttribute array as index.
       for (let i = 0; i < nodeAttributes.length; i++) {
@@ -2296,9 +2168,6 @@ var Witty = (function () {
       // !VA Add default border, cellspacing, cellpadding and role for accessiblity
       tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
       tableOuter.setAttribute('role', 'presentation'); 
-      // !VA Branch: 102020B
-      // !VA Deleting the below - it appears to be a dupe of the same statement above
-      // if (Attributes.tableStyle.str) { tableInner.setAttribute('style', Attributes.tableStyle.str ); }
       // !VA If ccpTbwGhostChk is checked, set the data-ghost attribute
       console.log('Attributes.tableWrapperGhost.str :>> ' + Attributes.tableWrapperGhost.str);
       if (Attributes.tableWrapperGhost.str) { tableOuter.setAttribute('data-ghost', 'tbw'); }
@@ -2354,12 +2223,8 @@ var Witty = (function () {
       // let bgcolor;
       let linebreak;
       linebreak = '\n';
-      // !VA 03.09.2020 Set the indentLevel to 1 for now
       // !VA The fallback color is written to the bgcolor input in showTdOptions, so get it from there
       // fallback = '#7bceeb';
-      // !VA Branch: 111120C
-      // !VA bgcolor not accessed, deprecating
-      // Attributes.tdBgcolor.str ? bgcolor = Attributes.tdBgcolor.str : bgcolor = document.querySelector(ccpUserInput.ccpTdaBgclrTfd).value;
       // !VA Define the innerHTML of the bgimage code
       bgimageStr = `${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}<v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:${Attributes.imgWidth.str}px;height:${Attributes.imgHeight.str}px;">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc.str}" color="${Attributes.tdBgcolor.str}" />${linebreak}${getIndent(indentLevel)}<v:textbox inset="0,0,0,0">${linebreak}${getIndent(indentLevel)}<![endif]-->${linebreak}${getIndent(indentLevel)}<div>${linebreak}${getIndent(indentLevel)}<!-- Put Foreground Content Here -->${linebreak}${getIndent(indentLevel)}</div>${linebreak}${getIndent(indentLevel)}<!--[if gte mso 9]>${linebreak}${getIndent(indentLevel)}  </v:textbox>${linebreak}${getIndent(indentLevel)}</v:rect>${linebreak}${getIndent(indentLevel)}<![endif]-->`;
       // !VA Return the code block with line breaks and indents
@@ -2371,10 +2236,6 @@ var Witty = (function () {
       let vmlButtonStr, linebreak;
       // let tdWidth;
       linebreak = '\n';
-      // !VA Branch: 111120C
-      // !VA tdWidth not accessed, deprecating for now
-      // !VA Get the width of the TD from getAttributes
-      // tdWidth = Attributes.tdWidth.str;
       // !VA Define the innerHTML of the vmlbutton code
       vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:${Attributes.tdHeight.str}px;v-text-anchor:middle;width:${Attributes.tdWidth.str}px;" arcsize="10%" strokecolor="${Attributes.tdBorderColor.str}" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc.str}" color="#556270" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Button Text!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="#"
 style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});border:1px solid ${Attributes.tdBorderColor.str};border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:${Attributes.tdHeight.str}px;text-align:center;text-decoration:none;width:${Attributes.tdWidth.str}px;-webkit-text-size-adjust:none;mso-hide:all;">Button Text!</a></div>`;
@@ -2390,6 +2251,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA INDENT FUNCTIONS
     // !VA CBController   
     // !VA NOTE: This routine identifies if the nodes 1) contain the id 'stack-column-center' 2) contain MS conditional code and 2) contain an A tag. It applies indents accordingly to the nodes using insertAdjacentHTML. 1) Is problematic because if that class name is not present in the HTML file, the indent will break. I couldn't figure out a way to do this without the id by looking for sibling nodes, so trying to create options for three or even two column tables will be ridiculous time-consuming - not an option for now.
+
     function applyIndents( id, outputNL ) {
       let selectedTdOption;
       // !VA Query Appobj to get the selected TD option
@@ -2490,13 +2352,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     
     // !VA CBController private
-    // !VA Branch: 111320C
-    // !VA 
+    // !VA Configurations for the ghost table output
     function configGhostTable(option, hasWrapper, nodeList) {
       // console.log('configGhostTable running'); 
       // console.log(`option :>> ${option}; hasWrapper :>> ${hasWrapper}`);
+      
       // !VA The tokens used as placeholders for the ghost tables
-      ghostOpn1 = '/ghostOpn1/', ghostCls1 = '/ghostCls1/', ghostOpn2 = '/ghostOpn2/', ghostCls2 = '/ghostCls2/';
+      const ghostOpn1 = '/ghostOpn1/',  ghostCls1 = '/ghostCls1/', ghostOpn2 = '/ghostOpn2/', ghostCls2 = '/ghostCls2/';
       // !VA Place the placeholders in the nodes before the respective opening and closing table tags. Can not put them in the correct positions now because the 'beforebegin' and 'afterend' parameters are used by applyIndents and TMK there is no way to append or modify the adjacentHTML once it has been written to the node. The ghost tokens will be moved to the correct position in transposeTokens. 
       if (option === 'basic' || option === 'bgimg' || option === 'iswap' ) {
         if (hasWrapper) {
@@ -2526,26 +2388,20 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           nodeList[6].insertAdjacentHTML('beforeend', ghostCls1);
         }
       }
-
       // console.log('configGhostTable nodeList :>> ');
       // console.log(nodeList);
       return nodeList;
     }
 
-
-
-
     // !VA CBController private
     // !VA handle the buildNodeList clipboardStr output, define and place the tokens in the clipboardStr output and replace the tokens with the ghost tabs from getGhostTags or strip them out depending on the checked status of the Ghost checkbox icons passed in as bool parameters from the caller.
     function applyGhostTable(tbl, bool1, bool2, option) {
-
       console.log('applyGhostTable running');
       console.log(`option :>> ${option};`);
-      // console.log('TOP tbl :>> ');
-      // console.log(tbl);
-
-      let openTag, closeTag, ghostOpn1, ghostCls1, ghostOpn2, ghostCls2, openTBLPos,  closeTBLPos, closeTBWPos;
-      let indexPos, ghostTags = [], wrapperChecked;
+      let openTag, closeTag, ghostOpn1, ghostCls1, ghostOpn2, ghostCls2, ghostTags = [], wrapperChecked, tokens, tokenIdx, tagIdx, sub1, sub2, sub3, hasIndex, tag, tokenOpn;
+      // !VA Branch: 112020A
+      // !VA token is a parameter below but is never declared, and it is assigned a value of ghostOpn2 which is never accessed. Deleting it, but keep an eye out for repercussions.
+      // let token;
       // !VA Define the tokens to use as placeholders before the replace operation
       ghostOpn1 = '/ghostOpn1/', ghostCls1 = '/ghostCls1/', ghostOpn2 = '/ghostOpn2/', ghostCls2 = '/ghostCls2/';
       // !VA Define the opening and closing table tags
@@ -2555,7 +2411,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // console.log(`bool1 (tableGhost:):>> ${bool1}; bool2 (tableWrapperGhost): ${bool2}`);
       wrapperChecked = appController.getAppobj('ccpTblWraprChk');
       // console.log('wrapperChecked :>> ' + wrapperChecked);
-      let curPos, targetPos, tokens;
       if (!wrapperChecked) {
         // tokens = [ ghostOpn1, ghostCls1, ghostOpn2, ghostCls2 ];
         tokens = [ ghostOpn1, ghostCls1 ]; }
@@ -2563,16 +2418,13 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
         // tokens = [ ghostOpn1, ghostCls1, ghostOpn2, ghostCls2 ];
         tokens = [ ghostOpn2, ghostOpn1, ghostCls2, ghostCls1 ]; 
       }
-      tokenIdx, tagIdx;
-      tbl2 = tbl;
-      token = ghostOpn2;
-      tokenIndex = 0;
+      // !VA Branch: 112020A
+      // !VA Check this...looks fishy, see comment on let token above;
+      // token = ghostOpn2;
 
       function transposeTokens(tbl, token, tokenIdx, tagIdx) {
         console.log('transposeTokens running'); 
         console.log(`tbl :>> ${tbl};`);
-
-        let sub1, sub2, sub3;
 
         if (token.includes('Opn')) {
         // !VA sub1 is the string from the beginning to the tagIndex.
@@ -2606,7 +2458,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           console.log(`$TOKEN: ${token} - sub2 :>> "${sub2}"`);
           // !VA The two sub3 statements below output the same number for the position argument, but the slice method results in a str that is off by 1 character. I don't know why the current sub3 works, but it does. Come back to this when I have a lot of extra time on my hands. 
           // sub3 = str.slice( tagIdx + tag.length + 1, -1);
-          sub3 = tbl.substring( str.length - (tbl.length - tagIdx - tag.length), tbl.length );
+          // !VA Branch: 112020A
+          // !VA Alert - the first occurrence of tbl.length below was str.length, just fixed it and don't know if there are consequences.
+          sub3 = tbl.substring( tbl.length - (tbl.length - tagIdx - tag.length), tbl.length );
           // !VA The below is where I try to figure out the difference between the two sub3 statements above.
           // var foo = (v.length - ( tbl.length - tagIdx - tag.length));
           // console.log(`TOKEN: ${token}; foo :>> ${foo};`);
@@ -2623,8 +2477,6 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       } 
       
 
-      var hasIndex, tokenIdx, tagIdx;
-      str = tbl;
       for (const token of tokens) {
         // console.log('token :>> ' + token);
         if (token.includes('Opn')) { 
@@ -2660,8 +2512,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
               tbl = transposeTokens( tbl, token, tokenIdx, tagIdx );
             }
           }
-          // !VA Branch: 111520A
-          // !VA Return out on error
+          // !VA Return out on error, used for dev to catch infinite loops
           // console.log('Error, returning out');
           // return;
         }
@@ -2701,13 +2552,9 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       hasWrapper = appController.getAppobj('ccpTblWraprChk');
       hasWrapper ? indent = '      ' : indent = '';
 
-      // !VA Branch: 111520A
+      // !VA Get the attributes to plug into placeholders
       let Attributes;
       Attributes = getAttributes();
-      console.log('NOW');
-      console.log(`Attributes.tableWidth.str :>> ${Attributes.tableWidth.str};`);
-
-
 
       // !VA Define the opening and closing ghost tags for the inner tablesd
       ghostOpn1 = 
@@ -3524,7 +3371,6 @@ ${indent}<![endif]-->`;
     // !VA Called from handleKeydown. Applies the user-entered input value in the Toolbar or CCP, i.e. writes the value to Appobj and, if Toolbar, runs updateCurrentImage which then runs calcViewerSize to update the dynamicElements with the new value.
     // !VA NOTE: This may be a functional dupe of updateCurrentImage
     function applyInputValue(userInputObj) {
-      // !VA Branch: 102120A
       // !VA Destructure userInputObj into variables
       let { evtTargetVal, appObjProp } = userInputObj;
       let inputObj = {};
@@ -3669,7 +3515,6 @@ ${indent}<![endif]-->`;
       // !VA For IMG Excld option, override curImg sizing and padding recalculation because there effectively is no curImg to resize/recalc
       } else {
         console.log('Excld mode');
-        // !VA Branch: 110220C
         // !VA Disable all autocalc of padding for now in IMG EXCLD mode by setting Appobj TD width and height to empty.
         Appobj.ccpTdaWidthTfd = Appobj.ccpTdaHeigtTfd = '';
         highlightArray = [ 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd' ];
@@ -3818,12 +3663,12 @@ ${indent}<![endif]-->`;
           this.value = '';
         }
       }
-      // !VA Branch: 102320A
+      // !VA Write error to console if curImgW or curImgH is empty, could have repercussions
       if (Appobj.curImgW === '' ) {
-        alert('ERROR in handleBlur - Appobj.curImgW is empty ');
+        console.log('ERROR in handleBlur - Appobj.curImgW is empty ');
       }
       if (Appobj.curImgH === '' ) {
-        alert('ERROR in handleBlur - Appobj.curImgH is empty ');
+        console.log('ERROR in handleBlur - Appobj.curImgH is empty ');
       }
 
 
@@ -4183,8 +4028,6 @@ ${indent}<![endif]-->`;
           }
           break;
         case (appObjProp === 'ccpTblWidthTfd') :
-          // !VA Branch: 102020B
-          // !VA Changed old reference to rdoCcpTdExcludeimg
           // !VA If imgExcld 'excld' is checked then the TBL W input can't exceed the viewer width and cannot be less than the TD Width
           if (Appobj.ccpImgExcldRdo === 'excld') {
             if (retVal > Appobj.imgViewerW) {
@@ -4209,9 +4052,6 @@ ${indent}<![endif]-->`;
           }
           break;
         case (appObjProp === 'ccpTbwWidthTfd') :
-          // !VA Branch: 102020B
-          // !VA This condition refers to old element alias
-          // if (Appobj.rdoCcpTdExcludeimg) {
           // !VA If imgExcld 'excld' is checked, then:
           if (Appobj.ccpImgExcldRdo === 'excld') {
             // !VA retVal must be greater than TBL W and less than imgViewrW
@@ -4272,15 +4112,14 @@ ${indent}<![endif]-->`;
       // !VA NOTE: Condition-specific variables are declared in the respective condition
       let { evtTargetVal, appObjProp } = userInputObj;
 
-      // !VA Branch: 110920A
       // !VA If IMG Excld is selection, return out - Excld mode ignores all curImg recalc
       if (Appobj.ccpImgExcldRdo === 'excld') {
 
         return;
       } else {
 
-      // !VA If the target is TD Width and it is greater than TBL Width, set TBL Width to TD Width. This is an override for TBL Width being populated with curImgW whenever curImgW is resized. If the user enters a TD Width that is greater than the TBL Width, the TBL Width must conform to the larger user-entered value.
-      switch(true) {
+        // !VA If the target is TD Width and it is greater than TBL Width, set TBL Width to TD Width. This is an override for TBL Width being populated with curImgW whenever curImgW is resized. If the user enters a TD Width that is greater than the TBL Width, the TBL Width must conform to the larger user-entered value.
+        switch(true) {
         case (appObjProp === 'curImgW' || appObjProp === 'curImgH'):
           if (Appobj.ccpTdaWidthTfd) {
             if (evtTargetVal < Appobj.ccpTdaWidthTfd ) {
@@ -4306,8 +4145,7 @@ ${indent}<![endif]-->`;
         };
         UIController.configCCP( configObj );
   
-        // !VA Branch: 102520A
-        // !VA I don't know if this error message handler even works
+        // !VA NOTE: I don't know if this error message handler even works
         // !VA Error condition - pass the appMessCode to handleAppMessages
         if (isErr) {
           // !VA IF Error pass the code to errorHandler to get the error message
@@ -4318,11 +4156,7 @@ ${indent}<![endif]-->`;
           // !VA If no error...
           isErr = false;
         }
-
-
       }
-
-
     }
 
     // !VA appController  
@@ -4755,8 +4589,6 @@ ${indent}<![endif]-->`;
               UIController.configCCP( configObj );
             }
           }
-        // !VA Branch: 111820B
-        // !VA This still doesn't work
         // !VA If the target is the IMG Anchor input element, reveal/conceal the dependent elements, i.e. ccpImgTxclrTfd and ccpImgTargtChk
         } else if (tar.id === 'ccp-img-anchr-ipt') {
           console.log('Handling IMG ANCHR input');
@@ -4982,10 +4814,7 @@ ${indent}<![endif]-->`;
       // !VA APPOBJ PROPERTIES
       // !VA NOTE: It might be redundant to set input elements to empty strings on init, since that is handled in reflectObject when called from populateCcpProperties. For later...
 
-
-      // !VA Branch: 102220A
       // !VA First, set ccpTdaOptnsRdo to the TD Options selection. This will always be the option parameter, except on init. On init, configDefault is called with alias = 'default'. On init, populateCcpProperties first populates  and option = true, so create a condition that excludes that case.
-      
       if (Appobj[alias] === 'default' ) { 
         Appobj['ccpTdaOptnsRdo'] = '';
       } else {
@@ -5058,10 +4887,7 @@ ${indent}<![endif]-->`;
       // !VA check ghost checkboxes for dev
       checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpImgTargtChk', 'ccpTblGhostChk', 'ccpTbwGhostChk' ];
       // !VA Make the configuration object to pass to configCCP
-      // !VA Branch: 111920B
-      // !VA Include initArray
       configObj = {
-        // revealReset: { alias: 'default'},
         revealElements: { caller: 'configDefault', flag: false, initArray: fetchRevealArray('init'), revealArray: revealArray }, 
         disableReset: { alias: 'default' },
         reflectAppobj: { reflect: reflectArray },
@@ -5078,10 +4904,7 @@ ${indent}<![endif]-->`;
     // !VA Called from fetchConfigObj to get the IMG EXCLD-specific configObj configuration properties to the  configCCP function, which then applies DOM-level changes to the CCP. 
     function configExcld( alias, option) {
       let configObj = {}, reflectArray, mkcssArray, highlightArray, revealArray, revealFlag, radioArray, checkedArray;
-      // // !VA Running selectTdaOptions also runs the default config, which overwrites the imgExcld config. But we need to select the basic TD options when imgExcld is selected. So integrate default config options into this config.
-      // !VA Branch: 102020B
-      // !VA Don't run selectTdaOptions because it applies the defaultConfig, which overwrites some of these config options. Instead, just include the radioState method in the configObj to select the 'basic' TD option.
-      // selectTdaOptions('basic');
+      //!VA Running selectTdaOptions also runs the default config, which overwrites the imgExcld config. But we need to select the basic TD options when imgExcld is selected. So integrate default config options into this config.
       // !VA revealFlag is false because elements are revealed by REMOVING the ccp-conceal-ctn class
       revealFlag = false;
       // !VA The imgExcld radio only works with TD Options set to 'basic'. So set the Appobj property.
@@ -5089,11 +4912,11 @@ ${indent}<![endif]-->`;
       // !VA radioState METHOD
       // !VA Set the array of radio element states to set, i.e. the current element - do this for both incld and excld. Also set TD Options to 'basic' as per the Appobj property above because imgExcld doesn't work with any of the other TD options.
       radioArray = [ 'ccpImgExcldRdo', 'ccpTdaOptnsRdo' ];
-
+      // !VA checkboxState METHOD
       checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk' ];
+      // !VA Set Appobj properties for reflectAppobj
       Appobj.ccpTblWraprChk = false;
       Appobj.ccpTblHybrdChk = false;
-
       // !VA Toggleable config properties
       // !VA The imgExcld icon is selected
       if ( option === 'excld') {
@@ -5110,16 +4933,13 @@ ${indent}<![endif]-->`;
         Appobj.ccpTdaPdrgtTfd = '';
         Appobj.ccpTdaPdlftTfd = '';
         Appobj.ccpTdaPdbtmTfd = '';
-
-
         // !VA reflectAppobj METHOD
         // Set the array of elements whose Appobj properties are to be reflected in CCP
         reflectArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaTxcntTfd', 'ccpTblWidthTfd' ];
         // !VA revealElements METHOD
         revealArray = fetchRevealArray('excld');
         revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn', 'ccpTdaOptnsRdo', 'ccpTdaTxcntTfd' ];
-        // revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgAlignRdo', 'ccpImgItypeRdo', ];
-
+      // !VA option === 'incld'
       } else {
         // !VA The imgIncld icon is selected 
         // !VA Appobj property values valid for the Excld 'incld' option
@@ -5129,19 +4949,17 @@ ${indent}<![endif]-->`;
         reflectArray = ['ccpTblWidthTfd'];
         // !VA revealElements METHOD - Elements to conceal
         revealArray = fetchRevealArray('incld');
-
       }
-      // !VA Get the highlightArray of all input elements to apply the highlight to any input elements whose Appobj property is not empty
+      // !VA Get the highlightArray of all input elements to apply the highlight to any input elements whose Appobj property is not empty, applies to both excld and incld
       highlightArray = getInputArray();
-      // configObj.highlightIcon = { highlight: highlightArray};
-      
+      // !VA revealMkcss METHOD array
       mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp'];
 
       // !VA Branch: 111920B
+      // !VA This flag applies to revealMkcss but not to revealElements, remove the flag from revealElements
       var flag = true;
 
       configObj = {
-        // !VA Branch: 111820B
         revealMkcss: {caller: 'configExcld', flag: true, revealArray: mkcssArray },
         highlightIcon: { highlight: highlightArray},
         checkboxState:  { checked: checkedArray },
@@ -5201,7 +5019,7 @@ ${indent}<![endif]-->`;
         configObj = configDefault( alias, option );
         // !VA Set the flag to conceal items in revealArray
         // !VA Branch: 111920A
-        // !VA Why is the revealFlag being set here?
+        // !VA Why is the revealFlag being set here? The flag property is set explicitly in revealMkcss below.
         revealFlag = false;
         mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ]
         configObj.revealMkcss =  {caller: 'configOptns', flag: true, revealArray: mkcssArray };
@@ -5239,10 +5057,7 @@ ${indent}<![endif]-->`;
         // !VA I'm not sure this description still applies
         // !VA revealElements METHOD: revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
         revealFlag = false;
-        // !VA Branch: 110720A changed revealed to concealed below
         // !VA Array of elements to be concealed. 
-        // !VA Branch: 110920A
-        // !VA The only change from the default config is concealing TD Width and TD Height
         revealArray = fetchRevealArray('iswap');
         // !VA radioState METHOD: Array of radio elements whose checked state to set
         radioArray = [ 'ccpImgItypeRdo' ];
@@ -5270,7 +5085,6 @@ ${indent}<![endif]-->`;
         break;
         
       case option === 'swtch':
-        // !VA Branch: 110120B
         // !VA TD posswitch option has the same config except TBL Width = imgViewerW. NOTE: That is the default config. 
         // !VA Get the default config
         configObj = configDefault( alias, option );
@@ -5282,10 +5096,6 @@ ${indent}<![endif]-->`;
         Appobj.ccpTdaAlignRdo = 'center';
         Appobj.ccpTdaValgnRdo = 'middle';
         Appobj.ccpTblClassTfd = 'devicewidth';
-        // !VA Set the flag to conceal items in revealArray
-        // !VA Branch: 111920A
-        // !VA This is wrong -- the flag is 'flag', not 'option'
-        // option = false;
         // !VA checkboxState METHOD: set the checkboxes whose checked value is to be set to the Appobj properties above.
         checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpImgTargtChk' ];
         // !VA radioState METHOD: Array of radio elements whose checked state to set
@@ -5298,15 +5108,8 @@ ${indent}<![endif]-->`;
           revealMkcss: {caller: 'configOptns', flag: true, revealArray: mkcssArray},
           checkboxState: { checked: checkedArray },
           radioState: { radio: radioArray },
-          // disableElements: { flag: disableFlag, disable: disableArray },
-          // !VA Branch: 111920A
-          // !VA Review the use of revealReset.
-          // !VA the revealReset array, iswapArr,  is set in revealReset. It includes all elements that are revealed by default except ccpImgCbhtmlBut because the img tag can't be output to the cliboard with the iswap option. iswap requires a TD or higher.
           revealElements:  { caller: 'configOptns', flag: revealFlag, revealArray: revealArray }
         };
-        // !VA Branch: 111920A
-        // !VA This doesn't do anything. configObj is now defined for each option condition separately
-        // delete configObj.revealReset;
         break;
         
       case option === 'bgimg':
@@ -5397,8 +5200,7 @@ ${indent}<![endif]-->`;
       highlightArray = getInputArray();
       // !VA Add the highlightIcon property to configObj and return
       configObj.highlightIcon = { highlight: highlightArray};
-
-      // !VA Branch: 111920B
+      // !VA Set the revealArray the one used at initialization
       configObj.revealElements.initArray =  fetchRevealArray('init');
       console.log('configOptns configObj :>> ');
       console.log(configObj);
@@ -5408,8 +5210,7 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
-    // !VA Branch: 110120B
-    // !VA Returns an array of input element aliases
+    // !VA Returns an array of input element aliases. 
     function getInputArray() {
       const iptArray = [];
       for (const key of Object.keys(ccpUserInput)) {
@@ -5563,8 +5364,7 @@ ${indent}<![endif]-->`;
       initCcp: function () {
         // let ccpState;
         // !VA Get the current open/closed state of the CCP
-        // !VA Branch: 102120A
-        // !VA ccpState is never accessed, deprecated.
+        // !VA NOTE: ccpState is never accessed but leaving it here for future reference.
         // ccpState = UIController.toggleCcp(true);
         UIController.toggleCcp(true);
       },
@@ -5625,8 +5425,6 @@ ${indent}<![endif]-->`;
         }
         // !VA If appMessType is err or msg, call setTimeout to set the duration of the message, i.e. time delay before the message is undisplayed.
         if ( appMessType === 'err' || appMessType === 'msg') {
-          // !VA Branch: 102120A
-          // !VA What is timer doing here? This doesn't need to be a named function, get rid of it.
           setTimeout(() => {
             // !VA Read the appMessContent into the tooltip content element
             // !VA Call displayAppMessages with the isTrue parameter = false to undisplay the message after the timeout. 
@@ -5640,8 +5438,7 @@ ${indent}<![endif]-->`;
       // !VA Query whether localStorage is currently set for imgViewerW, sPhonesW and lPhonesW
       // !VA appController public
       getLocalStorage: function() {
-        // !VA Branch: 102020B
-        // !VA Update comment with where localStorage is set - updateAppobj doesn't exist anymore
+        // !VA NOTE: Update comment with where localStorage is set - updateAppobj doesn't exist anymore
         // !VA Get localStorage for imgViewerW here. localStorage is set in updateAppobj after the user input has been parsed for errors. 
         let arr = [], curLocalStorage = [];
         // !VA Clear localStorage for testing only.
@@ -5661,6 +5458,7 @@ ${indent}<![endif]-->`;
         // !VA Determine if the window is an isolate window, i.e. should be displayed with just the Witty app in window with fixed dimensions without header or tutorial content.
         let curUrl, initMode;
         let configObj = {};
+        let ccpCtnElements = [];
         // !VA If the value of the query string is true, then remove the header-container, isolate button and content from the DOM
         curUrl = window.location.href;
 
@@ -5674,10 +5472,7 @@ ${indent}<![endif]-->`;
         // !VA First, populate Appobj with dynamicRegions and fill CCP elements with empty values
         UIController.populateAppobj(Appobj, 'ccp');
 
-        // !VA Branch: 110720A
-        // !VA Initializing all CCP elements as concealed on init, letting the default config handle the reveal. 
-        // !VA Since this is init, access the DOM directly here from appController. 
-        var ccpCtnElements = [];
+        // !VA Initializing all CCP elements as concealed on init, letting the default config handle the reveal. Since this is init, access the DOM directly here from appController. 
         ccpCtnElements = document.getElementsByClassName('ccp-ctn');
         for (const el of ccpCtnElements) {
           el.classList.add('ccp-conceal-ctn');
