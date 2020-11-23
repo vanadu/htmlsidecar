@@ -601,53 +601,6 @@ var Witty = (function () {
       }
     }
 
-    // !VA initArray: fetchRevealArray('init'), 
-
-
-
-    function revealElements2( caller, flag, initArray, revealArray) {
-      console.clear();
-      console.log(`revealElements caller :>> ${caller}; flag :>> ${flag}; revealElements: revealArray :>> ${revealArray}; `);
-      let el, revealedArray = [];
-      console.log('revealElements initArray :>> ');
-      console.log(initArray);
-      console.log('revealElements revealArray :>> ');
-      console.log(revealArray);
-
-
-      // !VA Branch: 112020A
-      // !VA Start by building an array of the revealable elements and its current conceal status: true is concealed (ccp-conceal-ctn IS applied) and false is NOT applied;
-      var obj = {};
-      var isConcealed;
-      // !VA Loop through ccpUserInput
-      for (const entry of Object.entries(ccpUserInput)) {
-        // console.log(`entries[1].substring( 9, 14) :>> ${entries[1].substring(  9, 14 )};`);
-        // !VA Select all the revealable CCP element IDs. Entry[1] is the ccpUserInput ID 
-        if (entry[1].includes('tfd') || entry[1].includes('chk') || entry[1].includes('rdo') || entry[1].substring(9, 14 ) === 'cbhtm') {
-
-          el = document.querySelector(entry[1]);
-          // console.log(`el.id :>> ${el.id};`);
-          console.log(`entry[0] :>> ${entry[0]};`);
-
-          for (let i = 0; i < revealArray.length; i++) {
-            console.log('revealArray[i] is: ' +  revealArray[i]);
-            if (revealArray[i] === entry[0]) {
-              console.log('HIT');
-
-              if (el.classList.contains('ccp-conceal-ctn')) {
-                el.classList.remove('ccp-conceal-ctn');
-              } else  {
-                el.classList.add('ccp-conceal-ctn');
-              }
-            }
-          }
-        }
-      }
-      // console.log('obj :>> ');
-      // console.log(obj);
-    }
-
-
 
     // !VA UIController private
     // !VA Branch: 112220A
@@ -4677,7 +4630,7 @@ ${indent}<![endif]-->`;
           // !VA Deprecate, see comment above.
           // flag ? revealArray = makeAliasArray('ccpImgTxclrTfd', 'ccpImgTargtChk') : revealArray = [];
           configObj = {
-            revealElements: { caller: 'handleTextInputEvent', revealType: 'update', initArray: fetchRevealArray('init'), revealArray: revealArray }
+            revealElements: { caller: 'handleTextInputEvent', revealType: 'update', revealArray: revealArray }
           };
           UIController.configCCP( configObj );
         } else {
@@ -4966,7 +4919,7 @@ ${indent}<![endif]-->`;
       checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpImgTargtChk', 'ccpTblGhostChk', 'ccpTbwGhostChk' ];
       // !VA Make the configuration object to pass to configCCP
       configObj = {
-        revealElements: { caller: 'configDefault', revealType: 'config', initArray: fetchRevealArray('init'), revealArray: revealArray }, 
+        revealElements: { caller: 'configDefault', revealType: 'config', revealArray: revealArray }, 
         disableReset: { alias: 'default' },
         reflectAppobj: { reflect: reflectArray },
         checkboxState: { checked: checkedArray },
@@ -5043,7 +4996,7 @@ ${indent}<![endif]-->`;
         checkboxState:  { checked: checkedArray },
         radioState: { radio: radioArray },
         reflectAppobj: { reflect: reflectArray },
-        revealElements: { caller: 'configExcld', revealType: 'config', initArray: fetchRevealArray('init'), revealArray: revealArray },
+        revealElements: { caller: 'configExcld', revealType: 'config', revealArray: revealArray },
       };
       // if ( option === 'incld') { configObj.revealReset = { alias: 'incld' }; }
       return configObj;
@@ -5073,7 +5026,7 @@ ${indent}<![endif]-->`;
         highlightIcon: { highlight: highlightArray},
         reflectAppobj: { reflect: reflectArray },
         radioState: { radio: radioArray },
-        revealElements: { caller: 'configItype', revealType: 'config', initArray: fetchRevealArray('init'), reveal: revealArray }
+        revealElements: { caller: 'configItype', revealType: 'config', reveal: revealArray }
       };
       return configObj;
     }
@@ -5161,7 +5114,7 @@ ${indent}<![endif]-->`;
           // !VA Branch: 111920A
           // !VA Review if this comment still applies
           // !VA the revealReset array, iswapArr,  is set in revealReset. It includes all elements that are revealed by default except ccpImgCbhtmlBut because the img tag can't be output to the cliboard with the iswap option. iswap requires a TD or higher.
-          revealElements:  { caller: 'configOptns', revealType: 'config', initArray: fetchRevealArray('init'), revealArray: revealArray }
+          revealElements:  { caller: 'configOptns', revealType: 'config', revealArray: revealArray }
         };
         break;
         
@@ -5197,15 +5150,6 @@ ${indent}<![endif]-->`;
         configObj.revealMkcss = { caller: 'configOptns', flag: true, revealArray: mkcssArray };
         configObj.revealElements = { caller: 'configOptns', revealType: 'config', initArray: fetchRevealArray('init'), revealArray: revealArray };
         configObj.checkboxState = { checked: checkedArray };
-
-
-        // configObj = {
-        //   revealMkcss: {caller: 'configOptns', flag: true, revealArray: mkcssArray},
-        //   checkboxState: { checked: checkedArray },
-        //   radioState: { radio: radioArray },
-        //   revealElements:  { caller: 'configOptns', flag: revealFlag, revealArray: revealArray }
-        // };
-
         break;
         
       case option === 'bgimg':
@@ -5245,7 +5189,7 @@ ${indent}<![endif]-->`;
           checkboxState:  { checked: checkedArray },
           disableReset: { alias: 'default' },
           reflectAppobj: { reflect: reflectArray },
-          revealElements:  { caller: 'configOptns', revealType: 'config', initArray: fetchRevealArray('init'), revealArray: revealArray }
+          revealElements:  { caller: 'configOptns', revealType: 'config', revealArray: revealArray }
         };
         break;
       case option === 'vmlbt':
@@ -5290,7 +5234,7 @@ ${indent}<![endif]-->`;
           checkboxState:  { checked: checkedArray },
           disableReset: { alias: 'default' },
           reflectAppobj: { reflect: reflectArray },
-          revealElements:  { caller: 'configOptns', revealType: 'config', initArray: fetchRevealArray('init'), revealArray: revealArray }
+          revealElements:  { caller: 'configOptns', revealType: 'config', revealArray: revealArray }
         };
         console.log('swtch AFTER configObj :>> ');
         console.dir(configObj);
@@ -5438,7 +5382,7 @@ ${indent}<![endif]-->`;
         reflectAppobj: { reflect: reflectArray },
         radioState: { radio: radioArray },
         // revealReset: { alias: 'default'},
-        revealElements: { caller: 'configHybrd', revealType: 'config', initArray: fetchRevealArray('init'), reveal: revealArray },
+        revealElements: { caller: 'configHybrd', revealType: 'config', reveal: revealArray },
       };
       return configObj;
     }
