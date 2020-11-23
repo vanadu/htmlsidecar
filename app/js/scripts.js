@@ -655,25 +655,22 @@ var Witty = (function () {
 
     function revealElements ( caller, revealType, initArray, revealArray) {
       console.clear();
-      console.log(`revealElements caller :>> ${caller}; flag :>> ${revealType}; revealElements: revealArray :>> ${revealArray}; `);
-      let el, revealedArray = [], initObj = {}, revealObj = {}, currentObj = {};
+      console.log(`revealElements caller :>> ${caller}; revealType :>> ${revealType}; revealElements: revealArray :>> ${revealArray}; `);
+      let el, revealObj = {}, currentObj = {};
       console.log('revealElements revealArray :>> ');
       console.log(revealArray);
 
+      const allAliases =  [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaTxcntTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdparGrp', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblMsdpiChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblCbhtmBtn' ];
 
-      // !VA Branch: 112230A
-      // !VA 1)
-
-      const allArray =  [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaTxcntTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdparGrp', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblMsdpiChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblCbhtmBtn' ];
-
-      // !VA Get object containing the reveal configuration at initialization
+      // !VA Get object containing the reveal configuration at initialization based on allArray above and initConcealed. initConcealed is the array of elements that are concealed at initialization. The result is an object whose keys are the revealable element aliases and whose values represent the reveal state at initialization.
       function getInitObj() {
         let obj = {};
         const initConcealed = [ 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaTxcntTfd' ];
-        console.log(`initConcealed.length :>> ${initConcealed.length};`);
-        for (let i = 0; i < allArray.length; i++) {
-          obj[allArray[i]] = true;
+        // !VA Read in all aliases whose reveal state is true, i.e 
+        for (let i = 0; i < allAliases.length; i++) {
+          obj[allAliases[i]] = true;
         }
+        // !VA Read in all aliases whose reveal state is false, i.e. concealed
         for (let i = 0; i < initConcealed.length; i++) {
           obj[initConcealed[i]] = false;
         }
@@ -682,10 +679,10 @@ var Witty = (function () {
         return obj;
       }
 
-      // !VA Get object containing the current configuration at initialization
+      // !VA Get object containing the current configuration at the time revealElements is run, before any change to the reveal configuration is implemented. This object is used to compare against the current revealObj, i.e. the object containing the reveal configuration to implement in order to filter out the elements whose reveal state does not change so that these aren't included in the reveal/conceal animation handler.
       function getCurrentObj() {
         let obj = {};
-        for (const alias of allArray  ) {
+        for (const alias of allAliases  ) {
           el = document.querySelector(ccpUserInput[alias]);
           if (el.classList.contains('ccp-conceal-ctn')) {
             obj[alias] = false;
@@ -696,11 +693,6 @@ var Witty = (function () {
         console.log(obj);
         return obj;
       }
-
-
-
-
-
 
       // !VA Branch: 112220A
       // !VA If revealType is 'update', do not change the reveal configuration but instead just toggle the aliases in revealArray on and off with animation. Called from handleIconClick and handeTextInputEvent to handle the reveal/conceal of aliases with dependent elements, such as IMG Anchr.
@@ -719,151 +711,63 @@ var Witty = (function () {
             }, 100 * i);
           })(i);
         }
-      // !VA Branch: 112220A
-      // !VA If revealType is 'config', first reset the reveal configuration to the default (i.e. the configuration established at initializtaion), then set the reveal/state of each alias in revealArray based on a comparision to that default configuration. 
+      // !VA Branch: 112320A
+      // !VA If the revealType is 'config' set the reveal configuration for the selected option. 1) Create an object containing default configuration array 2) in that object, toggle the reveal/conceal property of the aliases in revealArray the reveal configuration to implement. This results in revealObj, i.e. the object containing the target reveal configuration 3) 
       } else if ( revealType === 'config') {
-        console.log('CONFIG running...');
-
-
-
-        initObj = getInitObj();
+        // !VA Get an object containing the current reveal configuration before the new configuration is implemented. This will be used to compare against the new configuration to filter out items that are identical between the current and the new configuration so that these are not included in the reveal/conceal animation 
         currentObj = getCurrentObj();
-
-        // !VA Make a copy of initObj named revealObj. 
+        // !VA Get an object containing the default reveal configuration. 
         revealObj = getInitObj();
         // !VA Import the revealArray into revealObj, setting the reveal/conceal flag property accordingly. The reveal/conceal flag is used to toggle the reveal state of the items based on revealArray
         for (const entry of Object.entries(revealObj)) {
           for (let i = 0; i < revealArray.length; i++) {
             // !VA If the revealObj property name matches the revealArray alias, toggle the reveal/conceal property. The result is a revealObj whose reveal/conceal properties indicate the aliases whose elements' reveal states are to be toggled. 
             if (entry[0] === revealArray[i]) {
-              // console.log(`revealArray[i] :>> ${revealArray[i]};`);
+              // Toggle the property
               revealObj[entry[0]] = !entry[1];
-              // console.log(`revealObj[entry[0]] :>> ${revealObj[entry[0]]};`);
             }
           }
         }
-
-
-        var reveal = Object.entries(revealObj);
-        var init = Object.entries(initObj);
-        var current = Object.entries(currentObj);
-        console.log('reveal :>> ');
-        console.dir(reveal);
-
+        // !VA Call revealCcpElements to implement the reveal/conceal with animation, passing the entries in currentObj and revealObj.
         revealCcpElements(Object.entries(currentObj), Object.entries(revealObj));
-
-        // !VA Branch: 112230A
-        // !VA This works. How can it be this simple? Now need to do the animation.
-        for (let i = 0; i < reveal.length; i++) {
-          // console.log(`${reveal[i][0]} :>> ${reveal[i][1]};`);
-          // console.log(`${init[i][0]} :>> ${init[i][1]};`);
-          // console.log(`reveal[i][0] :>> ${reveal[i][0]};`);
-          // console.log('reveal[i] is: ' +  reveal[i]);
-          el = document.querySelector(ccpUserInput[reveal[i][0]]);
-          if (reveal[i][1] === false) {
-            // el.classList.add('ccp-conceal-ctn');
-            // revealCcpElements(reveal[i][0], true );
-          } else {
-            // el.classList.remove('ccp-conceal-ctn');
-            // revealCcpElements(reveal[i][0], false );
-          }
-        }
-
-  
       } else {
         console.log('ERROR in revealElements: unknown revealType');
       }
 
-      // !VA Branch: 112220A
-      // !VA What we need here is simply an array of the elements whose reveal state is to be changed.
-
-      // !VA Reveal elements not containing children.
-
+      // !VA Receieves the Object.entries list from currentObj and revealObj. 
       function revealCcpElements(current, reveal) {
-        // var reveal = Object.entries(revealObj);
-        let foo = {}, fooObj;
-
-        // !VA Iterate through the array containing all the revealable elements (ccpArr).
+        // unique is the object containing the elements that are unique to this reveal operation, i.e. the elements whose reveal state is not identical to the current reveal state. This is necessary because if we include all the object properties in the reveal/conceal animation, it will be choppy because elements will have their already existing conceal class set without changing anything. Using the unique object, only the delta of the object properties are animated.
+        let unique = {}, uniqueObj;
+        // !VA Iterate through the Object.entries containing all the aliases and their reveal/conceal states.
         for (var i = 0; i < reveal.length; i++) {
-
-          // !VA This is where we filter out the elements that don't change between the current reveal config and the new reveal config
+          // !VA Filter out the elements that don't change between the current reveal config and the new reveal config.
+          // !VA If the reveal state of the reveal list is not identical to the reveal state of the current list, then add that property to the unique object.
           if (reveal[i][1] !== current[i][1]) { 
-            console.log('NOT IDENTICAL ');
-            console.log(`reveal[i] :>> ${reveal[i]};`);
-            // foo.reveal[i][0] = reveal[i][1];
-            // foo[reveal[i][0]] = reveal[i][1];
-            foo[reveal[i][0]] = reveal[i][1];
-            console.log('foo :>> ');
-            console.log(foo);
-            fooObj = Object.entries(foo);
-            console.log('fooObj :>> ');
-            console.log(fooObj);
-
-            for (let i = 0; i < fooObj.length; i++) {
-              console.log('fooObj[i] is: ' +  fooObj[i]);
-
-
+            // console.log('NOT IDENTICAL ');
+            // console.log(`reveal[i] :>> ${reveal[i]};`);
+            unique[reveal[i][0]] = reveal[i][1];
+            // console.log('unique :>> ');
+            // console.log(unique);
+            // !VA Convert the unique object to an Object.entries list
+            uniqueObj = Object.entries(unique);
+            // !VA Loop through the uniqueObj entries list
+            for (let i = 0; i < uniqueObj.length; i++) {
+              // !VA Animate the reveal/conceal operation
               (function (i) {
                 setTimeout(function () {
-  
-                  el = document.querySelector(ccpUserInput[fooObj[i][0]]);
-                  console.log(`el.id :>> ${el.id};`);
-                  // !VA Now check each alias in the array of CCP elements (i.e. only those elements that can be concealed/revealed. This doesn't include UI items which are always present, i.e. the TBL Wrapr checkbox, etc). If the CCP element is already revealed, conceal it and if it is concealed, reveal it. In other words, toggle the reveal/conceal status based on the presence of the alias in the alias array passed in from configObj.
-                  if (fooObj[i][1] === true) {
-                    // !VA Get DOM elements for the aliases to reveal
-                    el.classList.remove('ccp-conceal-ctn');
-                  // !VA If the current alias in the ccpArr is NOT in the array of elements to be revealed/concealed, then conceal it.
-                  } else {
-                    // !VA Get DOM elements for the aliases to conceal
-                    el.classList.add('ccp-conceal-ctn');
-                  }
+                  // !VA Select the element corresponing to the current alias in the uniqueObj list
+                  el = document.querySelector(ccpUserInput[uniqueObj[i][0]]);
+                  // console.log(`el.id :>> ${el.id};`);
+                  // Reveal/conceal each element based on the reveal/conceal property of the current uniqueObj entry.
+                  uniqueObj[i][1] ? el.classList.remove('ccp-conceal-ctn') : el.classList.add('ccp-conceal-ctn');
                 // !VA Pause 15 milliseconds between iterations
                 }, 50 * i);
               })(i);
-
-
-
             }
-            // !VA Pause between each iteration 
-            // console.log(`revealArray :>> ${revealArray};`);
-      
           }
         }
       }
-
-
-      function revealCcpElementsOLD(revealArray, conceal) {
-        // !VA Iterate through the array containing all the revealable elements (ccpArr).
-        for (var i = 0; i < revealedArray.length; i++) {
-          // !VA Pause between each iteration 
-          (function (i) {
-            setTimeout(function () {
-              // !VA Now check each alias in the array of CCP elements (i.e. only those elements that can be concealed/revealed. This doesn't include UI items which are always present, i.e. the TBL Wrapr checkbox, etc). If the CCP element is already revealed, conceal it and if it is concealed, reveal it. In other words, toggle the reveal/conceal status based on the presence of the alias in the alias array passed in from configObj.
-              if (revealArray.includes(revealedArray[i])) {
-                // !VA Get DOM elements for the aliases to reveal
-                el = document.querySelector(ccpUserInput[revealedArray[i]]);
-                el.classList.add('ccp-conceal-ctn');
-              // !VA If the current alias in the ccpArr is NOT in the array of elements to be revealed/concealed, then conceal it.
-              } else {
-                // !VA Get DOM elements for the aliases to conceal
-                el = document.querySelector(ccpUserInput[revealedArray[i]]);
-                el.classList.remove('ccp-conceal-ctn');
-              }
-            // !VA Pause 15 milliseconds between iterations
-            }, 10 * i);
-          })(i);
-        }
-      }
     }
-
-
-
-
-
-
-
-
-
 
     // !VA UIController private
     // !VA Use configCCP to apply/remove the highlight style to input elements, which then adds/removes the filter on the icon, as defined in the CSS. highlightIconPresets in resizeContainers sets the highlight on icons that have a default preset value. Individual icon highlights are set through configObj using the highlight method and the highlightArray array.
