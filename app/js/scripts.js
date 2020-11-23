@@ -750,7 +750,7 @@ var Witty = (function () {
         console.log('reveal :>> ');
         console.dir(reveal);
 
-        revealCcpElements(revealObj);
+        revealCcpElements(Object.entries(currentObj), Object.entries(revealObj));
 
         // !VA Branch: 112230A
         // !VA This works. How can it be this simple? Now need to do the animation.
@@ -778,31 +778,56 @@ var Witty = (function () {
       // !VA What we need here is simply an array of the elements whose reveal state is to be changed.
 
       // !VA Reveal elements not containing children.
-      function revealCcpElements(revealObj) {
-        var reveal = Object.entries(revealObj);
 
+      function revealCcpElements(current, reveal) {
+        // var reveal = Object.entries(revealObj);
+        let foo = {}, fooObj;
 
         // !VA Iterate through the array containing all the revealable elements (ccpArr).
         for (var i = 0; i < reveal.length; i++) {
-          // !VA Pause between each iteration 
-          // console.log(`revealArray :>> ${revealArray};`);
-          (function (i) {
-            setTimeout(function () {
 
-              el = document.querySelector(ccpUserInput[reveal[i][0]]);
-              console.log(`el.id :>> ${el.id};`);
-              // !VA Now check each alias in the array of CCP elements (i.e. only those elements that can be concealed/revealed. This doesn't include UI items which are always present, i.e. the TBL Wrapr checkbox, etc). If the CCP element is already revealed, conceal it and if it is concealed, reveal it. In other words, toggle the reveal/conceal status based on the presence of the alias in the alias array passed in from configObj.
-              if (reveal[i][1] === true) {
-                // !VA Get DOM elements for the aliases to reveal
-                el.classList.remove('ccp-conceal-ctn');
-              // !VA If the current alias in the ccpArr is NOT in the array of elements to be revealed/concealed, then conceal it.
-              } else {
-                // !VA Get DOM elements for the aliases to conceal
-                el.classList.add('ccp-conceal-ctn');
-              }
-            // !VA Pause 15 milliseconds between iterations
-            }, 15 * i);
-          })(i);
+          // !VA This is where we filter out the elements that don't change between the current reveal config and the new reveal config
+          if (reveal[i][1] !== current[i][1]) { 
+            console.log('NOT IDENTICAL ');
+            console.log(`reveal[i] :>> ${reveal[i]};`);
+            // foo.reveal[i][0] = reveal[i][1];
+            // foo[reveal[i][0]] = reveal[i][1];
+            foo[reveal[i][0]] = reveal[i][1];
+            console.log('foo :>> ');
+            console.log(foo);
+            fooObj = Object.entries(foo);
+            console.log('fooObj :>> ');
+            console.log(fooObj);
+
+            for (let i = 0; i < fooObj.length; i++) {
+              console.log('fooObj[i] is: ' +  fooObj[i]);
+
+
+              (function (i) {
+                setTimeout(function () {
+  
+                  el = document.querySelector(ccpUserInput[fooObj[i][0]]);
+                  console.log(`el.id :>> ${el.id};`);
+                  // !VA Now check each alias in the array of CCP elements (i.e. only those elements that can be concealed/revealed. This doesn't include UI items which are always present, i.e. the TBL Wrapr checkbox, etc). If the CCP element is already revealed, conceal it and if it is concealed, reveal it. In other words, toggle the reveal/conceal status based on the presence of the alias in the alias array passed in from configObj.
+                  if (fooObj[i][1] === true) {
+                    // !VA Get DOM elements for the aliases to reveal
+                    el.classList.remove('ccp-conceal-ctn');
+                  // !VA If the current alias in the ccpArr is NOT in the array of elements to be revealed/concealed, then conceal it.
+                  } else {
+                    // !VA Get DOM elements for the aliases to conceal
+                    el.classList.add('ccp-conceal-ctn');
+                  }
+                // !VA Pause 15 milliseconds between iterations
+                }, 50 * i);
+              })(i);
+
+
+
+            }
+            // !VA Pause between each iteration 
+            // console.log(`revealArray :>> ${revealArray};`);
+      
+          }
         }
       }
 
