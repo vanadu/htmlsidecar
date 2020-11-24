@@ -2412,143 +2412,160 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       return nodeList;
     }
 
+    function transposeTokens(tag, tbl, token, tokenIdx, tagIdx) {
+      // console.log('transposeTokens running'); 
+      // console.log(`tbl :>> ${tbl};`);
+      let sub1, sub2, sub3;
+      if (token.includes('Opn')) {
+      // !VA sub1 is the string from the beginning to the tagIndex.
+        sub1 = tbl.substring( 0, tagIdx );
+        // console.log('sub1 :>> ' + sub1);
+        // !VA sub2 is the string from the tag index to the end of the token.
+        sub2 = tbl.substring( tagIdx, tokenIdx + token.length);
+        // console.log('sub2 :>> ' + sub2);
+        // !VA Now add the token to the front of sub2
+        sub2 = token + sub2;
+        // console.log('sub2 :>> ' + sub2);
+        // !VA Now delete the token from the tail of sub2
+        sub2 = sub2.substring( 0, sub2.length - token.length );
+        // console.log('sub2 :>> ' + sub2);
+        // !VA sub3 strips the original token and returns the rest of the str
+        sub3 = tbl.substring( tokenIdx + token.length, tbl.length);
+        // console.log('sub3 :>> ' + sub3);
+        // !VA Concatenate the substrings
+        tbl = sub1 + sub2 + sub3;
+
+      } else {
+        // !VA STOPPING HERE, ghostCls still not right
+        // console.log(`TOKEN :>> ${token}; tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}; `);
+        // !VA substring 1 includes up to the token index position
+        sub1 = tbl.substring( tbl, tokenIdx );
+        // console.log(`TOKEN: ${token} - sub1 :>>  ${sub1}`);
+        // !VA substring 2 is from the token index position up to the tag index plus the tag length, that is, the position to which the token will move.
+        sub2 = tbl.substring( tokenIdx, tagIdx + tag.length);
+        // !VA Remove the existing token from substring 2
+        sub2 = sub2.substring( token.length, sub2.length);
+        // console.log(`$TOKEN: ${token} - sub2 :>> "${sub2}"`);
+        // !VA The two sub3 statements below output the same number for the position argument, but the slice method results in a str that is off by 1 character. I don't know why the current sub3 works, but it does. Come back to this when I have a lot of extra time on my hands. 
+        // sub3 = str.slice( tagIdx + tag.length + 1, -1);
+        // !VA Branch: 112020A
+        // !VA Alert - the first occurrence of tbl.length below was str.length, just fixed it and don't know if there are consequences.
+        sub3 = tbl.substring( tbl.length - (tbl.length - tagIdx - tag.length), tbl.length );
+        // !VA The below is where I try to figure out the difference between the two sub3 statements above.
+        // var foo = (v.length - ( tbl.length - tagIdx - tag.length));
+        // console.log(`TOKEN: ${token}; foo :>> ${foo};`);
+        // var baz = tagIdx + tag.length;
+        // console.log(`TOKEN: ${token}; baz :>> ${baz};`);
+        // sub3 = tbl.substring( tagIdx - tag.length, tbl.length );
+        // console.log(`TOKEN: ${token}; tbl.LENGTH: ${tbl.length}; TOKENIDX: ${tokenIdx}; TAGIDX: ${tagIdx}; - sub3 :>> "${sub3}"`);
+        // !VA Concatenate the substrings to build the string and return.
+        tbl = sub1 + sub2 + token + sub3;
+        // console.log(`$TOKEN: ${token} - tokenIdx :>> ${tokenIdx};`);
+        // console.log(`TOKEN: ${token} tbl :>> "${tbl}"`);
+      }
+
+      return tbl;
+    } 
+
     // !VA CBController private
-    // !VA handle the buildNodeList clipboardStr output, define and place the tokens in the clipboardStr output and replace the tokens with the ghost tabs from getGhostTags or strip them out depending on the checked status of the Ghost checkbox icons passed in as bool parameters from the caller.
-    function applyGhostTable(tbl, bool1, bool2, option) {
-      // console.log('applyGhostTable running');
-      // console.log(`option :>> ${option};`);
-      let openTag, closeTag, ghostOpn1, ghostCls1, ghostOpn2, ghostCls2, ghostTags = [], wrapperChecked, tokens, tokenIdx, tagIdx, sub1, sub2, sub3, hasIndex, tag, tokenOpn;
-      // !VA Branch: 112020A
-      // !VA token is a parameter below but is never declared, and it is assigned a value of ghostOpn2 which is never accessed. Deleting it, but keep an eye out for repercussions.
-      // let token;
+    // !VA Called from buildOutputNodeList. Ghost tag tokens were inserted via insertAdjacentHTML during node creation. This function replaces the tokens with the ghost tags from getGhostTags depending on the checked status of the Ghost checkbox icons passed in as bool parameters from the caller. chkbxTbl and chkbxTbw are booleans indicating whether ccpTblGhostChk and ccpTbwGhostChk are checked. Calls transposeTokens to swap the position of the token from before the tag to after it. This is necessary because the ghost tokens had to be positioned before the tags due to the indents being placed after them using insertAdjacentHtml - it is not possible to modify or append to strings inserted with insertAdjacentHtml.
+    function applyGhostTable(tbl, chkbxTbl, chkbxTbw, option) {
+      console.log(`applyGhostTable tbl :>> ${tbl};`);
+      console.log(`applyGhostTable chkbxTbl :>> ${chkbxTbl}; chkbxTbw :>> ${chkbxTbw}; option :>> ${option}`);
+      let openTag, closeTag, ghostOpn1, ghostCls1, ghostOpn2, ghostCls2, ghostTags = [], wrapperChecked, tokens, tokenIdx, tagIdx, nextTag, tag;
+      // !VA NOTE: token isn't a variable, it's an item in the forof loop of the tokens array
+
       // !VA Define the tokens to use as placeholders before the replace operation
       ghostOpn1 = '/ghostOpn1/', ghostCls1 = '/ghostCls1/', ghostOpn2 = '/ghostOpn2/', ghostCls2 = '/ghostCls2/';
       // !VA Define the opening and closing table tags
       openTag = '<table', closeTag = '</table>';
-      // !VA Get the ghost tags and their indents
-      ghostTags = getGhostTags(option);
-      // console.log(`bool1 (tableGhost:):>> ${bool1}; bool2 (tableWrapperGhost): ${bool2}`);
+
+      // !VA If ccpTblWraprChk is checked, add the 2nd level ghost tokens to the tokens array
       wrapperChecked = appController.getAppobj('ccpTblWraprChk');
       // console.log('wrapperChecked :>> ' + wrapperChecked);
       if (!wrapperChecked) {
-        // tokens = [ ghostOpn1, ghostCls1, ghostOpn2, ghostCls2 ];
         tokens = [ ghostOpn1, ghostCls1 ]; }
       else {
-        // tokens = [ ghostOpn1, ghostCls1, ghostOpn2, ghostCls2 ];
         tokens = [ ghostOpn2, ghostOpn1, ghostCls2, ghostCls1 ]; 
       }
-      // !VA Branch: 112020A
-      // !VA Check this...looks fishy, see comment on let token above;
-      // token = ghostOpn2;
 
-      function transposeTokens(tbl, token, tokenIdx, tagIdx) {
-        // console.log('transposeTokens running'); 
-        // console.log(`tbl :>> ${tbl};`);
-        if (token.includes('Opn')) {
-        // !VA sub1 is the string from the beginning to the tagIndex.
-          sub1 = tbl.substring( 0, tagIdx );
-          // console.log('sub1 :>> ' + sub1);
-          // !VA sub2 is the string from the tag index to the end of the token.
-          sub2 = tbl.substring( tagIdx, tokenIdx + token.length);
-          // console.log('sub2 :>> ' + sub2);
-          // !VA Now add the token to the front of sub2
-          sub2 = token + sub2;
-          // console.log('sub2 :>> ' + sub2);
-          // !VA Now delete the token from the tail of sub2
-          sub2 = sub2.substring( 0, sub2.length - token.length );
-          // console.log('sub2 :>> ' + sub2);
-          // !VA sub3 strips the original token and returns the rest of the str
-          sub3 = tbl.substring( tokenIdx + token.length, tbl.length);
-          // console.log('sub3 :>> ' + sub3);
-          // !VA Concatenate the substrings
-          tbl = sub1 + sub2 + sub3;
-
-        } else {
-          // !VA STOPPING HERE, ghostCls still not right
-          // console.log(`TOKEN :>> ${token}; tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}; `);
-          // !VA substring 1 includes up to the token index position
-          sub1 = tbl.substring( tbl, tokenIdx );
-          // console.log(`TOKEN: ${token} - sub1 :>>  ${sub1}`);
-          // !VA substring 2 is from the token index position up to the tag index plus the tag length, that is, the position to which the token will move.
-          sub2 = tbl.substring( tokenIdx, tagIdx + tag.length);
-          // !VA Remove the existing token from substring 2
-          sub2 = sub2.substring( token.length, sub2.length);
-          // console.log(`$TOKEN: ${token} - sub2 :>> "${sub2}"`);
-          // !VA The two sub3 statements below output the same number for the position argument, but the slice method results in a str that is off by 1 character. I don't know why the current sub3 works, but it does. Come back to this when I have a lot of extra time on my hands. 
-          // sub3 = str.slice( tagIdx + tag.length + 1, -1);
-          // !VA Branch: 112020A
-          // !VA Alert - the first occurrence of tbl.length below was str.length, just fixed it and don't know if there are consequences.
-          sub3 = tbl.substring( tbl.length - (tbl.length - tagIdx - tag.length), tbl.length );
-          // !VA The below is where I try to figure out the difference between the two sub3 statements above.
-          // var foo = (v.length - ( tbl.length - tagIdx - tag.length));
-          // console.log(`TOKEN: ${token}; foo :>> ${foo};`);
-          // var baz = tagIdx + tag.length;
-          // console.log(`TOKEN: ${token}; baz :>> ${baz};`);
-          // sub3 = tbl.substring( tagIdx - tag.length, tbl.length );
-          // console.log(`TOKEN: ${token}; tbl.LENGTH: ${tbl.length}; TOKENIDX: ${tokenIdx}; TAGIDX: ${tagIdx}; - sub3 :>> "${sub3}"`);
-          // !VA Concatenate the substrings to build the string and return.
-          tbl = sub1 + sub2 + token + sub3;
-          // console.log(`$TOKEN: ${token} - tokenIdx :>> ${tokenIdx};`);
-          // console.log(`TOKEN: ${token} tbl :>> "${tbl}"`);
-        }
-
-        return tbl;
-      } 
-      
-
+      // !VA Loop through the tokens array and process each token in the list
+      // !VA NOTE: token isn't a variable, it's an item in the tokens array list. However, its value is passed to transposeTokens as a paremeter
       for (const token of tokens) {
-        // console.log('token :>> ' + token);
-        if (token.includes('Opn')) { 
-          tokenOpn = true;
-          tag = openTag;
-        }
-        else {
-          tokenOpn = false;
-          tag = closeTag;
-        }  
+        // !VA Process tokens until tagIdx is not found i.e. returns -1
+        // !VA Branch: 112420C
+        // !VA replaced tokenIdx with tagIdx as do loop terminator, not yet tested so this could be a source of bugs
         do {
+          // !VA Dev, loop test. Insert this for loop to catch crash loops in the do handler
+          // for (let i = 0; i < 5; i++) {
           tokenIdx = 0;
-          if (tokenOpn) {
-            // console.log('OPEN');
+          // !VA If token contains the string 'Opn' then it is the token for an opening Ghost tag
+          if (token.includes('Opn')) {
+            // !VA Set the current tag to openTag, i.e. the opening table tag. 
+            tag = openTag;
             // !VA Loop here but only on bgimg option
+            // !VA Branch: 112420C
+            // !VA Not sure what the above means
+            // !VA Start searching for the token from the first character of tbl. Continue the search by adding 1 to the current tokenIdx.
             tokenIdx = tbl.indexOf( token, tokenIdx + 1);
+            // !VA Search backward from the tokenIdx to locate the index of the current table tag.
             tagIdx = tbl.lastIndexOf( tag, tokenIdx);
-            // console.log(`tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}`);
-            if (tokenIdx !== -1 ) { 
-              hasIndex = false;
+            console.log(`applyGhostTable do OPN: tag :>> '${tag}'; tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}`);
+            // !VA Branch: 112420C
+            // !VA Use the tagIdx rather than the tokenIdx to terminate the loop. This can be deleted if no bugs appear.
+            // if (tokenIdx !== -1 ) { 
+            if (tagIdx !== -1 ) { 
+              // !VA If tagIdx returns -1, then no nextTag was found, so terminate the loop. Otherwise, call transposeTokens to place the tokens after the tag
+              nextTag = false;
               // console.log(`Mark1A tbl :>> ${tbl};`);
-              tbl = transposeTokens( tbl, token, tokenIdx, tagIdx );
+              tbl = transposeTokens( tag, tbl, token, tokenIdx, tagIdx );
               // console.log(`Mark1B tbl :>> ${tbl};`);
             }
           } else  {
-            // console.log(`Mark2 tbl :>> ${tbl};`);
+            tag = closeTag;
             tokenIdx = tbl.lastIndexOf( token, tbl.length - tag.length);
-            // console.log('tokenIdx :>> ' + tokenIdx);
             tagIdx = tbl.indexOf( tag, tokenIdx);
-            // console.log('tagIdx :>> ' + tagIdx);
-            if (tokenIdx !== -1 ) { 
-              hasIndex = false;
-              tbl = transposeTokens( tbl, token, tokenIdx, tagIdx );
+            console.log(`applyGhostTable do CLS: tag :>> '${tag}'; tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}`);
+            // !VA Branch: 112420C
+            // !VA Use the tagIdx rather than the tokenIdx to terminate the loop. This can be deleted if no bugs appear.
+            // if (tokenIdx !== -1 ) { 
+            if (tagIdx !== -1 ) { 
+              // !VA If tagIdx returns -1, then no nextTag was found, so terminate the loop. Otherwise, call transposeTokens to place the tokens after the tag
+              nextTag = false;
+              tbl = transposeTokens( tag, tbl, token, tokenIdx, tagIdx );
             }
           }
           // !VA Return out on error, used for dev to catch infinite loops
-          console.log('Error, returning out');
-          return;
-        }
-        while ( hasIndex !== false);
-      }
+          // console.log('Error, returning out');
+          // return;
+          // !VA Dev, loop test. Closing bracket for the dev for loop.
+          // console.log(`i :>> ${i};`);
+          // }
 
-      if (bool1) {
+        }
+        while ( nextTag !== false);
+      }
+      // !VA Get the array of ghost tags including indents
+      // !VA Branch: 112420C
+      // !VA Something is wrong with the indents - investigate
+      ghostTags = getGhostTags(option);
+
+      // !VA Set which ghost tags replace which tokens based on whether ccpTblWraprChk is checked
+      if (chkbxTbl) {
+        // !VA If the TBL ghost checkbox is checked, replace the first opening and closing ghost tokens with the corresponding ghost tags
         tbl = tbl.replace(ghostOpn1,  ghostTags[0]);
         tbl = tbl.replace(ghostCls1, ghostTags[1]);
+        // !VA If the TBL ghost checkbox is not checked, remove the ghost tokens from tbl
       } else {
         tbl = tbl.replace(ghostOpn1,'');
         tbl = tbl.replace(ghostCls1, '');
       }
-      if (bool2) {
+      if (chkbxTbw) {
+        // !VA If the TBW ghost checkbox is checked, replace the first opening and closing ghost tokens with the corresponding ghost tags
         tbl = tbl.replace(ghostOpn2, ghostTags[2]);
         tbl = tbl.replace(ghostCls2, ghostTags[3]);
       } else {
+        // !VA If the TBW ghost checkbox is not checked, remove the ghost tokens from tbl
         tbl = tbl.replace(ghostOpn2,'');
         tbl = tbl.replace(ghostCls2, '');
       }
