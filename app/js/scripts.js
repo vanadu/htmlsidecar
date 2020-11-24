@@ -612,12 +612,13 @@ var Witty = (function () {
       let el, revealObj = {}, currentObj = {};
       console.log('revealElements revealArray :>> ');
       console.log(revealArray);
-
+      // !VA Contains all the aliases whose elements can be concealed/revealed by the revealElements method of configCcp. Does not include the MKCSS button groups, since those buttons are children of the parent and are thus handled by revealMkcss. 
       const allAliases =  [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaTxcntTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdparGrp', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblMsdpiChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblCbhtmBtn', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
 
-      // !VA Get object containing the reveal configuration at initialization based on allArray above and initConcealed. initConcealed is the array of elements that are concealed at initialization. The result is an object whose keys are the revealable element aliases and whose values represent the reveal state at initialization.
+      // !VA Get object containing the reveal configuration at initialization based on allArray above and initConcealed. initConcealed is the array of elements that are concealed at initialization. The result is an object whose keys are the revealable element aliases and whose values represent the reveal state at initialization. This object forms the basis for the revealObj defined below.
       function getInitObj() {
         let obj = {};
+        // !VA initConcealed are the aliases whose elements are concealed at initialization.
         const initConcealed = [ 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaTxcntTfd', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
         // !VA Read in all aliases whose reveal state is true, i.e 
         for (let i = 0; i < allAliases.length; i++) {
@@ -627,8 +628,6 @@ var Witty = (function () {
         for (let i = 0; i < initConcealed.length; i++) {
           obj[initConcealed[i]] = false;
         }
-        console.log('obj :>> ');
-        console.log(obj);
         return obj;
       }
 
@@ -647,7 +646,6 @@ var Witty = (function () {
         return obj;
       }
 
-      // !VA Branch: 112220A
       // !VA If revealType is 'update', do not change the reveal configuration but instead just toggle the aliases in revealArray on and off with animation. Called from handleIconClick and handeTextInputEvent to handle the reveal/conceal of aliases with dependent elements, such as IMG Anchr.
       if (revealType === 'update') {
         // !VA Loop through the revealArray and toggle the reveal state of the aliased element.
@@ -819,15 +817,10 @@ var Witty = (function () {
         }
       } 
     }
-
-
-
-
     // !VA END CCP FUNCTIONS
 
     // !VA UIController public functions
     return {
-
       // !VA V2 Return all the strings for the UI element's IDs
       getInspectorElementIDs: function() {
         return inspectorElements;
@@ -861,11 +854,9 @@ var Witty = (function () {
         return appMessageElements;
       },
 
-
       // !VA UIController public
       // !VA Called from init(). Set dev mode options: Display toolbar, curImg, filename, display/undisplay CCP. Then initialize the UI: get localStorage and show dynamic containers and toolbar.
       initUI: function(initMode) {
-
         const delayInMilliseconds = 500;
         // !VA Here we initialize DEV mode, i.e. reading a hardcoded image from the HTML file instead of loading one manually in production mode
         if (initMode === 'devmode') {
@@ -1594,7 +1585,7 @@ var Witty = (function () {
       // !VA Create the full nodeList from the tableNodeFragment. If tableNodeFragment is null, return to abort without creating Clipboard object.
 
       // !VA Branch: 111920B
-      console.log(`buildOutputNodeList tableNodeFragment  :>> ${tableNodeFragment };`);
+      // console.log(`buildOutputNodeList tableNodeFragment  :>> ${tableNodeFragment };`);
       try {
         nl = tableNodeFragment.querySelectorAll('*');
       } catch (e) {
@@ -1668,7 +1659,7 @@ var Witty = (function () {
         // !VA Branch: 111520A
         // !VA If the TBL Ghost checkbox is checked, fetch the ghost table config for the TD options handled in this condition. TD options bgimg and iswap are handled in their respective conditions below.
         if (Attributes.tableGhost.str) {
-          console.log('hasWrapper :>> ' + hasWrapper);
+          // console.log('hasWrapper :>> ' + hasWrapper);
           if (selectedTdOption === 'basic' ) {
             outputNL = configGhostTable( 'basic', hasWrapper, outputNL);
           } else if (selectedTdOption === 'swtch') {
@@ -1998,7 +1989,7 @@ var Witty = (function () {
         returnNodeFragment.appendChild(imgNode);
       }
       // !VA return the imgNode as node fragment
-      console.log(`makeImgNode returnNodeFragment :>> ${returnNodeFragment};`);
+      // console.log(`makeImgNode returnNodeFragment :>> ${returnNodeFragment};`);
       return returnNodeFragment;
     }
 
@@ -2196,7 +2187,8 @@ var Witty = (function () {
       tableOuter.border = '0', tableOuter.cellSpacing = '0', tableOuter.cellPadding = '0';
       tableOuter.setAttribute('role', 'presentation'); 
       // !VA If ccpTbwGhostChk is checked, set the data-ghost attribute
-      console.log('Attributes.tableWrapperGhost.str :>> ' + Attributes.tableWrapperGhost.str);
+
+      // console.log('Attributes.tableWrapperGhost.str :>> ' + Attributes.tableWrapperGhost.str);
       if (Attributes.tableWrapperGhost.str) { tableOuter.setAttribute('data-ghost', 'tbw'); }
       // !VA Append the outer tr to the wrapper
       tableOuter.appendChild(trOuter);
@@ -2214,7 +2206,7 @@ var Witty = (function () {
       // !VA Pass the outer table to the tableNodeFragment and return it.
       tableNodeFragment.appendChild(tableOuter);
       // !VA Branch: 111920B
-      console.log(`makeTableNode tableNodeFragment :>> ${tableNodeFragment};`);
+      // console.log(`makeTableNode tableNodeFragment :>> ${tableNodeFragment};`);
 
 
       return tableNodeFragment;
@@ -2423,8 +2415,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CBController private
     // !VA handle the buildNodeList clipboardStr output, define and place the tokens in the clipboardStr output and replace the tokens with the ghost tabs from getGhostTags or strip them out depending on the checked status of the Ghost checkbox icons passed in as bool parameters from the caller.
     function applyGhostTable(tbl, bool1, bool2, option) {
-      console.log('applyGhostTable running');
-      console.log(`option :>> ${option};`);
+      // console.log('applyGhostTable running');
+      // console.log(`option :>> ${option};`);
       let openTag, closeTag, ghostOpn1, ghostCls1, ghostOpn2, ghostCls2, ghostTags = [], wrapperChecked, tokens, tokenIdx, tagIdx, sub1, sub2, sub3, hasIndex, tag, tokenOpn;
       // !VA Branch: 112020A
       // !VA token is a parameter below but is never declared, and it is assigned a value of ghostOpn2 which is never accessed. Deleting it, but keep an eye out for repercussions.
@@ -2450,9 +2442,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // token = ghostOpn2;
 
       function transposeTokens(tbl, token, tokenIdx, tagIdx) {
-        console.log('transposeTokens running'); 
-        console.log(`tbl :>> ${tbl};`);
-
+        // console.log('transposeTokens running'); 
+        // console.log(`tbl :>> ${tbl};`);
         if (token.includes('Opn')) {
         // !VA sub1 is the string from the beginning to the tagIndex.
           sub1 = tbl.substring( 0, tagIdx );
@@ -2477,12 +2468,12 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           // console.log(`TOKEN :>> ${token}; tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}; `);
           // !VA substring 1 includes up to the token index position
           sub1 = tbl.substring( tbl, tokenIdx );
-          console.log(`TOKEN: ${token} - sub1 :>>  ${sub1}`);
+          // console.log(`TOKEN: ${token} - sub1 :>>  ${sub1}`);
           // !VA substring 2 is from the token index position up to the tag index plus the tag length, that is, the position to which the token will move.
           sub2 = tbl.substring( tokenIdx, tagIdx + tag.length);
           // !VA Remove the existing token from substring 2
           sub2 = sub2.substring( token.length, sub2.length);
-          console.log(`$TOKEN: ${token} - sub2 :>> "${sub2}"`);
+          // console.log(`$TOKEN: ${token} - sub2 :>> "${sub2}"`);
           // !VA The two sub3 statements below output the same number for the position argument, but the slice method results in a str that is off by 1 character. I don't know why the current sub3 works, but it does. Come back to this when I have a lot of extra time on my hands. 
           // sub3 = str.slice( tagIdx + tag.length + 1, -1);
           // !VA Branch: 112020A
@@ -2497,9 +2488,10 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
           // console.log(`TOKEN: ${token}; tbl.LENGTH: ${tbl.length}; TOKENIDX: ${tokenIdx}; TAGIDX: ${tagIdx}; - sub3 :>> "${sub3}"`);
           // !VA Concatenate the substrings to build the string and return.
           tbl = sub1 + sub2 + token + sub3;
-          console.log(`$TOKEN: ${token} - tokenIdx :>> ${tokenIdx};`);
-          console.log(`TOKEN: ${token} tbl :>> "${tbl}"`);
+          // console.log(`$TOKEN: ${token} - tokenIdx :>> ${tokenIdx};`);
+          // console.log(`TOKEN: ${token} tbl :>> "${tbl}"`);
         }
+
         return tbl;
       } 
       
@@ -2521,7 +2513,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             // !VA Loop here but only on bgimg option
             tokenIdx = tbl.indexOf( token, tokenIdx + 1);
             tagIdx = tbl.lastIndexOf( tag, tokenIdx);
-            console.log(`tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}`);
+            // console.log(`tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}`);
             if (tokenIdx !== -1 ) { 
               hasIndex = false;
               // console.log(`Mark1A tbl :>> ${tbl};`);
@@ -2529,7 +2521,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
               // console.log(`Mark1B tbl :>> ${tbl};`);
             }
           } else  {
-            console.log(`Mark2 tbl :>> ${tbl};`);
+            // console.log(`Mark2 tbl :>> ${tbl};`);
             tokenIdx = tbl.lastIndexOf( token, tbl.length - tag.length);
             // console.log('tokenIdx :>> ' + tokenIdx);
             tagIdx = tbl.indexOf( tag, tokenIdx);
@@ -2540,8 +2532,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             }
           }
           // !VA Return out on error, used for dev to catch infinite loops
-          // console.log('Error, returning out');
-          // return;
+          console.log('Error, returning out');
+          return;
         }
         while ( hasIndex !== false);
       }
@@ -2572,7 +2564,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CBController private
     // !VA Returns the strings for opening and closing ghost table tag as a two-item array with indents on the inner table based on the status of the Table Wrapper checkbox icon.
     function getGhostTags(option) {
-      console.log(`getGhostTags option :>> ${option};`);
+      // console.log(`getGhostTags option :>> ${option};`);
       let ghostOpn1, ghostCls1, ghostOpn2, ghostCls2, hasWrapper, indent;
       let ghosttags = [];
       // !VA Get the status of the Table Wrapper checkbox - it determines whether indents are applied to the inner table or not.
@@ -2829,6 +2821,7 @@ ${indent}<![endif]-->`;
       doClipboard: function(evt) {
         let targetid, modifierKey;
         targetid = evt.target.id;
+        console.log(`targetid :>> ${targetid};`);
         // !VA Determined if shift or ctrl is pressed while clicked
         if (evt.shiftKey) { 
           modifierKey = 'shift';
@@ -5026,7 +5019,7 @@ ${indent}<![endif]-->`;
         highlightIcon: { highlight: highlightArray},
         reflectAppobj: { reflect: reflectArray },
         radioState: { radio: radioArray },
-        revealElements: { caller: 'configItype', revealType: 'config', reveal: revealArray }
+        revealElements: { caller: 'configItype', revealType: 'config', revealArray: revealArray }
       };
       return configObj;
     }
@@ -5034,13 +5027,9 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from fetchConfigObj to get the TD Option radio group-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
     function configOptns( alias, option ) {
-      let revealFlag, revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray, highlightArray, mkcssArray, initArray;
+      let revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray, highlightArray, mkcssArray;
       let configObj = {};
-
-      initArray = fetchRevealArray('init');
-      // console.log('configOptns initArray :>> ');
-      // console.log(initArray);
-
+      
       // !VA Handle the TD Options CCP configurations
       switch(true) {
       case option === 'basic':
@@ -5056,7 +5045,6 @@ ${indent}<![endif]-->`;
         // !VA NOTE: This should perhaps be in configDefault.
         selectCheckbox( false, 'ccpTblWraprChk');
 
-        revealFlag = false;
         mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ]
         configObj.revealMkcss =  {caller: 'configOptns', flag: true, revealArray: mkcssArray };
         // !VA Branch: 111920B
@@ -5096,7 +5084,6 @@ ${indent}<![endif]-->`;
         // !VA Branch: 111920A
         // !VA I'm not sure this description still applies
         // !VA revealElements METHOD: revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
-        revealFlag = false;
         // !VA Array of elements to be concealed. 
         revealArray = fetchRevealArray('iswap');
         // !VA radioState METHOD: Array of radio elements whose checked state to set
@@ -5236,7 +5223,6 @@ ${indent}<![endif]-->`;
         // !VA revealElements METHOD: revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
         // !VA Branch: 111920A
         // !VA Check if revealFlag is still applicable
-        revealFlag = false;
         // !VA Array of elements to be revealed.
         revealArray = fetchRevealArray('vmlbt');
         // !VA revealMkcss METHOD: conceal/reveal Make CSS buttons
