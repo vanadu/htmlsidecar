@@ -538,6 +538,7 @@ var Witty = (function () {
     // !VA UIController private
     // !VA Toggle the table wrapper options in the CCP UI based on the configObj passed from configWrapr. 
     function toggleWrapr(flag) {
+      console.log('toggleWrapr running'); 
       let el, clss;
       // !VA Array of table wrapper aliases
       let wraprArr;
@@ -4945,6 +4946,9 @@ ${indent}<![endif]-->`;
       radioArray = [ 'ccpImgExcldRdo', 'ccpTdaOptnsRdo' ];
       // !VA checkboxState METHOD
       checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk' ];
+      // !VA Branch: 112240A
+      // !VA Conceal the TBW options and turn off the Wrapr checkbox.
+      selectCheckbox( false, 'ccpTblWraprChk');
       // !VA Set Appobj properties for reflectAppobj
       Appobj.ccpTblWraprChk = false;
       Appobj.ccpTblHybrdChk = false;
@@ -4985,10 +4989,6 @@ ${indent}<![endif]-->`;
       highlightArray = getInputArray();
       // !VA revealMkcss METHOD array
       mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp'];
-
-      // !VA Branch: 111920B
-      // !VA This flag applies to revealMkcss but not to revealElements, remove the flag from revealElements
-      var flag = true;
 
       configObj = {
         revealMkcss: {caller: 'configExcld', flag: true, revealArray: mkcssArray },
@@ -5050,6 +5050,12 @@ ${indent}<![endif]-->`;
         // !VA Set the flag to conceal items in revealArray
         // !VA Branch: 111920A
         // !VA Why is the revealFlag being set here? The flag property is set explicitly in revealMkcss below.
+
+        // !VA Branch: 112240A
+        // !VA Conceal the TBW options and turn off the Wrapr checkbox.
+        // !VA NOTE: This should perhaps be in configDefault.
+        selectCheckbox( false, 'ccpTblWraprChk');
+
         revealFlag = false;
         mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ]
         configObj.revealMkcss =  {caller: 'configOptns', flag: true, revealArray: mkcssArray };
@@ -5141,10 +5147,9 @@ ${indent}<![endif]-->`;
         // !VA Get the revealArray for the revealElements METHOD.
         revealArray = fetchRevealArray('swtch');
 
-        // !VA Branch: 112020A
-        // !VA we need overrides here, not a new configObj
-        // console.log('swtch BEFORE configObj :>> ');
-        // console.log(configObj);
+        // !VA Branch: 112240A
+        // !VA Conceal the TBW options and turn off the Wrapr checkbox.
+        selectCheckbox( false, 'ccpTblWraprChk');
 
         // !VA Modifications to configDefault configuration
         configObj.revealMkcss = { caller: 'configOptns', flag: true, revealArray: mkcssArray };
@@ -5180,6 +5185,10 @@ ${indent}<![endif]-->`;
         radioArray = [ 'ccpImgItypeRdo' ];
         // !VA checkboxState METHOD: Array of checkbox elements whose checked state to set
         checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk' ];
+        // !VA Branch: 112240A
+        // !VA Conceal the TBW options and turn off the Wrapr checkbox.
+        selectCheckbox( false, 'ccpTblWraprChk');
+
         // !VA revealMkcss METHOD: conceal/reveal Make CSS buttons
         mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ]
         // !VA Set the configObj with the methods and properties to configure
@@ -5217,6 +5226,10 @@ ${indent}<![endif]-->`;
         reflectArray = ['ccpImgClassTfd', 'ccpImgAnchrTfd', 'ccpImgItypeRdo', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaHeigtTfd',  'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTdaBdradTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
         // !VA checkboxState METHOD: Array of checkbox elements whose checked state to set
         checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk' ];
+        // !VA Branch: 112240A
+        // !VA Conceal the TBW options and turn off the Wrapr checkbox.
+        selectCheckbox( false, 'ccpTblWraprChk');
+
         // !VA  radioState METHOD: Array of radio elements whose checked state to set
         radioArray = [ 'ccpImgItypeRdo', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo' ];
         // !VA revealElements METHOD: revealFlag will always be false. This method only reveals elements - it's not a toggle. Elements aren't unrevealed, rather the entire config is reset and replaced with a different config when a different selection is made.
@@ -5363,6 +5376,8 @@ ${indent}<![endif]-->`;
 
       // !VA checkboxState METHOD: Set the Wrapper and Hybrid checkbox as properties of the checkboxState method. These two checkboxes will have checked state set by the Appobj property set above.
       checkedArray = ['ccpTblWraprChk', 'ccpTblHybrdChk'];
+      // !VA Reveal the TBW options and turn on the Wrapr checkbox.
+      selectCheckbox( true, 'ccpTblWraprChk');
       // !VA reflectElements METHOD: Set the array of the elements whose CCP value should be set according to the REFLECT PROPERTIES set above
       reflectArray = ['ccpImgClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTblClassTfd', 'ccpTbwClassTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwMaxwdTfd' ];
       // !VA radioState METHOD: Set the properties of the radioState method whose selected option is set according to its Appobj properties set in the APPOBJ PROPERTIES section above
@@ -5382,7 +5397,7 @@ ${indent}<![endif]-->`;
         reflectAppobj: { reflect: reflectArray },
         radioState: { radio: radioArray },
         // revealReset: { alias: 'default'},
-        revealElements: { caller: 'configHybrd', revealType: 'config', reveal: revealArray },
+        revealElements: { caller: 'configHybrd', revealType: 'config', revealArray: revealArray },
       };
       return configObj;
     }
