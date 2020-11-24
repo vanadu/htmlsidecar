@@ -606,8 +606,7 @@ var Witty = (function () {
     // !VA Branch: 112220A
     // !VA Reveal and conceal individual CCP container elements with sequential animation. revealType specifies whether the existing reveal configuration should be updated with the revealArray items or whether a different reveal configuration should be set based on a comparison between the revealArray elements and the default revealInit array. the revealType arguments are 'update' and 'config'.
 
-    function revealElements ( caller, revealType, initArray, revealArray) {
-      console.clear();
+    function revealElements ( caller, revealType, revealArray) {
       console.log(`revealElements caller :>> ${caller}; revealType :>> ${revealType}; revealElements: revealArray :>> ${revealArray}; `);
       let el, revealObj = {}, currentObj = {};
       console.log('revealElements revealArray :>> ');
@@ -955,7 +954,7 @@ var Witty = (function () {
           revealInit( configObj.revealInit.reveal );
         }
         if ( configObj.revealElements ) {
-          revealElements( configObj.revealElements.caller, configObj.revealElements.revealType, configObj.revealElements.initArray, configObj.revealElements.revealArray );
+          revealElements( configObj.revealElements.caller, configObj.revealElements.revealType, configObj.revealElements.revealArray );
         }
         if ( configObj.revealMkcss) {
           revealMkcss( configObj.revealMkcss.caller, configObj.revealMkcss.flag, configObj.revealMkcss.revealArray);
@@ -4472,10 +4471,10 @@ ${indent}<![endif]-->`;
       evtTargetId = evt.target.id;
       // !VA Get the Appobj alias of the corresponding input element of the label
       appObjProp = elemIdToAppobjProp(evtTargetId.replace('lbl', 'ipt'));
+      console.log(`Mark1 Appobj.ccpImgAnchrTfd :>> ${Appobj.ccpImgAnchrTfd};`);
       // !VA If the target element is NOT the padding icon
       if (evt.target.id !== 'ccp-tda-padng-icn') {
-        // !VA Set the Appobj property of the input to empty, i.e. the value after the icon click.
-        Appobj[appObjProp] = '';
+
         // !VA Reflect the Appobj value to and highlight the appObjProp element. NOTE: appObjProp element is set in CSS to highlight its sibling label element, i.e. the icon.
         reflectArray = [ appObjProp ];
         highlightArray = [ appObjProp ];
@@ -4486,11 +4485,11 @@ ${indent}<![endif]-->`;
         };
         // !VA Handle the reveal state of the IMG Anchr dependent elements: ccpImgTxclrTfd' and 'ccpImgTargtChk
         // !VA Branch: 112220A
-        // !VA Implementing revealType = 'update'
-        if (appObjProp.includes('Anchr')) {
+        // !VA Implementing revealType = 'update' to conceal the dependent elements if the IMG Anchr field is not empty. If it is empty, don't run revealElements, otherwise the dependent elements will toggle on and off
+        if (appObjProp.includes('Anchr') && Appobj.ccpImgAnchrTfd !== '') {
           revealArray = [ 'ccpImgTxclrTfd', 'ccpImgTargtChk'];
           // !VA initArray property not required for initType = 'update'
-          configObj.revealElements = { caller: 'handleIconClick', revealType: 'update', initArray: fetchRevealArray('init'), revealArray: revealArray };
+          configObj.revealElements = { caller: 'handleIconClick', revealType: 'update', revealArray: revealArray };
         }
         // !VA If the target is a label for a Class input element, also handle the conceal of the associated Make CSS buttons
         if (appObjProp.includes('Class')) {
@@ -4504,7 +4503,8 @@ ${indent}<![endif]-->`;
           configObj.revealMkcss = { caller: 'handleIconClick', flag: true, initArray: fetchRevealArray('init'), revealArray: mkcssArray };
         }
 
-        // !VA Add the revealElements to the config 
+        // !VA Set the Appobj property of the input to empty, i.e. the value after the icon click.
+        Appobj[appObjProp] = '';
 
         // !VA Run the configuration
         UIController.configCCP( configObj);
