@@ -1569,8 +1569,8 @@ var Witty = (function () {
 
     // !VA CBController   
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
-    function buildOutputNodeList( id ) {
-      console.log(`buildOutputNodeList id :>> ${id};`);
+    function buildOutputNodeList( id, nodeDepth ) {
+      console.log(`buildOutputNodeList id :>> ${id}; nodeDepth :>> ${nodeDepth}`);
       let selectedTdOption, hasAnchor, hasWrapper, Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
       // !VA Set hasAnchor if ccpImgAnchrTfd has a value
       appController.getAppobj('ccpImgAnchrTfd')  ? hasAnchor = true : hasAnchor = false;
@@ -1655,6 +1655,13 @@ var Witty = (function () {
 
         // !VA Create the outputNL nodeList to pass to the Clipboard object
         outputNL = container.querySelectorAll('*');
+
+        // !VA Branch: 112420D
+        // !VA 
+        console.log('Mark1 outputNL :>> ');
+        console.log(outputNL);
+
+
 
         // !VA Branch: 111520A
         // !VA If the TBL Ghost checkbox is checked, fetch the ghost table config for the TD options handled in this condition. TD options bgimg and iswap are handled in their respective conditions below.
@@ -2375,6 +2382,11 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     function configGhostTable(option, hasWrapper, nodeList) {
       // console.log('configGhostTable running'); 
       // console.log(`option :>> ${option}; hasWrapper :>> ${hasWrapper}`);
+
+      // !VA Branch: 112420D
+      // !VA Need to add a condition somehow that this routine only runs if the TBL Make HTML is the event target. Otherwise, if TD or IMG Make HTML is the target, the nodelist indices below are undefined.
+
+
       
       // !VA The tokens used as placeholders for the ghost tables
       const ghostOpn1 = '/ghostOpn1/',  ghostCls1 = '/ghostCls1/', ghostOpn2 = '/ghostOpn2/', ghostCls2 = '/ghostCls2/';
@@ -2581,7 +2593,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CBController private
     // !VA Returns the strings for opening and closing ghost table tag as a two-item array with indents on the inner table based on the status of the Table Wrapper checkbox icon.
     function getGhostTags(option) {
-      // console.log(`getGhostTags option :>> ${option};`);
+      console.log(`getGhostTags option :>> ${option};`);
       let ghostOpn1, ghostCls1, ghostOpn2, ghostCls2, hasWrapper, indent;
       let ghosttags = [];
       // !VA Get the status of the Table Wrapper checkbox - it determines whether indents are applied to the inner table or not.
@@ -2837,28 +2849,74 @@ ${indent}<![endif]-->`;
       // !VA Called from eventHandler to initialize clipboard functionality
       doClipboard: function(evt) {
         let targetid, modifierKey;
+        // !VA nodeDepth can have three values: 'imgNode', 'tdaNode', 'tblNode'
+        let nodeDepth;
         targetid = evt.target.id;
-        console.log(`targetid :>> ${targetid};`);
+        console.log(`doClipboard targetid :>> ${targetid};`);
+        // console.log('doClipboard evt :>> ');
+        // console.dir(evt);
         // !VA Determined if shift or ctrl is pressed while clicked
         if (evt.shiftKey) { 
           modifierKey = 'shift';
         } else if (evt.ctrlKey ) {
           modifierKey = 'ctrl';
+        } else if (evt.altKey ) {
+          modifierKey = 'alt';
         } else {
           modifierKey = false;
         }
+
+
+
+
+
+
         // !VA IMPORTANT: Is this still necessary? Attributes don't appear to be passed anywhere here, I think this might be deprecated.
         // !VA If the CCP image fluid/fixed radio button is clicked, then 
-        if (targetid.includes('fixed') || targetid.includes('fluid')) {
-          getAttributes();
-        }
+        // if (targetid.includes('fixed') || targetid.includes('fluid')) {
+        //   getAttributes();
+        // }
         // !VA Run the Clipboard building routine based on the click target. 
         switch(true) {
-        
-        case targetid.includes('cbhtm') || targetid.includes('ipt'):
-        // case targetid.includes('tag') || targetid.includes('fluid') || targetid.includes('fixed') :
-          buildOutputNodeList (targetid);
+        // !VA Branch: 112420D
+        // !VA What we need here is an argument to pass to buildOutputNodeList that indicates NOT the id of the event but rather the nodes to output. 
+        // !VA Deprecating for now, replacing with individual cbhtm cases
+        // case targetid.includes('cbhtm') :
+        //   buildOutputNodeList(targetid);
+        //   break;
+        case evt.target.name === 'ccp-cbhtm-btn' :
+          console.log('NAME: ccp-cbhtm-btn');
+          if (targetid === 'ccp-img-cbhtm-ipt') {
+            console.log('IMG Make HTML');
+            buildOutputNodeList(targetid, 'imgNode');
+          } else if (targetid === 'ccp-tda-cbhtm-ipt') {
+            console.log('TDA Make HTML');
+            buildOutputNodeList(targetid, 'tdaNode');
+          } else if (targetid === 'ccp-tbl-cbhtm-ipt') {
+            console.log('TBL Make HTML');
+            buildOutputNodeList(targetid, 'tblNode');
+          } else {
+            console.log('ERROR in doClipboard - unknown condition');
+          }
           break;
+        // !VA Trap the input elements
+        case evt.target.classList.toString().includes('ccp-txfld-ipt') :
+          console.log(`TEXT INPUT targetid :>> ${targetid};`);
+          // !VA Will have to add conditions to exclude the unpressed modifiers
+          if (evt.shiftKey === true) {
+            console.log('IMG Make HTML');
+            // buildOutputNodeList(targetid);
+          } else if (evt.ctrlKey === true) {
+            console.log('TDA Make HTML');
+            // buildOutputNodeList(targetid);
+          } else if (evt.altKey === true) {
+            console.log('TBL Make HTML');
+            // buildOutputNodeList(targetid);
+          } else {
+            console.log('ERROR in doClipboard - unknown condition');
+          }
+          break;
+
         // !VA cbdtp, cbsph and cblph are the 5-char element codes for the Make CSS buttons
         case targetid.includes('cbdtp') || targetid.includes('cbsph') || targetid.includes('cblph'):
           makeCssRule(targetid);
@@ -3811,8 +3869,8 @@ ${indent}<![endif]-->`;
     // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Calls handleUserInput which validates the input and returns either an integer or a string and passes the value to applyInputValue to write to Appobj and the DOM. Then, for curImgW/curImgH, sets the input value to '' so the placeholder shows through. For all other input elements, sets the input value to the respective Appobj property.
     // !VA NOTE: Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances to the next field.
     function handleKeydown(evt) {
-      console.log('handleKeydown running');
-      console.log(`evt.target.id :>> ${evt.target.id};`);
+      // console.log('handleKeydown running');
+      // console.log(`evt.target.id :>> ${evt.target.id};`);
       let retVal, reflectArray = [], highlightArray = [], configObj = {};
       // !VA Get the keypress
       let keydown = evt.which || evt.keyCode || evt.key;
@@ -3863,21 +3921,15 @@ ${indent}<![endif]-->`;
               this.select();
             }
           } 
-          // !VA Branch: 111920B
-          if (evt.getModifierState('Shift')) {
-            console.log('SHIFT pressed');
+          console.clear();
+          // !VA Branch: 112420D
+          // !VA The modifier keypress is passed with the event. Need to filter out all the elements we do NOT want to trigger the clipboard output.
+          // !VA If the classList converted to string contains the ccp-txfld-ipt class, then the target element is an input element that can support a MODIFIER+ENTER action to trigger a clipboar output.   
+          if (evt.target.classList.toString().includes('ccp-txfld-ipt')) {
             CBController.doClipboard(evt);
-          } else if ( evt.getModifierState('Control')) {
-            console.log('CTRL pressed');
-          } else if ( evt.getModifierState('Alt')) {
-            console.log('ALT pressed');
-          } else {
-            console.log('No modifier pressed');
           }
 
-
-          // CBController.doClipboard(evt);
-
+          
         } else if ( keydown === 9) {
           // !VA NOTE: TAB key is handled by handleBlur, so do nothing here.
           // console.log('TAB key');
