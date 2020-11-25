@@ -60,60 +60,6 @@ var Witty = (function () {
   // mutationObserver.observe(mainNode, { attributes: true });
 
 
-  //   var tbl = 
-  // `<table role="presentation" data-ghost-tbl="true" width="200" cellspacing="0" cellpadding="0" border="0">
-  //   <tr>
-  //     <td valign="top" align="left">
-  //       <a href="#" style="color: #0000FF; " target="_blank"><img src="img/_200X150.png" style="display: block; width: 200px; height: 150px; font-family: Arial, sans-serif; font-size: 16px; line-height: 15px; text-decoration: none; border: none; outline: none;" width="200" height="150" border="0"></a>
-  //     </td>
-  //   </tr>
-  // </table>`;
-    
-  //   var ghostOpn = 
-  // `<!--[if (gte mso 9)|(IE)]>
-  // <table align="center" border="0" cellspacing="0" cellpadding="0" width="200">
-  // <tr>
-  // <td align="center" valign="top" width="200">
-  // <![endif]-->\n`;
-
-  //   var ghostCls = 
-  // `\n<!--[if (gte mso 9)|(IE)]>
-  // </td>
-  // </tr>
-  // </table>
-  // <![endif]-->`;
-
-  // // !VA Get the full data property string including boolean
-  // var index, dataAtt, dataAttLength, boolPos, bool, boolLength, replStr;
-  // dataAtt = 'data-ghost-tbl';
-  // // !VA Get the index of the data attribute
-  // index = tbl.indexOf(dataAtt);
-  // // !VA Get the length of the data attribute
-  // dataAttLength = dataAtt.length;
-  // // !VA Get the index of the data attribute's value, which is a boolean
-  // boolPos = index + dataAttLength + 2;
-  // // !VA If the 4 chars following boolpos equals 'true' then the bool is true, else it is false
-  // tbl.substr( boolPos, 4) === 'true' ? bool = true : bool = false;
-  // // !VA Length of the data attribute value, i.e. the boolean
-  // bool ? boolLength = 4 : boolLength = 5;
-  // // !VA Length of the data attribute including value, including equal sign, two quotes and a space
-  // dataAttLength = dataAttLength + boolLength + 4;
-  // // !VA The full data attribute string, including value and closing space
-  // dataAtt = tbl.substr( index, dataAttLength);
-  // console.log('dataAtt is: ' + dataAtt, '; bool is: ' + bool);
-  // // !VA The string to add the opening ghost tag to. The string length is the index of the data attribute, i.e. index, plus the length of the data attribute, i.e. dataAttLength.
-  // replStr = tbl.substr( 0, index + dataAttLength);
-  // // !VA If the Ghost checkbox icon is checked, i.e. bool is true, then prepend the ghost table to the table, and add the closing ghost tag after the closing table tag
-  // if (bool) { 
-  //   tbl = tbl.replace( replStr, `${ghostOpn}${replStr}`); 
-  //   tbl = tbl.replace( '</table>', `</table>${ghostCls}`)
-
-  // }
-  // // !VA Remove the data attribute string
-  // tbl = tbl.replace( dataAtt, '');
-  // // console.log('tbl is: ');
-  // // console.log(tbl);
-
   var testbut = document.querySelector('#testme');
   // var testbut2 = document.querySelector('#testme2');
   var addMe = function() {
@@ -128,6 +74,9 @@ var Witty = (function () {
     console.log('getImgType is: ' + getImgType);
     
   };
+
+  var activeFocus = document.activeElement.tagName; 
+  console.log(`activeFocus :>> ${activeFocus};`);
 
   // !VA GLOBAL
   let myObject = {};
@@ -1608,14 +1557,14 @@ var Witty = (function () {
         // !VA Process the makeNode button clicks
         switch(true) {
         // !VA ccpImgCbhtmIpt is clicked. We can hardcode the index where the extraction begins because the imgNode is created in makeTdNode and the ccpImgCbhtmIpt button click overrides any other makeNode button actions. 
-        case ( '#' + id === iptCcpMakeClips.ccpImgCbhtmIpt):
+        case ( nodeDepth === 'imgNode' ):
           
           // !VA If hasAnchor === true then the checkbox is checked, so take the last two (i.e. A and IMG) nodes, otherwise just take the last (i.e. IMG) node.
           hasAnchor === true ? frag = nl[nl.length - 2] : frag = nl[nl.length - 1]; 
 
           break;
         // !VA ccpTdaCbhtmIpt is clicked. Here we handle the 'rdoCcpTdBasic', 'rdoCcpTdExcludeimg' and 'rdoCcpTdPosswitch' options because they process indents with no modifications. 'rdoCcpTdImgswap', 'rdoCcpTdBgimage' and 'rdoCcpTdVmlbutton' options are handled separately because they import comment nodes with MS conditional code
-        case ( '#' + id === iptCcpMakeClips.ccpTdaCbhtmIpt):
+        case ( nodeDepth === 'tdaNode' ):
           // !VA basic option is selected 
           if ( selectedTdOption === 'basic') { 
             // !VA We can hardcode this for now, but that will be a problem if any other options with other nodes are added.
@@ -1632,7 +1581,7 @@ var Witty = (function () {
           frag = nl[extractPos];
           break;
         // !VA Target id is MakeTableTag button
-        case ( '#' + id === iptCcpMakeClips.ccpTblCbhtmIpt):
+        case ( nodeDepth === 'tblNode' ):
           // !VA basic or excludeimg option is selected 
           // !VA We can hardcode the 'rdoCcpTdBasic' and 'rdoCcpTdPosswitch' positions for now, but these will have to be revisited if any new options are added that change the outputNL indices. 
           // !VA If the Appobj property for the Include table wrapper icon is true
@@ -1655,13 +1604,6 @@ var Witty = (function () {
 
         // !VA Create the outputNL nodeList to pass to the Clipboard object
         outputNL = container.querySelectorAll('*');
-
-        // !VA Branch: 112420D
-        // !VA 
-        console.log('Mark1 outputNL :>> ');
-        console.log(outputNL);
-
-
 
         // !VA Branch: 111520A
         // !VA If the TBL Ghost checkbox is checked, fetch the ghost table config for the TD options handled in this condition. TD options bgimg and iswap are handled in their respective conditions below.
@@ -1754,7 +1696,14 @@ var Witty = (function () {
       console.log('buildOutputNodeList clipboardStr is: ');
       console.log(clipboardStr);
       // !VA Write clipboardStr to the Clipboard
-      writeClipboard( id, clipboardStr );
+      // !VA Branch: 112520A
+      if (id.substring( 8, 13) === 'cbhtm') {
+        writeClipboard( id, clipboardStr );
+      } else {
+        // writeClipboardKeys( id, clipboardStr );
+      }
+      return clipboardStr;
+
     }
 
     // !VA Make the nodes for the 'posswitch option' using the DIR attribute
@@ -1953,7 +1902,7 @@ var Witty = (function () {
     // !VA CBController   
     // !VA Builds the imgNode that is appended to the tdNode, that is in turn appended to the tableNode to generate the clipboard output. The individual attributes of the node (i.e. class, alt, etc) are received in the Attributes argument, which is originally created in getAttributes and called in buildOutputNodeList. Each property of the Attributes object contains any logic required to create the Attribute, but the logic of WHETHER the Attribute is to be included in the imgNode is 
     function makeImgNode ( id, Attributes ) {
-      console.log(`makeImgNode id :>> ${id};`);
+      // console.log(`makeImgNode id :>> ${id};`);
       // !VA Id is passed but not used here,  because we're only building the node.
       let imgNode, returnNodeFragment, textColorProp;
       // !VA Create the image node
@@ -2003,7 +1952,7 @@ var Witty = (function () {
     // !VA Make the TD node
     // !VA CBController   
     function makeTdNode( id, Attributes ) {
-      console.log(`makeTdNode id :>> ${id};`);
+      // console.log(`makeTdNode id :>> ${id};`);
       // !VA Variables for error handling - need to include this in the return value so the Clipboard object can differentiate between alert and success messages. 
       let isErr;
       // !VA Query Appobj to get the selected TD option
@@ -2132,7 +2081,7 @@ var Witty = (function () {
     // !VA Make the table node, including parent and wrapper table if selected
     // !VA CBController   
     function makeTableNode( id, Attributes ) {
-      console.log(`makeTableNode id :>> ${id};`);
+      // console.log(`makeTableNode id :>> ${id};`);
       // !VA Variables for parent and wrapper table, parent and wrapper tr, and wrapper td. Parent td is called from makeTdNode and is appended to tdNodeFragment. tableNodeFragment is the node that contains the entire nodelist which is returned to buildOutputNodeList
       let tableOuter, trOuter, tdOuter, tableInner, trInner, tdNodeFragment, tableNodeFragment;
       tableNodeFragment = document.createDocumentFragment();
@@ -2482,8 +2431,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CBController private
     // !VA Called from buildOutputNodeList. Ghost tag tokens were inserted via insertAdjacentHTML during node creation. This function replaces the tokens with the ghost tags from getGhostTags depending on the checked status of the Ghost checkbox icons passed in as bool parameters from the caller. chkbxTbl and chkbxTbw are booleans indicating whether ccpTblGhostChk and ccpTbwGhostChk are checked. Calls transposeTokens to swap the position of the token from before the tag to after it. This is necessary because the ghost tokens had to be positioned before the tags due to the indents being placed after them using insertAdjacentHtml - it is not possible to modify or append to strings inserted with insertAdjacentHtml.
     function applyGhostTable(tbl, chkbxTbl, chkbxTbw, option) {
-      console.log(`applyGhostTable tbl :>> ${tbl};`);
-      console.log(`applyGhostTable chkbxTbl :>> ${chkbxTbl}; chkbxTbw :>> ${chkbxTbw}; option :>> ${option}`);
+      // console.log(`applyGhostTable tbl :>> ${tbl};`);
+      // console.log(`applyGhostTable chkbxTbl :>> ${chkbxTbl}; chkbxTbw :>> ${chkbxTbw}; option :>> ${option}`);
       let openTag, closeTag, ghostOpn1, ghostCls1, ghostOpn2, ghostCls2, ghostTags = [], wrapperChecked, tokens, tokenIdx, tagIdx, nextTag, tag;
       // !VA NOTE: token isn't a variable, it's an item in the forof loop of the tokens array
 
@@ -2522,7 +2471,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             tokenIdx = tbl.indexOf( token, tokenIdx + 1);
             // !VA Search backward from the tokenIdx to locate the index of the current table tag.
             tagIdx = tbl.lastIndexOf( tag, tokenIdx);
-            console.log(`applyGhostTable do OPN: tag :>> '${tag}'; tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}`);
+            // console.log(`applyGhostTable do OPN: tag :>> '${tag}'; tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}`);
             // !VA Branch: 112420C
             // !VA Use the tagIdx rather than the tokenIdx to terminate the loop. This can be deleted if no bugs appear.
             // if (tokenIdx !== -1 ) { 
@@ -2537,7 +2486,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             tag = closeTag;
             tokenIdx = tbl.lastIndexOf( token, tbl.length - tag.length);
             tagIdx = tbl.indexOf( tag, tokenIdx);
-            console.log(`applyGhostTable do CLS: tag :>> '${tag}'; tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}`);
+            // console.log(`applyGhostTable do CLS: tag :>> '${tag}'; tokenIdx :>> ${tokenIdx}; tagIdx :>> ${tagIdx}`);
             // !VA Branch: 112420C
             // !VA Use the tagIdx rather than the tokenIdx to terminate the loop. This can be deleted if no bugs appear.
             // if (tokenIdx !== -1 ) { 
@@ -2593,7 +2542,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CBController private
     // !VA Returns the strings for opening and closing ghost table tag as a two-item array with indents on the inner table based on the status of the Table Wrapper checkbox icon.
     function getGhostTags(option) {
-      console.log(`getGhostTags option :>> ${option};`);
+      // console.log(`getGhostTags option :>> ${option};`);
       let ghostOpn1, ghostCls1, ghostOpn2, ghostCls2, hasWrapper, indent;
       let ghosttags = [];
       // !VA Get the status of the Table Wrapper checkbox - it determines whether indents are applied to the inner table or not.
@@ -2646,19 +2595,89 @@ ${indent}<![endif]-->`;
 
     // !VA CLIPBOARD FUNCTIONS
     // !VA CBController   
-    // !VA Write the clipboardStr to the clipboard. 
-    // !VA NOTE: Lint errors caused by non-access of clipboard.js
-    function writeClipboard(id, str) {
+    // !VA Branch: 112520A
+    // !VA writeClipboard via keypresses
+    (function () {
+      var id = 'ccp-img-class-ipt';
+      var txt;
+      var dummybutton = document.querySelector('#dummy');
+      var clipboard = new ClipboardJS('#dummy');
+      clipboard.on('success', function(e) {
+        console.info('Action:', e.action);
+        console.info('Text:', e.text);
+        console.info('Trigger:', e.trigger);
+        e.clearSelection();
+      });
+      clipboard.on('error', function(e) {
+        console.error('Action:', e.action);
+        console.error('Trigger:', e.trigger);
+      });
+
+      // document.querySelector('#ccp-img-class-ipt').onkeydown = function(event){
+      document.querySelector('#ccp').onkeydown = function(event){
+        event = event || window.event;
+        let keydown = event.which || event.keyCode || event.key;
+        // console.log('event :>> ');
+        // console.log(event);
+        if( keydown === 13 && event.shiftKey ){
+          txt = buildOutputNodeList('ccp-img-cbhtm-ipt', 'imgNode');
+          console.log('txt :>> ');
+          console.log(txt);
+          dummybutton.setAttribute('data-clipboard-text', txt);
+
+          dummybutton.click();
+          togglep();
+        }
+      };
+
+      function togglep(){
+        console.log('FUCKME');
+      }
+
+
+
+    
+    })();
+
+
+
+
+
+
+
+
+
+    function writeClipboardKeys(id, str) {
+      // console.clear();
+      console.log(`writeClipboardKeys id :>> ${id};`);
+      console.log(`writeClipboardKeys str :>> ${str};`);
+      var dummybutton = document.querySelector('#dummy');
       let clipboardStr;
       // !VA clipboardStr is returned to clipboard.js
+
+      (function () {
+        console.log('SLSIDJFLSKDFS');
+
+        function togglep(){
+          console.log('FUCKME');
+        }
+      
+
+
+      })();
+
+
+
       clipboardStr = str;
       // clipboardStr = tag.outerHTML;
-      var currentCB = new ClipboardJS('#' + id, {
+      var currentCB = new ClipboardJS('#dummy', {
         text: function(trigger) {
           // !VA Write success message to app message area on success
           // !VA TODO: Need to differentiate between success messages and alert messages displayed in the message bar. 
-          currentCB.on('success', function(event) {
+          currentCB.on('success', function(e) {
             appController.handleAppMessages('msg_copied_2_CB');
+            console.info('Action:', e.action);
+            e.clearSelection();
           });
   
           currentCB.on('error', function(e) {
@@ -2666,6 +2685,89 @@ ${indent}<![endif]-->`;
             console.error('Trigger:', e.trigger);
             // !VA TODO: Need to output an error message to message bar if the clipboard operation fails here.
           });
+          // !VA Branch: 112520A
+          // !VA This is where to trigger the fake mouseclick
+          document.querySelector('#' + id).onkeydown = function(event){
+            event = event || window.event;
+            let keydown = event.which || event.keyCode || event.key;
+            if( keydown === 32){
+              togglep();
+            }
+          };
+
+          function togglep(){
+            console.log('FUCKME');
+          }
+
+
+
+          // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
+          return clipboardStr;
+        }
+      });
+    }
+
+
+
+    // !VA Write the clipboardStr to the clipboard. 
+    // !VA NOTE: Lint errors caused by non-access of clipboard.js
+    function writeClipboard(id, str) {
+      // console.clear();
+      console.log(`writeClipboard id :>> ${id};`);
+      console.log(`writeClipboard str :>> ${str};`);
+      var dummybutton = document.querySelector('#dummy');
+      let clipboardStr;
+      // !VA clipboardStr is returned to clipboard.js
+
+
+
+      (function () {
+        console.log('SLSIDJFLSKDFS');
+
+        function fuckme() {
+          console.log('fuckme');
+        }
+
+
+        document.querySelector('#dummy').addEventListener('click', fuckme, false);
+        // triggerEvent( dummybutton, 'click' );
+        function triggerEvent( elem, event ) {
+          var clickEvent = new Event( event ); // Create the event.
+          elem.dispatchEvent( clickEvent );    // Dispatch the event.
+        }
+
+        triggerEvent( dummybutton, 'click' );
+
+
+      })();
+
+
+
+      clipboardStr = str;
+      // clipboardStr = tag.outerHTML;
+      var currentCB = new ClipboardJS('#' + id, {
+        text: function(trigger) {
+          // !VA Write success message to app message area on success
+          // !VA TODO: Need to differentiate between success messages and alert messages displayed in the message bar. 
+          currentCB.on('success', function(e) {
+            appController.handleAppMessages('msg_copied_2_CB');
+            console.info('Action:', e.action);
+            e.clearSelection();
+          });
+  
+          currentCB.on('error', function(e) {
+            console.error('Action:', e.action);
+            console.error('Trigger:', e.trigger);
+            // !VA TODO: Need to output an error message to message bar if the clipboard operation fails here.
+          });
+          // !VA Branch: 112520A
+          // !VA This is where to trigger the fake mouseclick
+          
+
+
+
+
+
           // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
           return clipboardStr;
         }
@@ -2846,31 +2948,28 @@ ${indent}<![endif]-->`;
         return Attributes;
       },
 
+      // doClipboard2: function(evt) {
+      //   console.log('doClipboard2 running'); 
+      //   buildOutputNodeList(evt.target.id, 'imgNode');
+      //   return;
+      // },
+
+
       // !VA Called from eventHandler to initialize clipboard functionality
       doClipboard: function(evt) {
-        let targetid, modifierKey;
+        let targetid, nodeDepth, modifierKey;
         // !VA nodeDepth can have three values: 'imgNode', 'tdaNode', 'tblNode'
-        let nodeDepth;
         targetid = evt.target.id;
-        console.log(`doClipboard targetid :>> ${targetid};`);
+        console.log(`doClipboard targetid :>> ${targetid}; nodeDepth :>> ${nodeDepth}`);
         // console.log('doClipboard evt :>> ');
         // console.dir(evt);
-        // !VA Determined if shift or ctrl is pressed while clicked
         if (evt.shiftKey) { 
           modifierKey = 'shift';
         } else if (evt.ctrlKey ) {
           modifierKey = 'ctrl';
-        } else if (evt.altKey ) {
-          modifierKey = 'alt';
         } else {
           modifierKey = false;
         }
-
-
-
-
-
-
         // !VA IMPORTANT: Is this still necessary? Attributes don't appear to be passed anywhere here, I think this might be deprecated.
         // !VA If the CCP image fluid/fixed radio button is clicked, then 
         // if (targetid.includes('fixed') || targetid.includes('fluid')) {
@@ -2885,7 +2984,7 @@ ${indent}<![endif]-->`;
         //   buildOutputNodeList(targetid);
         //   break;
         case evt.target.name === 'ccp-cbhtm-btn' :
-          console.log('NAME: ccp-cbhtm-btn');
+          console.log(`CBHTML BUTTON CLICKED: targetid :>> ${targetid}`);
           if (targetid === 'ccp-img-cbhtm-ipt') {
             console.log('IMG Make HTML');
             buildOutputNodeList(targetid, 'imgNode');
@@ -2900,22 +2999,21 @@ ${indent}<![endif]-->`;
           }
           break;
         // !VA Trap the input elements
-        case evt.target.classList.toString().includes('ccp-txfld-ipt') :
-          console.log(`TEXT INPUT targetid :>> ${targetid};`);
-          // !VA Will have to add conditions to exclude the unpressed modifiers
-          if (evt.shiftKey === true) {
-            console.log('IMG Make HTML');
-            // buildOutputNodeList(targetid);
-          } else if (evt.ctrlKey === true) {
-            console.log('TDA Make HTML');
-            // buildOutputNodeList(targetid);
-          } else if (evt.altKey === true) {
-            console.log('TBL Make HTML');
-            // buildOutputNodeList(targetid);
-          } else {
-            console.log('ERROR in doClipboard - unknown condition');
-          }
-          break;
+        // case evt.target.classList.toString().includes('ccp-txfld-ipt') :
+        //   // !VA Will have to add conditions to exclude the unpressed modifiers;
+        //   if ( evt.shiftKey && !evt.ctrlKey && !evt.altKey ) {
+        //     console.log('doClipboard: SHIFT + ENTER ');
+        //     buildOutputNodeList( targetid, 'imgNode');
+        //   } else if ( !evt.shiftKey && evt.ctrlKey && !evt.altKey ) {
+        //     console.log('doClipboard: CTRL + ENTER ');
+        //     // buildOutputNodeList(targetid, 'tdaNode');
+        //   } else if ( !evt.shiftKey && !evt.ctrlKey && evt.altKey ) {
+        //     console.log('doClipboard: ALT + ENTER ');
+        //     // buildOutputNodeList(targetid, 'tblNode');
+        //   } else {
+        //     console.log('ERROR in doClipboard - unknown condition');
+        //   }
+        //   break;
 
         // !VA cbdtp, cbsph and cblph are the 5-char element codes for the Make CSS buttons
         case targetid.includes('cbdtp') || targetid.includes('cbsph') || targetid.includes('cblph'):
@@ -2927,6 +3025,7 @@ ${indent}<![endif]-->`;
         default:
           console.log('ERROR in doClipboard: case not defined');
         } 
+
         return targetid;
       },
     };
@@ -3125,6 +3224,26 @@ ${indent}<![endif]-->`;
 
       // !VA CLICK HANDLERS
       // ------------------
+
+      // !VA The problem here is that trapKeypress sets the focus on the ccp element, thereby blurring from the mouse target and running handleBlur. How to prevent the focus from 
+      // !VA No that's not the problem at all, it seems. And I cant figure it out
+      function trapKeypress(evt) {
+        console.log('trapKeypress running'); 
+        // console.clear();
+        let keydown = evt.which || evt.keyCode || evt.key;
+        if ( keydown === 13 ) {
+          if ( evt.altKey || evt.shiftKey || evt.ctrlKey ) {
+            console.log('evt :>> ');
+            console.log(evt);
+            console.log('MODIFIER + ENTER');
+            CBController.doClipboard(evt);
+          }
+        }
+        // evt.preventDefault();
+        // evt.stopPropagation();
+      }
+      // addEventHandler(document.querySelector('#ccp-img-class-ipt'),'keydown',trapKeypress,false);
+
       // !VA Add click and blur event handlers for clickable toolbarElements 
       const tbClickables = [ toolbarElements.btnTbrIncr50, toolbarElements.btnTbrIncr10, toolbarElements.btnTbrIncr01, toolbarElements.btnTbrDecr50, toolbarElements.btnTbrDecr10, toolbarElements.btnTbrDecr01  ];
       for (let i = 0; i < tbClickables.length; i++) {
@@ -3385,6 +3504,7 @@ ${indent}<![endif]-->`;
     // !VA sdf MODIFIER KEYS FOR TOOLTIP DISPLAY
     // !VA appController  
     // !VA NOTE: This all should be enclosed in a function or at least an IIFE.
+    /* !VA  
     document.addEventListener('DOMContentLoaded', function() {
       // !VA Get the root (html) element 
       const rootElement = document.querySelector(':root');
@@ -3411,8 +3531,7 @@ ${indent}<![endif]-->`;
         }
       });
     });
-
-
+ */
 
             
     // !VA INPUT HANDLING
@@ -3466,6 +3585,7 @@ ${indent}<![endif]-->`;
     // !VA Called from handleKeydown. Applies the user-entered input value in the Toolbar or CCP, i.e. writes the value to Appobj and, if Toolbar, runs updateCurrentImage which then runs calcViewerSize to update the dynamicElements with the new value.
     // !VA NOTE: This may be a functional dupe of updateCurrentImage
     function applyInputValue(userInputObj) {
+      console.log('applyInputValue running'); 
       // !VA Destructure userInputObj into variables
       let { evtTargetVal, appObjProp } = userInputObj;
       let inputObj = {};
@@ -3704,6 +3824,12 @@ ${indent}<![endif]-->`;
 
     // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. This also handles the cases where the user enters 0 to blur, or leaves the input empty to blur, and the padding-specific handling of TD Width values. Note: This emulates the preventDefault behavior of the TAB key. Remember that if you set preventDefault on the TAB key, the blur event will still fire on mouse out and the result will be that the blur is handled twice. Handling the blur here and NOT on the TAB keypress avoids that trap.
     function handleBlur(evt) {
+      // debugger;
+      console.trace(evt);
+      console.log('handleBlur running'); 
+      console.log('evt :>> ');
+      console.log(evt);
+
       // !VA Create the object to store the Appobj property and current input value
       let reflectArray, userInputObj = {}, configObj = {};
       let retVal;
@@ -3735,7 +3861,7 @@ ${indent}<![endif]-->`;
         // console.log('Zero value handler skipped');
         retVal = handleUserInput(userInputObj);
       }
-
+      console.log(`retVal :>> ${retVal};`);
       // !VA If retVal returns false, then there is a validation error, so emulate preventDefault on the blur event. Blur does not support preventDefault. Select the target's value. Select doesn't work with blur because the focus is already out of the field before the select() method can be invoked on the input element. To fix, set timeout 10ms, then shift it back to run the rest of the handler. The focus() method selects the input value by default. Alternatively, it should be possible to use focusout instead of blur, which does support preventDefault, but this works just as well for now.
       if (retVal === false) {
         // !VA Shift the focus back to the target element.
@@ -3765,14 +3891,14 @@ ${indent}<![endif]-->`;
       if (Appobj.curImgH === '' ) {
         console.log('ERROR in handleBlur - Appobj.curImgH is empty ');
       }
-
-
+      console.log('handleBlur userInputObj :>> ');
+      console.log(userInputObj);
     }
 
     // !VA appController   
     // !VA Called from tbClickables event handler. Handles clicks on the Toolbar increment/decrement buttons and handles blur for Toolbar and ccpUserInput input elements. NOTE: This used to be where blur on all inputs was handled but that is now in handleBlur where it belongs.
     function handleMouseEvents(evt) {
-      // console.log('handleMouseEvents running'); 
+      console.log('handleMouseEvents running'); 
       // !VA elId adds the hash to evt.target.id
       let elId = '#' + evt.target.id;
       // !VA val is a temporary variable to mutate evt.target.value into Appobj.curImgW. retVal is the value returned by checkNumericInput, i.e. either an integer or false if validation fails. 
@@ -3815,6 +3941,8 @@ ${indent}<![endif]-->`;
     // !VA Called from handleKeydown and handleBlur to handle CCP element user input. Runs checkUserInput to check for error conditions and returns either an empty string, a valid value or FALSE to the caller.
     // !VA NOTE: There was a priorVal variable earlier that stored evt.target.val for use with CCP inputs because at that time CCP inputs weren't immediately stored in Appobj. Keep an eye on that - currently all CCP values are stored to Appobj.
     function handleUserInput( userInputObj ) {
+      // console.trace(userInputObj);
+      console.log('handleUserInput running'); 
       let retVal;
       let tbrIptAliases = [], imgIptAliases = [], ccpIptAliases = [];
       // let configObj = {};
@@ -3862,6 +3990,7 @@ ${indent}<![endif]-->`;
         }
       }
       // !VA Return either the valid value or FALSE to handleKeyDown
+      console.log(`handleUserInput retVal :>> ${retVal};`);
       return retVal;
     }
 
@@ -3876,6 +4005,7 @@ ${indent}<![endif]-->`;
       let keydown = evt.which || evt.keyCode || evt.key;
       // !VA userInputObj is the array containing the values needed to evaluate input based on whether the target is a Toolbar element or a CCP element. userInputObj includes the target's value and Appobj property/ccpUserInput alias.
       const userInputObj = { };
+
       // !VA If TAB or ENTER
       if (keydown == 9 || keydown == 13) {
         // !VA elemIdToAppobjProp gets the Appobj key that corresponds to a given element ID. Write that Appobj property/ccpUserInput alias to the appObjProp property of the userInputObj object.
@@ -3886,8 +4016,13 @@ ${indent}<![endif]-->`;
         // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp locally.  
         let { appObjProp } = userInputObj;
         // !VA Call handleUserInput to validate the user input and process it based on the input type (i.e. Toolbar or CCP input). retVal will return either an empty string, a valid value, or FALSE if checkUserInput detects an input error.
+
         if (keydown === 13) {
           console.log('ENTER key');
+
+
+
+
           // !VA Handling zero values now on ENTER the same way they are handled in handleBlur. '
           // !VA TODO: In fact, this is the exact same routine, so DRYify it in a private function. 
           // !VA Skip straight to handleUserInput if appObjProp is a Toolbar input, which cannot have a 0 or empty value
@@ -3921,12 +4056,14 @@ ${indent}<![endif]-->`;
               this.select();
             }
           } 
-          console.clear();
+          // !VA Branch: 112520A
+          // !VA Commenting this out, trying separate keydown handler for CB output that traps keypress on ccp element so it works anywhere in the app.
           // !VA Branch: 112420D
           // !VA The modifier keypress is passed with the event. Need to filter out all the elements we do NOT want to trigger the clipboard output.
           // !VA If the classList converted to string contains the ccp-txfld-ipt class, then the target element is an input element that can support a MODIFIER+ENTER action to trigger a clipboar output.   
           if (evt.target.classList.toString().includes('ccp-txfld-ipt')) {
             CBController.doClipboard(evt);
+
           }
 
           
@@ -4527,7 +4664,7 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from event handlers on CCP labels to remove any input field content, remove the 'active' class from the input element related to the clicked label icon, and remove ccp-conceal-ctn class from the Make CSS buttons.NOTE: evt.target.value will always be undefined because the target element is a label. To get a value, target the input element, i.e. the htmlFor of the target label. 
     function handleIconClick(evt) {
-      // console.log(`handleIconClick evt.target.id :>> ${evt.target.id};`);
+      console.log(`handleIconClick evt.target.id :>> ${evt.target.id};`);
       let appObjProp, evtTargetId, reflectArray, mkcssArray, highlightArray, revealArray, revealFlag, mkcssProp;
       let configObj = {};
       // !VA get the id of the target label element
@@ -4718,6 +4855,8 @@ ${indent}<![endif]-->`;
     // !VA appController  
     // !VA Key/value pairs containing the unique tooltip ID generate from target ID of the mouseenter event and the corresponding tooltip content.
     function getAppMessageStrings( appMessCode) {
+      console.log(`getAppMessageStrings appMessCode :>> ${appMessCode};`);
+      // console.trace(appMessCode);
       let appMessContent;
       // !VA Set tooltipContent to ''. This overwrites tooltipContent being undefined if tooltipid is invalid
       appMessContent = '';
