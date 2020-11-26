@@ -2596,7 +2596,7 @@ ${indent}<![endif]-->`;
     // !VA CLIPBOARD FUNCTIONS
     // !VA CBController   
     // !VA Branch: 112520A
-    // !VA writeClipboard via keypresses
+    // !VA writeClipboard via keypresses. This IIFE is required due to ClipboardJS' non-support for keyboard triggers. Implementation based on https://stackoverflow.com/questions/53444494/copy-text-to-clipboard-upon-keypress. This function 1) defines a keydown event on the parent element of the CCP i.e. #ccp to trap  the modifier+ENTER keypresses.  
     (function () {
       var id = 'ccp-img-class-ipt';
       var txt;
@@ -2633,18 +2633,7 @@ ${indent}<![endif]-->`;
       function togglep(){
         console.log('FUCKME');
       }
-
-
-
-    
     })();
-
-
-
-
-
-
-
 
 
     function writeClipboardKeys(id, str) {
