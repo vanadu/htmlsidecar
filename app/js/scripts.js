@@ -75,9 +75,6 @@ var Witty = (function () {
     
   };
 
-  var activeFocus = document.activeElement.tagName; 
-  console.log(`activeFocus :>> ${activeFocus};`);
-
   // !VA GLOBAL
   let myObject = {};
   myObject.variable = 'This is a string';
@@ -2596,144 +2593,74 @@ ${indent}<![endif]-->`;
     // !VA CLIPBOARD FUNCTIONS
     // !VA CBController   
     // !VA Branch: 112520A
-    // !VA writeClipboard via keypresses. This IIFE is required due to ClipboardJS' non-support for keyboard triggers. Implementation based on https://stackoverflow.com/questions/53444494/copy-text-to-clipboard-upon-keypress. This function 1) defines a keydown event on the parent element of the CCP i.e. #ccp to trap  the modifier+ENTER keypresses.  
+    // !VA writeClipboard via keypresses. This IIFE is required as workaround for ClipboardJS' non-support for keyboard triggers. Implementation based on https://stackoverflow.com/questions/53444494/copy-text-to-clipboard-upon-keypress. This function 1) defines a keydown event on the parent element of the CCP i.e. #ccp to trap c the modifier+ENTER keypresses. 2) Uses a dummy button as trigger for the clipboard object, assigning it the clipboardStr as data-clipboard-text attribute and 3) generates a click to the dummy button to trigger the clipboard action
     (function () {
-      var id = 'ccp-img-class-ipt';
-      var txt;
-      var dummybutton = document.querySelector('#dummy');
+      console.clear();
+      console.log('writeClipboard for keyboard running'); 
+      // !VA Branch: 112520A
+      // !VA dummybutton is defined in HTML and currently assigned opacity=0 inline, need to put that in CSS and use visibility property.
+      let clipboardStr, dummybutton, targetId;
+      dummybutton = document.querySelector('#dummy');
+      // !VA Pass the dummy button ID to clipboard object
       var clipboard = new ClipboardJS('#dummy');
       clipboard.on('success', function(e) {
-        console.info('Action:', e.action);
-        console.info('Text:', e.text);
-        console.info('Trigger:', e.trigger);
+        appController.handleAppMessages('msg_copied_2_CB');
+        // console.info('Action:', e.action);
+        // console.info('Text:', e.text);
+        // console.info('Trigger:', e.trigger);
         e.clearSelection();
       });
       clipboard.on('error', function(e) {
-        console.error('Action:', e.action);
-        console.error('Trigger:', e.trigger);
+        console.error('Error: ClipboardJS Action:', e.action);
+        console.error('Error: ClipboardJS Trigger:', e.trigger);
       });
 
-      // document.querySelector('#ccp-img-class-ipt').onkeydown = function(event){
+      // !VA Branch: 112620A
+      // !VA As yet there is no event and hence no way to determine the element that had the focus when at this function's runtime. So use the CCP's parent element to trap the key combo.
       document.querySelector('#ccp').onkeydown = function(event){
         event = event || window.event;
         let keydown = event.which || event.keyCode || event.key;
-        // console.log('event :>> ');
-        // console.log(event);
-        if( keydown === 13 && event.shiftKey ){
-          txt = buildOutputNodeList('ccp-img-cbhtm-ipt', 'imgNode');
-          console.log('txt :>> ');
-          console.log(txt);
-          dummybutton.setAttribute('data-clipboard-text', txt);
-
+        if( keydown === 13) {
+          console.log('event :>> ');
+          console.log(event);
+          targetId = event.target.id;
+          if ( event.shiftKey && !event.ctrlKey && !event.altKey ) {
+            // console.log('doClipboard: SHIFT + ENTER ');
+            clipboardStr = buildOutputNodeList('ccp-img-cbhtm-ipt', 'imgNode');
+          } else if ( !event.shiftKey && event.ctrlKey && !event.altKey ) {
+            // console.log('doClipboard: CTRL + ENTER ');
+            clipboardStr = buildOutputNodeList('ccp-tda-cbhtm-ipt', 'tdaNode');
+          } else if ( !event.shiftKey && !event.ctrlKey && event.altKey ) {
+            // console.log('doClipboard: ALT + ENTER ');
+            clipboardStr = buildOutputNodeList('ccp-tbl-cbhtm-ipt', 'tblNode');
+            // buildOutputNodeList(targetid, 'tblNode');
+          } else {
+            console.log('ERROR in doClipboard - unknown condition');
+          }
+          console.log('writeClipboardKeyboard clipboardStr :>> ');
+          console.log(clipboardStr);
+          dummybutton.setAttribute('data-clipboard-text', clipboardStr);
           dummybutton.click();
-          togglep();
+          // !VA Branch: 112620A
+          // !VA Put the focus back in the event target if the event target is an input, otherwise leave the event target on the CCP parent, which will make the focus invisible to the user. Log in in devlog. NOTE: This might generate another clipboard output if the focus is on a Make CSS or Make HTML button. Log it in devlog.
+          if (targetId.substring( 14, 17) === 'ipt') {
+            console.log('HIT');
+            document.getElementById(targetId).focus();
+          }
+
         }
       };
 
-      function togglep(){
-        console.log('FUCKME');
-      }
     })();
 
 
-    function writeClipboardKeys(id, str) {
-      // console.clear();
-      console.log(`writeClipboardKeys id :>> ${id};`);
-      console.log(`writeClipboardKeys str :>> ${str};`);
-      var dummybutton = document.querySelector('#dummy');
-      let clipboardStr;
-      // !VA clipboardStr is returned to clipboard.js
-
-      (function () {
-        console.log('SLSIDJFLSKDFS');
-
-        function togglep(){
-          console.log('FUCKME');
-        }
-      
-
-
-      })();
-
-
-
-      clipboardStr = str;
-      // clipboardStr = tag.outerHTML;
-      var currentCB = new ClipboardJS('#dummy', {
-        text: function(trigger) {
-          // !VA Write success message to app message area on success
-          // !VA TODO: Need to differentiate between success messages and alert messages displayed in the message bar. 
-          currentCB.on('success', function(e) {
-            appController.handleAppMessages('msg_copied_2_CB');
-            console.info('Action:', e.action);
-            e.clearSelection();
-          });
-  
-          currentCB.on('error', function(e) {
-            console.error('Action:', e.action);
-            console.error('Trigger:', e.trigger);
-            // !VA TODO: Need to output an error message to message bar if the clipboard operation fails here.
-          });
-          // !VA Branch: 112520A
-          // !VA This is where to trigger the fake mouseclick
-          document.querySelector('#' + id).onkeydown = function(event){
-            event = event || window.event;
-            let keydown = event.which || event.keyCode || event.key;
-            if( keydown === 32){
-              togglep();
-            }
-          };
-
-          function togglep(){
-            console.log('FUCKME');
-          }
-
-
-
-          // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
-          return clipboardStr;
-        }
-      });
-    }
-
-
-
-    // !VA Write the clipboardStr to the clipboard. 
-    // !VA NOTE: Lint errors caused by non-access of clipboard.js
+    // !VA CBController private
+    // !VA Function to write clipboard content on mouse click. There is a separate IIFE function for writing clipboard triggered by keyboard combinations but that is a workaround for ClipboardJS non-support for keyboard triggers. Best to keep these two functions separate for now. NOTE: For Lint errors caused by non-access of clipboard.js. 
     function writeClipboard(id, str) {
       // console.clear();
-      console.log(`writeClipboard id :>> ${id};`);
-      console.log(`writeClipboard str :>> ${str};`);
-      var dummybutton = document.querySelector('#dummy');
       let clipboardStr;
       // !VA clipboardStr is returned to clipboard.js
-
-
-
-      (function () {
-        console.log('SLSIDJFLSKDFS');
-
-        function fuckme() {
-          console.log('fuckme');
-        }
-
-
-        document.querySelector('#dummy').addEventListener('click', fuckme, false);
-        // triggerEvent( dummybutton, 'click' );
-        function triggerEvent( elem, event ) {
-          var clickEvent = new Event( event ); // Create the event.
-          elem.dispatchEvent( clickEvent );    // Dispatch the event.
-        }
-
-        triggerEvent( dummybutton, 'click' );
-
-
-      })();
-
-
-
       clipboardStr = str;
-      // clipboardStr = tag.outerHTML;
       var currentCB = new ClipboardJS('#' + id, {
         text: function(trigger) {
           // !VA Write success message to app message area on success
@@ -2749,14 +2676,6 @@ ${indent}<![endif]-->`;
             console.error('Trigger:', e.trigger);
             // !VA TODO: Need to output an error message to message bar if the clipboard operation fails here.
           });
-          // !VA Branch: 112520A
-          // !VA This is where to trigger the fake mouseclick
-          
-
-
-
-
-
           // !VA Return the clipboard string to clipboard.js to paste it to the clipboard
           return clipboardStr;
         }
@@ -2987,22 +2906,7 @@ ${indent}<![endif]-->`;
             console.log('ERROR in doClipboard - unknown condition');
           }
           break;
-        // !VA Trap the input elements
-        // case evt.target.classList.toString().includes('ccp-txfld-ipt') :
-        //   // !VA Will have to add conditions to exclude the unpressed modifiers;
-        //   if ( evt.shiftKey && !evt.ctrlKey && !evt.altKey ) {
-        //     console.log('doClipboard: SHIFT + ENTER ');
-        //     buildOutputNodeList( targetid, 'imgNode');
-        //   } else if ( !evt.shiftKey && evt.ctrlKey && !evt.altKey ) {
-        //     console.log('doClipboard: CTRL + ENTER ');
-        //     // buildOutputNodeList(targetid, 'tdaNode');
-        //   } else if ( !evt.shiftKey && !evt.ctrlKey && evt.altKey ) {
-        //     console.log('doClipboard: ALT + ENTER ');
-        //     // buildOutputNodeList(targetid, 'tblNode');
-        //   } else {
-        //     console.log('ERROR in doClipboard - unknown condition');
-        //   }
-        //   break;
+
 
         // !VA cbdtp, cbsph and cblph are the 5-char element codes for the Make CSS buttons
         case targetid.includes('cbdtp') || targetid.includes('cbsph') || targetid.includes('cblph'):
@@ -3814,11 +3718,7 @@ ${indent}<![endif]-->`;
     // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. This also handles the cases where the user enters 0 to blur, or leaves the input empty to blur, and the padding-specific handling of TD Width values. Note: This emulates the preventDefault behavior of the TAB key. Remember that if you set preventDefault on the TAB key, the blur event will still fire on mouse out and the result will be that the blur is handled twice. Handling the blur here and NOT on the TAB keypress avoids that trap.
     function handleBlur(evt) {
       // debugger;
-      console.trace(evt);
-      console.log('handleBlur running'); 
-      console.log('evt :>> ');
-      console.log(evt);
-
+      // console.log('handleBlur running'); 
       // !VA Create the object to store the Appobj property and current input value
       let reflectArray, userInputObj = {}, configObj = {};
       let retVal;
@@ -3850,7 +3750,7 @@ ${indent}<![endif]-->`;
         // console.log('Zero value handler skipped');
         retVal = handleUserInput(userInputObj);
       }
-      console.log(`retVal :>> ${retVal};`);
+      // console.log(`retVal :>> ${retVal};`);
       // !VA If retVal returns false, then there is a validation error, so emulate preventDefault on the blur event. Blur does not support preventDefault. Select the target's value. Select doesn't work with blur because the focus is already out of the field before the select() method can be invoked on the input element. To fix, set timeout 10ms, then shift it back to run the rest of the handler. The focus() method selects the input value by default. Alternatively, it should be possible to use focusout instead of blur, which does support preventDefault, but this works just as well for now.
       if (retVal === false) {
         // !VA Shift the focus back to the target element.
@@ -3880,8 +3780,8 @@ ${indent}<![endif]-->`;
       if (Appobj.curImgH === '' ) {
         console.log('ERROR in handleBlur - Appobj.curImgH is empty ');
       }
-      console.log('handleBlur userInputObj :>> ');
-      console.log(userInputObj);
+      // console.log('handleBlur userInputObj :>> ');
+      // console.log(userInputObj);
     }
 
     // !VA appController   
@@ -3930,8 +3830,7 @@ ${indent}<![endif]-->`;
     // !VA Called from handleKeydown and handleBlur to handle CCP element user input. Runs checkUserInput to check for error conditions and returns either an empty string, a valid value or FALSE to the caller.
     // !VA NOTE: There was a priorVal variable earlier that stored evt.target.val for use with CCP inputs because at that time CCP inputs weren't immediately stored in Appobj. Keep an eye on that - currently all CCP values are stored to Appobj.
     function handleUserInput( userInputObj ) {
-      // console.trace(userInputObj);
-      console.log('handleUserInput running'); 
+      // console.log('handleUserInput running'); 
       let retVal;
       let tbrIptAliases = [], imgIptAliases = [], ccpIptAliases = [];
       // let configObj = {};
@@ -4007,11 +3906,7 @@ ${indent}<![endif]-->`;
         // !VA Call handleUserInput to validate the user input and process it based on the input type (i.e. Toolbar or CCP input). retVal will return either an empty string, a valid value, or FALSE if checkUserInput detects an input error.
 
         if (keydown === 13) {
-          console.log('ENTER key');
-
-
-
-
+          console.log('handleKeydown: ENTER key');
           // !VA Handling zero values now on ENTER the same way they are handled in handleBlur. '
           // !VA TODO: In fact, this is the exact same routine, so DRYify it in a private function. 
           // !VA Skip straight to handleUserInput if appObjProp is a Toolbar input, which cannot have a 0 or empty value
@@ -4050,10 +3945,9 @@ ${indent}<![endif]-->`;
           // !VA Branch: 112420D
           // !VA The modifier keypress is passed with the event. Need to filter out all the elements we do NOT want to trigger the clipboard output.
           // !VA If the classList converted to string contains the ccp-txfld-ipt class, then the target element is an input element that can support a MODIFIER+ENTER action to trigger a clipboar output.   
-          if (evt.target.classList.toString().includes('ccp-txfld-ipt')) {
-            CBController.doClipboard(evt);
-
-          }
+          // if (evt.target.classList.toString().includes('ccp-txfld-ipt')) {
+          //   CBController.doClipboard(evt);
+          // }
 
           
         } else if ( keydown === 9) {
@@ -4844,7 +4738,7 @@ ${indent}<![endif]-->`;
     // !VA appController  
     // !VA Key/value pairs containing the unique tooltip ID generate from target ID of the mouseenter event and the corresponding tooltip content.
     function getAppMessageStrings( appMessCode) {
-      console.log(`getAppMessageStrings appMessCode :>> ${appMessCode};`);
+      // console.log(`getAppMessageStrings appMessCode :>> ${appMessCode};`);
       // console.trace(appMessCode);
       let appMessContent;
       // !VA Set tooltipContent to ''. This overwrites tooltipContent being undefined if tooltipid is invalid
