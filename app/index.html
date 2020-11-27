@@ -184,6 +184,8 @@
 
       <!-- #ccp clipboard control panel -->
       <div id="ccp"  tabindex="0">
+        <!-- VA! This is the dummy button used in the writeClipboardKeys IIFE to work around non-support for keyboard triggers in ClipboardJS   -->
+        <button id="dummy"></button>
         <!-- #ccp-content -->
         <div id="ccp-content">
           <!-- #ccp-content -->
@@ -644,9 +646,7 @@
   </div>
   <!-- /#app-container -->
 
-  <div>
-    <button id="dummy" style="opacity: 0"></button>
-  </div>
+
 
 
   <section class="content-section">

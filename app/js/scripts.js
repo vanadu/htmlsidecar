@@ -2598,7 +2598,7 @@ ${indent}<![endif]-->`;
     // !VA writeClipboard via keypresses. This IIFE is required as workaround for ClipboardJS' non-support for keyboard triggers. Implementation based on https://stackoverflow.com/questions/53444494/copy-text-to-clipboard-upon-keypress. This function 1) defines a keydown event on the parent element of the CCP i.e. #ccp to trap c the modifier+ENTER keypresses. 2) Uses a dummy button as trigger for the clipboard object, assigning it the clipboardStr as data-clipboard-text attribute and 3) generates a click to the dummy button to trigger the clipboard action
     (function () {
       console.clear();
-      console.log('writeClipboard for keyboard running'); 
+      console.log('writeClipboardKeys running'); 
       // !VA Branch: 112520A
       // !VA dummybutton is defined in HTML and currently assigned opacity=0 inline, need to put that in CSS and use visibility property.
       let clipboardStr, dummybutton, targetId;
@@ -2639,14 +2639,11 @@ ${indent}<![endif]-->`;
           } else {
             console.log('ERROR in doClipboard - unknown condition');
           }
-          console.log('writeClipboardKeyboard clipboardStr :>> ');
-          console.log(clipboardStr);
           dummybutton.setAttribute('data-clipboard-text', clipboardStr);
           dummybutton.click();
           // !VA Branch: 112620A
           // !VA Put the focus back in the event target if the event target is an input, otherwise leave the event target on the CCP parent, which will make the focus invisible to the user. Log in in devlog. NOTE: This might generate another clipboard output if the focus is on a Make CSS or Make HTML button. Log it in devlog.
           if (targetId.substring( 14, 17) === 'ipt') {
-            console.log('HIT');
             document.getElementById(targetId).focus();
           }
         }
@@ -4970,8 +4967,8 @@ ${indent}<![endif]-->`;
 
       // !VA Branch: 111320C
       // !VA check ghost checkboxes for dev
-      Appobj.ccpTblGhostChk = true;
-      Appobj.ccpTbwGhostChk = true;
+      // Appobj.ccpTblGhostChk = true;
+      // Appobj.ccpTbwGhostChk = true;
 
       // !VA reflectAppobj METHOD: set the array of elements whose Appobj properties above are to be written to the CCP DOM
       // !VA Why are there two of these? Commenting out the lower one for now.
@@ -5001,7 +4998,8 @@ ${indent}<![endif]-->`;
 
       // !VA Branch: 111320C
       // !VA check ghost checkboxes for dev
-      checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpImgTargtChk', 'ccpTblGhostChk', 'ccpTbwGhostChk' ];
+      // checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpImgTargtChk', 'ccpTblGhostChk', 'ccpTbwGhostChk' ];
+      checkedArray = [ 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpImgTargtChk' ];
       // !VA Make the configuration object to pass to configCCP
       configObj = {
         revealElements: { caller: 'configDefault', revealType: 'config', revealArray: revealArray }, 

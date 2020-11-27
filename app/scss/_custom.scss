@@ -669,6 +669,14 @@ output {
   cursor: default;
   opacity: .91;
   z-index: 100;
+  #dummy {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: 0 !important;
+    visibility: transparent;
+    // opacity: 0;
+  }
   // Animation
   &.active {
     transform: scaleX(1);
