@@ -2328,41 +2328,43 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     function configGhostTable(option, hasWrapper, nodeList) {
       // console.log('configGhostTable running'); 
       // console.log(`option :>> ${option}; hasWrapper :>> ${hasWrapper}`);
-
-      // !VA Branch: 112420D
-      // !VA Need to add a condition somehow that this routine only runs if the TBL Make HTML is the event target. Otherwise, if TD or IMG Make HTML is the target, the nodelist indices below are undefined.
-
-
       
       // !VA The tokens used as placeholders for the ghost tables
       const ghostOpn1 = '/ghostOpn1/',  ghostCls1 = '/ghostCls1/', ghostOpn2 = '/ghostOpn2/', ghostCls2 = '/ghostCls2/';
+      let hasTable;
+
+      hasTable = false;
+      // !VA Loop through nodeList and set hasTable to true if it contains a TABLE tag
+      for (const node of nodeList) {
+        if (node.nodeName === 'TABLE') { hasTable = true; break; }
+      }
       // !VA Place the placeholders in the nodes before the respective opening and closing table tags. Can not put them in the correct positions now because the 'beforebegin' and 'afterend' parameters are used by applyIndents and TMK there is no way to append or modify the adjacentHTML once it has been written to the node. The ghost tokens will be moved to the correct position in transposeTokens. 
-      if (option === 'basic' || option === 'bgimg' || option === 'iswap' ) {
-        if (hasWrapper) {
-          nodeList[0].insertAdjacentHTML('afterbegin', ghostOpn2);
-          nodeList[0].insertAdjacentHTML('beforeend', ghostCls2);
-          nodeList[3].insertAdjacentHTML('afterbegin', ghostOpn1);
-          nodeList[3].insertAdjacentHTML('beforeend', ghostCls1);
-        } else {
-          nodeList[0].insertAdjacentHTML('afterbegin', ghostOpn1);
-          nodeList[0].insertAdjacentHTML('beforeend', ghostCls1);
-        }
-      } else if ( option === 'swtch') {
-        console.log('configGhostTable swtch running'); 
-        console.log('nodeList :>> ');
-        console.log(nodeList);
-        if (hasWrapper) {
-          nodeList[0].insertAdjacentHTML('afterbegin', ghostOpn2);
-          nodeList[0].insertAdjacentHTML('beforeend', ghostCls2);
-          nodeList[3].insertAdjacentHTML('afterbegin', ghostOpn2);
-          nodeList[3].insertAdjacentHTML('beforeend', ghostCls2);
-          nodeList[9].insertAdjacentHTML('afterbegin', ghostOpn1);
-          nodeList[9].insertAdjacentHTML('beforeend', ghostCls1);
-        } else {
-          nodeList[0].insertAdjacentHTML('afterbegin', ghostOpn2);
-          nodeList[0].insertAdjacentHTML('beforeend', ghostCls2);
-          nodeList[6].insertAdjacentHTML('afterbegin', ghostOpn1);
-          nodeList[6].insertAdjacentHTML('beforeend', ghostCls1);
+      if (hasTable) {
+        if (option === 'basic' || option === 'bgimg' || option === 'iswap' ) {
+          if (hasWrapper) {
+            nodeList[0].insertAdjacentHTML('afterbegin', ghostOpn2);
+            nodeList[0].insertAdjacentHTML('beforeend', ghostCls2);
+            nodeList[3].insertAdjacentHTML('afterbegin', ghostOpn1);
+            nodeList[3].insertAdjacentHTML('beforeend', ghostCls1);
+          } else {
+            nodeList[0].insertAdjacentHTML('afterbegin', ghostOpn1);
+            nodeList[0].insertAdjacentHTML('beforeend', ghostCls1);
+          }
+        } else if ( option === 'swtch') {
+          console.log(nodeList);
+          if (hasWrapper) {
+            nodeList[0].insertAdjacentHTML('afterbegin', ghostOpn2);
+            nodeList[0].insertAdjacentHTML('beforeend', ghostCls2);
+            nodeList[3].insertAdjacentHTML('afterbegin', ghostOpn2);
+            nodeList[3].insertAdjacentHTML('beforeend', ghostCls2);
+            nodeList[9].insertAdjacentHTML('afterbegin', ghostOpn1);
+            nodeList[9].insertAdjacentHTML('beforeend', ghostCls1);
+          } else {
+            nodeList[0].insertAdjacentHTML('afterbegin', ghostOpn2);
+            nodeList[0].insertAdjacentHTML('beforeend', ghostCls2);
+            nodeList[6].insertAdjacentHTML('afterbegin', ghostOpn1);
+            nodeList[6].insertAdjacentHTML('beforeend', ghostCls1);
+          }
         }
       }
       // console.log('configGhostTable nodeList :>> ');
@@ -2647,10 +2649,8 @@ ${indent}<![endif]-->`;
             console.log('HIT');
             document.getElementById(targetId).focus();
           }
-
         }
       };
-
     })();
 
 
