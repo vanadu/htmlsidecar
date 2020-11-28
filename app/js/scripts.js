@@ -4687,8 +4687,10 @@ ${indent}<![endif]-->`;
             if (tar.id === entry[1]) {
               // !VA Put the corresponding Make CSS button alias in mkcssArray to pass to revealMkcss
               mkcssArray = makeAliasArray( entry[0] );
-              // !VA Add/remove the active class on the target input, which turns on/off the highlight of the sibling label icon as defined in CVSS 
-              flag ? tar.classList.remove('active') : tar.classList.add('active');
+              // !VA Branch: 112820A
+              // !VA removing this here and adding to the foot of this if clause
+              // !VA Add/remove the active class on the target input, which turns on/off the highlight of the sibling label icon as defined in CSS 
+              // flag ? tar.classList.remove('active') : tar.classList.add('active');
               // !VA Set the revealMkcss method properties for the alias in mkcssArray and pass to configCcp to apply the DOM change.
               configObj = {
                 revealMkcss: { caller: 'handleTextInputEvent', flag: flag, revealArray: mkcssArray }
@@ -4702,8 +4704,10 @@ ${indent}<![endif]-->`;
           
           // !VA Get the state of the icon before it is toggled. Determines if the reveal state of the dependent elements should be toggled when there is only a single character in the input field the value of the field changes.
           hasActive = evt.target.classList.contains('active');
+          // !VA Branch: 112820A
+          // !VA Removing this here and adding to foot of this if clause
           // !VA If there's a value in the field, then flag is true, so highlight the icon
-          flag ? tar.classList.remove('active') : tar.classList.add('active');
+          // flag ? tar.classList.remove('active') : tar.classList.add('active');
           // !VA Set the revealArray
           revealArray = makeAliasArray('ccpImgTxclrTfd', 'ccpImgTargtChk');
           configObj.revealElements = { caller: 'handleTextInputEvent', revealType: 'update', revealArray: revealArray };
@@ -4723,6 +4727,10 @@ ${indent}<![endif]-->`;
         //   tar.value !== '' ? tar.classList.add('active') : tar.classList.remove('active');
           console.log('ERROR in handleTextInputEvent - unknown condition');
         }
+        // !VA Branch: 112820A
+        // !VA Add condition to highlight/unhighlight icons depending on whether there is a value in the input field. Applies to all input fields in CCP
+        flag ? evt.target.classList.remove('active') : evt.target.classList.add('active');
+
       // !VA Now handle the unlabelled padding text input elements
       } else {
         let userInputObj = {};
