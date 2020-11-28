@@ -2597,7 +2597,6 @@ ${indent}<![endif]-->`;
     // !VA Branch: 112520A
     // !VA writeClipboard via keypresses. This IIFE is required as workaround for ClipboardJS' non-support for keyboard triggers. Implementation based on https://stackoverflow.com/questions/53444494/copy-text-to-clipboard-upon-keypress. This function 1) defines a keydown event on the parent element of the CCP i.e. #ccp to trap c the modifier+ENTER keypresses. 2) Uses a dummy button as trigger for the clipboard object, assigning it the clipboardStr as data-clipboard-text attribute and 3) generates a click to the dummy button to trigger the clipboard action
     (function () {
-      console.clear();
       console.log('writeClipboardKeys running'); 
       // !VA Branch: 112520A
       // !VA dummybutton is defined in HTML and currently assigned opacity=0 inline, need to put that in CSS and use visibility property.
@@ -4665,7 +4664,7 @@ ${indent}<![endif]-->`;
     // !VA NOTE: This function is in appController the actions are distinct from the actions in configCCP. Those controls pertain to specific option configurations that functionally depend on a selected option. These options below only make other options available if a text input is entered. Perhaps an insignificant distinction, but a valid one - all the configCCP react to checkbox state changes, not input values.
     function handleTextInputEvent(evt) {
       // console.log('handleTextInputEvent running'); 
-      let tar, flag, configObj = {}, revealArray = [], mkcssArray = [];
+      let tar, flag, hasActive, configObj = {}, revealArray = [], mkcssArray = [];
 
       // !VA classObj is used to match Make CSS button element aliases with their respective class input ID.
       const classObj = {
@@ -4697,25 +4696,32 @@ ${indent}<![endif]-->`;
               UIController.configCCP( configObj );
             }
           }
-        // !VA If the target is the IMG Anchor input element, reveal/conceal the dependent elements, i.e. ccpImgTxclrTfd and ccpImgTargtChk
+        // !VA If the target is the IMG Anchor input element, reveal/conceal the dependent elements, i.e. ccpImgTxclrTfd and ccpImgTargtChk. 
         } else if (tar.id === 'ccp-img-anchr-ipt') {
           console.log('Handling IMG ANCHR input');
-          // !VA The 2 elements that are dependent on the anchor input value
-          revealArray = makeAliasArray('ccpImgTxclrTfd', 'ccpImgTargtChk');
+          
+          // !VA Get the state of the icon before it is toggled. Determines if the reveal state of the dependent elements should be toggled when there is only a single character in the input field the value of the field changes.
+          hasActive = evt.target.classList.contains('active');
           // !VA If there's a value in the field, then flag is true, so highlight the icon
           flag ? tar.classList.remove('active') : tar.classList.add('active');
-          // !VA aliasArray is the list of dependent elements. Their reveal state is toggled in revealElements based on whether the conceal class is present or not, so it's not necessary to toggle them here based on the value of 'flag'
-          makeAliasArray('ccpImgTxclrTfd', 'ccpImgTargtChk');
-          // !VA Branch: 112220A
-          // !VA Deprecate, see comment above.
-          // flag ? revealArray = makeAliasArray('ccpImgTxclrTfd', 'ccpImgTargtChk') : revealArray = [];
-          configObj = {
-            revealElements: { caller: 'handleTextInputEvent', revealType: 'update', revealArray: revealArray }
-          };
-          UIController.configCCP( configObj );
+          // !VA Set the revealArray
+          revealArray = makeAliasArray('ccpImgTxclrTfd', 'ccpImgTargtChk');
+          configObj.revealElements = { caller: 'handleTextInputEvent', revealType: 'update', revealArray: revealArray };
+          console.clear();
+          console.log(`evt.target.value.length :>> ${evt.target.value.length};`);
+
+          if (flag) {
+            UIController.configCCP(configObj);
+          } else {
+            // !VA If the input only has one character, then the user is either adding to or deleting characters from the input. If adding, then ignore all subsequent characters. If deleting, only toggle the reveal if the icon does NOT have the active class, i.e. the icon appears blue. This indicated that there is already a value in the field, i.e. that the dependent elements should NOT be toggle. If the icon does have the active class then it appears white, i.e. deleting the character results in an empty input, thus the dependent elements should be toggled off.
+            if (evt.target.value.length === 1 && !hasActive) {
+              UIController.configCCP(configObj);
+            }
+          } 
         } else {
-          // !VA Add/remove active class on all the other labelled text input elements
-          tar.value !== '' ? tar.classList.add('active') : tar.classList.remove('active');
+        //   // !VA Add/remove active class on all the other labelled text input elements
+        //   tar.value !== '' ? tar.classList.add('active') : tar.classList.remove('active');
+          console.log('ERROR in handleTextInputEvent - unknown condition');
         }
       // !VA Now handle the unlabelled padding text input elements
       } else {
