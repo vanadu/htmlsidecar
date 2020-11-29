@@ -72,8 +72,10 @@ var Witty = (function () {
     var Attributes = CBController.initGetAttributes();
     const getImgType = Attributes.imgType;
     console.log('getImgType is: ' + getImgType);
-    
   };
+
+
+
 
   // !VA GLOBAL
   let myObject = {};
@@ -463,6 +465,8 @@ var Witty = (function () {
     // !VA Resets all the reveal aliases to the default array. Called only once at initialization 
     // !VA Branch: 112020A
     // !VA This should be folded into revealElements which includes exactly the same function.
+    // !VA Branch: 112920B
+    // !VA Turn tabIndex on for 
     function revealInit( initArray ) {
       // console.log('revealInit running'); 
       let el;
@@ -474,6 +478,11 @@ var Witty = (function () {
             if ( initArray[i] ) { 
               el = document.querySelector(ccpUserInput[initArray[i]]);
               el.classList.remove('ccp-conceal-ctn'); 
+              // !VA Branch: 112920B
+              // !VA If the classList of el contains ccp-txfld-ctn, then it is a text input field, not a checkbox or radio element, so set tabIndex to 0 to allow tabbing.
+              if (el.classList.contains('ccp-txfld-ctn')) {
+                el.children[0].tabIndex = 0;
+              }
             }
           // !VA Pause 25 milliseconds between iterations
           }, 25 * i);
@@ -599,9 +608,15 @@ var Witty = (function () {
               el = document.querySelector(ccpUserInput[revealArray[i]]);
               if ( el.classList.contains('ccp-conceal-ctn')) {
                 el.classList.remove('ccp-conceal-ctn');
+                // !VA Branch: 112920B
+                // !VA Turn on tabIndex for children of the currently revealed element
+                el.children[0].tabIndex = 0;
               } else {
                 el.classList.add('ccp-conceal-ctn');
+                // !VA Turn off tabIndex for children of the currently concealed element
+                el.children[0].tabIndex = -1;
               }
+              // console.log(`el.id :>> ${el.id}; el.tabIndex :>> ${el.tabIndex}`);
             // !VA Pause 15 milliseconds between iterations
             }, 100 * i);
           })(i);
@@ -631,6 +646,7 @@ var Witty = (function () {
 
       // !VA Receieves the Object.entries list from currentObj and revealObj. 
       function revealCcpElements(current, reveal) {
+        console.log('revealCcpElements running'); 
         // unique is the object containing the elements that are unique to this reveal operation, i.e. the elements whose reveal state is not identical to the current reveal state. This is necessary because if we include all the object properties in the reveal/conceal animation, it will be choppy because elements will have their already existing conceal class set without changing anything. Using the unique object, only the delta of the object properties are animated.
         let unique = {}, uniqueObj;
         // !VA Iterate through the Object.entries containing all the aliases and their reveal/conceal states.
@@ -655,6 +671,7 @@ var Witty = (function () {
                   // console.log(`el.id :>> ${el.id};`);
                   // Reveal/conceal each element based on the reveal/conceal property of the current uniqueObj entry.
                   uniqueObj[i][1] ? el.classList.remove('ccp-conceal-ctn') : el.classList.add('ccp-conceal-ctn');
+                  uniqueObj[i][1] ? el.children[0].tabIndex = 0 : el.children[0].tabIndex = -1;
                 // !VA Pause 15 milliseconds between iterations
                 }, 50 * i);
               })(i);
@@ -2620,8 +2637,8 @@ ${indent}<![endif]-->`;
         event = event || window.event;
         let keydown = event.which || event.keyCode || event.key;
         if( keydown === 13) {
-          console.log('event :>> ');
-          console.log(event);
+          // console.log('event :>> ');
+          // console.log(event);
           targetId = event.target.id;
           if ( event.shiftKey && !event.ctrlKey && !event.altKey ) {
             // console.log('doClipboard: SHIFT + ENTER ');
@@ -2634,7 +2651,8 @@ ${indent}<![endif]-->`;
             clipboardStr = buildOutputNL('ccp-tbl-cbhtm-ipt', 'tblNode');
             // buildOutputNL(targetid, 'tblNode');
           } else {
-            console.log('ERROR in doClipboard - unknown condition');
+            // !VA Trap the ENTER key here for possible error condition
+            // console.log('ERROR in doClipboard - unknown condition');
           }
           dummybutton.setAttribute('data-clipboard-text', clipboardStr);
           dummybutton.click();
@@ -3696,7 +3714,13 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Select the input on focus. Maybe there's an easier way to do this.
     function handleFocus(evt) {
+      console.log('handleFocus running'); 
       evt.target.select();
+      (function () {
+        var hasFocus = document.activeElement.id;
+        console.log(`hasFocus :>> ${hasFocus};`);
+        console.log(`evt.target.tabIndex :>> ${evt.target.tabIndex};`);
+      })();
     }
 
     // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. This also handles the cases where the user enters 0 to blur, or leaves the input empty to blur, and the padding-specific handling of TD Width values. Note: This emulates the preventDefault behavior of the TAB key. Remember that if you set preventDefault on the TAB key, the blur event will still fire on mouse out and the result will be that the blur is handled twice. Handling the blur here and NOT on the TAB keypress avoids that trap.
@@ -3937,6 +3961,12 @@ ${indent}<![endif]-->`;
         } else if ( keydown === 9) {
           // !VA NOTE: TAB key is handled by handleBlur, so do nothing here.
           // console.log('TAB key');
+          // !VA Branch: 112920B
+          if (document.hasFocus()) {
+            console.log('DOCUMENT has focus');
+          } else {
+            console.log('DOCUMENT does NOT have  focus');
+          } 
         }
       }
     }
@@ -5619,6 +5649,12 @@ ${indent}<![endif]-->`;
         ccpCtnElements = document.getElementsByClassName('ccp-ctn');
         for (const el of ccpCtnElements) {
           el.classList.add('ccp-conceal-ctn');
+          // !VA Branch: 112920B
+          // !VA Turn tabIndex off for all the children elements of the input elements
+          if (el.id.substring( 14, 17) == 'tfd') {
+            console.log(`Mark1 el.id :>> ${el.id};`);
+            el.children[0].tabIndex = -1;
+          }
         }
 
         // !VA Then set the CCP to configDefault on init. NOTE: the default parameter sets Appobj.ccpTdaOptnsRdo to an empty string, which forces populateCcpProperties to access the hard-coded value from the HTML file. That is the default, i.e. the 'basic' option. That is the mechanism for pre-selecting the 'basic' TD option on reload. Not ideal, but that is a carryover from before we were using configObj for configuration. At least I think that's the way it works :-)

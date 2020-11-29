@@ -1215,9 +1215,6 @@ fieldset {
   height: 30px;
 }
 
-
-
-
 // VA! Default icon group input style - only the icon itself should display, so hide the input element. Using the appearance property - display and visibility don't work as expected and opacity cuts off a slice from the icon. If there are browser compatibility issues, revisit this, but it works on modern desktop browsers: https://caniuse.com/#feat=css-appearance.
 
 // VA! 08.22.20 
