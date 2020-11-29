@@ -484,7 +484,7 @@ var Witty = (function () {
     // !VA UIController private
     // !VA Toggle the table wrapper options in the CCP UI based on the configObj passed from configWrapr. 
     function toggleWrapr(flag) {
-      console.log('toggleWrapr running'); 
+      // console.log('toggleWrapr running'); 
       let el, clss;
       // !VA Array of table wrapper aliases
       let wraprArr;
@@ -554,16 +554,16 @@ var Witty = (function () {
     // !VA Reveal and conceal individual CCP container elements with sequential animation. revealType specifies whether the existing reveal configuration should be updated with the revealArray items or whether a different reveal configuration should be set based on a comparison between the revealArray elements and the default revealInit array. the revealType arguments are 'update' and 'config'.
 
     function revealElements ( caller, revealType, revealArray) {
-      console.log(`revealElements caller :>> ${caller}; revealType :>> ${revealType}; revealElements: revealArray :>> ${revealArray}; `);
-      let el, revealObj = {}, currentObj = {};
-      console.log('revealElements revealArray :>> ');
-      console.log(revealArray);
+      // console.log(`revealElements caller :>> ${caller}; revealType :>> ${revealType}; revealElements: revealArray :>> ${revealArray}; `);
+      let el, obj = {}, revealObj = {}, currentObj = {};
+      // console.log('revealElements revealArray :>> ');
+      // console.log(revealArray);
       // !VA Contains all the aliases whose elements can be concealed/revealed by the revealElements method of configCcp. Does not include the MKCSS button groups, since those buttons are children of the parent and are thus handled by revealMkcss. 
       const allAliases =  [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaTxcntTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdparGrp', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblMsdpiChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblCbhtmBtn', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
 
       // !VA Get object containing the reveal configuration at initialization based on allArray above and initConcealed. initConcealed is the array of elements that are concealed at initialization. The result is an object whose keys are the revealable element aliases and whose values represent the reveal state at initialization. This object forms the basis for the revealObj defined below.
       function getInitObj() {
-        let obj = {};
+        obj = {};
         // !VA initConcealed are the aliases whose elements are concealed at initialization.
         const initConcealed = [ 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaTxcntTfd', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
         // !VA Read in all aliases whose reveal state is true, i.e 
@@ -579,7 +579,7 @@ var Witty = (function () {
 
       // !VA Get object containing the current configuration at the time revealElements is run, before any change to the reveal configuration is implemented. This object is used to compare against the current revealObj, i.e. the object containing the reveal configuration to implement in order to filter out the elements whose reveal state does not change so that these aren't included in the reveal/conceal animation handler.
       function getCurrentObj() {
-        let obj = {};
+        obj = {};
         for (const alias of allAliases  ) {
           el = document.querySelector(ccpUserInput[alias]);
           if (el.classList.contains('ccp-conceal-ctn')) {
@@ -587,8 +587,6 @@ var Witty = (function () {
           } else 
             obj[alias] = true;
         }
-        console.log('obj :>> ');
-        console.log(obj);
         return obj;
       }
 
@@ -1144,7 +1142,7 @@ var Witty = (function () {
 
     // !VA ATTRIBUTE FUNCTIONS
     // !VA CBController   
-    // !VA NOTE: All these attributes are set here prior to building the individual nodes. It is first called in buildOutputNodeList, and is passed to each make node function in succesion after that. So, it would make sense that getAttributes includes ALL the logic for rendering each attribute before it is passed to the respective make node function. 
+    // !VA NOTE: All these attributes are set here prior to building the individual nodes. It is first called in buildOutputNL, and is passed to each make node function in succesion after that. So, it would make sense that getAttributes includes ALL the logic for rendering each attribute before it is passed to the respective make node function. 
     // !VA TODO: This could be DRYified, since most of the Attributes return the Appobj property value. 
     function getAttributes() {
       var Appobj = {};
@@ -1515,8 +1513,8 @@ var Witty = (function () {
 
     // !VA CBController   
     // !VA Build the subset of nodes that will be populated with indents and output to the Clipboard. NOTE: outputNL can't be a fragment because fragments don't support insertAdjacentHMTL). So we have to create a documentFragment that contains all the nodes to be output, then append them to a container div 'outputNL', then do further processing on the container div.
-    function buildOutputNodeList( id, nodeDepth ) {
-      console.log(`buildOutputNodeList id :>> ${id}; nodeDepth :>> ${nodeDepth}`);
+    function buildOutputNL( id, nodeDepth ) {
+      // console.log(`buildOutputNL id :>> ${id}; nodeDepth :>> ${nodeDepth}`);
       let selectedTdOption, hasAnchor, hasWrapper, Attributes, tableNodeFragment, nl, frag, outputNL, clipboardStr;
       // !VA Set hasAnchor if ccpImgAnchrTfd has a value
       appController.getAppobj('ccpImgAnchrTfd')  ? hasAnchor = true : hasAnchor = false;
@@ -1531,11 +1529,11 @@ var Witty = (function () {
       // !VA Create the full nodeList from the tableNodeFragment. If tableNodeFragment is null, return to abort without creating Clipboard object.
 
       // !VA Branch: 111920B
-      // console.log(`buildOutputNodeList tableNodeFragment  :>> ${tableNodeFragment };`);
+      // console.log(`buildOutputNL tableNodeFragment  :>> ${tableNodeFragment };`);
       try {
         nl = tableNodeFragment.querySelectorAll('*');
       } catch (e) {
-        console.log('Error in buildOutputNodeList: tableNodeFragment is null. Aborting...');
+        console.log('Error in buildOutputNL: tableNodeFragment is null. Aborting...');
         return;
       }
       // !VA Create the div container to which the extracted nodeList fragment will be appended
@@ -1593,7 +1591,7 @@ var Witty = (function () {
 
           break;
         default:
-          console.log('Error in buildOutputNodeList: case not defined, id is: ' + id);
+          console.log('Error in buildOutputNL: case not defined, id is: ' + id);
           // Default code block, this should be an error code
         }
         // !VA Append the fragment to the container
@@ -1656,8 +1654,8 @@ var Witty = (function () {
         outputNL = container.querySelectorAll('*');
 
         // !VA Ghost for vmlbt, bgimg, iswap
-        console.log('MS Conditionals - outputNL :>> ');
-        console.log(outputNL);
+        // console.log('MS Conditionals - outputNL :>> ');
+        // console.log(outputNL);
         // !VA If the TBL Ghost checkbox is checked, fetch the ghost table config for the TD options handled in this condition. TD options basic and swtch are handled in their respective conditions below.
         if (Attributes.tableGhost.str) {
           if (selectedTdOption === 'bgimg') {
@@ -1690,7 +1688,7 @@ var Witty = (function () {
         // console.log(clipboardStr);
         clipboardStr = applyGhostTable(clipboardStr, Attributes.tableGhost.str, Attributes.tableWrapperGhost.str, selectedTdOption );
       }
-      console.log('buildOutputNodeList clipboardStr is: ');
+      console.log('buildOutputNL clipboardStr is: ');
       console.log(clipboardStr);
       // !VA Write clipboardStr to the Clipboard
       // !VA Branch: 112520A
@@ -1897,7 +1895,7 @@ var Witty = (function () {
 
     // !VA Make the img node, including anchor if it is checked
     // !VA CBController   
-    // !VA Builds the imgNode that is appended to the tdNode, that is in turn appended to the tableNode to generate the clipboard output. The individual attributes of the node (i.e. class, alt, etc) are received in the Attributes argument, which is originally created in getAttributes and called in buildOutputNodeList. Each property of the Attributes object contains any logic required to create the Attribute, but the logic of WHETHER the Attribute is to be included in the imgNode is 
+    // !VA Builds the imgNode that is appended to the tdNode, that is in turn appended to the tableNode to generate the clipboard output. The individual attributes of the node (i.e. class, alt, etc) are received in the Attributes argument, which is originally created in getAttributes and called in buildOutputNL. Each property of the Attributes object contains any logic required to create the Attribute, but the logic of WHETHER the Attribute is to be included in the imgNode is 
     function makeImgNode ( id, Attributes ) {
       // console.log(`makeImgNode id :>> ${id};`);
       // !VA Id is passed but not used here,  because we're only building the node.
@@ -2010,7 +2008,7 @@ var Witty = (function () {
         break;
       // !VA (selectedTdOption === 'rdoCcpTdBgimage'):
       case (selectedTdOption === 'bgimg'):
-        // !VA Create the parent node to which the bgimage code block will be appended after outputNL is converted to text in buildOutputNodeList.
+        // !VA Create the parent node to which the bgimage code block will be appended after outputNL is converted to text in buildOutputNL.
         // !VA Include width, height and valign as per Stig's version
         tdInner.width = Attributes.tdAppobjWidth.str;
         tdInner.height = Attributes.tdAppobjHeight.str;
@@ -2026,7 +2024,7 @@ var Witty = (function () {
         break;
       // !VA  (selectedTdOption === 'rdoCcpTdVmlbutton'):
       case (selectedTdOption === 'vmlbt'):
-        // !VA IMPORTANT: Height and width fields have to be entered, otherwise the button can't be built. Button width and height are set here in makeTdNode, the rest of the options are set in getVmlCodeBlock in buildOutputNodeList. The defaults of 40/200 as per Stig are set in UIController.showTdOptions. So if there's no value for td height and width, then the user has deleted the default and not replaced it with a valid entry. In this case, throw an ERROR and abort before it gets to the clipboard.
+        // !VA IMPORTANT: Height and width fields have to be entered, otherwise the button can't be built. Button width and height are set here in makeTdNode, the rest of the options are set in getVmlCodeBlock in buildOutputNL. The defaults of 40/200 as per Stig are set in UIController.showTdOptions. So if there's no value for td height and width, then the user has deleted the default and not replaced it with a valid entry. In this case, throw an ERROR and abort before it gets to the clipboard.
         if (!appController.getAppobj('ccpTdaHeigtTfd') || !appController.getAppobj('ccpTdaWidthTfd')) {
           console.log('ERROR in makeTdNode rdoCcpTdVmlbutton: no value for either height or width');
           isErr = true;
@@ -2063,7 +2061,7 @@ var Witty = (function () {
       // !VA Set the node fragment to the TD node
       tdNodeFragment.appendChild(tdInner);
 
-      // !VA TODO: This error handling is poor because it only allows for one possible error. But, it does return nothing, which is then passed on to the calling function and terminates in buildOutputNodeList
+      // !VA TODO: This error handling is poor because it only allows for one possible error. But, it does return nothing, which is then passed on to the calling function and terminates in buildOutputNL
       if (isErr) { 
         console.log('makeTdNode: vml_button_no_value error: id is: ' + id);
         appController.handleAppMessages('vml_button_no_value');
@@ -2079,7 +2077,7 @@ var Witty = (function () {
     // !VA CBController   
     function makeTableNode( id, Attributes ) {
       // console.log(`makeTableNode id :>> ${id};`);
-      // !VA Variables for parent and wrapper table, parent and wrapper tr, and wrapper td. Parent td is called from makeTdNode and is appended to tdNodeFragment. tableNodeFragment is the node that contains the entire nodelist which is returned to buildOutputNodeList
+      // !VA Variables for parent and wrapper table, parent and wrapper tr, and wrapper td. Parent td is called from makeTdNode and is appended to tdNodeFragment. tableNodeFragment is the node that contains the entire nodelist which is returned to buildOutputNL
       let tableOuter, trOuter, tdOuter, tableInner, trInner, tdNodeFragment, tableNodeFragment;
       tableNodeFragment = document.createDocumentFragment();
       tableOuter = document.createElement('table');
@@ -2114,7 +2112,7 @@ var Witty = (function () {
       tdNodeFragment = makeTdNode( id, Attributes );
 
       
-      // !VA If tdNodeFragment is null, then there was an error in makeTdNode, so console the error and return null to buildOutputNodeList to abort.
+      // !VA If tdNodeFragment is null, then there was an error in makeTdNode, so console the error and return null to buildOutputNL to abort.
       try {
         trInner.appendChild(tdNodeFragment);
       } catch (e) {
@@ -2169,7 +2167,7 @@ var Witty = (function () {
     // !VA START TD OPTIONS MS-CONDITIONAL CODE BLOCKS
     // !VA These are the code blocks that contain MS conditionals in comment nodes or text nodes, i.e. mobile swap, background image, and vmlbutton
     // !VA UIController private
-    // !VA Called from buildOutputNodeList. Gets the clipboardStr that comprises the MS Conditional code for the iswap, i.e. TD OPTNS image swap option.
+    // !VA Called from buildOutputNL. Gets the clipboardStr that comprises the MS Conditional code for the iswap, i.e. TD OPTNS image swap option.
     function getImgSwapBlock( id, indentLevel, Attributes ) {
       let Appobj, linebreak;
       // !VA TODO: We don't need the entire Appobj here. What we should do is call rest parameters on what we need and then destructure the return array into separate variables. But for now, this is good enough.
@@ -2187,7 +2185,7 @@ var Witty = (function () {
     }
 
     // !VA UIController   
-    // !VA Called from buildOutputNodeList. Gets the clipboardStr that comprises the MS Conditional code for the Bgimage.
+    // !VA Called from buildOutputNL. Gets the clipboardStr that comprises the MS Conditional code for the Bgimage.
     function getBgimageBlock( id, indentLevel, Attributes ) {
       // !VA Keeping the original reference to fallback for posterity for now
       // let bgimageStr, fallback, bgcolor;
@@ -2428,7 +2426,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     } 
 
     // !VA CBController private
-    // !VA Called from buildOutputNodeList. Ghost tag tokens were inserted via insertAdjacentHTML during node creation. This function replaces the tokens with the ghost tags from getGhostTags depending on the checked status of the Ghost checkbox icons passed in as bool parameters from the caller. chkbxTbl and chkbxTbw are booleans indicating whether ccpTblGhostChk and ccpTbwGhostChk are checked. Calls transposeTokens to swap the position of the token from before the tag to after it. This is necessary because the ghost tokens had to be positioned before the tags due to the indents being placed after them using insertAdjacentHtml - it is not possible to modify or append to strings inserted with insertAdjacentHtml.
+    // !VA Called from buildOutputNL. Ghost tag tokens were inserted via insertAdjacentHTML during node creation. This function replaces the tokens with the ghost tags from getGhostTags depending on the checked status of the Ghost checkbox icons passed in as bool parameters from the caller. chkbxTbl and chkbxTbw are booleans indicating whether ccpTblGhostChk and ccpTbwGhostChk are checked. Calls transposeTokens to swap the position of the token from before the tag to after it. This is necessary because the ghost tokens had to be positioned before the tags due to the indents being placed after them using insertAdjacentHtml - it is not possible to modify or append to strings inserted with insertAdjacentHtml.
     function applyGhostTable(tbl, chkbxTbl, chkbxTbw, option) {
       // console.log(`applyGhostTable tbl :>> ${tbl};`);
       // console.log(`applyGhostTable chkbxTbl :>> ${chkbxTbl}; chkbxTbw :>> ${chkbxTbw}; option :>> ${option}`);
@@ -2532,7 +2530,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Now strip out the data-ghost attributes.
       tbl = tbl.replace(' data-ghost="tbl"', '');
       tbl = tbl.replace(' data-ghost="tbw"', '');
-      // !VA Return this to buildOutputNodeList clipboardStr
+      // !VA Return this to buildOutputNL clipboardStr
       // console.log('Return tbl :>> ');
       // console.log(tbl);
       return tbl;
@@ -2627,14 +2625,14 @@ ${indent}<![endif]-->`;
           targetId = event.target.id;
           if ( event.shiftKey && !event.ctrlKey && !event.altKey ) {
             // console.log('doClipboard: SHIFT + ENTER ');
-            clipboardStr = buildOutputNodeList('ccp-img-cbhtm-ipt', 'imgNode');
+            clipboardStr = buildOutputNL('ccp-img-cbhtm-ipt', 'imgNode');
           } else if ( !event.shiftKey && event.ctrlKey && !event.altKey ) {
             // console.log('doClipboard: CTRL + ENTER ');
-            clipboardStr = buildOutputNodeList('ccp-tda-cbhtm-ipt', 'tdaNode');
+            clipboardStr = buildOutputNL('ccp-tda-cbhtm-ipt', 'tdaNode');
           } else if ( !event.shiftKey && !event.ctrlKey && event.altKey ) {
             // console.log('doClipboard: ALT + ENTER ');
-            clipboardStr = buildOutputNodeList('ccp-tbl-cbhtm-ipt', 'tblNode');
-            // buildOutputNodeList(targetid, 'tblNode');
+            clipboardStr = buildOutputNL('ccp-tbl-cbhtm-ipt', 'tblNode');
+            // buildOutputNL(targetid, 'tblNode');
           } else {
             console.log('ERROR in doClipboard - unknown condition');
           }
@@ -2854,17 +2852,17 @@ ${indent}<![endif]-->`;
 
       // doClipboard2: function(evt) {
       //   console.log('doClipboard2 running'); 
-      //   buildOutputNodeList(evt.target.id, 'imgNode');
+      //   buildOutputNL(evt.target.id, 'imgNode');
       //   return;
       // },
 
 
       // !VA Called from eventHandler to initialize clipboard functionality
       doClipboard: function(evt) {
-        let targetid, nodeDepth, modifierKey;
+        let targetid, modifierKey;
         // !VA nodeDepth can have three values: 'imgNode', 'tdaNode', 'tblNode'
         targetid = evt.target.id;
-        console.log(`doClipboard targetid :>> ${targetid}; nodeDepth :>> ${nodeDepth}`);
+        // console.log(`doClipboard targetid :>> ${targetid};`);
         // console.log('doClipboard evt :>> ');
         // console.dir(evt);
         if (evt.shiftKey) { 
@@ -2874,30 +2872,20 @@ ${indent}<![endif]-->`;
         } else {
           modifierKey = false;
         }
-        // !VA IMPORTANT: Is this still necessary? Attributes don't appear to be passed anywhere here, I think this might be deprecated.
-        // !VA If the CCP image fluid/fixed radio button is clicked, then 
-        // if (targetid.includes('fixed') || targetid.includes('fluid')) {
-        //   getAttributes();
-        // }
         // !VA Run the Clipboard building routine based on the click target. 
         switch(true) {
-        // !VA Branch: 112420D
-        // !VA What we need here is an argument to pass to buildOutputNodeList that indicates NOT the id of the event but rather the nodes to output. 
-        // !VA Deprecating for now, replacing with individual cbhtm cases
-        // case targetid.includes('cbhtm') :
-        //   buildOutputNodeList(targetid);
-        //   break;
+        // !VA Second argument of the buildOutputNL call is nodeDepth, i.e. which nodes are output to the clipboard object: imgNode, tdaNode or tblNode.
         case evt.target.name === 'ccp-cbhtm-btn' :
-          console.log(`CBHTML BUTTON CLICKED: targetid :>> ${targetid}`);
+          // console.log(`CBHTML BUTTON CLICKED: targetid :>> ${targetid}`);
           if (targetid === 'ccp-img-cbhtm-ipt') {
-            console.log('IMG Make HTML');
-            buildOutputNodeList(targetid, 'imgNode');
+            // console.log('IMG Make HTML');
+            buildOutputNL(targetid, 'imgNode');
           } else if (targetid === 'ccp-tda-cbhtm-ipt') {
-            console.log('TDA Make HTML');
-            buildOutputNodeList(targetid, 'tdaNode');
+            // console.log('TDA Make HTML');
+            buildOutputNL(targetid, 'tdaNode');
           } else if (targetid === 'ccp-tbl-cbhtm-ipt') {
-            console.log('TBL Make HTML');
-            buildOutputNodeList(targetid, 'tblNode');
+            // console.log('TBL Make HTML');
+            buildOutputNL(targetid, 'tblNode');
           } else {
             console.log('ERROR in doClipboard - unknown condition');
           }
@@ -4638,15 +4626,16 @@ ${indent}<![endif]-->`;
         UIController.configCCP( configObj);
         break;
       case alias === 'ccpTblGhostChk':
-        // !VA This alias is handled in CBController getAttributes and UIController makeImgNode. If checked, this element writes the target attribute to the img clipboard output. If unchecked, it does nothing - so it has no effect on the DOM.
-        console.log('ALERT in selectCheckbox - Unaccessed condition, Appobj ccpTblGhostChk is:' + Appobj['ccpTblGhostChk']);
+        // !VA This alias is handled in CBController getAttributes and UIController makeImgNode. If checked, this element writes the target attribute to the img clipboard output. If unchecked, it does nothing - so it has no effect on the DOM. Keeping this condition in the switch, commenting out the console call.
+        // console.log('ALERT in selectCheckbox - Unaccessed condition, Appobj ccpTblGhostChk is:' + Appobj['ccpTblGhostChk']);
         break;
       case alias === 'ccpImgTargtChk':
-        // !VA This alias is handled in CBController getAttributes and UIController makeImgNode. If checked, this element writes the target attribute to the img clipboard output. If unchecked, it does nothing - so it has no effect on the DOM.
-        console.log('ALERT in selectCheckbox - unaccessed condition - ccpImgTargtChk');
+        // !VA This alias is handled in CBController getAttributes and UIController makeImgNode. If checked, this element writes the target attribute to the img clipboard output. If unchecked, it does nothing - so it has no effect on the DOM. Keeping this condition in the switch, commenting out the console call.
+        // console.log('ALERT in selectCheckbox - unaccessed condition - ccpImgTargtChk');
         break;
       default:
-        console.log('Alias not yet handled in selectCheckbox');
+        // !VA Keeping the default condition in the switch, commenting out the console call.
+        // console.log('Alias not yet handled in selectCheckbox');
       }    
     }
 
@@ -5339,8 +5328,8 @@ ${indent}<![endif]-->`;
           reflectAppobj: { reflect: reflectArray },
           revealElements:  { caller: 'configOptns', revealType: 'config', revealArray: revealArray }
         };
-        console.log('swtch AFTER configObj :>> ');
-        console.dir(configObj);
+        // console.log('swtch AFTER configObj :>> ');
+        // console.dir(configObj);
         break;
       default:
         console.log('ERROR in configOptns - Appobj property not recognized');
@@ -5384,7 +5373,7 @@ ${indent}<![endif]-->`;
         revealArray = [ ];
 
       } else if (option === 'iswap') {
-        revealArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd' ];  
+        revealArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];  
         // revealArray = [  ];  
       } else if (option === 'swtch') {
         revealArray = [ 'ccpTblMaxwdTfd' ];
