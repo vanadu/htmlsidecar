@@ -564,7 +564,8 @@ var Witty = (function () {
 
     function revealElements ( caller, revealType, revealArray) {
       // console.log(`revealElements caller :>> ${caller}; revealType :>> ${revealType}; revealElements: revealArray :>> ${revealArray}; `);
-      let el, obj = {}, revealObj = {}, currentObj = {};
+      let el, obj = {}, revealObj = {}, currentObj = {}, uniqueObj = {};
+      let foo, baz, arr = [];
       // console.log('revealElements revealArray :>> ');
       // console.log(revealArray);
       // !VA Contains all the aliases whose elements can be concealed/revealed by the revealElements method of configCcp. Does not include the MKCSS button groups, since those buttons are children of the parent and are thus handled by revealMkcss. 
@@ -638,47 +639,96 @@ var Witty = (function () {
             }
           }
         }
+        console.log('revealObj :>> ');
+        console.log(revealObj);
+
         // !VA Call revealCcpElements to implement the reveal/conceal with animation, passing the entries in currentObj and revealObj.
-        revealCcpElements(Object.entries(currentObj), Object.entries(revealObj));
+        // revealCcpElements(Object.entries(currentObj), Object.entries(revealObj));
+
+
+        // uniqueObj is the object containing the elements that are unique to this reveal operation, i.e. the elements whose reveal state is not identical to the current reveal state. This is necessary because if we include all the object properties in the reveal/conceal animation, it will be choppy because elements will have their already existing conceal class set without changing anything. Using the unique object, only the delta of the object properties are animated.
+        uniqueObj = makeUnique(Object.entries(currentObj), Object.entries(revealObj));
+        console.log('uniqueObj :>> ');
+        console.dir(uniqueObj);
+
+        revealCcpElements(uniqueObj);
+
+
+        // !VA Branch: 113020A
+        // !VA Loop through uniqueObj and include/exclude elements from the tab order based on the reveal flag, i.e. uniqueObj[1]. Filter for TFD elements, i.e. elements that have IPT children to include/exclude in the tab order, and filter for the ccpTdaPdparGrp alias to include/exclude the IPT children. i.e. the padding inputs.
+        for (const entry of uniqueObj) {
+          console.log(`entry[0].substring( 8, 14 ) :>> ${entry[0].substring( 6, 14 )};`);
+          // !VA If uniqueObj contains any TFD aliases, exclude the corresponding input element from the tab order.
+          if (entry[0].substring( 11, 14 ) === 'Tfd') {
+            console.log(`entry[0] :>> ${entry[0]}; entry[1] :>> ${entry[1]}`);
+            // !VA Branch: 113020A
+            // !VA Push the first child element, i.e. the input element, of the TFD element onto the tabindexObj array
+            // !VA If the reveal flag on the entry is true, include the element in the tab order, otherwise exclude it.
+            entry[1] ? document.querySelector(ccpUserInput[entry[0]]).children[0].tabIndex = 0 : document.querySelector(ccpUserInput[entry[0]]).children[0].tabIndex = -1;
+
+          // !VA If uniqueObj contains the parent element of the padding inputs, add the elements with the class ccp-padng-ipt, i.e. all the padding inputs, to tabindexObj.
+          } else if (entry[0].substring( 6, 14 ) === 'PdparGrp') {
+            // !VA Loop through the collection of padding inputs and if the reveal flag on the entry is true, include the element in the tab order, otherwise exclude it.
+            for (const ipt of document.getElementsByClassName('ccp-padng-ipt')) {
+              entry[1] ? ipt.tabIndex = 0 : ipt.tabIndex = -1;
+            }
+          // !VA Write message to console if no TFD or PADNG elements are in uniqueObj
+          } else {
+            console.log('ALERT in revealElements - no TFD or PADNG elements, nothing to exclude from tab order');
+          }
+        }
+
       } else {
         console.log('ERROR in revealElements: unknown revealType');
       }
 
-      // !VA Receieves the Object.entries list from currentObj and revealObj. 
-      function revealCcpElements(current, reveal) {
-        console.log('revealCcpElements running'); 
-        // unique is the object containing the elements that are unique to this reveal operation, i.e. the elements whose reveal state is not identical to the current reveal state. This is necessary because if we include all the object properties in the reveal/conceal animation, it will be choppy because elements will have their already existing conceal class set without changing anything. Using the unique object, only the delta of the object properties are animated.
+      // !VA Make the uniqueObj object by comnparing the items in currentObj with the items in revealObj and filtering out those which don't match.
+      function makeUnique(current, reveal) {
         let unique = {}, uniqueObj;
-        // !VA Iterate through the Object.entries containing all the aliases and their reveal/conceal states.
         for (var i = 0; i < reveal.length; i++) {
           // !VA Filter out the elements that don't change between the current reveal config and the new reveal config.
           // !VA If the reveal state of the reveal list is not identical to the reveal state of the current list, then add that property to the unique object.
           if (reveal[i][1] !== current[i][1]) { 
-            // console.log('NOT IDENTICAL ');
-            // console.log(`reveal[i] :>> ${reveal[i]};`);
+            // !VA Reveal state is identical, so add the item to uniqueObj
             unique[reveal[i][0]] = reveal[i][1];
-            // console.log('unique :>> ');
-            // console.log(unique);
-            // !VA Convert the unique object to an Object.entries list
-            uniqueObj = Object.entries(unique);
-            // !VA Loop through the uniqueObj entries list
-            for (let i = 0; i < uniqueObj.length; i++) {
-              // !VA Animate the reveal/conceal operation
-              (function (i) {
-                setTimeout(function () {
-                  // !VA Select the element corresponing to the current alias in the uniqueObj list
-                  el = document.querySelector(ccpUserInput[uniqueObj[i][0]]);
-                  // console.log(`el.id :>> ${el.id};`);
-                  // Reveal/conceal each element based on the reveal/conceal property of the current uniqueObj entry.
-                  uniqueObj[i][1] ? el.classList.remove('ccp-conceal-ctn') : el.classList.add('ccp-conceal-ctn');
-                  uniqueObj[i][1] ? el.children[0].tabIndex = 0 : el.children[0].tabIndex = -1;
-                // !VA Pause 15 milliseconds between iterations
-                }, 50 * i);
-              })(i);
-            }
           }
         }
+        // !VA Convert the unique object to an Object.entries list and return
+        uniqueObj = Object.entries(unique);
+        return uniqueObj;
       }
+
+      function revealCcpElements(uniqueObj) {
+        console.log('revealCcpElements running'); 
+        // unique is the object containing the elements that are unique to this reveal operation, i.e. the elements whose reveal state is not identical to the current reveal state. This is necessary because if we include all the object properties in the reveal/conceal animation, it will be choppy because elements will have their already existing conceal class set without changing anything. Using the unique object, only the delta of the object properties are animated.
+        // !VA Iterate through the Object.entries containing all the aliases and their reveal/conceal states.
+
+
+
+        // !VA Loop through the uniqueObj entries list
+        for (let i = 0; i < uniqueObj.length; i++) {
+          // !VA Animate the reveal/conceal operation
+          (function (i) {
+            setTimeout(function () {
+              // !VA Select the element corresponing to the current alias in the uniqueObj list. uniqueObj[0] is the element id, uniqueObj[1] is its reveal state.
+              el = document.querySelector(ccpUserInput[uniqueObj[i][0]]);
+              // console.log(`uniqueObj[i][1] :>> ${uniqueObj[i][1]};`);
+              // Reveal/conceal each element based on the reveal/conceal property of the current uniqueObj entry.
+              uniqueObj[i][1] ? el.classList.remove('ccp-conceal-ctn') : el.classList.add('ccp-conceal-ctn');
+              // !VA Branch: 113020A
+              // !VA Setting the tabindex
+              // Now we need to get all the IPT elements that are children of these uniqueObj keys: TFD and GRP elements. One way to do that is to iterate through them and build a new array of IPT elements.
+              /* !VA  
+              1) el.id.replace('tfd', 'itp) => get elements => add to array
+              2) getelementsbyclass('ccp-padng-ipt) => get elements => add to arra
+              */
+            // !VA Pause 15 milliseconds between iterations
+            }, 50 * i);
+          })(i);
+        }
+      }
+
+
     }
 
     // !VA UIController private
@@ -5652,7 +5702,6 @@ ${indent}<![endif]-->`;
           // !VA Branch: 112920B
           // !VA Turn tabIndex off for all the children elements of the input elements
           if (el.id.substring( 14, 17) == 'tfd') {
-            console.log(`Mark1 el.id :>> ${el.id};`);
             el.children[0].tabIndex = -1;
           }
         }
