@@ -505,14 +505,14 @@ var Witty = (function () {
         // console.log('wraprArr :>> ');
         // console.log(wraprArr);
       }
-      // !VA Conceal class name
-      clss = 'ccp-conceal-ctn';
       // !VA Loop through wraprArr and apply/remove the conceal class
       for (let i = 0; i < wraprArr.length; i++) {
         (function (i) {
           setTimeout(function () {
             el = document.querySelector(ccpUserInput[wraprArr[i]]);
-            flag ? el.classList.remove(clss) : el.classList.add(clss);
+            // !VA If flag is true, remove ccp-conceal-ctn and include child IPT in tab order, otherwise add ccp-conceal-ctn and exclude it from tab order.
+            flag ? el.classList.remove('ccp-conceal-ctn') : el.classList.add('ccp-conceal-ctn');
+            flag ? el.children[0].tabIndex = 0 : el.children[0].tabIndex = -1;
           // !VA Pause 35 milliseconds between iterations
           }, 35 * i);
         })(i);
@@ -639,28 +639,23 @@ var Witty = (function () {
             }
           }
         }
-        console.log('revealObj :>> ');
-        console.log(revealObj);
-
-        // !VA Call revealCcpElements to implement the reveal/conceal with animation, passing the entries in currentObj and revealObj.
-        // revealCcpElements(Object.entries(currentObj), Object.entries(revealObj));
-
+        // console.log('revealObj :>> ');
+        // console.log(revealObj);
 
         // uniqueObj is the object containing the elements that are unique to this reveal operation, i.e. the elements whose reveal state is not identical to the current reveal state. This is necessary because if we include all the object properties in the reveal/conceal animation, it will be choppy because elements will have their already existing conceal class set without changing anything. Using the unique object, only the delta of the object properties are animated.
         uniqueObj = makeUnique(Object.entries(currentObj), Object.entries(revealObj));
-        console.log('uniqueObj :>> ');
-        console.dir(uniqueObj);
-
+        // console.log('uniqueObj :>> ');
+        // console.dir(uniqueObj);
+        // !VA Call revealCcpElements to implement the reveal/conceal with animation, passing in uniqueObj.
         revealCcpElements(uniqueObj);
-
 
         // !VA Branch: 113020A
         // !VA Loop through uniqueObj and include/exclude elements from the tab order based on the reveal flag, i.e. uniqueObj[1]. Filter for TFD elements, i.e. elements that have IPT children to include/exclude in the tab order, and filter for the ccpTdaPdparGrp alias to include/exclude the IPT children. i.e. the padding inputs.
         for (const entry of uniqueObj) {
-          console.log(`entry[0].substring( 8, 14 ) :>> ${entry[0].substring( 6, 14 )};`);
+          // console.log(`entry[0].substring( 6, 14 ) :>> ${entry[0].substring( 6, 14 )};`);
           // !VA If uniqueObj contains any TFD aliases, exclude the corresponding input element from the tab order.
           if (entry[0].substring( 11, 14 ) === 'Tfd') {
-            console.log(`entry[0] :>> ${entry[0]}; entry[1] :>> ${entry[1]}`);
+            // console.log(`entry[0] :>> ${entry[0]}; entry[1] :>> ${entry[1]}`);
             // !VA Branch: 113020A
             // !VA Push the first child element, i.e. the input element, of the TFD element onto the tabindexObj array
             // !VA If the reveal flag on the entry is true, include the element in the tab order, otherwise exclude it.
@@ -674,7 +669,8 @@ var Witty = (function () {
             }
           // !VA Write message to console if no TFD or PADNG elements are in uniqueObj
           } else {
-            console.log('ALERT in revealElements - no TFD or PADNG elements, nothing to exclude from tab order');
+            // !VA Nothing to exclude from tab order or the element is not a TFD or padding input.
+            // console.log('ALERT in revealElements - no TFD or PADNG elements, nothing to exclude from tab order');
           }
         }
 
@@ -700,11 +696,8 @@ var Witty = (function () {
 
       function revealCcpElements(uniqueObj) {
         console.log('revealCcpElements running'); 
-        // unique is the object containing the elements that are unique to this reveal operation, i.e. the elements whose reveal state is not identical to the current reveal state. This is necessary because if we include all the object properties in the reveal/conceal animation, it will be choppy because elements will have their already existing conceal class set without changing anything. Using the unique object, only the delta of the object properties are animated.
+        // uniqueObj is the object containing the elements that are unique to this reveal operation, i.e. the elements whose reveal state is not identical to the current reveal state. This is necessary because if we include all the object properties in the reveal/conceal animation, it will be choppy because elements will have their already existing conceal class set without changing anything. Using the unique object, only the delta of the object properties are animated.
         // !VA Iterate through the Object.entries containing all the aliases and their reveal/conceal states.
-
-
-
         // !VA Loop through the uniqueObj entries list
         for (let i = 0; i < uniqueObj.length; i++) {
           // !VA Animate the reveal/conceal operation
@@ -715,20 +708,11 @@ var Witty = (function () {
               // console.log(`uniqueObj[i][1] :>> ${uniqueObj[i][1]};`);
               // Reveal/conceal each element based on the reveal/conceal property of the current uniqueObj entry.
               uniqueObj[i][1] ? el.classList.remove('ccp-conceal-ctn') : el.classList.add('ccp-conceal-ctn');
-              // !VA Branch: 113020A
-              // !VA Setting the tabindex
-              // Now we need to get all the IPT elements that are children of these uniqueObj keys: TFD and GRP elements. One way to do that is to iterate through them and build a new array of IPT elements.
-              /* !VA  
-              1) el.id.replace('tfd', 'itp) => get elements => add to array
-              2) getelementsbyclass('ccp-padng-ipt) => get elements => add to arra
-              */
             // !VA Pause 15 milliseconds between iterations
             }, 50 * i);
           })(i);
         }
       }
-
-
     }
 
     // !VA UIController private
@@ -3764,13 +3748,13 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Select the input on focus. Maybe there's an easier way to do this.
     function handleFocus(evt) {
-      console.log('handleFocus running'); 
+      // console.log('handleFocus running'); 
       evt.target.select();
-      (function () {
-        var hasFocus = document.activeElement.id;
-        console.log(`hasFocus :>> ${hasFocus};`);
-        console.log(`evt.target.tabIndex :>> ${evt.target.tabIndex};`);
-      })();
+      // (function () {
+      //   var hasFocus = document.activeElement.id;
+      //   console.log(`hasFocus :>> ${hasFocus};`);
+      //   console.log(`evt.target.tabIndex :>> ${evt.target.tabIndex};`);
+      // })();
     }
 
     // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. This also handles the cases where the user enters 0 to blur, or leaves the input empty to blur, and the padding-specific handling of TD Width values. Note: This emulates the preventDefault behavior of the TAB key. Remember that if you set preventDefault on the TAB key, the blur event will still fire on mouse out and the result will be that the blur is handled twice. Handling the blur here and NOT on the TAB keypress avoids that trap.
@@ -4012,11 +3996,11 @@ ${indent}<![endif]-->`;
           // !VA NOTE: TAB key is handled by handleBlur, so do nothing here.
           // console.log('TAB key');
           // !VA Branch: 112920B
-          if (document.hasFocus()) {
-            console.log('DOCUMENT has focus');
-          } else {
-            console.log('DOCUMENT does NOT have  focus');
-          } 
+          // if (document.hasFocus()) {
+          //   console.log('DOCUMENT has focus');
+          // } else {
+          //   console.log('DOCUMENT does NOT have  focus');
+          // } 
         }
       }
     }
@@ -5222,8 +5206,8 @@ ${indent}<![endif]-->`;
         // !VA Branch: 111920B
 
         // delete configObj.revealReset;
-        console.log('Mark1 configObj :>> ');
-        console.log(configObj);
+        // console.log('configObj :>> ');
+        // console.log(configObj);
         break;
 
       case option === 'iswap':
