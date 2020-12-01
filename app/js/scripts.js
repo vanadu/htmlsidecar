@@ -1742,11 +1742,10 @@ var Witty = (function () {
       console.log(clipboardStr);
       // !VA Write clipboardStr to the Clipboard
       // !VA Branch: 112520A
-      if (id.substring( 8, 13) === 'cbhtm') {
-        writeClipboard( id, clipboardStr );
-      } else {
-        // writeClipboardKeys( id, clipboardStr );
-      }
+      writeClipboard( id, clipboardStr );
+      // if (id.substring( 8, 13) === 'cbhtm') {
+      // } else {
+      // }
       return clipboardStr;
 
     }
@@ -2646,73 +2645,33 @@ ${indent}<![endif]-->`;
 
     // !VA CLIPBOARD FUNCTIONS
     // !VA CBController   
+    console.log('HIT2');
     // !VA Branch: 112520A
-    // !VA writeClipboard via keypresses. This IIFE is required as workaround for ClipboardJS' non-support for keyboard triggers. Implementation based on https://stackoverflow.com/questions/53444494/copy-text-to-clipboard-upon-keypress. This function 1) defines a keydown event on the parent element of the CCP i.e. #ccp to trap c the modifier+ENTER keypresses. 2) Uses a dummy button as trigger for the clipboard object, assigning it the clipboardStr as data-clipboard-text attribute and 3) generates a click to the dummy button to trigger the clipboard action
-    (function () {
-      console.log('writeClipboardKeys running'); 
-      // !VA Branch: 112520A
-      // !VA dummybutton is defined in HTML and currently assigned opacity=0 inline, need to put that in CSS and use visibility property.
-      let clipboardStr, dummybutton, targetId;
-      dummybutton = document.querySelector('#dummy');
-      // !VA Pass the dummy button ID to clipboard object
-      var clipboard = new ClipboardJS('#dummy');
-      clipboard.on('success', function(e) {
-        console.log('HIT');
-        appController.handleAppMessages('msg_copied_2_CB');
-        // console.info('Action:', e.action);
-        // console.info('Text:', e.text);
-        // console.info('Trigger:', e.trigger);
-        e.clearSelection();
-      });
-      clipboard.on('error', function(e) {
-        console.error('Error: ClipboardJS Action:', e.action);
-        console.error('Error: ClipboardJS Trigger:', e.trigger);
-      });
-
-      // !VA Branch: 112620A
-      // !VA As yet there is no event and hence no way to determine the element that had the focus when at this function's runtime. So use the CCP's parent element to trap the key combo.
-      document.querySelector('#ccp').onkeydown = function(event){
-        event = event || window.event;
-        let keydown = event.which || event.keyCode || event.key;
-        if( keydown === 13) {
-          // console.log('event :>> ');
-          // console.log(event);
-          targetId = event.target.id;
-          if ( event.shiftKey && !event.ctrlKey && !event.altKey ) {
-            // console.log('doClipboard: SHIFT + ENTER ');
-            clipboardStr = buildOutputNL('ccp-img-cbhtm-ipt', 'imgNode');
-          } else if ( !event.shiftKey && event.ctrlKey && !event.altKey ) {
-            // console.log('doClipboard: CTRL + ENTER ');
-            clipboardStr = buildOutputNL('ccp-tda-cbhtm-ipt', 'tdaNode');
-          } else if ( !event.shiftKey && !event.ctrlKey && event.altKey ) {
-            // console.log('doClipboard: ALT + ENTER ');
-            clipboardStr = buildOutputNL('ccp-tbl-cbhtm-ipt', 'tblNode');
-            // buildOutputNL(targetid, 'tblNode');
-          } else {
-            // !VA Trap the ENTER key here for possible error condition
-            // console.log('ERROR in doClipboard - unknown condition');
-          }
-          dummybutton.setAttribute('data-clipboard-text', clipboardStr);
-          dummybutton.click();
-          // !VA Branch: 112620A
-          // !VA Put the focus back in the event target if the event target is an input, otherwise leave the event target on the CCP parent, which will make the focus invisible to the user. Log in in devlog. NOTE: This might generate another clipboard output if the focus is on a Make CSS or Make HTML button. Log it in devlog.
-          if (targetId.substring( 14, 17) === 'ipt') {
-            document.getElementById(targetId).focus();
-          }
-        }
-      };
-    })();
 
 
     // !VA CBController private
     // !VA Function to write clipboard content on mouse click. There is a separate IIFE function for writing clipboard triggered by keyboard combinations but that is a workaround for ClipboardJS non-support for keyboard triggers. Best to keep these two functions separate for now. NOTE: For Lint errors caused by non-access of clipboard.js. 
     function writeClipboard(id, str) {
+      console.log(`writeClipboard id :>> ${id};`);
       // console.clear();
       let clipboardStr;
       // !VA clipboardStr is returned to clipboard.js
       clipboardStr = str;
-      var currentCB = new ClipboardJS('#' + id, {
+      let callerId;
+      let foo;
+
+      if (id.substring( 8, 13) === 'cbhtm') {
+        console.log('MAKE HTM BUTTON CLICKED');
+        callerId = '#' + id;
+
+      } else {
+        callerId = '#dummy';
+      }
+      console.log(`callerId :>> ${callerId};`);
+
+      var currentCB = new ClipboardJS(callerId, {
         text: function(trigger) {
+          // console.log(`Mark1 callerId :>> ${callerId};`);
           // !VA Write success message to app message area on success
           // !VA TODO: Need to differentiate between success messages and alert messages displayed in the message bar. 
           currentCB.on('success', function(e) {
@@ -2730,6 +2689,20 @@ ${indent}<![endif]-->`;
           return clipboardStr;
         }
       });
+
+
+      console.log('KEYPRESS');
+      var dummybutton = document.querySelector('#dummy');
+      // console.log(`dummybutton :>> ${dummybutton};`);
+
+      dummybutton.setAttribute('data-clipboard-text', clipboardStr);
+      console.log('dummybutton :>> ');
+      console.log(dummybutton);
+
+      dummybutton.click();
+      console.log('currentCB :>> ');
+      console.log(currentCB);
+
     }
 
     // !VA New CSS RUle output functionality 02.20.20
@@ -2921,7 +2894,7 @@ ${indent}<![endif]-->`;
         let targetid, modifierKey;
         // !VA nodeDepth can have three values: 'imgNode', 'tdaNode', 'tblNode'
         targetid = evt.target.id;
-        // console.log(`doClipboard targetid :>> ${targetid};`);
+        console.log(`doClipboard targetid :>> ${targetid};`);
         // console.log('doClipboard evt :>> ');
         // console.dir(evt);
         if (evt.shiftKey) { 
@@ -2951,7 +2924,12 @@ ${indent}<![endif]-->`;
           }
           break;
 
+        case evt.target.id === 'ccp-img-class-ipt' :
+          console.log('IMG CLASS IPT');
+          buildOutputNL(targetid, 'imgNode');
 
+
+          break;
         // !VA cbdtp, cbsph and cblph are the 5-char element codes for the Make CSS buttons
         case targetid.includes('cbdtp') || targetid.includes('cbsph') || targetid.includes('cblph'):
           console.log('Mark2');
@@ -3992,9 +3970,30 @@ ${indent}<![endif]-->`;
             }
           } 
 
-          console.log('HIT2');
+          console.log(`handleKeydown bottom - retVal :>> ${retVal};`);
 
-          
+          if ( event.shiftKey && !event.ctrlKey && !event.altKey ) {
+            // console.log('doClipboard -  SHIFT + ENTER ');
+            CBController.doClipboard(evt);
+          } else if ( !event.shiftKey && event.ctrlKey && !event.altKey ) {
+            // console.log('doClipboard -  CTRL + ENTER ');
+            // clipboardStr = buildOutputNL('ccp-tda-cbhtm-ipt', 'tdaNode');
+          } else if ( !event.shiftKey && !event.ctrlKey && event.altKey ) {
+            // console.log('doClipboard -  ALT + ENTER ');
+            // clipboardStr = buildOutputNL('ccp-tbl-cbhtm-ipt', 'tblNode');
+            // buildOutputNL(targetid, 'tblNode');
+          } else {
+            // !VA Trap the ENTER key here for possible error condition
+            // console.log('ERROR in doClipboard - unknown condition');
+          }
+
+
+
+
+
+
+
+
         } else if ( keydown === 9) {
           // !VA NOTE: TAB key is handled by handleBlur, so do nothing here.
           // console.log('TAB key');
