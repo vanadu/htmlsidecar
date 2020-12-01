@@ -695,9 +695,8 @@ var Witty = (function () {
       }
 
       function revealCcpElements(uniqueObj) {
-        console.log('revealCcpElements running'); 
-        // uniqueObj is the object containing the elements that are unique to this reveal operation, i.e. the elements whose reveal state is not identical to the current reveal state. This is necessary because if we include all the object properties in the reveal/conceal animation, it will be choppy because elements will have their already existing conceal class set without changing anything. Using the unique object, only the delta of the object properties are animated.
-        // !VA Iterate through the Object.entries containing all the aliases and their reveal/conceal states.
+        // console.log('revealCcpElements running'); 
+        // !VA Iterate through uniqueObj, which contains all the aliases unique to this config as compared to the prior (i.e. current) config and their reveal/conceal states.
         // !VA Loop through the uniqueObj entries list
         for (let i = 0; i < uniqueObj.length; i++) {
           // !VA Animate the reveal/conceal operation
@@ -2061,8 +2060,12 @@ var Witty = (function () {
       case (selectedTdOption === 'bgimg'):
         // !VA Create the parent node to which the bgimage code block will be appended after outputNL is converted to text in buildOutputNL.
         // !VA Include width, height and valign as per Stig's version
-        tdInner.width = Attributes.tdAppobjWidth.str;
-        tdInner.height = Attributes.tdAppobjHeight.str;
+        // !VA Branch: 113020B
+        // !VA Replacing tdAppobjWidth and tdAppobjHeight with Attributes.imgHeight.str and Attributes.imgWidth.str, since that is what's in getBgimageBlock. If no issues, we can deprecate Attributes.tdAppobjWidth and Attributes.tdAppobjHeight.
+        // tdInner.width = Attributes.tdAppobjWidth.str;
+        // tdInner.height = Attributes.tdAppobjHeight.str;
+        tdInner.width = Attributes.imgWidth.str;
+        tdInner.height = Attributes.imgHeight.str;
         tdInner.vAlign = Attributes.tdValign.str;
         // !VA Set the background attribute to the current path/filename
         tdInner.setAttribute('background', Attributes.tdBackground.str);
@@ -2654,6 +2657,7 @@ ${indent}<![endif]-->`;
       // !VA Pass the dummy button ID to clipboard object
       var clipboard = new ClipboardJS('#dummy');
       clipboard.on('success', function(e) {
+        console.log('HIT');
         appController.handleAppMessages('msg_copied_2_CB');
         // console.info('Action:', e.action);
         // console.info('Text:', e.text);
@@ -2739,6 +2743,8 @@ ${indent}<![endif]-->`;
       // !VA TODO: Call getAppobj with rest parameters and destructure the return array into separate variables.
       let Appobj = {};
       Appobj = appController.getAppobj();
+      console.log('Appobj :>> ');
+      console.log(Appobj);
       // !VA Destructure Appobj to variables
       let { curImgW, curImgH, sPhonesW, sPhonesH, lPhonesW, lPhonesH } = Appobj;
       let clipboardStr;
@@ -2911,6 +2917,7 @@ ${indent}<![endif]-->`;
 
       // !VA Called from eventHandler to initialize clipboard functionality
       doClipboard: function(evt) {
+        // console.log(`doClipboard evt.target.id :>> ${evt.target.id};`);
         let targetid, modifierKey;
         // !VA nodeDepth can have three values: 'imgNode', 'tdaNode', 'tblNode'
         targetid = evt.target.id;
@@ -2928,6 +2935,7 @@ ${indent}<![endif]-->`;
         switch(true) {
         // !VA Second argument of the buildOutputNL call is nodeDepth, i.e. which nodes are output to the clipboard object: imgNode, tdaNode or tblNode.
         case evt.target.name === 'ccp-cbhtm-btn' :
+          console.log('Mark1');
           // console.log(`CBHTML BUTTON CLICKED: targetid :>> ${targetid}`);
           if (targetid === 'ccp-img-cbhtm-ipt') {
             // console.log('IMG Make HTML');
@@ -2946,6 +2954,7 @@ ${indent}<![endif]-->`;
 
         // !VA cbdtp, cbsph and cblph are the 5-char element codes for the Make CSS buttons
         case targetid.includes('cbdtp') || targetid.includes('cbsph') || targetid.includes('cblph'):
+          console.log('Mark2');
           makeCssRule(targetid);
           break;
         case targetid.includes('ins') :
@@ -3982,14 +3991,8 @@ ${indent}<![endif]-->`;
               this.select();
             }
           } 
-          // !VA Branch: 112520A
-          // !VA Commenting this out, trying separate keydown handler for CB output that traps keypress on ccp element so it works anywhere in the app.
-          // !VA Branch: 112420D
-          // !VA The modifier keypress is passed with the event. Need to filter out all the elements we do NOT want to trigger the clipboard output.
-          // !VA If the classList converted to string contains the ccp-txfld-ipt class, then the target element is an input element that can support a MODIFIER+ENTER action to trigger a clipboar output.   
-          // if (evt.target.classList.toString().includes('ccp-txfld-ipt')) {
-          //   CBController.doClipboard(evt);
-          // }
+
+          console.log('HIT2');
 
           
         } else if ( keydown === 9) {
@@ -4778,7 +4781,8 @@ ${indent}<![endif]-->`;
         } else {
         //   // !VA Add/remove active class on all the other labelled text input elements
         //   tar.value !== '' ? tar.classList.add('active') : tar.classList.remove('active');
-          console.log('ERROR in handleTextInputEvent - unknown condition');
+          // !VA In case an error ensues anywhere, uncomment the below to trap it.
+          // console.log('ERROR in handleTextInputEvent - unknown condition');
         }
         // !VA Branch: 112820A
         // !VA Add condition to highlight/unhighlight icons depending on whether there is a value in the input field. Applies to all input fields in CCP
@@ -5005,6 +5009,7 @@ ${indent}<![endif]-->`;
       Appobj.ccpImgClassTfd = '';
       Appobj.ccpImgLoctnTfd = 'img/';
       Appobj.ccpImgAnchrTfd = '#';
+      Appobj.ccpImgAlignRdo = '';
       Appobj.ccpImgItypeRdo = 'fixed';
       Appobj.ccpImgTxclrTfd = '#0000FF';
       Appobj.ccpImgTargtChk = false;
@@ -5040,7 +5045,7 @@ ${indent}<![endif]-->`;
       // !VA reflectAppobj METHOD: set the array of elements whose Appobj properties above are to be written to the CCP DOM
       // !VA Why are there two of these? Commenting out the lower one for now.
       // reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd',  'ccpTbwBgclrTfd' ];
-      reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd' ];
+      reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd' ];
 
       // !VA highlightIcon METHOD: Set the array of elements that should receive a highlight because their Appobj property indicates a preset value
       highlightArray = [ 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd' ];
@@ -5059,7 +5064,7 @@ ${indent}<![endif]-->`;
       }
 
       // !VA radioState METHOD: set the elements whose selected value is to be set to the Appobj properties above.
-      radioArray = [  'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpTdaAlignRdo' , 'ccpTdaValgnRdo', 'ccpTblAlignRdo', 'ccpTbwAlignRdo', 'ccpTdaOptnsRdo' ];
+      radioArray = [  'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpTdaAlignRdo' , 'ccpTdaValgnRdo', 'ccpTblAlignRdo', 'ccpTbwAlignRdo', 'ccpTdaOptnsRdo' ];
       // !VA checkboxState METHOD: set the checkboxes whose checked value is to be set to the Appobj properties above.
 
 
