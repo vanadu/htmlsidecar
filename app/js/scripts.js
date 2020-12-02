@@ -2651,36 +2651,38 @@ ${indent}<![endif]-->`;
 
     // !VA CBController private
     // !VA Function to write clipboard content on mouse click. There is a separate IIFE function for writing clipboard triggered by keyboard combinations but that is a workaround for ClipboardJS non-support for keyboard triggers. Best to keep these two functions separate for now. NOTE: For Lint errors caused by non-access of clipboard.js. 
-    function writeClipboard(id, str) {
+    function writeClipboard(id, clipboardStr) {
       console.log(`writeClipboard id :>> ${id};`);
-      // console.clear();
-      let clipboardStr;
-      // !VA clipboardStr is returned to clipboard.js
-      clipboardStr = str;
-      let callerId;
-      let foo;
 
+      let targetId, iptCodes, evtType, dummybutton;
+      // !VA iptCodes are the 5-char codes at index 8-13 of the ID that indicate the input type. This is included for error checking only, clipboardJS doesn't need to know the code, only the id of event target of the doClipboard call.
+      iptCodes = ['class', 'altxt', 'loctn', 'anchr', 'width', 'heigt', 'bgclr', 'txclr', 'bdrad', 'bdclr', 'maxwd' ];
+      // !VA Determine if the target event was invoked from a Make Clipboard button or a keyboard combo. This is necessary because ClipboardJS doesn't natively support keyboard events, so a workaround with a mouse click on a dummy button element has to be implemented. 
       if (id.substring( 8, 13) === 'cbhtm') {
         console.log('MAKE HTM BUTTON CLICKED');
-        callerId = '#' + id;
-
+        evtType = 'mouseClick';
+        targetId = '#' + id;
+      } else if (iptCodes.toString().includes(id.substring( 8, 13))) {
+        console.log('KEY COMBO ENTERED FROM INPUT ELEMENT');
+        evtType = 'keyCombo';
+        targetId = '#dummy';
       } else {
-        callerId = '#dummy';
+        console.log('ERROR in writeClipboard, unknown event type');
       }
-      console.log(`callerId :>> ${callerId};`);
-
-      var currentCB = new ClipboardJS(callerId, {
+      console.log(`targetId :>> ${targetId};`);
+      // !VA Create the clipboard object. Using var instead of let to indicated that this is non-native code.
+      var clipboard = new ClipboardJS(targetId, {
         text: function(trigger) {
-          // console.log(`Mark1 callerId :>> ${callerId};`);
+          // console.log(`Mark1 targetId :>> ${targetId};`);
           // !VA Write success message to app message area on success
           // !VA TODO: Need to differentiate between success messages and alert messages displayed in the message bar. 
-          currentCB.on('success', function(e) {
+          clipboard.on('success', function(e) {
             appController.handleAppMessages('msg_copied_2_CB');
             console.info('Action:', e.action);
             e.clearSelection();
           });
   
-          currentCB.on('error', function(e) {
+          clipboard.on('error', function(e) {
             console.error('Action:', e.action);
             console.error('Trigger:', e.trigger);
             // !VA TODO: Need to output an error message to message bar if the clipboard operation fails here.
@@ -2689,20 +2691,17 @@ ${indent}<![endif]-->`;
           return clipboardStr;
         }
       });
-
-
-      console.log('KEYPRESS');
-      var dummybutton = document.querySelector('#dummy');
-      // console.log(`dummybutton :>> ${dummybutton};`);
-
-      dummybutton.setAttribute('data-clipboard-text', clipboardStr);
-      console.log('dummybutton :>> ');
-      console.log(dummybutton);
-
-      dummybutton.click();
-      console.log('currentCB :>> ');
-      console.log(currentCB);
-
+      // !VA If the event was invoked by a key combination, access the dummy button element, populate the data-clipboard-text attribute with the clipboardStr, and click the button to create the clipboard object.
+      if ( evtType === 'keyCombo') {  
+        // !VA Access the dummybutton element
+        dummybutton = document.querySelector('#dummy');
+        // !VA Set the data-clipboard-text to clipboardStr
+        dummybutton.setAttribute('data-clipboard-text', clipboardStr);
+        console.log('Clicking dummybutton...');
+        dummybutton.click();
+        // !VA Return the focus to the target input element, i.e. the id passed in the id argument - it was moved away by the dummy button click
+        document.getElementById(id).focus();
+      } 
     }
 
     // !VA New CSS RUle output functionality 02.20.20
@@ -2891,23 +2890,41 @@ ${indent}<![endif]-->`;
       // !VA Called from eventHandler to initialize clipboard functionality
       doClipboard: function(evt) {
         // console.log(`doClipboard evt.target.id :>> ${evt.target.id};`);
-        let targetid, modifierKey;
+        let targetType, clssList, targetid, modifierKey;
         // !VA nodeDepth can have three values: 'imgNode', 'tdaNode', 'tblNode'
         targetid = evt.target.id;
         console.log(`doClipboard targetid :>> ${targetid};`);
-        // console.log('doClipboard evt :>> ');
-        // console.dir(evt);
+
+        // !VA Get current modifier key to variable modifierKey
         if (evt.shiftKey) { 
           modifierKey = 'shift';
         } else if (evt.ctrlKey ) {
-          modifierKey = 'ctrl';
+          modifierKey = 'ctrl'; 
+        } else if (evt.altKey ) {
+          modifierKey = 'alt'; 
         } else {
           modifierKey = false;
         }
-        // !VA Run the Clipboard building routine based on the click target. 
+
+        // !VA Identify the target element as Make HTML button, text input element, or Make CSS button. If a text input element is the target, then the event was invoked by an ENTER + modifierKey key combination. 
+        // !VA classList is the classList of the target element, converted to a string to search.
+        clssList = evt.target.classList.toString();
+
+
+        // !VA If the classList contains the cbhtm, txfld or cbcss class, set the appropriate targetType.
+        if (clssList.includes('ccp-cbhtm-ipt')) {
+          targetType = 'makeHTMButton';
+        } else if ( clssList.includes('ccp-txfld-ipt')) {
+          targetType = 'enterKeyCombo';
+        } else if ( clssList.includes('ccp-cbcss-ipt')) {
+          targetType = 'makeCSSButton';
+        } else {
+          console.log('ERROR in doClipboard - unknown target class');
+        }
+
+        // !VA Run the clipboardJS routine dependin on the targetType. For makeHTMButton and enterKeyCombo, the second argument of the buildOutputNL call is nodeDepth, i.e. which nodes are output to the clipboard object: imgNode, tdaNode or tblNode. NOTE: This could be DRYer but I'm leaving it as is for transparency's sake.
         switch(true) {
-        // !VA Second argument of the buildOutputNL call is nodeDepth, i.e. which nodes are output to the clipboard object: imgNode, tdaNode or tblNode.
-        case evt.target.name === 'ccp-cbhtm-btn' :
+        case targetType === 'makeHTMButton' :
           console.log('Mark1');
           // console.log(`CBHTML BUTTON CLICKED: targetid :>> ${targetid}`);
           if (targetid === 'ccp-img-cbhtm-ipt') {
@@ -2923,25 +2940,36 @@ ${indent}<![endif]-->`;
             console.log('ERROR in doClipboard - unknown condition');
           }
           break;
-
-        case evt.target.id === 'ccp-img-class-ipt' :
-          console.log('IMG CLASS IPT');
-          buildOutputNL(targetid, 'imgNode');
-
-
+        // !VA Set the buildOutputNL parameters for keyCombos
+        case targetType === 'enterKeyCombo' :
+          if (modifierKey === 'shift') {
+            // console.log('IMG Make HTML');
+            buildOutputNL(targetid, 'imgNode');
+          } else if (modifierKey === 'ctrl') {
+            // console.log('TDA Make HTML');
+            buildOutputNL(targetid, 'tdaNode');
+          } else if (modifierKey === 'alt') {
+            // console.log('TBL Make HTML');
+            buildOutputNL(targetid, 'tblNode');
+          } else {
+            console.log('ERROR in doClipboard - unknown condition');
+          }
           break;
-        // !VA cbdtp, cbsph and cblph are the 5-char element codes for the Make CSS buttons
-        case targetid.includes('cbdtp') || targetid.includes('cbsph') || targetid.includes('cblph'):
-          console.log('Mark2');
+        // !VA If the targetType is a makeCSS button, run makeCSSRule
+        case targetType === 'MakeCSSButton' :
           makeCssRule(targetid);
           break;
+        // !VA Branch: 120220A
+        // !VA TODO: This condition should refer to a className like the other conditions above.
+        // !VA If the target is an Inspector element, run the clipboardJS routine for inspector clicks.
         case targetid.includes('ins') :
           handleInspectorClicks(targetid, modifierKey);
           break;
         default:
           console.log('ERROR in doClipboard: case not defined');
         } 
-
+        // !VA Branch: 120220A
+        // !VA Not sure why targetid is returned anywhere.
         return targetid;
       },
     };
@@ -3970,28 +3998,10 @@ ${indent}<![endif]-->`;
             }
           } 
 
-          console.log(`handleKeydown bottom - retVal :>> ${retVal};`);
-
-          if ( event.shiftKey && !event.ctrlKey && !event.altKey ) {
-            // console.log('doClipboard -  SHIFT + ENTER ');
+          // !VA If ENTER + modifier key (i.e. shift, ctrl or alt) was pressed, run doClipboard to intiate HTML clipboard output. 
+          if ( evt.shiftKey || evt.ctrlKey || evt.altKey ) {
             CBController.doClipboard(evt);
-          } else if ( !event.shiftKey && event.ctrlKey && !event.altKey ) {
-            // console.log('doClipboard -  CTRL + ENTER ');
-            // clipboardStr = buildOutputNL('ccp-tda-cbhtm-ipt', 'tdaNode');
-          } else if ( !event.shiftKey && !event.ctrlKey && event.altKey ) {
-            // console.log('doClipboard -  ALT + ENTER ');
-            // clipboardStr = buildOutputNL('ccp-tbl-cbhtm-ipt', 'tblNode');
-            // buildOutputNL(targetid, 'tblNode');
-          } else {
-            // !VA Trap the ENTER key here for possible error condition
-            // console.log('ERROR in doClipboard - unknown condition');
-          }
-
-
-
-
-
-
+          } 
 
 
         } else if ( keydown === 9) {
