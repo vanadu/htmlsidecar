@@ -477,11 +477,20 @@ var Witty = (function () {
           setTimeout(function () {
             if ( initArray[i] ) { 
               el = document.querySelector(ccpUserInput[initArray[i]]);
+              // console.log(`revealInit el.id :>> ${el.id};`);
               el.classList.remove('ccp-conceal-ctn'); 
               // !VA Branch: 112920B
               // !VA If the classList of el contains ccp-txfld-ctn, then it is a text input field, not a checkbox or radio element, so set tabIndex to 0 to allow tabbing.
               if (el.classList.contains('ccp-txfld-ctn')) {
                 el.children[0].tabIndex = 0;
+              } else if ( el.classList.contains('ccp-padng-grp')) {
+                // !VA For the parent padding group, include the padding inputs in the tab order
+                for (const ipt of document.getElementsByClassName('ccp-padng-ipt')) {
+                  ipt.tabIndex = 0;
+                }
+              } else {
+                // !VA Other classList entries aren't handled in this context
+                // console.log('revealInit - classList entry not handled');
               }
             }
           // !VA Pause 25 milliseconds between iterations
@@ -565,7 +574,6 @@ var Witty = (function () {
     function revealElements ( caller, revealType, revealArray) {
       // console.log(`revealElements caller :>> ${caller}; revealType :>> ${revealType}; revealElements: revealArray :>> ${revealArray}; `);
       let el, obj = {}, revealObj = {}, currentObj = {}, uniqueObj = {};
-      let foo, baz, arr = [];
       // console.log('revealElements revealArray :>> ');
       // console.log(revealArray);
       // !VA Contains all the aliases whose elements can be concealed/revealed by the revealElements method of configCcp. Does not include the MKCSS button groups, since those buttons are children of the parent and are thus handled by revealMkcss. 
@@ -663,6 +671,7 @@ var Witty = (function () {
 
           // !VA If uniqueObj contains the parent element of the padding inputs, add the elements with the class ccp-padng-ipt, i.e. all the padding inputs, to tabindexObj.
           } else if (entry[0].substring( 6, 14 ) === 'PdparGrp') {
+            console.log('Mark1');
             // !VA Loop through the collection of padding inputs and if the reveal flag on the entry is true, include the element in the tab order, otherwise exclude it.
             for (const ipt of document.getElementsByClassName('ccp-padng-ipt')) {
               entry[1] ? ipt.tabIndex = 0 : ipt.tabIndex = -1;
@@ -717,18 +726,15 @@ var Witty = (function () {
     // !VA UIController private
     // !VA Use configCCP to apply/remove the highlight style to input elements, which then adds/removes the filter on the icon, as defined in the CSS. highlightIconPresets in resizeContainers sets the highlight on icons that have a default preset value. Individual icon highlights are set through configObj using the highlight method and the highlightArray array.
     function highlightIcon( highlightArray ) {
-      console.log('highlightIcon running'); 
-      console.log('highlightArray :>> ');
-      console.log(highlightArray);
       var ipt;
       for (const el of highlightArray) {
         if ( el.substring( 11, 14) === 'Tfd') {
           ipt = document.querySelector(ccpUserInput[el].replace('tfd', 'ipt'));
           if (ipt.value !== '') { 
-            console.log('NOT EMPTY');
+            // console.log('NOT EMPTY');
             ipt.classList.add('active');
           } else {
-            console.log('EMPTY');
+            // console.log('EMPTY');
             ipt.classList.remove('active');
           }
         }
@@ -1739,8 +1745,6 @@ var Witty = (function () {
       } 
       // !VA If clipboardStr contains the ghost tokens, then call applyGhostTable to add the ghost tags. Otherwise, don't since the ghost tokens screw up the IMG and TD clipboard output.
       if (clipboardStr.includes('data-ghost')) {
-        // console.log('Mark2 clipboardStr :>> ');
-        // console.log(clipboardStr);
         clipboardStr = applyGhostTable(clipboardStr, Attributes.tableGhost.str, Attributes.tableWrapperGhost.str, selectedTdOption );
       }
       console.log('buildOutputNL clipboardStr is: ');
@@ -2533,9 +2537,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
             if (tagIdx !== -1 ) { 
               // !VA If tagIdx returns -1, then no nextTag was found, so terminate the loop. Otherwise, call transposeTokens to place the tokens after the tag
               nextTag = false;
-              // console.log(`Mark1A tbl :>> ${tbl};`);
               tbl = transposeTokens( tag, tbl, token, tokenIdx, tagIdx );
-              // console.log(`Mark1B tbl :>> ${tbl};`);
             }
           } else  {
             tag = closeTag;
@@ -2653,28 +2655,25 @@ ${indent}<![endif]-->`;
     // !VA CBController private
     // !VA Function to write clipboard content on mouse click. There is a separate IIFE function for writing clipboard triggered by keyboard combinations but that is a workaround for ClipboardJS non-support for keyboard triggers. Best to keep these two functions separate for now. NOTE: For Lint errors caused by non-access of clipboard.js. 
     function writeClipboard(id, clipboardStr) {
-      console.log(`writeClipboard id :>> ${id};`);
-
+      // console.log(`writeClipboard id :>> ${id};`);
       let targetId, iptCodes, evtType, dummybutton;
       // !VA iptCodes are the 5-char codes at index 8-13 of the ID that indicate the input type. This is included for error checking only, clipboardJS doesn't need to know the code, only the id of event target of the doClipboard call.
-      iptCodes = ['class', 'altxt', 'loctn', 'anchr', 'width', 'heigt', 'bgclr', 'txclr', 'bdrad', 'bdclr', 'maxwd' ];
+      iptCodes = ['class', 'altxt', 'loctn', 'anchr', 'width', 'heigt', 'bgclr', 'txclr', 'bdrad', 'bdclr', 'pdtop', 'pdrgt', 'pdbtm', 'pdlft', 'maxwd' ];
       // !VA Determine if the target event was invoked from a Make Clipboard button or a keyboard combo. This is necessary because ClipboardJS doesn't natively support keyboard events, so a workaround with a mouse click on a dummy button element has to be implemented. 
       if (id.substring( 8, 13) === 'cbhtm') {
-        console.log('MAKE HTM BUTTON CLICKED');
+        // console.log('MAKE HTM BUTTON CLICKED');
         evtType = 'mouseClick';
         targetId = '#' + id;
       } else if (iptCodes.toString().includes(id.substring( 8, 13))) {
-        console.log('KEY COMBO ENTERED FROM INPUT ELEMENT');
+        // console.log('KEY COMBO ENTERED FROM INPUT ELEMENT');
         evtType = 'keyCombo';
         targetId = '#dummy';
       } else {
         console.log('ERROR in writeClipboard, unknown event type');
       }
-      console.log(`targetId :>> ${targetId};`);
       // !VA Create the clipboard object. Using var instead of let to indicated that this is non-native code.
       var clipboard = new ClipboardJS(targetId, {
         text: function(trigger) {
-          // console.log(`Mark1 targetId :>> ${targetId};`);
           // !VA Write success message to app message area on success
           // !VA TODO: Need to differentiate between success messages and alert messages displayed in the message bar. 
           clipboard.on('success', function(e) {
@@ -2682,7 +2681,6 @@ ${indent}<![endif]-->`;
             console.info('Action:', e.action);
             e.clearSelection();
           });
-  
           clipboard.on('error', function(e) {
             console.error('Action:', e.action);
             console.error('Trigger:', e.trigger);
@@ -2894,7 +2892,7 @@ ${indent}<![endif]-->`;
         let targetType, clssList, targetid, modifierKey;
         // !VA nodeDepth can have three values: 'imgNode', 'tdaNode', 'tblNode'
         targetid = evt.target.id;
-        console.log(`doClipboard targetid :>> ${targetid};`);
+        // console.log(`doClipboard targetid :>> ${targetid};`);
 
         // !VA Get current modifier key to variable modifierKey
         if (evt.shiftKey) { 
@@ -2906,12 +2904,9 @@ ${indent}<![endif]-->`;
         } else {
           modifierKey = false;
         }
-
         // !VA Identify the target element as Make HTML button, text input element, or Make CSS button. If a text input element is the target, then the event was invoked by an ENTER + modifierKey key combination. 
         // !VA classList is the classList of the target element, converted to a string to search.
         clssList = evt.target.classList.toString();
-
-
         // !VA If the classList contains the cbhtm, txfld or cbcss class, set the appropriate targetType.
         if (clssList.includes('ccp-cbhtm-ipt')) {
           targetType = 'makeHTMButton';
@@ -2922,11 +2917,9 @@ ${indent}<![endif]-->`;
         } else {
           console.log('ERROR in doClipboard - unknown target class');
         }
-
         // !VA Run the clipboardJS routine dependin on the targetType. For makeHTMButton and enterKeyCombo, the second argument of the buildOutputNL call is nodeDepth, i.e. which nodes are output to the clipboard object: imgNode, tdaNode or tblNode. NOTE: This could be DRYer but I'm leaving it as is for transparency's sake.
         switch(true) {
         case targetType === 'makeHTMButton' :
-          console.log('Mark1');
           // console.log(`CBHTML BUTTON CLICKED: targetid :>> ${targetid}`);
           if (targetid === 'ccp-img-cbhtm-ipt') {
             // console.log('IMG Make HTML');
@@ -3981,7 +3974,6 @@ ${indent}<![endif]-->`;
               UIController.configCCP( configObj);
             } else {
               // !VA If the target value is not zero or empty, run the input error check to get retVal
-              console.log('Mark3');
               retVal = handleUserInput(userInputObj);
             }
           // !VA If appObjProp is a toolbar input, run handleUserInput without the zero value handler
@@ -4181,7 +4173,6 @@ ${indent}<![endif]-->`;
           break;
         // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply - exclude rdoCcpTdExcludeimg from the error condition
         case (appObjProp === 'ccpTdaWidthTfd') :
-          console.log('Mark1');
           if ( retVal > Appobj.ccpTblWidthTfd ) {
             isErr = true;
             appMessCode = 'err_table_cell_wider_than_parent_table';
@@ -4209,7 +4200,8 @@ ${indent}<![endif]-->`;
             isErr = true;
             appMessCode = 'err_cell_smaller_than_image';
           } else {
-            console.log('ERROR in checkNumericInput - unknown ccpTdaHeigtTfd condition');
+            // !VA If error or unexpected behavior
+            // console.log('ERROR in checkNumericInput - unknown ccpTdaHeigtTfd condition');
           }
           break;
         case (appObjProp === 'ccpTblWidthTfd') :
@@ -4321,8 +4313,8 @@ ${indent}<![endif]-->`;
           console.log('ALERT in recalcAppobj - unaccessed appObjProp');
           break;
         default:
-          // code block
-          console.log('ERROR in recalcAppobj - unknown switch/case condition');
+          // !VA Error message in case of unexpected behavior or debug
+          // console.log('ERROR in recalcAppobj - unknown switch/case condition');
         } 
   
         configObj = {
@@ -4630,7 +4622,6 @@ ${indent}<![endif]-->`;
       evtTargetId = evt.target.id;
       // !VA Get the Appobj alias of the corresponding input element of the label
       appObjProp = elemIdToAppobjProp(evtTargetId.replace('lbl', 'ipt'));
-      console.log(`Mark1 Appobj.ccpImgAnchrTfd :>> ${Appobj.ccpImgAnchrTfd};`);
       // !VA If the target element is NOT the padding icon
       if (evt.target.id !== 'ccp-tda-padng-icn') {
 
@@ -5713,7 +5704,6 @@ ${indent}<![endif]-->`;
         ccpCtnElements = document.getElementsByClassName('ccp-ctn');
         for (const el of ccpCtnElements) {
           el.classList.add('ccp-conceal-ctn');
-          // !VA Branch: 112920B
           // !VA Turn tabIndex off for all the children elements of the input elements
           if (el.id.substring( 14, 17) == 'tfd') {
             el.children[0].tabIndex = -1;
