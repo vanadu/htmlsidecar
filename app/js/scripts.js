@@ -717,13 +717,18 @@ var Witty = (function () {
     // !VA UIController private
     // !VA Use configCCP to apply/remove the highlight style to input elements, which then adds/removes the filter on the icon, as defined in the CSS. highlightIconPresets in resizeContainers sets the highlight on icons that have a default preset value. Individual icon highlights are set through configObj using the highlight method and the highlightArray array.
     function highlightIcon( highlightArray ) {
+      console.log('highlightIcon running'); 
+      console.log('highlightArray :>> ');
+      console.log(highlightArray);
       var ipt;
       for (const el of highlightArray) {
         if ( el.substring( 11, 14) === 'Tfd') {
           ipt = document.querySelector(ccpUserInput[el].replace('tfd', 'ipt'));
           if (ipt.value !== '') { 
+            console.log('NOT EMPTY');
             ipt.classList.add('active');
           } else {
+            console.log('EMPTY');
             ipt.classList.remove('active');
           }
         }
@@ -2644,10 +2649,6 @@ ${indent}<![endif]-->`;
     // !VA GHOST FUNCTIONS
 
     // !VA CLIPBOARD FUNCTIONS
-    // !VA CBController   
-    console.log('HIT2');
-    // !VA Branch: 112520A
-
 
     // !VA CBController private
     // !VA Function to write clipboard content on mouse click. There is a separate IIFE function for writing clipboard triggered by keyboard combinations but that is a workaround for ClipboardJS non-support for keyboard triggers. Best to keep these two functions separate for now. NOTE: For Lint errors caused by non-access of clipboard.js. 
@@ -3914,6 +3915,7 @@ ${indent}<![endif]-->`;
 
         // !VA First, check the input and get the return value - it will either be a valid value or FALSE if the error check detected an input error.
         retVal = checkUserInput( userInputObj );
+
         // !VA If the value is valid, i.e. checkUserInput did not return false
         if (retVal !== false) {
           // !VA If the target is a toolbar element, apply the input value, i.e. write to Appobj and update the Inspector panel.
@@ -3970,17 +3972,16 @@ ${indent}<![endif]-->`;
           if (appObjProp.substring( 0, 3) === 'ccp') {
             if ( Number(userInputObj.evtTargetVal) === 0 ) { 
               // !VA If the target input value is 0, convert it to empty, set the Appobj property to empty and reflect that to the CCP.
-              if (Number(userInputObj.evtTargetVal) === 0) {
-                Appobj[appObjProp] = '';
-                reflectArray = highlightArray = [ appObjProp ];
-                configObj = {
-                  highlightIcon: { highlight: highlightArray },
-                  reflectAppobj: { reflect: reflectArray }
-                };
-                UIController.configCCP( configObj);
-              }
+              Appobj[appObjProp] = '';
+              reflectArray = highlightArray = [ appObjProp ];
+              configObj = {
+                highlightIcon: { highlight: highlightArray },
+                reflectAppobj: { reflect: reflectArray }
+              };
+              UIController.configCCP( configObj);
             } else {
               // !VA If the target value is not zero or empty, run the input error check to get retVal
+              console.log('Mark3');
               retVal = handleUserInput(userInputObj);
             }
           // !VA If appObjProp is a toolbar input, run handleUserInput without the zero value handler
@@ -3993,8 +3994,18 @@ ${indent}<![endif]-->`;
               this.select();
               this.value = '';
             } else {
+              // !VA Branch: 120220B
+              // !VA 
+              // !VA If retVal is false, then the value entered was invalid.
+              // !VA Set the input value to appObjProp, which if retVal is false will be an empty string.
               this.value = Appobj[appObjProp];
               this.select();
+              // !VA Call highlightIcon. If this.value is empty, highlightIcon turns the highlight off.
+              highlightArray = [ appObjProp ];
+              configObj = {
+                highlightIcon: { highlight: highlightArray },
+              };
+              UIController.configCCP( configObj);
             }
           } 
 
@@ -4002,6 +4013,10 @@ ${indent}<![endif]-->`;
           if ( evt.shiftKey || evt.ctrlKey || evt.altKey ) {
             CBController.doClipboard(evt);
           } 
+
+
+
+
 
 
         } else if ( keydown === 9) {
@@ -4166,6 +4181,7 @@ ${indent}<![endif]-->`;
           break;
         // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply - exclude rdoCcpTdExcludeimg from the error condition
         case (appObjProp === 'ccpTdaWidthTfd') :
+          console.log('Mark1');
           if ( retVal > Appobj.ccpTblWidthTfd ) {
             isErr = true;
             appMessCode = 'err_table_cell_wider_than_parent_table';
