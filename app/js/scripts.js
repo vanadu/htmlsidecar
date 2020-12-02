@@ -347,6 +347,7 @@ var Witty = (function () {
     // !VA I'm not sure if this is still true. I think now the default reflect configuration comes from configDefault.
     // !VA If called from populateAppobj, returns the value of text input fields as hard-coded in the HTML. Otherwise, called by configCCP, which receives an array of aliases whose corresponding CCP element value is set to its corresponding Appobj value. 
     function reflectAppobj( reflectArray) { 
+      var Appobj = appController.getAppobj();
       // console.log('reflectAppobj running'); 
       let el, isInit, retVal, toolbarAliases;
       // !VA Loop through all the aliases in the reflectArray parameter
@@ -364,11 +365,14 @@ var Witty = (function () {
             // !VA TODO: Deleting the value on init should reset all input fields to empty strings, thereby exposing whatever preset value attributes in the HTML. This should actually make resetting input elements to empty in configDefault redundant. For later...
             el.value = '';
             retVal = el.value;
+            // !VA Branch: 120220C
+            // !VA Commented out return retVal because it was terminating the loop, causing subsequent aliases not to be processed if any Appobj[alias] was at runtime undefined. Keep an eye on this, not sure if the whole isInit clause is necessary anymore. AFAIK it's the defaultConfig that determines the Appobj values that are being reflected on initialization.
             // !VA If initializing, return an empty string for the property value
-            return retVal;
+            // return retVal;
           // !VA Otherwise, set the element value to the current Appobj value.
           } else {
-            el.value = appController.getAppobj( alias );
+            // console.log(`Mark 2 alias :>> ${alias};`);
+            el.value = Appobj[ alias ];
           }
         } else {
           // !VA If the alias is a toolbar alias, just return - 
@@ -2892,7 +2896,9 @@ ${indent}<![endif]-->`;
         let targetType, clssList, targetid, modifierKey;
         // !VA nodeDepth can have three values: 'imgNode', 'tdaNode', 'tblNode'
         targetid = evt.target.id;
-        // console.log(`doClipboard targetid :>> ${targetid};`);
+        console.log(`doClipboard targetid :>> ${targetid};`);
+        console.log('evt.target :>> ');
+        console.log(evt.target);
 
         // !VA Get current modifier key to variable modifierKey
         if (evt.shiftKey) { 
@@ -5050,7 +5056,7 @@ ${indent}<![endif]-->`;
       Appobj.ccpTbwClassTfd = 'devicewidth';
       Appobj.ccpTbwWidthTfd = Appobj.imgViewerW;
       Appobj.ccpTbwMaxwdTfd = '';
-      // Appobj.ccpTbwBgclrTfd = '';
+      Appobj.ccpTbwBgclrTfd = '';
       Appobj.ccpTbwAlignRdo = 'center';
 
       // !VA Branch: 111320C
@@ -5061,7 +5067,7 @@ ${indent}<![endif]-->`;
       // !VA reflectAppobj METHOD: set the array of elements whose Appobj properties above are to be written to the CCP DOM
       // !VA Why are there two of these? Commenting out the lower one for now.
       // reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd',  'ccpTbwBgclrTfd' ];
-      reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd' ];
+      reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd' ];
 
       // !VA highlightIcon METHOD: Set the array of elements that should receive a highlight because their Appobj property indicates a preset value
       highlightArray = [ 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd' ];
