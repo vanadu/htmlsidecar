@@ -1751,6 +1751,8 @@ var Witty = (function () {
       if (clipboardStr.includes('data-ghost')) {
         clipboardStr = applyGhostTable(clipboardStr, Attributes.tableGhost.str, Attributes.tableWrapperGhost.str, selectedTdOption );
       }
+
+
       console.log('buildOutputNL clipboardStr is: ');
       console.log(clipboardStr);
       // !VA Write clipboardStr to the Clipboard
@@ -2659,7 +2661,8 @@ ${indent}<![endif]-->`;
     // !VA CBController private
     // !VA Function to write clipboard content on mouse click. There is a separate IIFE function for writing clipboard triggered by keyboard combinations but that is a workaround for ClipboardJS non-support for keyboard triggers. Best to keep these two functions separate for now. NOTE: For Lint errors caused by non-access of clipboard.js. 
     function writeClipboard(id, clipboardStr) {
-      // console.log(`writeClipboard id :>> ${id};`);
+      console.log(`writeClipboard id :>> ${id};`);
+      var counter = 0;
       let targetId, iptCodes, evtType, dummybutton;
       // !VA iptCodes are the 5-char codes at index 8-13 of the ID that indicate the input type. This is included for error checking only, clipboardJS doesn't need to know the code, only the id of event target of the doClipboard call.
       iptCodes = ['class', 'altxt', 'loctn', 'anchr', 'width', 'heigt', 'bgclr', 'txclr', 'bdrad', 'bdclr', 'pdtop', 'pdrgt', 'pdbtm', 'pdlft', 'maxwd' ];
@@ -2678,6 +2681,8 @@ ${indent}<![endif]-->`;
       // !VA Create the clipboard object. Using var instead of let to indicated that this is non-native code.
       var clipboard = new ClipboardJS(targetId, {
         text: function(trigger) {
+          counter++;
+          console.log(`counter :>> ${counter};`);
           // !VA Write success message to app message area on success
           // !VA TODO: Need to differentiate between success messages and alert messages displayed in the message bar. 
           clipboard.on('success', function(e) {
@@ -2892,13 +2897,14 @@ ${indent}<![endif]-->`;
 
       // !VA Called from eventHandler to initialize clipboard functionality
       doClipboard: function(evt) {
-        // console.log(`doClipboard evt.target.id :>> ${evt.target.id};`);
-        let targetType, clssList, targetid, modifierKey;
+        console.log(`doClipboard evt.target.id :>> ${evt.target.id};`);
+        let targetType, clssList, targetid, modifierKey, iptCodes;
         // !VA nodeDepth can have three values: 'imgNode', 'tdaNode', 'tblNode'
         targetid = evt.target.id;
         console.log(`doClipboard targetid :>> ${targetid};`);
         console.log('evt.target :>> ');
         console.log(evt.target);
+
 
         // !VA Get current modifier key to variable modifierKey
         if (evt.shiftKey) { 
@@ -2912,16 +2918,33 @@ ${indent}<![endif]-->`;
         }
         // !VA Identify the target element as Make HTML button, text input element, or Make CSS button. If a text input element is the target, then the event was invoked by an ENTER + modifierKey key combination. 
         // !VA classList is the classList of the target element, converted to a string to search.
+
+        // !VA Branch: 120320A
+        // !VA Now trying to implement combo key writeClipboard invocation outside of txfld elements.
+        console.log(`targetid.substring( 8, 13 ) :>> ${targetid.substring( 8, 13 )};`);
+
+
+
         clssList = evt.target.classList.toString();
         // !VA If the classList contains the cbhtm, txfld or cbcss class, set the appropriate targetType.
         if (clssList.includes('ccp-cbhtm-ipt')) {
           targetType = 'makeHTMButton';
-        } else if ( clssList.includes('ccp-txfld-ipt')) {
-          targetType = 'enterKeyCombo';
         } else if ( clssList.includes('ccp-cbcss-ipt')) {
           targetType = 'makeCSSButton';
+
+
+        
+
+
+        } else if ( clssList.includes('ccp-txfld-ipt')) {
+          targetType = 'enterKeyCombo';
+
         } else {
           console.log('ERROR in doClipboard - unknown target class');
+
+
+
+
         }
         // !VA Run the clipboardJS routine dependin on the targetType. For makeHTMButton and enterKeyCombo, the second argument of the buildOutputNL call is nodeDepth, i.e. which nodes are output to the clipboard object: imgNode, tdaNode or tblNode. NOTE: This could be DRYer but I'm leaving it as is for transparency's sake.
         switch(true) {
@@ -3078,6 +3101,10 @@ ${indent}<![endif]-->`;
       }
     }
 
+
+
+
+
     // !VA appController  
     // !VA Separate event listener setup for Tooltips. Managed separately from the main Toolbar and CCP element event handlers just for manageability's sake. NOTE: This should probably be merged with its sister handler, addTooltipEventListeners, somehow
     function removeTooltipEventListeners() {
@@ -3169,24 +3196,6 @@ ${indent}<![endif]-->`;
       // !VA CLICK HANDLERS
       // ------------------
 
-      // !VA The problem here is that trapKeypress sets the focus on the ccp element, thereby blurring from the mouse target and running handleBlur. How to prevent the focus from 
-      // !VA No that's not the problem at all, it seems. And I cant figure it out
-      function trapKeypress(evt) {
-        console.log('trapKeypress running'); 
-        // console.clear();
-        let keydown = evt.which || evt.keyCode || evt.key;
-        if ( keydown === 13 ) {
-          if ( evt.altKey || evt.shiftKey || evt.ctrlKey ) {
-            console.log('evt :>> ');
-            console.log(evt);
-            console.log('MODIFIER + ENTER');
-            CBController.doClipboard(evt);
-          }
-        }
-        // evt.preventDefault();
-        // evt.stopPropagation();
-      }
-      // addEventHandler(document.querySelector('#ccp-img-class-ipt'),'keydown',trapKeypress,false);
 
       // !VA Add click and blur event handlers for clickable toolbarElements 
       const tbClickables = [ toolbarElements.btnTbrIncr50, toolbarElements.btnTbrIncr10, toolbarElements.btnTbrIncr01, toolbarElements.btnTbrDecr50, toolbarElements.btnTbrDecr10, toolbarElements.btnTbrDecr01  ];
@@ -3285,6 +3294,9 @@ ${indent}<![endif]-->`;
           addEventHandler(el,'blur',handleBlur,false);
         }
       }
+
+      // !VA Branch: 120320A
+      addEventHandler(document.querySelector('#ccp'), 'keydown', handleKeydown,false);
       
       // !VA Change event handler to reset padding values.
       const pdngInputs = [ ccpUserInput.ccpTdaPdtopTfd, ccpUserInput.ccpTdaPdbtmTfd,ccpUserInput.ccpTdaPdlftTfd, ccpUserInput.ccpTdaPdrgtTfd ];
@@ -3940,31 +3952,45 @@ ${indent}<![endif]-->`;
       return retVal;
     }
 
+
+
+
+
     // !VA appController function
     // !VA Handles keyboard input for all UI elements. Called from event listeners for tbKeypresses and ccpKeypresses. Calls handleUserInput which validates the input and returns either an integer or a string and passes the value to applyInputValue to write to Appobj and the DOM. Then, for curImgW/curImgH, sets the input value to '' so the placeholder shows through. For all other input elements, sets the input value to the respective Appobj property.
     // !VA NOTE: Tab needs to be in a keyDown because keyup is too late to trap the value before the default behavior advances to the next field.
     function handleKeydown(evt) {
       // console.log('handleKeydown running');
-      // console.log(`evt.target.id :>> ${evt.target.id};`);
-      let retVal, reflectArray = [], highlightArray = [], configObj = {};
+      var counter = 0;
+      let retVal, reflectArray = [], highlightArray = [], configObj = {}, iptCodes, isTxfld;
       // !VA Get the keypress
       let keydown = evt.which || evt.keyCode || evt.key;
       // !VA userInputObj is the array containing the values needed to evaluate input based on whether the target is a Toolbar element or a CCP element. userInputObj includes the target's value and Appobj property/ccpUserInput alias.
       const userInputObj = { };
 
-      // !VA If TAB or ENTER
-      if (keydown == 9 || keydown == 13) {
-        // !VA elemIdToAppobjProp gets the Appobj key that corresponds to a given element ID. Write that Appobj property/ccpUserInput alias to the appObjProp property of the userInputObj object.
-        userInputObj.appObjProp = elemIdToAppobjProp(evt.target.id);
-        // !VA evtTargetVal is the value the user entered into the input element.
-    
-        userInputObj.evtTargetVal = evt.target.value;
-        // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp locally.  
-        let { appObjProp } = userInputObj;
-        // !VA Call handleUserInput to validate the user input and process it based on the input type (i.e. Toolbar or CCP input). retVal will return either an empty string, a valid value, or FALSE if checkUserInput detects an input error.
 
-        if (keydown === 13) {
-          console.log('handleKeydown: ENTER key');
+
+
+      
+      // !VA If ENTER is pressed
+      if (keydown === 13 ) {
+        console.log('handleKeydown: ENTER key');
+        console.log(`handleKeydown evt.target.id :>> ${evt.target.id};`);
+        // !VA Handle IDs for elements that are included in the tab order and pass value in the event, i.e. text input elements, which can be identified by their 5-char ID code at positions 8 - 13 in the id.
+        // !VA iptCodes is an array of identifier codes for valid text input elements
+        iptCodes = ['class', 'altxt', 'loctn', 'anchr', 'width', 'heigt', 'bgclr', 'txclr', 'bdrad', 'bdclr', 'pdtop', 'pdrgt', 'pdbtm', 'pdlft', 'maxwd' ];
+        // !VA If evt.target.id.substring returns an empty string or the return string is not in the list of IDs whose 5-char identifier indicates a TXFLD element, set isTxfld to false, otherwise set isTxfld to true
+        evt.target.id.substring( 8, 13) === '' || !iptCodes.toString().includes( evt.target.id.substring( 8, 13 )) ? isTxfld = false : isTxfld = true;
+        console.log(`isTxfld :>> ${isTxfld};`);
+        // !VA If the id is a text input element
+        if (isTxfld) {
+          // !VA elemIdToAppobjProp gets the Appobj key that corresponds to a given element ID. Write that Appobj property/ccpUserInput alias to the appObjProp property of the userInputObj object.
+          userInputObj.appObjProp = elemIdToAppobjProp(evt.target.id);
+          // !VA evtTargetVal is the value the user entered into the input element.
+          userInputObj.evtTargetVal = evt.target.value;
+          // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp locally.  
+          let { appObjProp } = userInputObj;
+          // !VA Call handleUserInput to validate the user input and process it based on the input type (i.e. Toolbar or CCP input). retVal will return either an empty string, a valid value, or FALSE if checkUserInput detects an input error.
           // !VA Handling zero values now on ENTER the same way they are handled in handleBlur. '
           // !VA TODO: In fact, this is the exact same routine, so DRYify it in a private function. 
           // !VA Skip straight to handleUserInput if appObjProp is a Toolbar input, which cannot have a 0 or empty value
@@ -3986,8 +4012,9 @@ ${indent}<![endif]-->`;
           } else {
             retVal = handleUserInput(userInputObj);
           }
-
+          // !VA If retVal is false, then the input was invalid, so handle the behavior in the input element.
           if ( retVal === false) { 
+            // !VA If the target element is curImgW or curImgH, delete the value to show the placeholder - the current W and H are shown in the Display Size field of the Inspector panel.
             if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
               this.select();
               this.value = '';
@@ -4007,27 +4034,14 @@ ${indent}<![endif]-->`;
             }
           } 
 
-          // !VA If ENTER + modifier key (i.e. shift, ctrl or alt) was pressed, run doClipboard to intiate HTML clipboard output. 
-          if ( evt.shiftKey || evt.ctrlKey || evt.altKey ) {
-            CBController.doClipboard(evt);
-          } 
-
-
-
-
-
-
-        } else if ( keydown === 9) {
-          // !VA NOTE: TAB key is handled by handleBlur, so do nothing here.
-          // console.log('TAB key');
-          // !VA Branch: 112920B
-          // if (document.hasFocus()) {
-          //   console.log('DOCUMENT has focus');
-          // } else {
-          //   console.log('DOCUMENT does NOT have  focus');
-          // } 
         }
-      }
+
+        // !VA If ENTER + modifier key (i.e. shift, ctrl or alt) was pressed, run doClipboard to intiate HTML clipboard output. 
+        if ( evt.shiftKey || evt.ctrlKey || evt.altKey ) {
+          CBController.doClipboard(evt);
+        } 
+
+      } 
     }
 
     // !VA appController  
