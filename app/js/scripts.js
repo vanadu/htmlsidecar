@@ -349,7 +349,7 @@ var Witty = (function () {
     function reflectAppobj( reflectArray) { 
       var Appobj = appController.getAppobj();
       // console.log('reflectAppobj running'); 
-      let el, isInit, retVal, toolbarAliases;
+      let el, isInit, toolbarAliases;
       // !VA Loop through all the aliases in the reflectArray parameter
       for (const alias of reflectArray) {
         // !VA If there is no corresponding Appobj property for the alias, set isInit to true, otherwise false
@@ -364,7 +364,6 @@ var Witty = (function () {
             // !VA Not sure whether this is still applicable.
             // !VA TODO: Deleting the value on init should reset all input fields to empty strings, thereby exposing whatever preset value attributes in the HTML. This should actually make resetting input elements to empty in configDefault redundant. For later...
             el.value = '';
-            retVal = el.value;
             // !VA Branch: 120220C
             // !VA Commented out return retVal because it was terminating the loop, causing subsequent aliases not to be processed if any Appobj[alias] was at runtime undefined. Keep an eye on this, not sure if the whole isInit clause is necessary anymore. AFAIK it's the defaultConfig that determines the Appobj values that are being reflected on initialization.
             // !VA If initializing, return an empty string for the property value
@@ -466,11 +465,7 @@ var Witty = (function () {
     // }
 
     // !VA UIController private
-    // !VA Resets all the reveal aliases to the default array. Called only once at initialization 
-    // !VA Branch: 112020A
-    // !VA This should be folded into revealElements which includes exactly the same function.
-    // !VA Branch: 112920B
-    // !VA Turn tabIndex on for 
+    // !VA Reveals elements at initialization based on the configDefault configuration. revealInit is only called once, i.e. at initializion. NOTE: This could probably be integrated into revealElements, but it's better kept separate for now for transparency's sake.
     function revealInit( initArray ) {
       // console.log('revealInit running'); 
       let el;
@@ -507,7 +502,7 @@ var Witty = (function () {
     // !VA Toggle the table wrapper options in the CCP UI based on the configObj passed from configWrapr. 
     function toggleWrapr(flag) {
       // console.log('toggleWrapr running'); 
-      let el, clss;
+      let el;
       // !VA Array of table wrapper aliases
       let wraprArr;
       wraprArr =  [ 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd',  'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
@@ -2390,7 +2385,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
 
     
     // !VA CBController private
-    // !VA Configurations for the ghost table output
+    // !VA Configurations for the ghost table output. Place the ghost table tokens and return nodeList.
     function configGhostTable(option, hasWrapper, nodeList) {
       // console.log('configGhostTable running'); 
       // console.log(`option :>> ${option}; hasWrapper :>> ${hasWrapper}`);
@@ -2438,6 +2433,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       return nodeList;
     }
 
+    // !VA CBController private
+    // !VA Transpose the ghost tokens inserted before the table tag using insertAdjacentHTML to their correct position after the table tag. They were inserted before the table tag because the position after the table tags is already in use for the indents and there is no way to append an existing string inserted using insertAdjacentHTML.
     function transposeTokens(tag, tbl, token, tokenIdx, tagIdx) {
       // console.log('transposeTokens running'); 
       // console.log(`tbl :>> ${tbl};`);
@@ -2572,6 +2569,8 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
       // !VA Get the array of ghost tags including indents
       // !VA Branch: 112420C
       // !VA Something is wrong with the indents - investigate
+      // !VA Branch: 120420B
+      // !VA option doesn't appear to be accessed in getGhostTags - omit it?
       ghostTags = getGhostTags(option);
 
       // !VA Set which ghost tags replace which tokens based on whether ccpTblWraprChk is checked
@@ -2605,7 +2604,7 @@ style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});b
     // !VA CBController private
     // !VA Returns the strings for opening and closing ghost table tag as a two-item array with indents on the inner table based on the status of the Table Wrapper checkbox icon.
     function getGhostTags(option) {
-      // console.log(`getGhostTags option :>> ${option};`);
+      console.log(`getGhostTags option :>> ${option};`);
       let ghostOpn1, ghostCls1, ghostOpn2, ghostCls2, hasWrapper, indent;
       let ghosttags = [];
       // !VA Get the status of the Table Wrapper checkbox - it determines whether indents are applied to the inner table or not.
@@ -2906,16 +2905,8 @@ ${indent}<![endif]-->`;
 
       // !VA Called from eventHandler to initialize clipboard functionality
       doClipboard: function(evt) {
-        let targetType, clssList, targetid, modifierKey, iptCodes, isTfd;
-        // !VA nodeDepth can have three values: 'imgNode', 'tdaNode', 'tblNode'
+        let targetType, clssList, targetid, modifierKey;
         targetid = evt.target.id;
-        // console.log(`doClipboard targetid :>> ${targetid};`);
-        // console.log('evt.target :>> ');
-        // console.log(evt.target);
-        iptCodes = ['class', 'altxt', 'loctn', 'anchr', 'width', 'heigt', 'bgclr', 'txclr', 'bdrad', 'bdclr', 'pdtop', 'pdrgt', 'pdbtm', 'pdlft', 'maxwd' ];
-        // !VA If the 5-char identifier code at index 8 - 13 of the ID returns and empty string or is not in the list of valid identifier codes, then it is not a valid text input element id.
-        evt.target.id.substring( 8, 13) === '' || !iptCodes.toString().includes( evt.target.id.substring( 8, 13 )) ? isTfd = false : isTfd = true;
-        // console.log(`doClipboard isTfd :>> ${isTfd};`);
         // !VA Get current modifier key to variable modifierKey
         if (evt.shiftKey) { 
           modifierKey = 'shift';
@@ -3021,7 +3012,9 @@ ${indent}<![endif]-->`;
     // !VA Deprecated?
     // const ccpUserInputLabels = UICtrl.getCcpUserInputLabelIds();
     const iptCcpMakeClips =  UICtrl.getiptCcpMakeClips();
-    const appMessageElements =  UICtrl.getAppMessageElements();
+    // !VA Branch: 120420B
+    // !VA Declared but never used, commented out for now.
+    // const appMessageElements =  UICtrl.getAppMessageElements();
 
 
     
@@ -3607,7 +3600,7 @@ ${indent}<![endif]-->`;
       Appobj.sPhonesH = Math.round(Appobj.sPhonesW * (1 / Appobj.aspect[0]));
       Appobj.lPhonesW = Appobj.lPhonesW - pDeltaW;
       Appobj.lPhonesH = Math.round(Appobj.lPhonesW * (1 / Appobj.aspect[0]));
-      // !VA Put the post-change padding values in local variables - these are the post-change Appobj values from getPaddingNew()
+      // !VA Put the post-change padding values in local variables - these are the post-change Appobj values from getPaddingAfter()
       rgt = pNew[1], lft = pNew[3];
       top = pNew[0], btm = pNew[2];
       // !VA TD Width reflects the post-change curImgW plus the post-change padding width
@@ -3619,7 +3612,7 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
-    // !VA Called from handlePaddingChange. Sets and runs the CCP configuration and updates Inspectors for padding-dependent elements.
+    // !VA Called from handlePaddingChange. Sets and runs the CCP configuration for padding-dependent elements and updates Inspectors and curImg. 
     // !VA Branch: 110520A
     // !VA Overriding curImg resizing for IMG excld and TD vmlbt and bgimg 
     function configPadding(appObjProp) {
@@ -3700,7 +3693,7 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
-    // !VA Called from getPaddingNew and handlePaddingChange. Convert an array of property values of type String to integers.
+    // !VA Called from getPaddingAfter and handlePaddingChange. Convert an array of property values of type String to integers.
     function arrayStringToInteger(arr) {
       for (let i = 0; i < arr.length; i++) {
         arr[i] === '' ? arr[i] = 0 : arr[i] = parseInt(arr[i]);
@@ -3709,8 +3702,8 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
-    // !VA Called from handlePaddingChange. Gets the post-change array of padding values.
-    function getPaddingNew( paddingAliases, userInputObj) {
+    // !VA Called from handlePaddingChange. Gets the array of padding values after the change event.
+    function getPaddingAfter( paddingAliases, userInputObj) {
       let index, paddingNew = [];
       // !VA Destructure userInputObj to local variables
       let { appObjProp, evtTargetVal } = userInputObj;
@@ -3757,7 +3750,7 @@ ${indent}<![endif]-->`;
         // !VA Get the current padding before the change event as integer array
         pCurrent = arrayStringToInteger(pCurrent);
         // !VA Get the new padding after the change event
-        pNew = getPaddingNew(pAliases, userInputObj);
+        pNew = getPaddingAfter(pAliases, userInputObj);
         // !VA pDeltaW is the delta of the current padding width and the new padding width. NOTE: Height values are calculated from the padding width, so pDeltaH is not required. 
         pDeltaW = -(pCurrent[1] + pCurrent[3]) + (pNew[1] + pNew[3]);
         // !VA Set Appobj for the change event target
@@ -4304,7 +4297,7 @@ ${indent}<![endif]-->`;
 
     // !VA appController private
     // !VA Called from checkNumericInput, applyInputValue, This function calculates CCP input values based on curImgW, curImgH and other CCP input values. It also serves as secondary error checking, i.e. not checking the input per se but rather checking the input in relation to other Appobj properties which may or may not have been populated by the time checkNumericInput was run.
-    // !VA IMPORTANT: Padding-related TBL and TDA width/height input value changes are handled in handlePadding. Padding-related sPhoneW/lPhoneW values are handled here.
+    // !VA IMPORTANT: Padding-related TBL and TDA width/height input value changes are handled in configPadding. Padding-related sPhoneW/lPhoneW values are handled here.
     function recalcAppobj(userInputObj) {
       let isErr, appMessCode, reflectArray = [], configObj = {};
       // !VA NOTE: Condition-specific variables are declared in the respective condition
@@ -4673,10 +4666,10 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
-    // !VA Called from event handlers on CCP labels to remove any input field content, remove the 'active' class from the input element related to the clicked label icon, and remove ccp-conceal-ctn class from the Make CSS buttons.NOTE: evt.target.value will always be undefined because the target element is a label. To get a value, target the input element, i.e. the htmlFor of the target label. 
+    // !VA Called from event handlers on CCP labels to remove any input field content, remove the 'active' class from the input element related to the clicked label icon, and remove ccp-conceal-ctn class from the Make CSS buttons. NOTE: evt.target.value will always be undefined because the target element is a label. To get a value, target the input element, i.e. the htmlFor of the target label. 
     function handleIconClick(evt) {
       console.log(`handleIconClick evt.target.id :>> ${evt.target.id};`);
-      let appObjProp, evtTargetId, reflectArray, mkcssArray, highlightArray, revealArray, revealFlag, mkcssProp;
+      let appObjProp, evtTargetId, reflectArray, mkcssArray, highlightArray, revealArray, mkcssProp;
       let configObj = {};
       // !VA get the id of the target label element
       evtTargetId = evt.target.id;
@@ -4705,8 +4698,6 @@ ${indent}<![endif]-->`;
         if (appObjProp.includes('Class')) {
           // !VA Replace the ClassTfd string to get the Make CSS button group alias
           mkcssProp = appObjProp.replace('ClassTfd', 'MkcssGrp');
-          // !VA Set the reveal flag to add the ccp-conceal-ctn style to the Make CSS group, thereby concealing its children when revealElements is run.
-          revealFlag = true;
           // !VA Set the alias of the Make CSS buttons to conceal
           mkcssArray = [ mkcssProp ];
           // !VA Add the revealMkcss elements to the config
@@ -5151,10 +5142,9 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from fetchConfigObj to get the IMG EXCLD-specific configObj configuration properties to the  configCCP function, which then applies DOM-level changes to the CCP. 
     function configExcld( alias, option) {
-      let configObj = {}, reflectArray, mkcssArray, highlightArray, revealArray, revealFlag, radioArray, checkedArray;
+      let configObj = {}, reflectArray, mkcssArray, highlightArray, revealArray, radioArray, checkedArray;
       //!VA Running selectTdaOptions also runs the default config, which overwrites the imgExcld config. But we need to select the basic TD options when imgExcld is selected. So integrate default config options into this config.
       // !VA revealFlag is false because elements are revealed by REMOVING the ccp-conceal-ctn class
-      revealFlag = false;
       // !VA The imgExcld radio only works with TD Options set to 'basic'. So set the Appobj property.
       Appobj.ccpTdaOptnsRdo = 'basic';
       // !VA radioState METHOD
@@ -5228,12 +5218,14 @@ ${indent}<![endif]-->`;
     function configItype( alias, option) {
       console.log('configItype running'); 
       console.log('option :>> ' + option);
-      let configObj, reflectArray, radioArray, highlightArray, revealArray, revealFlag;
+      let configObj, reflectArray, radioArray, highlightArray, revealArray;
       // !VA REFLECT APPOBJ to TEXT INPUT FIELDS
       option === 'fluid' ?  Appobj['ccpImgClassTfd'] = 'img-fluid' : Appobj['ccpImgClassTfd'] = '';
       // !VA REVEAL the Make CSS buttons if fluid
       revealArray = [ 'ccpImgMkcssGrp'];
-      option === 'fluid' ?  revealFlag = false : revealFlag = true;
+      // !VA Branch: 120420B
+      // !VA The below should be 
+      // option === 'fluid' ?  revealFlag = false : revealFlag = true;
       // console.log('revealArray :>> ');
       // console.log(revealArray);
 
@@ -5267,7 +5259,7 @@ ${indent}<![endif]-->`;
         // !VA NOTE: This should perhaps be in configDefault.
         selectCheckbox( false, 'ccpTblWraprChk');
 
-        mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ]
+        mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ];
         configObj.revealMkcss =  {caller: 'configOptns', flag: true, revealArray: mkcssArray };
         console.log('configOptns basic configObj :>> ');
         console.log(configObj);
@@ -5357,7 +5349,6 @@ ${indent}<![endif]-->`;
         // !VA Get the revealArray for the revealElements METHOD.
         revealArray = fetchRevealArray('swtch');
 
-        // !VA Branch: 112240A
         // !VA Conceal the TBW options and turn off the Wrapr checkbox.
         selectCheckbox( false, 'ccpTblWraprChk');
 
@@ -5400,7 +5391,7 @@ ${indent}<![endif]-->`;
         selectCheckbox( false, 'ccpTblWraprChk');
 
         // !VA revealMkcss METHOD: conceal/reveal Make CSS buttons
-        mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ]
+        mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ];
         // !VA Set the configObj with the methods and properties to configure
         configObj = {
           revealMkcss: {caller: 'configOptns', flag: true, revealArray: mkcssArray},
@@ -5448,7 +5439,7 @@ ${indent}<![endif]-->`;
         // !VA Array of elements to be revealed.
         revealArray = fetchRevealArray('vmlbt');
         // !VA revealMkcss METHOD: conceal/reveal Make CSS buttons
-        mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ]
+        mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ];
         // !VA Set the configObj with the methods and properties to configure
         configObj = {
           revealMkcss: {caller: 'configOptns', flag: true, revealArray: mkcssArray},
@@ -5484,7 +5475,7 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
-    // !VA Returns an array of input element aliases. 
+    // !VA Returns an array of input element aliases. Called from handleUserInput, configExcld, configItype, configOptns.
     function getInputArray() {
       const iptArray = [];
       for (const key of Object.keys(ccpUserInput)) {
@@ -5544,7 +5535,7 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from fetchConfigObj to get the HYBRD-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
     function configHybrd( alias, isChecked ) {
-      let checkedArray, radioArray, reflectArray, revealFlag, revealArray, highlightArray;
+      let checkedArray, radioArray, reflectArray, revealArray, highlightArray;
       let configObj = {};
       // !VA APPOBJ PROPERTIES FOR CONFIGURING THE HYBRID OPTION
       // !VA If Hybrid is checked, set these options
@@ -5596,8 +5587,6 @@ ${indent}<![endif]-->`;
       radioArray = [ 'ccpTblAlignRdo' , 'ccpTbwAlignRdo', 'ccpTdaOptnsRdo' ];
       // !VA revealElements METHOD: Set the reveal flag. The reveal flag is the opposite of the isChecked property because the ccp-conceal-ctn class is REMOVED in order to reveal the elements.
       // !VA Branch: 111920A
-      // !VA Check if the revealFlag is applicable
-      revealFlag = !isChecked;
       // !VA Call the revealArray from fetchRevealArray
       revealArray = fetchRevealArray('hybrd');
       // !VA Get the highlightArray of all input elements to apply the highlight to any input elements whose Appobj property is not empty
