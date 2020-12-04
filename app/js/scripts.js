@@ -346,8 +346,12 @@ var Witty = (function () {
     // !VA Branch: 111920A
     // !VA I'm not sure if this is still true. I think now the default reflect configuration comes from configDefault.
     // !VA If called from populateAppobj, returns the value of text input fields as hard-coded in the HTML. Otherwise, called by configCCP, which receives an array of aliases whose corresponding CCP element value is set to its corresponding Appobj value. 
-    function reflectAppobj( reflectArray) { 
+    function reflectAppobj( caller, reflectArray) { 
+      console.log(`reflectAppobj caller :>> ${caller}; reflectArray  :>> `);
+      console.log(reflectArray);
       var Appobj = appController.getAppobj();
+      console.log('reflectAppobj Appobj :>> ');
+      console.log(Appobj);
       // console.log('reflectAppobj running'); 
       let el, isInit, toolbarAliases;
       // !VA Loop through all the aliases in the reflectArray parameter
@@ -378,6 +382,7 @@ var Witty = (function () {
           return;
         }
       }
+
     }
 
     // !VA UIController private
@@ -670,7 +675,6 @@ var Witty = (function () {
 
           // !VA If uniqueObj contains the parent element of the padding inputs, add the elements with the class ccp-padng-ipt, i.e. all the padding inputs, to tabindexObj.
           } else if (entry[0].substring( 6, 14 ) === 'PdparGrp') {
-            console.log('Mark1');
             // !VA Loop through the collection of padding inputs and if the reveal flag on the entry is true, include the element in the tab order, otherwise exclude it.
             for (const ipt of document.getElementsByClassName('ccp-padng-ipt')) {
               entry[1] ? ipt.tabIndex = 0 : ipt.tabIndex = -1;
@@ -944,7 +948,7 @@ var Witty = (function () {
         let retVal;
         // !VA 
         if ( configObj.reflectAppobj ) {
-          reflectAppobj( configObj.reflectAppobj.reflect );
+          reflectAppobj( configObj.reflectAppobj.caller, configObj.reflectAppobj.reflect );
         }
         if ( configObj.revealInit) {
           revealInit( configObj.revealInit.reveal );
@@ -1619,7 +1623,9 @@ var Witty = (function () {
 
           break;
         // !VA ccpTdaCbhtmIpt is clicked. Here we handle the 'rdoCcpTdBasic', 'rdoCcpTdExcludeimg' and 'rdoCcpTdPosswitch' options because they process indents with no modifications. 'rdoCcpTdImgswap', 'rdoCcpTdBgimage' and 'rdoCcpTdVmlbutton' options are handled separately because they import comment nodes with MS conditional code
+        // !VA ccpTdaCbhtmIpt is clicked. Here we handle the 'rdoCcpTdBasic', 'rdoCcpTdExcludeimg' and 'rdoCcpTdPosswitch' options because they process indents with no modifications. 'rdoCcpTdImgswap', 'rdoCcpTdBgimage' and 'rdoCcpTdVmlbutton' options are handled separately because they import comment nodes with MS conditional code
         case ( nodeDepth === 'tdaNode' ):
+          console.log(`buildOutputNL id :>> ${id};`);
           // !VA basic option is selected 
           if ( selectedTdOption === 'basic') { 
             // !VA We can hardcode this for now, but that will be a problem if any other options with other nodes are added.
@@ -3686,7 +3692,7 @@ ${indent}<![endif]-->`;
       }
       // !VA Build the config obj and run configCCP to apply the config
       configObj = {
-        reflectAppobj: { reflect: reflectArray },
+        reflectAppobj: { caller: 'configPadding', reflect: reflectArray },
         highlightIcon: { highlight: highlightArray }
       };
       UIController.configCCP( configObj );
@@ -3800,7 +3806,7 @@ ${indent}<![endif]-->`;
             Appobj[appObjProp] = '';
             reflectArray = [ appObjProp ];
             configObj = {
-              reflectAppobj: { reflect: reflectArray },
+              reflectAppobj: { caller: 'handleBlur', reflect: reflectArray },
             };
             UIController.configCCP( configObj);
           }
@@ -3995,7 +4001,7 @@ ${indent}<![endif]-->`;
               reflectArray = highlightArray = [ appObjProp ];
               configObj = {
                 highlightIcon: { highlight: highlightArray },
-                reflectAppobj: { reflect: reflectArray }
+                reflectAppobj: { caller: 'handleKeydown', reflect: reflectArray }
               };
               UIController.configCCP( configObj);
             } else {
@@ -4332,7 +4338,7 @@ ${indent}<![endif]-->`;
         } 
   
         configObj = {
-          reflectAppobj: { reflect: reflectArray },
+          reflectAppobj: { caller: 'recalcAppobj', reflect: reflectArray },
         };
         UIController.configCCP( configObj );
   
@@ -4353,8 +4359,8 @@ ${indent}<![endif]-->`;
     // !VA appController  
     // !VA Called from applyInputValue and handleMouseEvents. Writes imgViewerW, sPhonesW and lPhonesW to localStorage and calculates the adjacent side of the curImgW/curImgH input, then runs calcViewerSize to resize the dynamicElements containers. NOTE: This function does things that are done elsewhere and does other things that it shouldn't do. Revisit this at some point but for now it works.
     function updateCurrentImage(userInputObj) {
-      console.log('updateCurrentImage running'); 
-      console.log('updateCurrentImage userInputObj :>> ');
+      // console.log('updateCurrentImage running'); 
+      // console.log('updateCurrentImage userInputObj :>> ');
       console.log(userInputObj);
       // !VA Initialize vars for curImgH and curImgW in order to calculate one based on the value of the other * Appobj.aspect.
       // let curImgH, curImgW;
@@ -4487,11 +4493,11 @@ ${indent}<![endif]-->`;
       aliasArray = [ 'ccpTblWidthTfd', 'ccpTbwWidthTfd'];
       // !VA reflectAppobj implements the Appobj properties in CCP elements so that the CCP reflects the current state of Appobj
       configObj = {
-        reflectAppobj: { reflect: aliasArray },
+        reflectAppobj: { caller: 'resizeContainers', reflect: aliasArray },
         highlightIcon: { highlight: aliasArray }
       };
       UIController.configCCP( configObj );
-
+      console.log(`resizeContainers Appobj.ccpTdaWidthTfd :>> ${Appobj.ccpTdaWidthTfd};`);
       // !VA Write the inspectors based on Appobj values
       UICtrl.writeInspectors(Appobj);
     }
@@ -4633,7 +4639,7 @@ ${indent}<![endif]-->`;
     // !VA Branch: 120420B
     // !VA Resets the padding input fields to empty, toggles off the padding icon, resets curImg to pre-padding values, and restores dependent TDA & TBL Width input values to pre-padding state.
     function resetPadding() {
-      console.log('resetPadding running'); 
+      // console.log('resetPadding running'); 
       let reflectArray = [], configObj = {}, imgInputObj = {};
       // console.log(`Appobj.ccpTdaPdrgtTfd :>> ${Appobj.ccpTdaPdrgtTfd};`);
       // console.log(`Appobj.ccpTdaPdlftTfd :>> ${Appobj.ccpTdaPdlftTfd};`);
@@ -4655,13 +4661,14 @@ ${indent}<![endif]-->`;
       document.querySelector(ccpUserInput.ccpTdaHeigtTfd.replace('tfd', 'ipt')).classList.remove('active');
       document.querySelector(ccpUserInput.ccpTdaWidthTfd.replace('tfd', 'ipt')).classList.remove('active');
       configObj = {
-        reflectAppobj: { reflect: reflectArray }
+        reflectAppobj: { caller: 'resetPadding', reflect: reflectArray }
       };
       // !VA Run the config
       UIController.configCCP( configObj );
       // !VA Remove the active class from the padding icon, i.e. the event target.
       // !VA NOTE: There should be a configCcp method for this.
       document.getElementById('ccp-tda-padng-icn').classList.remove('active');
+      console.log(`resetPadding Appobj.ccpTdaWidthTfd :>> ${Appobj.ccpTdaWidthTfd};`);
 
     }
 
@@ -4683,7 +4690,7 @@ ${indent}<![endif]-->`;
         highlightArray = [ appObjProp ];
         // !VA Set reflect and highlight in configObj
         configObj = {
-          reflectAppobj: { reflect: reflectArray },
+          reflectAppobj: { caller: 'handleIconClick', reflect: reflectArray },
           highlightIcon: { highlight: highlightArray },
         };
         // !VA Handle the reveal state of the IMG Anchr dependent elements: ccpImgTxclrTfd' and 'ccpImgTargtChk
@@ -5129,7 +5136,7 @@ ${indent}<![endif]-->`;
       configObj = {
         revealElements: { caller: 'configDefault', revealType: 'config', revealArray: revealArray }, 
         disableReset: { alias: 'default' },
-        reflectAppobj: { reflect: reflectArray },
+        reflectAppobj: { caller: 'configDefault', reflect: reflectArray },
         checkboxState: { checked: checkedArray },
         radioState: { radio: radioArray },
         highlightIcon: { highlight: highlightArray }
@@ -5202,7 +5209,7 @@ ${indent}<![endif]-->`;
         highlightIcon: { highlight: highlightArray},
         checkboxState:  { checked: checkedArray },
         radioState: { radio: radioArray },
-        reflectAppobj: { reflect: reflectArray },
+        reflectAppobj: { caller: 'configExcld', reflect: reflectArray },
         revealElements: { caller: 'configExcld', revealType: 'config', revealArray: revealArray },
       };
       // !VA Reset any padding entries and restore curImgW to the dimensions shown in the Inspector panel
@@ -5235,7 +5242,7 @@ ${indent}<![endif]-->`;
       highlightArray = getInputArray();
       configObj = {
         highlightIcon: { highlight: highlightArray},
-        reflectAppobj: { reflect: reflectArray },
+        reflectAppobj: { caller: 'configItype', reflect: reflectArray },
         radioState: { radio: radioArray },
         revealElements: { caller: 'configItype', revealType: 'config', revealArray: revealArray }
       };
@@ -5315,7 +5322,7 @@ ${indent}<![endif]-->`;
         configObj = {
           revealMkcss: {caller: 'configOptns', flag: false, revealArray: mkcssArray},
           checkboxState: { checked: checkedArray },
-          reflectAppobj: { reflect: reflectArray },
+          reflectAppobj: { caller: 'iswap', reflect: reflectArray },
           radioState: { radio: radioArray },
           disableElements: { flag: disableFlag, disable: disableArray },
           // !VA Branch: 111920A
@@ -5398,7 +5405,7 @@ ${indent}<![endif]-->`;
           radioState: { radio: radioArray },
           checkboxState:  { checked: checkedArray },
           disableReset: { alias: 'default' },
-          reflectAppobj: { reflect: reflectArray },
+          reflectAppobj: { caller: 'bgimg', reflect: reflectArray },
           revealElements:  { caller: 'configOptns', revealType: 'config', revealArray: revealArray }
         };
         break;
@@ -5411,8 +5418,14 @@ ${indent}<![endif]-->`;
         Appobj.ccpImgAnchrTfd = '#';
         Appobj.ccpImgItypeRdo = 'fixed';
         Appobj.ccpTblClassTfd = '';
-        Appobj.ccpTdaWidthTfd = Appobj.curImgW;
-        Appobj.ccpTdaHeigtTfd = Appobj.curImgH;
+
+        // !VA Branch: 120420C
+        // Appobj.ccpTdaWidthTfd = Appobj.curImgW;
+        // Appobj.ccpTdaHeigtTfd = Appobj.curImgH;
+        // !VA  ccpTdaWidthTfd and ccpTdaHeigtTfd need to be the default as per buttons.cm, i.e. 200 X 40 - but these values aren't being reflected. 
+    
+        Appobj.ccpTdaWidthTfd = 200;
+        Appobj.ccpTdaHeigtTfd = 40;
         Appobj.ccpTdaBgclrTfd = '#556270';
         Appobj.ccpTdaTxclrTfd = '#FFFFFF';
         Appobj.ccpTdaBdclrTfd = '#1e3650';
@@ -5446,9 +5459,10 @@ ${indent}<![endif]-->`;
           radioState: { radio: radioArray },
           checkboxState:  { checked: checkedArray },
           disableReset: { alias: 'default' },
-          reflectAppobj: { reflect: reflectArray },
+          reflectAppobj: { caller: 'vmlbt', reflect: reflectArray },
           revealElements:  { caller: 'configOptns', revealType: 'config', revealArray: revealArray }
         };
+        console.log(`configOptns Appobj.ccpTdaWidthTfd :>> ${Appobj.ccpTdaWidthTfd};`);
         // console.log('swtch AFTER configObj :>> ');
         // console.dir(configObj);
         break;
@@ -5595,7 +5609,7 @@ ${indent}<![endif]-->`;
       configObj = {
         highlightIcon: { highlight: highlightArray },
         checkboxState: { checked: checkedArray },
-        reflectAppobj: { reflect: reflectArray },
+        reflectAppobj: { caller: 'configHybrd', reflect: reflectArray },
         radioState: { radio: radioArray },
         // revealReset: { alias: 'default'},
         revealElements: { caller: 'configHybrd', revealType: 'config', revealArray: revealArray },
