@@ -2661,36 +2661,23 @@ ${indent}<![endif]-->`;
     // !VA CBController private
     // !VA Function to write clipboard content on mouse click. There is a separate IIFE function for writing clipboard triggered by keyboard combinations but that is a workaround for ClipboardJS non-support for keyboard triggers. Best to keep these two functions separate for now. NOTE: For Lint errors caused by non-access of clipboard.js. 
     function writeClipboard(id, clipboardStr) {
-      console.log(`Mark1 writeClipboard id :>> ${id};`);
+      // console.log(`Mark1 writeClipboard id :>> ${id};`);
       var counter = 0;
       let targetId, iptCodes, isTfd, evtType, dummybutton;
       // !VA iptCodes are the 5-char codes at index 8-13 of the ID that indicate the input type. This is included for error checking only, clipboardJS doesn't need to know the code, only the id of event target of the doClipboard call.
       iptCodes = ['class', 'altxt', 'loctn', 'anchr', 'width', 'heigt', 'bgclr', 'txclr', 'bdrad', 'bdclr', 'pdtop', 'pdrgt', 'pdbtm', 'pdlft', 'maxwd' ];
-
+      // !VA If the five-char identifier code at index 8-13 of the id is in iptCodes, i.e. is a valid text input, return true, otherwise false
       id.substring( 8, 13) === '' || !iptCodes.toString().includes(id.substring( 8, 13)) ? isTfd = false : isTfd = true;
-      console.log(`writeClipboard isTfd :>> ${isTfd};`);
-
-
-
 
       // !VA Determine if the target event was invoked from a Make Clipboard button or a keyboard combo. This is necessary because ClipboardJS doesn't natively support keyboard events, so a workaround with a mouse click on a dummy button element has to be implemented. 
-      // if (id.substring( 8, 13) === 'cbhtm') {
-      //   // console.log('MAKE HTM BUTTON CLICKED');
-      //   evtType = 'mouseClick';
-      //   targetId = '#' + id;
-      // } else if (iptCodes.toString().includes(id.substring( 8, 13))) {
-      //   // console.log('KEY COMBO ENTERED FROM INPUT ELEMENT');
-      //   evtType = 'keyCombo';
-      //   targetId = '#dummy';
-      // } else {
-      //   console.log('ERROR in writeClipboard, unknown event type');
-      // }
+      // !VA cbhtm is the identifier code for Make HTML buttons, so the trigger event is a mouseclick
       if (id.substring( 8, 13) === 'cbhtm') {
         // console.log('MAKE HTM BUTTON CLICKED');
         evtType = 'mouseClick';
         targetId = '#' + id;
+      // !VA Otherwise, the trigger event is an ENTER+Modifier key combination
       } else {
-        console.log('KEY COMBO ENTERED FROM INPUT ELEMENT');
+        // console.log('KEY COMBO ENTERED');
         evtType = 'keyCombo';
         targetId = '#dummy';
       }
@@ -2699,8 +2686,6 @@ ${indent}<![endif]-->`;
       // !VA Create the clipboard object. Using var instead of let to indicated that this is non-native code.
       var clipboard = new ClipboardJS(targetId, {
         text: function(trigger) {
-          counter++;
-          console.log(`counter :>> ${counter};`);
           // !VA Destroy existing clipboard object, otherwise they will accumulate
           if (clipboard) {
             // console.log('Destroying...');
@@ -2723,17 +2708,15 @@ ${indent}<![endif]-->`;
         }
       });
 
-
-
       // !VA If the event was invoked by a key combination, access the dummy button element, populate the data-clipboard-text attribute with the clipboardStr, and click the button to create the clipboard object.
       if ( evtType === 'keyCombo') {  
         // !VA Access the dummybutton element
         dummybutton = document.querySelector('#dummy');
         // !VA Set the data-clipboard-text to clipboardStr
         dummybutton.setAttribute('data-clipboard-text', clipboardStr);
-        console.log('Clicking dummybutton...');
+        // console.log('Clicking dummybutton...');
         dummybutton.click();
-        // !VA Return the focus to the target input element, i.e. the id passed in the id argument - it was moved away by the dummy button click
+        // !VA If the trigger element was a text input, return the focus to the target input element, i.e. the id passed in the id argument - it was moved away by the dummy button click
         if (isTfd) { document.getElementById(id).focus(); }
       } 
     }
@@ -2923,17 +2906,16 @@ ${indent}<![endif]-->`;
 
       // !VA Called from eventHandler to initialize clipboard functionality
       doClipboard: function(evt) {
-        console.log(`doClipboard evt.target.id :>> ${evt.target.id};`);
         let targetType, clssList, targetid, modifierKey, iptCodes, isTfd;
         // !VA nodeDepth can have three values: 'imgNode', 'tdaNode', 'tblNode'
         targetid = evt.target.id;
-        console.log(`doClipboard targetid :>> ${targetid};`);
+        // console.log(`doClipboard targetid :>> ${targetid};`);
         // console.log('evt.target :>> ');
         // console.log(evt.target);
         iptCodes = ['class', 'altxt', 'loctn', 'anchr', 'width', 'heigt', 'bgclr', 'txclr', 'bdrad', 'bdclr', 'pdtop', 'pdrgt', 'pdbtm', 'pdlft', 'maxwd' ];
         // !VA If the 5-char identifier code at index 8 - 13 of the ID returns and empty string or is not in the list of valid identifier codes, then it is not a valid text input element id.
         evt.target.id.substring( 8, 13) === '' || !iptCodes.toString().includes( evt.target.id.substring( 8, 13 )) ? isTfd = false : isTfd = true;
-        console.log(`doClipboard isTfd :>> ${isTfd};`);
+        // console.log(`doClipboard isTfd :>> ${isTfd};`);
         // !VA Get current modifier key to variable modifierKey
         if (evt.shiftKey) { 
           modifierKey = 'shift';
@@ -2946,13 +2928,6 @@ ${indent}<![endif]-->`;
         }
         // !VA Identify the target element as Make HTML button, text input element, or Make CSS button. If a text input element is the target, then the event was invoked by an ENTER + modifierKey key combination. 
         // !VA classList is the classList of the target element, converted to a string to search.
-
-        // !VA Branch: 120320A
-        // !VA Now trying to implement combo key writeClipboard invocation outside of txfld elements.
-        console.log(`targetid.substring( 8, 13 ) :>> ${targetid.substring( 8, 13 )};`);
-
-
-
         clssList = evt.target.classList.toString();
         // !VA If the classList contains the cbhtm, txfld or cbcss class, set the appropriate targetType.
         // !VA The id represents a Make HTM Clip button
@@ -2968,9 +2943,8 @@ ${indent}<![endif]-->`;
           // !VA The console call below is in case another case to handle errors is needed.
           // console.log('ERROR in doClipboard - unknown target class');
         }
-
-        console.log(`targetType :>> ${targetType};`);
-        // !VA Run the clipboardJS routine dependin on the targetType. For makeHTMButton and enterKeyCombo, the second argument of the buildOutputNL call is nodeDepth, i.e. which nodes are output to the clipboard object: imgNode, tdaNode or tblNode. NOTE: This could be DRYer but I'm leaving it as is for transparency's sake.
+        // console.log(`targetType :>> ${targetType};`);
+        // !VA Run the clipboardJS routine depending on the targetType. For makeHTMButton and enterKeyCombo, the second argument of the buildOutputNL call is nodeDepth, i.e. which nodes are output to the clipboard object: imgNode, tdaNode or tblNode. NOTE: This could be DRYer but I'm leaving it as is for transparency's sake.
         switch(true) {
         case targetType === 'makeHTMButton' :
           // console.log(`CBHTML BUTTON CLICKED: targetid :>> ${targetid}`);
