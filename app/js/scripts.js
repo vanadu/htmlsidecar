@@ -3285,6 +3285,7 @@ ${indent}<![endif]-->`;
           el = document.querySelector(iptId);
           // !VA KEYBOARD HANDLERS
           addEventHandler(el,'input',handleTextInputEvent,false);
+          // !VA keydown handler removed from here, keydown now handled via event propagation on the #ccp element, see below.
           // addEventHandler(el,'keydown',handleKeydown,false);
           addEventHandler(el,'keyup',handleKeyup,false);
           addEventHandler(el,'focus',handleFocus,false);
@@ -3731,6 +3732,7 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from setupEventListeners change event. Collects pre-change and post-change padding values to generate delta which is used to restore padding dependencies to pre-change state before each change is implemented. This prevents accumulation of changes in curImg each time a padding value is entered.
     function handlePaddingChange(evt) {
+      console.log('handlePaddingChange running'); 
       let pAliases = [], pCurrent = [], pNew, pDeltaW;
       
       // !VA The value entered has already been error-checked in handleKeydown, so if it is invalid, the error will display and the cursor will stay in the field. But since handlePaddingChange is called directly from the change eventListener, an invalid value will sneak through here. So test the evt.target.value for NaN, and if it is, return out.
@@ -4358,6 +4360,9 @@ ${indent}<![endif]-->`;
     // !VA appController  
     // !VA Called from applyInputValue and handleMouseEvents. Writes imgViewerW, sPhonesW and lPhonesW to localStorage and calculates the adjacent side of the curImgW/curImgH input, then runs calcViewerSize to resize the dynamicElements containers. NOTE: This function does things that are done elsewhere and does other things that it shouldn't do. Revisit this at some point but for now it works.
     function updateCurrentImage(userInputObj) {
+      console.log('updateCurrentImage running'); 
+      console.log('updateCurrentImage userInputObj :>> ');
+      console.log(userInputObj);
       // !VA Initialize vars for curImgH and curImgW in order to calculate one based on the value of the other * Appobj.aspect.
       // let curImgH, curImgW;
       // !VA ES6 Destructure args into constants. userInputObj is passed in from the mouse/keyboard event handlers.
@@ -4632,6 +4637,42 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController private
+    // !VA Branch: 120420B
+    // !VA Resets the padding input fields to empty, toggles off the padding icon, resets curImg to pre-padding values, and restores dependent TDA & TBL Width input values to pre-padding state.
+    function resetPadding() {
+      console.log('resetPadding running'); 
+      let reflectArray = [], configObj = {}, imgInputObj = {};
+      // console.log(`Appobj.ccpTdaPdrgtTfd :>> ${Appobj.ccpTdaPdrgtTfd};`);
+      // console.log(`Appobj.ccpTdaPdlftTfd :>> ${Appobj.ccpTdaPdlftTfd};`);
+ 
+      // !VA imgInputObj is the appObjProp/evtTargetVal pair that will be passed to updateCurrentImage
+      imgInputObj.appObjProp = 'curImgW';
+      // !VA evtTargetVal is the sum of the curImg dimension plus the value of the Appobj padding width properties.
+      imgInputObj.evtTargetVal = Appobj.curImgW + Number(Appobj.ccpTdaPdrgtTfd) + Number(Appobj.ccpTdaPdlftTfd);
+      // !VA Update the current image with the values in imgInputObj to restore the curImg to its pre-padding dimensions. This also resets Appobj.curImgW.
+      appController.initUpdateCurrentImage(imgInputObj);
+      // !VA Set the TD Height input to the curImgH plus the sum of the Appobj lft/rgt input properties. No resizing of curImg is necessary here, since the TD height is independent of the curImg height.
+      Appobj.ccpTdaHeigtTfd = Appobj.ccpTdaWidthTfd = Appobj.ccpTdaPdrgtTfd = Appobj.ccpTdaPdlftTfd = Appobj.ccpTdaPdtopTfd = Appobj.ccpTdaPdbtmTfd = '';
+      // !VA Reset TBL W to Appobj.curImgW restored to pre-padding value, as set in updateCuurrentImg
+      Appobj.ccpTblWidthTfd = Appobj.curImgW; 
+      // !VA Set the reflect array for TD H, TD W and TBL W
+      reflectArray = [ 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdbtmTfd', 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
+      // !VA Unhighlight the TD Width and TD Height icons.
+      // !VA TODO: All actions with the 'active' class should be handled by a configCcp method.
+      document.querySelector(ccpUserInput.ccpTdaHeigtTfd.replace('tfd', 'ipt')).classList.remove('active');
+      document.querySelector(ccpUserInput.ccpTdaWidthTfd.replace('tfd', 'ipt')).classList.remove('active');
+      configObj = {
+        reflectAppobj: { reflect: reflectArray }
+      };
+      // !VA Run the config
+      UIController.configCCP( configObj );
+      // !VA Remove the active class from the padding icon, i.e. the event target.
+      // !VA NOTE: There should be a configCcp method for this.
+      document.getElementById('ccp-tda-padng-icn').classList.remove('active');
+
+    }
+
+    // !VA appController private
     // !VA Called from event handlers on CCP labels to remove any input field content, remove the 'active' class from the input element related to the clicked label icon, and remove ccp-conceal-ctn class from the Make CSS buttons.NOTE: evt.target.value will always be undefined because the target element is a label. To get a value, target the input element, i.e. the htmlFor of the target label. 
     function handleIconClick(evt) {
       console.log(`handleIconClick evt.target.id :>> ${evt.target.id};`);
@@ -4680,31 +4721,14 @@ ${indent}<![endif]-->`;
 
 
       } else {
-        console.log('handleIconClick PADDING');
 
-        // !VA This is where we need to add the padding width values back to Appobj.curImgW and remove the values from TD H and TD W
-        // !VA First, get padHeight an padWidth from current Appobj
-        // !VA This is the same as running handlePadding with appObjProp = ccpTdaPdrgtTfd - see if it can be replaced with that, but it works for now. 
-        let imgInputObj = {};
-        imgInputObj.appObjProp = 'curImgW';
-        imgInputObj.evtTargetVal = Appobj.curImgW + Number(Appobj.ccpTdaPdrgtTfd) + Number(Appobj.ccpTdaPdlftTfd);
-        appController.initUpdateCurrentImage(imgInputObj);
-        // !VA Set the TD Height input to the curImgH plus the sum of the Appobj lft/rgt input properties.
-        Appobj.ccpTdaHeigtTfd = Appobj.ccpTdaWidthTfd = Appobj.ccpTdaPdrgtTfd = Appobj.ccpTdaPdlftTfd = Appobj.ccpTdaPdtopTfd = Appobj.ccpTdaPdbtmTfd = '';
-        // !VA Reset TBL W to Appobj.curImgW restored to pre-padding value
-        Appobj.ccpTblWidthTfd = Appobj.curImgW; 
-        // !VA Set the reflect array for TD H, TD W and TBL W
-        reflectArray = [ 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdbtmTfd', 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTblWidthTfd' ];
-        // !VA Unhighlight the TD Width and TD Height icons - this should be done in the configCCP call
-        document.querySelector(ccpUserInput.ccpTdaHeigtTfd.replace('tfd', 'ipt')).classList.remove('active');
-        document.querySelector(ccpUserInput.ccpTdaWidthTfd.replace('tfd', 'ipt')).classList.remove('active');
-        configObj = {
-          reflectAppobj: { reflect: reflectArray }
-        };
-        // !VA Run the config
-        UIController.configCCP( configObj );
-        // !VA Remove the active class from the padding icon, i.e. the event target.
-        document.getElementById(evt.target.id).classList.remove('active');
+        // !VA Branch: 120420B
+        // !VA 
+        console.log('handleIconClick PADDING');
+        console.log(`evt.target.id :>> ${evt.target.id};`);
+        // !VA This element will ALWAYS be the padding icon, why pass the ID?
+        resetPadding();
+
       }
     }
 
@@ -5056,6 +5080,9 @@ ${indent}<![endif]-->`;
       Appobj.ccpTdaAlignRdo = 'left';
       Appobj.ccpTdaValgnRdo = 'top';
       
+
+      // !VA Branch: 120420B
+      // !VA The reason we don't reset the padding properties here is because we need these values to reset curImg in resetPadding. Running resetPadding will set the Appobj properties to empty. 
       // Appobj.ccpTdaPdtopTfd = '';
       // Appobj.ccpTdaPdrgtTfd = '';
       // Appobj.ccpTdaPdlftTfd = '';
@@ -5080,7 +5107,7 @@ ${indent}<![endif]-->`;
       // !VA reflectAppobj METHOD: set the array of elements whose Appobj properties above are to be written to the CCP DOM
       // !VA Why are there two of these? Commenting out the lower one for now.
       // reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd',  'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd',  'ccpTbwBgclrTfd' ];
-      reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdlftTfd', 'ccpTdaPdbtmTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd' ];
+      reflectArray = ['ccpImgClassTfd', 'ccpImgLoctnTfd', 'ccpImgExcldRdo', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpTblClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd' ];
 
       // !VA highlightIcon METHOD: Set the array of elements that should receive a highlight because their Appobj property indicates a preset value
       highlightArray = [ 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd' ];
@@ -5153,13 +5180,14 @@ ${indent}<![endif]-->`;
         Appobj.ccpTdaBdradTfd = '';
         Appobj.ccpTdaBdclrTfd = '';
         Appobj.ccpTblWidthTfd = '';
-        Appobj.ccpTdaPdtopTfd = '';
-        Appobj.ccpTdaPdrgtTfd = '';
-        Appobj.ccpTdaPdlftTfd = '';
-        Appobj.ccpTdaPdbtmTfd = '';
+        // Appobj.ccpTdaPdtopTfd = '';
+        // Appobj.ccpTdaPdrgtTfd = '';
+        // Appobj.ccpTdaPdlftTfd = '';
+        // Appobj.ccpTdaPdbtmTfd = '';
         // !VA reflectAppobj METHOD
         // Set the array of elements whose Appobj properties are to be reflected in CCP
-        reflectArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaTxcntTfd', 'ccpTblWidthTfd' ];
+        // reflectArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaTxcntTfd', 'ccpTblWidthTfd' ];
+        reflectArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaTxcntTfd', 'ccpTblWidthTfd' ];
         // !VA revealElements METHOD
         revealArray = fetchRevealArray('excld');
         revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn', 'ccpTdaOptnsRdo', 'ccpTdaTxcntTfd' ];
@@ -5187,6 +5215,8 @@ ${indent}<![endif]-->`;
         reflectAppobj: { reflect: reflectArray },
         revealElements: { caller: 'configExcld', revealType: 'config', revealArray: revealArray },
       };
+      // !VA Reset any padding entries and restore curImgW to the dimensions shown in the Inspector panel
+      resetPadding();
       // if ( option === 'incld') { configObj.revealReset = { alias: 'incld' }; }
       return configObj;
     }
@@ -5229,13 +5259,9 @@ ${indent}<![endif]-->`;
       // !VA Handle the TD Options CCP configurations
       switch(true) {
       case option === 'basic':
+
         // !VA For the TD Options basic and swtch, use the default CCP configuration
-
         configObj = configDefault( alias, option );
-        // !VA Set the flag to conceal items in revealArray
-        // !VA Branch: 111920A
-        // !VA Why is the revealFlag being set here? The flag property is set explicitly in revealMkcss below.
-
         // !VA Branch: 112240A
         // !VA Conceal the TBW options and turn off the Wrapr checkbox.
         // !VA NOTE: This should perhaps be in configDefault.
@@ -5243,11 +5269,10 @@ ${indent}<![endif]-->`;
 
         mkcssArray = [ 'ccpImgMkcssGrp', 'ccpTdaMkcssGrp', 'ccpTblMkcssGrp' ]
         configObj.revealMkcss =  {caller: 'configOptns', flag: true, revealArray: mkcssArray };
-        // !VA Branch: 111920B
-
-        // delete configObj.revealReset;
-        // console.log('configObj :>> ');
-        // console.log(configObj);
+        console.log('configOptns basic configObj :>> ');
+        console.log(configObj);
+        console.log('configOptns basic Appobj :>> ');
+        console.log(Appobj);
         break;
 
       case option === 'iswap':
@@ -5287,6 +5312,7 @@ ${indent}<![endif]-->`;
         // !VA Branch: 102220A
         // !VA Should wrapper be shown by default?
         selectCheckbox( true, 'ccpTblWraprChk');
+
         // !VA disableElements METHOD: disableFlag is always true. This isn't a toggle. Elements stay disabled until a different option with a different config is selected.
         // !VA Only disabling IMG class for now.
         disableFlag = false;
@@ -5438,6 +5464,9 @@ ${indent}<![endif]-->`;
       default:
         console.log('ERROR in configOptns - Appobj property not recognized');
       } 
+
+      // !VA Reset any padding entries and restore curImgW to the dimensions shown in the Inspector panel
+      resetPadding();
       // !VA Get the highlightArray of all input elements to apply the highlight to any input elements whose Appobj property is not empty
       highlightArray = getInputArray();
       // !VA Add the highlightIcon property to configObj and return
