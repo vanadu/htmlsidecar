@@ -347,11 +347,11 @@ var Witty = (function () {
     // !VA I'm not sure if this is still true. I think now the default reflect configuration comes from configDefault.
     // !VA If called from populateAppobj, returns the value of text input fields as hard-coded in the HTML. Otherwise, called by configCCP, which receives an array of aliases whose corresponding CCP element value is set to its corresponding Appobj value. 
     function reflectAppobj( caller, reflectArray) { 
-      console.log(`reflectAppobj caller :>> ${caller}; reflectArray  :>> `);
-      console.log(reflectArray);
+      // console.log(`reflectAppobj caller :>> ${caller}; reflectArray  :>> `);
+      // console.log(reflectArray);
       var Appobj = appController.getAppobj();
-      console.log('reflectAppobj Appobj :>> ');
-      console.log(Appobj);
+      // console.log('reflectAppobj Appobj :>> ');
+      // console.log(Appobj);
       // console.log('reflectAppobj running'); 
       let el, isInit, toolbarAliases;
       // !VA Loop through all the aliases in the reflectArray parameter
@@ -4453,7 +4453,7 @@ ${indent}<![endif]-->`;
     }
 
     // !VA appController  
-    // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values which are passed in from calcViewerSize, then runs writedynamicElementsDOM(Appobj, viewportH, appH) to size the containers. IMPORTANT: This is also where the Appobj properties for the Table Width and Table Wrapper Width input elements are initialized. NOTE: The complete Appobj is passed here although only imgViewer and curImg values are needed to resize the dynamicElements. 
+    // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values set in calcViewerSize, then runs writedynamicElementsDOM(Appobj, viewportH, appH) to size the containers. IMPORTANT: This is also where the Appobj properties for the Table Width and Table Wrapper Width input elements are initialized. By default, ccpTblWidthTfd and ccpTbwWidthTfd are set to curImgW and imgViewerW. However, some options override this default. For instance ccpTdaOptnsRdo = 'vmlbt' requires that the TBL Width be equal to the TDA Width because, if a 1px-wide gradient is used, the TD container needs to accommodate that. See the condition on Appobj.ccpTdaOptnsRdo below. 
     function resizeContainers()  {
       // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values which are passed in from calcViewerSize.
       // !VA Initial height is 450, as explicitly defined in calcViewerSize. TOo much hassle to try and get the value as defined in the CSS programmatically.
@@ -4481,16 +4481,23 @@ ${indent}<![endif]-->`;
       // !VA DOM Access to apply dimensions for the dynamicElements elements, i.e. the current image and its containers. Write dimensions of dynamicElements.curImg, dynamicElements.imgViewer and the height of dynamicElements.imgViewport and dynamicElements.appContainer. Width of dynamicElements.imgViewport and dynamicElements.appContainer is static and is sized to the actual application area width.
       // !VA NOTE: This function only exists because Appobj has no property for viewportH or appH. This is a one-off call, so having a separate function for it is kind of wasteful. See if it can be done another way.
       UIController.writedynamicElementsDOM(Appobj, viewportH, appH);
-      // !VA Set Appobj table width and wrapper table width now.
-      Appobj.ccpTblWidthTfd = Appobj.curImgW;
+
+
+      // !VA Set Appobj table width and wrapper table width. This has to happen before initCCP, otherwise Appobj won't initialize with values for table width and table wrapper width. 
+      // !VA If the TDA Option is 'vmlbt' override the default and set TBL Width to Appobj.ccpTdaWidthTfd. This allows the parent table to accommodate widths greater than the actual curImgW, i.e. if a 1px gradient is used for the button image.
+      if ( Appobj.ccpTdaOptnsRdo === 'vmlbt') {
+        Appobj.ccpTblWidthTfd = Appobj.ccpTblWidthTfd;
+      // !VA In every other case but vmlbt, set the TBL Width to curImgW
+      } else {
+        Appobj.ccpTblWidthTfd = Appobj.curImgW;
+      }
+      // !VA Set the TBW Width to the device width, i.e. imgViewerW
       Appobj.ccpTbwWidthTfd = Appobj.imgViewerW;
       
       // !VA True is the flag to stash instead of retrieve, tableWidth and tableWrapper are the rest parameters containing the key/value pairs to stash.;
       // !VA NOTE: Not implementing this yet
       // UIController.stashAppobjProperties(true, tableWidth, tableWrapperWidth);
-      
-      // !VA Called in resizeContainers after writedynamicElements, takes parameter list of CCP ID/value pairs, and updates the DOM with the passed parameters. It is the CCP DOM counterpart to updateAppobj, I think, since it only updates those DOM elements whose ID/Value passed in, rather than a blanket DOM update of all DOM. Renamed from writeDOMElementValues. writeCcpDOM takes rest parameters. Pass multiple arguments as arrays of key/value pairs with the cross-object identifier (the value in the ccpUserInput object) as key and the Appobj value as value. 
-      // !VA NOTE: This has to happen before initCCP, othewise Appobj won't initialize with values for table width and table wrapper width. 
+
       // !VA Create the aliasArray to pass to configCCP. Include highlightIcon method - reflectAppobj adds those values to the TBL Width and TBW Width inputs so those icons have to be highlighted
       aliasArray = [ 'ccpTblWidthTfd', 'ccpTbwWidthTfd'];
       // !VA reflectAppobj implements the Appobj properties in CCP elements so that the CCP reflects the current state of Appobj
@@ -4499,7 +4506,8 @@ ${indent}<![endif]-->`;
         highlightIcon: { highlight: aliasArray }
       };
       UIController.configCCP( configObj );
-      console.log(`resizeContainers Appobj.ccpTdaWidthTfd :>> ${Appobj.ccpTdaWidthTfd};`);
+      // console.log('resizeContainers Appobj :>> ');
+      // console.log(Appobj);
       // !VA Write the inspectors based on Appobj values
       UICtrl.writeInspectors(Appobj);
     }
