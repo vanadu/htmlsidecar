@@ -4210,13 +4210,15 @@ ${indent}<![endif]-->`;
             appMessCode = 'err_cell_wider_than_parent_table';
           }
           break;
-        // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply - exclude rdoCcpTdExcludeimg from the error condition
+        // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply - exclude ccpImgExcldRdo from the error condition
         case (appObjProp === 'ccpTdaHeigtTfd') :
+          console.log('Mark1');
 
           if (Appobj.ccpImgExcldRdo === 'excld') {
             isErr = false;
+          } else if ( Appobj.ccpTdaOptnsRdo === 'vmlbt' ) {
+            isErr = false;
           } else if ( retVal < Appobj.curImgH ) {
-
             isErr = true;
             appMessCode = 'err_cell_smaller_than_image';
           } else {
@@ -5254,6 +5256,9 @@ ${indent}<![endif]-->`;
     function configOptns( alias, option ) {
       let revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray, highlightArray, mkcssArray;
       let configObj = {};
+
+        // !VA Reset any padding entries and restore curImgW to the dimensions shown in the Inspector panel
+      resetPadding();
       
       // !VA Handle the TD Options CCP configurations
       switch(true) {
@@ -5432,7 +5437,7 @@ ${indent}<![endif]-->`;
         Appobj.ccpTdaBdradTfd = 4;
         Appobj.ccpTdaAlignRdo = 'center';
         Appobj.ccpTdaValgnRdo = 'middle';
-        Appobj.ccpTblWidthTfd = Appobj.curImgW;
+        Appobj.ccpTblWidthTfd = Appobj.ccpTdaWidthTfd;
         Appobj.ccpTbwWidthTfd = Appobj.imgViewerW;
         Appobj.ccpTblMaxwdTfd = '';
         Appobj.ccpTbwMaxwdTfd = '';
@@ -5470,8 +5475,7 @@ ${indent}<![endif]-->`;
         console.log('ERROR in configOptns - Appobj property not recognized');
       } 
 
-      // !VA Reset any padding entries and restore curImgW to the dimensions shown in the Inspector panel
-      resetPadding();
+
       // !VA Get the highlightArray of all input elements to apply the highlight to any input elements whose Appobj property is not empty
       highlightArray = getInputArray();
       // !VA Add the highlightIcon property to configObj and return
