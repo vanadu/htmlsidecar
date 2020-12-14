@@ -38,7 +38,7 @@ var Witty = (function () {
   // var testbut = document.querySelector('#testme');
   // function runMe(evt) {
   //   console.log('runMe running');
-  //   testbut.classList.add('active')
+
   // }
 
   // !VA MUTATIONOBSERVER
@@ -59,19 +59,44 @@ var Witty = (function () {
   // const mutationObserver = new MutationObserver(callback);
   // mutationObserver.observe(mainNode, { attributes: true });
 
+  // !VA Fail -- you cannot programmatically open the Open dialog. It requires a user-initiated action.
+  // function clickMe() {
+  //   console.log('clickMe running'); 
+  //   var foo = document.getElementById("files");
+  //   console.log('foo :>> ');
+  //   console.log(foo);
+  //   foo.addEventListener("click", function() {
+  //     console.log('Clicked');
+  //   }, false);
+  //   setTimeout(function() {
+  //     console.log('Artificial click:');
+  //     foo.click(); // <==================== The artificial click
+  //   }, 1000);
+  //   // function display(msg) {
+  //   //   var p = document.createElement('p');
+  //   //   p.innerHTML = String(msg);
+  //   //   document.body.appendChild(p);
+  //   // }
+  // }
+
+  // !VA ispopen
+  document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(function(){ 
+      // UIController.toggleISP(true);
+    }, 10);
+  });
+
+
 
   var testbut = document.querySelector('#testme');
   // var testbut2 = document.querySelector('#testme2');
-  var addMe = function() {
-    console.log('event listener');
-  };
+  // var addMe = function() {
+  //   console.log('event listener');
+  // };
 
-  testbut.onclick = function() {
-    // console.log('someVar is: ' + someVar);
-    // someVar ?  testbut2.addEventListener('click', addMe, false) : testbut2.removeEventListener('click', addMe, false);
-    var Attributes = CBController.initGetAttributes();
-    const getImgType = Attributes.imgType;
-    console.log('getImgType is: ' + getImgType);
+  testbut.onclick = function(evt) {
+    console.log('testbut clicked');
+    UIController.toggleISP(evt);
   };
 
 
@@ -129,17 +154,19 @@ var Witty = (function () {
 
     // !VA UIController: toolButton ID Strings
     const toolbarElements = {
+      btnTbrImgSelector: '#btn-tbr-imgselector',
       iptTbrImgViewerW: '#ipt-tbr-imgviewerw',
-      btnTbrIncr50: '#btn-tbr-incr50',
+      // btnTbrIncr50: '#btn-tbr-incr50',
       btnTbrIncr10: '#btn-tbr-incr10',
       btnTbrIncr01: '#btn-tbr-incr01',
       iptTbrCurImgW: '#ipt-tbr-curimgw',
       iptTbrCurImgH: '#ipt-tbr-curimgh',
       btnTbrDecr01:'#btn-tbr-decr01',
       btnTbrDecr10: '#btn-tbr-decr10',
-      btnTbrDecr50: '#btn-tbr-decr50',
+      // btnTbrDecr50: '#btn-tbr-decr50',
       iptTbrSPhonesW: '#ipt-tbr-sphonesw',
       iptTbrLPhonesW: '#ipt-tbr-lphonesw',
+      btnTbrReload: '#btn-tbr-reload'
     };
 
     // !VA UIController: dynamicElements
@@ -152,12 +179,28 @@ var Witty = (function () {
 
     // !VA UIController: staticContainers
     const staticContainers = {
+      imageSelector: '#isp',
+      fileSelector: '#file-selector',
+      imageLoader: '#image-loader',
       dropArea: '#drop-area',
       tbrContainer: '#toolbar-container',
       ccpContainer: '#ccp',
       msgContainer: '#msg-container',
       appBlocker: '#app-blocker',
       hdrIsolateApp: '.header-isolate-app'
+    };
+
+    const ISPElements = {
+      ispThumbsLst: '#isp-thumbs-list',
+      ispRemoveThumbsIpt: '#isp-remove-thumbs-ipt',
+      ispClearThumbsIpt: '#isp-clear-thumbs-ipt',
+      ispAddThumbsIpt: '#isp-add-thumbs-ipt',
+      ispCloseIpt: '#isp-close-ipt'
+    };
+
+    const FSPElements = {
+      fspSelectImagesIpt: '#fsp-select-images-ipt',
+
     };
     
     // !VA  OVERHAUL NEW: UIController: ccpUserInput ID Strings
@@ -236,7 +279,6 @@ var Witty = (function () {
       iptCcpImgIncludeWidthHeightLabel: '#ccp-img-include-width-height-label',
     };
       
-    // !VA OVERHAUL NEW: Build HTML Clipboard Buttons. 
     // !VA NOTE: The suffix on the alias is Btn and the suffix on the element ID is ipt. Consider fixing this at some point
     const iptCcpMakeClips = {
       // !VA Make HTML Tag Buttons
@@ -257,15 +299,363 @@ var Witty = (function () {
       ccpTblCblphIpt: '#ccp-tbl-cblph-ipt',
     };
 
-    
     // !VA Appmessage elements
     const appMessageElements = {
       tipContent: '#tip-content',
       msgContent: '#msg-content',
       errContent: '#err-content'
     };
+    
+    // !VA ispfunc Image Selector Panel (ISP) Functions
+    // !VA =====================================
 
-    // !VA UIController   
+    // !VA UIController private
+    // !VA Branch: 120820B
+    // !VA Reload the page
+    function reloadPage() {
+      location.reload();
+    }
+
+    // !VA UIController private
+    // !VA Branch: 121320A
+    // !VA Clear thumbnails from ISP
+    function ispClearThumbs() {
+      // !VA Clear the innerHTML of the thumbnail parent container to remove all nodes.
+      document.querySelector(ISPElements.ispThumbsLst).innerHTML = '';
+    }
+
+    // !VA UIController private
+    // !VA Branch: 121420C
+    // !VA Sort the thumbnail items based on the filename in the caption node
+    function ispSortThumbs( thumbItems ) {
+
+      // !VA Get the file name from the p caption element of the current node in the loop
+      function getFilename(el) {
+        let fName, nodeIndex;
+        nodeIndex = el.id.substring( 16, 18 );
+        fName = document.getElementById('thumb-filename-' + nodeIndex).innerHTML;
+        return fName;
+      }
+
+      // !VA Convert thumbItems to array and sort by fileName.
+      var sorted = [].slice.call(thumbItems).sort(function(a, b) {
+        var textA = getFilename(a).toLowerCase();
+        var textB = getFilename(b).toLowerCase();
+    
+        return textA.localeCompare(textB);
+      });
+      // console.log('sorted :>> ');
+      // console.log(sorted);
+      // console.log(`sorted.length :>> ${sorted.length};`);
+      // console.log(`thumbItems.length :>> ${thumbItems.length};`);
+
+      // !VA Branch: 121420C
+      // !VA This works, but for some reason the width and height attributes on the thumb image aren't being applied to the first two elements in the thumb items array after appending. 
+      // !VA Branch: 121420D
+      // !VA Not sure this is fixed, keep an eye on it
+
+      // !VA Append the sorted thumbItems back to the parent
+      for (let i = 0; i < thumbItems.length; i++) {
+        // console.log('thumbItems[i] is: ' +  thumbItems[i]);
+        // console.log('sorted[i] :>> ');
+        // console.log(sorted[i]);
+        // console.log('thumbItems[i] :>> ');
+        // console.log(thumbItems[i]);
+        // !VA 
+        thumbItems[i].parentNode.appendChild(sorted[i]);
+      }
+    }
+
+    // !VA UIController private
+    // !VA Branch: 121320B
+    // !VA Delete duplicates - called from ispMakeThumbs. Loop through each element in thumbs and compare all other elements in thumbs against that el for duplicate src attribute (i.e. the binary image data). Remove duplicates from thumbs and delete the id attribute, it will need to be reassigned based on the updated thumbsUl.
+    function removeDuplicateThumbs (thumbUl ) {
+      // console.log('removeDuplicateThumbs thumbUl :>> ');
+      // console.log(thumbUl);
+      let items1 =[], items2 = [], thumbItems, src1, src2, counter;
+
+      // !VA This loop 1) removes duplicates by comparing the img.src attribute of each element against the img.src attribute of each other element without comparing each element against itself. So if the element count in the first loop equals the element count in the second loop, that comparison is excluded (i.e. counter1 !== i). Then, if two elements' source attributes are equal (i.e. the image is identical) then another counter is set and all duplicates except the first occurrence ( counter2 > 1 ) are removed. 
+      thumbItems = thumbUl.children;
+      for (let i = 0; i < thumbItems.length; i++) {
+        counter = -1;
+        // console.log('thumbItems[i] is: ' +  thumbItems[i]);
+        items1[i] = thumbItems[i].querySelectorAll('*');
+        // console.log('items1[i] :>> ');
+        // console.log(items1[i]);
+        // console.log('items1[i][2].src :>> ');
+        // console.log(items1[i][2].src);
+        src1 = items1[i][2].src;
+        for (const el of thumbItems) {
+          counter++;
+          // console.log(`counter :>> ${counter};`);
+          // console.log(`i :>> ${i};`);
+          if (counter !== i) {
+            items2[counter] = el.querySelectorAll('*');
+            // console.log('items2[counter] :>> ');
+            // console.log(items2[counter]);
+            src2 = items2[counter][2].src;
+            // console.log(`src2 :>> ${src2};`);
+            if (src1 === src2) {
+              console.log('Duplicate...');
+              el.innerHTML = '';
+              el.parentNode.removeChild(el);
+            }
+          }
+        }
+
+        // !VA Assign IDs to thumbItems and its children
+        thumbItems[i].id = `thumb-list-item-${getIdCount(i)}`;
+        items1[i] = thumbItems[i].querySelectorAll('*');
+        items1[i][1].id = `thumb-bg-${getIdCount(i)}`;
+        items1[i][2].id = `thumb-${getIdCount(i)}`;
+        items1[i][3].id = `thumb-filename-${getIdCount(i)}`;
+        items1[i][4].id = `thumb-filesize-${getIdCount(i)}`;
+        items1[i][5].id = `thumb-overlay-${getIdCount(i)}`;
+        console.log(`items1[i][3].innerHTML :>> ${items1[i][3].innerHTML};`);
+
+      }
+
+      // !VA Branch: 121420C
+      // !VA Sort the thumbnails before returning to ispMakeThumbs to display.
+      ispSortThumbs(thumbItems);
+  
+      
+      return thumbUl;
+    }
+
+    // !VA Branch: 121320C
+    // !VA Get the id count for ISP thumb elements
+    // !VA l is thumbUl.children.length as described below
+    function getIdCount(l) {
+      let idCount;
+      idCount = (l+1).toString().padStart(2, '0');
+      return idCount;
+    }
+
+    // !VA UIController private
+    // !VA Branch: 121320C
+    // !VA Toggle checkbox to enter/exit remove thumbs mode, which displays the thumb overlay with the X box in the top right corner. Clicking the overlay runs ispRemoveThumb to remove the selected thumbnail. 
+    function ispRemoveThumbsMode(evt) {
+      console.log('ispRemoveThumbsMode running'); 
+      console.log(`evt.target.id :>> ${evt.target.id};`);
+      let overlays, removeThumbsChx;
+      // !VA Get the overlays to a collection
+      overlays =document.getElementsByClassName('thumb-overlay');
+      // !VA Get the checkbox
+      removeThumbsChx = document.querySelector(ISPElements.ispRemoveThumbsIpt);
+      console.log(`removeThumbsChx.checked :>> ${removeThumbsChx.checked};`);
+      // !VA For each overlay, add a click event listener and display if the checkbox is checked.
+      for (let i = 0; i < overlays.length; i++) {
+        if (removeThumbsChx.checked) {
+          overlays[i].style.display = 'flex';
+        } else {
+          overlays[i].style.display = 'none';
+        }
+        document.querySelector('#' + overlays[i].id).addEventListener('click', ispRemoveThumb,false);
+      }
+    }
+
+    // !VA Branch: 121420A
+
+    function resetRemoveThumbsMode() {
+      console.log('resetRemoveThumbsMode running'); 
+      document.querySelector(ISPElements.ispRemoveThumbsIpt).checked = false;
+      var overlays =document.getElementsByClassName('thumb-overlay');
+      for (const el of overlays) {
+        el.style.display = 'none';
+      }
+    }
+
+
+    function ispRemoveThumb(evt) {
+      // console.log('ispRemoveThumb running'); 
+      let toRemove;
+      console.log('ispRemoveThumb evt.target :>> ');
+      console.log(evt.target);
+      // !VA Get the file index of the event target and append it to the thumb-list-item prefix to get the element corresponding to the clicked thumb overlay, i.e. the element to remove from the ISP.
+      toRemove = document.querySelector('#thumb-list-item-' + evt.target.id.substring( 14, 16 ));
+      // !VA Remove the element
+      toRemove.innerHTML = '';
+      toRemove.parentNode.removeChild(toRemove);
+    }
+
+    // !VA UIController private
+    // !VA Branch: 121120A
+    // !VA Build the Image Selector thumbnails and return to handleFileSelect. The nodes are built and added to the DOM live here, so there's no need to return anything to handleFileSelect. IMPORTANT: This is a sync call, i.e. the thumbnails haven't been loaded yet, hence no image natural dimensions can be queried here. This only returns the metadata and source data that was provided by the FileReader object in handleFileSelect.
+    function ispMakeThumbs(imgObjArray) {
+      // console.log('ispMakeThumbs imgObjArray :>> ');
+      // console.log(imgObjArray);
+      // console.log(`imgObjArray.length :>> ${imgObjArray.length};`);
+      let fileSize, contentDiv, thumbDiv, overlayDiv, thumbImg, pFilename, pFilesize;
+      let el, thumbs, thumbUl, thumbLi;
+      
+      // !VA Create the initial row
+      thumbUl = document.querySelector('#isp-thumbs-list');
+
+
+      // !VA Branch: 121420A
+      // !VA 
+      // thumbUl.style.display = 'none';
+
+      // !VA Loop through the imgObjArray array and build thumbnail nodes
+      for (let i = 0; i < imgObjArray.length; i++) {
+        // console.log(`i :>> ${i}; fileName :>> ${imgObjArray[i].fileName}; fileSize :>> ${imgObjArray[i].fileSize}`);
+
+        // !VA Convert the filesize to approximate KB values
+        fileSize =  `~${(imgObjArray[i].file.size / 1000).toFixed(0)} KB`;
+        // !VA Create all the elements that will be output as thumbnails: list item, thumbnail metadata content wrapper, thumbnail wrapper, thumbnail image, filename and filesize.
+        thumbLi = document.createElement('li');
+        contentDiv = document.createElement('div');
+        thumbDiv = document.createElement('div');
+        overlayDiv = document.createElement('div');
+        thumbImg = document.createElement('img');
+        pFilename = document.createElement('p');
+        pFilesize = document.createElement('p');
+        // !VA Populate the current list item
+        thumbLi.classList.add('thumb-list-item');
+        // !VA Append the list item to the parent list element in the HTML
+        thumbUl.appendChild(thumbLi);
+        // !VA Append the content wrapper to the list item
+        thumbLi.appendChild(contentDiv);
+        contentDiv.classList.add('thumb-content');
+        // !VA Create the thumbnail image wrapper class
+        thumbDiv.classList.add('thumb-bg');
+        // !VA The click target of the selectThumbnail function is the parent div (thumb-bg) of the thumbnail image. Using the image as click target won't work because the image only partially covers the thumbnail area.
+        // !VA Create src attribute and class for the thumbnail image 
+        thumbImg.classList.add('thumb-img');
+        thumbImg.src = imgObjArray[i].imgData;
+        // !VA Append the thumbnail image to the content wrapper
+        thumbDiv.appendChild(thumbImg);
+        // !VA Append the thumbnail image wrapper to the thumbnail content wrapper
+        contentDiv.appendChild(thumbDiv);
+
+        // !VA Add class and HTML text to the p caption elements.
+        pFilename.classList.add('thumb-filename');
+        pFilename.innerHTML = imgObjArray[i].file.name;
+        pFilesize.classList.add('thumb-filesize');
+        // !VA Write the filesize to the p caption element
+        pFilesize.innerHTML = `${fileSize}`;
+        // !VA Append the p caption elements to the content wrapper
+        contentDiv.appendChild(pFilename);
+        contentDiv.appendChild(pFilesize);
+        // !VA Add class to overlayDiv
+        overlayDiv.classList.add('thumb-overlay');
+        // !VA Add the overlayDiv as last element of contentDiv
+        contentDiv.appendChild(overlayDiv);
+      }
+      // !VA Once the nodes are created, we can use the onload method to get natural width and natural height attributes of the selected images
+      thumbs = document.getElementsByClassName('thumb-img');
+
+
+      // !VA Branch: 121420C
+      // !VA Sorting has to happen in removeDuplicateThumbs before thumbUl is returned and maybe needs a callback
+
+      // !VA Remove any duplicate thumbs from thumbUl. Duplicates can come from users inadvertently adding duplicates when using the Add thumbnails button in ISP. This function removes the duplicates in the thumbUl node, adds IDs and sorts the thumbUl children, 
+      thumbUl = removeDuplicateThumbs( thumbUl );
+
+
+      // !VA Images are as yet unloaded so dimension attributes can't be queried. So load the images now, get their natural dimensions and append that data to the existing nodes.
+      for (let i = 0; i < thumbs.length; i++) {
+        // !VA If the current element is loaded
+        thumbs[i].onload = function() {
+          // !VA width/height properties are set to 'auto' in CSS and are overridden here, whereby the adjacent dimension retains 'auto'. Ensures that thumbs render within the 90px container
+          thumbs[i].naturalWidth > thumbs[i].naturalHeight ? thumbs[i].style.width = '85px' : thumbs[i].style.height = '85px';
+          // !VA el is the p caption displaying the filesize
+          el = document.querySelector(`#thumb-filesize-${getIdCount(i)}`);
+
+          if (el) {
+            // !VA Append the natural width and height to the filesize in the caption
+            el.innerHTML = el.innerHTML + `&nbsp;&nbsp;|&nbsp;&nbsp;${thumbs[i].naturalWidth} X ${thumbs[i].naturalHeight}`;
+          }
+        };
+      }
+
+      // !VA Branch: 121420A
+      // !VA 
+      // thumbUl.style.display = 'inline-block';
+      // console.log('ispMakeThumbs thumbs :>> ');
+      // console.log(thumbs);
+
+      for (let i = 0; i < thumbUl.children.length; i++) {
+        thumbUl.children[i].style.display = 'inline-block';
+        (function (i) {
+          setTimeout(function () {
+            // console.log('timer...');
+            // console.log(`thumbUl.children[i].id :>> ${thumbUl.children[i].id};`);
+            // console.log('thumbUl.children[i] :>> ');
+            // console.log(thumbUl.children[i]);
+            thumbUl.children[i].classList.add('active');
+          }, 35 * i);
+        })(i);
+      }
+    }
+    // !VA /ispMakeThumbs
+
+    // !VA UIController private
+    // !VA Branch: 121020A Moved and renameed selectThumbnaild from appController
+    // !VA 
+    function ispSelectThumb(evt) {
+      // !VA Branch: 120920A
+      // !VA evt.target is the parent div of the thumbnail image, otherwise if the image is narrow the click will miss it and not be captured.
+      console.log(`selectThumbnail evt.target.id :>> ${evt.target.id};`);
+      let id, theImg, theContainer;
+      id = evt.target.id;
+      // !VA If the click target is a parent div of a thumbnail
+
+      if ( id.substring( 0, 9) === 'thumb-bg-') {
+
+        // document.querySelector(inspectorElements.insFilename).textContent = Appobj.fileName = fileName;
+        // !VA Branch: 120920A
+        // !VA Get the filename
+        // console.log('evt.target.parentNode.children[1].innerHTML :>> ');
+        // console.log(evt.target.parentNode.children[1].innerHTML);
+        // !VA To get the filename of the selected thumbnail, access the p caption element in buildImageSelector. That is where the File object information was passed when the files were selected/dropped. The filename was stored in the pFilename node, which is the second child of the parent of the click event. So the filename is in the innerHTML of the evt.target.parentNode.children[1].
+
+        // !VA Branch: 121120A
+        // !VA How to write to Appobj from outside appController? Need to write the filename...but it appears to be written elsewhere, so...keep an eye on it.
+        // document.querySelector(inspectorElements.insFilename).textContent = Appobj.fileName = evt.target.parentNode.children[1].innerHTML;
+        document.querySelector(inspectorElements.insFilename).textContent = evt.target.parentNode.children[1].innerHTML;
+
+        // !VA theContainer is the image container in #main-img where images are displayed.
+        theContainer = document.querySelector('#cur-img-container');
+
+
+        if (theContainer.children[0]) { 
+          console.log('Exists');
+          theContainer.removeChild(theContainer.children[0]);
+        }
+        // !VA Clone the thumbnail, which is the first child of the click target div. If it is not cloned, the thumbnail will move from the Image Selector to the main-img container and disappear from the Image Selector
+        theImg = evt.target.children[0].cloneNode(true);
+        // !VA Add theImg to the image container on the imgViewer
+        theContainer.appendChild(theImg);
+        // !VA Branch: 120920A
+        // !VA Hide the image loader page.  
+        // !VA NOTE: THis should be done with configCcp
+        document.querySelector(staticContainers.imageLoader).style.display = 'none';
+        // !VA Close the Image Selector
+        UIController.toggleISP(false);
+        // !VA Change the id of the cloned thumbnail to cur-img so that the element alias dynamicElements.curImg refers to it
+        theImg.id = 'cur-img';
+        // !VA Set width/style.width and height/style.height to the natural dimensions of the image.
+        theImg.width = theImg.naturalWidth;
+        theImg.style.width = theImg.naturalWidth + 'px';
+        theImg.height = theImg.naturalHeight;
+        theImg.style.height = theImg.naturalHeight + 'px';
+        // document.querySelector(staticContainers.imageLoader).style.display = 'none';
+        // !VA  Show the toolbar
+        // !VA TODO: Make function
+        document.querySelector(staticContainers.tbrContainer).style.display = 'flex';
+        appController.initCalcViewerSize(true);
+
+      } else {
+        console.log('not thumb');
+      }
+    }
+    // !VA /ispSelectThumb
+
+    // !VA END ISP FUNCTIONS
+
+    // !VA UIController private
     // !VA Called from writeInspectors. Evaluate which Inspectors should be flagged with alerts for having too low a resolution for retina devices
     function evalInspectorAlerts(Appobj) {
       // !VA init inspector and flagged inspector lists
@@ -292,7 +682,7 @@ var Witty = (function () {
       UIController.writeInspectorAlerts(flaggedInspectors);
     }
 
-    // !VA UIController   
+    // !VA UIController private
     // !VA Not sure why I removed the tooltipTarget argument, but keeping it for reference
     // function showAppMessages(appMessContainerId, tooltipTarget) {
     function showAppMessages(appMessContainerId ) {
@@ -303,7 +693,7 @@ var Witty = (function () {
       } 
     }
 
-    // !VA UIController   
+    // !VA UIController private
     // !VA Not sure why the tooltipTarget was included, but it's not referenced, so removing for now.
     // function hideAppMessages(appMessContainerId, tooltipTarget) {
     function hideAppMessages(appMessContainerId) {
@@ -312,7 +702,7 @@ var Witty = (function () {
       document.querySelector(appMessContainerId).classList.remove('active');
     }
 
-    // !VA UIController   
+    // !VA UIController private
     // !VA TODO: Determine final location for getAspectRatio
     // !VA Calc the apsect ratio - putting this here for now until it's decided where it needs to live. It's currently needed in appController for Appd... but can live in UIController    once Appd... is deprecated.
     function getAspectRatio (var1, var2) {
@@ -374,7 +764,6 @@ var Witty = (function () {
             // return retVal;
           // !VA Otherwise, set the element value to the current Appobj value.
           } else {
-            // console.log(`Mark 2 alias :>> ${alias};`);
             el.value = Appobj[ alias ];
           }
         } else {
@@ -825,6 +1214,7 @@ var Witty = (function () {
         }
       } 
     }
+
     // !VA END CCP FUNCTIONS
 
     // !VA UIController public functions
@@ -845,6 +1235,12 @@ var Witty = (function () {
       },
       getDynamicRegionIDs: function() {
         return dynamicElements;
+      },
+      getISPElementIDs: function() {
+        return ISPElements;
+      },
+      getFSPElementIDs: function() {
+        return FSPElements;
       },
       getStaticRegionIDs: function() {
         return staticContainers;
@@ -920,12 +1316,11 @@ var Witty = (function () {
 
         // !VA Make sure the tbrContainer is off and the dropArea is on.
         // !VA TODO: Make function
-        document.querySelector(staticContainers.dropArea).style.display = 'flex';
+        document.querySelector(staticContainers.imageLoader).style.display = 'flex';
         document.querySelector(staticContainers.tbrContainer).style.display = 'none';
         document.querySelector(inspectorElements.btnToggleCcp).style.display = 'none';
 
       },
-
 
       // !VA UIController public
       // !VA  This is where the DOM write in evalToolbarInputs and updateAppObj used to happen
@@ -1100,20 +1495,112 @@ var Witty = (function () {
         // console.log(Appobj);
       },
 
+      // !VA UIController public
+      // !VA Capture ISP events from appController event handler and pass to respective UIController handler
+      captureISPEvents: function (evt) {
+        let alias;
+        // !VA Add the hash to convert the id to alias
+        alias = '#' + evt.target.id;
+        // console.log(`captureISPEvents alias :>> ${alias};`);
+        // console.log(`tarId.substring( 0, 9) :>> ${tarId.substring( 0, 9)};`);
+        // !VA Click events
+        switch(true) {
+        // !VA Toolbar button toggle ISP button
+        case alias === toolbarElements.btnTbrImgSelector : 
+          console.log('btn-tbr-imgselector clicked');
+          UIController.toggleISP(evt);
+          break;
+        case alias === toolbarElements.btnTbrReload : 
+          console.log('btn-tbr-imgselector clicked');
+          reloadPage(evt);
+          break;
+        // !VA ISP Thumbnail
+        case alias.substring( 1, 10) === 'thumb-bg-': 
+          // console.log('thumb-bg- clicked');
+          ispSelectThumb(evt);
+          break;
+        // !VA ISP Remove thumbs button
+        case alias === ISPElements.ispRemoveThumbsIpt :
+          console.log('isp-remove-thumbs-ipt clicked'); 
+          ispRemoveThumbsMode(evt);
+          break;
+        // !VA ISP Clear thumbs button
+        case alias === ISPElements.ispClearThumbsIpt :
+          console.log('isp-clear-thumbs-ipt clicked'); 
+          ispClearThumbs(evt);
+          break;
+        // !VA ISP Close button
+        case alias === ISPElements.ispCloseIpt :
+          // console.log('isp-close-ipt clicked'); 
+          UIController.toggleISP(evt);
+          break;
+        default:
+          // code block
+        } 
+      }, 
+
+      initISPMakeThumbs: function(imgObjArray) {
+        ispMakeThumbs(imgObjArray);
+      },
+
+      // !VA UIController public
+      // !VA Control the ISP display either from the toolbar button or other functions. arg is either true/open or false/close or an Event object. This function tests for an event id, and if detected, the ISP display is toggled.
+      toggleISP: function(arg) {
+        // console.log(`toggleISP arg :>> ${arg}`);
+        // console.log(`typeof(arg) :>> ${typeof(arg)};`);
+        let isp, ccp;
+        isp = document.querySelector(staticContainers.imageSelector);
+        ccp = document.querySelector(staticContainers.ccpContainer);
+
+        // !VA If the argument is a boolean, then open/close the ISP based on the true/false value.
+        if (typeof(arg) === 'boolean') { 
+          // console.log('toggleISP boolean');
+          if (arg) {
+            isp.classList.add('active');
+            if (ccp.classList.contains('active')) { ccp.classList.remove('active'); } 
+          } else {
+            isp.classList.remove('active');
+            resetRemoveThumbsMode();
+          }
+        // !VA If the argument is an Event object that returns an event id, then toggle the ISP display on/off.
+        } else if (typeof(arg) === 'object') {
+          // console.log(`toggleISP arg.target.id :>> ${arg.target.id};`);
+          if (arg.target.id === 'isp-close-ipt') { 
+            isp.classList.remove('active');
+            // !VA Branch: 121020A
+            // !VA clear image selector contents
+            // clearImageSelector();
+            // !VA Branch: 121420A
+            resetRemoveThumbsMode();
+          } else if (arg.target.id === 'btn-tbr-imgselector' || arg.target.id === 'testme' ) {
+            isp.classList.contains('active') ?  isp.classList.remove('active') : isp.classList.add('active'), ccp.classList.remove('active') ; 
+          } else {
+            console.log('toggleISP - unknown arg');
+          }
+        }
+        // !VA isp = Image Selector Panel, ccp = Clipboard Control Panel
+      },
 
       // !VA UIController public
       // !VA The toggle argument is a boolean flag to indicate whether to actually toggle the CCP on and off or just to return the state. Don't forget that Appobj doesn't exist here, so don't try to log it. True means toggle it, false means just return the state
       toggleCcp: function(toggle) {
         // !VA NOTE: All this does now is toggle the CCP on and off or return the toggle state
         let ccpState;
+        let ccp, isp;
+        isp = document.querySelector(staticContainers.imageSelector);
+        ccp = document.querySelector(staticContainers.ccpContainer);
         // !VA If the toggle argument is true, toggle the CCP on and off
         if (toggle) {
-          document.querySelector(staticContainers.ccpContainer).classList.toggle('active');
+          ccp.classList.toggle('active');
           // !VA NOTE: Adding the clipboard button active class to this - it should have an alias 
           document.querySelector('#btn-toggle-ccp').classList.toggle('active');
         }
         // !VA If the CCP is displayed, return true, otherwise false
         document.querySelector(staticContainers.ccpContainer).classList.contains('active') ? ccpState = true : ccpState = false;
+        // !VA Branch: 120920D
+        // !VA If the isp is open when the ccp is opened, close the isp
+        if (ccpState && isp.classList.contains('active')) { isp.classList.remove('active');}
+
         return ccpState;
       },
 
@@ -1122,7 +1609,6 @@ var Witty = (function () {
       displayAppMessages: function (isShow, appMessContainerId, tooltipTarget) {
         isShow ? showAppMessages(appMessContainerId, tooltipTarget) : hideAppMessages(appMessContainerId, tooltipTarget);
       },
-
 
       // !VA UIController public
       // !VA Hide  the default 'No Image' value displayed when the app is opened with no image and display the Inspector values for the current image, show the Clipboard button and call evalInspectorAlerts to determine which Inspector labels should get dimension alerts (red font applied). 
@@ -1134,7 +1620,7 @@ var Witty = (function () {
 
         // !VA Hide the dropArea
         // !VA TODO: Make function
-        document.querySelector(staticContainers.dropArea).style.display = 'none';
+        document.querySelector(staticContainers.imageLoader).style.display = 'none';
         // Write the inspectorElements
         document.querySelector(inspectorElements.insFilename).innerHTML = `<span class='pop-font'>${Appobj.fileName}</span>`;
         // !VA Inspectors: Hide all the P elements with the class 'no-image' that contain the default 'No Image' text 
@@ -2666,7 +3152,6 @@ ${indent}<![endif]-->`;
     // !VA CBController private
     // !VA Function to write clipboard content on mouse click. There is a separate IIFE function for writing clipboard triggered by keyboard combinations but that is a workaround for ClipboardJS non-support for keyboard triggers. Best to keep these two functions separate for now. NOTE: For Lint errors caused by non-access of clipboard.js. 
     function writeClipboard(id, clipboardStr) {
-      // console.log(`Mark1 writeClipboard id :>> ${id};`);
       var counter = 0;
       let targetId, iptCodes, isTfd, evtType, dummybutton;
       // !VA iptCodes are the 5-char codes at index 8-13 of the ID that indicate the input type. This is included for error checking only, clipboardJS doesn't need to know the code, only the id of event target of the doClipboard call.
@@ -3012,6 +3497,8 @@ ${indent}<![endif]-->`;
     const inspectorValues = UICtrl.getInspectorValuesIDs();
     const inspectorLabels = UICtrl.getInspectorLabelsIDs();
     const dynamicElements = UICtrl.getDynamicRegionIDs();
+    const ISPElements = UICtrl.getISPElementIDs();
+    const FSPElements = UICtrl.getFSPElementIDs();
     const staticContainers = UICtrl.getStaticRegionIDs();
     const toolbarElements = UICtrl.getToolButtonIDs();
     const ccpUserInput = UICtrl.getCcpUserInputIDs();
@@ -3165,19 +3652,48 @@ ${indent}<![endif]-->`;
       }
     }
 
-    // !VA appController  
+    // !VA appController private
     var setupEventListeners = function() {
 
-      //DRAG AND DROP PROCESSING START
-      // Event Listeners for Drag and Drop
-      // !VA dropArea is the screen region that will accept the drop event 
-      var dropArea = document.querySelector(dynamicElements.appContainer);
+      let dropArea;
+      // !VA Branch: 120820B
+      // !VA IMAGE SELECTOR
+      // !VA ==============
+      // !VA Drag and drop handlers
+      dropArea = document.querySelector(dynamicElements.appContainer);
       dropArea.addEventListener('dragover', handleDragOver, false);
-    
       // !VA Initiates the FileReader function to get the dropped image data
-      dropArea.addEventListener('drop', handleFileSelect, false);
-      // Drag and Drop Listener 
-      //DRAG AND DROP PROCESSING END
+      dropArea.addEventListener('drop', handleFileSelect2, false);
+
+      // !VA ispevt Image Selector Panel and File Selector Panel Event Handlers
+      // !VA ===================================================================
+      // !VA  - Events that create or edit ISP thumbnail nodes or manipulate the ISP UI are passed to UIController.captureISPEvents. 
+      // !VA Branch: 121120A
+      // !VA Need a function that traps ipt elements so lbl elements don't get passed to captureISPEvents
+      // !VA Image Selector Panel click events
+      addEventHandler(document.querySelector(staticContainers.imageSelector),'click',UIController.captureISPEvents,false);
+
+      // !VA Branch: 121120A
+      // !VA Doesn't work, the clicked element is passed, not the parent
+      // document.querySelector('#isp-thumbs-list').addEventListener('click', UIController.captureISPEvents, false);
+
+
+      // // !VA File Selector Panel click events
+      addEventHandler(document.querySelector(staticContainers.fileSelector),'click',UIController.captureISPEvents,false);
+      // // !VA Toolbar Image Selector button click
+      addEventHandler(document.querySelector(toolbarElements.btnTbrImgSelector),'click',UIController.captureISPEvents,false);
+      // !VA Toolbar reload page button click
+      addEventHandler(document.querySelector(toolbarElements.btnTbrReload),'click',UIController.captureISPEvents,false);
+      // !VA NOTE: ispRemoveThumbs event listeners are in ispMakeThumbs
+
+
+
+      // // !VA Events that run appController FileReader methods via handleFileSelect2
+      // // !VA File Selector Select Files input element
+      addEventHandler(document.querySelector(FSPElements.fspSelectImagesIpt),'change',handleFileSelect2,false);
+      // // !VA fspclick - ISP Add thumbnails input element
+      addEventHandler(document.querySelector('#isp-add-thumbs-ipt'),'change',handleFileSelect2,false);
+      
 
       // !VA Add the click event listener for creating the isolate popup
       var runIsolateApp = document.querySelector(staticContainers.hdrIsolateApp);
@@ -3195,7 +3711,10 @@ ${indent}<![endif]-->`;
 
 
       // !VA Add click and blur event handlers for clickable toolbarElements 
-      const tbClickables = [ toolbarElements.btnTbrIncr50, toolbarElements.btnTbrIncr10, toolbarElements.btnTbrIncr01, toolbarElements.btnTbrDecr50, toolbarElements.btnTbrDecr10, toolbarElements.btnTbrDecr01  ];
+      // const tbClickables = [ toolbarElements.btnTbrIncr50, toolbarElements.btnTbrIncr10, toolbarElements.btnTbrIncr01, toolbarElements.btnTbrDecr50, toolbarElements.btnTbrDecr10, toolbarElements.btnTbrDecr01  ];
+      // !VA Branch: 120620A
+      // !VA Removed increment and decrement 50 elements from toolbar
+      const tbClickables = [ toolbarElements.btnTbrIncr10, toolbarElements.btnTbrIncr01, toolbarElements.btnTbrDecr10, toolbarElements.btnTbrDecr01  ];
       for (let i = 0; i < tbClickables.length; i++) {
         // !VA convert the ID string to the object inside the loop
         tbClickables[i] = document.querySelector(tbClickables[i]);
@@ -3346,7 +3865,350 @@ ${indent}<![endif]-->`;
     };
     // !VA EVENT HANDLING END
 
+
+
+
+
+    // !VA appController private
+    // !VA Build the Image Selector thumbnails and return to handleFileSelect. The nodes are built and added to the DOM live here, so there's no need to return anything to handleFileSelect. IMPORTANT: This is a sync call, i.e. the thumbnails haven't been loaded yet, hence no image natural dimensions can be queried here. This only returns the metadata and source data that was provided by the FileReader object in handleFileSelect.
+    // !VA Branch: 121020A
+    function buildImageSelector( imgObjArray ) {
+      // console.log('buildImageSelector imgObjArray :>> ');
+      // console.log(imgObjArray);
+      // !VA Branch: 120920B
+      // console.log('imgObjArray[0].file.size :>> ');
+      // console.log(imgObjArray[0].file.size);
+
+
+      let idCount, fileSize, contentDiv, thumbDiv, thumbImg, pFilename, pFilesize;
+      let el, elems, thumbUl, thumbLi;
+      let foo, curImages;
+
+      curImages = document.getElementById('isp-thumbs-list');
+
+      function getIdCount(i) {
+        idCount = (i+1).toString().padStart(2, '0');
+        return idCount;
+      }
+
+      // !VA Create the initial row
+      thumbUl = document.querySelector('#isp-thumbs-list');
+
+      // !VA Loop through the imgObjArray array and build thumbnail nodes
+      for (let i = 0; i < imgObjArray.length; i++) {
+        // console.log(`i :>> ${i}; fileName :>> ${imgObjArray[i].fileName}; fileSize :>> ${imgObjArray[i].fileSize}`);
+        
+        // !VA idCount is the 2-digit string indicating the file count that is appended to the element's id starting with the loop iterator plus 1.
+
+        // !VA Convert the filesize to approximate KB values
+        fileSize =  `~${(imgObjArray[i].file.size / 1000).toFixed(0)} KB`;
+
+        // !VA Create all the elements that will be output as thumbnails: list item, thumbnail metadata content wrapper, thumbnail wrapper, thumbnail image, filename and filesize.
+        thumbLi = document.createElement('li');
+        contentDiv = document.createElement('div');
+        thumbDiv = document.createElement('div');
+        thumbImg = document.createElement('img');
+        pFilename = document.createElement('p');
+        pFilesize = document.createElement('p');
+
+        // !VA Populate the current list item
+        thumbLi.id = `thumb-list-item-${getIdCount(i)}`;
+        thumbLi.classList.add('thumb-list-item');
+        // !VA Append the list item to the parent list element in the HTML
+        thumbUl.appendChild(thumbLi);
+        // !VA Append the content wrapper to the list item
+        thumbLi.appendChild(contentDiv);
+        contentDiv.classList.add('thumb-content');
+        // !VA Create the thumbnail image wrapper class
+        thumbDiv.classList.add('thumb-bg');
+        // !VA The click target of the selectThumbnail function is the parent div of the thumbnail image, otherwise if the image is narrow the click will miss it and not be captured.
+        thumbDiv.id = `thumb-bg-${getIdCount(i)}`;
+        // !VA Create src attribute, id and class for the thumbnail image 
+        thumbImg.id = `thumb-${getIdCount(i)}`;
+        thumbImg.classList.add('thumb-img');
+        thumbImg.src = imgObjArray[i].imgData;
+        // !VA Append the thumbnail image to the content wrapper
+        thumbDiv.appendChild(thumbImg);
+        // !VA Append the thumbnail image wrapper to the thumbnail content wrapper
+        contentDiv.appendChild(thumbDiv);
+        // !VA Add id, class and HTML text to the p caption elements.
+        pFilename.id = `thumb-filename-${getIdCount(i)}`;
+        pFilename.classList.add('thumb-filename');
+        pFilename.innerHTML = imgObjArray[i].file.name;
+        pFilesize.classList.add('thumb-filesize');
+        // !VA Add an id to the pFilesize caption. This allows us to append the natural dimensions to it after onload, see the onload function at the foot of this function
+        pFilesize.id = `thumb-filesize-${getIdCount(i)}`;
+        // !VA Write the filesize to the p caption element
+        pFilesize.innerHTML = `${fileSize}`;
+        // !VA Append the p caption elements to the content wrapper
+        contentDiv.appendChild(pFilename);
+        contentDiv.appendChild(pFilesize);
+
+      }
+
+      // !VA Once the nodes are created, we can use the onload method to get natural width and natural height attributes of the selected images
+      elems = document.getElementsByClassName('thumb-img');
+      for (let i = 0; i < elems.length; i++) {
+        // !VA If the current element is loaded
+        elems[i].onload = function() {
+          // !VA width/height properties are set to 'auto' in CSS and are overridden here, whereby the adjacent dimension retains 'auto'. Ensures that thumbs render within the 90px container
+          elems[i].naturalWidth > elems[i].naturalHeight ? elems[i].style.width = '90px' : elems[i].style.height = '90px';
+          // !VA el is the p caption displaying the filesize
+          el = document.querySelector(`#thumb-filesize-${getIdCount(i)}`);
+          // !VA Append the natural width and height to the filesize in the caption
+          el.innerHTML = el.innerHTML + `&nbsp;&nbsp;|&nbsp;&nbsp;${elems[i].naturalWidth} X ${elems[i].naturalHeight}`;
+        };
+      }
+    }
+
+    function selectThumbnail(evt) {
+      // !VA Branch: 120920A
+      // !VA evt.target is the parent div of the thumbnail image, otherwise if the image is narrow the click will miss it and not be captured.
+      console.log(`selectThumbnail evt.target.id :>> ${evt.target.id};`);
+      let id, theImg, theContainer;
+      id = evt.target.id;
+      // !VA If the click target is a parent div of a thumbnail
+
+      if ( id.substring( 0, 9) === 'thumb-bg-') {
+
+        // document.querySelector(inspectorElements.insFilename).textContent = Appobj.fileName = fileName;
+        // !VA Branch: 120920A
+        // !VA Get the filename
+        // console.log('evt.target.parentNode.children[1].innerHTML :>> ');
+        // console.log(evt.target.parentNode.children[1].innerHTML);
+        // !VA To get the filename of the selected thumbnail, access the p caption element in buildImageSelector. That is where the File object information was passed when the files were selected/dropped. The filename was stored in the pFilename node, which is the second child of the parent of the click event. So the filename is in the innerHTML of the evt.target.parentNode.children[1].
+        document.querySelector(inspectorElements.insFilename).textContent = Appobj.fileName = evt.target.parentNode.children[1].innerHTML;
+
+        // !VA theContainer is the image container in #main-img where images are displayed.
+        theContainer = document.querySelector('#cur-img-container');
+
+
+        if (theContainer.children[0]) { 
+          console.log('Exists');
+          theContainer.removeChild(theContainer.children[0]);
+        }
+        // !VA Clone the thumbnail, which is the first child of the click target div. If it is not cloned, the thumbnail will move from the Image Selector to the main-img container and disappear from the Image Selector
+        theImg = evt.target.children[0].cloneNode(true);
+        // !VA Add theImg to the image container on the imgViewer
+        theContainer.appendChild(theImg);
+        // !VA Branch: 120920A
+        // !VA Hide the image loader page.  
+        // !VA NOTE: THis should be done with configCcp
+        document.querySelector(staticContainers.imageLoader).style.display = 'none';
+        // !VA Close the Image Selector
+        UIController.toggleISP(false);
+        // !VA Change the id of the cloned thumbnail to cur-img so that the element alias dynamicElements.curImg refers to it
+        theImg.id = 'cur-img';
+        // !VA Set width/style.width and height/style.height to the natural dimensions of the image.
+        theImg.width = theImg.naturalWidth;
+        theImg.style.width = theImg.naturalWidth + 'px';
+        theImg.height = theImg.naturalHeight;
+        theImg.style.height = theImg.naturalHeight + 'px';
+        // document.querySelector(staticContainers.imageLoader).style.display = 'none';
+        // !VA  Show the toolbar
+        // !VA TODO: Make function
+        document.querySelector(staticContainers.tbrContainer).style.display = 'flex';
+        calcViewerSize(true);
+
+      } else {
+        console.log('not thumb');
+      }
+    }
+
+    function loadImage(theFile) {
+      console.log('loadImage theFile :>> ');
+      console.log(theFile);
+      let f;
+      // !VA Branch: 120920A
+      // !VA From handleFileSelect
+      // If a file is already being displayed, i.e. Appobj.fname is true, then remove that image to make room for the next image being dropped
+      // !VA Remove the current #cur-img from the DOM. This has to be done in a separate function call, I'm not sure why handleFileSelect doesn't see #cur-img even though it is in the DOM at this point
+      // !VA Remove the current image if one exists so the user can drop another one over it and reboot the process rather than having to refresh the browser and drop another image. This way, all the current settings are maintained. If they want new settings they can refresh the browser.
+      document.querySelector('#cur-img-container').parentNode.removeChild(document.querySelector('#cur-img-container'));
+
+      f = theFile;
+      // !VA From handleFileSelect
+      var reader = new FileReader();
+      // Closure to capture the file information.
+      reader.onload = (function(theFile) {
+        return function(e) {
+          // Create the image object        
+          var curImg = new Image();
+          // !VA create the id
+          curImg.id = 'cur-img';
+          // !VA assign the blob in e.target.result to the source of the image. the onload function ensures that the blob is loaded before the
+          // curImg.src = e.target.result;
+          curImg.src = e.target.result;
+          let fileName;
+          // Read the insFilename of the FileReader object into a variable to pass to Appobj function, otherwise the blob has no name
+          fileName = theFile.name;
+
+          // !VA Branch: 120920C
+          // !VA TODO: This should only write to the DOM and Appobj if a single file was selected/dropped. Otherwise, the filename is retrieved from the pFilename node in selectThumbnail.
+          document.querySelector(inspectorElements.insFilename).textContent = Appobj.fileName = fileName;
+
+          // !VA Hide the dropArea - not sure if this is the right place for this.
+          // !VA TODO: Make function
+          // !VA Branch: 120620A
+          document.querySelector(staticContainers.imageLoader).style.display = 'none';
+          // !VA  Once the current image has loaded, initialize the dinViewers by querying the current image properties from UICtrl and passing them to writeInspectors.
+          function initInspectors() { 
+            // !VA  Initialize the variable that will contain the new image's height, width, naturalHeight and naturalWidth
+            // !VA Set a short timeout while the blob loads, then run the onload function before displaying the image and getting its properties. This is probably overkill, but noone will notice the 250ms anyway and better safe then no-workie. But now that the image is loaded, we can display it and get its properties.
+            setTimeout(() => {
+              // Once the blob is loaded, show it and get its data
+              curImg.onload = (function() {
+              // !VA Hide the drop area.
+              // !VA TODO: Make function
+              // !VA Branch: 120620A
+                document.querySelector(staticContainers.imageLoader).style.display = 'none';
+                // !VA  Show the toolbar
+                // !VA TODO: Make function
+                document.querySelector(staticContainers.tbrContainer).style.display = 'flex';
+                // !VA Display the current image
+                // !VA TODO: Make function
+                curImg.style.display = 'block';
+                // !VA Calculate the viewer size based on the loaded image. Thetrue parameter indicates that a new image is being initialized
+                calcViewerSize(true);
+              })();
+              
+              // !VA Timeout of 250 ms while the blob loads.
+            }, 250);
+          }
+
+          // !VA First, write the new curImg object to the DOM
+          function initImgToDOM(curImg, callback) {
+
+            // VA! The callback function allows access of image properties. You can't get image properties from a FileReader object -- it's a binary blob that takes time to load, and by the time it's loaded all the functions that get its properties have run and returned undefined. Temporary solution: hide the image object for 250 ms, then show it and get the properties -- by then it should have loaded. There is a better way to do this with promises but that will have to be for later.
+            // !VA Create a div in the DOM
+            var curImgDiv = document.createElement('div');
+            // !VA Assign the new div an id that reflects its purpose
+            curImgDiv.id = 'cur-img-container';
+            // Insert cur-img-container into the existing main-image inside the main-image div.
+            document.getElementById('main-image').insertBefore(curImgDiv, null);
+            // !VA insert the new curImg into the new cur-img container
+            document.getElementById('cur-img-container').insertBefore(curImg, null);
+            // Create the image object and read in the binary image from the FileReader object.
+            // This allows access of image properties. You can't get image properties from a FileReader object -- it's just a blob' 
+            // !VA Hide the DOM element while the blob loads.
+            document.querySelector(dynamicElements.curImg).style.display = 'none';
+            callback(curImg);		
+          }
+          // !VA Call the callback function that writes the new image to the DOM.
+          initImgToDOM(curImg, initInspectors);
+        };
+
+      })(f);
+      // Read in the image file as a data URL.
+      reader.readAsDataURL(f);
+      
+    }
+
     // !VA FILEREADER OBJECT PROCESSING
+
+    // appController private
+    function handleFileSelect2(evt) {
+      console.log('handleFileSelect2 running'); 
+      // console.log(`handleFileSelect2 evt.target.id :>> ${evt.target.id};`); 
+      // !VA files is the object in evt.target/evt.dataTransfer used to hold the data from a file select or drag operation - returns the file list. f is variable for iterating through the files array.
+      let files, f;
+      // !VA count is the file count, which is passed to the callback funciton from reader.onload. imgObj contains the image dataURL and metadata from FileReader. imgObjArray is the array of imgObj objects passed to buildImageSelector. action is the evt.type. fileCount is the number of files in the files array.
+      let count, imgObj = {}, imgObjArray = [], action, fileCount;
+      // Loop through the FileList and render image files as thumbnails. NOTE: next line disables the eslint no conditional assignment rule. Assigning f in the loop declaration is an eslint no-no. Explore alternatives to this construction.
+      count = -1;
+
+      // !VA Branch: 120920A
+      // !VA Determine if drop or select event
+      evt.type === 'change' ? action = 'selected' : action = 'dropped';
+      
+      if (action === 'dropped') {
+        evt.stopPropagation();
+        evt.preventDefault();
+        // !VA returned from drop operation
+          files = evt.dataTransfer.files; // FileList object.
+        } else if (action === 'selected') {
+        // !VA returned from File Upload dialog selection in browser
+        files = evt.target.files;
+      } else {
+        console.log('ERROR in handleFileSelect2 - unknown action');
+      }
+      fileCount = files.length;
+      // console.log(`handleFileSelect2 action :>> ${action}; `);
+      // console.log(`Action :>> ${action};  fileCount :>> ${fileCount}; files :>>`);
+      // console.dir(files);
+      
+
+      for (var i = 0; f = files[i]; i++) {
+        // !VA If the current file (f) in files is an image, continue
+        if (f.type.match('image.*')) {
+          // !VA Get the thumbnails, each iteration of the files array builds new FileReader object that reads the binary image data as a dataURL
+          var reader = new FileReader();
+          // !VA This closure captures the file information and data, builds the HTML container to display the image in 
+          reader.onload = (function(theFile) {
+            // console.log('theFile :>> ');
+            // console.log(theFile);
+            return function(e) {
+              // !VA count will be the total file count filelist. It is used to determine the last item in the loop in callback and buildImageSelector
+              count++;
+              // !VA callback required because FileReader is async
+              callback(count, e.target.result, theFile);
+            };
+
+          })(f);
+
+          // !VA Read in the image file as a data URL.
+          reader.readAsDataURL(f);
+        // !VA If not an image file, write to console.
+        } else {
+          console.log('NOT IMAGE FILE');
+        }
+      }
+      // !VA Callback to build imgObj, imgObjArray and call buildImageSelector
+      function callback(count, result, theFile) {
+        // console.log(`callback count :>> ${count}; fileName :>> ${fileName}; fileSize :>> ${fileSize}`);
+        // !VA Build the imgObj to push onto imgObjArray, which is passed to buildImageSelector
+        imgObj = {
+          fileCount: count,
+          file: theFile,
+          imgData: result
+        };
+        // !VA Push imgObj to imgObjArray 
+
+        // !VA Branch: 121020A
+        // !VA This is where we need to prevent adding duplicates to the image selector
+        // let foo, curImages;
+        // curImages = document.getElementById('isp-thumbs-list');
+        // console.log('curImages.children[0] :>> ');
+        // console.log(curImages.children[0]);
+
+        imgObjArray.push(imgObj);
+        // imgObjArray =  removeDupes(imgObjArray);
+        // !VA If the loop iterator equals the number of files in the file list, then call buildImageSelector. Prevents it being called for each iteration.
+        if ( i === imgObj.fileCount + 1 ) {
+          // !VA Branch: 120920A
+          // !VA Multiple images - open image selector
+          if ( imgObj.fileCount > 0 ) {
+            UIController.toggleISP(true);
+            // buildImageSelector(imgObjArray);
+
+            // !VA Branch: 121320A
+            UIController.initISPMakeThumbs(imgObjArray);
+
+
+          } else {
+            // !VA Branch: 120920A
+            // !VA Single image
+            console.log('single image - load image');
+            // console.log('files[0] :>> ');
+            // console.log(files[0]);
+            loadImage(files[0]);
+
+          }
+        }
+      }
+      // !VA Open the Image Selector
+    }
+
     // !VA appController  : hfs - FILEREADER OBJECT PROCESSING
     // !VA Includes all the FileReader processing for loading the image the user has dropped in the dropZone as blob, and initializing the image in the DOM.  
     function handleFileSelect(evt) {
@@ -3358,8 +4220,9 @@ ${indent}<![endif]-->`;
       // !VA Can't remember what this does running    
       evt.stopPropagation();
       evt.preventDefault();
+
       //dataTransfer object is used to hold object data during a drag operation
-      var files = evt.dataTransfer.files; // FileList object.
+      let files = evt.dataTransfer.files; // FileList object.
       // files is a FileList of File objects. List some properties.
       //Note that the File objects are blob objects that include the parameter
       // type, which indicates the type of file. 
@@ -3367,7 +4230,7 @@ ${indent}<![endif]-->`;
       // var output = [];
       // !VA get the number of files selected
       
-      var f =  files[0];
+      let f =  files[0];
       // !VA this for loop would be used if we were using the entire filelist instead of just one
       // a single dropped file
       // for (var i = 0, f; f = files[i]; i++) {
@@ -3402,7 +4265,8 @@ ${indent}<![endif]-->`;
 
           // !VA Hide the dropArea - not sure if this is the right place for this.
           // !VA TODO: Make function
-          document.querySelector(staticContainers.dropArea).style.display = 'none';
+          // !VA Branch: 120620A
+          document.querySelector(staticContainers.imageLoader).style.display = 'none';
           // !VA  Once the current image has loaded, initialize the dinViewers by querying the current image properties from UICtrl and passing them to writeInspectors.
           function initInspectors() { 
             // !VA  Initialize the variable that will contain the new image's height, width, naturalHeight and naturalWidth
@@ -3412,7 +4276,8 @@ ${indent}<![endif]-->`;
               curImg.onload = (function() {
               // !VA Hide the drop area.
               // !VA TODO: Make function
-                document.querySelector(staticContainers.dropArea).style.display = 'none';
+              // !VA Branch: 120620A
+                document.querySelector(staticContainers.imageLoader).style.display = 'none';
                 // !VA  Show the toolbar
                 // !VA TODO: Make function
                 document.querySelector(staticContainers.tbrContainer).style.display = 'flex';
@@ -4212,7 +5077,6 @@ ${indent}<![endif]-->`;
           break;
         // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply - exclude ccpImgExcldRdo from the error condition
         case (appObjProp === 'ccpTdaHeigtTfd') :
-          console.log('Mark1');
 
           if (Appobj.ccpImgExcldRdo === 'excld') {
             isErr = false;
@@ -4403,6 +5267,8 @@ ${indent}<![endif]-->`;
         // !VA Populate the dynamicElements properties in Appobj on new image initialization and get localStorage values if set.
         UIController.populateAppobj(Appobj, 'app');
       }
+      console.log('calcViewerSize Appobj :>> ');
+      console.log(Appobj);
       // !VA If initializing a new image, use the naturalWidth and naturalHeight. If updating via user input, use the display image and height, curImgW and curImgH. 
       // !VA TODO: See if the if condition below has any effect, if not, remove
       // !VA TODO: actualW and actualH should be replaced globally with curImgW and curImgH - the actualW/actualH condition isn't relevant anymore. Test first.
@@ -4685,7 +5551,7 @@ ${indent}<![endif]-->`;
     // !VA appController private
     // !VA Called from event handlers on CCP labels to remove any input field content, remove the 'active' class from the input element related to the clicked label icon, and remove ccp-conceal-ctn class from the Make CSS buttons. NOTE: evt.target.value will always be undefined because the target element is a label. To get a value, target the input element, i.e. the htmlFor of the target label. 
     function handleIconClick(evt) {
-      console.log(`handleIconClick evt.target.id :>> ${evt.target.id};`);
+      // console.log(`handleIconClick evt.target.id :>> ${evt.target.id};`);
       let appObjProp, evtTargetId, reflectArray, mkcssArray, highlightArray, revealArray, mkcssProp;
       let configObj = {};
       // !VA get the id of the target label element
@@ -4732,8 +5598,8 @@ ${indent}<![endif]-->`;
 
         // !VA Branch: 120420B
         // !VA 
-        console.log('handleIconClick PADDING');
-        console.log(`evt.target.id :>> ${evt.target.id};`);
+        // console.log('handleIconClick PADDING');
+        // console.log(`evt.target.id :>> ${evt.target.id};`);
         // !VA This element will ALWAYS be the padding icon, why pass the ID?
         resetPadding();
 

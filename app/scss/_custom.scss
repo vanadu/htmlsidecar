@@ -97,6 +97,12 @@ button:disabled  {
   cursor: not-allowed;
 }
 
+// !VA Branch: 123060A
+// VA! Processing multiple files
+.thumb { width: 50px; height: auto;}
+
+
+
 .output {
   border: 1px solid magenta;
 }
@@ -321,10 +327,15 @@ input[type=number] {
   // display: none;
   align-items: center;
   justify-content: space-between;
-  width: 90%;
+  width: 94%;
   margin: 0 auto;
   padding: 0;
   list-style-type: none;
+  // border: 1px solid blue;
+  li {
+    margin: 0;
+    padding: 0;
+  }
   .toolbar-but {
     width: 50px;
     height: 30px;
@@ -345,6 +356,19 @@ input[type=number] {
     font-style: italic;
     line-height: 18px;
     text-align: center;
+  }
+  .toolbar-icn {
+    display: block;
+    position: relative;
+    width: 56px;
+    height: 32px;
+    margin: 0;
+    padding: 0;
+    border: none !important;
+    outline: none !important;
+    &:hover {
+      cursor: pointer;
+    }
     // border: 1px solid magenta;
   }
   // VA! Reboot: deleted img selector, moved img styling to class .toolbar-but
@@ -363,6 +387,18 @@ input[type=number] {
   #btn-tbr-decr10 { background-image: url('../img/decr10-button.png'); }
   #btn-tbr-decr50 { background-image: url('../img/decr50-button.png'); }
   
+  #btn-tbr-imgselector {
+    background: url('../img/image-selector-button.png') no-repeat;
+    background-size: contain;
+    margin-right: 10px !important;
+  }
+
+  #btn-tbr-reload {
+    background: url('../img/toolbar-reload.png') no-repeat;
+    background-size: contain;
+
+  }
+
   #ipt-tbr-imgviewerw {
     width: 80px;
     padding-left: 35px;
@@ -580,6 +616,8 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   // !VA Width and height should only be set programmatically
   transform:  translateY(-50%) translateX(-50%);
   background: #e1e1e1 url('../img/html-email-icon-white.png') repeat;
+  z-index: -1;
+
 }
 
 #main-image {
@@ -592,49 +630,124 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   #main-img {
     border: 1px dotted #959595;
   }
-  // DROP AREA
-  #drop-area {
-    // VA! display: flex is set programmatically
-    display: flex;
-    position: relative;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    width: 600px;
-    min-height: 400px;
-    border: 2px dashed #bbb;
-    border-radius: 10px;
-    .witty {
-      color: #6a6a6a;
-      font-size: 110%;
+}
+
+// !VA Branch: 120620A
+// VA! Child of main-image
+#image-loader {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 450px;
+  // border: 1px solid magenta;
+}
+
+#file-selector {
+  display: block;
+  margin: 40px auto 0;
+  width: 210px;
+  .file-selector-btn {
+    border: 1px solid #337ab7;
+    border-radius: 8px;
+    padding: 5px;
+    &:hover {
+      filter: brightness(.5) grayscale(.1) opacity(.5);
+      -webkit-filter: brightness(.5) grayscale(.1) opacity(.5);
+      -moz-filter: brightness(.5) grayscale(.1) opacity(.5);
+    }
+  }
+  input {
+    // display: none;
+    display: block;
+    height: 0;
+    width: 0;
+    opacity: 0;
+  }
+  .file-selector-lbl {
+    width: 100%;
+    height: 40px;
+    display: inline-block;
+    background-position: 4px 2px;
+    background-repeat: no-repeat;
+    background-size: 50px 33px;
+    background-image: url('../img/file-selector-icon.png'); 
+    transition: all 100ms ease-in;
+    -webkit-transition: all 100ms ease-in;    
+    -moz-transition: all 100ms ease-in;
+    &:hover {
+      filter: brightness(.5) grayscale(1) opacity(.6);
+      -webkit-filter: brightness(.5) grayscale(1) opacity(.6);
+      -moz-filter: brightness(.5) grayscale(1) opacity(.6);
+      transform: scale(1.01);
+      // border: 1px solid red;
+    }
+    h4 {
+      position: relative;
+      top: -8px;
+      display: inline-block;
+      width: 100%;
+      font-size: 16px;
+      line-height: 16px; 
+      font-weight: bold;
+      padding-left: 65px;
+      color: #337ab7;
     }
   }
 }
 
-.drop-callout {
+#image-loader-separator {
   display: block;
-  position: relative;
   width: 100%;
-  height: 70px;
-  margin-top: 0;
-  padding: 15px 25px;
-  color: #959595;
-  font-size: 40px;
-  text-align: center;
-  text-transform: uppercase;
-}
-.drop-area-content {
-  display: block;
-  margin: 0 20px 10px 40px;
-  color: #959595;
-  font-size: 1.125rem !important;
-  line-height: 1.365rem;
-  text-align: left;
-  a {
-    color: inherit;
-    text-decoration: underline;
+  .or {
+    color: #337ab7;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
   }
 }
+
+#drop-area {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 600px;
+  height: 280px;
+  padding: 20px;
+  border: 2px dashed #337ab7;
+  border-radius: 10px;
+  background: transparent;
+  // min-height: 400px;
+  // VA! display: flex is set programmatically
+  
+  #drop-area-content {
+    display: block;
+    color: #337ab7;
+    font-size: 1.125rem !important;
+    line-height: 1.365rem;
+    text-align: center;
+    .drop-callout {
+      display: block;
+      position: relative;
+      color: #337ab7;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      // border: 1px solid blue;
+      a {
+        color: inherit;
+        text-decoration: underline;
+      }
+    }
+    img {
+      width: 100px;
+      margin: 0 auto;
+    }
+  }
+}
+
+
 
 // :VA Not sure where this goes
 output {
@@ -651,14 +764,13 @@ output {
 
 // CLIPBOARD CONTROL PANEL
 
-#ccp {
+#ccp, #isp {
   display: flex;
   position: relative;
   width: 98%;
   height: 530px;
   margin: 6px auto 0;
   padding: 0;
-
   // VA! 08.13.20
   // VA! Uncomment transform and transition to restore normal display
   transform: scaleX(0);
@@ -690,6 +802,208 @@ output {
     text-align: center;
   }
 }
+
+// !VA Branch: 120920D
+// VA! Shift the CCP up to occupy the same space as the ISP. Required because the stacking order of elements breaks during the scale transition, causing main-image-viewer to show through while the ISP is animating if ISP has position: absolute.
+#ccp {
+  top: -535px;
+}
+
+// VA! Image Selector
+// VA!==============
+#isp {
+  // VA! Reboot: Working
+  display: block;
+  // VA! Can't use position: absolute because the stacking order of elements is broken during the scale transition, causing main-image-viewer to show through while the ISP is animating.
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 98%;
+  height: 530px;
+  overflow-y: auto;
+  z-index: 101;
+  will-change: transition;
+  &.active {
+    transform: scaleX(1);
+  }
+}
+
+
+#isp-controls {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  top: 15px;
+  right: 15px;
+  height: 200px;
+  width: 48px;
+  & > div {
+    position: relative;
+    height: 40px;
+  }
+}
+
+.isp-controls-lbl {
+  display: block;
+  width: 40px;
+  height: 40px;
+  background-size: contain !important;;
+  background-repeat: no-repeat;
+  // border: 1px solid red;
+
+  // VA! Transforms blue icon to white - default behavior
+  -webkit-filter: brightness(2) grayscale(1) opacity(1);
+  -moz-filter: brightness(2) grayscale(1) opacity(1);
+  filter: brightness(2) grayscale(1) opacity(1);
+  transition: all 100ms ease-in;
+  -webkit-transition: all 100ms ease-in;
+  -moz-transition: all 100ms ease-in;
+  &:hover {
+    -webkit-filter: none;
+    -moz-filter: none;
+    filter: none !important;
+    transform: scale(1.075);
+  }
+}
+
+// #isp-remove-thumbs-lbl {
+//   -webkit-filter: brightness(2) grayscale(1) opacity(1);
+//   -moz-filter: brightness(2) grayscale(1) opacity(1);
+//   filter: brightness(2) grayscale(1) opacity(1);
+//   transition: all 100ms ease-in;
+//   -webkit-transition: all 100ms ease-in;
+//   -moz-transition: all 100ms ease-in;
+// }
+
+
+// #isp-remove-thumbs-ipt
+#isp-add-thumbs-lbl  { background-image: url('../img/icon-isp-add.png')}
+#isp-clear-thumbs-lbl  { background-image: url('../img/icon-isp-clear.png')}
+#isp-remove-thumbs-lbl  { background-image: url('../img/icon-isp-remove.png')}
+#isp-close-lbl  { background-image: url('../img/close-icon.png')}
+
+.isp-controls-ipt {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+#isp-close-lbl { 
+  width: 30px; 
+  height: 30px;
+}
+
+
+#isp-content {
+  width: 100%;
+  padding: 20px;
+}
+
+#isp-thumbs-list {
+  // display: flex;
+  // flex-direction: columns;
+  // justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  .thumb-list-item {
+    display: none;
+    // display: inline-block;
+    position: relative;
+    width: 19%;
+    height: 155px;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+    list-style-type: none;
+    opacity: 0;
+    // opacity: 1;
+    transition: opacity 1000ms;
+
+    &.active {
+
+      opacity: 1;
+    }
+  }
+}
+
+.thumb-content {
+  position: relative;
+  .thumb-bg, .thumb-overlay {
+    top: 0;
+    left: 0;
+    align-items: center;
+    justify-content: center;
+    width: 85px;
+    height: 85px;
+    margin: 0;
+    padding: 0;
+  }
+  .thumb-bg {
+    display: flex;
+    position: relative;
+    border: 1px solid #959595;
+    &:hover {
+      outline: 2px solid #959595;
+    }
+  }
+  .thumb-overlay {
+    position: absolute;
+    display: none;
+    &:before {
+      display: inline-block;
+      position: relative;
+      bottom: 35px;
+      left: 35px;
+      width: 30px;
+      height: 30px;
+      background-image: url('../img/icon-isp-remove-thumb.png');
+      background-repeat: no-repeat;
+      background-size: 30px 30px;
+      transition: all 100ms ease-in;
+      -webkit-transition: all 100ms ease-in;    
+      -moz-transition: all 100ms ease-in;
+      content: '';
+    }
+    &:hover {
+      cursor: pointer;
+      &:before {
+        background-image: url('../img/icon-isp-remove-thumb-hover.png');
+        transform: scale(1.075);
+      }
+
+    }
+  }
+  img {
+    display: block;
+    position: relative;
+    // !VA Branch: 120820B 
+    // VA! width and height properties are set programmatically in buildImageSelector. 
+    width: auto;
+    height: auto;
+    z-index: -1;
+  }
+  p {
+    display: block;
+    margin: 0;
+    padding: 2px 0 0 0;
+    color: #FFFFFF;
+    font-size: 12px;
+    text-align: left;
+    // !VA Branch: 120920D
+    // !VA Wrap long filenames at any character
+    word-break: break-all;
+  }
+}
+
+
+
+// VA! Clipboard Control Panel
+// ===========================
 
 .ccp-link {
   color: #057CC6;
@@ -1239,12 +1553,8 @@ fieldset {
   flex-direction: row-reverse;
 }
 
-
-
-
-
 // VA! Default behavior for text input fields, radio input buttons and checkboxes.
-.ccp-txfld-ctn, .ccp-radio-ctn, .ccp-chkbx-ctn, .ccp-buttn-ctn {
+.ccp-txfld-ctn, .ccp-radio-ctn, .ccp-chkbx-ctn, .ccp-buttn-ctn, .isp-remove-thumbs {
   // VA! Hide all the input elements. 
   // VA! 08.22.20
   // VA! Why doesn't including ccp-txfld-ctn input here hide the text input field? It appears that appearance only hides the radio buttons.  
@@ -1258,14 +1568,15 @@ fieldset {
     // VA! Prevent outline on focus
     outline: 0;
     // VA! Define the active class property that is applied to radio and checkbox elements to visually indicate their checked/selected status (opacity = .9). This applies to all input labels including text input labels, although for text input labels the active class is applied not when the element is checked/selected but rather onchange if the text input gets a value.
-    &:active +.ccp-radio-lbl, &:active +.ccp-chkbx-lbl {
+    &:active +.ccp-radio-lbl, &:active +.ccp-chkbx-lbl, &:active +.isp-remove-thumbs-lbl {
       opacity: .9;
     }
     // VA! Sets the properties that visually indicate the checked/selected status of radio and checkbox input elements, i.e. CSS filters are removed so the original blue color of the PNG image is displayed. 
-    &:checked +.ccp-radio-lbl, &:checked +.ccp-chkbx-lbl {
+    &:checked +.ccp-radio-lbl, &:checked +.ccp-chkbx-lbl, &:checked +.isp-remove-thumbs-lbl {
       -webkit-filter: none;
       -moz-filter: none;
       filter: none;
+      // border: 1px solid magenta;
     }
     // VA! Applies the active class to all sibling elements of the input element that have the class .ccp-txfld-lbl
     &.active +.ccp-txfld-lbl {
@@ -1286,12 +1597,13 @@ fieldset {
       -moz-filter: brightness(1.2) grayscale(1) opacity(.5);
       transform: scale(1);
     }
+
   }
 }
 
 // VA! 08.19.20
 // VA! Default display and hover behavior for radio, checkbox and button labels. Elements display in white, i.e. with a high brigtness filter applied. On hover, the filter is diminished so the blue color shows through. 
-.ccp-radio-lbl, .ccp-chkbx-lbl, .ccp-buttn-lbl {
+.ccp-radio-lbl, .ccp-chkbx-lbl, .ccp-buttn-lbl, .isp-remove-thumbs-lbl {
   display: inline-block;
   transition: all 100ms ease-in;
   -webkit-transition: all 100ms ease-in;    
