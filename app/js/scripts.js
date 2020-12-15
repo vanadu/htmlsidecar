@@ -317,8 +317,7 @@ var Witty = (function () {
     }
 
     // !VA UIController private
-    // !VA Branch: 121320A
-    // !VA Clear thumbnails from ISP
+    // !VA Clear thumbnails from ISP by setting the innerHTML of the parent of the thumb list items to empty, thereby removing any HTML content from the parent.
     function ispClearThumbs() {
       // !VA Clear the innerHTML of the thumbnail parent container to remove all nodes.
       document.querySelector(ISPElements.ispThumbsLst).innerHTML = '';
@@ -326,8 +325,9 @@ var Witty = (function () {
 
     // !VA UIController private
     // !VA Branch: 121420C
-    // !VA Sort the thumbnail items based on the filename in the caption node
+    // !VA Sort the thumbnail items based on the filename in the caption node. Converts the thumb items to an array, uses the sort method to sort the elements based on the innerHTML of the thumb-filename element, i.e. the filename of the current item, then appends the sorted items back to the parent of thumbItems, i.e. thumbUl.
     function ispSortThumbs( thumbItems ) {
+      let sorted, textA, textB;
 
       // !VA Get the file name from the p caption element of the current node in the loop
       function getFilename(el) {
@@ -337,40 +337,25 @@ var Witty = (function () {
         return fName;
       }
 
-      // !VA Convert thumbItems to array and sort by fileName.
-      var sorted = [].slice.call(thumbItems).sort(function(a, b) {
-        var textA = getFilename(a).toLowerCase();
-        var textB = getFilename(b).toLowerCase();
+      // !VA Convert thumbItems to array and sort by fileName. See https://stackoverflow.com/questions/46546875/javascript-sort-li-items-alphabetically-by-data-attribute-without-jquery
+      sorted = [].slice.call(thumbItems).sort(function(a, b) {
+        textA = getFilename(a).toLowerCase();
+        textB = getFilename(b).toLowerCase();
     
         return textA.localeCompare(textB);
       });
-      // console.log('sorted :>> ');
-      // console.log(sorted);
-      // console.log(`sorted.length :>> ${sorted.length};`);
-      // console.log(`thumbItems.length :>> ${thumbItems.length};`);
-
-      // !VA Branch: 121420C
-      // !VA This works, but for some reason the width and height attributes on the thumb image aren't being applied to the first two elements in the thumb items array after appending. 
-      // !VA Branch: 121420D
-      // !VA Not sure this is fixed, keep an eye on it
 
       // !VA Append the sorted thumbItems back to the parent
       for (let i = 0; i < thumbItems.length; i++) {
-        // console.log('thumbItems[i] is: ' +  thumbItems[i]);
-        // console.log('sorted[i] :>> ');
-        // console.log(sorted[i]);
-        // console.log('thumbItems[i] :>> ');
-        // console.log(thumbItems[i]);
-        // !VA 
         thumbItems[i].parentNode.appendChild(sorted[i]);
       }
     }
 
     // !VA UIController private
     // !VA Branch: 121320B
-    // !VA Delete duplicates - called from ispMakeThumbs. Loop through each element in thumbs and compare all other elements in thumbs against that el for duplicate src attribute (i.e. the binary image data). Remove duplicates from thumbs and delete the id attribute, it will need to be reassigned based on the updated thumbsUl.
-    function removeDuplicateThumbs (thumbUl ) {
-      // console.log('removeDuplicateThumbs thumbUl :>> ');
+    // !VA Delete duplicates and assign thumb IDs - called from ispMakeThumbs. Loop through each element in thumbs and compare all other elements in thumbs against that el for duplicate src attribute (i.e. the binary image data). Remove duplicates from thumbs and delete the id attribute, it will need to be reassigned based on the updated thumbsUl. Once duplicates are deleted, assign the IDs for the thumb list item node and its children.
+    function ispStripDuplicateThumbs(thumbUl ) {
+      // console.log('ispStripDuplicateThumbs thumbUl :>> ');
       // console.log(thumbUl);
       let items1 =[], items2 = [], thumbItems, src1, src2, counter;
 
@@ -404,29 +389,23 @@ var Witty = (function () {
         }
 
         // !VA Assign IDs to thumbItems and its children
-        thumbItems[i].id = `thumb-list-item-${getIdCount(i)}`;
+        thumbItems[i].id = `thumb-list-item-${ispGetIdCount(i)}`;
         items1[i] = thumbItems[i].querySelectorAll('*');
-        items1[i][1].id = `thumb-bg-${getIdCount(i)}`;
-        items1[i][2].id = `thumb-${getIdCount(i)}`;
-        items1[i][3].id = `thumb-filename-${getIdCount(i)}`;
-        items1[i][4].id = `thumb-filesize-${getIdCount(i)}`;
-        items1[i][5].id = `thumb-overlay-${getIdCount(i)}`;
-        console.log(`items1[i][3].innerHTML :>> ${items1[i][3].innerHTML};`);
-
+        items1[i][1].id = `thumb-bg-${ispGetIdCount(i)}`;
+        items1[i][2].id = `thumb-${ispGetIdCount(i)}`;
+        items1[i][3].id = `thumb-filename-${ispGetIdCount(i)}`;
+        items1[i][4].id = `thumb-filesize-${ispGetIdCount(i)}`;
+        items1[i][5].id = `thumb-overlay-${ispGetIdCount(i)}`;
       }
 
-      // !VA Branch: 121420C
-      // !VA Sort the thumbnails before returning to ispMakeThumbs to display.
+      // !VA Sort the thumbnails before returning to ispMakeThumbs to display, the above changes were made live to the node list, so no return thumbUl is necessary to pass to ispSortThumbs.
       ispSortThumbs(thumbItems);
-  
-      
       return thumbUl;
     }
 
-    // !VA Branch: 121320C
-    // !VA Get the id count for ISP thumb elements
-    // !VA l is thumbUl.children.length as described below
-    function getIdCount(l) {
+    // !VA UIController private
+    // !VA  Get the id file index for ISP thumb elements, i.e. a two-digit identifier of the thumb's position in the ISP thumb item list. l is thumbUl.children.length + 1.
+    function ispGetIdCount(l) {
       let idCount;
       idCount = (l+1).toString().padStart(2, '0');
       return idCount;
@@ -455,8 +434,8 @@ var Witty = (function () {
       }
     }
 
-    // !VA Branch: 121420A
-
+    // !VA UIController private
+    // !VA Removes the X overlay from the thumb items if the checked status of the Remove Thumbs checkbox in the ISP is false. Note that this doesn't remove the active style, but rather sets the element display property to none so that the element can't recieve a click event.
     function resetRemoveThumbsMode() {
       console.log('resetRemoveThumbsMode running'); 
       document.querySelector(ISPElements.ispRemoveThumbsIpt).checked = false;
@@ -466,7 +445,8 @@ var Witty = (function () {
       }
     }
 
-
+    // !VA UIController private
+    // !VA Removes the selected thumb from the ISP in Remove Thumbs mode. Gets the file index from the event target and uses it to select the corresponding thumb list item, whose innerHTML is then set to empty to remove its content, and then removes the thumb list item node from its parent.
     function ispRemoveThumb(evt) {
       // console.log('ispRemoveThumb running'); 
       let toRemove;
@@ -481,28 +461,20 @@ var Witty = (function () {
 
     // !VA UIController private
     // !VA Branch: 121120A
-    // !VA Build the Image Selector thumbnails and return to handleFileSelect. The nodes are built and added to the DOM live here, so there's no need to return anything to handleFileSelect. IMPORTANT: This is a sync call, i.e. the thumbnails haven't been loaded yet, hence no image natural dimensions can be queried here. This only returns the metadata and source data that was provided by the FileReader object in handleFileSelect.
+    // !VA Creates the ISP thumbnail nodes, calls ispStripDuplicateThumbs to remove any duplicates selected in the File Upload dialog and add IDs, then adds classes and, once the images are loaded with the onload method, gets the natural W and H and adds them to the filesize p caption element. Finally, the active class is added to display the thumbnails with sequential animation. The DOM nodes are processed live, so there's no need to return anything to handleFileSelect.
     function ispMakeThumbs(imgObjArray) {
       // console.log('ispMakeThumbs imgObjArray :>> ');
       // console.log(imgObjArray);
       // console.log(`imgObjArray.length :>> ${imgObjArray.length};`);
       let fileSize, contentDiv, thumbDiv, overlayDiv, thumbImg, pFilename, pFilesize;
       let el, thumbs, thumbUl, thumbLi;
-      
       // !VA Create the initial row
       thumbUl = document.querySelector('#isp-thumbs-list');
-
-
-      // !VA Branch: 121420A
-      // !VA 
-      // thumbUl.style.display = 'none';
-
       // !VA Loop through the imgObjArray array and build thumbnail nodes
       for (let i = 0; i < imgObjArray.length; i++) {
         // console.log(`i :>> ${i}; fileName :>> ${imgObjArray[i].fileName}; fileSize :>> ${imgObjArray[i].fileSize}`);
-
         // !VA Convert the filesize to approximate KB values
-        fileSize =  `~${(imgObjArray[i].file.size / 1000).toFixed(0)} KB`;
+        fileSize =  `~${(imgObjArray[i].file.size / 1000).toFixed(1)} KB`;
         // !VA Create all the elements that will be output as thumbnails: list item, thumbnail metadata content wrapper, thumbnail wrapper, thumbnail image, filename and filesize.
         thumbLi = document.createElement('li');
         contentDiv = document.createElement('div');
@@ -545,15 +517,8 @@ var Witty = (function () {
       }
       // !VA Once the nodes are created, we can use the onload method to get natural width and natural height attributes of the selected images
       thumbs = document.getElementsByClassName('thumb-img');
-
-
-      // !VA Branch: 121420C
-      // !VA Sorting has to happen in removeDuplicateThumbs before thumbUl is returned and maybe needs a callback
-
       // !VA Remove any duplicate thumbs from thumbUl. Duplicates can come from users inadvertently adding duplicates when using the Add thumbnails button in ISP. This function removes the duplicates in the thumbUl node, adds IDs and sorts the thumbUl children, 
-      thumbUl = removeDuplicateThumbs( thumbUl );
-
-
+      thumbUl = ispStripDuplicateThumbs( thumbUl );
       // !VA Images are as yet unloaded so dimension attributes can't be queried. So load the images now, get their natural dimensions and append that data to the existing nodes.
       for (let i = 0; i < thumbs.length; i++) {
         // !VA If the current element is loaded
@@ -561,29 +526,18 @@ var Witty = (function () {
           // !VA width/height properties are set to 'auto' in CSS and are overridden here, whereby the adjacent dimension retains 'auto'. Ensures that thumbs render within the 90px container
           thumbs[i].naturalWidth > thumbs[i].naturalHeight ? thumbs[i].style.width = '85px' : thumbs[i].style.height = '85px';
           // !VA el is the p caption displaying the filesize
-          el = document.querySelector(`#thumb-filesize-${getIdCount(i)}`);
-
+          el = document.querySelector(`#thumb-filesize-${ispGetIdCount(i)}`);
           if (el) {
             // !VA Append the natural width and height to the filesize in the caption
             el.innerHTML = el.innerHTML + `&nbsp;&nbsp;|&nbsp;&nbsp;${thumbs[i].naturalWidth} X ${thumbs[i].naturalHeight}`;
           }
         };
       }
-
-      // !VA Branch: 121420A
-      // !VA 
-      // thumbUl.style.display = 'inline-block';
-      // console.log('ispMakeThumbs thumbs :>> ');
-      // console.log(thumbs);
-
+      // !VA Display the thumbs and show them i.e. apply the active class, with sequential animation
       for (let i = 0; i < thumbUl.children.length; i++) {
         thumbUl.children[i].style.display = 'inline-block';
         (function (i) {
           setTimeout(function () {
-            // console.log('timer...');
-            // console.log(`thumbUl.children[i].id :>> ${thumbUl.children[i].id};`);
-            // console.log('thumbUl.children[i] :>> ');
-            // console.log(thumbUl.children[i]);
             thumbUl.children[i].classList.add('active');
           }, 35 * i);
         })(i);
@@ -592,63 +546,48 @@ var Witty = (function () {
     // !VA /ispMakeThumbs
 
     // !VA UIController private
-    // !VA Branch: 121020A Moved and renameed selectThumbnaild from appController
-    // !VA 
+    // !VA Displays the selected thumb in the main-image viewer, initiates calcViewerSize to build the image and populate the inspectors, and closes the ISP. The click event target is the parent div of the thumbnail image not the image itself, otherwise if the image is narrow the click will miss it and not be captured. Also gets the selected elements' filename from the p caption and writes it to the filename field in the Inspector panel.
     function ispSelectThumb(evt) {
       // !VA Branch: 120920A
-      // !VA evt.target is the parent div of the thumbnail image, otherwise if the image is narrow the click will miss it and not be captured.
       console.log(`selectThumbnail evt.target.id :>> ${evt.target.id};`);
       let id, theImg, theContainer;
       id = evt.target.id;
       // !VA If the click target is a parent div of a thumbnail
-
       if ( id.substring( 0, 9) === 'thumb-bg-') {
-
-        // document.querySelector(inspectorElements.insFilename).textContent = Appobj.fileName = fileName;
-        // !VA Branch: 120920A
-        // !VA Get the filename
-        // console.log('evt.target.parentNode.children[1].innerHTML :>> ');
-        // console.log(evt.target.parentNode.children[1].innerHTML);
-        // !VA To get the filename of the selected thumbnail, access the p caption element in buildImageSelector. That is where the File object information was passed when the files were selected/dropped. The filename was stored in the pFilename node, which is the second child of the parent of the click event. So the filename is in the innerHTML of the evt.target.parentNode.children[1].
-
-        // !VA Branch: 121120A
-        // !VA How to write to Appobj from outside appController? Need to write the filename...but it appears to be written elsewhere, so...keep an eye on it.
-        // document.querySelector(inspectorElements.insFilename).textContent = Appobj.fileName = evt.target.parentNode.children[1].innerHTML;
+        // !VA NOTE: Cannot write the filename to Appobj because we're in UIController, but it seems to be correct in Appobj, so it's being written to Appobj elsewhere, probably in when the Inspectors are built
         document.querySelector(inspectorElements.insFilename).textContent = evt.target.parentNode.children[1].innerHTML;
 
         // !VA theContainer is the image container in #main-img where images are displayed.
         theContainer = document.querySelector('#cur-img-container');
 
-
+        // !VA If the container has children, remove them - this deletes any existing image in the viewer.
         if (theContainer.children[0]) { 
-          console.log('Exists');
+          // console.log('Exists');
           theContainer.removeChild(theContainer.children[0]);
         }
-        // !VA Clone the thumbnail, which is the first child of the click target div. If it is not cloned, the thumbnail will move from the Image Selector to the main-img container and disappear from the Image Selector
+        // !VA Clone the thumbnail, i.e. the first child of the click target div. It needs to be cloned because otherwise the thumbnail will move from the Image Selector to the main-img container and disappear from the Image Selector.
         theImg = evt.target.children[0].cloneNode(true);
         // !VA Add theImg to the image container on the imgViewer
         theContainer.appendChild(theImg);
-        // !VA Branch: 120920A
         // !VA Hide the image loader page.  
-        // !VA NOTE: THis should be done with configCcp
         document.querySelector(staticContainers.imageLoader).style.display = 'none';
-        // !VA Close the Image Selector
+        // !VA Close the ISP
         UIController.toggleISP(false);
-        // !VA Change the id of the cloned thumbnail to cur-img so that the element alias dynamicElements.curImg refers to it
+        // !VA Change the id of the cloned thumbnail to cur-img so that the element alias dynamicElements.curImg can access it
         theImg.id = 'cur-img';
         // !VA Set width/style.width and height/style.height to the natural dimensions of the image.
         theImg.width = theImg.naturalWidth;
         theImg.style.width = theImg.naturalWidth + 'px';
         theImg.height = theImg.naturalHeight;
         theImg.style.height = theImg.naturalHeight + 'px';
-        // document.querySelector(staticContainers.imageLoader).style.display = 'none';
         // !VA  Show the toolbar
-        // !VA TODO: Make function
         document.querySelector(staticContainers.tbrContainer).style.display = 'flex';
+        // !VA Run calcViewerSize to size the image and populate inspectors
         appController.initCalcViewerSize(true);
 
       } else {
-        console.log('not thumb');
+        // !VA Error checking if necessary
+        // console.log('The selected element is not a thumbnail and cannot be removed');
       }
     }
     // !VA /ispSelectThumb
@@ -3663,7 +3602,7 @@ ${indent}<![endif]-->`;
       dropArea = document.querySelector(dynamicElements.appContainer);
       dropArea.addEventListener('dragover', handleDragOver, false);
       // !VA Initiates the FileReader function to get the dropped image data
-      dropArea.addEventListener('drop', handleFileSelect2, false);
+      dropArea.addEventListener('drop', handleFileSelect, false);
 
       // !VA ispevt Image Selector Panel and File Selector Panel Event Handlers
       // !VA ===================================================================
@@ -3688,11 +3627,11 @@ ${indent}<![endif]-->`;
 
 
 
-      // // !VA Events that run appController FileReader methods via handleFileSelect2
+      // // !VA Events that run appController FileReader methods via handleFileSelect
       // // !VA File Selector Select Files input element
-      addEventHandler(document.querySelector(FSPElements.fspSelectImagesIpt),'change',handleFileSelect2,false);
+      addEventHandler(document.querySelector(FSPElements.fspSelectImagesIpt),'change',handleFileSelect,false);
       // // !VA fspclick - ISP Add thumbnails input element
-      addEventHandler(document.querySelector('#isp-add-thumbs-ipt'),'change',handleFileSelect2,false);
+      addEventHandler(document.querySelector('#isp-add-thumbs-ipt'),'change',handleFileSelect,false);
       
 
       // !VA Add the click event listener for creating the isolate popup
@@ -3866,155 +3805,6 @@ ${indent}<![endif]-->`;
     // !VA EVENT HANDLING END
 
 
-
-
-
-    // !VA appController private
-    // !VA Build the Image Selector thumbnails and return to handleFileSelect. The nodes are built and added to the DOM live here, so there's no need to return anything to handleFileSelect. IMPORTANT: This is a sync call, i.e. the thumbnails haven't been loaded yet, hence no image natural dimensions can be queried here. This only returns the metadata and source data that was provided by the FileReader object in handleFileSelect.
-    // !VA Branch: 121020A
-    function buildImageSelector( imgObjArray ) {
-      // console.log('buildImageSelector imgObjArray :>> ');
-      // console.log(imgObjArray);
-      // !VA Branch: 120920B
-      // console.log('imgObjArray[0].file.size :>> ');
-      // console.log(imgObjArray[0].file.size);
-
-
-      let idCount, fileSize, contentDiv, thumbDiv, thumbImg, pFilename, pFilesize;
-      let el, elems, thumbUl, thumbLi;
-      let foo, curImages;
-
-      curImages = document.getElementById('isp-thumbs-list');
-
-      function getIdCount(i) {
-        idCount = (i+1).toString().padStart(2, '0');
-        return idCount;
-      }
-
-      // !VA Create the initial row
-      thumbUl = document.querySelector('#isp-thumbs-list');
-
-      // !VA Loop through the imgObjArray array and build thumbnail nodes
-      for (let i = 0; i < imgObjArray.length; i++) {
-        // console.log(`i :>> ${i}; fileName :>> ${imgObjArray[i].fileName}; fileSize :>> ${imgObjArray[i].fileSize}`);
-        
-        // !VA idCount is the 2-digit string indicating the file count that is appended to the element's id starting with the loop iterator plus 1.
-
-        // !VA Convert the filesize to approximate KB values
-        fileSize =  `~${(imgObjArray[i].file.size / 1000).toFixed(0)} KB`;
-
-        // !VA Create all the elements that will be output as thumbnails: list item, thumbnail metadata content wrapper, thumbnail wrapper, thumbnail image, filename and filesize.
-        thumbLi = document.createElement('li');
-        contentDiv = document.createElement('div');
-        thumbDiv = document.createElement('div');
-        thumbImg = document.createElement('img');
-        pFilename = document.createElement('p');
-        pFilesize = document.createElement('p');
-
-        // !VA Populate the current list item
-        thumbLi.id = `thumb-list-item-${getIdCount(i)}`;
-        thumbLi.classList.add('thumb-list-item');
-        // !VA Append the list item to the parent list element in the HTML
-        thumbUl.appendChild(thumbLi);
-        // !VA Append the content wrapper to the list item
-        thumbLi.appendChild(contentDiv);
-        contentDiv.classList.add('thumb-content');
-        // !VA Create the thumbnail image wrapper class
-        thumbDiv.classList.add('thumb-bg');
-        // !VA The click target of the selectThumbnail function is the parent div of the thumbnail image, otherwise if the image is narrow the click will miss it and not be captured.
-        thumbDiv.id = `thumb-bg-${getIdCount(i)}`;
-        // !VA Create src attribute, id and class for the thumbnail image 
-        thumbImg.id = `thumb-${getIdCount(i)}`;
-        thumbImg.classList.add('thumb-img');
-        thumbImg.src = imgObjArray[i].imgData;
-        // !VA Append the thumbnail image to the content wrapper
-        thumbDiv.appendChild(thumbImg);
-        // !VA Append the thumbnail image wrapper to the thumbnail content wrapper
-        contentDiv.appendChild(thumbDiv);
-        // !VA Add id, class and HTML text to the p caption elements.
-        pFilename.id = `thumb-filename-${getIdCount(i)}`;
-        pFilename.classList.add('thumb-filename');
-        pFilename.innerHTML = imgObjArray[i].file.name;
-        pFilesize.classList.add('thumb-filesize');
-        // !VA Add an id to the pFilesize caption. This allows us to append the natural dimensions to it after onload, see the onload function at the foot of this function
-        pFilesize.id = `thumb-filesize-${getIdCount(i)}`;
-        // !VA Write the filesize to the p caption element
-        pFilesize.innerHTML = `${fileSize}`;
-        // !VA Append the p caption elements to the content wrapper
-        contentDiv.appendChild(pFilename);
-        contentDiv.appendChild(pFilesize);
-
-      }
-
-      // !VA Once the nodes are created, we can use the onload method to get natural width and natural height attributes of the selected images
-      elems = document.getElementsByClassName('thumb-img');
-      for (let i = 0; i < elems.length; i++) {
-        // !VA If the current element is loaded
-        elems[i].onload = function() {
-          // !VA width/height properties are set to 'auto' in CSS and are overridden here, whereby the adjacent dimension retains 'auto'. Ensures that thumbs render within the 90px container
-          elems[i].naturalWidth > elems[i].naturalHeight ? elems[i].style.width = '90px' : elems[i].style.height = '90px';
-          // !VA el is the p caption displaying the filesize
-          el = document.querySelector(`#thumb-filesize-${getIdCount(i)}`);
-          // !VA Append the natural width and height to the filesize in the caption
-          el.innerHTML = el.innerHTML + `&nbsp;&nbsp;|&nbsp;&nbsp;${elems[i].naturalWidth} X ${elems[i].naturalHeight}`;
-        };
-      }
-    }
-
-    function selectThumbnail(evt) {
-      // !VA Branch: 120920A
-      // !VA evt.target is the parent div of the thumbnail image, otherwise if the image is narrow the click will miss it and not be captured.
-      console.log(`selectThumbnail evt.target.id :>> ${evt.target.id};`);
-      let id, theImg, theContainer;
-      id = evt.target.id;
-      // !VA If the click target is a parent div of a thumbnail
-
-      if ( id.substring( 0, 9) === 'thumb-bg-') {
-
-        // document.querySelector(inspectorElements.insFilename).textContent = Appobj.fileName = fileName;
-        // !VA Branch: 120920A
-        // !VA Get the filename
-        // console.log('evt.target.parentNode.children[1].innerHTML :>> ');
-        // console.log(evt.target.parentNode.children[1].innerHTML);
-        // !VA To get the filename of the selected thumbnail, access the p caption element in buildImageSelector. That is where the File object information was passed when the files were selected/dropped. The filename was stored in the pFilename node, which is the second child of the parent of the click event. So the filename is in the innerHTML of the evt.target.parentNode.children[1].
-        document.querySelector(inspectorElements.insFilename).textContent = Appobj.fileName = evt.target.parentNode.children[1].innerHTML;
-
-        // !VA theContainer is the image container in #main-img where images are displayed.
-        theContainer = document.querySelector('#cur-img-container');
-
-
-        if (theContainer.children[0]) { 
-          console.log('Exists');
-          theContainer.removeChild(theContainer.children[0]);
-        }
-        // !VA Clone the thumbnail, which is the first child of the click target div. If it is not cloned, the thumbnail will move from the Image Selector to the main-img container and disappear from the Image Selector
-        theImg = evt.target.children[0].cloneNode(true);
-        // !VA Add theImg to the image container on the imgViewer
-        theContainer.appendChild(theImg);
-        // !VA Branch: 120920A
-        // !VA Hide the image loader page.  
-        // !VA NOTE: THis should be done with configCcp
-        document.querySelector(staticContainers.imageLoader).style.display = 'none';
-        // !VA Close the Image Selector
-        UIController.toggleISP(false);
-        // !VA Change the id of the cloned thumbnail to cur-img so that the element alias dynamicElements.curImg refers to it
-        theImg.id = 'cur-img';
-        // !VA Set width/style.width and height/style.height to the natural dimensions of the image.
-        theImg.width = theImg.naturalWidth;
-        theImg.style.width = theImg.naturalWidth + 'px';
-        theImg.height = theImg.naturalHeight;
-        theImg.style.height = theImg.naturalHeight + 'px';
-        // document.querySelector(staticContainers.imageLoader).style.display = 'none';
-        // !VA  Show the toolbar
-        // !VA TODO: Make function
-        document.querySelector(staticContainers.tbrContainer).style.display = 'flex';
-        calcViewerSize(true);
-
-      } else {
-        console.log('not thumb');
-      }
-    }
-
     function loadImage(theFile) {
       console.log('loadImage theFile :>> ');
       console.log(theFile);
@@ -4107,9 +3897,11 @@ ${indent}<![endif]-->`;
     // !VA FILEREADER OBJECT PROCESSING
 
     // appController private
-    function handleFileSelect2(evt) {
-      console.log('handleFileSelect2 running'); 
-      // console.log(`handleFileSelect2 evt.target.id :>> ${evt.target.id};`); 
+    // !VA appController  : hfs - FILEREADER OBJECT PROCESSING
+    // !VA Includes FileReader processing for loading selected image (either by drag and drop in the drop zone or by selection in the File Upload dialog) and initializing the image in the DOM.  
+    function handleFileSelect(evt) {
+      console.log(`handleFileSelect evt.target.id :>> ${evt.target.id};`);
+      // console.log(`handleFileSelect evt.target.id :>> ${evt.target.id};`); 
       // !VA files is the object in evt.target/evt.dataTransfer used to hold the data from a file select or drag operation - returns the file list. f is variable for iterating through the files array.
       let files, f;
       // !VA count is the file count, which is passed to the callback funciton from reader.onload. imgObj contains the image dataURL and metadata from FileReader. imgObjArray is the array of imgObj objects passed to buildImageSelector. action is the evt.type. fileCount is the number of files in the files array.
@@ -4125,15 +3917,15 @@ ${indent}<![endif]-->`;
         evt.stopPropagation();
         evt.preventDefault();
         // !VA returned from drop operation
-          files = evt.dataTransfer.files; // FileList object.
-        } else if (action === 'selected') {
+        files = evt.dataTransfer.files; // FileList object.
+      } else if (action === 'selected') {
         // !VA returned from File Upload dialog selection in browser
         files = evt.target.files;
       } else {
-        console.log('ERROR in handleFileSelect2 - unknown action');
+        console.log('ERROR in handleFileSelect - unknown action');
       }
       fileCount = files.length;
-      // console.log(`handleFileSelect2 action :>> ${action}; `);
+      // console.log(`handleFileSelect action :>> ${action}; `);
       // console.log(`Action :>> ${action};  fileCount :>> ${fileCount}; files :>>`);
       // console.dir(files);
       
@@ -4174,151 +3966,28 @@ ${indent}<![endif]-->`;
         };
         // !VA Push imgObj to imgObjArray 
 
-        // !VA Branch: 121020A
-        // !VA This is where we need to prevent adding duplicates to the image selector
-        // let foo, curImages;
-        // curImages = document.getElementById('isp-thumbs-list');
-        // console.log('curImages.children[0] :>> ');
-        // console.log(curImages.children[0]);
-
         imgObjArray.push(imgObj);
-        // imgObjArray =  removeDupes(imgObjArray);
-        // !VA If the loop iterator equals the number of files in the file list, then call buildImageSelector. Prevents it being called for each iteration.
+        // !VA If the loop iterator equals the number of files in the file list, then call ispMakeThumbs. Prevents it being called for each iteration.
         if ( i === imgObj.fileCount + 1 ) {
-          // !VA Branch: 120920A
-          // !VA Multiple images - open image selector
-          if ( imgObj.fileCount > 0 ) {
-            UIController.toggleISP(true);
-            // buildImageSelector(imgObjArray);
-
-            // !VA Branch: 121320A
-            UIController.initISPMakeThumbs(imgObjArray);
-
-
+          if ( imgObj.fileCount === 0 ) {
+            if (evt.target.id === 'fsp-select-images-ipt') {
+            // console.log('single image selected from File Selector Panel - load image');
+              loadImage(files[0]);
+            } else if (evt.target.id === 'isp-add-thumbs-ipt') {
+            // console.log('single image selected from ISP Panel - add to ISP');
+              UIController.toggleISP(true);
+              UIController.initISPMakeThumbs(imgObjArray);
+            }
           } else {
-            // !VA Branch: 120920A
-            // !VA Single image
-            console.log('single image - load image');
-            // console.log('files[0] :>> ');
-            // console.log(files[0]);
-            loadImage(files[0]);
-
+            // !VA Multiple files selected - add to ISP
+            UIController.toggleISP(true);
+            UIController.initISPMakeThumbs(imgObjArray);
           }
         }
       }
       // !VA Open the Image Selector
     }
 
-    // !VA appController  : hfs - FILEREADER OBJECT PROCESSING
-    // !VA Includes all the FileReader processing for loading the image the user has dropped in the dropZone as blob, and initializing the image in the DOM.  
-    function handleFileSelect(evt) {
-      // If a file is already being displayed, i.e. Appobj.fname is true, then remove that image to make room for the next image being dropped
-      // !VA Remove the current #cur-img from the DOM. This has to be done in a separate function call, I'm not sure why handleFileSelect doesn't see #cur-img even though it is in the DOM at this point
-      // !VA Remove the current image if one exists so the user can drop another one over it and reboot the process rather than having to refresh the browser and drop another image. This way, all the current settings are maintained. If they want new settings they can refresh the browser.
-      document.querySelector('#cur-img-container').parentNode.removeChild(document.querySelector('#cur-img-container'));
-      //The drop event has been executed and handleFileSelect is running.
-      // !VA Can't remember what this does running    
-      evt.stopPropagation();
-      evt.preventDefault();
-
-      //dataTransfer object is used to hold object data during a drag operation
-      let files = evt.dataTransfer.files; // FileList object.
-      // files is a FileList of File objects. List some properties.
-      //Note that the File objects are blob objects that include the parameter
-      // type, which indicates the type of file. 
-      // !VA I don't think the output array is used here, so commenting out.
-      // var output = [];
-      // !VA get the number of files selected
-      
-      let f =  files[0];
-      // !VA this for loop would be used if we were using the entire filelist instead of just one
-      // a single dropped file
-      // for (var i = 0, f; f = files[i]; i++) {
-      // Only process image files.
-      //This is the query for file type -- it includes any MIME type that starts 
-      //with 'image' which is a huge list of possible formats -- see the complete
-      //list of MIME formats. Best to narrow that down to JPG, GIF, PNG -- not sure
-      //about SVG and VML, they're not in the big list of MIME types I found 
-      // !VA Need to handle this error
-      if (!f.type.match('image.*')) {
-        // !VA Below is the error handler - skipping for now
-        // var isErr = errorHandler(target, 0, 0);
-        return;
-      }
-      var reader = new FileReader();
-      // Closure to capture the file information.
-      reader.onload = (function(theFile) {
-        return function(e) {
-          // Create the image object        
-          var curImg = new Image();
-          // !VA create the id
-          curImg.id = 'cur-img';
-          // !VA assign the blob in e.target.result to the source of the image. the onload function ensures that the blob is loaded before the
-          // curImg.src = e.target.result;
-          curImg.src = e.target.result;
-          let fileName;
-          // Read the insFilename of the FileReader object into a variable to pass to Appobj function, otherwise the blob has no name
-          fileName = theFile.name;
-
-          // !VA TODO: Review this. I'm not sure this has to be written to the DOM now.
-          document.querySelector(inspectorElements.insFilename).textContent = Appobj.fileName = fileName;
-
-          // !VA Hide the dropArea - not sure if this is the right place for this.
-          // !VA TODO: Make function
-          // !VA Branch: 120620A
-          document.querySelector(staticContainers.imageLoader).style.display = 'none';
-          // !VA  Once the current image has loaded, initialize the dinViewers by querying the current image properties from UICtrl and passing them to writeInspectors.
-          function initInspectors() { 
-            // !VA  Initialize the variable that will contain the new image's height, width, naturalHeight and naturalWidth
-            // !VA Set a short timeout while the blob loads, then run the onload function before displaying the image and getting its properties. This is probably overkill, but noone will notice the 250ms anyway and better safe then no-workie. But now that the image is loaded, we can display it and get its properties.
-            setTimeout(() => {
-              // Once the blob is loaded, show it and get its data
-              curImg.onload = (function() {
-              // !VA Hide the drop area.
-              // !VA TODO: Make function
-              // !VA Branch: 120620A
-                document.querySelector(staticContainers.imageLoader).style.display = 'none';
-                // !VA  Show the toolbar
-                // !VA TODO: Make function
-                document.querySelector(staticContainers.tbrContainer).style.display = 'flex';
-                // !VA Display the current image
-                // !VA TODO: Make function
-                curImg.style.display = 'block';
-                // !VA Calculate the viewer size based on the loaded image. Thetrue parameter indicates that a new image is being initialized
-                calcViewerSize(true);
-              })();
-              
-              // !VA Timeout of 250 ms while the blob loads.
-            }, 250);
-          }
-
-          // !VA First, write the new curImg object to the DOM
-          function initImgToDOM(curImg, callback) {
-
-            // VA! The callback function allows access of image properties. You can't get image properties from a FileReader object -- it's a binary blob that takes time to load, and by the time it's loaded all the functions that get its properties have run and returned undefined. Temporary solution: hide the image object for 250 ms, then show it and get the properties -- by then it should have loaded. There is a better way to do this with promises but that will have to be for later.
-            // !VA Create a div in the DOM
-            var curImgDiv = document.createElement('div');
-            // !VA Assign the new div an id that reflects its purpose
-            curImgDiv.id = 'cur-img-container';
-            // Insert cur-img-container into the existing main-image inside the main-image div.
-            document.getElementById('main-image').insertBefore(curImgDiv, null);
-            // !VA insert the new curImg into the new cur-img container
-            document.getElementById('cur-img-container').insertBefore(curImg, null);
-            // Create the image object and read in the binary image from the FileReader object.
-            // This allows access of image properties. You can't get image properties from a FileReader object -- it's just a blob' 
-            // !VA Hide the DOM element while the blob loads.
-            document.querySelector(dynamicElements.curImg).style.display = 'none';
-            callback(curImg);		
-          }
-          // !VA Call the callback function that writes the new image to the DOM.
-          initImgToDOM(curImg, initInspectors);
-        };
-
-      })(f);
-      // Read in the image file as a data URL.
-      reader.readAsDataURL(f);
-    }
-    //FILEREADER OBJECT PROCESSING END
 
 
     // !VA sdf MODIFIER KEYS FOR TOOLTIP DISPLAY
