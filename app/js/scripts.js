@@ -2090,6 +2090,8 @@ var Witty = (function () {
 
         // !VA Create the outputNL nodeList to pass to the Clipboard object
         outputNL = container.querySelectorAll('*');
+        console.log('outputNL :>> ');
+        console.log(outputNL);
 
         // !VA Branch: 111520A
         // !VA If the TBL Ghost checkbox is checked, fetch the ghost table config for the TD options handled in this condition. TD options bgimg and iswap are handled in their respective conditions below.
@@ -2276,8 +2278,13 @@ var Witty = (function () {
       if (Attributes.tdClass.str) { nodeList[0].setAttribute('class', Attributes.tdClass.str); } 
       // !VA If the bkgrnd color input element under td options is empty, do nothing, otherwise add the bkgrnd color to the container TD and set the bgcolor attribute
       if (Attributes.tdBgcolor.str) { nodeList[0].setAttribute('bgcolor', Attributes.tdBgcolor.str); }
-      // !VA Include the padding style property in the image column, i.e. nodeList[6]. 
-      if (Attributes.tdStyle.str) { nodeList[6].setAttribute( 'style', Attributes.tdStyle.str );}
+      // !VA Branch: 121520A
+      // !VA Include the padding style property in the td column, i.e. nodeList[8]. 
+      if (Attributes.tdStyle.str) { nodeList[8].setAttribute( 'style', Attributes.tdStyle.str );}
+
+      if (Attributes.tdHeight.str) { nodeList[8].setAttribute( 'height', Attributes.tdHeight.str );}
+
+      if (Attributes.tdWidth.str) { nodeList[8].setAttribute( 'width', Attributes.tdWidth.str );}
 
       // !VA Add the rest of the attributes to the nodes
       td_switchcontainerAttr = {
@@ -2303,7 +2310,12 @@ var Witty = (function () {
         class: 'stack-column-center'
       };
       table_switchchild1Attr = {
-        width: Attributes.imgWidth.str,
+        // !VA Branch: 121520A
+        // !VA removed
+        // !VA Branch: 121520A
+        // !VA Added
+        align: 'center',
+        // width: Attributes.imgWidth.str,
         class: 'devicewidth',
         role: 'presentation',
         border: '0',
@@ -2316,8 +2328,11 @@ var Witty = (function () {
       };
       td_switchcontent1Attr = {
         dir: 'ltr',
-        align: 'center',
-        vAlign: 'top'
+        // !VA Branch: 121520A
+        align: Attributes.tdAlign.str,
+        valign: Attributes.tdValign.str,
+        width: Attributes.tdWidth.str,
+        height: Attributes.tdHeight.str,
       };
       a_switchcontent1Attr = {
         href: '#',
