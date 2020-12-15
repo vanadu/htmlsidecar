@@ -75,6 +75,7 @@ body {
   // VA! From normalize.less 
   font-size: 1rem;
   line-height: 1.42857143;
+  overflow: hidden;
 }
 
 // VA! From Bootstrap 3
@@ -195,33 +196,25 @@ input[type=number] {
   justify-content: flex-start;
   width: 100%;
   height: 80px;
-  padding: 0 0 0 60px;
 }
 
 .header-text {
-  width: 500px;
-}
-
-.header-headline {
-  position: relative;
-  width: 440px;
-  height: 46px;
-  float: left;
+  width: 580px;
 }
 
 .header-image {
   position: relative;
   // top: 0;
-  width: 70px;
-  height: 90px;
-  margin-top: 5px;
-  margin-left: -8px;
-  float: left;
+  left: 10px;
+  width: 120px;
+  height: 66px;
+
   // VA! z-index is for the 'runMe' link, only for dev
   z-index: 100;
   img {
     width: 100%;
     height: auto;
+    padding: 4px 0;
   }
 }
 
@@ -239,39 +232,43 @@ input[type=number] {
     font-size: 32px;
     font-weight: bold;
   }
-  .header-version {
-    position: absolute;
-    top: 17px;
-    right: 0;
-    font-size: 12px;
-    p {
-      margin: 0;
-      padding: 0;
-      color: #959595;
-    }
-  }
 }
 
 
-.header-slug {
+.header-text {
   position: relative;
   width: 100%;
-  h2 {
-    width: 100%;
-    margin-top: 6px;
-    padding: 0;
-    color: $header-subtext-color;
-    font-size: 20px;
-    text-align: left;
-    text-transform: uppercase;
+  margin-left: 25px;
+
+}
+
+.header-headline, .header-subtext {
+  position: relative;
+  width: 100%;
+  margin: 6px 0 0;
+  padding: 0;
+  color: $header-subtext-color;
+  text-align: left;
+  text-transform: uppercase;
+  // border: 1px solid magenta;
+}
+
+.header-headline {
+  margin: 6px 0 0;
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.header-subtext {
+  margin: 6px 0 0;
+  font-size: 20px;
+  font-weight: normal;
+  .slug-initial-cap {
+    color: $logo-color;
+    font-weight: bold;
   }
 }
 
-.initial-cap {
-  color: $logo-color;
-  font-size: 110%;
-  font-weight: 800;
-}
 
 // APP-CONTAINER
 #app-container {
@@ -430,7 +427,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   position: absolute;
   top: 40px;
   width: 850px;
-  height: 679px;
+  height: 685px;
   min-height: 679px !important;
   margin: 0 auto;
   border-top: 110px solid #000;
@@ -438,7 +435,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   border-bottom:  24px solid #000;
   border-left:  24px solid #000;
   border-radius: 10px;
-  // overflow: auto;
+  overflow: none;
   background: #E1E1E1 url('../img/html-email-icon-blue.png') repeat;
   z-index: 2;
 }
