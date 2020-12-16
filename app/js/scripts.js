@@ -29,10 +29,10 @@ var Witty = (function () {
   // });
 
   // !VA Test function to identify the target of the mouseclick
-  // window.onclick = e => {
-  //   console.log('Clicked element');
-  //   console.log(e.target);
-  // };
+  window.onclick = e => {
+    console.log('Clicked element');
+    console.log(e.target);
+  };
 
   // !VA Click on Witty logo to run test function
   // var testbut = document.querySelector('#testme');
@@ -1637,6 +1637,8 @@ var Witty = (function () {
       var Appobj = {};
       // !VA TODO: We don't need the entire Appobj here. What we should do is call rest parameters on what we need and then destructure the return array into separate variables. This needs to be done when getAttributes is reevaluated since there appears to be a lot of unnecessary DOM access here. But I don't know if it's faster to get all of Appobj or just target a specific Appobj property -- for later.
       Appobj = appController.getAppobj();
+      console.log('getAttributes Appobj :>> ');
+      console.log(Appobj);
 
       let str, appObjProp, imgType, Attributes, retObj;
       // !VA Create the array to return. First value is the id of the CCP element, second value is the string to write to the CCP element. If the first value is false, then the str isn't queried from a Ccp element, but rather is generated in the Attribute based on other conditions. For instance, the img style attribute is conditioned on the fluid/fixed option, but writes to the style attribute of the img tag.
@@ -1719,16 +1721,16 @@ var Witty = (function () {
           return retObj;
         })(),
         // !VA TD Attributes
-        // !VA NOTE: Why can't I just access Appobj directly in getBgimageBlock?
+        // !VA NOTE: Why can't I just access Appobj directly in getBgimgCodeBlock?
         // !VA TD Width and height from Appobj = curImgW and curImgW -- only used for Stig's BG image
         tdAppobjWidth: (function() {
-          // !VA NOTE: There is no Appobj property or alias for this, so why can't I just access Appobj directly in getBgimageBlock?
+          // !VA NOTE: There is no Appobj property or alias for this, so why can't I just access Appobj directly in getBgimgCodeBlock?
           // !VA Setting retObj here to false because there's no appObjProp for this, pending check attempt to set this directly in getBgimgBlock
           retObj = returnObject( false, Appobj.curImgW );
           return retObj;
         })(),
         tdAppobjHeight: (function() {
-          // !VA NOTE: There is no Appobj property or alias for this, so why can't I just access Appobj directly in getBgimageBlock?
+          // !VA NOTE: There is no Appobj property or alias for this, so why can't I just access Appobj directly in getBgimgCodeBlock?
           // !VA Setting retObj here to false because there's no appObjProp for this, pending check attempt to set this directly in getBgimgBlock
           retObj = returnObject( false, Appobj.curImgH );
           return retObj;
@@ -1784,6 +1786,11 @@ var Witty = (function () {
           appObjProp = 'ccpTdaBdradTfd';
           str = Appobj[appObjProp];
           retObj = returnObject(appObjProp, str);
+          console.log('retObj :>> ');
+          console.log(retObj);
+          // var Appobj = appController.getAppobj();
+          // console.log('Appobj :>> ');
+          // console.dir(Appobj);
           return retObj;
         })(),
         tdTextColor: (function() {
@@ -2110,11 +2117,11 @@ var Witty = (function () {
         // !VA Convert the nodeList to text for output to the clipboard.
         clipboardStr = outputNL[0].outerHTML;
 
-      // !VA These options include MS conditional code retrieved by getImgSwapBlock, getBgimageBlock, getVMLBlock which includes getIndent functions. First, run applyIndents on outputNL. applyIndents also inserts tokens at the position where the codeBlock is to be inserted. The parent nodelist is converted to a string, the code blocks are retrieved, indents are inserted, and finally the codeblocks are inserted into the string between the tags of the last node in the outputNL.outerHTML string.
+      // !VA These options include MS conditional code retrieved by getIswapCodeBlock, getBgimgCodeBlock, getVMLBlock which includes getIndent functions. First, run applyIndents on outputNL. applyIndents also inserts tokens at the position where the codeBlock is to be inserted. The parent nodelist is converted to a string, the code blocks are retrieved, indents are inserted, and finally the codeblocks are inserted into the string between the tags of the last node in the outputNL.outerHTML string.
       
 
       } else if (selectedTdOption === 'iswap' || selectedTdOption  === 'bgimg' || selectedTdOption === 'vmlbt') {
-        // !VA Start with the ccpTdaCbhtmIpt makeNode button because the img makeNode button isn't referenced in the imgswap option. The A/IMG tags are hard-coded into the MS Conditional code in getImgSwapBlock. Also, there's a switch to include/exclude the A/IMG node in makeTdNode.
+        // !VA Start with the ccpTdaCbhtmIpt makeNode button because the img makeNode button isn't referenced in the imgswap option. The A/IMG tags are hard-coded into the MS Conditional code in getIswapCodeBlock. Also, there's a switch to include/exclude the A/IMG node in makeTdNode.
         // !VA extractNodeIndex is the nl index position at which the nodes are extracted to build outputNL. It equals the nodeList length minus the indentLevel.
         let extractNodeIndex;
         // !VA indentLevel is the number of indents passed to getIndent.
@@ -2166,11 +2173,11 @@ var Witty = (function () {
         
         // !VA Get the codeBlock corresponding to the selected TD option
         if ( selectedTdOption === 'iswap') {
-          codeBlock = getImgSwapBlock( id, indentLevel, Attributes);
+          codeBlock = getIswapCodeBlock( id, indentLevel, Attributes);
         } else if (  selectedTdOption === 'bgimg' ) {
-          codeBlock = getBgimageBlock(id, indentLevel, Attributes);
+          codeBlock = getBgimgCodeBlock(id, indentLevel, Attributes);
         } else if (selectedTdOption === 'vmlbt') {
-          codeBlock = getVmlButtonBlock(id, indentLevel, Attributes);
+          codeBlock = getVmlbtCodeBlock(id, indentLevel, Attributes);
         } 
         // !VA Replace the tokens in clipboardStr that were added in applyIndents with the respective codeBlock
         clipboardStr = clipboardStr.replace('/replacestart//replaceend/', codeBlock + '\n');
@@ -2516,7 +2523,7 @@ var Witty = (function () {
         // !VA Create the parent node to which the bgimage code block will be appended after outputNL is converted to text in buildOutputNL.
         // !VA Include width, height and valign as per Stig's version
         // !VA Branch: 113020B
-        // !VA Replacing tdAppobjWidth and tdAppobjHeight with Attributes.imgHeight.str and Attributes.imgWidth.str, since that is what's in getBgimageBlock. If no issues, we can deprecate Attributes.tdAppobjWidth and Attributes.tdAppobjHeight.
+        // !VA Replacing tdAppobjWidth and tdAppobjHeight with Attributes.imgHeight.str and Attributes.imgWidth.str, since that is what's in getBgimgCodeBlock. If no issues, we can deprecate Attributes.tdAppobjWidth and Attributes.tdAppobjHeight.
         // tdInner.width = Attributes.tdAppobjWidth.str;
         // tdInner.height = Attributes.tdAppobjHeight.str;
         tdInner.width = Attributes.imgWidth.str;
@@ -2677,7 +2684,7 @@ var Witty = (function () {
     // !VA These are the code blocks that contain MS conditionals in comment nodes or text nodes, i.e. mobile swap, background image, and vmlbutton
     // !VA UIController private
     // !VA Called from buildOutputNL. Gets the clipboardStr that comprises the MS Conditional code for the iswap, i.e. TD OPTNS image swap option.
-    function getImgSwapBlock( id, indentLevel, Attributes ) {
+    function getIswapCodeBlock( id, indentLevel, Attributes ) {
       let Appobj, linebreak;
       // !VA TODO: We don't need the entire Appobj here. What we should do is call rest parameters on what we need and then destructure the return array into separate variables. But for now, this is good enough.
       Appobj = appController.getAppobj();
@@ -2695,7 +2702,7 @@ var Witty = (function () {
 
     // !VA UIController   
     // !VA Called from buildOutputNL. Gets the clipboardStr that comprises the MS Conditional code for the Bgimage.
-    function getBgimageBlock( id, indentLevel, Attributes ) {
+    function getBgimgCodeBlock( id, indentLevel, Attributes ) {
       // !VA Keeping the original reference to fallback for posterity for now
       // let bgimageStr, fallback, bgcolor;
       let bgimageStr;
@@ -2711,17 +2718,17 @@ var Witty = (function () {
     }
 
     // !VA CBController   
-    function getVmlButtonBlock ( id, indentLevel, Attributes) {
+    function getVmlbtCodeBlock ( id, indentLevel, Attributes) {
       let vmlButtonStr, linebreak;
       // let tdWidth;
       linebreak = '\n';
       // !VA Define the innerHTML of the vmlbutton code
-      vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:${Attributes.tdHeight.str}px;v-text-anchor:middle;width:${Attributes.tdWidth.str}px;" arcsize="10%" strokecolor="${Attributes.tdBorderColor.str}" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc.str}" color="#556270" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Button Text!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="#"
-style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});border:1px solid ${Attributes.tdBorderColor.str};border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:${Attributes.tdHeight.str}px;text-align:center;text-decoration:none;width:${Attributes.tdWidth.str}px;-webkit-text-size-adjust:none;mso-hide:all;">Button Text!</a></div>`;
+      vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${Attributes.imgAnchor.str}" style="height:${Attributes.tdHeight.str}px;v-text-anchor:middle;width:${Attributes.tdWidth.str}px;" arcsize="${Attributes.tdHeight/Attributes.tdBorderRadius.str}" strokecolor="${Attributes.tdBorderColor.str}" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc.str}" color="#556270" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Button Text!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="${Attributes.imgAnchor.str}"
+style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});border:1px solid ${Attributes.tdBorderColor.str};border-radius:${Attributes.tdBorderRadius.str};color:${Attributes.tdTextColor.str};display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:${Attributes.tdHeight.str}px;text-align:center;text-decoration:none;width:${Attributes.tdWidth.str}px;-webkit-text-size-adjust:none;mso-hide:all;">Button Text!</a></div>`;
       try {
         !vmlButtonStr;
       } catch (error) {
-        console.log('ERROR in getVmlButtonBlock: vmlButtonStr does not exist: id is:' + id);
+        console.log('ERROR in getVmlbtCodeBlock: vmlButtonStr does not exist: id is:' + id);
       }
       return vmlButtonStr;
     }
@@ -3821,15 +3828,14 @@ ${indent}<![endif]-->`;
 
 
     function loadImage(theFile) {
-      console.log('loadImage theFile :>> ');
-      console.log(theFile);
+      // console.log('loadImage theFile :>> ');
+      // console.log(theFile);
       let f;
       // !VA Branch: 120920A
       // !VA From handleFileSelect
       // If a file is already being displayed, i.e. Appobj.fname is true, then remove that image to make room for the next image being dropped
       // !VA Remove the current #cur-img from the DOM. This has to be done in a separate function call, I'm not sure why handleFileSelect doesn't see #cur-img even though it is in the DOM at this point
-      // !VA Remove the current image if one exists so the user can drop another one over it and reboot the process rather than having to refresh the browser and drop another image. This way, all the current settings are maintained. If they want new settings they can refresh the browser.
-      document.querySelector('#cur-img-container').parentNode.removeChild(document.querySelector('#cur-img-container'));
+
 
       f = theFile;
       // !VA From handleFileSelect
@@ -3924,6 +3930,13 @@ ${indent}<![endif]-->`;
       // Loop through the FileList and render image files as thumbnails. NOTE: next line disables the eslint no conditional assignment rule. Assigning f in the loop declaration is an eslint no-no. Explore alternatives to this construction.
       count = -1;
 
+
+      if (document.querySelector('#cur-img')) {
+        // // !VA Remove the current image if one exists so the user can drop another one over it and reboot the process rather than having to refresh the browser and drop another image. This way, all the current settings are maintained. If they want new settings they can refresh the browser.
+        document.querySelector('#cur-img-container').parentNode.removeChild(document.querySelector('#cur-img-container'));
+      }
+
+
       // !VA Branch: 120920A
       // !VA Determine if drop or select event
       evt.type === 'change' ? action = 'selected' : action = 'dropped';
@@ -3984,8 +3997,11 @@ ${indent}<![endif]-->`;
         imgObjArray.push(imgObj);
         // !VA If the loop iterator equals the number of files in the file list, then call ispMakeThumbs. Prevents it being called for each iteration.
         if ( i === imgObj.fileCount + 1 ) {
+          console.log('Mark6');
+          console.log(`imgObj.fileCount :>> ${imgObj.fileCount};`);
           if ( imgObj.fileCount === 0 ) {
-            if (evt.target.id === 'fsp-select-images-ipt') {
+            // !VA cur-img is included so that users can over-drop images onto existing ones to replace them. If cur-img is too small to capture the drop, then main-image-viewer is used to capture it
+            if (evt.target.id === 'fsp-select-images-ipt' || evt.target.id === 'drop-area' || evt.target.id === 'cur-img' || evt.target.id === 'main-image-viewer') {
             // console.log('single image selected from File Selector Panel - load image');
               loadImage(files[0]);
             } else if (evt.target.id === 'isp-add-thumbs-ipt') {
@@ -4448,7 +4464,8 @@ ${indent}<![endif]-->`;
     // !VA Called from handleKeydown and handleBlur to handle CCP element user input. Runs checkUserInput to check for error conditions and returns either an empty string, a valid value or FALSE to the caller.
     // !VA NOTE: There was a priorVal variable earlier that stored evt.target.val for use with CCP inputs because at that time CCP inputs weren't immediately stored in Appobj. Keep an eye on that - currently all CCP values are stored to Appobj.
     function handleUserInput( userInputObj ) {
-      // console.log('handleUserInput running'); 
+      // console.log('handleUserInput userInputObj :>> ');
+      // console.log(userInputObj);
       let retVal;
       let tbrIptAliases = [], imgIptAliases = [], ccpIptAliases = [];
       // let configObj = {};
@@ -4474,6 +4491,7 @@ ${indent}<![endif]-->`;
       } else {
 
         // !VA First, check the input and get the return value - it will either be a valid value or FALSE if the error check detected an input error.
+
         retVal = checkUserInput( userInputObj );
 
         // !VA If the value is valid, i.e. checkUserInput did not return false
@@ -4544,6 +4562,7 @@ ${indent}<![endif]-->`;
           // !VA TODO: In fact, this is the exact same routine, so DRYify it in a private function. 
           // !VA Skip straight to handleUserInput if appObjProp is a Toolbar input, which cannot have a 0 or empty value
           if (appObjProp.substring( 0, 3) === 'ccp') {
+            console.log('Mark1');
             if ( Number(userInputObj.evtTargetVal) === 0 ) { 
               // !VA If the target input value is 0, convert it to empty, set the Appobj property to empty and reflect that to the CCP.
               Appobj[appObjProp] = '';
@@ -4554,11 +4573,17 @@ ${indent}<![endif]-->`;
               };
               UIController.configCCP( configObj);
             } else {
+              console.log('Mark3');
               // !VA If the target value is not zero or empty, run the input error check to get retVal
               retVal = handleUserInput(userInputObj);
+              console.log('handleKeyDown retVal :>> ');
+              console.log(retVal);
             }
           // !VA If appObjProp is a toolbar input, run handleUserInput without the zero value handler
           } else {
+            console.log('Mark3');
+            console.log('userInputObj :>> ');
+            console.log(userInputObj);
             retVal = handleUserInput(userInputObj);
           }
           // !VA If retVal is false, then the input was invalid, so handle the behavior in the input element.
@@ -4611,12 +4636,14 @@ ${indent}<![endif]-->`;
     // !VA appController  
     // !VA Called from handleKeydown and handleMouseEvents. Separates numeric input from string input based on the Appobj property name included in two arrays. Numeric input is routed to checkNumericInput where values of type string are converted to integers. String inputs are routed to checkTextInput for valiation and error checking. 
     function checkUserInput(userInputObj) {
+      console.log('checkUserInput userInputObj :>> ');
+      console.log(userInputObj);
       // !VA Destructure userInputObj, making variables instead of constants
       let { appObjProp, evtTargetVal } = userInputObj;
       // !VA Distinguish between elements that allow percent input, elements that allow string input and elements that allow numeric input. Percent inputs validate the percent value and return it with no further error checking. Numeric input elements have validation with error codes that display error messages. String inputs have no validation currently, but validation for hex color codes might be an option.
       let numericInputs, stringInputs, retVal, percentVal, percentInputs;
       percentInputs = [ 'ccpTdaWidthTfd', 'ccpTblWidthTfd', 'ccpTbwWidthTfd'],
-      numericInputs = [ 'imgViewerW', 'curImgW', 'curImgH',  'sPhonesW', 'lPhonesW', 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd' ];
+      numericInputs = [ 'imgViewerW', 'curImgW', 'curImgH',  'sPhonesW', 'lPhonesW', 'ccpTdaHeigtTfd', 'ccpTdaWidthTfd', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaBdradTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd' ];
       stringInputs = ['ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpTdaTxcntTfd', 'ccpImgLoctnTfd', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdclrTfd', 'ccpTblClassTfd', 'ccpTblBgclrTfd', 'ccpTbwClassTfd', 'ccpTbwBgclrTfd' ];
 
       // !VA Determine if the numeric portion of evtTargetVal; is a valid percent value 
@@ -4655,6 +4682,7 @@ ${indent}<![endif]-->`;
           console.log('checkUserInput - The CCP input field is empty - do nothing.');
         // !VA If curImgW or curImgH is empty, do nothing.
         } else {
+          console.log('Mark5');
           // !VA Error check the numeric input
           retVal = checkNumericInput( {appObjProp, evtTargetVal } ); 
         }
@@ -4951,8 +4979,8 @@ ${indent}<![endif]-->`;
         // !VA Populate the dynamicElements properties in Appobj on new image initialization and get localStorage values if set.
         UIController.populateAppobj(Appobj, 'app');
       }
-      console.log('calcViewerSize Appobj :>> ');
-      console.log(Appobj);
+      // console.log('calcViewerSize Appobj :>> ');
+      // console.log(Appobj);
       // !VA If initializing a new image, use the naturalWidth and naturalHeight. If updating via user input, use the display image and height, curImgW and curImgH. 
       // !VA TODO: See if the if condition below has any effect, if not, remove
       // !VA TODO: actualW and actualH should be replaced globally with curImgW and curImgH - the actualW/actualH condition isn't relevant anymore. Test first.
@@ -5228,7 +5256,7 @@ ${indent}<![endif]-->`;
       // !VA Remove the active class from the padding icon, i.e. the event target.
       // !VA NOTE: There should be a configCcp method for this.
       document.getElementById('ccp-tda-padng-icn').classList.remove('active');
-      console.log(`resetPadding Appobj.ccpTdaWidthTfd :>> ${Appobj.ccpTdaWidthTfd};`);
+      // console.log(`resetPadding Appobj.ccpTdaWidthTfd :>> ${Appobj.ccpTdaWidthTfd};`);
 
     }
 
@@ -5815,7 +5843,7 @@ ${indent}<![endif]-->`;
       let revealArray, disableFlag, disableArray, radioArray, reflectArray, checkedArray, highlightArray, mkcssArray;
       let configObj = {};
 
-        // !VA Reset any padding entries and restore curImgW to the dimensions shown in the Inspector panel
+      // !VA Reset any padding entries and restore curImgW to the dimensions shown in the Inspector panel
       resetPadding();
       
       // !VA Handle the TD Options CCP configurations
@@ -5992,7 +6020,7 @@ ${indent}<![endif]-->`;
         Appobj.ccpTdaBgclrTfd = '#556270';
         Appobj.ccpTdaTxclrTfd = '#FFFFFF';
         Appobj.ccpTdaBdclrTfd = '#1e3650';
-        Appobj.ccpTdaBdradTfd = 4;
+        Appobj.ccpTdaBdradTfd = '4';
         Appobj.ccpTdaAlignRdo = 'center';
         Appobj.ccpTdaValgnRdo = 'middle';
         Appobj.ccpTblWidthTfd = Appobj.ccpTdaWidthTfd;

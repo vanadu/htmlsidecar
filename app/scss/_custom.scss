@@ -636,13 +636,14 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   flex-direction: column;
   width: 100%;
   height: 450px;
-  // border: 1px solid magenta;
+  width: 650px;
 }
 
 #file-selector {
   display: block;
   margin: 40px auto 0;
   width: 210px;
+  height: 70px;
   .file-selector-btn {
     border: 1px solid #337ab7;
     border-radius: 8px;
@@ -695,6 +696,7 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 #image-loader-separator {
   display: block;
   width: 100%;
+  height: 60px;
   .or {
     color: #337ab7;
     font-size: 14px;
@@ -704,46 +706,54 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 }
 
 #drop-area {
-  display: flex;
-  position: relative;
+  display: block;
+  position: absolute;
+  top: 160px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 600px;
-  height: 280px;
+  width: 650px;
+  height: 300px;
   padding: 20px;
-  border: 2px dashed #337ab7;
+
   border-radius: 10px;
   background: transparent;
+  z-index: 1000;
   // min-height: 400px;
   // VA! display: flex is set programmatically
   
-  #drop-area-content {
+
+}
+#drop-area-content {
+  display: block;
+  position: relative;
+  height: 260px;
+  width: 610px;
+  margin: 0 auto;
+  color: #337ab7;
+  font-size: 1.125rem !important;
+  line-height: 1.365rem;
+  text-align: center;
+  border: 2px dashed #337ab7;
+  border-radius: 20px;
+  .drop-callout {
     display: block;
     color: #337ab7;
-    font-size: 1.125rem !important;
-    line-height: 1.365rem;
+    font-size: 16px;
+    font-weight: bold;
     text-align: center;
-    .drop-callout {
-      display: block;
-      position: relative;
-      color: #337ab7;
-      font-size: 16px;
-      font-weight: bold;
-      text-align: center;
-      // border: 1px solid blue;
-      a {
-        color: inherit;
-        text-decoration: underline;
-      }
-    }
-    img {
-      width: 100px;
-      margin: 0 auto;
+    padding-top: 40px;
+    // border: 1px solid blue;
+    a {
+      color: inherit;
+      text-decoration: underline;
     }
   }
+  img {
+    width: 100px;
+    margin: 0 auto;
+  }
 }
-
 
 
 // :VA Not sure where this goes
