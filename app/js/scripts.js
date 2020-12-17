@@ -29,10 +29,10 @@ var Witty = (function () {
   // });
 
   // !VA Test function to identify the target of the mouseclick
-  window.onclick = e => {
-    console.log('Clicked element');
-    console.log(e.target);
-  };
+  // window.onclick = e => {
+  //   console.log('Clicked element');
+  //   console.log(e.target);
+  // };
 
   // !VA Click on Witty logo to run test function
   // var testbut = document.querySelector('#testme');
@@ -1786,8 +1786,9 @@ var Witty = (function () {
           appObjProp = 'ccpTdaBdradTfd';
           str = Appobj[appObjProp];
           retObj = returnObject(appObjProp, str);
-          console.log('retObj :>> ');
+          console.log('tdBorderRadius retObj :>> ');
           console.log(retObj);
+          console.log(`retObj.str :>> ${typeof(retObj.str)};`);
           // var Appobj = appController.getAppobj();
           // console.log('Appobj :>> ');
           // console.dir(Appobj);
@@ -2719,12 +2720,13 @@ var Witty = (function () {
 
     // !VA CBController   
     function getVmlbtCodeBlock ( id, indentLevel, Attributes) {
-      let vmlButtonStr, linebreak;
-      // let tdWidth;
+      let vmlButtonStr, linebreak, arcsize;
       linebreak = '\n';
+      arcsize = (Attributes.tdBorderRadius.str/Attributes.tdHeight.str * 100).toFixed(0) + '%';
+      console.log(`arcsize :>> ${arcsize};`);
       // !VA Define the innerHTML of the vmlbutton code
-      vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${Attributes.imgAnchor.str}" style="height:${Attributes.tdHeight.str}px;v-text-anchor:middle;width:${Attributes.tdWidth.str}px;" arcsize="${Attributes.tdHeight/Attributes.tdBorderRadius.str}" strokecolor="${Attributes.tdBorderColor.str}" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc.str}" color="#556270" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:#ffffff;font-family:sans-serif;font-size:13px;font-weight:bold;">Button Text!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="${Attributes.imgAnchor.str}"
-style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});border:1px solid ${Attributes.tdBorderColor.str};border-radius:${Attributes.tdBorderRadius.str};color:${Attributes.tdTextColor.str};display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:${Attributes.tdHeight.str}px;text-align:center;text-decoration:none;width:${Attributes.tdWidth.str}px;-webkit-text-size-adjust:none;mso-hide:all;">Button Text!</a></div>`;
+      vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${Attributes.imgAnchor.str}" style="height:${Attributes.tdHeight.str}px;v-text-anchor:middle;width:${Attributes.tdWidth.str}px;" arcsize="${arcsize}" strokecolor="${Attributes.tdBorderColor.str}" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc.str}" color="${Attributes.tdBgcolor.str}" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:${Attributes.tdTextColor.str};font-family:sans-serif;font-size:13px;font-weight:bold;">Button Text!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="${Attributes.imgAnchor.str}"
+style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});border:1px solid ${Attributes.tdBorderColor.str};border-radius:${Attributes.tdBorderRadius.str}px;color:${Attributes.tdTextColor.str};display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:${Attributes.tdHeight.str}px;text-align:center;text-decoration:none;width:${Attributes.tdWidth.str}px;-webkit-text-size-adjust:none;mso-hide:all;">Button Text!</a></div>`;
       try {
         !vmlButtonStr;
       } catch (error) {
@@ -3921,8 +3923,7 @@ ${indent}<![endif]-->`;
     // !VA appController  : hfs - FILEREADER OBJECT PROCESSING
     // !VA Includes FileReader processing for loading selected image (either by drag and drop in the drop zone or by selection in the File Upload dialog) and initializing the image in the DOM.  
     function handleFileSelect(evt) {
-      console.log(`handleFileSelect evt.target.id :>> ${evt.target.id};`);
-      // console.log(`handleFileSelect evt.target.id :>> ${evt.target.id};`); 
+      // console.log(`handleFileSelect evt.target.id :>> ${evt.target.id};`);
       // !VA files is the object in evt.target/evt.dataTransfer used to hold the data from a file select or drag operation - returns the file list. f is variable for iterating through the files array.
       let files, f;
       // !VA count is the file count, which is passed to the callback funciton from reader.onload. imgObj contains the image dataURL and metadata from FileReader. imgObjArray is the array of imgObj objects passed to buildImageSelector. action is the evt.type. fileCount is the number of files in the files array.
@@ -3997,11 +3998,9 @@ ${indent}<![endif]-->`;
         imgObjArray.push(imgObj);
         // !VA If the loop iterator equals the number of files in the file list, then call ispMakeThumbs. Prevents it being called for each iteration.
         if ( i === imgObj.fileCount + 1 ) {
-          console.log('Mark6');
-          console.log(`imgObj.fileCount :>> ${imgObj.fileCount};`);
           if ( imgObj.fileCount === 0 ) {
             // !VA cur-img is included so that users can over-drop images onto existing ones to replace them. If cur-img is too small to capture the drop, then main-image-viewer is used to capture it
-            if (evt.target.id === 'fsp-select-images-ipt' || evt.target.id === 'drop-area' || evt.target.id === 'cur-img' || evt.target.id === 'main-image-viewer') {
+            if (evt.target.id === 'fsp-select-images-ipt' || evt.target.id === 'drop-area' || evt.target.id === 'cur-img' || evt.target.id === 'main-image-viewer' || evt.target.id.substring( 0, 3 ) === 'ccp') {
             // console.log('single image selected from File Selector Panel - load image');
               loadImage(files[0]);
             } else if (evt.target.id === 'isp-add-thumbs-ipt') {
@@ -4636,8 +4635,7 @@ ${indent}<![endif]-->`;
     // !VA appController  
     // !VA Called from handleKeydown and handleMouseEvents. Separates numeric input from string input based on the Appobj property name included in two arrays. Numeric input is routed to checkNumericInput where values of type string are converted to integers. String inputs are routed to checkTextInput for valiation and error checking. 
     function checkUserInput(userInputObj) {
-      console.log('checkUserInput userInputObj :>> ');
-      console.log(userInputObj);
+
       // !VA Destructure userInputObj, making variables instead of constants
       let { appObjProp, evtTargetVal } = userInputObj;
       // !VA Distinguish between elements that allow percent input, elements that allow string input and elements that allow numeric input. Percent inputs validate the percent value and return it with no further error checking. Numeric input elements have validation with error codes that display error messages. String inputs have no validation currently, but validation for hex color codes might be an option.
@@ -4683,6 +4681,8 @@ ${indent}<![endif]-->`;
         // !VA If curImgW or curImgH is empty, do nothing.
         } else {
           console.log('Mark5');
+          console.log('checkUserInput userInputObj :>> ');
+          console.log(userInputObj);
           // !VA Error check the numeric input
           retVal = checkNumericInput( {appObjProp, evtTargetVal } ); 
         }

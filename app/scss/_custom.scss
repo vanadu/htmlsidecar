@@ -634,16 +634,15 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 #image-loader {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  height: 450px;
   width: 650px;
+  height: 450px;
 }
 
 #file-selector {
   display: block;
-  margin: 40px auto 0;
   width: 210px;
   height: 70px;
+  margin: 40px auto 0;
   .file-selector-btn {
     border: 1px solid #337ab7;
     border-radius: 8px;
@@ -657,21 +656,21 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
   input {
     // display: none;
     display: block;
-    height: 0;
     width: 0;
+    height: 0;
     opacity: 0;
   }
   .file-selector-lbl {
+    display: inline-block;
     width: 100%;
     height: 40px;
-    display: inline-block;
-    background-position: 4px 2px;
-    background-repeat: no-repeat;
-    background-size: 50px 33px;
-    background-image: url('../img/file-selector-icon.png'); 
     transition: all 100ms ease-in;
     -webkit-transition: all 100ms ease-in;    
     -moz-transition: all 100ms ease-in;
+    background-position: 4px 2px;
+    background-size: 50px 33px;
+    background-repeat: no-repeat;
+    background-image: url('../img/file-selector-icon.png'); 
     &:hover {
       filter: brightness(.5) grayscale(1) opacity(.6);
       -webkit-filter: brightness(.5) grayscale(1) opacity(.6);
@@ -680,15 +679,15 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
       // border: 1px solid red;
     }
     h4 {
+      display: inline-block;
       position: relative;
       top: -8px;
-      display: inline-block;
       width: 100%;
-      font-size: 16px;
-      line-height: 16px; 
-      font-weight: bold;
       padding-left: 65px;
       color: #337ab7;
+      font-size: 16px;
+      font-weight: bold;
+      line-height: 16px; 
     }
   }
 }
@@ -727,22 +726,22 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
 #drop-area-content {
   display: block;
   position: relative;
-  height: 260px;
   width: 610px;
+  height: 260px;
   margin: 0 auto;
+  border: 2px dashed #337ab7;
+  border-radius: 20px;
   color: #337ab7;
   font-size: 1.125rem !important;
   line-height: 1.365rem;
   text-align: center;
-  border: 2px dashed #337ab7;
-  border-radius: 20px;
   .drop-callout {
     display: block;
+    padding-top: 40px;
     color: #337ab7;
     font-size: 16px;
     font-weight: bold;
     text-align: center;
-    padding-top: 40px;
     // border: 1px solid blue;
     a {
       color: inherit;
@@ -827,9 +826,9 @@ output {
   left: 0;
   width: 98%;
   height: 530px;
-  overflow-y: auto;
   z-index: 101;
   will-change: transition;
+  overflow-y: auto;
   &.active {
     transform: scaleX(1);
   }
@@ -837,15 +836,15 @@ output {
 
 
 #isp-controls {
-  position: absolute;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
+  position: absolute;
   top: 15px;
   right: 15px;
-  height: 200px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   width: 48px;
+  height: 200px;
   & > div {
     position: relative;
     height: 40px;
@@ -856,22 +855,22 @@ output {
   display: block;
   width: 40px;
   height: 40px;
-  background-size: contain !important;;
+  transition: all 100ms ease-in;
   background-repeat: no-repeat;
+  background-size: contain !important;
   // border: 1px solid red;
 
   // VA! Transforms blue icon to white - default behavior
-  -webkit-filter: brightness(2) grayscale(1) opacity(1);
-  -moz-filter: brightness(2) grayscale(1) opacity(1);
-  filter: brightness(2) grayscale(1) opacity(1);
-  transition: all 100ms ease-in;
   -webkit-transition: all 100ms ease-in;
   -moz-transition: all 100ms ease-in;
+  filter: brightness(2) grayscale(1) opacity(1);
+  -webkit-filter: brightness(2) grayscale(1) opacity(1);
+  -moz-filter: brightness(2) grayscale(1) opacity(1);
   &:hover {
+    transform: scale(1.075);
+    filter: none !important;
     -webkit-filter: none;
     -moz-filter: none;
-    filter: none !important;
-    transform: scale(1.075);
   }
 }
 
@@ -893,9 +892,9 @@ output {
 
 .isp-controls-ipt {
   position: absolute;
-  opacity: 0;
   width: 0;
   height: 0;
+  opacity: 0;
 }
 
 #isp-close-lbl { 
@@ -1124,7 +1123,6 @@ fieldset {
     transition: opacity .250s;
     opacity: 1;
     pointer-events: auto;
-    border: 1px solid magenta;
     &.ccp-conceal-ctn {
       transition: opacity .250s;
       opacity: 0 !important;
@@ -1174,26 +1172,26 @@ fieldset {
 
 
   // VA! Set width of section columns in the respective options groups
-  #img-options-left,  #img-options-right {
+  #ccp-img-options-left,  #ccp-img-options-right {
     width: 50%;
   }
   // VA! td and table options are three column, with the outer columns slightly wider than the center
-  #td-options-left {
+  #ccp-td-options-left {
     width: 225px;
   }
-  #table-options-left {
+  #ccp-table-options-left {
     width: 240px;
   }
-  #td-options-center {
+  #ccp-td-options-center {
     width: 330px;
   }
-  #td-options-right {
+  #ccp-td-options-right {
     width: 160px;
   }
-  #table-options-right {
+  #ccp-table-options-right {
     width: 200px;
   }
-  #table-options-center {
+  #ccp-table-options-center {
     display: flex;
     // flex-direction: column;
     justify-content: flex-start;
@@ -1201,11 +1199,11 @@ fieldset {
   }
 
   // VA! Container to the right of the table wrapper icon container where the table wrapper options live
-  #table-options-center-wrapper-options {
+  #ccp-table-options-center-wrapper-options {
     width: 240px;
   }
 
-  #table-options-center-icons {
+  #ccp-table-options-center-icons {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
