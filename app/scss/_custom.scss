@@ -855,7 +855,6 @@ output {
   transition: all 100ms ease-in;
   background-repeat: no-repeat;
   background-size: contain !important;
-  // border: 1px solid red;
 
   // VA! Transforms blue icon to white - default behavior
   -webkit-transition: all 100ms ease-in;
@@ -1141,7 +1140,7 @@ output {
   justify-content: space-between;
   // !VA Branch: 121720A
   width: 670px;
-
+  border: 1px solid blue;
   .cpp-par {
     transition: opacity .250s;
     opacity: 1;
@@ -1152,105 +1151,117 @@ output {
       pointer-events: none !important;
     }
   }
+}
 
-  // VA! Inherit pointer events for each child up to .clipboard-buttons, otherwise the child's pointer-events=auto causes it to be clickable even though concealed
-  #ccp-img-cbhtm-ipt, #ccp-img-cbhtm-btn {
-    pointer-events: inherit;
+// VA! Inherit pointer events for each child up to .clipboard-buttons, otherwise the child's pointer-events=auto causes it to be clickable even though concealed
+#ccp-img-cbhtm-ipt, #ccp-img-cbhtm-btn {
+  pointer-events: inherit;
+}
+
+// VA! Standard properties for all options sections in all three fieldsets
+.ccp-options-left {
+  display: flex;
+  position: relative;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 556px;
+  // !VA Custom widths for flex child elements of .ccp-options
+  // !VA Classes
+  .ccp-class-ipt { width: 127px; }
+  .ccp-align-lbl { 
+    width: 25px;
+    height: 25px; 
+    margin-right: 8px;
+  }
+  // !VA Specific IMG element properties
+  #ccp-img-loctn-tfd {  margin-left: 46px; }
+  #ccp-img-loctn-ipt { width: 330px; }
+  #ccp-img-altxt-ipt { width: 330px; }
+  #ccp-img-anchr-ipt { width: 330px; }
+  #ccp-tda-class-ipt { width: 144px; }
+  #ccp-tda-valgn-rdo { margin-left: 22px; }
+  #ccp-tda-pdpar-grp { margin-left: 28px; }
+}
+
+.ccp-options-right {
+  position: relative;
+  display: block;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  // align-items: flex-start;
+  width: 104px;
+  #ccp-img-excld-rdo, #ccp-img-itype-rdo {
+    display: inline-block;
+    // !VA Move the excld element up so it rests on the baseline
+    height: 35px;
+    // !VA Keep the taller element on the baseline without affecting the items on the next flex row
   }
 
-  // VA! Standard properties for all options sections in all three fieldsets
-  .ccp-options {
+  // VA! Width of TD options icons container
+  #ccp-tda-optns-rdo, #ccp-img-optns-rdo {
     display: flex;
-    position: relative;
+    position: absolute;
+    top: 0;
     flex-direction: row;
     flex-wrap: wrap;
-    align-items: flex-start;
-    justify-content: flex-start;
-    width: 100%;
-    border: 1px solid magenta;
-    // !VA Custom widths for flex child elements of .ccp-options
-    // !VA Classes
-    .ccp-class-ipt { width: 126px; }
-    .ccp-align-lbl { 
-      width: 25px;
-      height: 25px; 
-      margin-right: 8px;
-    }
-    // !VA Specific IMG element properties
-    #ccp-img-loctn-tfd {  margin-left: 46px; }
-    #ccp-img-loctn-ipt { width: 334px; }
-    #ccp-img-excld-rdo, #ccp-img-itype-rdo {
-      display: inline-block;
-      position: relative;
-      // !VA Move the excld element up so it rests on the baseline
-      top: -8px;
-      width: 86px;
-      height: 35px;
-      // !VA Keep the taller element on the baseline without affecting the items on the next flex row
-      margin-bottom: -8px;
-    }
-    #ccp-img-itype-rdo {
-      // !VA Allow this element to top align with the other elements. The negative margin above shrinks its box to cancel out the fact that it visually extends below the baseline.
-      top: 0;
-    }
-    // !VA Specific TD element properties
-    // VA! Width of TD options icons container
-    #ccp-tda-optns-rdo {
-      position: absolute;
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      top: 0;
-      right: -5px;
-      justify-content: space-between;
-      // VA! Compensate for whitespace created by hidden input element
-      width: 100px;
-    }
-
+    justify-content: space-between;
+    width: 104px;
+    // VA! Compensate for whitespace created by hidden input element
 
   }
+  #ccp-tda-optns-rdo {
+    // !VA Override the margin applied to .ccp-ctn, otherwise it will be applied twice because .ccp-ctn is applied to both this element and its children divs. This is poor style, but I think there is JS that refers to the child elements of ccp-tda-optns-rdo and its children. For later...
+    // display: inline-block;
+    width: 94px;
+    height: 140px;
+    margin: 0;
+    padding-left: 8px;
+  }
+}
 
 
-  // VA! HERE
-  #ccp-tda-txcnt-tfd {
-    position: absolute;
-    top: 1px;
-    left: 2px;
+// VA! HERE
+#ccp-tda-txcnt-tfd {
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  width: 514px;
+  textarea {
+    height: 45px;
     width: 514px;
-    textarea {
-      height: 45px;
-      width: 514px;
-      resize: none;
-      // wrap: hard;
-      z-index: 100;
-    }
+    resize: none;
+    // wrap: hard;
+    z-index: 100;
   }
+}
 
 
 
-  #ccp-table-options-left {
-    width: 240px;
-  }
-  #ccp-table-options-right {
-    width: 200px;
-  }
-  #ccp-table-options-center {
-    display: flex;
-    // flex-direction: column;
-    justify-content: flex-start;
-    width: 315px;
-  }
+#ccp-table-options-left {
+  width: 240px;
+}
+#ccp-table-options-right {
+  width: 200px;
+}
+#ccp-table-options-center {
+  display: flex;
+  // flex-direction: column;
+  justify-content: flex-start;
+  width: 315px;
+}
 
-  // VA! Container to the right of the table wrapper icon container where the table wrapper options live
-  #ccp-table-options-center-wrapper-options {
-    width: 240px;
-  }
+// VA! Container to the right of the table wrapper icon container where the table wrapper options live
+#ccp-table-options-center-wrapper-options {
+  width: 240px;
+}
 
-  #ccp-table-options-center-icons {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-  }
+#ccp-table-options-center-icons {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 // VA! IMAGE OPTIONS SECTION
@@ -1270,7 +1281,7 @@ output {
 #ccp-img-targt-chk {
   display: block;
   position: relative;
-  width: 50px;
+  width: 35px;
   height: 25px;
 }
 
@@ -1299,7 +1310,7 @@ output {
   font-weight: 300;
   opacity: 1;
   pointer-events: auto;
-  border: 1px solid green;
+  // border: 1px solid green;
   // !VA Branch: 121720A
   
   &.ccp-conceal-ctn {
