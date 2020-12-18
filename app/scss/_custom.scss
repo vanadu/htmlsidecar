@@ -326,7 +326,6 @@ input[type=number] {
   margin: 0 auto;
   padding: 0;
   list-style-type: none;
-  // border: 1px solid blue;
   li {
     margin: 0;
     padding: 0;
@@ -673,7 +672,6 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
       -webkit-filter: brightness(.5) grayscale(1) opacity(.6);
       -moz-filter: brightness(.5) grayscale(1) opacity(.6);
       transform: scale(1.01);
-      // border: 1px solid red;
     }
     h4 {
       display: inline-block;
@@ -739,7 +737,6 @@ input:focus:-ms-input-placeholder { color:transparent; } /* IE 10+ */
     font-size: 16px;
     font-weight: bold;
     text-align: center;
-    // border: 1px solid blue;
     a {
       color: inherit;
       text-decoration: underline;
@@ -1140,7 +1137,6 @@ output {
   justify-content: space-between;
   // !VA Branch: 121720A
   width: 670px;
-  border: 1px solid blue;
   .cpp-par {
     transition: opacity .250s;
     opacity: 1;
@@ -1166,7 +1162,7 @@ output {
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: flex-start;
-  width: 556px;
+  width: 558px;
   // !VA Custom widths for flex child elements of .ccp-options
   // !VA Classes
   .ccp-class-ipt { width: 127px; }
@@ -1183,6 +1179,27 @@ output {
   #ccp-tda-class-ipt { width: 144px; }
   #ccp-tda-valgn-rdo { margin-left: 22px; }
   #ccp-tda-pdpar-grp { margin-left: 28px; }
+
+  #parent-table-options, #wrapper-table-options {
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    position: relative;
+    width: 236px;
+    #ccp-tbl-class-ipt,  #ccp-tbw-class-ipt { width: 164px; }
+    #ccp-tbl-width-ipt, #ccp-tbw-width-ipt, #ccp-tbl-maxwd-ipt, #ccp-tbw-maxwd-ipt { width: 60px;}
+  }
+  #table-checkboxes {
+    display: block;
+    position: relative;
+    width: 80px;
+  }
+
+
+
 }
 
 .ccp-options-right {
@@ -1238,33 +1255,6 @@ output {
   }
 }
 
-
-
-#ccp-table-options-left {
-  width: 240px;
-}
-#ccp-table-options-right {
-  width: 200px;
-}
-#ccp-table-options-center {
-  display: flex;
-  // flex-direction: column;
-  justify-content: flex-start;
-  width: 315px;
-}
-
-// VA! Container to the right of the table wrapper icon container where the table wrapper options live
-#ccp-table-options-center-wrapper-options {
-  width: 240px;
-}
-
-#ccp-table-options-center-icons {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-
-// VA! IMAGE OPTIONS SECTION
 
 
 
@@ -1465,7 +1455,6 @@ output {
 //   width: 44px;
 //   height: 25px;
 //   opacity: 1 !important;
-//   border: 1px solid blue;
 // }
 
 
