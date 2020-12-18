@@ -105,7 +105,6 @@ button:disabled  {
 
 
 .output {
-  border: 1px solid magenta;
 }
 
 // VA! Get rid of the default decrement/increment arrows on input elements of type number 
@@ -250,7 +249,6 @@ input[type=number] {
   color: $header-subtext-color;
   text-align: left;
   text-transform: uppercase;
-  // border: 1px solid magenta;
 }
 
 .header-headline {
@@ -366,7 +364,6 @@ input[type=number] {
     &:hover {
       cursor: pointer;
     }
-    // border: 1px solid magenta;
   }
   // VA! Reboot: deleted img selector, moved img styling to class .toolbar-but
   // VA! Reboot: deleted .divider child selector under input selector, moved divider styling to class .divider
@@ -1046,12 +1043,11 @@ output {
   // }
 }
 
-#ccp-content-img {
+.ccp-section-content {
   display: flex;
   justify-content: space-between;
   position: relative;
   width: 100%;
-  border: 1px solid magenta;
   // VA! Set the width of the 4 options columns in each fieldset
   fieldset {
     display: block;
@@ -1143,9 +1139,8 @@ output {
   position: relative;
   align-content: flex-start;
   justify-content: space-between;
-
-
-
+  // !VA Branch: 121720A
+  width: 670px;
 
   .cpp-par {
     transition: opacity .250s;
@@ -1167,21 +1162,55 @@ output {
   .ccp-options {
     display: flex;
     position: relative;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     align-items: flex-start;
     justify-content: flex-start;
     width: 100%;
-    // VA! Standard properties for all child rows in the options groups 
-    .ccp-row {
-      display: flex;
-      position: relative;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      padding-bottom: 8px;
+    border: 1px solid magenta;
+    // !VA Custom widths for flex child elements of .ccp-options
+    // !VA Classes
+    .ccp-class-ipt { width: 126px; }
+    .ccp-align-lbl { 
+      width: 25px;
+      height: 25px; 
+      margin-right: 8px;
     }
+    // !VA Specific IMG element properties
+    #ccp-img-loctn-tfd {  margin-left: 46px; }
+    #ccp-img-loctn-ipt { width: 334px; }
+    #ccp-img-excld-rdo, #ccp-img-itype-rdo {
+      display: inline-block;
+      position: relative;
+      // !VA Move the excld element up so it rests on the baseline
+      top: -8px;
+      width: 86px;
+      height: 35px;
+      // !VA Keep the taller element on the baseline without affecting the items on the next flex row
+      margin-bottom: -8px;
+    }
+    #ccp-img-itype-rdo {
+      // !VA Allow this element to top align with the other elements. The negative margin above shrinks its box to cancel out the fact that it visually extends below the baseline.
+      top: 0;
+    }
+    // !VA Specific TD element properties
+    // VA! Width of TD options icons container
+    #ccp-tda-optns-rdo {
+      position: absolute;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      top: 0;
+      right: -5px;
+      justify-content: space-between;
+      // VA! Compensate for whitespace created by hidden input element
+      width: 100px;
+    }
+
+
   }
+
+
   // VA! HERE
   #ccp-tda-txcnt-tfd {
     position: absolute;
@@ -1199,22 +1228,8 @@ output {
 
 
 
-  // VA! Set width of section columns in the respective options groups
-  #ccp-img-options-left,  #ccp-img-options-right {
-    width: 50%;
-  }
-  // VA! td and table options are three column, with the outer columns slightly wider than the center
-  #ccp-td-options-left {
-    width: 225px;
-  }
   #ccp-table-options-left {
     width: 240px;
-  }
-  #ccp-td-options-center {
-    width: 330px;
-  }
-  #ccp-td-options-right {
-    width: 160px;
   }
   #ccp-table-options-right {
     width: 200px;
@@ -1239,23 +1254,8 @@ output {
 }
 
 // VA! IMAGE OPTIONS SECTION
-// VA! Binary Radio Buttons, i.e. img-include, img-type
-#img-options-bnary {
-  display: flex;
-  position: absolute;
-  top: 0;
-  left: 28px;
-  flex-direction: column;
-  width: 100px;
-  height: 98px;
-}
 
-#ccp-img-excld-rdo, #ccp-img-itype-rdo {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
+
 
 // VA! Image anchor options that display when an anchor is provided in the anchor input
 #img-anchr-options {
@@ -1284,24 +1284,14 @@ output {
   height: 68px;
 }
 
-// VA! Width of TD options icons container
-#ccp-tda-optns-rdo {
-  display: flex;
-  position: absolute;
-  top: 23px;
-  left: -8px;
-  justify-content: space-between;
-  // VA! Compensate for whitespace created by hidden input element
-  width: 276px;
-  height: 44px;
-}
-
 // VA! CCP INPUT ELEMENT CLASSES
 // VA! Global properties for CCP input containers, applies all CCP element containers. 
 .ccp-ctn {
   display: flex;
   justify-content: flex-start;
-  margin-left: 10px;
+  // !VA Branch: 121720A
+  // margin-left: 10px;
+  margin: 0 0 8px 10px;
   transition: opacity .250s; 
   background: #000000;
   color: #FFFFFF;
@@ -1309,6 +1299,9 @@ output {
   font-weight: 300;
   opacity: 1;
   pointer-events: auto;
+  border: 1px solid green;
+  // !VA Branch: 121720A
+  
   &.ccp-conceal-ctn {
     transition: opacity .250s;
     opacity: 0 !important;
@@ -1325,9 +1318,9 @@ output {
 // VA! ALIGN container properties, including vAlign
 .ccp-align-ctn {
   display: flex;
-  justify-content: space-between;
-  width: 124px;
-  margin: 0 0 0 6px;
+  justify-content: flex-start;
+  width: 128px;
+  height: 27px;
 }
 
 // VA! Defaults for all CCP input/button elements
@@ -1441,13 +1434,13 @@ output {
 
 .ccp-padng-grp {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  position: absolute;
-  top: -4px;
-  right: 50px;
-  width: 130px;
-  height: 70px;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  position: relative;
+
+  width: 240px;
+  height: 25px;
   // margin-left: 10px;
   // VA! Prevent overlay by #td-options-center-row-2
   z-index: 102;
@@ -1464,23 +1457,14 @@ output {
 //   border: 1px solid blue;
 // }
 
-.ccp-padng-row {
-  display: flex;
-  justify-content: flex-end;
-}
 
 // VA! Padding icon is a special case - it has no input element. If an active class it to be put on it to highlight user text input in any of the padding input fields, it has to be done separately here. 
 #ccp-tda-padng-icn {
-
-  position: relative;
-  top: 18px;
-  right: 4px;
-  // left: 52px;
-  width: 26px;
-  height: 26px;
-
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
   // VA! background-image listed separately with all the other icons
-  background-size: 26px 26px;
+  background-size: 20px 20px;
   background-color: #000000;
   background-position: center center;
   // background-repeat: no-repeat;
@@ -1515,9 +1499,7 @@ output {
 #ccp-tda-pdlft-ipt {background: url('../img/icon-padng-lft.png') no-repeat;}
 
 #ccp-tda-pdtop-ipt, #ccp-tda-pdrgt-ipt, #ccp-tda-pdbtm-ipt, #ccp-tda-pdlft-ipt  {
-  // width: 80px;
-  height: 28px;
-  // padding-left: 35px;
+  height: 25px;
   background-size: 8px auto;
   background-position: 2px 10px;
   padding-left: 12px !important;
@@ -1609,7 +1591,6 @@ output {
       -webkit-filter: none;
       -moz-filter: none;
       filter: none;
-      // border: 1px solid magenta;
     }
     // VA! Applies the active class to all sibling elements of the input element that have the class .ccp-txfld-lbl
     &.active +.ccp-txfld-lbl {
