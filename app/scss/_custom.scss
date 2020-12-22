@@ -1048,6 +1048,7 @@ output {
   fieldset {
     display: block;
     position: relative;
+    left: 80px; 
     width: 670px;
     // VA! Below overrides the fieldset margin in normalize.less
     margin: 0;
@@ -1092,14 +1093,14 @@ output {
   .clipboard-buttons {
     display: flex;
     position: absolute;
-    top: 14px;
-    right: 2px;
+    top: 10px;
+    left: 4px;
     flex-direction: column;
     align-items: center;
     justify-content: space-evenly;
     width: 60px;
     height: 126px;
-    margin-right: 15px;
+    // margin-right: 15px;
     transition: opacity .250s;
     opacity: 1;
     z-index: 100;
