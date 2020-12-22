@@ -1710,13 +1710,15 @@ output {
 #ccp-tda-padng-icn { background-image: url('../img/icon-padng-blue.png');}
 // VA! TD OPTIONS
 #ccp-tda-basic-lbl { background-image: url('../img/icon-td-basic-blue.png');}
+#ccp-tda-excld-lbl { background-image: url('../img/icon-exclude-image-blue.png');}
 #ccp-tda-iswap-lbl { background-image: url('../img/icon-td-imgswap-blue.png');}
 #ccp-tda-swtch-lbl { background-image: url('../img/icon-td-posswitch-blue.png');}
 #ccp-tda-bgimg-lbl { background-image: url('../img/icon-td-bgimage-blue.png');}
 #ccp-tda-vmlbt-lbl { background-image: url('../img/icon-td-vmlbutton-blue.png');}
 // VA! IMG EXCLD
 #ccp-img-incld-lbl { background-image: url('../img/icon-include-image-blue.png');}
-#ccp-img-excld-lbl { background-image: url('../img/icon-exclude-image-blue.png');}
+// !VA Branch: 122220B
+// #ccp-img-excld-lbl { background-image: url('../img/icon-exclude-image-blue.png');}
 // VA! IMG ITYPE
 #ccp-img-fixed-lbl { background-image: url('../img/icon-fixed-blue.png');}
 #ccp-img-fluid-lbl { background-image: url('../img/icon-fluid-blue.png');}
