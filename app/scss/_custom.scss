@@ -1113,6 +1113,11 @@ output {
   }
 }
 
+// !VA Shift the TD and TBL CB buttons down so they line up with the first icon row
+#ccp-tda-cbbut-grp, #ccp-tbl-cbbut-grp {
+  margin-top: 12px;
+}
+
 // VA! CLIPBOARD BUTTON GROUP
 // VA! Parent container properties are defined in .ccp-options-container
 // VA! Curly braces at l/r of Make CSS Clip buttons in Clipboard Buttons section
