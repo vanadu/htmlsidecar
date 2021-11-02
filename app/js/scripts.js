@@ -606,7 +606,7 @@ var Witty = (function () {
       allInspectors = UIController.getInspectorLabelsIDs();
       // !VA Size On Disk is NOT 2X the Display Size: flag Size on Disk and Retina
       if (Appobj.curImgNW < (Appobj.curImgW * 2) ) {
-        flaggedInspectors.push(allInspectors.insDiskSizeLabel);
+        flaggedInspectors.push(allInspectors.insDisplaySizeLabel);
       } 
       // !VA Small phones isn't at least 2X size on Disk and Retina
       if (Appobj.curImgNW < (Appobj.sPhonesW * 2) ) {
