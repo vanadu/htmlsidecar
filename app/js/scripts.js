@@ -436,9 +436,9 @@ var Witty = (function () {
     }
 
     // !VA UIController private
-    // !VA Removes the X overlay from the thumb items if the checked status of the Remove Thumbs checkbox in the ISP is false. Note that this doesn't remove the active style, but rather sets the element display property to none so that the element can't recieve a click event.
+    // !VA Removes the X overlay from the thumb items if the checked status of the Remove Thumbs checkbox in the ISP is false. Note that this doesn't remove the active style, but rather sets the element display property to none so that the element can't receive a click event.
     function resetRemoveThumbsMode() {
-      console.log('resetRemoveThumbsMode running'); 
+      // console.log('resetRemoveThumbsMode running'); 
       document.querySelector(ISPElements.ispRemoveThumbsIpt).checked = false;
       var overlays =document.getElementsByClassName('thumb-overlay');
       for (const el of overlays) {
@@ -1378,6 +1378,10 @@ var Witty = (function () {
           Appobj.sPhonesH = Math.round(Appobj.sPhonesW * (1 / Appobj.aspect[0]));
           Appobj.lPhonesH = Math.round(Appobj.lPhonesW * (1 / Appobj.aspect[0]));
 
+          // console.log('populateAppobjProperties');
+          // console.log('Appobj.sPhonesW :>> ' + Appobj.sPhonesW);
+          // console.log('Appobj.sPhonesH :>> ' + Appobj.sPhonesH);
+
         }
         function populateCcpProperties(Appobj) {
           // !VA Now initialize Appobj with the CCP element values. This includes ALL CCP elements, including those that are displayed/undisplayed depending on which TDOption or imgType radio is selected. 
@@ -1554,7 +1558,9 @@ var Witty = (function () {
       // !VA UIController public
       // !VA Hide  the default 'No Image' value displayed when the app is opened with no image and display the Inspector values for the current image, show the Clipboard button and call evalInspectorAlerts to determine which Inspector labels should get dimension alerts (red font applied). 
       writeInspectors: function(Appobj) {
-
+        // console.log('writeInspectors running');
+        // console.log(' Appobj:');
+        // console.dir(Appobj);
         // !VA IMPORTANT - this is a devmode hack. The fileName has already been written to inspectorElements.insFilename in initUI devmode. So now we have to write it to Appobj, otherwise it will be undefined it gets written to the innerHTML below. This should probably be dependent on whether we're in devmode or not, but this works in any case and can be deleted for production. 
         Appobj.fileName = document.querySelector(inspectorElements.insFilename).textContent;
 
@@ -4126,7 +4132,7 @@ ${indent}<![endif]-->`;
     // !VA Called from handleKeydown. Applies the user-entered input value in the Toolbar or CCP, i.e. writes the value to Appobj and, if Toolbar, runs updateCurrentImage which then runs calcViewerSize to update the dynamicElements with the new value.
     // !VA NOTE: This may be a functional dupe of updateCurrentImage
     function applyInputValue(userInputObj) {
-      console.log('applyInputValue running'); 
+      // console.log('applyInputValue running'); 
       // !VA Destructure userInputObj into variables
       let { evtTargetVal, appObjProp } = userInputObj;
       let inputObj = {};
@@ -4147,7 +4153,8 @@ ${indent}<![endif]-->`;
       if (appObjProp.includes('curImg')) {
         recalcAppobj( inputObj );
       } else {
-        console.log('ERROR in applyInputValue - unknown condition');
+        // !VA Branch: 110821A The below is unnecessary - updateCurrentImage runs anyway and recalcAppobj only runs if appObjProp includes curImg - deprecating this error message for now
+        // console.log('ERROR in applyInputValue - unknown condition');
       }
       return;
     }
@@ -4704,9 +4711,8 @@ ${indent}<![endif]-->`;
           console.log('checkUserInput - The CCP input field is empty - do nothing.');
         // !VA If curImgW or curImgH is empty, do nothing.
         } else {
-          console.log('Mark5');
-          console.log('checkUserInput userInputObj :>> ');
-          console.log(userInputObj);
+          // console.log('checkUserInput userInputObj :>> ');
+          // console.log(userInputObj);
           // !VA Error check the numeric input
           retVal = checkNumericInput( {appObjProp, evtTargetVal } ); 
         }
@@ -4784,12 +4790,12 @@ ${indent}<![endif]-->`;
           break;
 
           // !VA TODO: Handle the small phone input
-        case (appObjProp === 'sPhoneW') :
+        case (appObjProp === 'sPhonesW') :
           console.log('Error handling for iptTbrSmallPhonesW input not implemented!');
           break;
         
         // !VA Handle the large phone input
-        case (appObjProp === 'lPhoneW') :
+        case (appObjProp === 'lPhonesW') :
           console.log('Error handling for imagewidth input not implemented!');
           break;
         // !VA Doesn't apply to the excludeimg option because that functionally doesn't have an img in the cell, so the error doesn't apply - exclude rdoCcpTdExcludeimg from the error condition
@@ -4960,9 +4966,12 @@ ${indent}<![endif]-->`;
 
     // !VA appController  
     // !VA Called from applyInputValue and handleMouseEvents. Writes imgViewerW, sPhonesW and lPhonesW to localStorage and calculates the adjacent side of the curImgW/curImgH input, then runs calcViewerSize to resize the dynamicElements containers. NOTE: This function does things that are done elsewhere and does other things that it shouldn't do. Revisit this at some point but for now it works.
+
+    // !VA Branch: 110821A 
+
     function updateCurrentImage(userInputObj) {
-      // console.log('updateCurrentImage running'); 
-      // console.log('updateCurrentImage userInputObj :>> ');
+      console.log('updateCurrentImage running'); 
+      console.log('updateCurrentImage userInputObj :>> ');
       console.log(userInputObj);
       // !VA Initialize vars for curImgH and curImgW in order to calculate one based on the value of the other * Appobj.aspect.
       // let curImgH, curImgW;
@@ -4971,6 +4980,14 @@ ${indent}<![endif]-->`;
       // !VA Handle the two cases: 1) appObjProp and evtTargetVal are used to write to Appobj, localStorage and the DOM. This applies to imgViewerW, sPhonesW and lPhonesH. 2) appObjProp and evtTargetVal are used to calculate the img's adacent dimension, then both the images' dimensions are written to Appobj. This applies to curImgW and curImgH. NOTE: For some reason, updateAppobj wrote curImgH to the DOM here - I'm not sure why that was done, but it shouldn't be. 
       // !VA appObjProp = imgViewerW, sPhonesW or lPhonesW
       if ( appObjProp === 'imgViewerW' || appObjProp === 'sPhonesW' || appObjProp === 'lPhonesW') {
+
+        // !VA Branch: 110821A Added this fix because sPhonesW and lPhoneH weren't updating on input. This is un-DRY - it's duplicated in populateAppProperties, but that runs on init. This is really the only place to put this, since it's where all the other Toolbar element updates are initiated.
+        if ( appObjProp === 'sPhonesW' || appObjProp === 'lPhonesW') {
+          console.log('Updating sPhonesH or lPhonesH');
+          Appobj.sPhonesH = Math.round(Appobj.sPhonesW * (1 / Appobj.aspect[0]));
+          Appobj.lPhonesH = Math.round(Appobj.lPhonesW * (1 / Appobj.aspect[0]));
+        }
+
         // !VA Set the Appobj property corresponding to the appObjProp identifier to its respective value
         Appobj[appObjProp] = evtTargetVal;
         // !VA Set the localStorage for the respective Appobj property to the respective value
