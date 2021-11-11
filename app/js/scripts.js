@@ -2551,6 +2551,9 @@ var Witty = (function () {
         // !VA Replacing tdAppobjWidth and tdAppobjHeight with Attributes.imgHeight.str and Attributes.imgWidth.str, since that is what's in getBgimgCodeBlock. If no issues, we can deprecate Attributes.tdAppobjWidth and Attributes.tdAppobjHeight.
         // tdInner.width = Attributes.tdAppobjWidth.str;
         // tdInner.height = Attributes.tdAppobjHeight.str;
+
+        // !VA Date: 110121 - Fixed class not outputting for bgimg option
+        omitIfEmpty( Attributes.tdClass.str, tdInner, 'className');
         tdInner.width = Attributes.imgWidth.str;
         tdInner.height = Attributes.imgHeight.str;
         tdInner.vAlign = Attributes.tdValign.str;
