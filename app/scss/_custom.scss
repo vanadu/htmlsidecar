@@ -1290,6 +1290,7 @@ output {
   color: #FFFFFF;
   font-size: 14px;
   font-weight: 300;
+  line-height: 14px;
   opacity: 1;
   pointer-events: auto;
   // border: 1px solid green;
@@ -1536,6 +1537,11 @@ output {
   height: 30px;
 }
 
+// !VA Branch: AddWidth100_111321A Bump up wd100, ghost and msdpi off the baseline, otherwise the 8px bottom margin on the parent will extend to 10px due to the 30px height of the icon
+.ccp-wd100-lbl, .ccp-ghost-lbl, .ccp-msdpi-lbl {
+  margin-top: -2px;
+}
+
 // VA! Default icon group input style - only the icon itself should display, so hide the input element. Using the appearance property - display and visibility don't work as expected and opacity cuts off a slice from the icon. If there are browser compatibility issues, revisit this, but it works on modern desktop browsers: https://caniuse.com/#feat=css-appearance.
 
 // VA! 08.22.20 
@@ -1680,6 +1686,11 @@ output {
 #ccp-img-loctn-lbl { background-image: url('../img/icon-location-blue.png')}
 // VA! WIDTH Input
 .ccp-width-lbl { background-image: url('../img/icon-width-blue.png')}
+
+// !VA Branch: showInitRecords
+.ccp-wd100-lbl { background-image: url('../img/icon-width100-blue.png')}
+
+
 // VA! HEIGHT Input
 #ccp-tda-heigt-lbl { background-image: url('../img/icon-height-blue.png')}
 // VA! BACKGROUND COLOR Input

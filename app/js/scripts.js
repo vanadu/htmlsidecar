@@ -255,6 +255,8 @@ var Witty = (function () {
       ccpTblAlignRdo: '#ccp-tbl-align-rdo',
       ccpTblClassTfd: '#ccp-tbl-class-tfd',
       ccpTblWidthTfd: '#ccp-tbl-width-tfd',
+      // !VA Branch: AddWidth100_111321A
+      ccpTblWd100Chk: '#ccp-tbl-wd100-chk',
       ccpTblMaxwdTfd: '#ccp-tbl-maxwd-tfd',
       ccpTblBgclrTfd: '#ccp-tbl-bgclr-tfd',
       ccpTblGhostChk: '#ccp-tbl-ghost-chk',
@@ -264,6 +266,8 @@ var Witty = (function () {
       ccpTbwAlignRdo: '#ccp-tbw-align-rdo',
       ccpTbwClassTfd: '#ccp-tbw-class-tfd',
       ccpTbwWidthTfd: '#ccp-tbw-width-tfd',
+      // !VA Branch: AddWidth100_111321A
+      ccpTbwWd100Chk: '#ccp-tbw-wd100-chk',
       ccpTbwMaxwdTfd: '#ccp-tbw-maxwd-tfd',
       ccpTbwBgclrTfd: '#ccp-tbw-bgclr-tfd',
       ccpTbwGhostChk: '#ccp-tbw-ghost-chk',
@@ -838,7 +842,7 @@ var Witty = (function () {
       let el;
       // !VA Array of table wrapper aliases
       let wraprArr;
-      wraprArr =  [ 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd',  'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+      wraprArr =  [ 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwWd100Chk', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
       // !VA There are conditions, i.e. the TD swtch option, in which ccpTbwMaxwdTfd should not be revealed, so in those cases remove that alias from the array
       if (appController.getAppobj('ccpTdaOptnsRdo') === 'swtch') {
         // console.log('SWTCH selected');
@@ -911,7 +915,8 @@ var Witty = (function () {
       // !VA Contains all the aliases whose elements can be concealed/revealed by the revealElements method of configCcp. Does not include the MKCSS button groups, since those buttons are children of the parent and are thus handled by revealMkcss. 
       // !VA Branch: 122220B
       // !VA Removed ccpImgExcldRdo
-      const allAliases =  [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgAlignRdo', 'ccpImgItypeRdo', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaTxcntTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdparGrp', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblMsdpiChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblCbhtmBtn', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
+      // !VA Branch: AddWidth100_111321A Added ccpTblWd100Chk
+      const allAliases =  [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd', 'ccpImgAnchrTfd', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgAlignRdo', 'ccpImgItypeRdo', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaBgclrTfd', 'ccpTdaTxclrTfd', 'ccpTdaBdradTfd', 'ccpTdaBdclrTfd', 'ccpTdaTxcntTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaPdparGrp', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblWd100Chk', 'ccpTblMaxwdTfd', 'ccpTblBgclrTfd', 'ccpTblGhostChk', 'ccpTblMsdpiChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblCbhtmBtn', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwWd100Chk', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];
 
       // !VA Get object containing the reveal configuration at initialization based on allArray above and initConcealed. initConcealed is the array of elements that are concealed at initialization. The result is an object whose keys are the revealable element aliases and whose values represent the reveal state at initialization. This object forms the basis for the revealObj defined below.
       function getInitObj() {
@@ -1885,6 +1890,18 @@ var Witty = (function () {
           retObj = returnObject( appObjProp, str );
           return retObj;
         })(),
+        // !VA Branch: AddWidth100_111321A
+        tableWd100: (function() {
+          appObjProp = 'ccpTblWd100Chk';
+
+
+
+          // !VA Not sure whether this should be Appobj[appObjProp] or Appobj['curImgW'] - keep an eye on it.
+          // !VA Branch: AddWidth100_111321A Commenting out for now
+          // Appobj.ccpImgItypeRdo === 'fixed' ? str = Appobj[appObjProp] : str = '100%';
+          retObj = returnObject( appObjProp, str );
+          return retObj;
+        })(),
         tableBgcolor: (function() {
           appObjProp = 'ccpTblBgclrTfd';
           str = Appobj[appObjProp];
@@ -1956,6 +1973,18 @@ var Witty = (function () {
           // !VA NOTE: The dependency between maxwidth and width is unclear. If there is a maxwidth, then width has to be a percent value. That's no yet implemented.
           // !VA If the imgTyp is fixed, set the wrapper width to the value of the input field, which for the most part will be imgViewerW. If it's fluid, set it to 100%
           imgType === 'fixed' ? str = Appobj[appObjProp] : str = '100%';
+          retObj = returnObject( appObjProp, str );
+          return retObj;
+        })(),
+        // !VA Branch: AddWidth100_111321A
+        tableWrapperWd100: (function() {
+          appObjProp = 'ccpTbwWd100Chk';
+
+
+
+          // !VA Not sure whether this should be Appobj[appObjProp] or Appobj['curImgW'] - keep an eye on it.
+          // !VA Branch: AddWidth100_111321A Commenting out for now
+          // Appobj.ccpImgItypeRdo === 'fixed' ? str = Appobj[appObjProp] : str = '100%';
           retObj = returnObject( appObjProp, str );
           return retObj;
         })(),
@@ -5686,6 +5715,9 @@ ${indent}<![endif]-->`;
     // !VA appController  
     // !VA CCP Configuration definitions for TD options and IMG excld radio. Note: alias and option parameters aren't accessed, including them as a console call and commenting out for now. This results in an error in the Outline view.
     function configDefault( alias, option ) {
+
+
+
       // console.log('configDefault alias :>> ' + alias +  '; option :>> ' + option);
       // !VA Alias and option are not used yet, are included mainly for debug. 
       let configObj, reflectArray, revealArray, highlightArray, radioArray, checkedArray;
@@ -5700,6 +5732,10 @@ ${indent}<![endif]-->`;
       }
       Appobj.ccpTblWraprChk = false;
       Appobj.ccpTblHybrdChk = false;
+      // !VA Branch: AddWidth100_111321A
+      Appobj.ccpTblWd100Chk = false;
+      Appobj.ccpTbwWd100Chk = false;
+
       Appobj.ccpImgClassTfd = '';
       Appobj.ccpImgLoctnTfd = 'img/';
       Appobj.ccpImgAnchrTfd = '#link';
@@ -6222,13 +6258,14 @@ ${indent}<![endif]-->`;
       if ( option === 'init') {
         // !VA Branch: 122220B
         // !VA Added ccpTdaBasicPar, removed ccpImgExcldRdo
-        revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaPdparGrp', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaExcldPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblBgclrTfd', 'ccpTblMaxwdTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
+        // !VA Branch: AddWidth100_111321A Width 100 added
+        revealArray = [ 'ccpImgClassTfd', 'ccpImgAltxtTfd', 'ccpImgLoctnTfd',  'ccpImgAnchrTfd','ccpImgAlignRdo', 'ccpImgItypeRdo', 'ccpImgTxclrTfd', 'ccpImgTargtChk', 'ccpImgCbhtmBtn', 'ccpTdaClassTfd', 'ccpTdaBgclrTfd', 'ccpTdaAlignRdo', 'ccpTdaValgnRdo', 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTdaPdparGrp', 'ccpTdaPdtopTfd', 'ccpTdaPdrgtTfd', 'ccpTdaPdbtmTfd', 'ccpTdaPdlftTfd', 'ccpTdaOptnsRdo', 'ccpTdaBasicPar', 'ccpTdaExcldPar', 'ccpTdaIswapPar', 'ccpTdaSwtchPar', 'ccpTdaBgimgPar', 'ccpTdaVmlbtPar', 'ccpTdaCbhtmBtn', 'ccpTblAlignRdo', 'ccpTblClassTfd', 'ccpTblWidthTfd', 'ccpTblWd100Chk', 'ccpTblBgclrTfd', 'ccpTblMaxwdTfd', 'ccpTblGhostChk', 'ccpTblWraprChk', 'ccpTblHybrdChk', 'ccpTblMsdpiChk', 'ccpTblCbhtmBtn' ];
       } else if (option === 'basic') {
 
         revealArray = [ ];
 
       } else if (option === 'iswap') {
-        revealArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];  
+        revealArray = [ 'ccpTdaWidthTfd', 'ccpTdaHeigtTfd', 'ccpTbwAlignRdo', 'ccpTbwClassTfd', 'ccpTbwWidthTfd', 'ccpTbwWd100Chk', 'ccpTbwMaxwdTfd', 'ccpTbwBgclrTfd', 'ccpTbwGhostChk', 'ccpTbwMsdpiChk' ];  
         // revealArray = [  ];  
       } else if (option === 'swtch') {
         revealArray = [ 'ccpTblMaxwdTfd' ];
