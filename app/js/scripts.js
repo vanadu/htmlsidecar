@@ -709,6 +709,8 @@ var Witty = (function () {
           // !VA Otherwise, set the element value to the current Appobj value.
           } else {
             el.value = Appobj[ alias ];
+            console.log(alias + ': el.value :>> ');
+            console.log(el.value);
           }
         } else {
           // !VA If the alias is a toolbar alias, just return - 
@@ -1389,6 +1391,7 @@ var Witty = (function () {
 
         }
         function populateCcpProperties(Appobj) {
+          console.log('populateCcpProperties running');
           // !VA Now initialize Appobj with the CCP element values. This includes ALL CCP elements, including those that are displayed/undisplayed depending on which TDOption or imgType radio is selected. 
           // !VA Loop through all the ccpUserInput elements and add their values to Appobj. The last three characters ( 11 - last ) are the alias code that identify the input type
           // !VA  radioState and checkboxState are called here before Appobj has been initialized, so the key argument is 'undefined'. This causes checkboxState and radioState to return the attribute value of the queried element as hard-coded in the HTML, thus initializing Appobj. 
@@ -1425,6 +1428,8 @@ var Witty = (function () {
               // Appobj[ key ] = checkboxState( [ key ] );
               // !VA Can't remove...testing setting them all to false and letting configDefault take over the rest
               Appobj[ key ] = false;
+              key === 'ccpTblWd100Chk' ? console.log(Appobj[ key ]) : false ;
+
             }
           }
         }
@@ -5167,6 +5172,7 @@ ${indent}<![endif]-->`;
     // !VA Returns the CCP configurations for each CCP UI element, i.e. the properties for configCCP methods.
     // !VA Note: 
     function fetchConfigObj( alias, option ) {
+      console.log('fetchConfigObj running');
       let configObj = [];
       // !VA Set the CCP configuration for specific user selections
       switch(true) {
@@ -5196,12 +5202,34 @@ ${indent}<![endif]-->`;
         // !VA Get the configObj, i.e. the methods and properties to pass to configCCP for configuring the CCP for the Hybrid option.
         configObj = configHybrd( alias, option );
         break;
-      
+
+      case alias === 'ccpTblWd100Chk' || alias === 'ccpTbwWd100Chk':
+        // !VA Get the configObj, i.e. the methods and properties to pass to configCCP for configuring the CCP for the Hybrid option.
+        // !VA Branch: AddWidth100_111321A
+        // !VA Here we send the 
+        // !VA mark2
+
+
+
+        configObj = 'returned from fetchConfigObj';
+
+
+
+
+        break;
+        
       default:
         console.log('ERROR in fetchConfigObj = Alias not recognized');
       } 
       return configObj;
     }
+
+    // function swapFieldValues( value1, value2) {
+
+
+
+    // }
+
 
 
     // !VA appController private
@@ -5296,7 +5324,6 @@ ${indent}<![endif]-->`;
       id = id.replace('ipt', 'chk');
       // !VA Convert the ID to the corresponding ccpUserInput alias/Appobj property and set it to isChecked
       alias = elemIdToAppobjProp(id);
-
       Appobj[alias] = isChecked;
       selectCheckbox( isChecked, alias );
     }
@@ -5415,6 +5442,26 @@ ${indent}<![endif]-->`;
         configObj = fetchConfigObj(  alias, isChecked );
         UIController.configCCP( configObj);
         break;
+        // !VA Branch: AddWidth100_111321A
+      case alias === 'ccpTblWd100Chk' || alias === 'ccpTbwWd100Chk':
+
+        // !VA Branch: AddWidth100_111321A
+        // !VA Here we run fetchConfigObj, passing alias and checked status. This returns the configObj that we pass to UIController.configCCP to update the CCP.
+        // !VA On second thought, I'm not sure we want to go through the whole reflect thing. That would mean we'd have to store the current Appobj.ccpTblWidthTfd property in temporary storage then change the Appobj.ccpTblWidthTfd to 100%, then change it back again. That's way too complicated. All we really want to do is toggle the CCP element value between 100% and its Appobj.ccpTblWidthTfd property value. We don't want to change Appobj.ccpTblWidthTfd at all. 
+
+
+
+        // !VA mark1
+
+
+        configObj = fetchConfigObj( alias, isChecked );
+        console.log('selectCheckbox configObj :>> ');
+        console.log(configObj);
+
+
+
+        break;
+
       case alias === 'ccpTblGhostChk':
         // !VA This alias is handled in CBController getAttributes and UIController makeImgNode. If checked, this element writes the target attribute to the img clipboard output. If unchecked, it does nothing - so it has no effect on the DOM. Keeping this condition in the switch, commenting out the console call.
         // console.log('ALERT in selectCheckbox - Unaccessed condition, Appobj ccpTblGhostChk is:' + Appobj['ccpTblGhostChk']);
@@ -5718,7 +5765,7 @@ ${indent}<![endif]-->`;
 
 
 
-      // console.log('configDefault alias :>> ' + alias +  '; option :>> ' + option);
+      console.log('configDefault alias :>> ' + alias +  '; option :>> ' + option);
       // !VA Alias and option are not used yet, are included mainly for debug. 
       let configObj, reflectArray, revealArray, highlightArray, radioArray, checkedArray;
       // !VA APPOBJ PROPERTIES
@@ -5815,8 +5862,6 @@ ${indent}<![endif]-->`;
         radioState: { radio: radioArray },
         highlightIcon: { highlight: highlightArray }
       };
-      // console.log('configDefault configObj :>> ');
-      // console.log(configObj);
       return configObj;
     }
 
@@ -6307,6 +6352,25 @@ ${indent}<![endif]-->`;
       };
       return configObj;
     }
+
+    function configWidth100( alias, isChecked) {
+      let reflectArray, configObj = [], flag;
+      isChecked ? flag = true : flag = false;
+
+
+
+      reflectArray = [ 'ccpTblWidthTfd'];
+
+      configObj = {
+        reflectAppobj: { caller: 'configItype', reflect: reflectArray },
+      };
+
+
+      return configObj;
+    }
+
+
+
 
     // !VA appController private
     // !VA Called from fetchConfigObj to get the HYBRD-specific configObj configuration properties to the  UIController configCCP function, which then applies DOM-level changes to the CCP. 
