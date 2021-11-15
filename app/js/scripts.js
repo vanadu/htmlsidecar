@@ -1321,7 +1321,10 @@ var Witty = (function () {
         // !VA Make sure the tbrContainer is off and the dropArea is on.
         // !VA TODO: Make function
         document.querySelector(staticContainers.imageLoader).style.display = 'flex';
+        
         document.querySelector(staticContainers.tbrContainer).style.display = 'none';
+        // !VA bug
+        // document.querySelector(staticContainers.tbrContainer).style.display = 'block';
         document.querySelector(inspectorElements.btnToggleCcp).style.display = 'none';
 
       },
@@ -3985,6 +3988,7 @@ ${indent}<![endif]-->`;
             setTimeout(() => {
               // Once the blob is loaded, show it and get its data
               curImg.onload = (function() {
+                // !VA HERE!
               // !VA Hide the drop area.
               // !VA TODO: Make function
               // !VA Branch: 120620A
@@ -4108,7 +4112,6 @@ ${indent}<![endif]-->`;
           imgData: result
         };
         // !VA Push imgObj to imgObjArray 
-
         imgObjArray.push(imgObj);
         // !VA If the loop iterator equals the number of files in the file list, then call ispMakeThumbs. Prevents it being called for each iteration.
         if ( i === imgObj.fileCount + 1 ) {
@@ -4467,7 +4470,6 @@ ${indent}<![endif]-->`;
 
     // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. This also handles the cases where the user enters 0 to blur, or leaves the input empty to blur, and the padding-specific handling of TD Width values. Note: This emulates the preventDefault behavior of the TAB key. Remember that if you set preventDefault on the TAB key, the blur event will still fire on mouse out and the result will be that the blur is handled twice. Handling the blur here and NOT on the TAB keypress avoids that trap.
     function handleBlur(evt) {
-      // debugger;
       console.log('handleBlur running'); 
       // !VA Create the object to store the Appobj property and current input value
       let reflectArray, checkedArray, userInputObj = {}, configObj = {};
@@ -6659,7 +6661,6 @@ ${indent}<![endif]-->`;
           // !VA TODO: Make function
           document.querySelector('.header-container').style.display = 'none';
           document.querySelector('.header-isolate-app').style.display = 'none';
-          document.querySelector('.content-section').style.display = 'none';
         } 
 
         // !VA First, populate Appobj with dynamicRegions and fill CCP elements with empty values

@@ -296,6 +296,7 @@ input[type=number] {
 // VA! Reboot 
 #toolbar-container {
   display: block;
+  display: flex !important;
   position: absolute;
   top: 0;
   left: 0;
@@ -1549,7 +1550,7 @@ output {
 .ccp-buttn-ctn {
   margin: 0;
   input {
-    margin: 0;padding: 0;
+    margin: 0;padding: 0
     // VA! Override the default border display for input elements. Otherwise, the button border will display even though the button itself's appearance is set to 0, so that the button border appears to the left of the background image icon.
     border: 0;
     outline: 0;
