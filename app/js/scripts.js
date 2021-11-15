@@ -709,8 +709,9 @@ var Witty = (function () {
           // !VA Otherwise, set the element value to the current Appobj value.
           } else {
             el.value = Appobj[ alias ];
-            console.log(alias + ': el.value :>> ');
-            console.log(el.value);
+            // !VA Branch: AddWidth100_111321A
+            // console.log(alias + ': el.value :>> ');
+            // console.log(el.value);
           }
         } else {
           // !VA If the alias is a toolbar alias, just return - 
@@ -723,8 +724,13 @@ var Witty = (function () {
     // !VA UIController private
     // !VA If called from populateAppobj, returns the value of checkbox input elements as hard-coded in the HTML. Otherwise, called by configCCP, which receives an array of aliases whose corresponding CCP element value is set to its corresponding Appobj value. 
     function checkboxState( checkedArray ) {
+      console.log('checkboxState running');
+      console.log('checkedArray :>> ');
+      console.log(checkedArray);
       let el, isChecked, isInit;
       for (let i = 0; i < checkedArray.length; i++) {
+        console.log('appController.getAppobj( checkedArray[i]) :>> ');
+        console.log(appController.getAppobj( checkedArray[i]));
         isChecked = appController.getAppobj( checkedArray[i]);
         // !VA Replace the 'chk' suffix in the alias with 'ipt' to target the checkbox input
         el = document.querySelector(ccpUserInput[checkedArray[i]].replace('chk', 'ipt'));
@@ -736,6 +742,8 @@ var Witty = (function () {
           return isChecked;
         } else  {
           // !VA If isInit is false, then Appobj is already populated, so get the checked state from Appobj and set the current elements' checked state to it.
+          console.log('Here el :>> ');
+          console.log(el);
           el.checked = isChecked;
         }
       }
@@ -863,6 +871,64 @@ var Witty = (function () {
           // !VA Pause 35 milliseconds between iterations
           }, 35 * i);
         })(i);
+      }
+    }
+    // !VA Branch: AddWidth100_111321A
+    // !VA Toggle can either be a two-item array or a single item array. If it's a two-item array, then the toggleWidth100 call originated in resizeContainers and was passed as a configObj property via configCPP. This is to ensure that the Width100 checked state persists across new image loads. It's necessary to query the DOM at that stage because populateAppobj doesn't get the initial Appobj properties from the actual state of the UI elements, but rather from the hard-coded HTML attributes at initialization. 
+    // !VA This works, but could be a lot DRYer - I made an attempt, see commented out code below, but it didn't work, and I need to get some sleep. 
+    function toggleWidth100( toggle ) {
+      console.log('toggleWidth100 running');
+      console.log('toggle :>> ');
+      console.log(toggle);
+      console.log('toggle.length :>> ');
+      console.log(toggle.length);
+      let el, widthEl;
+
+      // for (let i = 0; i < toggle.length; i++) {
+      //   if (toggle[i].includes('Tbl')) {
+      //     appController.getAppobj('ccpTblWd100Chk') ? document.querySelector(ccpUserInput.ccpTblWidthTfd).children[0].value = '100%' : document.querySelector(ccpUserInput.ccpTblWidthTfd).children[0].value = appController.getAppobj('ccpTblWidthTfd');
+
+      //   } else if (toggle[i].includes('Tbw')) {
+      //     appController.getAppobj('ccpTbwWd100Chk') ? document.querySelector(ccpUserInput.ccpTblwWidthTfd).children[0].value = '100%' : document.querySelector(ccpUserInput.ccpTbwWidthTfd).children[0].value = appController.getAppobj('ccpTbWidthTfd');
+      //   } else {
+      //     console.log('ERROR in toggleWidth100: unknown value');
+      //   }
+      // }
+
+
+      // !VA If the toggle array has more than one item
+      if (toggle.length > 1 ) {
+        // !VA Here we need to query the width100 checkboxes for their status and, depending on the checked property, toggle either 100% or the current Appobj property for table/table wrapper width into the table/table wrapper field.
+        // !VA Loop through the 2 array items
+        for (let i = 0; i < toggle.length; i++) {
+          // !VA Get the input element that owns the checked attribute by replacing the chk suffix with ipt.
+          el = document.querySelector(ccpUserInput[toggle[i]].replace('chk', 'ipt'));
+          // !VA widthEl is the CCP TBL/TBW width element corresponding to the array item. Replace the last 10 chars of the width100 alias to get the TBL/TBW width element.
+          widthEl = toggle[i].replace('Wd100Chk', 'WidthTfd');
+          console.log('widthEl :>> ');
+          console.log(widthEl);
+          // !VA If the width100 element is checked, write '100%' to the width field. Otherwise, reset the width field to the current Appobj property value.
+          if (el.checked) {
+            console.log('is checked');
+            document.querySelector(ccpUserInput[widthEl]).children[0].value = '100%';
+          } else {
+            document.querySelector(ccpUserInput[widthEl]).children[0].value = appController.getAppobj(widthEl);
+          }
+        }
+
+      } else {
+        if (toggle[0].includes('Tbl')) {
+          console.log('HIT');
+          // appController.getAppobj('ccpTblWd100Chk') ? console.log('TRUE') : console.log('FALSE');
+          appController.getAppobj('ccpTblWd100Chk') ? document.querySelector(ccpUserInput.ccpTblWidthTfd).children[0].value = '100%' : document.querySelector(ccpUserInput.ccpTblWidthTfd).children[0].value = appController.getAppobj('ccpTblWidthTfd');
+          // var foo = document.querySelector(ccpUserInput.ccpTblWidthTfd).children[0].value;
+          // console.log('foo :>> ');
+          // console.log(foo);
+        } else if (toggle[0].includes('Tbw')) {
+          appController.getAppobj('ccpTbwWd100Chk') ? document.querySelector(ccpUserInput.ccpTbwWidthTfd).children[0].value = '100%' : document.querySelector(ccpUserInput.ccpTbwWidthTfd).children[0].value = appController.getAppobj('ccpTbwWidthTfd');
+        } else {
+          console.log('ERROR in toggleWidth100: unknown value');
+        }
       }
     }
 
@@ -1262,6 +1328,14 @@ var Witty = (function () {
         document.querySelector(toolbarElements.iptTbrLPhonesW).value = curDeviceWidths[2];
         document.querySelector(toolbarElements.iptTbrLPhonesW).setAttribute('data-lphonesw', curDeviceWidths[2]);
 
+        // !VA Branch: AddWidth100_111321A
+        // !VA Reset width100 checkboxes to unchecked after each page reload
+        document.querySelector(ccpUserInput.ccpTblWd100Chk).children[0].checked = false;
+        document.querySelector(ccpUserInput.ccpTbwWd100Chk).children[0].checked = false;
+        // foo.checked = false;
+        // console.log('foo.checked :>> ');
+        // console.log(foo.checked);
+
         // !VA Make sure the tbrContainer is off and the dropArea is on.
         // !VA TODO: Make function
         document.querySelector(staticContainers.imageLoader).style.display = 'flex';
@@ -1288,6 +1362,8 @@ var Witty = (function () {
       // !VA UIController public
       // !VA Implement configuration settings/options for CCP UI DOM elements. This is basically a public router to private UIController functions to catch cross-module calls, whereby all arguments are passed in a single multidimensional configObj object.
       configCCP: function (configObj) {
+        // console.log('configObj :>> ');
+        // console.log(configObj);
         let retVal;
         // !VA 
         if ( configObj.reflectAppobj ) {
@@ -1322,6 +1398,10 @@ var Witty = (function () {
         }
         if ( configObj.highlightIcon ) {
           highlightIcon( configObj.highlightIcon.highlight );
+        }
+        // !VA Branch: AddWidth100_111321A
+        if ( configObj.toggleWidth100 ) {
+          toggleWidth100( configObj.toggleWidth100.toggle);
         }
         // if ( configObj.resetMkcss) {
         //   resetMkcss( configObj.resetMkcss.caller, configObj.resetMkcss.reset );
@@ -1391,7 +1471,6 @@ var Witty = (function () {
 
         }
         function populateCcpProperties(Appobj) {
-          console.log('populateCcpProperties running');
           // !VA Now initialize Appobj with the CCP element values. This includes ALL CCP elements, including those that are displayed/undisplayed depending on which TDOption or imgType radio is selected. 
           // !VA Loop through all the ccpUserInput elements and add their values to Appobj. The last three characters ( 11 - last ) are the alias code that identify the input type
           // !VA  radioState and checkboxState are called here before Appobj has been initialized, so the key argument is 'undefined'. This causes checkboxState and radioState to return the attribute value of the queried element as hard-coded in the HTML, thus initializing Appobj. 
@@ -1428,7 +1507,6 @@ var Witty = (function () {
               // Appobj[ key ] = checkboxState( [ key ] );
               // !VA Can't remove...testing setting them all to false and letting configDefault take over the rest
               Appobj[ key ] = false;
-              key === 'ccpTblWd100Chk' ? console.log(Appobj[ key ]) : false ;
 
             }
           }
@@ -1891,20 +1969,16 @@ var Witty = (function () {
           // !VA NOTE: The dependency between maxwidth and width is unclear. If there is a maxwidth, then width has to be a percent value. That's no yet implemented.
           // !VA imgType is fixed or fluid, depending on IMG itype, i.e. TBL width or 100%. 
           // !VA Not sure whether this should be Appobj[appObjProp] or Appobj['curImgW'] - keep an eye on it.
-          Appobj.ccpImgItypeRdo === 'fixed' ? str = Appobj[appObjProp] : str = '100%';
+          // !VA Branch: AddWidth100_111321A
+          if ( Appobj.ccpImgItypeRdo === 'fixed' ) {
+            Appobj.ccpTblWd100Chk ? str = '100%' : str = Appobj[appObjProp];
+          } else {
+            console.log('100');
+            str = '100%';
+          }
           retObj = returnObject( appObjProp, str );
-          return retObj;
-        })(),
-        // !VA Branch: AddWidth100_111321A
-        tableWd100: (function() {
-          appObjProp = 'ccpTblWd100Chk';
-
-
-
-          // !VA Not sure whether this should be Appobj[appObjProp] or Appobj['curImgW'] - keep an eye on it.
-          // !VA Branch: AddWidth100_111321A Commenting out for now
-          // Appobj.ccpImgItypeRdo === 'fixed' ? str = Appobj[appObjProp] : str = '100%';
-          retObj = returnObject( appObjProp, str );
+          console.log('retObj :>> ');
+          console.log(retObj);
           return retObj;
         })(),
         tableBgcolor: (function() {
@@ -1977,7 +2051,14 @@ var Witty = (function () {
           appObjProp = 'ccpTbwWidthTfd';
           // !VA NOTE: The dependency between maxwidth and width is unclear. If there is a maxwidth, then width has to be a percent value. That's no yet implemented.
           // !VA If the imgTyp is fixed, set the wrapper width to the value of the input field, which for the most part will be imgViewerW. If it's fluid, set it to 100%
-          imgType === 'fixed' ? str = Appobj[appObjProp] : str = '100%';
+          // !VA Branch: AddWidth100_111321A
+          if ( Appobj.ccpImgItypeRdo === 'fixed' ) {
+            Appobj.ccpTbwWd100Chk ? str = '100%' : str = Appobj[appObjProp];
+          } else {
+            console.log('100');
+            str = '100%';
+          }
+          // imgType === 'fixed' ? str = Appobj[appObjProp] : str = '100%';
           retObj = returnObject( appObjProp, str );
           return retObj;
         })(),
@@ -2102,13 +2183,11 @@ var Witty = (function () {
         case ( nodeDepth === 'tdaNode' ):
           console.log(`buildOutputNL id :>> ${id};`);
           // !VA basic option is selected 
-          console.log('Mark1');
           if ( selectedTdOption === 'basic') { 
             // !VA We can hardcode this for now, but that will be a problem if any other options with other nodes are added.
             hasAnchor ? extractPos = nl.length - 3 : extractPos = nl.length - 2;
             // !VA If imgExcld is selected, then extract nodes at position 5, i.e. without img or anchor
           } else if ( appController.getAppobj('ccpTdaOptnsRdo') === 'excld') {
-            console.log('HIT');
             extractPos = 5; 
             // !VA posswitch option is selected
           } else {
@@ -4419,9 +4498,9 @@ ${indent}<![endif]-->`;
     // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. This also handles the cases where the user enters 0 to blur, or leaves the input empty to blur, and the padding-specific handling of TD Width values. Note: This emulates the preventDefault behavior of the TAB key. Remember that if you set preventDefault on the TAB key, the blur event will still fire on mouse out and the result will be that the blur is handled twice. Handling the blur here and NOT on the TAB keypress avoids that trap.
     function handleBlur(evt) {
       // debugger;
-      // console.log('handleBlur running'); 
+      console.log('handleBlur running'); 
       // !VA Create the object to store the Appobj property and current input value
-      let reflectArray, userInputObj = {}, configObj = {};
+      let reflectArray, checkedArray, userInputObj = {}, configObj = {};
       let retVal;
       // !VA Get the Appobj/ccpUserInput alias from the target id
       userInputObj.appObjProp = elemIdToAppobjProp(evt.target.id);
@@ -4429,6 +4508,8 @@ ${indent}<![endif]-->`;
       userInputObj.evtTargetVal = evt.target.value;
       // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp  locally.
       let { appObjProp } = userInputObj;
+      console.log('appObjProp :>> ');
+      console.log(appObjProp);
       // !VA Get the return val from handlerUserInput - empty string, valid input or FALSE for error. Note; handleUserInput also sets the Appobj property of appObjProp if the input is valid.
       // !VA There are two ways to blur without a value. 1) The user enters a 0 and blurs or 2) the user deletes the existing value or blurs with an empty input. This doesn't apply to curImgW and curImgH which can never have a null or zero value. So condition the zero value handler to skip them
       if (appObjProp.substring( 0, 3) === 'ccp') {
@@ -4472,6 +4553,32 @@ ${indent}<![endif]-->`;
       } else {
         if ( appObjProp === 'curImgW' || appObjProp === 'curImgH') {
           this.value = '';
+        }
+        // !VA Branch: AddWidth100_111321A
+        // !VA The next two conditions test if 1) the focus is leaving a TBL/TBW width field and 2) the respective Wd100 checkbox for that field is checked. If it is and the field value is NOT 100%, then the Wd100 checkbox needs to be unchecked. This could be DRYer, but I'm tired and need to finish this.
+        if ( appObjProp === 'ccpTblWidthTfd' ) {
+          if (Appobj.ccpTblWd100Chk === true && this.value !== '100%' ) {
+            // !VA Set the Appobj property to false.
+            Appobj.ccpTblWd100Chk = false;
+            checkedArray = ['ccpTblWd100Chk'];
+            // !VA Set the checkboxState in the DOM to the Appobj property set above.
+            configObj = {
+              checkboxState: { checked: checkedArray },
+            };
+            UIController.configCCP( configObj );
+          }
+        }
+        if ( appObjProp === 'ccpTbwWidthTfd' ) {
+          if (Appobj.ccpTbwWd100Chk === true && this.value !== '100%' ) {
+            // !VA Set the Appobj property to false.
+            Appobj.ccpTbwWd100Chk = false;
+            checkedArray = ['ccpTbwWd100Chk'];
+            // !VA Set the checkboxState in the DOM to the Appobj property set above.
+            configObj = {
+              checkboxState: { checked: checkedArray },
+            };
+            UIController.configCCP( configObj );
+          }
         }
       }
       // !VA Write error to console if curImgW or curImgH is empty, could have repercussions
@@ -4629,7 +4736,6 @@ ${indent}<![endif]-->`;
           // !VA TODO: In fact, this is the exact same routine, so DRYify it in a private function. 
           // !VA Skip straight to handleUserInput if appObjProp is a Toolbar input, which cannot have a 0 or empty value
           if (appObjProp.substring( 0, 3) === 'ccp') {
-            console.log('Mark1');
             if ( Number(userInputObj.evtTargetVal) === 0 ) { 
               // !VA If the target input value is 0, convert it to empty, set the Appobj property to empty and reflect that to the CCP.
               Appobj[appObjProp] = '';
@@ -5111,6 +5217,7 @@ ${indent}<![endif]-->`;
     // !VA appController  
     // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values set in calcViewerSize, then runs writedynamicElementsDOM(Appobj, viewportH, appH) to size the containers. IMPORTANT: This is also where the Appobj properties for the Table Width and Table Wrapper Width input elements are initialized. By default, ccpTblWidthTfd and ccpTbwWidthTfd are set to curImgW and imgViewerW. However, some options override this default. For instance ccpTdaOptnsRdo = 'vmlbt' requires that the TBL Width be equal to the TDA Width because, if a 1px-wide gradient is used, the TD container needs to accommodate that. See the condition on Appobj.ccpTdaOptnsRdo below. 
     function resizeContainers()  {
+      console.log('resizeContainers running');
       // !VA This calculates the imgViewer, imgViewport and appContainer height based on Appobj values which are passed in from calcViewerSize.
       // !VA Initial height is 450, as explicitly defined in calcViewerSize. TOo much hassle to try and get the value as defined in the CSS programmatically.
       // !VA Note: This has dynamicRegion values that are not written back to Appobj after recalculation, this may be a problem at some point.
@@ -5155,11 +5262,18 @@ ${indent}<![endif]-->`;
       // UIController.stashAppobjProperties(true, tableWidth, tableWrapperWidth);
 
       // !VA Create the aliasArray to pass to configCCP. Include highlightIcon method - reflectAppobj adds those values to the TBL Width and TBW Width inputs so those icons have to be highlighted
+
+      // !VA Branch: AddWidth100_111321A 
+      // !VA We need to query the current state of the Width100 checkboxes. That is a UIController function, so let's handle that in toggleWidth100. Set the width100Array to include BOTH Width100 checkboxes. That is the ONLY condition when both of the checkboxes are included in the width100Array, since otherwise that configObj is populated as the result of a click on the checkbox icon, so the width100Array only receives the alias of the event target. Thus, when toggleWidth100 receives a two-item array, it knows we're initializing a new image, so the current checkbox state of both the width100 buttons has to be queried and written to Appobj 
+      let width100Array;
+      width100Array = [ 'ccpTblWd100Chk', 'ccpTbwWd100Chk'];
+
       aliasArray = [ 'ccpTblWidthTfd', 'ccpTbwWidthTfd'];
       // !VA reflectAppobj implements the Appobj properties in CCP elements so that the CCP reflects the current state of Appobj
       configObj = {
         reflectAppobj: { caller: 'resizeContainers', reflect: aliasArray },
-        highlightIcon: { highlight: aliasArray }
+        highlightIcon: { highlight: aliasArray },
+        toggleWidth100: { toggle: width100Array } 
       };
       UIController.configCCP( configObj );
       // console.log('resizeContainers Appobj :>> ');
@@ -5173,7 +5287,8 @@ ${indent}<![endif]-->`;
     // !VA Note: 
     function fetchConfigObj( alias, option ) {
       console.log('fetchConfigObj running');
-      let configObj = [];
+      let configObj = [];         
+      let width100Array;
       // !VA Set the CCP configuration for specific user selections
       switch(true) {
       case alias === 'default' :
@@ -5204,18 +5319,14 @@ ${indent}<![endif]-->`;
         break;
 
       case alias === 'ccpTblWd100Chk' || alias === 'ccpTbwWd100Chk':
-        // !VA Get the configObj, i.e. the methods and properties to pass to configCCP for configuring the CCP for the Hybrid option.
-        // !VA Branch: AddWidth100_111321A
-        // !VA Here we send the 
-        // !VA mark2
 
-
-
-        configObj = 'returned from fetchConfigObj';
-
-
-
-
+        // !VA Branch: AddWidth100_111321A - no need to create a separate configuration function, since we're only updating the CCP UI for one element, i.e. the width field corresponding to the clicked width100 button. So just set the Appobj for the alias to the option.
+        Appobj[alias] = option;
+        width100Array = [ alias ];
+        // configObj = 'returned from fetchConfigObj';
+        configObj = { 
+          toggleWidth100: { toggle: width100Array } 
+        };
         break;
         
       default:
@@ -5447,7 +5558,7 @@ ${indent}<![endif]-->`;
 
         // !VA Branch: AddWidth100_111321A
         // !VA Here we run fetchConfigObj, passing alias and checked status. This returns the configObj that we pass to UIController.configCCP to update the CCP.
-        // !VA On second thought, I'm not sure we want to go through the whole reflect thing. That would mean we'd have to store the current Appobj.ccpTblWidthTfd property in temporary storage then change the Appobj.ccpTblWidthTfd to 100%, then change it back again. That's way too complicated. All we really want to do is toggle the CCP element value between 100% and its Appobj.ccpTblWidthTfd property value. We don't want to change Appobj.ccpTblWidthTfd at all. 
+        // !VA On second thought, I'm not sure we want to go through the whole reflect thing. That would mean we'd have to store the current Appobj.ccpTblWidthTfd property in temporary storage then change the Appobj.ccpTblWidthTfd to 100%, then change it back again. That's way too complicated. All we really want to do is toggle the CCP element value between 100% and its Appobj.ccpTblWidthTfd property value. We don't want to change Appobj.ccpTblWidthTfd at all. From here we call fetchConfigObject. And pass the alias and true false value to a configuration function that returns a config object. That config object is then passed to UIController.configCCP which parses the config object for reflect properties etc  
 
 
 
@@ -5455,8 +5566,8 @@ ${indent}<![endif]-->`;
 
 
         configObj = fetchConfigObj( alias, isChecked );
-        console.log('selectCheckbox configObj :>> ');
-        console.log(configObj);
+        UIController.configCCP( configObj );
+
 
 
 
@@ -5762,10 +5873,7 @@ ${indent}<![endif]-->`;
     // !VA appController  
     // !VA CCP Configuration definitions for TD options and IMG excld radio. Note: alias and option parameters aren't accessed, including them as a console call and commenting out for now. This results in an error in the Outline view.
     function configDefault( alias, option ) {
-
-
-
-      console.log('configDefault alias :>> ' + alias +  '; option :>> ' + option);
+      // console.log('configDefault alias :>> ' + alias +  '; option :>> ' + option);
       // !VA Alias and option are not used yet, are included mainly for debug. 
       let configObj, reflectArray, revealArray, highlightArray, radioArray, checkedArray;
       // !VA APPOBJ PROPERTIES
@@ -5846,7 +5954,7 @@ ${indent}<![endif]-->`;
       // !VA radioState METHOD: set the elements whose selected value is to be set to the Appobj properties above.
       // radioArray = [  'ccpImgAlignRdo', 'ccpImgExcldRdo', 'ccpImgItypeRdo', 'ccpTdaAlignRdo' , 'ccpTdaValgnRdo', 'ccpTblAlignRdo', 'ccpTbwAlignRdo', 'ccpTdaOptnsRdo' ];
       radioArray = [  'ccpImgAlignRdo', 'ccpImgItypeRdo', 'ccpTdaAlignRdo' , 'ccpTdaValgnRdo', 'ccpTblAlignRdo', 'ccpTbwAlignRdo', 'ccpTdaOptnsRdo' ];
-      // !VA checkboxState METHOD: set the checkboxes whose checked value is to be set to the Appobj properties above.
+      // !VA checkboxState METHOD: set the checkboxes whose checked value is to be set to the Appobj properties abfove.
 
 
       // !VA Branch: 111320C
@@ -6353,21 +6461,6 @@ ${indent}<![endif]-->`;
       return configObj;
     }
 
-    function configWidth100( alias, isChecked) {
-      let reflectArray, configObj = [], flag;
-      isChecked ? flag = true : flag = false;
-
-
-
-      reflectArray = [ 'ccpTblWidthTfd'];
-
-      configObj = {
-        reflectAppobj: { caller: 'configItype', reflect: reflectArray },
-      };
-
-
-      return configObj;
-    }
 
 
 
