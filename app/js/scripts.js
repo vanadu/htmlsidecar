@@ -1321,10 +1321,7 @@ var Witty = (function () {
         // !VA Make sure the tbrContainer is off and the dropArea is on.
         // !VA TODO: Make function
         document.querySelector(staticContainers.imageLoader).style.display = 'flex';
-        
         document.querySelector(staticContainers.tbrContainer).style.display = 'none';
-        // !VA bug
-        // document.querySelector(staticContainers.tbrContainer).style.display = 'block';
         document.querySelector(inspectorElements.btnToggleCcp).style.display = 'none';
 
       },
@@ -2842,8 +2839,8 @@ var Witty = (function () {
       arcsize = (Attributes.tdBorderRadius.str/Attributes.tdHeight.str * 100).toFixed(0) + '%';
       console.log(`arcsize :>> ${arcsize};`);
       // !VA Define the innerHTML of the vmlbutton code
-      vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${Attributes.imgAnchor.str}" style="height:${Attributes.tdHeight.str}px;v-text-anchor:middle;width:${Attributes.tdWidth.str}px;" arcsize="${arcsize}" strokecolor="${Attributes.tdBorderColor.str}" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc.str}" color="${Attributes.tdBgcolor.str}" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:${Attributes.tdTextColor.str};font-family:sans-serif;font-size:13px;font-weight:bold;">Button Text!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="${Attributes.imgAnchor.str}"
-style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});border:1px solid ${Attributes.tdBorderColor.str};border-radius:${Attributes.tdBorderRadius.str}px;color:${Attributes.tdTextColor.str};display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:${Attributes.tdHeight.str}px;text-align:center;text-decoration:none;width:${Attributes.tdWidth.str}px;-webkit-text-size-adjust:none;mso-hide:all;">Button Text!</a></div>`;
+      vmlButtonStr = `${linebreak}${getIndent(indentLevel)}<div><!--[if mso]>${linebreak}${getIndent(indentLevel)}<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${Attributes.imgAnchor.str}" style="height:${Attributes.tdHeight.str}px;v-text-anchor:middle;width:${Attributes.tdWidth.str}px;" arcsize="${arcsize}" strokecolor="${Attributes.tdBorderColor.str}" fill="t">${linebreak}${getIndent(indentLevel)}<v:fill type="tile" src="${Attributes.imgSrc.str}" color="${Attributes.tdBgcolor.str}" />${linebreak}${getIndent(indentLevel)}${linebreak}${getIndent(indentLevel)}<w:anchorlock/>${linebreak}${getIndent(indentLevel)}<center style="color:${Attributes.tdTextColor.str};font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:bold;">VML Button!</center>${linebreak}${getIndent(indentLevel)}</v:roundrect>${linebreak}${getIndent(indentLevel)}<![endif]--><a href="${Attributes.imgAnchor.str}"
+style="background-color:#556270;background-image:url(${Attributes.imgSrc.str});border:1px solid ${Attributes.tdBorderColor.str};border-radius:${Attributes.tdBorderRadius.str}px;color:${Attributes.tdTextColor.str};display:inline-block;font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:bold;line-height:${Attributes.tdHeight.str}px;text-align:center;text-decoration:none;width:${Attributes.tdWidth.str}px;-webkit-text-size-adjust:none;mso-hide:all;">VML Button!</a></div>`;
       try {
         !vmlButtonStr;
       } catch (error) {
