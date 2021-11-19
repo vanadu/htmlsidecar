@@ -954,7 +954,7 @@ var Witty = (function () {
     // !VA Reveal and conceal individual CCP container elements with sequential animation. revealType specifies whether the existing reveal configuration should be updated with the revealArray items or whether a different reveal configuration should be set based on a comparison between the revealArray elements and the default revealInit array. the revealType arguments are 'update' and 'config'.
 
     function revealElements ( caller, revealType, revealArray) {
-      console.log(`revealElements caller :>> ${caller}; revealType :>> ${revealType}; revealElements: revealArray :>> ${revealArray}; `);
+      // console.log(`revealElements caller :>> ${caller}; revealType :>> ${revealType}; revealElements: revealArray :>> ${revealArray}; `);
       let el, obj = {}, revealObj = {}, currentObj = {}, uniqueObj = {};
       // console.log('revealElements revealArray :>> ');
       // console.log(revealArray);
@@ -1020,12 +1020,8 @@ var Witty = (function () {
       } else if ( revealType === 'config') {
         // !VA Get an object containing the current reveal configuration before the new configuration is implemented. This will be used to compare against the new configuration to filter out items that are identical between the current and the new configuration so that these are not included in the reveal/conceal animation 
         currentObj = getCurrentObj();
-        console.log('currentObj :>> ');
-        console.log(currentObj);
         // !VA Get an object containing the default reveal configuration. 
         revealObj = getInitObj();
-        console.log('revealObj :>> ');
-        console.log(revealObj);
         // !VA Import the revealArray into revealObj, setting the reveal/conceal flag property accordingly. The reveal/conceal flag is used to toggle the reveal state of the items based on revealArray
         for (const entry of Object.entries(revealObj)) {
           for (let i = 0; i < revealArray.length; i++) {
@@ -4467,24 +4463,29 @@ ${indent}<![endif]-->`;
 
     // !VA Called from input event handler in setupEventListeners. This replicates handleKeydown in that it calls handleUserInput to do error checking, then handles how the input elements respond to the return values. This also handles the cases where the user enters 0 to blur, or leaves the input empty to blur, and the padding-specific handling of TD Width values. Note: This emulates the preventDefault behavior of the TAB key. Remember that if you set preventDefault on the TAB key, the blur event will still fire on mouse out and the result will be that the blur is handled twice. Handling the blur here and NOT on the TAB keypress avoids that trap.
     function handleBlur(evt) {
-      console.log('handleBlur running'); 
       // !VA Create the object to store the Appobj property and current input value
       let reflectArray, checkedArray, userInputObj = {}, configObj = {};
       let retVal;
+      let appMessCode, isErr;
       // !VA Get the Appobj/ccpUserInput alias from the target id
       userInputObj.appObjProp = elemIdToAppobjProp(evt.target.id);
       // !VA evtTargetVal is the value the user entered into the input element.
       userInputObj.evtTargetVal = evt.target.value;
       // !VA Now that userInputObj is created for passing as argument, destructure it to use appObjProp  locally.
       let { appObjProp } = userInputObj;
-      console.log('appObjProp :>> ');
-      console.log(appObjProp);
       // !VA Get the return val from handlerUserInput - empty string, valid input or FALSE for error. Note; handleUserInput also sets the Appobj property of appObjProp if the input is valid.
       // !VA There are two ways to blur without a value. 1) The user enters a 0 and blurs or 2) the user deletes the existing value or blurs with an empty input. This doesn't apply to curImgW and curImgH which can never have a null or zero value. So condition the zero value handler to skip them
       if (appObjProp.substring( 0, 3) === 'ccp') {
         if ( Number(userInputObj.evtTargetVal) === 0 ) { 
           // !VA If the target input value is 0, convert it to empty, set the Appobj property to empty and reflect that to the CCP.
           if (Number(userInputObj.evtTargetVal) === 0) {
+            // !VA Trap the error if VML button is selected and the TD width or height field is empty and write the error message to the message bar.
+            if (  userInputObj.appObjProp === 'ccpTdaWidthTfd' || userInputObj.appObjProp === 'ccpTdaHeigtTfd' ) {
+              if (Appobj.ccpTdaOptnsRdo === 'vmlbt') {
+                isErr = true;
+                appMessCode = 'err_vmlbutton_no_value';
+              }
+            }
             Appobj[appObjProp] = '';
             reflectArray = [ appObjProp ];
             configObj = {
@@ -4560,6 +4561,17 @@ ${indent}<![endif]-->`;
       }
       // console.log('handleBlur userInputObj :>> ');
       // console.log(userInputObj);
+
+      // !VA Error condition - pass the appMessCode to handleAppMessages
+      if (isErr) {
+        // !VA IF Error pass the code to errorHandler to get the error message
+        appController.handleAppMessages( appMessCode );
+        // !VA Move the focus back to the event target - This needs to be much DRYer.
+        this.focus();
+        this.select();
+        return;
+      } 
+
     }
 
     // !VA appController   
@@ -4970,22 +4982,34 @@ ${indent}<![endif]-->`;
           }
           break;
         case (appObjProp === 'ccpTbwWidthTfd') :
+
           // !VA If imgExcld 'excld' is checked, then:
           if (Appobj.ccpTdaOptnsRdo === 'excld') {
             // !VA retVal must be greater than TBL W and less than imgViewrW
             if (retVal > Appobj.imgViewerW) {
               isErr = true;
-              appMessCode = 'err_wrapper_table_wider_than_devicewidth';
+              appMessCode = 'err_wrapper_table_wider_than_defaulttablewidth';
             } else if ( retVal < Appobj.ccpTblWidthTfd ) {
               isErr = true;
               appMessCode = 'err_parent_table_greater_than_wrapper';
             }
           // !VA If imgExcld 'incld' is checked, then:
           } else {
+            console.log('Appobj.ccpTdaOptnsRdo :>> ');
+            console.log(Appobj.ccpTdaOptnsRdo);
+            console.log('HERE retVal :>> ');
+            console.log(retVal);
+            console.log(' Appobj:');
+            console.dir(Appobj);
             if (retVal < Appobj.curImgW ) {
               // !VA errorHandler!
               isErr = true;
               appMessCode = 'err_img_wider_than_parent_table';
+            } 
+            if (retVal > Appobj.imgViewerW ) {
+              // !VA errorHandler!
+              isErr = true;
+              appMessCode = 'err_wrapper_table_wider_than_defaulttablewidth';
             } 
           }
           break;
@@ -5687,7 +5711,7 @@ ${indent}<![endif]-->`;
         err_table_cell_wider_than_parent_table: 'Table cell cannot be wider than parent table',
         err_img_wider_than_parent_table: 'Table must be at least as wide as the image it contains',
         err_parent_table_wider_than_wrapper_table: 'Parent table cannot be wider than its own container',
-        err_wrapper_table_wider_than_devicewidth: 'Wrapper table cannot exceed devicewidth',
+        err_wrapper_table_wider_than_defaulttablewidth: 'Wrapper table cannot exceed default table width',
         err_parent_table_greater_than_wrapper: 'Parent table width cannot be greater than wrapper table width',
 
 
@@ -6095,10 +6119,6 @@ ${indent}<![endif]-->`;
         // console.log(configObj);
         // console.log('configOptns basic Appobj :>> ');
         // console.log(Appobj);
-
-        console.log('HERE');
-        console.log('configObj :>> ');
-        console.log(configObj);
 
         break;
       case option === 'excld':
